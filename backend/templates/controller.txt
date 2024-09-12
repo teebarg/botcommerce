@@ -1,0 +1,87 @@
+# api/{{name}}.py
+
+from typing import Any
+
+from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
+
+import crud
+import deps
+from models.{{name}} import {{cname}}
+
+# Create a router for {{name}}
+router = APIRouter()
+
+
+@router.get("/", response_model=dict[str, Any])
+async def index(
+    db: deps.SessionDep, name: str = "", page: int = Query(default=1, gt=0), per_page: int = Query(default=20, le=100)
+):
+    """
+    Get all {{name}}s.
+
+    :param db: The database session dependency.
+    :param name: Optional name parameter to filter {{cname}}s by name.
+    :param page: Optional page parameter for pagination.
+    :param per_page: Optional per_page parameter for pagination (default: 20, max: 100).
+    :return: A dictionary containing the list of {{cname}}s, page, and per_page.
+    """
+    queries = {"name": name}
+
+    {{name}}s = crud.{{name}}.get_multi(db=db, queries=queries, per_page=per_page, offset=page)
+    return {
+        "{{name}}s": {{name}}s,
+        "page": page,
+        "per_page": per_page,
+    }
+
+
+@router.get("/{id}", response_model={{cname}})
+async def show(id: str, db: deps.SessionDep):
+    """
+    Get a specific {{name}} by ID.
+    """
+    if {{name}} := crud.{{name}}.get(db=db, id=id):
+        return {{name}}
+    raise HTTPException(status_code=404, detail="{{cname}} not found.")
+
+
+@router.post("/", response_model={{cname}}, status_code=201)
+async def create({{name}}: {{cname}}Create, db: deps.SessionDep):
+    """
+    Create a new {{name}}.
+    """
+    try:
+        return crud.{{name}}.create(db=db, obj_in={{name}})
+    except IntegrityError as e:
+        raise HTTPException(status_code=422, detail=f"An error occurred, {e.orig.pgerror}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred, {e}")
+
+
+@router.put("/{id}", response_model={{cname}})
+async def update(id: int, update: {{cname}}Update, db: deps.SessionDep):
+    """
+    Update a specific {{name}} by ID.
+    """
+    try:
+        if {{name}} := crud.{{name}}.get(db=db, id=id):
+            return crud.{{name}}.update(db=db, db_obj={{name}}, obj_in=update)
+        raise HTTPException(status_code=404, detail="{{cname}} not found.")
+    except IntegrityError as e:
+        raise HTTPException(status_code=422, detail=f"Error updating {{name}}, {e.orig.pgerror}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating {{name}}, {e}")
+
+
+@router.delete("/{id}", response_model={{cname}})
+async def delete(id: int, db: deps.SessionDep):
+    """
+    Get a specific {{name}} by ID.
+    """
+    try:
+        if {{name}} := crud.{{name}}.remove(db=db, id=id):
+            return {{name}}
+        raise HTTPException(status_code=404, detail="{{cname}} not found.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting {{name}}, invalid {{name}} id, {e}")

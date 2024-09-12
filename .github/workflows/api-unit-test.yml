@@ -1,0 +1,32 @@
+name: Api Unit Test
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**.py'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  api_unit_test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+          python-version: 3.11
+          cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+          pip install -r ./backend/requirements.dev.txt
+
+    - name: Run Tests
+      run: cd backend && make test

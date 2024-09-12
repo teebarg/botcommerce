@@ -1,0 +1,98 @@
+services:
+  traefik:
+    image: traefik:v2.9
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.http.address=:4000
+      # - --log.level=DEBUG  # Debug logging
+    ports:
+      - 4000:4000 # HTTP entrypoint
+      - 4001:8080 # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik-network
+    labels:
+      # Enable Traefik
+      - traefik.enable=true
+      # Dashboard route setup
+      - traefik.http.routers.traefik-dashboard.entrypoints=http
+      - traefik.http.routers.traefik-dashboard.rule=Host(`traefik.localhost`)
+      - traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik-dashboard.service=api@internal
+
+  backend:
+    image: 'botcommerce-backend:${TAG-latest}'
+    container_name: botcommerce-backend
+    labels:
+      - traefik.enable=true
+      # Route traffic on port 8000 to the backend service
+      - traefik.http.routers.botcommerce-backend-router.entrypoints=http
+      - traefik.http.routers.botcommerce-backend-router.rule=Host(`api.localhost`)
+      - traefik.http.services.botcommerce-backend-service.loadbalancer.server.port=8000
+    networks:
+      - traefik-network
+    env_file:
+      - ./backend/.env
+    build:
+      context: ./backend
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-false}
+    platform: linux/amd64 # Patch for M1 Mac
+    volumes:
+      - ./backend/:/app
+
+
+  frontend:
+    image: 'botcommerce-frontend:${TAG-latest}'
+    container_name: botcommerce-frontend
+    labels:
+      - traefik.enable=true
+      # Route traffic on port 3000 to the frontend service
+      - traefik.http.routers.botcommerce-frontend-router.entrypoints=http
+      - traefik.http.routers.botcommerce-frontend-router.rule=Host(`store.localhost`)
+      - traefik.http.services.botcommerce-frontend-service.loadbalancer.server.port=3000
+    networks:
+      - traefik-network
+    depends_on:
+      - backend
+    build:
+      context: ./frontend
+      args:
+        - NODE_ENV=production
+    command: npm run dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./frontend/.env
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.5
+    container_name: botcommerce-meilisearch
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-masterKey}
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_ENV=development
+    ports:
+      - "7700:7700"
+    networks:
+      - traefik-network
+    volumes:
+      - ./meilisearch-data:/meili_data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.meilisearch.rule=Host(`meilisearch.localhost`)
+      - traefik.http.services.meilisearch.loadbalancer.server.port=7700
+
+volumes:
+  volume-data:
+
+networks:
+  traefik-network:
+    name: traefik-network
+    external: true

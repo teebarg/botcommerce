@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: monthly
+      day: friday
+    commit-message:
+      prefix: ⬆
+  # Python
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: monthly
+      day: friday
+    ignore:
+      - dependency-name: "gevent"
+    commit-message:
+      prefix: ⬆
+  # Npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: monthly
+      day: friday
+    commit-message:
+      prefix: ⬆

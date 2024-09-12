@@ -1,0 +1,12 @@
+*.pyc
+*.pyo
+__pycache__
+.dockerignore
+.docker
+.git
+.env
+cred.json
+app.log
+
+.idea/
+.vercel

@@ -1,0 +1,42 @@
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+# Exclude specific directories or files
+exclude = ["migrations", "node_modules", "__pycache__", "alembic"]
+# Max line length
+line-length = 90
+indent-width = 4
+
+[tool.ruff.lint]
+# List of enabled rules
+select = [
+    "B",      # flake8-bugbear
+    "C",      # flake8-comprehensions
+    "C90",    # mccabe
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "I",      # isort
+    "Q",      # flake8-quotes
+    "RUF100", # Unused noqa directive
+]
+
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0

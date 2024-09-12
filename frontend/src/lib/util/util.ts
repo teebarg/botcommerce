@@ -1,0 +1,108 @@
+const buildUrl = (baseUrl: string, queryParams: Record<string, string | number | Date | undefined | null>): string => {
+    let url = baseUrl;
+    let firstQueryParam = true;
+
+    for (const key in queryParams) {
+        if (!queryParams[key]) continue;
+        // eslint-disable-next-line no-prototype-builtins
+        if (queryParams.hasOwnProperty(key)) {
+            if (firstQueryParam) {
+                url += `?${key}=${queryParams[key]}`;
+                firstQueryParam = false;
+            } else {
+                url += `&${key}=${queryParams[key]}`;
+            }
+        }
+    }
+
+    return url;
+};
+
+const currency = (number: number): string => {
+    return number.toLocaleString("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 });
+};
+
+const imgSrc = (image: string): string => {
+    return `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}?alt=media`;
+};
+
+const capitalize = (str: string): string => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// eslint-disable-next-line
+const debounce = <T extends (...args: any[]) => void>(func: T, delay: number): ((...args: Parameters<T>) => void) => {
+    let timer: NodeJS.Timeout;
+
+    return (...args: Parameters<T>) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+};
+
+const isEqual = (value: any, other: any): boolean => {
+    // Check if the values are strictly equal
+    if (value === other) {
+        return true;
+    }
+
+    // Check if either value is null or undefined
+    if (value == null || other == null) {
+        return value === other;
+    }
+
+    // Check if the types are different
+    if (typeof value !== typeof other) {
+        return false;
+    }
+
+    // Handle arrays
+    if (Array.isArray(value) && Array.isArray(other)) {
+        if (value.length !== other.length) {
+            return false;
+        }
+        for (let i = 0; i < value.length; i++) {
+            if (!isEqual(value[i], other[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Handle objects
+    if (typeof value === "object" && typeof other === "object") {
+        const valueKeys = Object.keys(value);
+        const otherKeys = Object.keys(other);
+
+        if (valueKeys.length !== otherKeys.length) {
+            return false;
+        }
+
+        for (const key of valueKeys) {
+            if (!otherKeys.includes(key) || !isEqual(value[key], other[key])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // For all other types, use strict equality
+    return value === other;
+};
+
+const omit = <T extends object, K extends keyof T>(obj: T, keys: K[] | K): Omit<T, K> => {
+    const keysToOmit = Array.isArray(keys) ? keys : [keys];
+    const result = { ...obj };
+
+    for (const key of keysToOmit) {
+        delete result[key];
+    }
+
+    return result as Omit<T, K>;
+};
+
+export { imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit };
