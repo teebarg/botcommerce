@@ -5,7 +5,7 @@ from typing import Annotated, Generator, Union
 import firebase_admin
 import jwt
 from fastapi import Cookie, Depends, HTTPException, Response, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
 from firebase_admin import credentials, storage
 from google.cloud.storage.bucket import Bucket
 from jwt.exceptions import InvalidTokenError
@@ -31,9 +31,9 @@ def get_db() -> Generator:
 
 
 SessionDep = Annotated[Session, Depends(get_db)]
-TokenDep = Annotated[str, Depends(reusable_oauth2)]
-# TokenDep2 = Annotated[str, Depends(APIKeyHeader(name="X-Auth"))]
-TokenDep2 = Annotated[Union[str, None], Cookie()]
+# TokenDep = Annotated[str, Depends(reusable_oauth2)]
+TokenDep = Annotated[str, Depends(APIKeyHeader(name="X-Auth"))]
+# TokenDep2 = Annotated[Union[str, None], Cookie()]
 
 
 def get_storage() -> Generator:
@@ -56,7 +56,7 @@ def get_storage() -> Generator:
 Storage = Annotated[Bucket, Depends(get_storage)]
 
 
-def get_current_user(session: SessionDep, access_token: TokenDep2) -> User:
+def get_current_user(session: SessionDep, access_token: TokenDep) -> User:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]

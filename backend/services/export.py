@@ -1,8 +1,9 @@
 import asyncio
 import os
 from datetime import datetime
-from io import BytesIO
+from io import BytesIO, StringIO
 from typing import Any, Dict
+import pandas as pd
 
 from fastapi import (
     HTTPException,
@@ -15,8 +16,6 @@ from core.deps import (
 from core.logging import logger
 from core.utils import generate_data_export_email, send_email
 from models.generic import UploadStatus
-from services.pd import data_to_csv
-from services.storage import upload_to_firebase
 
 upload_statuses: Dict[str, UploadStatus] = {}
 
@@ -60,25 +59,36 @@ async def send_status_update(task_id: str):
 
 
 async def export(data: list, name: str, bucket: Any, email: str, columns: list) -> str:
-    return "https://google.com"
-    # Get the current date
-    # current_date = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
-    # filename = f"{name}_export_{current_date}.csv"
-    # csv = data_to_csv(columns=columns, items=data, filename=filename)
-    # file_url = await upload_to_firebase(file_path=csv, bucket=bucket)
+    try:
+        # Convert data to CSV
+        df = pd.DataFrame(data, columns=columns)
+        csv_buffer = StringIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_content = csv_buffer.getvalue()
 
-    # # Send download link
-    # email_data = generate_data_export_email(download_link=file_url)
-    # send_email(
-    #     email_to=email,
-    #     subject=email_data.subject,
-    #     html_content=email_data.html_content,
-    # )
+        # Generate a unique filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{name}_export_{timestamp}.csv"
 
-    # # Clean up
-    # os.remove(f"./{filename}")
+        # Upload to Firebase
+        blob = bucket.blob(f"exports/{filename}")
+        blob.upload_from_string(csv_content, content_type='text/csv')
+        blob.make_public()
+        download_url = blob.public_url
 
-    # return file_url
+        # Send email with download link
+        email_data = generate_data_export_email(download_link=download_url)
+        send_email(
+            email_to=email,
+            subject=f"{name} Export Ready",
+            html_content=email_data.html_content,
+        )
+
+        return download_url
+    except Exception as e:
+        logger.error(f"Error in export function: {e}")
+        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+    
 
 
 async def validate_file(file, size: int = 1.5) -> None:

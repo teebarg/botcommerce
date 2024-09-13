@@ -1,11 +1,10 @@
-
-
 import { cache } from "react";
 import sortProducts from "@lib/util/sort-products";
 import transformProductPreview from "@lib/util/transform-product-preview";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 import { Product, ProductCategoryWithChildren } from "types/global";
 import { cookies } from "next/headers";
+import { buildUrl } from "@lib/util/util";
 
 const emptyResponse = {
     response: { products: [], count: 0 },
@@ -71,6 +70,34 @@ export const getCart = cache(async function (cartId: string) {
     //         return null;
     //     });
 });
+
+export const getProducts = cache(async function (
+    search?: string,
+    collections?: string,
+    page?: number,
+    per_page?: number
+) {
+    const headers = getHeaders([]);
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { search, collections, page, per_page });
+    const res = await fetch(url, {
+        cache: "no-store",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+        },
+    }).catch((error) => {
+        console.error("Error fetching products:", error);
+        return null;
+    });
+
+    if (!res) {
+        return null;
+    }
+
+    const data = await res.json();
+    return data
+});
+
 
 export async function addItem({ cartId, quantity }: { cartId: string; quantity: number }) {
     const headers = getHeaders(["cart"]);
@@ -200,7 +227,6 @@ export async function getToken(credentials: any) {
     //                 sameSite: "strict",
     //                 secure: process.env.NODE_ENV === "production",
     //             });
-
     //         return access_token;
     //     })
     //     .catch((err) => {
@@ -297,7 +323,6 @@ export const listRegions = cache(async function () {
     //     .then(({ regions }) => regions)
     //     .catch((err) => {
     //         console.log(err);
-
     //         return null;
     //     });
 });
@@ -524,10 +549,7 @@ export const retrieveCollection = cache(async function (id: string) {
     //     });
 });
 
-export const getCollectionsList = cache(async function (
-    offset: number = 0,
-    limit: number = 100
-): Promise<{ collections: any[]; count: number }> {
+export const getCollectionsList = cache(async function (offset: number = 0, limit: number = 100): Promise<{ collections: any[]; count: number }> {
     // const collections = await client.collections
     //     .list({ limit, offset }, { next: { tags: ["collections"] } })
     //     .then(({ collections }) => collections)
@@ -652,7 +674,6 @@ export const getCategoryByHandle = cache(async function (categoryHandle: string[
         //     .catch(() => {
         //         return {} as any;
         //     });
-
         // product_categories.push(category);
     }
 

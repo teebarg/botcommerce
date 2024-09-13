@@ -10,6 +10,7 @@ export type Product = {
     image: string;
     is_active?: boolean;
     ratings?: number;
+    created_at?: string;
 };
 
 export type FeaturedProduct = {
@@ -57,3 +58,28 @@ export type ProductCategoryWithChildren = Omit<any, "category_children"> & {
     category_children: any[];
     category_parent?: any;
 };
+
+export type User = {
+    id: number;
+    firstname: string;
+    email: string;
+    role: string;
+    status: string;
+    created_at: string;
+};
+
+export type Pagination = {
+    page: number;
+    per_page: number;
+    total_count: number;
+    total_pages: number;
+};
+
+export enum FileTypes {
+    png = "image/png",
+    jpeg = "image/jpeg",
+    jpg = "image/jpg",
+    csv = "text/csv",
+    xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    xls = "application/vnd.ms-excel",
+}

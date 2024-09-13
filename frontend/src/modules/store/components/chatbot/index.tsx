@@ -15,16 +15,18 @@ export const Chatbot: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('chatbotOpen') !== 'false';
+        }
+        return false;
+    });
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        if (!isOpen) return; // Don't set initial messages if chat is closed
 
-    useEffect(() => {
         const timer = setTimeout(() => {
-            setIsOpen(true);
             setMessages([
                 { text: "Hi, welcome to our store", isUser: false },
                 { text: "How can we help you today?", isUser: false },
@@ -32,7 +34,11 @@ export const Chatbot: React.FC = () => {
         }, 2000);
 
         return () => clearTimeout(timer);
-    }, []);
+    }, [isOpen]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -74,7 +80,9 @@ export const Chatbot: React.FC = () => {
     };
 
     const toggleChat = () => {
-        setIsOpen(!isOpen);
+        const newIsOpen = !isOpen;
+        setIsOpen(newIsOpen);
+        localStorage.setItem('chatbotOpen', newIsOpen.toString());
     };
 
     return (

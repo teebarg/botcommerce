@@ -32,12 +32,37 @@ from services.export import export, process_file, validate_file
 router = APIRouter()
 
 
+@router.get("/export")
+async def export_products(
+    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
+) -> Any:
+    try:
+        statement = "SELECT name, slug, description, price, old_price FROM product;"
+        products = db.exec(text(statement))
+
+        file_url = await export(
+            columns=["name", "slug", "description", "price", "old_price"],
+            data=products,
+            name="Product",
+            bucket=bucket,
+            email=current_user.email,
+        )
+
+        # Send email notification with file URL to user
+        await send_email_notification(current_user.email, file_url)
+
+        return {"message": "Data Export successful. An email with the file URL has been sent.", "file_url": file_url}
+    except Exception as e:
+        logger.error(f"Export products error: {e}")
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
 @router.get(
     "/",
     response_model=Any,
 )
 async def index(
-    query: str = "",
+    search: str = "",
     tag: str = "",
     collections: str = Query(default=""),
     maxPrice: int = Query(default=1000000, gt=0),
@@ -66,7 +91,7 @@ async def index(
 
     search_results = search_documents(
         index_name="products",
-        query=query,
+        query=search,
         **search_params
     )
 
@@ -171,28 +196,6 @@ async def upload_products(
     contents = await file.read()
     background_tasks.add_task(process_file, contents, id, db, crud.product.bulk_upload)
     return {"batch": batch, "message": "File upload started"}
-
-
-@router.post("/export")
-async def export_products(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
-) -> Any:
-    try:
-        statement = "SELECT name, slug, description, price, old_price FROM product;"
-        products = db.exec(text(statement))
-
-        file_url = await export(
-            columns=["name", "slug", "description", "price", "old_price"],
-            data=products,
-            name="Product",
-            bucket=bucket,
-            email=current_user.email,
-        )
-
-        return {"message": "Data Export successful", "file_url": file_url}
-    except Exception as e:
-        logger.error(f"Export products error: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 # Upload Image

@@ -282,10 +282,11 @@ export async function submitContactForm(_currentState: resType, formData: FormDa
     const message = formData.get("message") as string;
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/contact-form`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contact-form`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "accept": "application/json",
             },
             body: JSON.stringify({
                 to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
@@ -310,7 +311,7 @@ export async function newsletterForm(_currentState: resType, formData: FormData)
     const email = formData.get("email") as string;
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/newsletter`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/newsletter`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

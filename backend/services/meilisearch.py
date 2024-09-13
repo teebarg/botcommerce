@@ -3,9 +3,10 @@ from json import JSONEncoder
 from datetime import datetime
 from uuid import UUID
 from typing import Any
+from core.config import settings
 
 # Initialize Meilisearch client
-client = Client('http://meilisearch:7700', 'masterKey')
+client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
 class CustomEncoder(JSONEncoder):
     def default(self, o):

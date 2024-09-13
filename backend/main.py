@@ -16,8 +16,8 @@ from api.tag import router as tag_router
 # from api.websocket import consume_events
 from api.websocket import router as websocket_router
 from core.config import settings
-from core.utils import generate_contact_form_email, send_email
-from models.generic import ContactFormCreate
+from core.utils import generate_contact_form_email, generate_newsletter_email, send_email
+from models.generic import ContactFormCreate, NewsletterCreate
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
 
@@ -120,6 +120,19 @@ async def contact_form(data: ContactFormCreate):
     )
     return {"message": "Message sent successfully"}
 
+
+@app.post("/api/newsletter")
+async def newsletter(data: NewsletterCreate):
+    # Send download link
+    email_data = generate_newsletter_email(
+        email=data.email,
+    )
+    send_email(
+        email_to=settings.ADMIN_EMAIL,
+        subject=email_data.subject,
+        html_content=email_data.html_content,
+    )
+    return {"message": "Email sent successfully"}
 
 # @app.on_event("startup")
 # async def startup_event():

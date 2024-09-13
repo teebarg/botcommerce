@@ -79,6 +79,9 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
     RABBITMQ_HOST: str = "rabbitmq"
 
+    MEILI_MASTER_KEY: str = "masterKey"
+    MEILI_HOST: str = "http://meilisearch:7700"
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

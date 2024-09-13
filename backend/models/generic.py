@@ -23,7 +23,9 @@ class ContactFormCreate(BaseModel):
     phone: str | int | None = ""
     message: str = "bearer"
 
-
+class NewsletterCreate(BaseModel):
+    email: str
+    
 class UploadStatus(BaseModel):
     total_rows: int
     processed_rows: int

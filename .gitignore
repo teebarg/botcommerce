@@ -19,7 +19,6 @@ __debug_bin
 jsconfig.json
 *.code-workspace
 *.bkp
-docker/local.env
 frontend/node_modules
 frontend/src/node_modules
 frontend/build

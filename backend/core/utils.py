@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 import unicodedata
 from dataclasses import dataclass
@@ -142,6 +143,16 @@ def generate_contact_form_email(
             "phone": phone,
             "message": message,
         },
+    )
+    return EmailData(html_content=html_content, subject=subject)
+
+
+def generate_newsletter_email(email: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - New Newsletter Email"
+    html_content = render_email_template(
+        template_name="newsletter.html",
+        context={"project_name": settings.PROJECT_NAME, "email": email, "project_website": settings.DOMAIN, "unsubscribe_link": "", "current_year": datetime.now().year},
     )
     return EmailData(html_content=html_content, subject=subject)
 

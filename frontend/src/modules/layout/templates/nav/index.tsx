@@ -42,6 +42,11 @@ const Navbar = async () => {
                             Checkout
                         </LocalizedClientLink>
                     </NavbarMenuItem>
+                    <NavbarMenuItem>
+                        <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
+                            Adminn
+                        </LocalizedClientLink>
+                    </NavbarMenuItem>
                 </div>
             </NavbarContent>
 

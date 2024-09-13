@@ -3,14 +3,15 @@
 import React from "react";
 import { Pagination as Pag } from "@nextui-org/pagination";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
+import { Pagination as PaginationType } from "types/global";
 
 import Button from "../button";
 
 interface Props {
-    pagination: { page: number; totalPages: number };
+    pagination: PaginationType;
 }
 
-const PaginationComponent: React.FC<Props> = ({ pagination }) => {
+const Pagination: React.FC<Props> = ({ pagination }) => {
     const { updateQuery } = useUpdateQuery();
 
     const page = pagination?.page ?? 1;
@@ -31,7 +32,8 @@ const PaginationComponent: React.FC<Props> = ({ pagination }) => {
     );
 
     return (
-        <div className="py-2 px-2 flex justify-between items-center">
+        <div className="py-2 px-2 flex justify-between items-center mt-4">
+            <div className="w-[30%]"></div>
             <Pag
                 showControls
                 classNames={{
@@ -40,15 +42,15 @@ const PaginationComponent: React.FC<Props> = ({ pagination }) => {
                 color="default"
                 isDisabled={false}
                 page={page}
-                total={pagination?.totalPages ?? 1}
+                total={pagination?.total_pages ?? 1}
                 variant="light"
                 onChange={onPageChange}
             />
             <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                <Button disabled={pagination?.totalPages === 1 || page == 1} size="sm" variant="flat" onClick={onPreviousPage}>
+                <Button disabled={pagination?.total_pages === 1 || page == 1} size="sm" variant="flat" onClick={onPreviousPage}>
                     Previous
                 </Button>
-                <Button disabled={pagination?.totalPages === 1 || page == pagination?.totalPages} size="sm" variant="flat" onClick={onNextPage}>
+                <Button disabled={pagination?.total_pages === 1 || page == pagination?.total_pages} size="sm" variant="flat" onClick={onNextPage}>
                     Next
                 </Button>
             </div>
@@ -56,4 +58,4 @@ const PaginationComponent: React.FC<Props> = ({ pagination }) => {
     );
 };
 
-export { PaginationComponent };
+export { Pagination };
