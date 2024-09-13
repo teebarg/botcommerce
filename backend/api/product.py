@@ -1,6 +1,7 @@
 from io import BytesIO
 from typing import Annotated, Any
 
+from services.meilisearch import add_documents_to_index, delete_document, get_or_create_index, search_documents, update_document
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -8,10 +9,10 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
-    UploadFile
+    UploadFile,
+    Depends
 )
 from sqlalchemy.sql import text
-from sqlmodel import func, select
 
 import crud
 from core import deps
@@ -26,91 +27,57 @@ from models.product import (
     ProductUpdate,
 )
 from services.export import export, process_file, validate_file
-from meilisearch import Client
-from json import JSONEncoder
-from datetime import datetime
-from uuid import UUID
 
 # Create a router for products
 router = APIRouter()
 
-# # Initialize Meilisearch client
-# meilisearch_client = Client('http://meilisearch:7700', 'masterKey')
-
-# # Define the index name
-# index_name = 'products'
-
-# # Create the index if it doesn't exist
-# meilisearch_client.index(index_name)
-# if not meilisearch_client.get_index(index_name):
-#     print("Creating index")
-#     meilisearch_client.index(index_name)
-
-# Define a function to get or create a Meilisearch index
-def get_or_create_index(client: Client, index_name: str) -> Any:
-    print("Creating index")
-    try:
-        return client.get_index(index_name)
-    except Exception:
-        client.create_index(index_name)
-        return client.index(index_name)
-    
-index_name = "products"
-client = Client('http://meilisearch:7700', 'masterKey')
-# index = get_or_create_index(client, index_name)
-
 
 @router.get(
     "/",
-    response_model=Products,
+    response_model=Any,
 )
 async def index(
-    db: SessionDep,
-    sizes: str = None,
-    name: str = "",
+    query: str = "",
     tag: str = "",
-    collection: str = "",
+    collections: str = Query(default=""),
     maxPrice: int = Query(default=1000000, gt=0),
     minPrice: int = Query(default=1, gt=0),
     page: int = Query(default=1, gt=0),
     per_page: int = Query(default=20, le=100),
 ) -> Any:
     """
-    Retrieve products.
+    Retrieve products using Meilisearch.
     """
-    query = {
-        "name": name,
-        "tag": tag,
-        "collection": collection,
-        "sizes": sizes,
-        "price": [minPrice, maxPrice],
+    filters = []
+    if tag:
+        filters.append(f"tag = '{tag}'")
+    if collections:
+        filters.append(f"collections IN [{collections}]")
+    if minPrice and maxPrice:
+        filters.append(f"price >= {minPrice} AND price <= {maxPrice}")
+
+    search_params = {
+        "limit": per_page,
+        "offset": (page - 1) * per_page,
     }
 
-    count_statement = select(func.count()).select_from(Product)
-    count_statement = crud.product.generate_statement(
-        statement=count_statement, query=query
-    )
-    total_count = db.exec(count_statement).one()
+    if filters:
+        search_params["filter"] = " AND ".join(filters)
 
-    products = crud.product.get_multi(
-        db=db,
+    search_results = search_documents(
+        index_name="products",
         query=query,
-        per_page=per_page,
-        offset=(page - 1) * per_page,
+        **search_params
     )
 
+    total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // per_page) + (total_count % per_page > 0)
 
-    return Products(
-        products=products,
-        page=page,
-        per_page=per_page,
-        total_pages=total_pages,
-        total_count=total_count,
-    )
+    return {"products": search_results["hits"], "page": page, "per_page": per_page, "total_count": total_count, "total_pages": total_pages}
 
 
-@router.post("/", response_model=ProductPublic)
+
+@router.post("/")
 def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
     """
     Create new product.
@@ -124,16 +91,10 @@ def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
 
     product = crud.product.create(db=db, obj_in=product_in)
     try:
-        class CustomEncoder(JSONEncoder):
-            def default(self, o):
-                if isinstance(o, (UUID, datetime)):
-                    return str(o)
+        # Create a dictionary with product data and collection names
+        product_data = prepare_product_data_for_indexing(product)
 
-                # Let the base class default method raise the TypeError
-                return super().default(o)
-
-        index = get_or_create_index(client, index_name)
-        index.add_documents([product.dict()], serializer=CustomEncoder)
+        add_documents_to_index(index_name="products", documents=[product_data])
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -171,6 +132,13 @@ def update(
             detail="Product not found",
         )
     db_product = crud.product.update(db=db, db_obj=db_product, obj_in=product_in)
+    try:
+        # Prepare product data for Meilisearch indexing
+        product_data = prepare_product_data_for_indexing(db_product)
+
+        update_document(index_name="products", document=product_data)
+    except Exception as e:
+        logger.error(f"Error updating document in Meilisearch: {e}")
     return db_product
 
 
@@ -183,6 +151,10 @@ def delete(db: SessionDep, id: int) -> Message:
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     crud.product.remove(db=db, id=id)
+    try:
+        delete_document(index_name="products", document_id=str(id))
+    except Exception as e:
+        logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
 
 
@@ -239,17 +211,119 @@ async def upload_product_image(
         contents = await file.read()
 
         file_name = f"{id}.jpeg"
+        file_path = f"products/{file_name}"
 
-        blob = bucket.blob(f"products/{file_name}")
+        blob = bucket.blob(file_path)
         blob.upload_from_file(BytesIO(contents), content_type=file.content_type)
 
+        # Generate a signed URL for the uploaded file
+        file_url = blob.generate_signed_url(
+            version="v4",
+            expiration=datetime.timedelta(minutes=15),
+            method="GET"
+        )
+
         if product := crud.product.get(db=db, id=id):
+            # Prepare the document with updated image URL
+            updated_document = {
+                "id": id,
+                "image": file_url
+            }
+
+            # Update the document in the 'products' index
+            update_document("products", updated_document)
+
+            # Return the updated product
             return crud.product.update(
-                db=db, db_obj=product, obj_in={"image": file_name}
+                db=db, db_obj=product, obj_in={"image": file_url}
             )
+
         raise HTTPException(status_code=404, detail="Product not found.")
     except Exception as e:
         logger.error(f"{e}")
         raise HTTPException(
             status_code=500, detail=f"Error while uploading product image. {e}"
         ) from e
+
+
+@router.post("/reindex", dependencies=[Depends(deps.get_current_active_superuser)], response_model=Message)
+async def reindex_products(
+    db: SessionDep,
+    background_tasks: BackgroundTasks
+):
+    """
+    Re-index all products in the database to Meilisearch.
+    This operation is performed asynchronously in the background.
+    """
+    try:
+        # Define the background task
+        def reindex_task():
+            products = crud.product.all(db=db)
+
+            # Prepare the documents for Meilisearch
+            documents = []
+            for product in products:
+                product_dict = prepare_product_data_for_indexing(product)
+                documents.append(product_dict)
+
+            # Add all documents to the 'products' index
+            add_documents_to_index(index_name="products", documents=documents)
+
+            logger.info(f"Reindexed {len(documents)} products successfully.")
+
+        # Add the task to background tasks
+        background_tasks.add_task(reindex_task)
+
+        return Message(message="Product reindexing started. This may take a while.")
+    except Exception as e:
+        logger.error(f"Error during product reindexing: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while starting the reindexing process."
+        )
+
+
+@router.post("/configure-filterable-attributes", response_model=Message)
+async def configure_filterable_attributes(
+    db: SessionDep,
+    attributes: list[str],
+):
+    """
+    Configure filterable attributes for the products index in Meilisearch.
+    """
+    try:
+        index = get_or_create_index("products")
+        index.update_filterable_attributes(attributes)
+
+        logger.info(f"Updated filterable attributes: {attributes}")
+        return Message(message=f"Filterable attributes updated successfully: {attributes}")
+    except Exception as e:
+        logger.error(f"Error updating filterable attributes: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while updating filterable attributes."
+        )
+
+
+@router.get("/search/filterable-attributes", response_model=list[str])
+async def get_filterable_attributes():
+    """
+    Get the current filterable attributes for the products index in Meilisearch.
+    """
+    try:
+        index = get_or_create_index("products")
+        filterable_attributes = index.get_filterable_attributes()
+
+        logger.info(f"Retrieved filterable attributes: {filterable_attributes}")
+        return filterable_attributes
+    except Exception as e:
+        logger.error(f"Error retrieving filterable attributes: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while retrieving filterable attributes."
+        )
+
+def prepare_product_data_for_indexing(product: Product) -> dict:
+    product_dict = product.dict()
+    product_dict['collections'] = [collection.name for collection in product.collections]
+    return product_dict
