@@ -30,7 +30,7 @@ export default function Search() {
                                         <SearchInput />
                                         <Kbd className="hidden md:block border-none px-2 py-1 ml-2 font-medium text-[0.6rem]">ESC</Kbd>
                                     </div>
-                                    <div className="max-h-[60vh] min-h-[60vh] overflow-y-auto">
+                                    <div className="max-h-[70vh] min-h-[70vh] overflow-y-auto">
                                         <Hits hitComponent={Hit} />
                                     </div>
                                 </InstantSearch>

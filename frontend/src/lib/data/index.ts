@@ -4,7 +4,7 @@ import { cache } from "react";
 import sortProducts from "@lib/util/sort-products";
 import transformProductPreview from "@lib/util/transform-product-preview";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
-import { ProductCategoryWithChildren, ProductPreviewType } from "types/global";
+import { Product, ProductCategoryWithChildren } from "types/global";
 import { cookies } from "next/headers";
 
 const emptyResponse = {
@@ -72,7 +72,7 @@ export const getCart = cache(async function (cartId: string) {
     //     });
 });
 
-export async function addItem({ cartId, variantId, quantity }: { cartId: string; variantId: string; quantity: number }) {
+export async function addItem({ cartId, quantity }: { cartId: string; quantity: number }) {
     const headers = getHeaders(["cart"]);
 
     // return client.carts.lineItems
@@ -391,7 +391,7 @@ export const getProductsList = cache(async function ({
     queryParams?: any;
     countryCode: string;
 }): Promise<{
-    response: { products: ProductPreviewType[]; count: number };
+    response: { products: Product[]; count: number };
     nextPage: number | null;
     queryParams?: any;
 }> {
@@ -444,7 +444,7 @@ export const getProductsListWithSort = cache(async function getProductsListWithS
     sortBy?: SortOptions;
     countryCode: string;
 }): Promise<{
-    response: { products: ProductPreviewType[]; count: number };
+    response: { products: Product[]; count: number };
     nextPage: number | null;
     queryParams?: any;
 }> {
@@ -488,7 +488,7 @@ export const getHomepageProducts = cache(async function getHomepageProducts({
     currencyCode: string;
     countryCode: string;
 }) {
-    const collectionProductsMap = new Map<string, ProductPreviewType[]>();
+    const collectionProductsMap = new Map<string, Product[]>();
 
     const { collections } = await getCollectionsList(0, 3);
 
@@ -571,7 +571,7 @@ export const getProductsByCollectionHandle = cache(async function getProductsByC
     countryCode: string;
     currencyCode?: string;
 }): Promise<{
-    response: { products: ProductPreviewType[]; count: number };
+    response: { products: Product[]; count: number };
     nextPage: number | null;
 }> {
     const { id } = await getCollectionByHandle(handle).then((collection: any) => collection);
@@ -671,7 +671,7 @@ export const getProductsByCategoryHandle = cache(async function ({
     countryCode: string;
     currencyCode?: string;
 }): Promise<{
-    response: { products: ProductPreviewType[]; count: number };
+    response: { products: Product[]; count: number };
     nextPage: number | null;
 }> {
     const { id } = await getCategoryByHandle([handle]).then((res: any) => res.product_categories[0]);

@@ -1,14 +1,14 @@
 import React from "react";
 import { ChevronRightIcon, ExclamationIcon } from "nui-react-icons";
-import { ProductItem } from "@modules/products/components/product-item";
 import { PaginationComponent } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCategoriesList, getCollectionsList, getProductsListWithSort, getRegion } from "@lib/data";
-import { ProductPreviewType } from "types/global";
+import { Product } from "types/global";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 
 import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
+import { ProductCard } from "@modules/products/components/product-card";
 
 interface ComponentProps {
     productsIds?: string[];
@@ -34,7 +34,6 @@ const PRODUCT_LIMIT = 2;
 const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, productsIds, sortBy, searchParams }) => {
     const { collections } = await getCollectionsList();
     const { product_categories } = await getCategoriesList();
-    const region = (await getRegion("ng")) as Region;
 
     const queryParams: PaginatedProductsParams = {
         limit: PRODUCT_LIMIT,
@@ -109,8 +108,8 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, 
                                 ) : (
                                     <React.Fragment>
                                         <div className="grid w-full gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-4">
-                                            {products.map((product: ProductPreviewType, index: number) => (
-                                                <ProductItem key={index} product={product} region={region} />
+                                            {products.map((product: Product, index: number) => (
+                                                <ProductCard key={index} product={product} />
                                             ))}
                                         </div>
                                         {totalPages > 1 && <PaginationComponent pagination={{ page: Number(page), totalPages }} />}

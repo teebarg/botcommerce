@@ -8,7 +8,6 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { ArrowUpRightMini, ChevronRightIcon, StarIcon } from "nui-react-icons";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 
-import ProductActionsWrapper from "./product-actions-wrapper";
 import ProductDetails from "./details";
 
 type ProductTemplateProps = {
@@ -73,7 +72,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product, region, coun
                         </div>
                         <div className="max-w-40 mt-2">
                             <Suspense fallback={<ProductActions disabled={true} product={product} region={region} />}>
-                                <ProductActionsWrapper id={product.id} region={region} />
+                                <ProductActions product={product} />
                             </Suspense>
                         </div>
                         <div className="mt-4">

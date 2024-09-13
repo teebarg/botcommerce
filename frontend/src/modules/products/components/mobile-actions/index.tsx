@@ -25,7 +25,6 @@ type MobileActionsProps = {
 const MobileActions: React.FC<MobileActionsProps> = ({
     product,
     variant,
-    region,
     options,
     updateOptions,
     inStock,
@@ -39,7 +38,6 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     const price = getProductPrice({
         product: product,
         variantId: variant?.id,
-        region,
     });
 
     const selectedPrice = useMemo(() => {
@@ -155,7 +153,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                                     <div className="bg-white px-6 py-12">
                                         {product.variants.length > 1 && (
                                             <div className="flex flex-col gap-y-6">
-                                                {(product.options || []).map((option) => {
+                                                {(product.options || []).map((option: any) => {
                                                     return (
                                                         <div key={option.id}>
                                                             <OptionSelect

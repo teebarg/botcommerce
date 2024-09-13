@@ -2,10 +2,10 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 export type ProductHit = {
     id: string;
-    title: string;
-    handle: string;
+    name: string;
+    slug: string;
     description: string | null;
-    thumbnail: string | null;
+    image: string | null;
     variants: any[];
     collection_handle: string | null;
     collection_id: string | null;
@@ -16,15 +16,16 @@ type HitProps = {
 };
 
 const Hit = ({ hit }: HitProps) => {
+    console.log(hit);
     return (
-        <LocalizedClientLink className="block h-full" data-testid="search-result" href={`/products/${hit.handle}`}>
+        <LocalizedClientLink className="block h-full" data-testid="search-result" href={`/products/${hit.slug}`}>
             <div key={hit.id}>
                 <div className="relative">
                     <div className="relative h-72 w-full overflow-hidden rounded-lg">
-                        <img alt={hit.title} className="h-full w-full object-cover object-center" src={hit.thumbnail as string} />
+                        <img alt={hit.name} className="h-full w-full object-cover object-center" src={hit.image as string} />
                     </div>
                     <div className="relative mt-4">
-                        <span className="font-medium text-default-700 text-base line-clamp-2">{hit.title}</span>
+                        <span className="font-medium text-default-700 text-base line-clamp-2">{hit.name}</span>
                         <p className="text-left text-small text-default-500 truncate mt-1">{hit.description}</p>
                     </div>
                     <div className="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">

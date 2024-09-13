@@ -1,23 +1,21 @@
 import { Metadata } from "next";
-// import { getCollectionsList, getProductsList, getRegion } from "@lib/data";
-import { ProductCollectionWithPreviews, ProductPreviewType } from "types/global";
+import { Product } from "types/global";
 import React, { cache } from "react";
 import { Image } from "@nextui-org/image";
 import { LocationIcon, MailIcon } from "nui-react-icons";
 import { openingHours } from "@lib/config";
 import { buildUrl, imgSrc } from "@lib/util/util";
-import { ProductItem } from "@modules/products/components/product-item";
 import ContactForm from "@modules/store/components/contact-form";
 import Button from "@modules/common/components/button";
+import { ProductCard } from "@modules/products/components/product-card";
 
 export const metadata: Metadata = {
     title: "Children clothing | TBO Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 
-const getCollectionsWithProducts = cache(async (): Promise<any[] | null> => {
-    // const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { tag: "trending", per_page: 20 });
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { per_page: 20 });
+const getCollectionsWithProducts = cache(async (collection: string): Promise<{ products: Product[] } | null> => {
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { collections: collection, per_page: 5 });
     const res = await fetch(url, {
         cache: "no-store",
         headers: {
@@ -36,17 +34,10 @@ const getCollectionsWithProducts = cache(async (): Promise<any[] | null> => {
 });
 
 export default async function Home() {
-    const collections = (await getCollectionsWithProducts()) || [];
-    console.log("collections.......................");
-    console.log(collections);
+    const trending = (await getCollectionsWithProducts("trending"));
+    const latest = (await getCollectionsWithProducts("latest"));
 
-    // const trending = collections.find((item: ProductCollectionWithPreviews) => item.handle === "trending") as ProductCollectionWithPreviews;
-    // const latest = collections.find((item: ProductCollectionWithPreviews) => item.handle === "latest") as ProductCollectionWithPreviews;
-
-    const trending: any[] = []
-    const latest: any[] = []
-
-    if (!collections) {
+    if (!trending && !latest) {
         return null;
     }
 
@@ -102,8 +93,8 @@ export default async function Home() {
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.products?.map((product: ProductPreviewType, index: number) => (
-                                <ProductItem key={index} product={product} />
+                            {trending?.products?.map((product: Product, index: number) => (
+                                <ProductCard key={index} product={product} />
                             ))}
                         </div>
                     </div>
@@ -129,8 +120,8 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
-                            {latest?.products?.map((product: ProductPreviewType, index: number) => (
-                                <ProductItem key={index} product={product} />
+                            {latest?.products?.map((product: Product, index: number) => (
+                                <ProductCard key={index} product={product} />
                             ))}
                         </div>
                     </div>

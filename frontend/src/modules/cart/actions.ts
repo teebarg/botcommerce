@@ -2,7 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-import { addItem, createCart, getCart, getProductsById, getRegion, removeItem, updateCart, updateItem } from "@lib/data";
+import { addItem, createCart, getCart, getProductsById, removeItem, updateCart, updateItem } from "@lib/data";
 import { omit } from "@lib/util/util";
 
 /**
@@ -12,7 +12,7 @@ import { omit } from "@lib/util/util";
  * @example
  * const cart = await getOrSetCart()
  */
-export async function getOrSetCart(countryCode: string) {
+export async function getOrSetCart() {
     const cartId = cookies().get("_cart_id")?.value;
     let cart: any;
 
@@ -20,16 +20,9 @@ export async function getOrSetCart(countryCode: string) {
         cart = await getCart(cartId).then((cart: any) => cart);
     }
 
-    const region = await getRegion(countryCode);
-
-    if (!region) {
-        return null;
-    }
-
-    const region_id = region.id;
 
     if (!cart) {
-        cart = await createCart({ region_id }).then((res) => res);
+        cart = await createCart().then((res) => res);
         cart &&
             cookies().set("_cart_id", cart.id, {
                 maxAge: 60 * 60 * 24 * 7,
@@ -37,11 +30,6 @@ export async function getOrSetCart(countryCode: string) {
                 sameSite: "strict",
                 secure: process.env.NODE_ENV === "production",
             });
-        revalidateTag("cart");
-    }
-
-    if (cart && cart?.region_id !== region_id) {
-        await updateCart(cart.id, { region_id });
         revalidateTag("cart");
     }
 
@@ -66,19 +54,15 @@ export async function retrieveCart() {
     }
 }
 
-export async function addToCart({ variantId, quantity, countryCode }: { variantId: string; quantity: number; countryCode: string }) {
-    const cart = await getOrSetCart(countryCode).then((cart) => cart);
+export async function addToCart({ quantity }: { quantity: number }) {
+    const cart = await getOrSetCart().then((cart) => cart);
 
     if (!cart) {
         return "Missing cart ID";
     }
 
-    if (!variantId) {
-        return "Missing product variant ID";
-    }
-
     try {
-        await addItem({ cartId: cart.id, variantId, quantity });
+        await addItem({ cartId: cart.id, quantity });
         revalidateTag("cart");
     } catch (e) {
         return "Error adding item to cart";
