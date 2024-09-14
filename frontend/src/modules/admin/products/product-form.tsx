@@ -10,6 +10,9 @@ import { ImageUpload } from "@modules/common/components/image-upload";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
+import { Button as AriaButton, Input as AriaInput, Label, ListBox, ListBoxItem, Popover } from "react-aria-components";
+import { ComboBox } from "@modules/common/components/combobox";
+import { Item } from "react-stately";
 
 type Inputs = {
     name: string;
@@ -32,6 +35,14 @@ interface Props {
 interface ChildRef {
     submit: () => void;
 }
+
+const items = [
+    { id: 1, name: "Apple" },
+    { id: 2, name: "Banana" },
+    { id: 3, name: "Cherry" },
+    { id: 4, name: "Date" },
+    { id: 5, name: "Elderberry" },
+];
 
 const ProductForm = forwardRef<ChildRef, Props>(
     ({ type = "create", onClose, current = { name: "", is_active: true }, tags = [], collections = [] }, ref) => {
@@ -116,6 +127,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                             <SelectItem key={collection.value}>{collection.label}</SelectItem>
                                         ))}
                                     </Select>
+                                    <ComboBox name="beaf" label="Select a fruit" items={items} />
                                     <Input name="price" type="number" label="Price" placeholder="Ex. 2500" required />
                                     <Input name="old_price" type="number" label="Old Price" placeholder="Ex. 2500" required />
                                 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { cloneElement, useState } from "react";
+import React, { cloneElement, isValidElement, useState } from "react";
 
 import { Pagination as PaginationType } from "types/global";
 import { Pagination } from "../pagination";
@@ -32,7 +32,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
     const closeSlideOver = () => {
         state.close();
     };
-    const formWithHandler = cloneElement(form as React.ReactElement, { onClose: closeSlideOver });
+    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: closeSlideOver }) : form;
 
     const onSearchChange = React.useCallback(
         (query: string) => {
