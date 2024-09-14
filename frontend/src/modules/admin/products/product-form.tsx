@@ -11,6 +11,7 @@ import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
 import { ComboBox } from "@modules/common/components/combobox";
+import { MultiSelect } from "@modules/common/components/multiselect";
 
 type Inputs = {
     name: string;
@@ -103,7 +104,9 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     <Input name="name" label="Name" placeholder="Ex. Gown" required />
                                     <Switch name="is_active" />
                                     <Textarea name="description" placeholder="Product description" variant="bordered" />
-                                    <Select
+                                    <MultiSelect name="tags" options={tagOptions} label="Tags" placeholder="Select Tags" variant="bordered" />
+                                    <MultiSelect name="collections" options={collectionOptions} label="Collections" placeholder="Select Collections" variant="bordered" />
+                                    {/* <Select
                                         label="Tags"
                                         variant="bordered"
                                         placeholder="Select Tags"
@@ -113,8 +116,8 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                         {tagOptions.map((tag) => (
                                             <SelectItem key={tag.value}>{tag.label}</SelectItem>
                                         ))}
-                                    </Select>
-                                    <Select
+                                    </Select> */}
+                                    {/* <Select
                                         label="Collections"
                                         variant="bordered"
                                         placeholder="Select Collections"
@@ -124,7 +127,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                         {collectionOptions.map((collection) => (
                                             <SelectItem key={collection.value}>{collection.label}</SelectItem>
                                         ))}
-                                    </Select>
+                                    </Select> */}
                                     <ComboBox name="beaf" label="Select a fruit" items={items} description="Select a fruit" placeholder="Select a fruit" />
                                     <Input name="price" type="number" label="Price" placeholder="Ex. 2500" required />
                                     <Input name="old_price" type="number" label="Old Price" placeholder="Ex. 2500" required />

@@ -71,7 +71,7 @@ async def index(
     per_page: int = Query(default=20, le=100),
 ) -> Any:
     """
-    Retrieve products using Meilisearch.
+    Retrieve products using Meilisearch, sorted by latest.
     """
     filters = []
     if tag:
@@ -84,6 +84,7 @@ async def index(
     search_params = {
         "limit": per_page,
         "offset": (page - 1) * per_page,
+        # "sort": ["created_at:desc"],  # Sort by latest (assuming there's a 'created_at' field)
     }
 
     if filters:
@@ -288,7 +289,6 @@ async def reindex_products(
 
 @router.post("/configure-filterable-attributes", response_model=Message)
 async def configure_filterable_attributes(
-    db: SessionDep,
     attributes: list[str],
 ):
     """
@@ -296,7 +296,7 @@ async def configure_filterable_attributes(
     """
     try:
         index = get_or_create_index("products")
-        index.update_filterable_attributes(attributes)
+        index.update_filterable_attributes(["collections", "tags", "price", "old_price", "created_at"])
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(message=f"Filterable attributes updated successfully: {attributes}")

@@ -88,8 +88,8 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         name: formData.get("name"),
         is_active: Boolean(formData.get("is_active")) ?? false,
         description: formData.get("description"),
-        tags: formData.get("tags") ?? [],
-        collections: formData.get("collections") ?? [],
+        tags: JSON.parse(formData.get("tags") as string) ?? [],
+        collections: JSON.parse(formData.get("collections") as string) ?? [],
         price: formData.get("price") ?? 0,
         old_price: formData.get("old_price") ?? 0,
     };
