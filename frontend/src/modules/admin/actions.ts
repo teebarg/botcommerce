@@ -81,8 +81,6 @@ export async function uploadProductImage({ productId, formData }: { productId: s
 }
 
 export async function createProduct(currentState: unknown, formData: FormData) {
-    console.log(currentState);
-    console.log(formData);
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`;
     

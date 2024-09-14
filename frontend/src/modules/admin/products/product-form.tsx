@@ -10,9 +10,7 @@ import { ImageUpload } from "@modules/common/components/image-upload";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
-import { Button as AriaButton, Input as AriaInput, Label, ListBox, ListBoxItem, Popover } from "react-aria-components";
 import { ComboBox } from "@modules/common/components/combobox";
-import { Item } from "react-stately";
 
 type Inputs = {
     name: string;
@@ -127,7 +125,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                             <SelectItem key={collection.value}>{collection.label}</SelectItem>
                                         ))}
                                     </Select>
-                                    <ComboBox name="beaf" label="Select a fruit" items={items} />
+                                    <ComboBox name="beaf" label="Select a fruit" items={items} description="Select a fruit" placeholder="Select a fruit" />
                                     <Input name="price" type="number" label="Price" placeholder="Ex. 2500" required />
                                     <Input name="old_price" type="number" label="Old Price" placeholder="Ex. 2500" required />
                                 </div>
