@@ -1,14 +1,39 @@
 "use client";
 
+import { Confirm } from "@modules/common/components/confirm";
+import { Modal } from "@modules/common/components/modal";
 import { Tooltip } from "@nextui-org/tooltip";
 import { DeleteIcon, EditIcon, EyeIcon } from "nui-react-icons";
-import React, { useEffect, useState } from "react";
+import React, { cloneElement, isValidElement, useState } from "react";
+import { useOverlayTriggerState } from "react-stately";
+import { deleteProduct } from "../actions";
+import { useSnackbar } from "notistack";
+import { SlideOver } from "@modules/common/components/slideover";
 
 interface Props {
     item: any;
+    form: React.ReactNode;
 }
 
-const Actions: React.FC<Props> = ({ item }) => {
+const Actions: React.FC<Props> = ({ item, form }) => {
+    const { enqueueSnackbar } = useSnackbar();
+    const [current, setCurrent] = useState<any>({ is_active: true });
+    const deleteModalState = useOverlayTriggerState({});
+    const slideOverState = useOverlayTriggerState({});
+    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: slideOverState.close }) : form;
+
+    const onDelete = (value: any) => {
+        setCurrent((prev: any) => ({ ...prev, ...value }));
+        deleteModalState.open();
+    };
+
+    const onConfirmDelete = async () => {
+        try {
+            await deleteProduct(current.id);
+        } catch (error) {
+            enqueueSnackbar("Error deleting product", { variant: "error" });
+        }
+    };
     return (
         <React.Fragment>
             <div className="relative flex items-center gap-2">
@@ -20,17 +45,31 @@ const Actions: React.FC<Props> = ({ item }) => {
                 </Tooltip>
                 <Tooltip content="Edit products">
                     <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                        {/* <EditIcon onClick={() => handleEdit(item)} /> */}
-                        <EditIcon />
+                        <EditIcon onClick={() => slideOverState.open()} />
                     </span>
                 </Tooltip>
                 <Tooltip color="danger" content="Delete products">
                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        {/* <DeleteIcon onClick={() => onDelete(deleteModalRef, row)} /> */}
-                        <DeleteIcon />
+                        <DeleteIcon onClick={() => onDelete(item)} />
                     </span>
                 </Tooltip>
             </div>
+            {/* Delete Modal */}
+            {deleteModalState.isOpen && (
+                <Modal onClose={deleteModalState.close}>
+                    <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
+                </Modal>
+            )}
+            {slideOverState.isOpen && (
+                <SlideOver
+                    className="bg-default-50"
+                    isOpen={slideOverState.isOpen}
+                    title="Edit Product"
+                    onClose={slideOverState.close}
+                >
+                    {slideOverState.isOpen && formWithHandler}
+                </SlideOver>
+            )}
         </React.Fragment>
     );
 };

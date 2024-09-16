@@ -10,7 +10,6 @@ export function FormButton({
     color = "default",
     variant = "solid",
     size = "md",
-    fullWidth = false,
     className,
     "data-testid": dataTestId,
 }: {
@@ -25,16 +24,7 @@ export function FormButton({
     const { pending } = useFormStatus();
 
     return (
-        <Button
-            className={className}
-            color={color}
-            data-testid={dataTestId}
-            // fullWidth={fullWidth}
-            isLoading={pending}
-            size={size}
-            type="submit"
-            variant={variant}
-        >
+        <Button className={className} color={color} data-testid={dataTestId} isLoading={pending} size={size} type="submit" variant={variant}>
             {children}
         </Button>
     );

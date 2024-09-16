@@ -212,7 +212,7 @@ const Sidebar: React.FC<Props> = () => {
         >
             <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <div className="flex-1 mb-8 py-4">
-                    <h1 className="text-3xl pl-4 mb-8">RFT</h1>
+                    <h1 className="text-3xl pl-4 mb-8">TBO</h1>
                     <div className="px-6 mb-2">
                         <p className="font-semibold" style={{ opacity: 0.7, letterSpacing: "0.5px" }}>
                             General

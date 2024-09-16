@@ -1,11 +1,5 @@
 import { Metadata } from "next";
-import Footer from "@modules/layout/templates/footer";
-import Navbar from "@modules/layout/templates/nav";
 import React from "react";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { Banner } from "@modules/common/components/banner";
-import { Cookie } from "@modules/store/components/cookie";
-import { Chatbot } from "@modules/store/components/chatbot";
 import Sidebar from "@modules/admin/components/sidebar";
 import AdminNavbar from "@modules/admin/components/admin-navbar";
 
@@ -19,9 +13,9 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
         <React.Fragment>
             <div className="flex min-h-screen">
-                <aside className="hidden sm:block min-w-[20rem] h-screen overflow-y-auto">
+                <span className="hidden sm:block min-w-[20rem] h-screen overflow-y-auto">
                     <Sidebar />
-                </aside>
+                </span>
                 <div className="flex-1 h-screen overflow-y-auto">
                     <AdminNavbar />
                     <main>{props.children}</main>

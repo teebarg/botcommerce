@@ -1,57 +1,20 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useIntersection } from "@lib/hooks/use-in-view";
+import { useMemo, useState } from "react";
 import { addToCart } from "@modules/cart/actions";
-import OptionSelect from "@modules/products/components/option-select";
-import { isEqual } from "@lib/util/util";
+import { currency } from "@lib/util/util";
 import Button from "@modules/common/components/button";
-
-import MobileActions from "../mobile-actions";
-import ProductPrice from "../product-price";
 
 type ProductActionsProps = {
     product: any;
     disabled?: boolean;
 };
 
-export type PriceType = {
-    calculated_price: string;
-    original_price?: string;
-    price_type?: "sale" | "default";
-    percentage_diff?: string;
-};
-
 export default function ProductActions({ product, disabled }: ProductActionsProps) {
     if (!product) {
         return null;
     }
-    const [options, setOptions] = useState<Record<string, string>>({});
     const [isAdding, setIsAdding] = useState(false);
-
-    const countryCode = useParams().countryCode as string;
-
-
-    // initialize the option state
-    useEffect(() => {
-        const optionObj: Record<string, string> = {};
-
-        for (const option of product.options || []) {
-            Object.assign(optionObj, { [option.id]: undefined });
-        }
-
-        setOptions(optionObj);
-    }, [product]);
-
-
-    useEffect(() => {
-        setOptions(product.id);
-    }, [product]);
-
-    const updateOptions = (update: Record<string, string>) => {
-        setOptions({ ...options, ...update });
-    };
 
     // check if the selected variant is in stock
     const inStock = useMemo(() => {
@@ -64,16 +27,12 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
         return false;
     }, []);
 
-    const actionsRef = useRef<HTMLDivElement>(null);
-
-    const inView = useIntersection(actionsRef, "0px");
-
     // add the selected variant to the cart
     const handleAddToCart = async () => {
         setIsAdding(true);
 
         await addToCart({
-            quantity: 1
+            quantity: 1,
         });
 
         setIsAdding(false);
@@ -81,33 +40,25 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
 
     return (
         <>
-            <div ref={actionsRef} className="space-y-2">
-                <div>
-                    {product.length > 1 && (
-                        <div className="flex flex-col gap-y-2">
-                            {(product.options || []).map((option: any) => {
-                                return (
-                                    <div key={option.id}>
-                                        <OptionSelect
-                                            current={options[option.id]}
-                                            data-testid="product-options"
-                                            disabled={!!disabled || isAdding}
-                                            option={option}
-                                            title={option.title}
-                                            updateOption={updateOptions}
-                                        />
-                                    </div>
-                                );
-                            })}
-                            <hr className="tb-divider" />
+            <div className="space-y-2">
+                <div className="flex flex-col items-start mb-4">
+                    <div className="flex items-center">
+                        <span className="text-xl font-semibold text-danger">{currency(product.price)}</span>
+                        {product.old_price > product.price && (
+                            <span className="ml-2 text-sm text-gray-500 line-through">{currency(product.old_price)}</span>
+                        )}
+                    </div>
+                    {product.old_price > product.price && (
+                        <div className="mt-1">
+                            <span className="text-sm font-medium text-green-600">
+                                Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
+                            </span>
                         </div>
                     )}
                 </div>
 
-                <ProductPrice product={product} />
-
                 <Button
-                    className="w-full h-10"
+                    className="w-full"
                     color="default"
                     data-testid="add-product-button"
                     disabled={!inStock || !!disabled || isAdding}
@@ -116,17 +67,6 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
                 >
                     {!inStock ? "Out of stock" : "Add to cart"}
                 </Button>
-                {/* <MobileActions
-                    handleAddToCart={handleAddToCart}
-                    inStock={inStock}
-                    isAdding={isAdding}
-                    options={options}
-                    optionsDisabled={!!disabled || isAdding}
-                    product={product}
-                    show={!inView}
-                    updateOptions={updateOptions}
-                    variant={variant}
-                /> */}
             </div>
         </>
     );

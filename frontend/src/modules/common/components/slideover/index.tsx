@@ -7,6 +7,7 @@ import { FocusScope } from "@react-aria/focus";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { CancelIcon } from "nui-react-icons";
 import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
 type Direction = "left" | "right";
 interface SlideoverProps {
@@ -48,7 +49,11 @@ const SlideOver: React.FC<SlideoverProps> = ({ isOpen, onClose, children, title,
                     {...dialogProps}
                     {...modalProps}
                     ref={ref}
-                    className={`fixed flex flex-col top-0 w-[27%] h-screen shadow-lg transform transition-transform duration-300 z-50 py-5 px-2 bg-default-50 ${className} ${location[direction]}`}
+                    className={clsx(
+                        "fixed flex flex-col top-0 w-[27%] h-screen shadow-lg transform transition-transform duration-300 z-50 py-5 px-2 bg-default-50 focus-visible:outline-none",
+                        className,
+                        location[direction]
+                    )}
                 >
                     <button className="absolute top-4 right-2 bg-transparent" onClick={onClose}>
                         <CancelIcon size={24} />

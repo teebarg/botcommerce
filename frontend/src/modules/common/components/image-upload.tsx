@@ -59,7 +59,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
 
     return (
         <React.Fragment>
-            <div>
+            <div className="w-full">
                 {preview && (
                     <React.Fragment>
                         <div className="flex gap-1">
@@ -75,7 +75,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                         onSelect={OnSelect}
                         onError={(message: string) => enqueueSnackbar(message, { variant: "error" })}
                         allowsMultiple={false}
-                        acceptedFiles={[FileTypes.jpeg, FileTypes.jpg, FileTypes.png]}
+                        acceptedFiles={[FileTypes.jpeg, FileTypes.jpg, FileTypes.png, FileTypes.avif]}
                     />
                 )}
                 {preview && isDirty && (

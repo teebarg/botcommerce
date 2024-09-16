@@ -7,7 +7,7 @@ export async function indexProducts() {
     // const headers = getHeaders([]);
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/reindex`;
-    
+
     try {
         const res = await fetch(url, {
             method: 'POST',
@@ -33,7 +33,7 @@ export async function indexProducts() {
 export async function exportProducts() {
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/export`;
-    
+
     try {
         const res = await fetch(url, {
             method: 'GET',
@@ -56,10 +56,10 @@ export async function exportProducts() {
 export async function uploadProductImage({ productId, formData }: { productId: string; formData: FormData }) {
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}/image`;
-    
+
     try {
         const res = await fetch(url, {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 "X-Auth": accessToken,
             },
@@ -67,13 +67,14 @@ export async function uploadProductImage({ productId, formData }: { productId: s
         });
 
         if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            return { success: false, message: "Error uploading product image" };
         }
 
         // Revalidate the UI data
         revalidateTag("products");
+        revalidateTag("campaigns");
 
-        return await res.json();
+        return { success: true, message: "Image upload successful", data: await res.json() };;
     } catch (error) {
         console.error("Error uploading product image:", error);
         return { success: false, message: "Error uploading product image" };
@@ -82,8 +83,12 @@ export async function uploadProductImage({ productId, formData }: { productId: s
 
 export async function createProduct(currentState: unknown, formData: FormData) {
     const accessToken = cookies().get("access_token")?.value as string;
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`;
-    
+    // const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`;
+    const productId = formData.get("id") as string;
+    const type = formData.get("type") as string;
+
+    const url = type === "create" ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/` : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}/`;
+
     const productData = {
         name: formData.get("name"),
         is_active: Boolean(formData.get("is_active")) ?? false,
@@ -93,10 +98,10 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         price: formData.get("price") ?? 0,
         old_price: formData.get("old_price") ?? 0,
     };
-    console.log(productData);
+
     try {
         const res = await fetch(url, {
-            method: 'POST',
+            method: type === "create" ? 'POST' : 'PATCH',
             headers: {
                 "X-Auth": accessToken,
                 "Content-Type": "application/json",
@@ -105,11 +110,13 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         });
 
         if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            return { success: false, message: "Error creating product" };
         }
 
         // Revalidate the UI data
         revalidateTag("products");
+        revalidateTag("campaigns");
+
 
         return { success: true, message: "Product created successfully", data: await res.json() };
     } catch (error) {
@@ -118,18 +125,16 @@ export async function createProduct(currentState: unknown, formData: FormData) {
     }
 }
 
-export async function updateProduct(productId: string, productData: any) {
+export async function deleteProduct(productId: string) {
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
-    
+
     try {
         const res = await fetch(url, {
-            method: 'PUT',
+            method: 'DELETE',
             headers: {
                 "X-Auth": accessToken,
-                "Content-Type": "application/json",
             },
-            body: JSON.stringify(productData),
         });
 
         if (!res.ok) {
@@ -139,17 +144,18 @@ export async function updateProduct(productId: string, productData: any) {
         // Revalidate the UI data
         revalidateTag("products");
 
-        return { success: true, message: "Product updated successfully", data: await res.json() };
+        return { success: true, message: "Product deleted successfully" };
     } catch (error) {
-        console.error("Error updating product:", error);
-        return { success: false, message: "Error updating product" };
+        console.error("Error deleting product:", error);
+        return { success: false, message: "Error deleting product" };
     }
 }
+
 
 export async function createCollection(collectionData: any) {
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection`;
-    
+
     try {
         const res = await fetch(url, {
             method: 'POST',
@@ -177,7 +183,7 @@ export async function createCollection(collectionData: any) {
 export async function updateCollection(collectionId: string, collectionData: any) {
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${collectionId}`;
-    
+
     try {
         const res = await fetch(url, {
             method: 'PUT',
@@ -205,7 +211,7 @@ export async function updateCollection(collectionId: string, collectionData: any
 export async function deleteCollection(collectionId: string) {
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${collectionId}`;
-    
+
     try {
         const res = await fetch(url, {
             method: 'DELETE',
@@ -231,7 +237,7 @@ export async function deleteCollection(collectionId: string) {
 export async function getCollections(page: number = 1, perPage: number = 10) {
     const accessToken = cookies().get("access_token")?.value as string;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection?page=${page}&per_page=${perPage}`;
-    
+
     try {
         const res = await fetch(url, {
             headers: {
@@ -268,10 +274,10 @@ export async function bulkUploadProducts({ id, formData }: { id: string; formDat
         // Revalidate the UI data
         revalidateTag("products");
         return await res.json();
-        
+
         // // Revalidate the UI data
         // revalidateTag("products");
-        
+
         // return "Bulk product update successful";
     } catch (e) {
         console.error("Error during bulk product update:", e);

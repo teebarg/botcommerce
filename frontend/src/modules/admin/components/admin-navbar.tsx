@@ -13,13 +13,18 @@ const AdminNavbar = async () => {
         <NextUINavbar maxWidth="xl" position="sticky">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand as="li" className="gap-3 max-w-fit">
-                    <LocalizedClientLink className="flex justify-start items-center gap-1" href="/tbo">
-                        <p className="font-bold text-inherit">RFT</p>
+                    <LocalizedClientLink className="flex justify-start items-center gap-1" href="/admin">
+                        <p className="font-bold text-inherit">TBO</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
             </NavbarContent>
 
             <NavbarContent className="flex basis-1/5 sm:basis-full" justify="end">
+                <NavbarItem className="flex">
+                    <LocalizedClientLink className="text-sm font-semibold leading-6" href="/">
+                        Store
+                    </LocalizedClientLink>
+                </NavbarItem>
                 <NavbarItem className="flex gap-2 items-baseline justify-center">
                     {/* <Notification /> */}
                     <ThemeSwitch />

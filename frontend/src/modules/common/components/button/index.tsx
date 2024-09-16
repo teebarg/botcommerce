@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import clsx from "clsx";
 import { useButton } from "react-aria";
@@ -13,6 +15,7 @@ interface Props {
     isLoading?: boolean;
     className?: string;
     style?: React.CSSProperties;
+    [key: string]: any;
 }
 
 const Button: React.FC<Props> = ({
@@ -29,7 +32,6 @@ const Button: React.FC<Props> = ({
 }) => {
     const ref = useRef<HTMLButtonElement | null>(null);
     const { buttonProps } = useButton(props, ref);
-    console.log(buttonProps);
     const sizeCss = {
         sm: "px-3 min-w-16 h-8 text-tiny gap-2 rounded-small",
         md: "px-4 min-w-20 h-10 text-small gap-2 rounded-medium",

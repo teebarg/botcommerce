@@ -80,7 +80,9 @@ export const getProducts = cache(async function (
     const headers = getHeaders([]);
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { search, collections, page, per_page });
     const res = await fetch(url, {
-        cache: "no-store",
+        next: {
+            tags: ["products"],
+        },
         headers: {
             "Content-Type": "application/json",
             ...headers,

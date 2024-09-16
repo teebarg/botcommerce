@@ -15,13 +15,15 @@ export const metadata: Metadata = {
 };
 
 const getCollectionsWithProducts = cache(async (collection: string): Promise<{ products: Product[] } | null> => {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { collections: collection, per_page: 5 });
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { collections: collection, per_page: 4 });
     const res = await fetch(url, {
-        cache: "no-store",
+        next: {
+            tags: ["campaigns"],
+        },
         headers: {
             "Content-Type": "application/json",
         },
-    }).catch(error => {
+    }).catch((error) => {
         console.error("Error fetching collections:", error);
         return null;
     });
@@ -34,8 +36,8 @@ const getCollectionsWithProducts = cache(async (collection: string): Promise<{ p
 });
 
 export default async function Home() {
-    const trending = (await getCollectionsWithProducts("trending"));
-    const latest = (await getCollectionsWithProducts("latest"));
+    const trending = await getCollectionsWithProducts("trending");
+    const latest = await getCollectionsWithProducts("latest");
 
     if (!trending && !latest) {
         return null;

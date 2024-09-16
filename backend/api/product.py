@@ -1,3 +1,4 @@
+import datetime
 from io import BytesIO
 from typing import Annotated, Any
 
@@ -63,7 +64,6 @@ async def export_products(
 )
 async def index(
     search: str = "",
-    tag: str = "",
     collections: str = Query(default=""),
     maxPrice: int = Query(default=1000000, gt=0),
     minPrice: int = Query(default=1, gt=0),
@@ -74,8 +74,8 @@ async def index(
     Retrieve products using Meilisearch, sorted by latest.
     """
     filters = []
-    if tag:
-        filters.append(f"tag = '{tag}'")
+    # if tag:
+    #     filters.append(f"tag = '{tag}'")
     if collections:
         filters.append(f"collections IN [{collections}]")
     if minPrice and maxPrice:
@@ -84,7 +84,7 @@ async def index(
     search_params = {
         "limit": per_page,
         "offset": (page - 1) * per_page,
-        # "sort": ["created_at:desc"],  # Sort by latest (assuming there's a 'created_at' field)
+        "sort": ["created_at:desc"],  # Sort by latest (assuming there's a 'created_at' field)
     }
 
     if filters:
@@ -214,43 +214,38 @@ async def upload_product_image(
         await validate_file(file=file)
         contents = await file.read()
 
-        file_name = f"{id}.jpeg"
+        file_name = f"product_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpeg"
         file_path = f"products/{file_name}"
 
         blob = bucket.blob(file_path)
         blob.upload_from_file(BytesIO(contents), content_type=file.content_type)
+        blob.make_public()
 
-        # Generate a signed URL for the uploaded file
-        file_url = blob.generate_signed_url(
-            version="v4",
-            expiration=datetime.timedelta(minutes=15),
-            method="GET"
-        )
+        # Use the public URL instead of a signed URL
+        file_url = blob.public_url
 
         if product := crud.product.get(db=db, id=id):
-            # Prepare the document with updated image URL
-            updated_document = {
-                "id": id,
-                "image": file_url
-            }
-
-            # Update the document in the 'products' index
-            update_document("products", updated_document)
-
-            # Return the updated product
-            return crud.product.update(
+            product = crud.product.update(
                 db=db, db_obj=product, obj_in={"image": file_url}
             )
 
+            # Prepare product data for Meilisearch indexing
+            product_data = prepare_product_data_for_indexing(product)
+
+            update_document(index_name="products", document=product_data)
+
+            # Return the updated product
+            return product
+
         raise HTTPException(status_code=404, detail="Product not found.")
     except Exception as e:
-        logger.error(f"{e}")
+        logger.error(f"Error uploading product image: {e}")
         raise HTTPException(
-            status_code=500, detail=f"Error while uploading product image. {e}"
+            status_code=500, detail=f"Error while uploading product image: {str(e)}"
         ) from e
 
 
-@router.post("/reindex", dependencies=[Depends(deps.get_current_active_superuser)], response_model=Message)
+@router.post("/reindex", dependencies=[], response_model=Message)
 async def reindex_products(
     db: SessionDep,
     background_tasks: BackgroundTasks
@@ -296,7 +291,10 @@ async def configure_filterable_attributes(
     """
     try:
         index = get_or_create_index("products")
-        index.update_filterable_attributes(["collections", "tags", "price", "old_price", "created_at"])
+        # Update the filterable attributes
+        index.update_filterable_attributes(["collections", "price"])
+        # Update the sortable attributes
+        index.update_sortable_attributes(['created_at'])
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(message=f"Filterable attributes updated successfully: {attributes}")

@@ -44,7 +44,7 @@ const Navbar = async () => {
                     </NavbarMenuItem>
                     <NavbarMenuItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
-                            Adminn
+                            Admin
                         </LocalizedClientLink>
                     </NavbarMenuItem>
                 </div>

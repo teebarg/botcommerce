@@ -9,8 +9,12 @@ interface MultiSelectProps {
     }[];
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({ name, options, className, ...props }) => {
-    const [value, setValue] = React.useState<Selection>(new Set([]));
+const MultiSelect: React.FC<MultiSelectProps> = ({ name, options, className, defaultValue, ...props }) => {
+    const [value, setValue] = React.useState<Selection>(new Set(defaultValue));
+
+    React.useEffect(() => {
+        setValue(new Set(defaultValue));
+    }, [defaultValue]);
 
     return (
         <div className={`flex w-full flex-col gap-2 ${className}`}>
@@ -27,7 +31,6 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ name, options, className, ...
                     <SelectItem key={option.value}>{option.label}</SelectItem>
                 ))}
             </Select>
-            <p className="text-default-500 text-small">Selected: {Array.from(value).join(", ")}</p>
             <input type="hidden" name={name} value={JSON.stringify(Array.from(value))} />
         </div>
     );

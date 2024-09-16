@@ -2,26 +2,17 @@
 
 import React, { forwardRef, useRef } from "react";
 
-import { Input, Select, SelectItem, Switch } from "@nextui-org/react";
+import { Input } from "@nextui-org/input";
 import { FormButton } from "@modules/common/components/form-button";
-import { createProduct, uploadProductImage } from "../actions";
+import { createProduct, updateProduct, uploadProductImage } from "../actions";
 import { useSnackbar } from "notistack";
 import { ImageUpload } from "@modules/common/components/image-upload";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
-import { ComboBox } from "@modules/common/components/combobox";
 import { MultiSelect } from "@modules/common/components/multiselect";
-
-type Inputs = {
-    name: string;
-    is_active: boolean;
-    tags: Set<number | string>;
-    collections: Set<number | string>;
-    price: number;
-    old_price: number;
-    description: string;
-};
+import { Checkbox } from "@modules/common/components/checkbox";
+import { useRouter } from "next/navigation";
 
 interface Props {
     current?: any;
@@ -35,18 +26,18 @@ interface ChildRef {
     submit: () => void;
 }
 
-const items = [
-    { id: 1, name: "Apple" },
-    { id: 2, name: "Banana" },
-    { id: 3, name: "Cherry" },
-    { id: 4, name: "Date" },
-    { id: 5, name: "Elderberry" },
-];
-
 const ProductForm = forwardRef<ChildRef, Props>(
     ({ type = "create", onClose, current = { name: "", is_active: true }, tags = [], collections = [] }, ref) => {
+        const router = useRouter();
         const selectedTags = current?.tags?.map((item: any) => item.id) ?? [];
-        const selectedCollections = current?.collections?.map((item: any) => item.id) ?? [];
+        // const selectedCollections = current?.collections?.map((item: any) => item.id) ?? [];
+        const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
+        const isCreate = type === "create";
+
+        React.useEffect(() => {
+            const selected_collections = collections.filter((item) => current.collections.includes(item.name)).map((item) => item.id.toString());
+            setSelectedCollections(selected_collections);
+        }, [current.collections]);
 
         const { enqueueSnackbar } = useSnackbar();
         const [state, formAction] = useFormState(createProduct, {
@@ -63,11 +54,10 @@ const ProductForm = forwardRef<ChildRef, Props>(
                 // Leave the slider open and clear form
                 if (formRef.current) {
                     formRef.current.reset();
+                    router.refresh();
                 }
             }
         }, [state.success, state.message, enqueueSnackbar]);
-
-        const isCreate = type === "create";
 
         const collectionOptions = React.useMemo(() => {
             return collections.map((item) => {
@@ -83,8 +73,11 @@ const ProductForm = forwardRef<ChildRef, Props>(
 
         const handleUpload = async (data: any) => {
             try {
-                await uploadProductImage({ productId: current.id, formData: data });
-                enqueueSnackbar("Image uploaded successfully", { variant: "success" });
+                const res = await uploadProductImage({ productId: current.id, formData: data });
+                if (res.success) {
+                    router.refresh();
+                }
+                enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
             } catch (error) {
                 enqueueSnackbar(`${error}`, { variant: "error" });
             }
@@ -101,36 +94,41 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                         <span className="block text-sm font-medium mb-1">Product Image</span>
                                         {!isCreate && <ImageUpload onUpload={handleUpload} defaultImage={current.image} />}
                                     </div>
-                                    <Input name="name" label="Name" placeholder="Ex. Gown" required />
-                                    <Switch name="is_active" />
-                                    <Textarea name="description" placeholder="Product description" variant="bordered" />
-                                    <MultiSelect name="tags" options={tagOptions} label="Tags" placeholder="Select Tags" variant="bordered" />
-                                    <MultiSelect name="collections" options={collectionOptions} label="Collections" placeholder="Select Collections" variant="bordered" />
-                                    {/* <Select
+                                    <input type="text" name="type" value={type} className="hidden" readOnly />
+                                    <input type="text" name="id" value={current.id} className="hidden" readOnly />
+                                    <Input name="name" label="Name" placeholder="Ex. Gown" required defaultValue={current.name} />
+                                    <Checkbox name="is_active" label="Is Active" isSelected={current.is_active} />
+                                    <Textarea
+                                        name="description"
+                                        placeholder="Product description"
+                                        variant="bordered"
+                                        defaultValue={current.description}
+                                    />
+                                    <MultiSelect
+                                        name="tags"
+                                        options={tagOptions}
                                         label="Tags"
-                                        variant="bordered"
                                         placeholder="Select Tags"
-                                        // selectedKeys={selectedTags}
-                                        className=""
-                                    >
-                                        {tagOptions.map((tag) => (
-                                            <SelectItem key={tag.value}>{tag.label}</SelectItem>
-                                        ))}
-                                    </Select> */}
-                                    {/* <Select
-                                        label="Collections"
                                         variant="bordered"
+                                        defaultValue={selectedTags}
+                                    />
+                                    <MultiSelect
+                                        name="collections"
+                                        options={collectionOptions}
+                                        label="Collections"
                                         placeholder="Select Collections"
-                                        // selectedKeys={selectedCollections}
-                                        className=""
-                                    >
-                                        {collectionOptions.map((collection) => (
-                                            <SelectItem key={collection.value}>{collection.label}</SelectItem>
-                                        ))}
-                                    </Select> */}
-                                    <ComboBox name="beaf" label="Select a fruit" items={items} description="Select a fruit" placeholder="Select a fruit" />
-                                    <Input name="price" type="number" label="Price" placeholder="Ex. 2500" required />
-                                    <Input name="old_price" type="number" label="Old Price" placeholder="Ex. 2500" required />
+                                        variant="bordered"
+                                        defaultValue={selectedCollections}
+                                    />
+                                    <Input name="price" type="number" label="Price" placeholder="Ex. 2500" required defaultValue={current.price} />
+                                    <Input
+                                        name="old_price"
+                                        type="number"
+                                        label="Old Price"
+                                        placeholder="Ex. 2500"
+                                        required
+                                        defaultValue={current.old_price}
+                                    />
                                 </div>
                             </div>
                         </div>

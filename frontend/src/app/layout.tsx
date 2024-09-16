@@ -5,6 +5,7 @@ import clsx from "clsx";
 
 import { Providers } from "./providers";
 import { NotificationProviders } from "./notistack-providers";
+import OverlayClientProvider from "./overlay-providers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -31,7 +32,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <body className="min-h-screen bg-background">
                 <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
                     <NotificationProviders>
-                        <div className="relative flex flex-col min-h-screen">{children}</div>
+                        <OverlayClientProvider>
+                            <div className="relative flex flex-col min-h-screen">{children}</div>
+                        </OverlayClientProvider>
                     </NotificationProviders>
                 </Providers>
             </body>
