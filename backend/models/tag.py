@@ -24,6 +24,6 @@ class TagPublic(TagBase):
 class Tags(SQLModel):
     tags: list[TagPublic]
     page: int
-    per_page: int
+    limit: int
     total_count: int
     total_pages: int

@@ -21,7 +21,7 @@ const transformProductPreview = (product: any, region: any): ProductPreviewType 
     return {
         id: product.id!,
         title: product.title!,
-        handle: product.handle!,
+        slug: product.slug!,
         thumbnail: product.thumbnail!,
         created_at: product.created_at,
         price: cheapestVariant

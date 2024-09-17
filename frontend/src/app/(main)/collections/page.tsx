@@ -4,7 +4,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { CollectionTemplate } from "@modules/collections/templates";
 
 type Props = {
-    params: { handle: string; countryCode: string };
+    params: { slug: string };
     searchParams: {
         page?: string;
         sortBy?: SortOptions;
@@ -21,17 +21,12 @@ export async function generateStaticParams() {
         return [];
     }
 
-    const countryCodes = await listRegions().then((regions) => regions?.map((r) => r.countries.map((c) => c.iso_2)).flat());
+    const collectionHandles = collections.map((collection: any) => collection.slug);
 
-    const collectionHandles = collections.map((collection) => collection.handle);
-
-    const staticParams = countryCodes
-        ?.map((countryCode) =>
-            collectionHandles.map((handle) => ({
-                countryCode,
-                handle,
-            }))
-        )
+    const staticParams = collectionHandles
+        .map((slug: string) => ({
+            slug,
+        }))
         .flat();
 
     return staticParams;

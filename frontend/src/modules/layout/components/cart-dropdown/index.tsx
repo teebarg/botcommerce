@@ -91,12 +91,12 @@ const CartDropdown = ({ cart: cartState }: { cart?: Omit<any, "beforeInsert" | "
                             <>
                                 <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 no-scrollbar p-px">
                                     {cartState.items
-                                        .sort((a, b) => {
+                                        .sort((a: any, b: any) => {
                                             return a.created_at > b.created_at ? -1 : 1;
                                         })
-                                        .map((item) => (
+                                        .map((item: any) => (
                                             <div key={item.id} className="grid grid-cols-[122px_1fr] gap-x-4" data-testid="cart-item">
-                                                <LocalizedClientLink className="w-24" href={`/products/${item.variant.product.handle}`}>
+                                                <LocalizedClientLink className="w-24" href={`/products/${item.variant.product.slug}`}>
                                                     <Thumbnail size="square" thumbnail={item.thumbnail} />
                                                 </LocalizedClientLink>
                                                 <div className="flex flex-col justify-between flex-1">
@@ -106,7 +106,7 @@ const CartDropdown = ({ cart: cartState }: { cart?: Omit<any, "beforeInsert" | "
                                                                 <h3 className="text-base overflow-hidden text-ellipsis">
                                                                     <LocalizedClientLink
                                                                         data-testid="product-link"
-                                                                        href={`/products/${item.variant.product.handle}`}
+                                                                        href={`/products/${item.variant.product.slug}`}
                                                                     >
                                                                         {item.title}
                                                                     </LocalizedClientLink>

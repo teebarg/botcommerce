@@ -28,7 +28,7 @@ const ItemsPreviewTemplate = ({ items, region }: ItemsTemplateProps) => {
                             </div>
                             <div className="flex flex-1 flex-col">
                                 <div className="text-sm">
-                                    <LocalizedClientLink href={`/products/${item.variant.product.handle}`} role="link">
+                                    <LocalizedClientLink href={`/products/${item.variant.product.slug}`} role="link">
                                         <p className="font-semibold text-default-800 truncate max-w-40">{item.title}</p>
                                     </LocalizedClientLink>
                                     {item.variant.title && (

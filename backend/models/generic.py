@@ -95,7 +95,7 @@ class ProductPublic(ProductBase):
 class Products(SQLModel):
     products: list[ProductPublic]
     page: int
-    per_page: int
+    limit: int
     total_count: int
     total_pages: int
 
@@ -149,7 +149,7 @@ class AddressPublic(AddressBase):
 class Addresses(SQLModel):
     addresses: list[AddressPublic]
     page: int
-    per_page: int
+    limit: int
     total_count: int
     total_pages: int
 
@@ -193,7 +193,7 @@ class OrderPublic(OrderBase):
 class Orders(SQLModel):
     orders: list[OrderPublic]
     page: int
-    per_page: int
+    limit: int
     total_count: int
     total_pages: int
 
@@ -201,6 +201,6 @@ class Orders(SQLModel):
 class OrderItems(SQLModel):
     order_items: list[OrderItemPublic]
     page: int
-    per_page: int
+    limit: int
     total_count: int
     total_pages: int

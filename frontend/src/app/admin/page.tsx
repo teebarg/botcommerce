@@ -50,7 +50,7 @@ const users = [
 
 const pagination: PaginationType = {
     page: 1,
-    per_page: 5,
+    limit: 5,
     total_count: 6,
     total_pages: 2,
 };

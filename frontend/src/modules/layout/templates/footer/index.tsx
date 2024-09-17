@@ -40,8 +40,8 @@ const legal = [
 ];
 
 export default async function Footer() {
-    const { collections } = await getCollectionsList(0, 6);
-    const { product_categories } = await getCategoriesList(0, 6);
+    const { collections } = await getCollectionsList(1, 6);
+    const { product_categories } = await getCategoriesList(1, 6);
 
     return (
         <footer className="flex w-full flex-col">
@@ -77,13 +77,13 @@ export default async function Footer() {
                                     <div>
                                         <h3 className="text-small font-semibold text-default-600">Collections</h3>
                                         <ul className="mt-6 space-y-4">
-                                            {collections?.slice(0, 6).map((c, index) => (
+                                            {collections?.slice(0, 6).map((c: any, index: any) => (
                                                 <li key={index}>
                                                     <LocalizedClientLink
                                                         className="text-small hover:opacity-80 transition-opacity text-default-400"
-                                                        href={`/collections/${c.handle}`}
+                                                        href={`/collections/${c.slug}`}
                                                     >
-                                                        {c.title}
+                                                        {c.name}
                                                     </LocalizedClientLink>
                                                 </li>
                                             ))}
@@ -104,7 +104,7 @@ export default async function Footer() {
                                                 const children =
                                                     c.category_children?.map((child) => ({
                                                         name: child.name,
-                                                        handle: child.handle,
+                                                        slug: child.slug,
                                                         id: child.id,
                                                     })) || null;
 
@@ -113,7 +113,7 @@ export default async function Footer() {
                                                         <LocalizedClientLink
                                                             className="text-small hover:opacity-80 transition-opacity text-default-400"
                                                             data-testid="category-link"
-                                                            href={`/categories/${c.handle}`}
+                                                            href={`/categories/${c.slug}`}
                                                         >
                                                             {c.name}
                                                         </LocalizedClientLink>
@@ -124,7 +124,7 @@ export default async function Footer() {
                                                                         <LocalizedClientLink
                                                                             className="text-small hover:opacity-80 transition-opacity text-default-400"
                                                                             data-testid="category-link"
-                                                                            href={`/categories/${child.handle}`}
+                                                                            href={`/categories/${child.slug}`}
                                                                         >
                                                                             {child.name}
                                                                         </LocalizedClientLink>

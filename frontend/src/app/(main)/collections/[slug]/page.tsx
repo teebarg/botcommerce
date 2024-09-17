@@ -1,19 +1,17 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCollectionByHandle, getCollectionsList, listRegions } from "@lib/data";
+import {  getCollectionBySlug, getCollectionsList } from "@lib/data";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 import { CollectionTemplate } from "@modules/collections/templates";
 
 type Props = {
-    params: { handle: string; countryCode: string };
+    params: { slug: string };
     searchParams: {
         page?: string;
         sortBy?: SortOptions;
         cat_ids?: string;
     };
 };
-
-export const PRODUCT_LIMIT = 12;
 
 export async function generateStaticParams() {
     const { collections } = await getCollectionsList();
@@ -22,32 +20,31 @@ export async function generateStaticParams() {
         return [];
     }
 
-    const countryCodes = await listRegions().then((regions) => regions?.map((r) => r.countries.map((c) => c.iso_2)).flat());
+    const collectionHandles = collections.map((collection: any) => collection.slug);
 
-    const collectionHandles = collections.map((collection) => collection.handle);
-
-    const staticParams = countryCodes
-        ?.map((countryCode) =>
-            collectionHandles.map((handle) => ({
-                countryCode,
-                handle,
-            }))
-        )
+    const staticParams = collectionHandles
+        .map((slug: any) => ({
+            slug,
+        }))
         .flat();
+
+    console.log(staticParams);
 
     return staticParams;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const collection = await getCollectionByHandle(params.handle);
+    console.log("track i")
+    console.log(params.slug)
+    const collection = await getCollectionBySlug(params.slug);
 
     if (!collection) {
         notFound();
     }
 
     const metadata = {
-        title: `${collection.title} | TBO Store`,
-        description: `${collection.title} collection`,
+        title: `${collection.name} | TBO Store`,
+        description: `${collection.name} collection`,
     } as Metadata;
 
     return metadata;
@@ -55,8 +52,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CollectionPage({ params, searchParams }: Props) {
     const { sortBy, page } = searchParams;
+    console.log("track 2")
+    console.log(params.slug)
 
-    const collection = await getCollectionByHandle(params.handle).then((collection) => collection);
+    const collection = await getCollectionBySlug(params.slug).then((collection) => collection);
 
     if (!collection) {
         notFound();

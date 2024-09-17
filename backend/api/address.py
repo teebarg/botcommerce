@@ -36,7 +36,7 @@ def index(
     db: SessionDep,
     current_user: CurrentUser,
     page: int = Query(default=1, gt=0),
-    per_page: int = Query(default=20, le=100),
+    limit: int = Query(default=20, le=100),
 ) -> Addresses:
     """
     Retrieve addresses.
@@ -53,16 +53,16 @@ def index(
     addresses = crud.address.get_multi(
         db=db,
         query=query,
-        per_page=per_page,
-        offset=(page - 1) * per_page,
+        limit=limit,
+        offset=(page - 1) * limit,
     )
 
-    total_pages = (total_count // per_page) + (total_count % per_page > 0)
+    total_pages = (total_count // limit) + (total_count % limit > 0)
 
     return Addresses(
         addresses=addresses,
         page=page,
-        per_page=per_page,
+        limit=limit,
         total_pages=total_pages,
         total_count=total_count,
     )

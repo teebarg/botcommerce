@@ -40,7 +40,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self,
         db: Session,
         filters: list,
-        per_page: int = 20,
+        limit: int = 20,
         offset: int = 1,
         sort: str = "desc",
     ) -> list[ModelType]:
@@ -49,7 +49,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             statement = statement.where(or_(*filters))
         if sort == "desc":
             statement = statement.order_by(self.model.created_at.desc())
-        return db.exec(statement.offset(offset).limit(per_page))
+        return db.exec(statement.offset(offset).limit(limit))
 
     def all(self, db: Session) -> list[ModelType]:
         return db.query(self.model)

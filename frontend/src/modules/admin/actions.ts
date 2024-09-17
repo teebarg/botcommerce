@@ -234,9 +234,9 @@ export async function deleteCollection(collectionId: string) {
     }
 }
 
-export async function getCollections(page: number = 1, perPage: number = 10) {
+export async function getCollections(page: number = 1, limit: number = 10) {
     const accessToken = cookies().get("access_token")?.value as string;
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection?page=${page}&per_page=${perPage}`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection?page=${page}&limit=${limit}`;
 
     try {
         const res = await fetch(url, {

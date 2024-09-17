@@ -26,7 +26,7 @@ const ItemsTemplate = ({ items, region }: ItemsTemplateProps) => {
                     .map((item: any) => (
                         <tr key={item.id} className="even:bg-content2">
                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-800 sm:pl-3">
-                                <LocalizedClientLink className="flex sm:w-24 w-12" href={`/products/${item?.variant?.product.handle}`}>
+                                <LocalizedClientLink className="flex sm:w-24 w-12" href={`/products/${item?.variant?.product.slug}`}>
                                     <Thumbnail size="square" thumbnail={item.thumbnail} />
                                 </LocalizedClientLink>
                             </td>

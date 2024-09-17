@@ -1,8 +1,8 @@
 import React from "react";
 import { ChevronRightIcon, ExclamationIcon } from "nui-react-icons";
-import { PaginationComponent } from "@modules/common/components/pagination";
+import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { getCategoriesList, getCollectionsList, getProductsListWithSort, getRegion } from "@lib/data";
+import { getCategoriesList, getCollectionsList, getProductsList } from "@lib/data";
 import { Product } from "types/global";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 
@@ -29,18 +29,19 @@ type PaginatedProductsParams = {
     id?: string[];
 };
 
-const PRODUCT_LIMIT = 2;
-
 const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, productsIds, sortBy, searchParams }) => {
+    console.log(sortBy)
     const { collections } = await getCollectionsList();
     const { product_categories } = await getCategoriesList();
 
-    const queryParams: PaginatedProductsParams = {
-        limit: PRODUCT_LIMIT,
+    const queryParams: any = {
+        limit: 2,
+        page: page ?? 1,
+        sort: sortBy ?? "created_at:desc"
     };
 
     if (collection?.id) {
-        queryParams["collection_id"] = [collection.id];
+        queryParams["collections"] = [collection.slug];
     }
 
     if (searchParams?.cat_ids) {
@@ -51,15 +52,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, 
         queryParams["id"] = productsIds;
     }
 
-    const {
-        response: { products, count },
-    } = await getProductsListWithSort({
-        page: page ? parseInt(page) : 1,
-        queryParams,
-        sortBy,
-        countryCode: "ng",
-    });
-    const totalPages = Math.ceil(count / PRODUCT_LIMIT);
+    const { products, ...pagination } = await getProductsList(queryParams);
 
     return (
         <React.Fragment>
@@ -88,7 +81,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, 
                 <div className="flex gap-6 mt-6">
                     <CollectionsSideBar categories={product_categories} collections={collections} />
                     <div className="w-full flex-1 flex-col">
-                        <CollectionsTopBar count={count} slug={collection?.title} sortBy={sortBy} />
+                        <CollectionsTopBar count={pagination.total_count} slug={collection?.title} sortBy={sortBy} />
                         <main className="mt-4 w-full overflow-visible px-1">
                             <div className="block rounded-medium border-medium border-dashed border-divider px-2 py-4 min-h-[50vh]">
                                 {products.length === 0 ? (
@@ -112,7 +105,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, 
                                                 <ProductCard key={index} product={product} />
                                             ))}
                                         </div>
-                                        {totalPages > 1 && <PaginationComponent pagination={{ page: Number(page), totalPages }} />}
+                                        {pagination.total_pages > 1 && <Pagination pagination={pagination} />}
                                     </React.Fragment>
                                 )}
                             </div>

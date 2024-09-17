@@ -1,5 +1,3 @@
-
-
 export type Product = {
     id: number;
     name: string;
@@ -8,22 +6,30 @@ export type Product = {
     price: number;
     old_price: number;
     image: string;
+    images: string[];
     is_active?: boolean;
     ratings?: number;
+    created_at?: string;
+};
+
+export type Collection = {
+    id: number;
+    name: string;
+    slug?: string;
     created_at?: string;
 };
 
 export type FeaturedProduct = {
     id: string;
     title: string;
-    handle: string;
+    slug: string;
     thumbnail?: string;
 };
 
 export type ProductPreviewType = {
     id: string;
     title: string;
-    handle: string | null;
+    slug: string | null;
     thumbnail: string | null;
     created_at?: Date;
     price?: {
@@ -70,7 +76,7 @@ export type User = {
 
 export type Pagination = {
     page: number;
-    per_page: number;
+    limit: number;
     total_count: number;
     total_pages: number;
 };

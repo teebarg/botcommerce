@@ -21,7 +21,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         self,
         db: Session,
         query: dict,
-        per_page: int,
+        limit: int,
         offset: int,
         sort: str = "desc",
     ) -> list[Address]:
@@ -29,7 +29,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         statement = self.generate_statement(statement=statement, query=query)
         if sort == "desc":
             statement = statement.order_by(self.model.created_at.desc())
-        return db.exec(statement.offset(offset).limit(per_page))
+        return db.exec(statement.offset(offset).limit(limit))
 
     def create(self, db: Session, obj_in: AddressCreate, user_id: int) -> Address:
         db_obj = Address.model_validate(

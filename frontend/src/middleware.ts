@@ -1,14 +1,6 @@
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "ng";
-
-const regionMapCache = {
-    regionMap: new Map<string, Region>(),
-    regionMapUpdated: Date.now(),
-};
-
 /**
  * Middleware to handle region selection and onboarding status.
  */

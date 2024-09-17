@@ -5,6 +5,7 @@ import React from "react";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import useWatch from "@lib/hooks/use-watch";
+import { Collection } from "types/global";
 
 interface ComponentProps {
     collections: any[];
@@ -46,9 +47,9 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories 
                     <span className="text-sm">Collections</span>
                     <hr className="shrink-0 border-none w-full h-divider my-1 bg-default-100" />
                     <div className="block mb-6 space-y-1">
-                        {collections.map((item: any, index: number) => (
-                            <LocalizedClientLink key={index} className="block text-base" href={`/collections/${item.handle}`}>
-                                {item.title}
+                        {collections.map((item: Collection, index: number) => (
+                            <LocalizedClientLink key={index} className="block text-base" href={`/collections/${item.slug}`}>
+                                {item.name}
                             </LocalizedClientLink>
                         ))}
                     </div>

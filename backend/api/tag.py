@@ -43,7 +43,7 @@ async def index(
     db: SessionDep,
     name: str = "",
     page: int = Query(default=1, gt=0),
-    per_page: int = Query(default=20, le=100),
+    limit: int = Query(default=20, le=100),
 ) -> Tags:
     """
     Retrieve tags.
@@ -59,16 +59,16 @@ async def index(
     tags = crud.tag.get_multi(
         db=db,
         filters=filters,
-        per_page=per_page,
-        offset=(page - 1) * per_page,
+        limit=limit,
+        offset=(page - 1) * limit,
     )
 
-    total_pages = (total_count // per_page) + (total_count % per_page > 0)
+    total_pages = (total_count // limit) + (total_count % limit > 0)
 
     return Tags(
         tags=tags,
         page=page,
-        per_page=per_page,
+        limit=limit,
         total_pages=total_pages,
         total_count=total_count,
     )

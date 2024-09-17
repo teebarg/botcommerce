@@ -18,7 +18,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         self,
         db: Session,
         query: dict,
-        per_page: int,
+        limit: int,
         offset: int,
         sort: str = "desc",
     ) -> list[Order]:
@@ -26,7 +26,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         statement = self.generate_statement(statement=statement, query=query)
         if sort == "desc":
             statement = statement.order_by(self.model.created_at.desc())
-        return db.exec(statement.offset(offset).limit(per_page))
+        return db.exec(statement.offset(offset).limit(limit))
 
     def create(self, db: Session, obj_in: OrderCreate, user_id: int) -> Order:
         import random

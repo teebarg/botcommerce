@@ -68,7 +68,7 @@ async def index(
     maxPrice: int = Query(default=1000000, gt=0),
     minPrice: int = Query(default=1, gt=0),
     page: int = Query(default=1, gt=0),
-    per_page: int = Query(default=20, le=100),
+    limit: int = Query(default=20, le=100),
 ) -> Any:
     """
     Retrieve products using Meilisearch, sorted by latest.
@@ -82,8 +82,8 @@ async def index(
         filters.append(f"price >= {minPrice} AND price <= {maxPrice}")
 
     search_params = {
-        "limit": per_page,
-        "offset": (page - 1) * per_page,
+        "limit": limit,
+        "offset": (page - 1) * limit,
         "sort": ["created_at:desc"],  # Sort by latest (assuming there's a 'created_at' field)
     }
 
@@ -97,9 +97,51 @@ async def index(
     )
 
     total_count = search_results["estimatedTotalHits"]
-    total_pages = (total_count // per_page) + (total_count % per_page > 0)
+    total_pages = (total_count // limit) + (total_count % limit > 0)
 
-    return {"products": search_results["hits"], "page": page, "per_page": per_page, "total_count": total_count, "total_pages": total_pages}
+    return {"products": search_results["hits"], "page": page, "limit": limit, "total_count": total_count, "total_pages": total_pages}
+
+
+@router.post("/search", response_model=Any)
+async def search_products(search_params: dict) -> Any:
+    """
+    Search products using Meilisearch, sorted by relevance.
+    """
+
+    print(search_params)
+    search = search_params.get("search", "")
+    collections = search_params.get("collections", [])
+    minPrice = search_params.get("min_price", 1)
+    maxPrice = search_params.get("max_price", 1000000)
+    page = search_params.get("page", 1)
+    limit = search_params.get("limit", 20)
+    sort = search_params.get("sort", "created_at:desc")
+
+    filters = []
+    if collections:
+        filters.append(f"collections IN [{','.join(collections)}]")
+    if minPrice and maxPrice:
+        filters.append(f"price >= {minPrice} AND price <= {maxPrice}")
+
+    search_params = {
+        "limit": limit,
+        "offset": (page - 1) * limit,
+        "sort": [sort],  # Sort by specified field
+    }
+
+    if filters:
+        search_params["filter"] = " AND ".join(filters)
+
+    search_results = search_documents(
+        index_name="products",
+        query=search,
+        **search_params
+    )
+
+    total_count = search_results["estimatedTotalHits"]
+    total_pages = (total_count // limit) + (total_count % limit > 0)
+
+    return {"products": search_results["hits"], "page": page, "limit": limit, "total_count": total_count, "total_pages": total_pages}
 
 
 
@@ -294,7 +336,7 @@ async def configure_filterable_attributes(
         # Update the filterable attributes
         index.update_filterable_attributes(["collections", "price"])
         # Update the sortable attributes
-        index.update_sortable_attributes(['created_at'])
+        index.update_sortable_attributes(['created_at', 'price'])
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(message=f"Filterable attributes updated successfully: {attributes}")

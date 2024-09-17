@@ -30,9 +30,9 @@ const openingHours = [
 ];
 
 const filters = [
-    { key: "created_at", label: "Newest" },
-    { key: "price_asc", label: "Price: Low -> High" },
-    { key: "price_desc", label: "Price: High -> Low" },
+    { key: "created_at:desc", label: "Newest" },
+    { key: "price:asc", label: "Price: Low -> High" },
+    { key: "price:desc", label: "Price: High -> Low" },
 ];
 
 export { openingHours, filters };

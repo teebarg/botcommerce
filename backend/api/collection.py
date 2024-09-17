@@ -42,7 +42,7 @@ def index(
     db: SessionDep,
     name: str = "",
     page: int = Query(default=1, gt=0),
-    per_page: int = Query(default=20, le=100),
+    limit: int = Query(default=20, le=100),
 ) -> Collections:
     """
     Retrieve collections.
@@ -58,16 +58,16 @@ def index(
     collections = crud.collection.get_multi(
         db=db,
         filters=filters,
-        per_page=per_page,
-        offset=(page - 1) * per_page,
+        limit=limit,
+        offset=(page - 1) * limit,
     )
 
-    total_pages = (total_count // per_page) + (total_count % per_page > 0)
+    total_pages = (total_count // limit) + (total_count % limit > 0)
 
     return Collections(
         collections=collections,
         page=page,
-        per_page=per_page,
+        limit=limit,
         total_pages=total_pages,
         total_count=total_count,
     )
@@ -98,6 +98,18 @@ def read(id: int, db: SessionDep) -> Collection:
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
     return collection
+
+
+@router.get("/slug/{slug}", response_model=Collection)
+def get_by_slug(slug: str, db: SessionDep) -> Collection:
+    """
+    Get a collection by its slug.
+    """
+    collection = crud.collection.get_by_key(db=db, key="slug",value=slug)
+    if not collection:
+        raise HTTPException(status_code=404, detail="Collection not found")
+    return collection
+
 
 
 @router.patch(

@@ -114,12 +114,12 @@ The app folder contains all Next.js App Router pages and layouts, and takes care
         │           └── [id]
         ├── cart
         ├── collections
-        │   └── [handle]
+        │   └── [slug]
         ├── order
         │   └── confirmed
         │       └── [id]
         ├── products
-        │   └── [handle]
+        │   └── [slug]
         ├── search
             └── [query]
 ```

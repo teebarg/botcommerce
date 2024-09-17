@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 const getCollectionsWithProducts = cache(async (collection: string): Promise<{ products: Product[] } | null> => {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { collections: collection, per_page: 4 });
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { collections: collection, limit: 4 });
     const res = await fetch(url, {
         next: {
             tags: ["campaigns"],

@@ -71,14 +71,9 @@ export const getCart = cache(async function (cartId: string) {
     //     });
 });
 
-export const getProducts = cache(async function (
-    search?: string,
-    collections?: string,
-    page?: number,
-    per_page?: number
-) {
+export const getProducts = cache(async function (search?: string, collections?: string, page?: number, limit?: number) {
     const headers = getHeaders([]);
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { search, collections, page, per_page });
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { search, collections, page, limit });
     const res = await fetch(url, {
         next: {
             tags: ["products"],
@@ -97,9 +92,8 @@ export const getProducts = cache(async function (
     }
 
     const data = await res.json();
-    return data
+    return data;
 });
-
 
 export async function addItem({ cartId, quantity }: { cartId: string; quantity: number }) {
     const headers = getHeaders(["cart"]);
@@ -215,6 +209,41 @@ export async function addShippingMethod({ cartId, shippingMethodId }: { cartId: 
 
 // Authentication actions
 export async function getToken(credentials: any) {
+    console.log("............getToken............");
+    console.log(credentials);
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(credentials),
+        });
+
+        if (!response.ok) {
+            throw new Error("Login failed");
+        }
+
+        const data = await response.json();
+        console.log("............data............");
+        console.log(data);
+        return data;
+        // const { access_token } = data;
+
+        // if (access_token) {
+        //     cookies().set("access_token", access_token, {
+        //         maxAge: 60 * 60 * 24 * 7, // 7 days
+        //         httpOnly: true,
+        //         sameSite: "strict",
+        //         secure: process.env.NODE_ENV === "production",
+        //     });
+        // }
+
+        // return access_token;
+    } catch (error) {
+        console.error("Login error:", error);
+        throw new Error("Wrong email or password.");
+    }
     // return client.auth
     //     .getToken(credentials, {
     //         next: {
@@ -395,34 +424,55 @@ export const retrievePricedProductById = cache(async function ({ id, regionId }:
     //     });
 });
 
-export const getProductByHandle = cache(async function (handle: string): Promise<{ product: any }> {
-    const headers = getHeaders(["products"]);
+export const getProduct = cache(async function (slug: string): Promise<any> {
+    try {
+        const headers = getHeaders(["products"]);
 
-    // const product = await client.products
-    //     .list({ handle }, headers)
-    //     .then(({ products }) => products[0])
-    //     .catch((err) => {
-    //         throw err;
-    //     });
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                ...headers,
+            },
+        });
 
-    // return { product };
-    return null;
+        if (!response.ok) {
+            throw new Error("Failed to fetch product");
+        }
+
+        const product = await response.json();
+        return { product };
+    } catch (error) {
+        return null;
+    }
 });
 
-export const getProductsList = cache(async function ({
-    pageParam = 0,
-    queryParams,
-    countryCode,
-}: {
-    pageParam?: number;
-    queryParams?: any;
-    countryCode: string;
-}): Promise<{
-    response: { products: Product[]; count: number };
-    nextPage: number | null;
-    queryParams?: any;
-}> {
-    const limit = queryParams?.limit || 12;
+export const getProductsList = cache(async function (queryParams: any): Promise<any> {
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`;
+    const headers = getHeaders(["products"]);
+
+    console.log(queryParams);
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+            },
+            body: JSON.stringify(queryParams),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch products");
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+    }
 
     // const { products, count } = await client.products
     //     .list(
@@ -485,7 +535,6 @@ export const getProductsListWithSort = cache(async function getProductsListWithS
             ...queryParams,
             limit: 100,
         },
-        countryCode,
     });
 
     const sortedProducts = sortProducts(products, sortBy);
@@ -506,32 +555,25 @@ export const getProductsListWithSort = cache(async function getProductsListWithS
     };
 });
 
-export const getHomepageProducts = cache(async function getHomepageProducts({
-    collectionHandles,
-    currencyCode,
-    countryCode,
-}: {
-    collectionHandles?: string[];
-    currencyCode: string;
-    countryCode: string;
-}) {
+export const getHomepageProducts = cache(async function getHomepageProducts({ collectionHandles }: { collectionHandles?: string[] }) {
     const collectionProductsMap = new Map<string, Product[]>();
 
     const { collections } = await getCollectionsList(0, 3);
 
     if (!collectionHandles) {
-        collectionHandles = collections.map((collection: any) => collection.handle);
+        collectionHandles = collections.map((collection: any) => collection.slug);
     }
 
-    for (const handle of collectionHandles ?? []) {
+    console.log("collection handles");
+    console.log(collectionHandles);
+
+    for (const slug of collectionHandles ?? []) {
         const products = await getProductsByCollectionHandle({
-            handle,
-            currencyCode,
-            countryCode,
+            slug,
             limit: 3,
         });
 
-        collectionProductsMap.set(handle, products.response.products);
+        collectionProductsMap.set(slug, products.response.products);
     }
 
     return collectionProductsMap;
@@ -551,69 +593,57 @@ export const retrieveCollection = cache(async function (id: string) {
     //     });
 });
 
-export const getCollectionsList = cache(async function (offset: number = 0, limit: number = 100): Promise<{ collections: any[]; count: number }> {
-    // const collections = await client.collections
-    //     .list({ limit, offset }, { next: { tags: ["collections"] } })
-    //     .then(({ collections }) => collections)
-    //     .catch((err) => {
-    //         throw err;
-    //     });
+export const getCollectionsList = cache(async function (page: number = 1, limit: number = 100): Promise<any> {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/?page=${page}&limit=${limit}`);
 
-    // const count = collections.length;
+        if (!response.ok) {
+            throw new Error("Failed to fetch collections");
+        }
 
-    // return {
-    //     collections,
-    //     count,
-    // };
-    return {
-        collections: [],
-        count: 0,
-    };
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching collections:", error);
+        return { message: "Error fetching collections" };
+    }
 });
 
-export const getCollectionByHandle = cache(async function (handle: string): Promise<any> {
-    // const collection = await client.collections
-    //     .list({ handle: [handle] }, { next: { tags: ["collections"] } })
-    //     .then(({ collections }) => collections[0])
-    //     .catch((err) => {
-    //         throw err;
-    //     });
+export const getCollectionBySlug = cache(async function (slug: string): Promise<any> {
+    console.log("slug-------------");
+    console.log(slug);
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/slug/${slug}`, { next: { tags: ["collection"] } });
 
-    // return collection;
-    return null;
+        if (!response.ok) {
+            throw new Error("Failed to fetch collection");
+        }
+
+        const collection = await response.json();
+        return collection;
+    } catch (error) {
+        console.error("Error fetching collection by slug:", error);
+        return null;
+    }
 });
 
 export const getProductsByCollectionHandle = cache(async function getProductsByCollectionHandle({
-    pageParam = 0,
-    limit = 100,
-    handle,
-    countryCode,
+    page = 1,
+    slug,
+    limit = 1,
 }: {
-    pageParam?: number;
-    handle: string;
-    limit?: number;
-    countryCode: string;
-    currencyCode?: string;
-}): Promise<{
-    response: { products: Product[]; count: number };
-    nextPage: number | null;
-}> {
-    const { id } = await getCollectionByHandle(handle).then((collection: any) => collection);
+    page?: number;
+    slug: string;
+    limit: number;
+}): Promise<any> {
+    const { id } = await getCollectionBySlug(slug).then((collection: any) => collection);
 
-    const { response, nextPage } = await getProductsList({
-        pageParam,
-        queryParams: { collection_id: [id], limit },
-        countryCode,
-    })
+    const res = await getProductsList({ collections: [id], page })
         .then((res: any) => res)
         .catch((err: any) => {
             throw err;
         });
 
-    return {
-        response,
-        nextPage,
-    };
+    return res;
 });
 
 // Category actions
@@ -656,15 +686,15 @@ export const getCategoriesList = cache(async function (
 });
 
 export const getCategoryByHandle = cache(async function (categoryHandle: string[]): Promise<any> {
-    const handles = categoryHandle.map((handle: string, index: number) => categoryHandle.slice(0, index + 1).join("/"));
+    const handles = categoryHandle.map((slug: string, index: number) => categoryHandle.slice(0, index + 1).join("/"));
 
     const product_categories = [] as ProductCategoryWithChildren[];
 
-    for (const handle of handles) {
+    for (const slug of handles) {
         // const category = await client.productCategories
         //     .list(
         //         {
-        //             handle: handle,
+        //             slug: slug,
         //         },
         //         {
         //             next: {
@@ -686,18 +716,18 @@ export const getCategoryByHandle = cache(async function (categoryHandle: string[
 
 export const getProductsByCategoryHandle = cache(async function ({
     pageParam = 0,
-    handle,
+    slug,
     countryCode,
 }: {
     pageParam?: number;
-    handle: string;
+    slug: string;
     countryCode: string;
     currencyCode?: string;
 }): Promise<{
     response: { products: Product[]; count: number };
     nextPage: number | null;
 }> {
-    const { id } = await getCategoryByHandle([handle]).then((res: any) => res.product_categories[0]);
+    const { id } = await getCategoryByHandle([slug]).then((res: any) => res.product_categories[0]);
 
     const { response, nextPage } = await getProductsList({
         pageParam,

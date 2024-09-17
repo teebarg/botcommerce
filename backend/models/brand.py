@@ -24,6 +24,6 @@ class BrandPublic(BrandBase):
 class Brands(SQLModel):
     brands: list[BrandPublic]
     page: int
-    per_page: int
+    limit: int
     total_count: int
     total_pages: int

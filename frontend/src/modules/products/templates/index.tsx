@@ -9,14 +9,13 @@ import { ArrowUpRightMini, ChevronRightIcon, StarIcon } from "nui-react-icons";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 
 import ProductDetails from "./details";
+import { Product } from "types/global";
 
 type ProductTemplateProps = {
-    product: any;
-    region: any;
-    countryCode: string;
+    product: Product;
 };
 
-const ProductTemplate: React.FC<ProductTemplateProps> = ({ product, region, countryCode }) => {
+const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
     if (!product || !product.id) {
         return notFound();
     }
@@ -35,12 +34,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product, region, coun
                             </span>
                             <LocalizedClientLink href="/collections">Collection</LocalizedClientLink>
                         </li>
-                        {product?.title && (
+                        {product?.name && (
                             <li className="flex items-center" data-slot="base">
                                 <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
                                     <ChevronRightIcon />
                                 </span>
-                                <span>{product.title}</span>
+                                <span>{product.name}</span>
                             </li>
                         )}
                     </ol>
@@ -52,10 +51,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product, region, coun
                             <span className="flex-1 text-inherit font-normal px-2 pl-1">Popular</span>
                         </div>
                         <Image
-                            alt={product.title}
+                            alt={product.name}
                             className="h-[60vh]"
                             classNames={{ wrapper: "!max-w-full flex justify-center" }}
-                            src={product.thumbnail as string}
+                            src={product.image as string}
                         />
                         <ScrollShadow hideScrollBar className="mt-8 w-full" orientation="horizontal">
                             <div className="flex gap-2 w-[800px]">
@@ -66,12 +65,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product, region, coun
                         </ScrollShadow>
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-bold tracking-tight">{product.title}</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
                         <div className="my-2 flex items-center gap-2">
                             <p className="text-small text-default-400">669 reviews</p>
                         </div>
                         <div className="max-w-40 mt-2">
-                            <Suspense fallback={<ProductActions disabled={true} product={product} region={region} />}>
+                            <Suspense fallback={<ProductActions disabled={true} product={product} />}>
                                 <ProductActions product={product} />
                             </Suspense>
                         </div>
@@ -103,7 +102,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product, region, coun
             </div>
             <div className="max-w-7xl mx-auto px-6 my-16 sm:my-32" data-testid="related-products-container">
                 <Suspense fallback={<SkeletonRelatedProducts />}>
-                    <RelatedProducts countryCode={countryCode} product={product} />
+                    <RelatedProducts product={product} />
                 </Suspense>
             </div>
         </React.Fragment>

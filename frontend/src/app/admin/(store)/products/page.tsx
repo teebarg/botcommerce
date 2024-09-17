@@ -16,20 +16,17 @@ export const metadata: Metadata = {
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 
-const fetchProducts = async (search = "", page = 1, per_page = 10) => {
-    const products = await getProducts(search, undefined, page, per_page);
+const fetchProducts = async (search = "", page = 1, limit = 10) => {
+    const products = await getProducts(search, undefined, page, limit);
     return products;
 };
 
-export default async function ProductsPage({ searchParams }: { searchParams: { search?: string; page?: string; per_page?: string } }) {
+export default async function ProductsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
-    const per_page = parseInt(searchParams.per_page || "10", 10);
-    console.log(page, per_page);
-    const { products, ...pagination } = await fetchProducts(search, page, per_page);
+    const limit = parseInt(searchParams.limit || "10", 10);
+    const { products, ...pagination } = await fetchProducts(search, page, limit);
     const { collections } = await getCollections(1, 100);
-    console.log(".............collection.........");
-    console.log(collections);
 
     return (
         <React.Fragment>
@@ -52,7 +49,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                             .map((item: Product, index: number) => (
                                 <tr key={item.id} className="even:bg-content2">
                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        {(page - 1) * per_page + index + 1}
+                                        {(page - 1) * limit + index + 1}
                                     </td>
                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
                                         <Badge content="" color={item.is_active ? "success" : "danger"} shape="circle" placement="bottom-right">

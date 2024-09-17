@@ -1,40 +1,23 @@
-import { getProductsList, getRegion } from "@lib/data";
+import { getProductsList } from "@lib/data";
 
 import ProductPreview from "../product-preview";
 
 type RelatedProductsProps = {
     product: any;
-    countryCode: string;
 };
 
-export default async function RelatedProducts({ product, countryCode }: RelatedProductsProps) {
-    const region = await getRegion(countryCode);
-
-    if (!region) {
-        return null;
-    }
-
+export default async function RelatedProducts({ product }: RelatedProductsProps) {
     // edit this function to define your related products logic
     const setQueryParams = (): any => {
         const params: any = {};
 
-        if (region?.id) {
-            params.region_id = region.id;
-        }
-
-        if (region?.currency_code) {
-            params.currency_code = region.currency_code;
-        }
-
-        if (product.collection_id) {
-            params.collection_id = [product.collection_id];
+        if (product.collections) {
+            params.collections = [...product.collections];
         }
 
         if (product.tags) {
-            params.tags = product.tags.map((t) => t.value);
+            params.tags = product.tags.map((t: any) => t.value);
         }
-
-        params.is_giftcard = false;
 
         return params;
     };
@@ -43,8 +26,7 @@ export default async function RelatedProducts({ product, countryCode }: RelatedP
 
     const productPreviews = await getProductsList({
         queryParams,
-        countryCode,
-    }).then(({ response }) => response.products.filter((productPreview) => productPreview.id !== product.id));
+    }).then(({ response }) => response.products.filter((product: any) => product.id !== product.id));
 
     if (!productPreviews.length) {
         return null;
@@ -58,9 +40,9 @@ export default async function RelatedProducts({ product, countryCode }: RelatedP
             </div>
 
             <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                {productPreviews.slice(0, 4).map((productPreview) => (
-                    <li key={productPreview.id}>
-                        <ProductPreview productPreview={productPreview} region={region} />
+                {productPreviews.slice(0, 4).map((product: any) => (
+                    <li key={product.id}>
+                        <ProductPreview product={product} />
                     </li>
                 ))}
             </ul>

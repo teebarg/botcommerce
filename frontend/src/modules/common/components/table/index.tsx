@@ -16,7 +16,7 @@ import { SlideOver } from "../slideover";
 interface Props {
     children: React.ReactNode;
     columns: string[];
-    pagination: PaginationType;
+    pagination?: PaginationType;
     canExport?: boolean;
     canIndex?: boolean;
     searchQuery?: string;
@@ -127,7 +127,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                     </div>
                 </div>
             </div>
-            {pagination.total_pages > 1 && <Pagination pagination={pagination} />}
+            {pagination && pagination?.total_pages > 1 && <Pagination pagination={pagination} />}
             {state.isOpen && (
                 <SlideOver
                     className="bg-default-50"

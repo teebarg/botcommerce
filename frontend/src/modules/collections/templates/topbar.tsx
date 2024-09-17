@@ -17,7 +17,7 @@ interface ComponentProps {
 
 const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy }) => {
     const { updateQuery } = useUpdateQuery(1000);
-    const [value, setValue] = React.useState<any>(new Set([sortBy || "price_asc"]));
+    const [value, setValue] = React.useState<any>(new Set([sortBy || "created_at:desc"]));
 
     useWatch(value, (newValue: any) => {
         updateQuery([{ key: "sortBy", value: newValue.values().next().value }]);

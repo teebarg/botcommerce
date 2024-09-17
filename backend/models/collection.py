@@ -26,6 +26,6 @@ class CollectionPublic(CollectionBase):
 class Collections(SQLModel):
     collections: list[CollectionPublic]
     page: int
-    per_page: int
+    limit: int
     total_count: int
     total_pages: int
