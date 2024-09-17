@@ -449,7 +449,7 @@ export const getProduct = cache(async function (slug: string): Promise<any> {
 
 export const getProductsList = cache(async function (queryParams: any): Promise<any> {
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`;
-    const headers = getHeaders(["products"]);
+    // const headers = getHeaders([]);
 
     console.log(queryParams);
 
@@ -458,7 +458,7 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                ...headers,
+                // ...headers,
             },
             body: JSON.stringify(queryParams),
         });

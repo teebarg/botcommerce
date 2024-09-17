@@ -1,6 +1,7 @@
 import { getProductsList } from "@lib/data";
 
 import ProductPreview from "../product-preview";
+import { Product } from "types/global";
 
 type RelatedProductsProps = {
     product: any;
@@ -12,7 +13,7 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
         const params: any = {};
 
         if (product.collections) {
-            params.collections = [...product.collections];
+            params.collections = [...product.collections.map((item: any) => item.name)];
         }
 
         if (product.tags) {
@@ -23,10 +24,8 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
     };
 
     const queryParams = setQueryParams();
-
-    const productPreviews = await getProductsList({
-        queryParams,
-    }).then(({ response }) => response.products.filter((product: any) => product.id !== product.id));
+    const { products } = await getProductsList(queryParams);
+    const productPreviews = products.filter((item: Product) => item.id !== product.id);
 
     if (!productPreviews.length) {
         return null;
