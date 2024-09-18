@@ -9,6 +9,7 @@ import MapPin from "@modules/common/icons/map-pin";
 import Package from "@modules/common/icons/package";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import clsx from "clsx";
+import { Customer } from "types/global";
 
 const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | null }) => {
     const route = usePathname();
@@ -29,7 +30,7 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
                     </LocalizedClientLink>
                 ) : (
                     <>
-                        <div className="text-xl mb-4 px-8">Hello {customer?.first_name}</div>
+                        <div className="text-xl mb-4 px-8">Hello {customer?.firstname}</div>
                         <div className="text-base">
                             <ul>
                                 <li>

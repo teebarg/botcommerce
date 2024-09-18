@@ -2,9 +2,10 @@ import React from "react";
 import UnderlineLink from "@modules/common/components/interactive-link";
 
 import AccountNav from "../components/account-nav";
+import { Customer } from "types/global";
 
 interface AccountLayoutProps {
-    customer: Omit<any, "password_hash"> | null;
+    customer: Omit<Customer, "password_hash">;
     children: React.ReactNode;
 }
 

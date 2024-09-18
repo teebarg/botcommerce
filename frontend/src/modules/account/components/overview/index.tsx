@@ -1,9 +1,10 @@
 import { formatAmount } from "@lib/util/prices";
 import ChevronDown from "@modules/common/icons/chevron-down";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import { Customer } from "types/global";
 
 type OverviewProps = {
-    customer: Omit<any, "password_hash"> | null;
+    customer: Omit<Customer, "password_hash"> | null;
     orders: any[] | null;
 };
 
@@ -12,8 +13,8 @@ const Overview = ({ customer, orders }: OverviewProps) => {
         <div data-testid="overview-page-wrapper">
             <div className="hidden sm:block">
                 <div className="text-xl flex justify-between items-center mb-4">
-                    <span data-testid="welcome-message" data-value={customer?.first_name}>
-                        Hello {customer?.first_name}
+                    <span data-testid="welcome-message" data-value={customer?.firstname}>
+                        Hello {customer?.firstname}
                     </span>
                     <span className="text-sm text-default-700">
                         Signed in as:{" "}

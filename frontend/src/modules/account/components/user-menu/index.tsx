@@ -21,13 +21,13 @@ export default function UserDropDown({ customer }: any) {
                     }}
                     className="transition-transform"
                     description={customer?.email}
-                    name={customer?.last_name}
+                    name={customer?.lastname}
                 />
             </DropdownTrigger>
             <DropdownMenu aria-label="User Actions" variant="flat">
                 <DropdownItem key="user" className="h-14 gap-2">
                     <p className="font-bold">Signed in as</p>
-                    <p className="font-bold">@{customer?.first_name}</p>
+                    <p className="font-bold">@{customer?.firstname}</p>
                 </DropdownItem>
 
                 <DropdownItem key="admin">

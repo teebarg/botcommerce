@@ -49,9 +49,6 @@ async def export_products(
             email=current_user.email,
         )
 
-        # Send email notification with file URL to user
-        await send_email_notification(current_user.email, file_url)
-
         return {"message": "Data Export successful. An email with the file URL has been sent.", "file_url": file_url}
     except Exception as e:
         logger.error(f"Export products error: {e}")

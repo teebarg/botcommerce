@@ -24,10 +24,10 @@ const getHeaders = (tags: string[] = []) => {
         },
     } as Record<string, any>;
 
-    const token = cookies().get("_jwt")?.value;
+    const token = cookies().get("access_token")?.value;
 
     if (token) {
-        headers.authorization = `Bearer ${token}`;
+        headers["X-Auth"] = token;
     } else {
         headers.authorization = "";
     }
@@ -209,13 +209,14 @@ export async function addShippingMethod({ cartId, shippingMethodId }: { cartId: 
 
 // Authentication actions
 export async function getToken(credentials: any) {
-    console.log("............getToken............");
-    console.log(credentials);
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+            },
+            next: {
+                tags: ["auth"],
             },
             body: JSON.stringify(credentials),
         });
@@ -224,45 +225,22 @@ export async function getToken(credentials: any) {
             throw new Error("Login failed");
         }
 
-        const data = await response.json();
-        console.log("............data............");
-        console.log(data);
-        return data;
-        // const { access_token } = data;
+        const { access_token } = await response.json();
 
-        // if (access_token) {
-        //     cookies().set("access_token", access_token, {
-        //         maxAge: 60 * 60 * 24 * 7, // 7 days
-        //         httpOnly: true,
-        //         sameSite: "strict",
-        //         secure: process.env.NODE_ENV === "production",
-        //     });
-        // }
+        if (access_token) {
+            cookies().set("access_token", access_token, {
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+                httpOnly: true,
+                sameSite: "strict",
+                secure: process.env.NODE_ENV === "production",
+            });
+        }
 
-        // return access_token;
+        return access_token;
     } catch (error) {
         console.error("Login error:", error);
         throw new Error("Wrong email or password.");
     }
-    // return client.auth
-    //     .getToken(credentials, {
-    //         next: {
-    //             tags: ["auth"],
-    //         },
-    //     })
-    //     .then(({ access_token }) => {
-    //         access_token &&
-    //             cookies().set("_jwt", access_token, {
-    //                 maxAge: 60 * 60 * 24 * 7,
-    //                 httpOnly: true,
-    //                 sameSite: "strict",
-    //                 secure: process.env.NODE_ENV === "production",
-    //             });
-    //         return access_token;
-    //     })
-    //     .catch((err) => {
-    //         throw new Error("Wrong email or password." + err);
-    //     });
 }
 
 export async function authenticate(credentials: any) {
@@ -287,10 +265,23 @@ export const getSession = cache(async function getSession() {
 export async function getCustomer() {
     const headers = getHeaders(["customer"]);
 
-    // return client.customers
-    //     .retrieve(headers)
-    //     .then(({ customer }) => customer)
-    //     .catch(() => null);
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/users/me`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+            },
+            credentials: "include",
+        });
+        if (!res.ok) {
+            throw new Error("Login failed");
+        }
+
+        return await res.json();
+    } catch (error) {
+        return null;
+    }
 }
 
 export async function createCustomer(data: any) {

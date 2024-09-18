@@ -1,3 +1,13 @@
+export type Customer = {
+    id: number;
+    firstname: string;
+    lastname?: string;
+    email?: string;
+    is_active?: boolean;
+    is_superuser?: number;
+    created_at?: string;
+};
+
 export type Product = {
     id: number;
     name: string;

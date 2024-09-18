@@ -60,8 +60,6 @@ services:
       - backend
     build:
       context: ./frontend
-      args:
-        - NODE_ENV=production
     command: npm run dev
     volumes:
       - ./frontend:/app
