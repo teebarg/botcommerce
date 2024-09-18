@@ -467,7 +467,7 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
 });
 
 interface SearchParams {
-    search?: string;
+    query?: string;
     collections?: string[];
     min_price?: number;
     max_price?: number;
@@ -485,7 +485,7 @@ interface SearchResult {
 }
 
 export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
-    const { search = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
+    const { query = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
 
     const filters: string[] = [];
     if (collections.length > 0) {
@@ -505,7 +505,7 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
         meilisearchParams.filter = filters.join(" AND ");
     }
 
-    const searchResults = await searchDocuments<Product>("products", search, meilisearchParams);
+    const searchResults = await searchDocuments<Product>("products", query, meilisearchParams);
 
     const totalCount = searchResults.estimatedTotalHits || 0;
     const totalPages = Math.ceil(totalCount / limit);

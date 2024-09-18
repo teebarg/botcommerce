@@ -1,13 +1,9 @@
 import { MeiliSearch, Index, SearchParams, MeiliSearchApiError } from "meilisearch";
 
-// Assume these are defined in your environment or configuration file
-const MEILI_HOST = process.env.MEILI_HOST as string;
-const MEILI_MASTER_KEY = process.env.MEILI_MASTER_KEY as string;
-
 // Initialize Meilisearch client
 const client = new MeiliSearch({
-    host: MEILI_HOST,
-    apiKey: MEILI_MASTER_KEY,
+    host: process.env.NEXT_PUBLIC_SEARCH_ENDPOINT as string,
+    apiKey: process.env.NEXT_PUBLIC_SEARCH_API_KEY as string,
 });
 
 // Custom serializer function

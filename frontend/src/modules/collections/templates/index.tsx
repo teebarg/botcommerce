@@ -11,7 +11,8 @@ import { CollectionsSideBar } from "./sidebar";
 import { ProductCard } from "@modules/products/components/product-card";
 
 interface ComponentProps {
-    productsIds?: string[];
+    query?: string;
+    productsIds?: (string | number)[];
     collection?: any;
     page?: string;
     sortBy?: SortOptions;
@@ -22,14 +23,15 @@ interface ComponentProps {
     };
 }
 
-const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, productsIds, sortBy, searchParams }) => {
+const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, productsIds, sortBy, searchParams }) => {
     const { collections } = await getCollectionsList();
     const { product_categories } = await getCategoriesList();
 
     const queryParams: any = {
+        query,
         limit: 12,
         page: page ?? 1,
-        sort: sortBy ?? "created_at:desc"
+        sort: sortBy ?? "created_at:desc",
     };
 
     if (collection?.id) {

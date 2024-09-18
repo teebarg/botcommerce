@@ -40,7 +40,7 @@ const legal = [
 ];
 
 export default async function Footer() {
-    const { collections } = await getCollectionsList(1, 6);
+    const { collections } = await getCollectionsList(undefined, 1, 6);
     const { product_categories } = await getCategoriesList(1, 6);
 
     return (
