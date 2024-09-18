@@ -35,15 +35,23 @@ const addDocumentsToIndex = async <T extends Record<string, any>>(indexName: str
     await index.addDocuments(documents, { primaryKey: "id" });
 };
 
-const searchDocuments2 = async <T>(indexName: string, query: string, options: SearchParams = {}): Promise<{ hits: T[] }> => {
-    const index = await getOrCreateIndex(indexName);
-    const searchResponse = await index.search(query, options);
-    return { hits: searchResponse.hits.map((hit) => hit.document as T) };
-};
-
 const searchDocuments = async <T>(indexName: string, query: string, options: SearchParams = {}): Promise<any> => {
     const index = await getOrCreateIndex(indexName);
     return await index.search(query, options);
+};
+
+const multiSearchDocuments = async <T>(
+    queries: {
+        indexUid: string;
+        q: string;
+        limit?: number;
+        sort?: string[];
+        filter?: string;
+    }[]
+): Promise<any> => {
+    return client.multiSearch({
+        queries: queries,
+    });
 };
 
 const updateDocument = async <T extends Record<string, any>>(indexName: string, document: T): Promise<void> => {
@@ -65,4 +73,4 @@ const deleteIndex = async (indexName: string): Promise<void> => {
     await client.deleteIndex(indexName);
 };
 
-export { getOrCreateIndex, addDocumentsToIndex, searchDocuments, updateDocument, deleteDocument, clearIndex, deleteIndex };
+export { getOrCreateIndex, addDocumentsToIndex, searchDocuments, multiSearchDocuments, updateDocument, deleteDocument, clearIndex, deleteIndex };

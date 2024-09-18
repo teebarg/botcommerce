@@ -1,43 +1,39 @@
 import { Metadata } from "next";
 import { Product } from "types/global";
-import React, { cache } from "react";
+import React from "react";
 import { Image } from "@nextui-org/image";
 import { LocationIcon, MailIcon } from "nui-react-icons";
 import { openingHours } from "@lib/config";
-import { buildUrl, imgSrc } from "@lib/util/util";
+import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
 import Button from "@modules/common/components/button";
 import { ProductCard } from "@modules/products/components/product-card";
+import { multiSearchDocuments } from "@lib/util/meilisearch";
 
 export const metadata: Metadata = {
     title: "Children clothing | TBO Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 
-const getCollectionsWithProducts = cache(async (collection: string): Promise<{ products: Product[] } | null> => {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { collections: collection, limit: 4 });
-    const res = await fetch(url, {
-        next: {
-            tags: ["campaigns"],
-        },
-        headers: {
-            "Content-Type": "application/json",
-        },
-    }).catch((error) => {
-        console.error("Error fetching collections:", error);
-        return null;
-    });
-
-    if (!res) {
-        console.error("Failed to fetch collections");
-        return null;
-    }
-    return res.json();
-});
-
 export default async function Home() {
-    const trending = await getCollectionsWithProducts("trending");
-    const latest = await getCollectionsWithProducts("latest");
+    const {
+        results: [trending, latest],
+    } = await multiSearchDocuments([
+        {
+            indexUid: "products",
+            q: "",
+            limit: 4,
+            sort: ["created_at:desc"],
+            filter: "collections IN ['trending']",
+        },
+        {
+            indexUid: "products",
+            q: "",
+            limit: 4,
+            sort: ["created_at:desc"],
+            filter: "collections IN ['latest']",
+        },
+    ]);
 
     if (!trending && !latest) {
         return null;
@@ -95,7 +91,7 @@ export default async function Home() {
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.products?.map((product: Product, index: number) => (
+                            {trending?.hits?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} />
                             ))}
                         </div>
@@ -122,7 +118,7 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
-                            {latest?.products?.map((product: Product, index: number) => (
+                            {latest?.hits?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} />
                             ))}
                         </div>
