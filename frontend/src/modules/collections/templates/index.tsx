@@ -2,7 +2,7 @@ import React from "react";
 import { ChevronRightIcon, ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { getCategoriesList, getCollectionsList, getProductsList } from "@lib/data";
+import { getCategoriesList, getCollectionsList, searchProducts } from "@lib/data";
 import { Product } from "types/global";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 
@@ -22,20 +22,12 @@ interface ComponentProps {
     };
 }
 
-type PaginatedProductsParams = {
-    limit: number;
-    collection_id?: string[];
-    category_id?: string[];
-    id?: string[];
-};
-
 const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, productsIds, sortBy, searchParams }) => {
-    console.log(sortBy)
     const { collections } = await getCollectionsList();
     const { product_categories } = await getCategoriesList();
 
     const queryParams: any = {
-        limit: 2,
+        limit: 12,
         page: page ?? 1,
         sort: sortBy ?? "created_at:desc"
     };
@@ -52,7 +44,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ collection, page, 
         queryParams["id"] = productsIds;
     }
 
-    const { products, ...pagination } = await getProductsList(queryParams);
+    const { products, ...pagination } = await searchProducts(queryParams);
 
     return (
         <React.Fragment>

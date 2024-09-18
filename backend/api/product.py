@@ -2,7 +2,7 @@ import datetime
 from io import BytesIO
 from typing import Annotated, Any
 
-from services.meilisearch import add_documents_to_index, delete_document, get_or_create_index, search_documents, update_document
+from services.meilisearch import add_documents_to_index, clear_index, delete_document, delete_index, get_or_create_index, search_documents, update_document
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -110,8 +110,8 @@ async def search_products(search_params: dict) -> Any:
     collections = search_params.get("collections", [])
     minPrice = search_params.get("min_price", 1)
     maxPrice = search_params.get("max_price", 1000000)
-    page = search_params.get("page", 1)
-    limit = search_params.get("limit", 20)
+    page = int(search_params.get("page", 1))
+    limit = int(search_params.get("limit", 20))
     sort = search_params.get("sort", "created_at:desc")
 
     filters = []
@@ -186,6 +186,7 @@ def update(
     db: SessionDep,
     id: int,
     product_in: ProductUpdate,
+    background_tasks: BackgroundTasks,
 ) -> ProductPublic:
     """
     Update a product.
@@ -197,11 +198,17 @@ def update(
             detail="Product not found",
         )
     db_product = crud.product.update(db=db, db_obj=db_product, obj_in=product_in)
+    
     try:
-        # Prepare product data for Meilisearch indexing
-        product_data = prepare_product_data_for_indexing(db_product)
+        # Define the background task
+        def update_task(db_product):
+            # Prepare product data for Meilisearch indexing
+            product_data = prepare_product_data_for_indexing(db_product)
 
-        update_document(index_name="products", document=product_data)
+            update_document(index_name="products", document=product_data)
+
+        background_tasks.add_task(update_task, db_product=db_product)
+        return db_product
     except Exception as e:
         logger.error(f"Error updating document in Meilisearch: {e}")
     return db_product
@@ -303,7 +310,7 @@ async def reindex_products(
             for product in products:
                 product_dict = prepare_product_data_for_indexing(product)
                 documents.append(product_dict)
-
+                
             # Add all documents to the 'products' index
             add_documents_to_index(index_name="products", documents=documents)
 
@@ -344,23 +351,36 @@ async def configure_filterable_attributes(
             detail="An error occurred while updating filterable attributes."
         )
 
-
-@router.get("/search/filterable-attributes", response_model=list[str])
-async def get_filterable_attributes():
+    
+@router.get("/search/clear-index", response_model=dict)
+async def config_clear_index():
     """
-    Get the current filterable attributes for the products index in Meilisearch.
+    Clear the products index in Meilisearch.
     """
     try:
-        index = get_or_create_index("products")
-        filterable_attributes = index.get_filterable_attributes()
-
-        logger.info(f"Retrieved filterable attributes: {filterable_attributes}")
-        return filterable_attributes
+        clear_index("products")
+        return {"message": "Index cleared"}
     except Exception as e:
-        logger.error(f"Error retrieving filterable attributes: {e}")
+        logger.error(f"Error clearing index: {e}")
         raise HTTPException(
             status_code=500,
-            detail="An error occurred while retrieving filterable attributes."
+            detail="An error occurred while clearing index"
+        )
+    
+
+@router.get("/search/delete-index", response_model=dict)
+async def config_delete_index():
+    """
+    Drop the products index in Meilisearch.
+    """
+    try:
+        delete_index("products")
+        return {"message": "Index dropping"}
+    except Exception as e:
+        logger.error(f"Error dropping index: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while dropping index"
         )
 
 def prepare_product_data_for_indexing(product: Product) -> dict:

@@ -51,3 +51,17 @@ def delete_document(index_name: str, document_id: str) -> None:
     """
     index = get_or_create_index(index_name)
     index.delete_document(document_id)
+
+def clear_index(index_name: str) -> None:
+    """
+    Clear index from a Meilisearch.
+    """
+    index = get_or_create_index(index_name)
+    index.delete_all_documents()
+
+
+def delete_index(index_name: str) -> None:
+    """
+    Clear index from a Meilisearch.
+    """
+    client.delete_index(index_name)

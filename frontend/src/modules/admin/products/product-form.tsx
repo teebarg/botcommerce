@@ -4,7 +4,7 @@ import React, { forwardRef, useRef } from "react";
 
 import { Input } from "@nextui-org/input";
 import { FormButton } from "@modules/common/components/form-button";
-import { createProduct, updateProduct, uploadProductImage } from "../actions";
+import { createProduct, uploadProductImage } from "../actions";
 import { useSnackbar } from "notistack";
 import { ImageUpload } from "@modules/common/components/image-upload";
 import Button from "@modules/common/components/button";
@@ -30,12 +30,11 @@ const ProductForm = forwardRef<ChildRef, Props>(
     ({ type = "create", onClose, current = { name: "", is_active: true }, tags = [], collections = [] }, ref) => {
         const router = useRouter();
         const selectedTags = current?.tags?.map((item: any) => item.id) ?? [];
-        // const selectedCollections = current?.collections?.map((item: any) => item.id) ?? [];
         const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
         const isCreate = type === "create";
 
         React.useEffect(() => {
-            const selected_collections = collections.filter((item) => current.collections.includes(item.name)).map((item) => item.id.toString());
+            const selected_collections = collections.filter((item) => current?.collections?.includes(item.name)).map((item) => item?.id?.toString());
             setSelectedCollections(selected_collections);
         }, [current.collections]);
 
@@ -55,9 +54,11 @@ const ProductForm = forwardRef<ChildRef, Props>(
                 if (formRef.current) {
                     formRef.current.reset();
                     router.refresh();
+                    onClose?.()
                 }
             }
-        }, [state.success, state.message, enqueueSnackbar]);
+        }, [state, enqueueSnackbar]);
+
 
         const collectionOptions = React.useMemo(() => {
             return collections.map((item) => {

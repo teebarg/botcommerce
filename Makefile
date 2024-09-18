@@ -74,6 +74,17 @@ prep-docker: ## Prepare postges database
 	@echo "$(YELLOW)Preparing docker database...$(RESET)"
 	docker exec botcommerce-backend ./prestart.sh
 
+serve-backend: ## Serve the backend in terminal
+	@cd backend; python -m uvicorn main:app --host 0.0.0.0 --reload
+
+serve-frontend: ## Serve the frontend in terminal
+	@cd frontend; npm run dev
+
+dev: ## Serve the project in terminal
+	@echo "$(YELLOW)Running development in terminal...$(RESET)"
+	pip install -r backend/requirements.dev.txt --require-virtualenv
+	make -j 2 serve-backend serve-frontend
+
 
 # Backend Deployment
 deploy:

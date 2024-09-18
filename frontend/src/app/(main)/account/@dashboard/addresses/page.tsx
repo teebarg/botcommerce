@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AddressBook from "@modules/account/components/address-book";
-import { getCustomer, getRegion } from "@lib/data";
+import { getCustomer } from "@lib/data";
 
 export const metadata: Metadata = {
     title: "Addresses",
@@ -10,9 +10,8 @@ export const metadata: Metadata = {
 
 export default async function Addresses() {
     const customer = await getCustomer();
-    const region = await getRegion(process.env.NEXT_PUBLIC_COUNTRY_CODE as string);
 
-    if (!customer || !region) {
+    if (!customer) {
         notFound();
     }
 
@@ -25,7 +24,7 @@ export default async function Addresses() {
                     checkout.
                 </p>
             </div>
-            <AddressBook customer={customer} region={region} />
+            <AddressBook customer={customer} region={null} />
         </div>
     );
 }

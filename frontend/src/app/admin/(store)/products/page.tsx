@@ -8,7 +8,7 @@ import { Badge } from "@nextui-org/badge";
 import { Avatar } from "@nextui-org/avatar";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
-import { getCollections } from "@modules/admin/actions";
+import { deleteProduct, getCollections } from "@modules/admin/actions";
 import { ProductForm } from "@modules/admin/products/product-form";
 
 export const metadata: Metadata = {
@@ -72,7 +72,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                         {new Date(item.created_at as string).toLocaleDateString()}
                                     </td>
                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
-                                        <Actions item={item} form={<ProductForm type="update" collections={collections} current={item} />} />
+                                        <Actions item={item} form={<ProductForm type="update" collections={collections} current={item} />} deleteAction={deleteProduct} />
                                     </td>
                                 </tr>
                             ))}

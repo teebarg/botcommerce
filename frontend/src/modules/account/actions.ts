@@ -245,7 +245,6 @@ export async function updateCustomerBillingAddress(_currentState: Record<string,
             city: formData.get("billing_address.city"),
             postal_code: formData.get("billing_address.postal_code"),
             province: formData.get("billing_address.province"),
-            country_code: process.env.NEXT_PUBLIC_COUNTRY_CODE,
             phone: formData.get("billing_address.phone"),
         },
         } as any;

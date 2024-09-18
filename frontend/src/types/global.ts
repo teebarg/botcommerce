@@ -26,7 +26,7 @@ export type Collection = {
     id: number;
     name: string;
     slug?: string;
-    created_at?: string;
+    created_at: string;
 };
 
 export type FeaturedProduct = {

@@ -6,21 +6,23 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { DeleteIcon, EditIcon, EyeIcon } from "nui-react-icons";
 import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
-import { deleteProduct } from "../actions";
 import { useSnackbar } from "notistack";
 import { SlideOver } from "@modules/common/components/slideover";
+import { useRouter } from "next/navigation";
 
 interface Props {
     item: any;
     form: React.ReactNode;
+    deleteAction: (id: string) => void;
 }
 
-const Actions: React.FC<Props> = ({ item, form }) => {
+const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [current, setCurrent] = useState<any>({ is_active: true });
     const deleteModalState = useOverlayTriggerState({});
     const slideOverState = useOverlayTriggerState({});
     const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: slideOverState.close }) : form;
+    const router = useRouter();
 
     const onDelete = (value: any) => {
         setCurrent((prev: any) => ({ ...prev, ...value }));
@@ -29,7 +31,8 @@ const Actions: React.FC<Props> = ({ item, form }) => {
 
     const onConfirmDelete = async () => {
         try {
-            await deleteProduct(current.id);
+            await deleteAction(current.id);
+            router.refresh();
         } catch (error) {
             enqueueSnackbar("Error deleting product", { variant: "error" });
         }
@@ -61,12 +64,7 @@ const Actions: React.FC<Props> = ({ item, form }) => {
                 </Modal>
             )}
             {slideOverState.isOpen && (
-                <SlideOver
-                    className="bg-default-50"
-                    isOpen={slideOverState.isOpen}
-                    title="Edit Product"
-                    onClose={slideOverState.close}
-                >
+                <SlideOver className="bg-default-50" isOpen={slideOverState.isOpen} title="Edit Product" onClose={slideOverState.close}>
                     {slideOverState.isOpen && formWithHandler}
                 </SlideOver>
             )}

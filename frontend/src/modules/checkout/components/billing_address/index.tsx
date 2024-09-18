@@ -9,7 +9,7 @@ const BillingAddress = ({ cart, countryCode }: { cart: Omit<Cart, "refundable_am
         "billing_address.company": cart?.billing_address?.company || "",
         "billing_address.postal_code": cart?.billing_address?.postal_code || "",
         "billing_address.city": cart?.billing_address?.city || "",
-        "billing_address.country_code": process.env.NEXT_PUBLIC_COUNTRY_CODE || cart?.billing_address?.country_code || countryCode || "",
+        "billing_address.country_code": cart?.billing_address?.country_code || countryCode || "",
         "billing_address.province": cart?.billing_address?.province || "",
         "billing_address.phone": cart?.billing_address?.phone || "",
     });
@@ -22,7 +22,7 @@ const BillingAddress = ({ cart, countryCode }: { cart: Omit<Cart, "refundable_am
             "billing_address.company": cart?.billing_address?.company || "",
             "billing_address.postal_code": cart?.billing_address?.postal_code || "",
             "billing_address.city": cart?.billing_address?.city || "",
-            "billing_address.country_code": process.env.NEXT_PUBLIC_COUNTRY_CODE || cart?.billing_address?.country_code || "",
+            "billing_address.country_code": cart?.billing_address?.country_code || "",
             "billing_address.province": cart?.billing_address?.province || "",
             "billing_address.phone": cart?.billing_address?.phone || "",
         });

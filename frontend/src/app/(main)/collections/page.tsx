@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getCollectionsList, listRegions } from "@lib/data";
+import { getCollectionsList } from "@lib/data";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 import { CollectionTemplate } from "@modules/collections/templates";
 

@@ -10,13 +10,13 @@ export async function indexProducts() {
 
     try {
         const res = await fetch(url, {
-            method: 'POST',
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-Auth": accessToken,
                 // ...headers,
             },
-            body: JSON.stringify({access_token: accessToken}),
+            body: JSON.stringify({ access_token: accessToken }),
         });
 
         if (!res.ok) {
@@ -36,7 +36,7 @@ export async function exportProducts() {
 
     try {
         const res = await fetch(url, {
-            method: 'GET',
+            method: "GET",
             headers: {
                 "X-Auth": accessToken,
             },
@@ -59,7 +59,7 @@ export async function uploadProductImage({ productId, formData }: { productId: s
 
     try {
         const res = await fetch(url, {
-            method: 'PATCH',
+            method: "PATCH",
             headers: {
                 "X-Auth": accessToken,
             },
@@ -74,7 +74,7 @@ export async function uploadProductImage({ productId, formData }: { productId: s
         revalidateTag("products");
         revalidateTag("campaigns");
 
-        return { success: true, message: "Image upload successful", data: await res.json() };;
+        return { success: true, message: "Image upload successful", data: await res.json() };
     } catch (error) {
         console.error("Error uploading product image:", error);
         return { success: false, message: "Error uploading product image" };
@@ -87,7 +87,10 @@ export async function createProduct(currentState: unknown, formData: FormData) {
     const productId = formData.get("id") as string;
     const type = formData.get("type") as string;
 
-    const url = type === "create" ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/` : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}/`;
+    const url =
+        type === "create"
+            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`
+            : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
 
     const productData = {
         name: formData.get("name"),
@@ -101,7 +104,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
 
     try {
         const res = await fetch(url, {
-            method: type === "create" ? 'POST' : 'PATCH',
+            method: type === "create" ? "POST" : "PATCH",
             headers: {
                 "X-Auth": accessToken,
                 "Content-Type": "application/json",
@@ -109,7 +112,10 @@ export async function createProduct(currentState: unknown, formData: FormData) {
             body: JSON.stringify(productData),
         });
 
+        // console.log(res.json())
+
         if (!res.ok) {
+            console.log("is res nit ok?")
             return { success: false, message: "Error creating product" };
         }
 
@@ -117,6 +123,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         revalidateTag("products");
         revalidateTag("campaigns");
 
+        // console.log(await res.json())
 
         return { success: true, message: "Product created successfully", data: await res.json() };
     } catch (error) {
@@ -131,7 +138,7 @@ export async function deleteProduct(productId: string) {
 
     try {
         const res = await fetch(url, {
-            method: 'DELETE',
+            method: "DELETE",
             headers: {
                 "X-Auth": accessToken,
             },
@@ -151,19 +158,27 @@ export async function deleteProduct(productId: string) {
     }
 }
 
-
-export async function createCollection(collectionData: any) {
+export async function createCollection(currentState: unknown, formData: FormData) {
     const accessToken = cookies().get("access_token")?.value as string;
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection`;
+    console.log(accessToken);
+    const collectionUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection`;
+
+    const productId = formData.get("id") as string;
+    const type = formData.get("type") as string;
+
+    const url = type === "create" ? `${collectionUrl}/` : `${collectionUrl}/${productId}/`;
 
     try {
         const res = await fetch(url, {
-            method: 'POST',
+            method: type === "create" ? "POST" : "PATCH",
             headers: {
                 "X-Auth": accessToken,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(collectionData),
+            body: JSON.stringify({
+                name: formData.get("name"),
+                is_active: Boolean(formData.get("is_active")) ?? false,
+            }),
         });
 
         if (!res.ok) {
@@ -186,7 +201,7 @@ export async function updateCollection(collectionId: string, collectionData: any
 
     try {
         const res = await fetch(url, {
-            method: 'PUT',
+            method: "PUT",
             headers: {
                 "X-Auth": accessToken,
                 "Content-Type": "application/json",
@@ -214,7 +229,7 @@ export async function deleteCollection(collectionId: string) {
 
     try {
         const res = await fetch(url, {
-            method: 'DELETE',
+            method: "DELETE",
             headers: {
                 "X-Auth": accessToken,
             },
@@ -236,12 +251,15 @@ export async function deleteCollection(collectionId: string) {
 
 export async function getCollections(page: number = 1, limit: number = 10) {
     const accessToken = cookies().get("access_token")?.value as string;
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection?page=${page}&limit=${limit}`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/?page=${page}&limit=${limit}`;
 
     try {
         const res = await fetch(url, {
             headers: {
                 "X-Auth": accessToken,
+            },
+            next: {
+                tags: ["collections"],
             },
         });
 
@@ -255,10 +273,6 @@ export async function getCollections(page: number = 1, limit: number = 10) {
         return null;
     }
 }
-
-
-
-
 
 export async function bulkUploadProducts({ id, formData }: { id: string; formData: any }) {
     try {

@@ -24,7 +24,7 @@ const Addresses = ({
     const router = useRouter();
     const pathname = usePathname();
 
-    const countryCode = process.env.NEXT_PUBLIC_COUNTRY_CODE || "ng";
+    const countryCode = "ng";
 
     const isOpen = searchParams.get("step") === "address";
 

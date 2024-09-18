@@ -5,6 +5,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { Product, ProductCategoryWithChildren } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
+import { searchDocuments } from "@lib/util/meilisearch";
 
 const emptyResponse = {
     response: { products: [], count: 0 },
@@ -431,8 +432,7 @@ export const getProduct = cache(async function (slug: string): Promise<any> {
             throw new Error("Failed to fetch product");
         }
 
-        const product = await response.json();
-        return { product };
+        return await response.json();
     } catch (error) {
         return null;
     }
@@ -464,42 +464,60 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
         console.error("Error fetching products:", error);
         throw error;
     }
-
-    // const { products, count } = await client.products
-    //     .list(
-    //         {
-    //             limit,
-    //             offset: pageParam,
-    //             region_id: region.id,
-    //             ...queryParams,
-    //         },
-    //         { next: { tags: ["products"] } }
-    //     )
-    //     .then((res: any) => res)
-    //     .catch((err: any) => {
-    //         throw err;
-    //     });
-
-    // const transformedProducts = products.map((product: any) => {
-    //     return transformProductPreview(product, region!);
-    // });
-
-    // const nextPage = count > pageParam + 1 ? pageParam + 1 : null;
-
-    // return {
-    //     response: { products: transformedProducts, count },
-    //     nextPage,
-    //     queryParams,
-    // };
-    return {
-        response: {
-            products: [],
-            count: 0,
-        },
-        nextPage: null,
-        queryParams: {},
-    };
 });
+
+interface SearchParams {
+    search?: string;
+    collections?: string[];
+    min_price?: number;
+    max_price?: number;
+    page?: number;
+    limit?: number;
+    sort?: string;
+}
+
+interface SearchResult {
+    products: Product[];
+    page: number;
+    limit: number;
+    total_count: number;
+    total_pages: number;
+}
+
+export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
+    const { search = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
+
+    const filters: string[] = [];
+    if (collections.length > 0) {
+        filters.push(`collections IN [${collections.join(",")}]`);
+    }
+    if (min_price && max_price) {
+        filters.push(`price >= ${min_price} AND price <= ${max_price}`);
+    }
+
+    const meilisearchParams: Record<string, any> = {
+        limit: limit,
+        offset: (page - 1) * limit,
+        sort: [sort],
+    };
+
+    if (filters.length > 0) {
+        meilisearchParams.filter = filters.join(" AND ");
+    }
+
+    const searchResults = await searchDocuments<Product>("products", search, meilisearchParams);
+
+    const totalCount = searchResults.estimatedTotalHits || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+        products: searchResults.hits,
+        page: page,
+        limit: limit,
+        total_count: totalCount,
+        total_pages: totalPages,
+    };
+}
 
 export const getProductsListWithSort = cache(async function getProductsListWithSort({
     page = 0,
@@ -584,9 +602,14 @@ export const retrieveCollection = cache(async function (id: string) {
     //     });
 });
 
-export const getCollectionsList = cache(async function (page: number = 1, limit: number = 100): Promise<any> {
+export const getCollectionsList = cache(async function (search: string = "", page: number = 1, limit: number = 100): Promise<any> {
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, { search, page, limit });
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/?page=${page}&limit=${limit}`);
+        const response = await fetch(url, {
+            next: {
+                tags: ["collections"],
+            },
+        });
 
         if (!response.ok) {
             throw new Error("Failed to fetch collections");
