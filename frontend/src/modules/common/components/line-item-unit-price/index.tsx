@@ -1,15 +1,14 @@
-import { formatAmount } from "@lib/util/prices";
 import clsx from "clsx";
 import { getPercentageDiff } from "@lib/util/get-precentage-diff";
+import { currency } from "@lib/util/util";
 
 type LineItemUnitPriceProps = {
     item: Omit<any, "beforeInsert">;
-    region: any;
     style?: "default" | "tight";
 };
 
-const LineItemUnitPrice = ({ item, region, style = "default" }: LineItemUnitPriceProps) => {
-    const originalPrice = (item.variant as CalculatedVariant).original_price;
+const LineItemUnitPrice = ({ item, style = "default" }: LineItemUnitPriceProps) => {
+    const originalPrice = item.price;
     const hasReducedPrice = (originalPrice * item.quantity || 0) > item.total!;
     const reducedPrice = (item.total || 0) / item.quantity!;
 
@@ -20,11 +19,7 @@ const LineItemUnitPrice = ({ item, region, style = "default" }: LineItemUnitPric
                     <p>
                         {style === "default" && <span className="text-default-400">Original: </span>}
                         <span className="line-through" data-testid="product-unit-original-price">
-                            {formatAmount({
-                                amount: originalPrice,
-                                region: region,
-                                includeTaxes: false,
-                            })}
+                            {currency(originalPrice)}
                         </span>
                     </p>
                     {style === "default" && <span className="text-blue-400">-{getPercentageDiff(originalPrice, reducedPrice || 0)}%</span>}
@@ -36,11 +31,7 @@ const LineItemUnitPrice = ({ item, region, style = "default" }: LineItemUnitPric
                 })}
                 data-testid="product-unit-price"
             >
-                {formatAmount({
-                    amount: reducedPrice || item.unit_price || 0,
-                    region: region,
-                    includeTaxes: false,
-                })}
+                {currency(originalPrice)}
             </span>
         </div>
     );

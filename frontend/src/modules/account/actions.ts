@@ -5,7 +5,6 @@ import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-
 export async function signUp(_currentState: unknown, formData: FormData) {
     const customer = {
         email: formData.get("email"),
@@ -38,29 +37,33 @@ export async function logCustomerIn(_currentState: unknown, formData: FormData) 
     }
 }
 
-export async function googleLogin(data: any) {
-    const { email, password, first_name, last_name } = data;
-    const customer = {
-        email,
-        password,
-        first_name,
-        last_name,
-    } as any;
-
+export async function googleLogin(customer: { firstname: string; lastname: string; password: string; email: string }) {
     try {
-        await createCustomer(customer);
-        await getToken({ email: customer.email, password: customer.password }).then(() => {
-            revalidateTag("customer");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/social`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(customer),
         });
-    } catch (error: any) {
-        if (error.toString() === "Error: A customer with the given email already has an account. Log in instead.") {
-            await getToken({ email: customer.email, password: customer.password }).then(() => {
-                revalidateTag("customer");
-            });
 
-            return { error: false, message: "Logged in successfully" };
+        if (!response.ok) {
+            throw new Error(response.statusText);
         }
 
+        const { access_token } = await response.json();
+
+        if (access_token) {
+            cookies().set("access_token", access_token, {
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+                httpOnly: true,
+                sameSite: "strict",
+                secure: process.env.NODE_ENV === "production",
+            });
+        }
+
+        return access_token;
+    } catch (error: any) {
         return { error: true, message: error.toString() };
     }
 }
@@ -247,7 +250,7 @@ export async function updateCustomerBillingAddress(_currentState: Record<string,
             province: formData.get("billing_address.province"),
             phone: formData.get("billing_address.phone"),
         },
-        } as any;
+    } as any;
 
     try {
         await updateCustomer(customer).then(() => {
@@ -285,7 +288,7 @@ export async function submitContactForm(_currentState: resType, formData: FormDa
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "accept": "application/json",
+                accept: "application/json",
             },
             body: JSON.stringify({
                 to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,

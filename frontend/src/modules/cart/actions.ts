@@ -3,7 +3,7 @@
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { addItem, createCart, getCart, getProductsById, removeItem, updateCart, updateItem } from "@lib/data";
-import { omit } from "@lib/util/util";
+import { generateId, omit } from "@lib/util/util";
 
 /**
  * Retrieves the cart based on the cartId cookie
@@ -14,26 +14,28 @@ import { omit } from "@lib/util/util";
  */
 export async function getOrSetCart() {
     const cartId = cookies().get("_cart_id")?.value;
-    let cart: any;
+    // let cart: any;
+    console.log("line 18");
+    console.log(cartId);
 
-    if (cartId) {
-        cart = await getCart(cartId).then((cart: any) => cart);
-    }
+    // if (cartId) {
+    //     cart = await getCart(cartId).then((cart: any) => cart);
+    //     console.log("line 23");
+    //     console.log(cart);
+    // }
 
-
-    if (!cart) {
-        cart = await createCart().then((res) => res);
-        cart &&
-            cookies().set("_cart_id", cart.id, {
-                maxAge: 60 * 60 * 24 * 7,
-                httpOnly: true,
-                sameSite: "strict",
-                secure: process.env.NODE_ENV === "production",
-            });
+    if (!cartId) {
+        // cart = await createCart().then((res) => res);
+        const cartId = generateId();
+        cookies().set("_cart_id", cartId, {
+            maxAge: 60 * 60 * 24 * 7,
+            httpOnly: true,
+            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+        });
         revalidateTag("cart");
     }
-
-    return cart;
+    return cartId;
 }
 
 export async function retrieveCart() {
@@ -54,15 +56,18 @@ export async function retrieveCart() {
     }
 }
 
-export async function addToCart({ quantity }: { quantity: number }) {
-    const cart = await getOrSetCart().then((cart) => cart);
+export async function addToCart({ product_id, quantity }: { product_id: string, quantity: number }) {
+    // const cart = await getOrSetCart().then((cart) => cart);
+    const cartId = await getOrSetCart();
+    console.log("hmm,mmmmmmm");
+    console.log(cartId);
 
-    if (!cart) {
+    if (!cartId) {
         return "Missing cart ID";
     }
 
     try {
-        await addItem({ cartId: cart.id, quantity });
+        await addItem({ cartId, product_id, quantity });
         revalidateTag("cart");
     } catch (e) {
         return "Error adding item to cart";
@@ -78,10 +83,6 @@ export async function updateLineItem({ lineId, quantity }: { lineId: string; qua
 
     if (!lineId) {
         return "Missing lineItem ID";
-    }
-
-    if (!cartId) {
-        return "Missing cart ID";
     }
 
     try {
@@ -115,42 +116,26 @@ export async function deleteLineItem(lineId: string) {
     }
 }
 
-export async function enrichLineItems(
-    lineItems: any[],
-    regionId: string
-): Promise<any[] | undefined> {
+export async function enrichLineItems(lineItems: any[]): Promise<any[] | undefined> {
     // Prepare query parameters
-    const queryParams = {
-        ids: lineItems.map((lineItem) => lineItem.variant.product_id),
-        regionId: regionId,
-    };
+    // const queryParams = {
+    //     ids: lineItems.map((lineItem) => lineItem.variant.product_id),
+    // };
 
     // Fetch products by their IDs
-    const products = await getProductsById(queryParams);
+    // const products = await getProductsById(queryParams);
 
     // If there are no line items or products, return an empty array
-    if (!lineItems?.length || !products) {
+    if (!lineItems?.length) {
         return [];
     }
 
     // Enrich line items with product and variant information
 
     const enrichedItems = lineItems.map((item) => {
-        const product = products.find((p: any) => p.id === item.variant.product_id);
-        const variant = product?.variants.find((v: any) => v.id === item.variant_id);
-
-        // If product or variant is not found, return the original item
-        if (!product || !variant) {
-            return item;
-        }
-
         // If product and variant are found, enrich the item
         return {
             ...item,
-            variant: {
-                ...variant,
-                product: omit(product, "variants"),
-            },
         };
     }) as any[];
 

@@ -39,15 +39,22 @@ const getHeaders = (tags: string[] = []) => {
 // Cart actions
 export async function createCart(data = {}) {
     const headers = getHeaders(["cart"]);
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart`;
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+        },
+        body: JSON.stringify(data),
+    });
 
-    // return client.carts
-    //     .create(data, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => {
-    //         console.error(err);
+    if (!response.ok) {
+        throw new Error(`Failed to create cart: ${response.statusText}`);
+    }
 
-    //         return null;
-    //     });
+    const cart = await response.json();
+    return cart;
 }
 
 export async function updateCart(cartId: string, data: any) {
@@ -61,15 +68,22 @@ export async function updateCart(cartId: string, data: any) {
 
 export const getCart = cache(async function (cartId: string) {
     const headers = getHeaders(["cart"]);
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+            cartId,
+        },
+    });
 
-    // return client.carts
-    //     .retrieve(cartId, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => {
-    //         console.log(err);
+    if (!response.ok) {
+        throw new Error(`Failed to create cart: ${response.statusText}`);
+    }
 
-    //         return null;
-    //     });
+    const cart = await response.json();
+    return cart;
 });
 
 export const getProducts = cache(async function (search?: string, collections?: string, page?: number, limit?: number) {
@@ -96,21 +110,47 @@ export const getProducts = cache(async function (search?: string, collections?: 
     return data;
 });
 
-export async function addItem({ cartId, quantity }: { cartId: string; quantity: number }) {
-    const headers = getHeaders(["cart"]);
+export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
+    try {
+        console.log(cartId);
+        console.log(quantity);
+        console.log(product_id);
+        console.log("not again");
+        const headers = getHeaders(["cart"]);
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`;
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+                cartId,
+            },
+            body: JSON.stringify({ product_id, quantity }),
+        });
 
-    // return client.carts.lineItems
-    //     .create(cartId, { variant_id: variantId, quantity }, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => {
-    //         console.log(err);
+        if (!response.ok) {
+            throw new Error(`Failed to add item to cart: ${response.statusText}`);
+        }
 
-    //         return null;
-    //     });
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.log(error);
+        return { success: false, message: "error" };
+    }
 }
 
 export async function updateItem({ cartId, lineId, quantity }: { cartId: string; lineId: string; quantity: number }) {
     const headers = getHeaders(["cart"]);
+    console.log(cartId);
+    console.log(quantity);
+    console.log(lineId);
+    try {
+        await addItem({ cartId, product_id: lineId, quantity });
+        // revalidateTag("cart");
+    } catch (e) {
+        return "Error adding item to cart";
+    }
 
     // return client.carts.lineItems
     //     .update(cartId, lineId, { quantity }, headers)
@@ -390,7 +430,7 @@ export const getRegion = cache(async function (countryCode: string) {
 });
 
 // Product actions
-export const getProductsById = cache(async function ({ ids, regionId }: { ids: string[]; regionId: string }) {
+export const getProductsById = cache(async function ({ ids }: { ids: string[] }) {
     const headers = getHeaders(["products"]);
 
     // return client.products
@@ -623,13 +663,11 @@ export const getCollectionsList = cache(async function (search: string = "", pag
 });
 
 export const getCollectionBySlug = cache(async function (slug: string): Promise<any> {
-    console.log("slug-------------");
-    console.log(slug);
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/slug/${slug}`, { next: { tags: ["collection"] } });
 
         if (!response.ok) {
-            throw new Error("Failed to fetch collection");
+            throw new Error(response.statusText);
         }
 
         const collection = await response.json();

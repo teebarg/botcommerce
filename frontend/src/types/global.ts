@@ -100,3 +100,15 @@ export enum FileTypes {
     xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     xls = "application/vnd.ms-excel",
 }
+
+export type CartItem = {
+    item_id: string
+    product_id: string
+    slug: string
+    name: string
+    description?: string
+    image?: string
+    quantity: number
+    price: number
+    created_at: string
+};

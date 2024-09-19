@@ -1,7 +1,9 @@
+from services.meilisearch import get_document_by_id
 from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Header
 )
 
 import crud
@@ -10,24 +12,40 @@ from core.deps import (
     UserCart,
     get_current_user,
 )
-from models.generic import CartPublic
+from models.generic import CartItemIn, CartPublic
 from models.message import Message
+from firebase_cart import CartHandler, CartItem, Cart, FirebaseConfig
+from typing import Any
+from core.config import settings
+
+firebase_config = FirebaseConfig(
+    credentials=settings.FIREBASE_CRED,
+    database_url=settings.DATABASE_URL
+)
+
+cart_handler = CartHandler(firebase_config)
 
 # Create a router for carts
 router = APIRouter()
 
 
-@router.get(
-    "/",
-    response_model=CartPublic,
-)
+@router.get("/")
 def index(
-    cart: UserCart,
-) -> CartPublic:
+    # cart: UserCart,
+    cartId: str = Header(default=None),
+) -> Any:
     """
     Retrieve cart.
     """
-    return cart
+    return cart_handler.get_cart(cart_id=cartId)
+
+
+@router.post("/add")
+async def add_to_cart(cart_in: CartItemIn, cartId: str = Header(default=None)):
+    doc = get_document_by_id("products", cart_in.product_id)
+    id = str(doc.get("id"))
+    cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
+    return cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])

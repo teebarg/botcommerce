@@ -31,6 +31,17 @@ def add_documents_to_index(index_name: str, documents: list) -> None:
     index = get_or_create_index(index_name)
     index.add_documents(documents, primary_key='id', serializer=CustomEncoder)
 
+def get_document_by_id(index_name: str, doc_id: str):
+    """
+    Search documents in a Meilisearch index.
+    """
+    try:
+        index = get_or_create_index(index_name)
+        doc =  index.get_document(doc_id)
+        return dict(doc)
+    except Exception as e:
+        print(f"Error fetching document by ID: {e}")
+
 def search_documents(index_name: str, query: str, **kwargs) -> dict:
     """
     Search documents in a Meilisearch index.

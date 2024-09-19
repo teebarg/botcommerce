@@ -88,9 +88,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
     const type = formData.get("type") as string;
 
     const url =
-        type === "create"
-            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`
-            : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
+        type === "create" ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/` : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
 
     const productData = {
         name: formData.get("name"),
@@ -115,7 +113,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         // console.log(res.json())
 
         if (!res.ok) {
-            console.log("is res nit ok?")
+            console.log("is res nit ok?");
             return { success: false, message: "Error creating product" };
         }
 
@@ -160,13 +158,12 @@ export async function deleteProduct(productId: string) {
 
 export async function createCollection(currentState: unknown, formData: FormData) {
     const accessToken = cookies().get("access_token")?.value as string;
-    console.log(accessToken);
     const collectionUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection`;
 
-    const productId = formData.get("id") as string;
+    const id = formData.get("id");
     const type = formData.get("type") as string;
 
-    const url = type === "create" ? `${collectionUrl}/` : `${collectionUrl}/${productId}/`;
+    const url = type === "create" ? `${collectionUrl}/` : `${collectionUrl}/${id}`;
 
     try {
         const res = await fetch(url, {
@@ -182,7 +179,7 @@ export async function createCollection(currentState: unknown, formData: FormData
         });
 
         if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            throw new Error(res.statusText);
         }
 
         // Revalidate the UI data

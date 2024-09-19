@@ -32,7 +32,8 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
         setIsAdding(true);
 
         await addToCart({
-            quantity: 1,
+            product_id: product.id.toString(),
+            quantity: 1
         });
 
         setIsAdding(false);

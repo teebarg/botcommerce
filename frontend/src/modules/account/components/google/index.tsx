@@ -16,15 +16,13 @@ const GoogleLogin: React.FC<Props> = () => {
                 headers: { Authorization: `Bearer ${codeResponse.access_token}` },
             }).then((res) => res.json());
 
-            const customer = {
-                email: userInfo.email,
-                password: "password",
-                first_name: userInfo.given_name,
-                last_name: userInfo.family_name,
-            } as any;
-
             try {
-                const res = await googleLogin(customer);
+                const res = await googleLogin({
+                    email: userInfo.email,
+                    password: "password",
+                    firstname: userInfo.given_name,
+                    lastname: userInfo.family_name,
+                });
 
                 if (res?.error) {
                     enqueueSnackbar(`Google Login request failed: ${res.message}`, { variant: "error" });

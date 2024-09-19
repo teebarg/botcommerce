@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     FIREBASE_CRED: dict = {}
+    DATABASE_URL: str = ""
 
     POSTGRES_SERVER: str
     POSTGRES_USER: str = "postgres"

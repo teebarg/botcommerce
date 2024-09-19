@@ -6,10 +6,10 @@ import { updateLineItem } from "@modules/cart/actions";
 import Spinner from "@modules/common/icons/spinner";
 import { useState } from "react";
 import { useSnackbar } from "notistack";
+import { CartItem } from "types/global";
 
 type ItemsTemplateProps = {
-    // items: Omit<LineItem, "beforeInsert">[];
-    item: any;
+    item: CartItem;
 };
 
 const Control = ({ item }: ItemsTemplateProps) => {
@@ -37,16 +37,16 @@ const Control = ({ item }: ItemsTemplateProps) => {
 
     return (
         <div className="flex gap-2 items-center w-28">
-            <DeleteButton data-testid="product-delete-button" id={item.id} />
+            <DeleteButton data-testid="product-delete-button" id={item.item_id} />
             <CartItemSelect
                 className="w-14 h-10 p-4"
                 data-testid="product-select-button"
                 value={item.quantity}
-                onChange={(value) => changeQuantity(item.id, parseInt(value.target.value))}
+                onChange={(value) => changeQuantity(item.item_id, parseInt(value.target.value))}
             >
                 {Array.from(
                     {
-                        length: Math.min(item.variant.inventory_quantity > 0 ? item.variant.inventory_quantity : 10, 10),
+                        length: 10,
                     },
                     (_, i) => (
                         <option key={i} value={i + 1}>
@@ -55,7 +55,7 @@ const Control = ({ item }: ItemsTemplateProps) => {
                     )
                 )}
             </CartItemSelect>
-            {updating && <Spinner key={item.id} />}
+            {updating && <Spinner key={item.product_id} />}
         </div>
     );
 };

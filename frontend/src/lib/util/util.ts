@@ -105,4 +105,16 @@ const omit = <T extends object, K extends keyof T>(obj: T, keys: K[] | K): Omit<
     return result as Omit<T, K>;
 };
 
-export { imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit };
+const generateId = (prefix: string = "cart_", length: number = 25): string => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let id = prefix;
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length);
+        id += chars[randomIndex];
+    }
+
+    return id;
+};
+
+export { imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId };

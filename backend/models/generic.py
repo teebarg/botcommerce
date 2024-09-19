@@ -31,6 +31,10 @@ class UploadStatus(BaseModel):
     processed_rows: int
     status: str
 
+class CartItemIn(BaseModel):
+    product_id: int
+    quantity: int
+
 
 # Shared properties
 class ProductBrand(SQLModel, table=True):

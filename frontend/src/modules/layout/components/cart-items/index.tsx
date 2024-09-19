@@ -30,7 +30,7 @@ const CartItems: React.FC<ComponentProps> = ({ cartItems, region }) => {
             <div>
                 <h2 className="font-medium text-default-500">Your Cart</h2>
                 <hr className="tb-divider mt-4" />
-                <ItemsPreviewTemplate items={cartItems} region={region} />
+                <ItemsPreviewTemplate items={cartItems} />
             </div>
         </div>
     );
