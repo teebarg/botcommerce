@@ -32,9 +32,13 @@ class UploadStatus(BaseModel):
     status: str
 
 class CartItemIn(BaseModel):
-    product_id: int
+    product_id: str
     quantity: int
 
+class CartDetails(BaseModel):
+    shipping_address: dict | None
+    billing_address: dict | None
+    email: str | None
 
 # Shared properties
 class ProductBrand(SQLModel, table=True):

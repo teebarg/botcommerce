@@ -1,3 +1,4 @@
+from core.utils import generate_id
 from services.meilisearch import get_document_by_id
 from fastapi import (
     APIRouter,
@@ -12,7 +13,7 @@ from core.deps import (
     UserCart,
     get_current_user,
 )
-from models.generic import CartItemIn, CartPublic
+from models.generic import CartDetails, CartItemIn, CartPublic
 from models.message import Message
 from firebase_cart import CartHandler, CartItem, Cart, FirebaseConfig
 from typing import Any
@@ -31,7 +32,6 @@ router = APIRouter()
 
 @router.get("/")
 def index(
-    # cart: UserCart,
     cartId: str = Header(default=None),
 ) -> Any:
     """
@@ -46,6 +46,22 @@ async def add_to_cart(cart_in: CartItemIn, cartId: str = Header(default=None)):
     id = str(doc.get("id"))
     cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
     return cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
+
+
+@router.post("/create")
+async def create_cart():
+    id = generate_id()
+    return cart_handler.create_cart(cart_id=id, customer_id="", email="")
+
+
+@router.post("/update")
+async def update_cart(cart_in: CartItemIn, cartId: str = Header(default=None)):
+    return cart_handler.update_cart_quantity(cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity)
+
+
+@router.post("/update-cart-details")
+async def update_cart_details(cart_update: CartDetails, cartId: str = Header(default=None)):
+    return cart_handler.update_cart_details(cart_id=cartId, cart_data=cart_update)
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])

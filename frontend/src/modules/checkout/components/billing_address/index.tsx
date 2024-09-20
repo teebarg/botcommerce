@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@nextui-org/input";
+import { Cart } from "types/global";
 
-const BillingAddress = ({ cart, countryCode }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null; countryCode: string }) => {
+const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const [formData, setFormData] = useState({
         "billing_address.first_name": cart?.billing_address?.first_name || "",
         "billing_address.last_name": cart?.billing_address?.last_name || "",
@@ -9,8 +10,7 @@ const BillingAddress = ({ cart, countryCode }: { cart: Omit<Cart, "refundable_am
         "billing_address.company": cart?.billing_address?.company || "",
         "billing_address.postal_code": cart?.billing_address?.postal_code || "",
         "billing_address.city": cart?.billing_address?.city || "",
-        "billing_address.country_code": cart?.billing_address?.country_code || countryCode || "",
-        "billing_address.province": cart?.billing_address?.province || "",
+        "billing_address.state": cart?.billing_address?.state || "",
         "billing_address.phone": cart?.billing_address?.phone || "",
     });
 
@@ -22,8 +22,7 @@ const BillingAddress = ({ cart, countryCode }: { cart: Omit<Cart, "refundable_am
             "billing_address.company": cart?.billing_address?.company || "",
             "billing_address.postal_code": cart?.billing_address?.postal_code || "",
             "billing_address.city": cart?.billing_address?.city || "",
-            "billing_address.country_code": cart?.billing_address?.country_code || "",
-            "billing_address.province": cart?.billing_address?.province || "",
+            "billing_address.state": cart?.billing_address?.state || "",
             "billing_address.phone": cart?.billing_address?.phone || "",
         });
     }, [cart?.billing_address]);
@@ -93,10 +92,10 @@ const BillingAddress = ({ cart, countryCode }: { cart: Omit<Cart, "refundable_am
                 />
                 <Input
                     autoComplete="address-level1"
-                    data-testid="billing-province-input"
-                    label="State / Province"
-                    name="billing_address.province"
-                    value={formData["billing_address.province"]}
+                    data-testid="billing-state-input"
+                    label="State"
+                    name="billing_address.state"
+                    value={formData["billing_address.state"]}
                     onChange={handleChange}
                 />
                 <Input

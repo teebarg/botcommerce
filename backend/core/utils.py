@@ -11,7 +11,8 @@ from jinja2 import Environment, FileSystemLoader, Template
 from core.config import settings
 from core.logging import logger
 from models.generic import Order, User
-
+import random
+import string
 
 @dataclass
 class EmailData:
@@ -177,3 +178,9 @@ def generate_slug(name: str) -> str:
     name = name.strip("-")
 
     return name
+
+
+def generate_id(prefix='cart_', length=25):
+    chars = string.ascii_uppercase + string.digits
+    unique_part = ''.join(random.choice(chars) for _ in range(length))
+    return prefix + unique_part

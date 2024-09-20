@@ -12,19 +12,20 @@ import BillingAddress from "../billing_address";
 import ShippingAddress from "../shipping-address";
 import { setAddresses } from "../../actions";
 import ErrorMessage from "../error-message";
+import { Cart } from "types/global";
 
 const Addresses = ({
     cart,
     customer,
 }: {
-    cart: Omit<any, "refundable_amount" | "refunded_total"> | null;
+    cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null;
     customer: Omit<any, "password_hash"> | null;
 }) => {
+    console.log(cart)
+    console.log(cart && cart.shipping_address)
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-
-    const countryCode = "ng";
 
     const isOpen = searchParams.get("step") === "address";
 
@@ -57,16 +58,15 @@ const Addresses = ({
                         <ShippingAddress
                             cart={cart}
                             checked={sameAsSBilling}
-                            countryCode={countryCode}
                             customer={customer}
                             onChange={() => setSameAsSBilling(!sameAsSBilling)}
                         />
-                        <input checked={sameAsSBilling} className="hidden" name="same_as_billing" type="checkbox" />
+                        <input checked={sameAsSBilling} className="hidden" name="same_as_billing" type="checkbox" readOnly />
                         {!sameAsSBilling && (
                             <div>
                                 <h2 className="text-2xl gap-x-4 pb-6 pt-8">Billing address</h2>
 
-                                <BillingAddress cart={cart} countryCode={countryCode} />
+                                <BillingAddress cart={cart} />
                             </div>
                         )}
                         <FormButton className="mt-6" data-testid="submit-address-button">

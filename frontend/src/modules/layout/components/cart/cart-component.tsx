@@ -6,22 +6,27 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 import { SlideOver } from "@modules/common/components/slideover";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { formatAmount } from "@lib/util/prices";
-import { RegionInfo } from "types/global";
+import { Cart, CartItem } from "types/global";
 import { usePathname } from "next/navigation";
 
 import { CartItems } from "../cart-items";
+import { currency } from "@lib/util/util";
 
 interface ComponentProps {
-    cart: Omit<any, "beforeInsert" | "afterLoad"> | null;
+    cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;
 }
 
 const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(undefined);
 
     const totalItems =
-        cart?.items?.reduce((acc: number, item: any) => {
+        cart?.items?.reduce((acc: number, item: CartItem) => {
             return acc + item.quantity;
+        }, 0) || 0;
+
+    const total =
+        cart?.items?.reduce((acc: number, item: CartItem) => {
+            return acc + (item.quantity * item.price);
         }, 0) || 0;
 
     const state = useOverlayTriggerState({});
@@ -78,11 +83,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                                     <div className="flex justify-between">
                                         <dt className="text-small text-default-500">Subtotal</dt>
                                         <dd className="text-small font-semibold text-default-700">
-                                            {formatAmount({
-                                                amount: cart?.subtotal || 0,
-                                                region: cart?.region as RegionInfo,
-                                                includeTaxes: false,
-                                            })}
+                                            {currency(total)}
                                         </dd>
                                     </div>
                                 </dl>
@@ -109,7 +110,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                     title="Carts"
                     onClose={closeSlideOver}
                 >
-                    <CartItems cartItems={cart?.items} region={cart?.region} />
+                    <CartItems cartItems={cart?.items} />
                 </SlideOver>
             )}
         </div>

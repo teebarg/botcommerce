@@ -1,13 +1,13 @@
 "use client";
 
 import CartTotals from "@modules/common/components/cart-totals";
-import { CartWithCheckoutStep } from "types/global";
+import { Cart } from "types/global";
 import DiscountCode from "@modules/checkout/components/discount-code";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import Button from "@modules/common/components/button";
 
 type SummaryProps = {
-    cart: CartWithCheckoutStep;
+    cart: Cart;
 };
 
 const Summary = ({ cart }: SummaryProps) => {

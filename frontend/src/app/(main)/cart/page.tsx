@@ -3,9 +3,9 @@ import { Metadata } from "next";
 import { cookies } from "next/headers";
 import CartTemplate from "@modules/cart/templates";
 import { enrichLineItems } from "@modules/cart/actions";
-import { getCheckoutStep } from "@lib/util/get-checkout-step";
-import { CartWithCheckoutStep } from "types/global";
+// import { getCheckoutStep } from "@lib/util/get-checkout-step";
 import { getCart, getCustomer } from "@lib/data";
+import { Cart as CartType } from "types/global";
 
 export const metadata: Metadata = {
     title: "Cart",
@@ -19,7 +19,7 @@ const fetchCart = async () => {
         return null;
     }
 
-    const cart = await getCart(cartId).then((cart: any) => cart as any);
+    const cart = await getCart(cartId).then((cart: CartType) => cart);
 
     if (!cart) {
         return null;
@@ -31,7 +31,7 @@ const fetchCart = async () => {
         cart.items = enrichedItems as any[];
     }
 
-    cart.checkout_step = cart && getCheckoutStep(cart);
+    // cart.checkout_step = cart && getCheckoutStep(cart);
 
     return cart;
 };

@@ -1,23 +1,20 @@
 "use client";
 
-import { formatAmount } from "@lib/util/prices";
 import { InformationCircleSolid } from "nui-react-icons";
 import { Tooltip } from "@nextui-org/tooltip";
 import React from "react";
+import { Cart } from "types/global";
+import { currency } from "@lib/util/util";
 
 type CartTotalsProps = {
-    data: Omit<any, "refundable_amount" | "refunded_total"> | any;
+    data: Omit<Cart, "refundable_amount" | "refunded_total"> | any;
 };
 
 const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
     const { subtotal, discount_total, gift_card_total, tax_total, shipping_total, total } = data;
 
     const getAmount = (amount: number | null | undefined) => {
-        return formatAmount({
-            amount: amount || 0,
-            region: data.region,
-            includeTaxes: false,
-        });
+        return currency(amount || 0);
     };
 
     return (

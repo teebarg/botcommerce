@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { enrichLineItems } from "@modules/cart/actions";
 import Wrapper from "@modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
@@ -21,13 +20,6 @@ const fetchCart = async () => {
     }
 
     const cart = await getCart(cartId).then((cart) => cart);
-
-    if (cart?.items.length) {
-        const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id);
-
-        cart.items = enrichedItems as any[];
-    }
-
     return cart;
 };
 
@@ -62,7 +54,7 @@ export default async function Checkout() {
                                 </nav>
                             </div>
                             <Wrapper cart={cart}>
-                                <CheckoutForm />
+                                <CheckoutForm cart={cart} />
                             </Wrapper>
                         </div>
                         <CheckoutSummary />

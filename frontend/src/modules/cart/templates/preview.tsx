@@ -14,8 +14,6 @@ type ItemsTemplateProps = {
 };
 
 const ItemsPreviewTemplate = ({ items }: ItemsTemplateProps) => {
-    console.log("in item preview")
-    console.log(items)
     return (
         <React.Fragment>
             <ul className="max-h-[40vh] overflow-y-auto">

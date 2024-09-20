@@ -5,9 +5,14 @@ import Payment from "@modules/checkout/components/payment";
 import Review from "@modules/checkout/components/review";
 import Shipping from "@modules/checkout/components/shipping";
 import { cookies } from "next/headers";
-import { CartWithCheckoutStep } from "types/global";
+import { Cart, CartWithCheckoutStep } from "types/global";
 
-export default async function CheckoutForm() {
+type CheckoutFormProps = {
+    cart: Omit<Cart, "refundable_amount" | "refunded_total">;
+};
+
+const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
+// export default async function CheckoutForm() {
     const cartId = cookies().get("_cart_id")?.value;
 
     if (!cartId) {
@@ -15,20 +20,21 @@ export default async function CheckoutForm() {
     }
 
     // create payment sessions and get cart
-    const cart = (await createPaymentSessions(cartId).then((cart) => cart)) as CartWithCheckoutStep;
+    // const cart = (await createPaymentSessions(cartId).then((cart) => cart)) as CartWithCheckoutStep;
 
-    if (!cart) {
-        return null;
-    }
+    // if (!cart) {
+    //     return null;
+    // }
 
-    cart.checkout_step = cart && getCheckoutStep(cart);
+    // cart.checkout_step = cart && getCheckoutStep(cart);
 
     // get available shipping methods
-    const availableShippingMethods = await listCartShippingMethods(cart.id).then((methods) => methods?.filter((m) => !m.is_return));
+    // const availableShippingMethods = await listCartShippingMethods(cart.id).then((methods: any) => methods?.filter((m: any) => !m.is_return));
+    const availableShippingMethods: any = [];
 
-    if (!availableShippingMethods) {
-        return null;
-    }
+    // if (!availableShippingMethods) {
+    //     return null;
+    // }
 
     // get customer if logged in
     const customer = await getCustomer();
@@ -41,7 +47,7 @@ export default async function CheckoutForm() {
                 </div>
 
                 <div>
-                    <Shipping availableShippingMethods={availableShippingMethods} cart={cart} />
+                    {/* <Shipping availableShippingMethods={availableShippingMethods} cart={cart} /> */}
                 </div>
 
                 <div>
@@ -55,3 +61,5 @@ export default async function CheckoutForm() {
         </div>
     );
 }
+
+export default CheckoutForm

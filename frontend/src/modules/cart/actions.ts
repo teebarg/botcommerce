@@ -10,13 +10,10 @@ import { generateId, omit } from "@lib/util/util";
  *
  * @returns {Promise<Cart>} The cart
  * @example
- * const cart = await getOrSetCart()
  */
 export async function getOrSetCart() {
-    const cartId = cookies().get("_cart_id")?.value;
+    let cartId = cookies().get("_cart_id")?.value;
     // let cart: any;
-    console.log("line 18");
-    console.log(cartId);
 
     // if (cartId) {
     //     cart = await getCart(cartId).then((cart: any) => cart);
@@ -26,7 +23,7 @@ export async function getOrSetCart() {
 
     if (!cartId) {
         // cart = await createCart().then((res) => res);
-        const cartId = generateId();
+        cartId = generateId("cart")
         cookies().set("_cart_id", cartId, {
             maxAge: 60 * 60 * 24 * 7,
             httpOnly: true,
@@ -57,10 +54,7 @@ export async function retrieveCart() {
 }
 
 export async function addToCart({ product_id, quantity }: { product_id: string, quantity: number }) {
-    // const cart = await getOrSetCart().then((cart) => cart);
     const cartId = await getOrSetCart();
-    console.log("hmm,mmmmmmm");
-    console.log(cartId);
 
     if (!cartId) {
         return "Missing cart ID";

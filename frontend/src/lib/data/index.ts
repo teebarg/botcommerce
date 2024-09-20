@@ -38,13 +38,11 @@ const getHeaders = (tags: string[] = []) => {
 
 // Cart actions
 export async function createCart(data = {}) {
-    const headers = getHeaders(["cart"]);
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/create`;
     const response = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            ...headers,
         },
         body: JSON.stringify(data),
     });
@@ -54,6 +52,7 @@ export async function createCart(data = {}) {
     }
 
     const cart = await response.json();
+    console.log(cart)
     return cart;
 }
 
@@ -141,21 +140,28 @@ export async function addItem({ cartId, product_id, quantity }: { cartId: string
 }
 
 export async function updateItem({ cartId, lineId, quantity }: { cartId: string; lineId: string; quantity: number }) {
-    const headers = getHeaders(["cart"]);
-    console.log(cartId);
-    console.log(quantity);
-    console.log(lineId);
+    const headers = getHeaders(["cart"]); 
     try {
-        await addItem({ cartId, product_id: lineId, quantity });
-        // revalidateTag("cart");
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+                cartId,
+            },
+            body: JSON.stringify({ product_id: lineId, quantity }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to add item to cart: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        return result;
     } catch (e) {
         return "Error adding item to cart";
     }
-
-    // return client.carts.lineItems
-    //     .update(cartId, lineId, { quantity }, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => Error(err));
 }
 
 export async function removeItem({ cartId, lineId }: { cartId: string; lineId: string }) {

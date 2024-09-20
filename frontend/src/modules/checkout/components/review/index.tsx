@@ -5,15 +5,17 @@ import clsx from "clsx";
 import { siteConfig } from "@lib/config";
 
 import PaymentButton from "../payment-button";
+import { Cart } from "types/global";
 
 const Review = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> }) => {
     const searchParams = useSearchParams();
 
     const isOpen = searchParams.get("step") === "review";
 
-    const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
+    // const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const previousStepsCompleted = cart.shipping_address && cart.shipping_methods.length > 0 && (cart.payment_session || paidByGiftcard);
+    // const previousStepsCompleted = cart.shipping_address && cart.shipping_methods.length > 0 && (cart.payment_session || paidByGiftcard);
+    const previousStepsCompleted = cart?.shipping_address && cart?.shipping_methods?.length > 0 && (cart?.payment_session);
 
     return (
         <div>

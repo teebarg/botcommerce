@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
+import { Cart } from "types/global";
 
 type WrapperProps = {
-    cart: Omit<any, "refundable_amount" | "refunded_total">;
+    cart: Omit<Cart, "refundable_amount" | "refunded_total">;
     children: React.ReactNode;
 };
 

@@ -7,9 +7,9 @@ import Input from "@modules/common/components/input";
 import Trash from "@modules/common/icons/trash";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { removeDiscount, removeGiftCard, submitDiscountForm } from "@modules/checkout/actions";
-import { formatAmount } from "@lib/util/prices";
 import { FormButton } from "@modules/common/components/form-button";
 import { Tooltip } from "@nextui-org/tooltip";
+import { currency } from "@lib/util/util";
 
 type DiscountCodeProps = {
     cart: Omit<any, "refundable_amount" | "refunded_total">;
@@ -18,7 +18,7 @@ type DiscountCodeProps = {
 const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     const [isOpen, setIsOpen] = React.useState(false);
 
-    const { discounts, gift_cards, region } = cart;
+    const { discounts, gift_cards } = cart;
 
     const appliedDiscount = useMemo(() => {
         if (!discounts || !discounts.length) {
@@ -29,15 +29,12 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
             case "percentage":
                 return `${discounts[0].rule.value}%`;
             case "fixed":
-                return `- ${formatAmount({
-                    amount: discounts[0].rule.value,
-                    region: region,
-                })}`;
+                return `- ${currency(discounts[0].rule.value)}`;
 
             default:
                 return "Free shipping";
         }
-    }, [discounts, region]);
+    }, [discounts]);
 
     const removeGiftCardCode = async (code: string) => {
         await removeGiftCard(code, gift_cards);
@@ -52,10 +49,10 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     return (
         <div className="w-full flex flex-col">
             <div className="txt-medium">
-                {gift_cards.length > 0 && (
+                {gift_cards?.length > 0 && (
                     <div className="flex flex-col mb-4">
                         <h2 className="text-lg font-medium">Gift card(s) applied:</h2>
-                        {gift_cards?.map((gc) => (
+                        {gift_cards?.map((gc: any) => (
                             <div key={gc.id} className="flex items-center justify-between txt-small-plus" data-testid="gift-card">
                                 <p className="flex gap-x-1 items-baseline">
                                     <span>Code: </span>
@@ -64,11 +61,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                     </span>
                                 </p>
                                 <p className="font-semibold" data-testid="gift-card-amount" data-value={gc.balance}>
-                                    {formatAmount({
-                                        region: region,
-                                        amount: gc.balance,
-                                        includeTaxes: false,
-                                    })}
+                                    {currency(gc.balance)}
                                 </p>
                                 <button
                                     className="flex items-center gap-x-2 !background-transparent !border-none"

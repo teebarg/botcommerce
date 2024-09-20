@@ -101,6 +101,22 @@ export enum FileTypes {
     xls = "application/vnd.ms-excel",
 }
 
+export type Cart = {
+    cart_id: string
+    customer_id: string
+    email: string
+    items: CartItem[]
+    checkout_step?: "address" | "delivery" | "payment"
+    subtotal: number
+    tax_total: number
+    shipping_total: number
+    total: number;
+    billing_address: Record<string, any>
+    shipping_address: Record<string, any>
+    shipping_methods: any
+    payment_session: any
+};
+
 export type CartItem = {
     item_id: string
     product_id: string

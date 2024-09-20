@@ -3,19 +3,18 @@ import { Checkbox } from "@nextui-org/checkbox";
 import { Input } from "@nextui-org/input";
 
 import AddressSelect from "../address-select";
+import { Cart } from "types/global";
 
 const ShippingAddress = ({
     customer,
     cart,
     checked,
-    onChange,
-    countryCode,
+    onChange
 }: {
     customer: Omit<any, "password_hash"> | null;
-    cart: Omit<any, "refundable_amount" | "refunded_total"> | null;
+    cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null;
     checked: boolean;
     onChange: () => void;
-    countryCode: string;
 }) => {
     const [formData, setFormData] = useState({
         "shipping_address.first_name": cart?.shipping_address?.first_name || "",
@@ -24,19 +23,10 @@ const ShippingAddress = ({
         "shipping_address.company": cart?.shipping_address?.company || "",
         "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
         "shipping_address.city": cart?.shipping_address?.city || "",
-        "shipping_address.country_code": cart?.shipping_address?.country_code || countryCode || "",
-        "shipping_address.province": cart?.shipping_address?.province || "",
+        "shipping_address.state": cart?.shipping_address?.state || "",
         email: cart?.email || "",
         "shipping_address.phone": cart?.shipping_address?.phone || "",
     });
-
-    const countriesInRegion = useMemo(() => cart?.region.countries.map((c) => c.iso_2), [cart?.region]);
-
-    // check if customer has saved addresses that are in the current region
-    const addressesInRegion = useMemo(
-        () => customer?.shipping_addresses.filter((a) => a.country_code && countriesInRegion?.includes(a.country_code)),
-        [customer?.shipping_addresses, countriesInRegion]
-    );
 
     useEffect(() => {
         setFormData({
@@ -46,8 +36,7 @@ const ShippingAddress = ({
             "shipping_address.company": cart?.shipping_address?.company || "",
             "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
             "shipping_address.city": cart?.shipping_address?.city || "",
-            "shipping_address.country_code": cart?.shipping_address?.country_code || "",
-            "shipping_address.province": cart?.shipping_address?.province || "",
+            "shipping_address.state": cart?.shipping_address?.state || "",
             email: cart?.email || "",
             "shipping_address.phone": cart?.shipping_address?.phone || "",
         });
@@ -60,20 +49,9 @@ const ShippingAddress = ({
         });
     };
 
-    const countryOptions = useMemo(() => {
-        if (!cart?.region) {
-            return [];
-        }
-
-        return cart?.region.countries.map((country) => ({
-            value: country.iso_2,
-            label: country.display_name,
-        }));
-    }, [cart?.region]);
-
     return (
         <React.Fragment>
-            {customer && (addressesInRegion?.length || 0) > 0 && (
+            {customer && (customer.shipping_addresses?.length || 0) > 0 && (
                 <div className="shadow-md bg-default-50 w-full rounded-lg mb-6 flex flex-col gap-y-4 p-5">
                     <p className="text-small-regular">{`Hi ${customer.first_name}, do you want to use one of your saved addresses?`}</p>
                     <AddressSelect addresses={customer.shipping_addresses} cart={cart} />
@@ -135,10 +113,10 @@ const ShippingAddress = ({
                 />
                 <Input
                     autoComplete="address-level1"
-                    data-testid="shipping-province-input"
-                    label="State / Province"
-                    name="shipping_address.province"
-                    value={formData["shipping_address.province"]}
+                    data-testid="shipping-state-input"
+                    label="State"
+                    name="shipping_address.state"
+                    value={formData["shipping_address.state"]}
                     onChange={handleChange}
                 />
             </div>

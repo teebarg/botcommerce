@@ -4,7 +4,6 @@ import Button from "@modules/common/components/button";
 
 interface ComponentProps {
     cartItems: any;
-    region: any;
 }
 
 const EmptyCartState = () => {
@@ -20,7 +19,7 @@ const EmptyCartState = () => {
     );
 };
 
-const CartItems: React.FC<ComponentProps> = ({ cartItems, region }) => {
+const CartItems: React.FC<ComponentProps> = ({ cartItems }) => {
     if (cartItems?.length == 0) {
         return <EmptyCartState />;
     }
