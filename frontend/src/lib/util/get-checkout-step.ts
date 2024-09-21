@@ -1,9 +1,9 @@
+import { Cart } from "types/global";
 
-
-export function getCheckoutStep(cart: Omit<any, "beforeInsert" | "beforeUpdate" | "afterUpdateOrLoad">) {
+export function getCheckoutStep(cart: Omit<Cart, "beforeInsert" | "beforeUpdate" | "afterUpdateOrLoad">) {
     if (!cart?.shipping_address?.address_1 || !cart.email) {
         return "address";
-    } else if (cart?.shipping_methods.length === 0) {
+    } else if (cart?.shipping_method) {
         return "delivery";
     } else {
         return "payment";

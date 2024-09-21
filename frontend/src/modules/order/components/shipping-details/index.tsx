@@ -1,4 +1,4 @@
-import { formatAmount } from "@lib/util/prices";
+import { currency } from "@lib/util/util";
 
 type ShippingDetailsProps = {
     order: any;
@@ -20,7 +20,6 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
                     <p className="font-normal text-default-600">
                         {order.shipping_address.postal_code}, {order.shipping_address.city}
                     </p>
-                    <p className="font-normal text-default-600">{order.shipping_address.country_code?.toUpperCase()}</p>
                 </div>
 
                 <div className="flex flex-col w-1/3 " data-testid="shipping-contact-summary">
@@ -32,14 +31,8 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
                 <div className="flex flex-col w-1/3" data-testid="shipping-method-summary">
                     <p className="font-medium text-base mb-1">Method</p>
                     <p className="font-normal text-default-600">
-                        {order.shipping_methods[0].shipping_option?.name} (
-                        {formatAmount({
-                            amount: order.shipping_methods[0].price,
-                            region: order.region,
-                            includeTaxes: false,
-                        })
-                            .replace(/,/g, "")
-                            .replace(/\./g, ",")}
+                        {order.shipping_method?.shipping_option?.name} (
+                        {currency(order.shipping_method?.amount)}
                         )
                     </p>
                 </div>

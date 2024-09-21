@@ -23,7 +23,7 @@ export async function getOrSetCart() {
 
     if (!cartId) {
         // cart = await createCart().then((res) => res);
-        cartId = generateId("cart")
+        cartId = generateId()
         cookies().set("_cart_id", cartId, {
             maxAge: 60 * 60 * 24 * 7,
             httpOnly: true,

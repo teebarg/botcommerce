@@ -25,7 +25,7 @@ class ContactFormCreate(BaseModel):
 
 class NewsletterCreate(BaseModel):
     email: str
-    
+
 class UploadStatus(BaseModel):
     total_rows: int
     processed_rows: int
@@ -36,9 +36,11 @@ class CartItemIn(BaseModel):
     quantity: int
 
 class CartDetails(BaseModel):
-    shipping_address: dict | None
-    billing_address: dict | None
-    email: str | None
+    shipping_address: Optional[dict] = None
+    billing_address: Optional[dict] = None
+    email: Optional[str] = None
+    shipping_method: Optional[dict] = None
+    payment_session: Optional[dict] = None
 
 # Shared properties
 class ProductBrand(SQLModel, table=True):

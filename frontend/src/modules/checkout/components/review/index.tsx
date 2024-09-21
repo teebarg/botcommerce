@@ -14,8 +14,8 @@ const Review = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_tot
 
     // const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    // const previousStepsCompleted = cart.shipping_address && cart.shipping_methods.length > 0 && (cart.payment_session || paidByGiftcard);
-    const previousStepsCompleted = cart?.shipping_address && cart?.shipping_methods?.length > 0 && (cart?.payment_session);
+    // const previousStepsCompleted = cart.shipping_address && cart.shipping_method && (cart.payment_session || paidByGiftcard);
+    const previousStepsCompleted = cart?.shipping_address && cart?.shipping_method && (cart?.payment_session);
 
     return (
         <div>

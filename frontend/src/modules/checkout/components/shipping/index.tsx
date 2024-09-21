@@ -11,13 +11,17 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import Button from "@modules/common/components/button";
+import { Cart, DeliveryOption } from "types/global";
+import { currency } from "@lib/util/util";
 
 type ShippingProps = {
-    cart: Omit<any, "refundable_amount" | "refunded_total">;
+    cart: Omit<Cart, "refundable_amount" | "refunded_total">;
     availableShippingMethods: any[] | null;
 };
 
 const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) => {
+    console.log(availableShippingMethods);
+    console.log(cart);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,9 +40,9 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
         router.push(pathname + "?step=payment", { scroll: false });
     };
 
-    const set = async (id: string) => {
+    const set = async (option: DeliveryOption) => {
         setIsLoading(true);
-        await setShippingMethod(id)
+        await setShippingMethod(option)
             .then(() => {
                 setIsLoading(false);
             })
@@ -49,7 +53,10 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
     };
 
     const handleChange = (value: string) => {
-        set(value);
+        console.log(",,s,,,,,", value);
+        const item: DeliveryOption = availableShippingMethods?.find((item: DeliveryOption) => item.id == value);
+        console.log(item);
+        set(item);
     };
 
     useEffect(() => {
@@ -62,11 +69,11 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             <div className="flex flex-row items-center justify-between mb-6">
                 <h2
                     className={clsx("flex flex-row text-3xl gap-x-2 items-baseline", {
-                        "opacity-50 pointer-events-none select-none": !isOpen && cart.shipping_methods.length === 0,
+                        "opacity-50 pointer-events-none select-none": !isOpen && cart.shipping_method,
                     })}
                 >
                     Delivery
-                    {!isOpen && cart.shipping_methods.length > 0 && <CheckCircleSolid />}
+                    {!isOpen && cart.shipping_method && <CheckCircleSolid />}
                 </h2>
                 {!isOpen && cart?.shipping_address && cart?.billing_address && cart?.email && (
                     <button className="text-default-700 hover:text-blue-600" data-testid="edit-delivery-button" onClick={handleEdit}>
@@ -77,7 +84,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             {isOpen ? (
                 <div data-testid="delivery-options-container">
                     <div className="pb-8">
-                        <RadioGroup value={cart.shipping_methods[0]?.shipping_option_id} onChange={(value: string) => handleChange(value)}>
+                        <RadioGroup value={cart.shipping_method?.id} onChange={(value: string) => handleChange(value)}>
                             {availableShippingMethods ? (
                                 availableShippingMethods.map((option) => {
                                     return (
@@ -86,23 +93,17 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                                             className={clsx(
                                                 "flex items-center justify-between text-sm cursor-pointer py-4 border rounded-lg px-8 mb-2",
                                                 {
-                                                    "border-blue-400": option.id === cart.shipping_methods[0]?.shipping_option_id,
+                                                    "border-blue-400": option.id === cart.shipping_method?.id,
                                                 }
                                             )}
                                             data-testid="delivery-option-radio"
                                             value={option.id}
                                         >
                                             <div className="flex items-center gap-x-4">
-                                                <Radio checked={option.id === cart.shipping_methods[0]?.shipping_option_id} />
+                                                <Radio checked={option.id === cart.shipping_method?.id} />
                                                 <span className="text-base">{option.name}</span>
                                             </div>
-                                            <span className="justify-self-end text-default-800">
-                                                {formatAmount({
-                                                    amount: option.amount!,
-                                                    region: cart?.region,
-                                                    includeTaxes: false,
-                                                })}
-                                            </span>
+                                            <span className="justify-self-end text-default-800">{currency(option.amount!)}</span>
                                         </RadioGroup.Option>
                                     );
                                 })
@@ -119,7 +120,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     <Button
                         className="mt-6"
                         data-testid="submit-delivery-option-button"
-                        disabled={!cart.shipping_methods[0]}
+                        disabled={!cart.shipping_method}
                         isLoading={isLoading}
                         size="lg"
                         onClick={handleSubmit}
@@ -130,19 +131,12 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             ) : (
                 <div>
                     <div className="text-small-regular">
-                        {cart && cart.shipping_methods.length > 0 && (
+                        {cart && cart.shipping_method && (
                             <div className="flex flex-col w-1/3">
                                 <p className="font-medium mb-1 text-base">Method</p>
                                 <p className="font-normal text-default-600 text-base">
-                                    {cart.shipping_methods[0].shipping_option.name} (
-                                    {formatAmount({
-                                        amount: cart.shipping_methods[0].price,
-                                        region: cart.region,
-                                        includeTaxes: false,
-                                    })
-                                        .replace(/,/g, "")
-                                        .replace(/\./g, ",")}
-                                    )
+                                    {cart.shipping_method?.name} (
+                                    {currency(cart.shipping_method.amount).replace(/,/g, "").replace(/\./g, ",")})
                                 </p>
                             </div>
                         )}

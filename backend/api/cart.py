@@ -59,9 +59,10 @@ async def update_cart(cart_in: CartItemIn, cartId: str = Header(default=None)):
     return cart_handler.update_cart_quantity(cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity)
 
 
-@router.post("/update-cart-details")
+@router.patch("/update-cart-details")
 async def update_cart_details(cart_update: CartDetails, cartId: str = Header(default=None)):
-    return cart_handler.update_cart_details(cart_id=cartId, cart_data=cart_update)
+    update_data = cart_update.dict(exclude_unset=True)
+    return cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])

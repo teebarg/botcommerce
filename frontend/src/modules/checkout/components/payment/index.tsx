@@ -12,8 +12,11 @@ import { paymentInfoMap } from "@lib/constants";
 import clsx from "clsx";
 import { Tooltip } from "@nextui-org/tooltip";
 import Button from "@modules/common/components/button";
+import { Cart } from "types/global";
 
-const Payment = ({ cart }: { cart: Omit<any, "refundable_amount" | "refunded_total"> | null }) => {
+const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
+    console.log("youppppppppppppp")
+    console.log(cart)
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +28,7 @@ const Payment = ({ cart }: { cart: Omit<any, "refundable_amount" | "refunded_tot
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const paymentReady = (cart?.payment_session && cart?.shipping_methods.length !== 0) || paidByGiftcard;
+    const paymentReady = (cart?.payment_session && !cart?.shipping_method) || paidByGiftcard;
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -40,6 +43,8 @@ const Payment = ({ cart }: { cart: Omit<any, "refundable_amount" | "refunded_tot
 
     const set = async (providerId: string) => {
         setIsLoading(true);
+        console.log("44 Payment")
+
         await setPaymentMethod(providerId)
             .catch((err) => setError(err.toString()))
             .finally(() => {
@@ -89,23 +94,15 @@ const Payment = ({ cart }: { cart: Omit<any, "refundable_amount" | "refunded_tot
             </div>
             <div>
                 <div className={isOpen ? "block" : "hidden"}>
-                    {!paidByGiftcard && cart?.payment_sessions?.length ? (
+                    {!paidByGiftcard ? (
                         <>
-                            <RadioGroup value={cart.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
-                                {cart.payment_sessions
-                                    .sort((a, b) => {
-                                        return a.provider_id > b.provider_id ? 1 : -1;
-                                    })
-                                    .map((paymentSession) => {
-                                        return (
-                                            <PaymentContainer
-                                                key={paymentSession.id}
-                                                paymentInfoMap={paymentInfoMap}
-                                                paymentSession={paymentSession}
-                                                selectedPaymentOptionId={cart.payment_session?.provider_id || null}
-                                            />
-                                        );
-                                    })}
+                            <RadioGroup value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
+                                <PaymentContainer
+                                    key={1}
+                                    paymentInfoMap={paymentInfoMap}
+                                    paymentSession={{id: "stripe", provider_id: "Stripe"}}
+                                    selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
+                                />
                             </RadioGroup>
                         </>
                     ) : paidByGiftcard ? (

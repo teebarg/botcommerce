@@ -12,7 +12,7 @@ type CheckoutFormProps = {
 };
 
 const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
-// export default async function CheckoutForm() {
+    // export default async function CheckoutForm() {
     const cartId = cookies().get("_cart_id")?.value;
 
     if (!cartId) {
@@ -30,7 +30,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
 
     // get available shipping methods
     // const availableShippingMethods = await listCartShippingMethods(cart.id).then((methods: any) => methods?.filter((m: any) => !m.is_return));
-    const availableShippingMethods: any = [];
+    const availableShippingMethods: any = [
+        { id: 1, name: "Express", amount: 5000 },
+        { id: 2, name: "Regular", amount: 2500 },
+    ];
 
     // if (!availableShippingMethods) {
     //     return null;
@@ -47,7 +50,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
                 </div>
 
                 <div>
-                    {/* <Shipping availableShippingMethods={availableShippingMethods} cart={cart} /> */}
+                    <Shipping availableShippingMethods={availableShippingMethods} cart={cart} />
                 </div>
 
                 <div>
@@ -60,6 +63,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
             </div>
         </div>
     );
-}
+};
 
-export default CheckoutForm
+export default CheckoutForm;

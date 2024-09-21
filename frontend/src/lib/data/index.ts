@@ -58,11 +58,24 @@ export async function createCart(data = {}) {
 
 export async function updateCart(cartId: string, data: any) {
     const headers = getHeaders(["cart"]);
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update-cart-details`;
+    const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+            cartId
 
-    // return client.carts
-    //     .update(cartId, data, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((error) => Error(error));
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to update cart: ${response.statusText}`);
+    }
+
+    const updatedCart = await response.json();
+    return updatedCart;
 }
 
 export const getCart = cache(async function (cartId: string) {
@@ -140,7 +153,7 @@ export async function addItem({ cartId, product_id, quantity }: { cartId: string
 }
 
 export async function updateItem({ cartId, lineId, quantity }: { cartId: string; lineId: string; quantity: number }) {
-    const headers = getHeaders(["cart"]); 
+    const headers = getHeaders(["cart"]);
     try {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
         const response = await fetch(url, {

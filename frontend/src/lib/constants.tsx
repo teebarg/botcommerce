@@ -7,6 +7,10 @@ export const paymentInfoMap: Record<string, { title: string; icon: React.JSX.Ele
         title: "Test payment",
         icon: <CreditCard />,
     },
+    stripe: {
+        title: "Stripe",
+        icon: <CreditCard />,
+    },
     // Add more payment providers here
 };
 

@@ -1,3 +1,5 @@
+import exp from "constants";
+
 export type Customer = {
     id: number;
     firstname: string;
@@ -113,8 +115,9 @@ export type Cart = {
     total: number;
     billing_address: Record<string, any>
     shipping_address: Record<string, any>
-    shipping_methods: any
+    shipping_method: any
     payment_session: any
+    gift_cards: any
 };
 
 export type CartItem = {
@@ -128,3 +131,9 @@ export type CartItem = {
     price: number
     created_at: string
 };
+
+export type DeliveryOption = {
+    id: string
+    name: string
+    amount: number
+}

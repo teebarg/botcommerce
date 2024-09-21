@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Button from "@modules/common/components/button";
 
 import ErrorMessage from "../error-message";
+import { Cart } from "types/global";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -12,7 +13,7 @@ type PaymentButtonProps = {
 };
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, "data-testid": dataTestId }) => {
-    const notReady = !cart || !cart.shipping_address || !cart.billing_address || !cart.email || cart.shipping_methods.length < 1 ? true : false;
+    const notReady = !cart || !cart.shipping_address || !cart.billing_address || !cart.email || !cart.shipping_method ? true : false;
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
