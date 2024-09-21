@@ -10,9 +10,10 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from core.config import settings
 from core.logging import logger
-from models.generic import Order, User
+from models.generic import User
 import random
 import string
+from firebase_cart import Order
 
 @dataclass
 class EmailData:
@@ -91,7 +92,6 @@ def generate_invoice_email(order: Order, user: User) -> EmailData:
         template_name="invoice.html",
         context={
             "project_name": settings.PROJECT_NAME,
-            # "download_link": download_link,
             "order": order,
             "user": user,
         },

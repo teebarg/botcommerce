@@ -11,7 +11,7 @@ type CartTotalsProps = {
 };
 
 const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
-    const { subtotal, discount_total, gift_card_total, tax_total, shipping_total, total } = data;
+    const { subtotal, discount_total, gift_card_total, tax_total, delivery_fee, total } = data;
 
     const getAmount = (amount: number | null | undefined) => {
         return currency(amount || 0);
@@ -41,8 +41,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                     <div className="flex justify-between">
                         <dt className="text-small text-default-500">Delivery</dt>
                         <dd className="text-small font-semibold text-default-700">
-                            <span data-testid="cart-shipping" data-value={shipping_total || 0}>
-                                {getAmount(shipping_total)}
+                            <span data-testid="cart-shipping" data-value={delivery_fee || 0}>
+                                {getAmount(delivery_fee)}
                             </span>
                         </dd>
                     </div>

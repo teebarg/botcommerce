@@ -1,13 +1,14 @@
-import exp from "constants";
-
 export type Customer = {
     id: number;
     firstname: string;
     lastname?: string;
     email?: string;
+    phone?: string;
     is_active?: boolean;
     is_superuser?: number;
     created_at?: string;
+    billing_address?: Record<string, any>
+    shipping_address?: Record<string, any>
 };
 
 export type Product = {
@@ -111,7 +112,7 @@ export type Cart = {
     checkout_step?: "address" | "delivery" | "payment"
     subtotal: number
     tax_total: number
-    shipping_total: number
+    delivery_fee: number
     total: number;
     billing_address: Record<string, any>
     shipping_address: Record<string, any>
@@ -137,3 +138,29 @@ export type DeliveryOption = {
     name: string
     amount: number
 }
+
+export type PaymentSession = {
+    id: string
+    provider_id: string
+}
+
+export type Order = {
+    order_id: string
+    status?: "pending" | "processing" | "fulfilled"
+    fulfillment_status: "fulfilled" | "not_fulfilled"
+    cart_id: string
+    customer_id: string
+    email: string
+    line_items: CartItem[]
+    checkout_step?: "address" | "delivery" | "payment"
+    subtotal: number
+    tax_total: number
+    delivery_fee: number
+    total: number;
+    billing_address: Record<string, any>
+    shipping_address: Record<string, any>
+    shipping_method: Record<string, any>
+    payment_session: Record<string, any>
+    fulfillments: Record<string, any>[]
+    payment_status: "pending" | "paid"
+};

@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { addShippingMethod, completeCart, deleteDiscount, setPaymentSession, updateCart } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { DeliveryOption } from "types/global";
+import { DeliveryOption, PaymentSession } from "types/global";
 
 export async function cartUpdate(data: any) {
     const cartId = cookies().get("_cart_id")?.value;
@@ -152,19 +152,14 @@ export async function setShippingMethod(option: DeliveryOption) {
     }
 }
 
-export async function setPaymentMethod(providerId: string) {
+export async function setPaymentMethod(method: PaymentSession) {
     const cartId = cookies().get("_cart_id")?.value;
 
     if (!cartId) throw new Error("No cartId cookie found");
 
     try {
-        await updateCart(cartId, { payment_session: { provider_id: providerId, id: "stripe" } });
+        await updateCart(cartId, { payment_session: method });
         revalidateTag("cart");
-        // const cart = await setPaymentSession({ cartId, providerId });
-
-        // revalidateTag("cart");
-
-        // return cart;
     } catch (error: any) {
         throw error;
     }

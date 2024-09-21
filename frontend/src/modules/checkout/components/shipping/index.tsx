@@ -136,7 +136,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                                 <p className="font-medium mb-1 text-base">Method</p>
                                 <p className="font-normal text-default-600 text-base">
                                     {cart.shipping_method?.name} (
-                                    {currency(cart.shipping_method.amount).replace(/,/g, "").replace(/\./g, ",")})
+                                    {currency(cart.shipping_method.amount)})
                                 </p>
                             </div>
                         )}

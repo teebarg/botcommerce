@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Button from "@modules/common/components/button";
 
 import ErrorMessage from "../error-message";
-import { Cart } from "types/global";
+import { Cart, PaymentSession } from "types/global";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -22,10 +22,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, "data-testid": data
     }
 
     const paymentSession = cart.payment_session as PaymentSession;
+    console.log("pllkkkj..................")
+    console.log(paymentSession)
 
-    switch (paymentSession.provider_id) {
+    switch (paymentSession.id) {
         case "manual":
             return <ManualTestPaymentButton data-testid={dataTestId} notReady={notReady} />;
+        case "stripe":
+            return <Button disabled>Continue to payment</Button>;
         default:
             return <Button disabled>Select a payment method</Button>;
     }

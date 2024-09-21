@@ -42,6 +42,13 @@ class CartDetails(BaseModel):
     shipping_method: Optional[dict] = None
     payment_session: Optional[dict] = None
 
+class OrderDetails(BaseModel):
+    fulfillments: Optional[list[dict]] = None
+    fulfillment_status: Optional[str] = None
+    payment_status: Optional[str] = None
+    status: Optional[str] = None
+
+
 # Shared properties
 class ProductBrand(SQLModel, table=True):
     product_id: int = Field(foreign_key="product.id", primary_key=True)

@@ -10,11 +10,15 @@ export const metadata: Metadata = {
 
 export default async function OverviewTemplate() {
     const customer = await getCustomer().catch(() => null);
+    // console.log(customer)
     const orders = (await listCustomerOrders().catch(() => null)) || null;
+    console.log("listing orders......")
 
     if (!customer) {
         notFound();
     }
+
+    return <div>sjjsjsjsshhhhhssss</div>
 
     return <Overview customer={customer} orders={orders} />;
 }

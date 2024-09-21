@@ -9,23 +9,9 @@ import AccountInfo from "../account-info";
 
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;
-    regions: any[];
 };
 
-const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer, regions }) => {
-    const regionOptions = useMemo(() => {
-        return (
-            regions
-                ?.map((region) => {
-                    return region.countries.map((country) => ({
-                        value: country.iso_2,
-                        label: country.display_name,
-                    }));
-                })
-                .flat() || []
-        );
-    }, [regions]);
-
+const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
     const [successState, setSuccessState] = React.useState(false);
 
     const [state, formAction] = useFormState(updateCustomerBillingAddress, {
@@ -46,10 +32,6 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer, regions
             return "No billing address";
         }
 
-        const country =
-            regionOptions?.find((country) => country.value === customer.billing_address.country_code)?.label ||
-            customer.billing_address.country_code?.toUpperCase();
-
         return (
             <div className="flex flex-col font-semibold" data-testid="current-info">
                 <span>
@@ -63,10 +45,9 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer, regions
                 <span>
                     {customer.billing_address.postal_code}, {customer.billing_address.city}
                 </span>
-                <span>{country}</span>
             </div>
         );
-    }, [customer, regionOptions]);
+    }, [customer]);
 
     return (
         <form action={formAction} className="w-full" onReset={() => clearState()}>

@@ -14,9 +14,14 @@ import { Tooltip } from "@nextui-org/tooltip";
 import Button from "@modules/common/components/button";
 import { Cart } from "types/global";
 
+const payMethods = [
+    { id: "stripe", provider_id: "Stripe" },
+    { id: "manual", provider_id: "Bank Transfer" },
+];
+
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
-    console.log("youppppppppppppp")
-    console.log(cart)
+    console.log("youppppppppppppp");
+    console.log(cart);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +33,12 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const paymentReady = (cart?.payment_session && !cart?.shipping_method) || paidByGiftcard;
+    const paymentReady = (cart?.payment_session && cart?.shipping_method) || paidByGiftcard;
+    console.log("paidByGiftcard");
+    console.log(paidByGiftcard);
+    console.log(paymentReady);
+    console.log(cart?.payment_session);
+    console.log(cart?.shipping_method);
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -43,9 +53,10 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const set = async (providerId: string) => {
         setIsLoading(true);
-        console.log("44 Payment")
+        console.log("44 Payment");
+        const method = payMethods.find((item) => item.provider_id == providerId)
 
-        await setPaymentMethod(providerId)
+        await setPaymentMethod(method)
             .catch((err) => setError(err.toString()))
             .finally(() => {
                 setIsLoading(false);
@@ -97,12 +108,14 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     {!paidByGiftcard ? (
                         <>
                             <RadioGroup value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
-                                <PaymentContainer
-                                    key={1}
-                                    paymentInfoMap={paymentInfoMap}
-                                    paymentSession={{id: "stripe", provider_id: "Stripe"}}
-                                    selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
-                                />
+                                {payMethods.map((item) => (
+                                    <PaymentContainer
+                                        key={item.id}
+                                        paymentInfoMap={paymentInfoMap}
+                                        paymentSession={item}
+                                        selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
+                                    />
+                                ))}
                             </RadioGroup>
                         </>
                     ) : paidByGiftcard ? (

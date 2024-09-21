@@ -113,7 +113,7 @@ const getProfileCompletion = (customer: Omit<Customer, "password_hash"> | null) 
         count++;
     }
 
-    if (customer.first_name && customer.last_name) {
+    if (customer.firstname && customer.lastname) {
         count++;
     }
 

@@ -12,7 +12,6 @@ type CheckoutFormProps = {
 };
 
 const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
-    // export default async function CheckoutForm() {
     const cartId = cookies().get("_cart_id")?.value;
 
     if (!cartId) {

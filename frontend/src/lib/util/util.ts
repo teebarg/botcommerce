@@ -19,7 +19,7 @@ const buildUrl = (baseUrl: string, queryParams: Record<string, string | number |
 };
 
 const currency = (number: number): string => {
-    return number.toLocaleString("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 });
+    return number?.toLocaleString("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 });
 };
 
 const imgSrc = (image: string): string => {

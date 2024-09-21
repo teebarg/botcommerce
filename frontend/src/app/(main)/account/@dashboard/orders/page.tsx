@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Orders() {
+    console.log("smksjks......")
     const orders = await listCustomerOrders();
 
     if (!orders) {

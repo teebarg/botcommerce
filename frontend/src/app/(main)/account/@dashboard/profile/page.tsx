@@ -4,7 +4,7 @@ import ProfileBillingAddress from "@modules/account/components/profile-billing-a
 import ProfileEmail from "@modules/account/components/profile-email";
 import ProfileName from "@modules/account/components/profile-name";
 import ProfilePassword from "@modules/account/components/profile-password";
-import { getCustomer, listRegions } from "@lib/data";
+import { getCustomer } from "@lib/data";
 import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -14,9 +14,8 @@ export const metadata: Metadata = {
 
 export default async function Profile() {
     const customer = await getCustomer();
-    const regions = await listRegions();
 
-    if (!customer || !regions) {
+    if (!customer) {
         notFound();
     }
 
@@ -38,7 +37,7 @@ export default async function Profile() {
                 <hr className="tb-divider" />
                 <ProfilePassword customer={customer} />
                 <hr className="tb-divider" />
-                <ProfileBillingAddress customer={customer} regions={regions} />
+                <ProfileBillingAddress customer={customer} />
             </div>
         </div>
     );
