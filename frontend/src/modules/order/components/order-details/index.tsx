@@ -7,9 +7,9 @@ type OrderDetailsProps = {
 
 const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
     const formatStatus = (str: string) => {
-        const formatted = str.split("_").join(" ");
+        const formatted = str?.split("_")?.join(" ");
 
-        return formatted.slice(0, 1).toUpperCase() + formatted.slice(1);
+        return formatted?.slice(0, 1)?.toUpperCase() + formatted?.slice(1);
     };
 
     return (

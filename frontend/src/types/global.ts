@@ -7,8 +7,8 @@ export type Customer = {
     is_active?: boolean;
     is_superuser?: number;
     created_at?: string;
-    billing_address?: Record<string, any>
-    shipping_address?: Record<string, any>
+    billing_addresses?: Record<string, any>[]
+    shipping_addresses?: Record<string, any>[]
 };
 
 export type Product = {
@@ -163,4 +163,5 @@ export type Order = {
     payment_session: Record<string, any>
     fulfillments: Record<string, any>[]
     payment_status: "pending" | "paid"
+    created_at: string
 };

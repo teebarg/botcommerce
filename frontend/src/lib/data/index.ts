@@ -26,13 +26,7 @@ const getHeaders = (tags: string[] = []) => {
     } as Record<string, any>;
 
     const token = cookies().get("access_token")?.value;
-
-    if (token) {
-        headers["X-Auth"] = token;
-    } else {
-        headers.authorization = "";
-    }
-
+    headers["X-Auth"] = token ?? "";
     return headers;
 };
 
@@ -52,7 +46,6 @@ export async function createCart(data = {}) {
     }
 
     const cart = await response.json();
-    console.log(cart)
     return cart;
 }
 
@@ -64,8 +57,7 @@ export async function updateCart(cartId: string, data: any) {
         headers: {
             "Content-Type": "application/json",
             ...headers,
-            cartId
-
+            cartId,
         },
         body: JSON.stringify(data),
     });
@@ -228,20 +220,47 @@ export async function setPaymentSession({ cartId, providerId }: { cartId: string
 export async function completeCart(cartId: string) {
     const headers = getHeaders(["cart"]);
 
-    // return client.carts
-    //     .complete(cartId, headers)
-    //     .then((res) => res)
-    //     .catch((err) => Error(err));
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+                cartId
+            },
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        return { message: error, status: "error" };
+    }
 }
 
 // Order actions
 export const retrieveOrder = cache(async function (id: string) {
     const headers = getHeaders(["order"]);
 
-    // return client.orders
-    //     .retrieve(id, headers)
-    //     .then(({ order }) => order)
-    //     .catch((err) => Error(err));
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+            },
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        return { message: error, status: "error" };
+    }
 });
 
 // Shipping actions
@@ -390,12 +409,25 @@ export async function updateShippingAddress(addressId: string, data: any) {
 }
 
 export const listCustomerOrders = cache(async function (limit: number = 10, offset: number = 0) {
-    const headers = getHeaders(["customer"]);
+    const headers = getHeaders(["orders"]);
 
-    // return client.customers
-    //     .listOrders({ limit, offset }, headers)
-    //     .then(({ orders }) => orders)
-    //     .catch((err) => Error(err));
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+            },
+        });
+        if (!res.ok) {
+            throw new Error("Login failed");
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        return { message: error, status: "error" };
+    }
 });
 
 // Region actions

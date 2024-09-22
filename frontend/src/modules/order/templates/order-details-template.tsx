@@ -8,9 +8,10 @@ import OrderDetails from "@modules/order/components/order-details";
 import OrderSummary from "@modules/order/components/order-summary";
 import ShippingDetails from "@modules/order/components/shipping-details";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import { Order } from "types/global";
 
 type OrderDetailsTemplateProps = {
-    order: any;
+    order: Order;
 };
 
 const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) => {
@@ -28,7 +29,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({ order }) =>
             </div>
             <div className="flex flex-col gap-4 h-full w-full" data-testid="order-details-container">
                 <OrderDetails showStatus order={order} />
-                <Items items={order.items} region={order.region} />
+                <Items items={order.line_items} />
                 <ShippingDetails order={order} />
                 <OrderSummary order={order} />
                 <Help />

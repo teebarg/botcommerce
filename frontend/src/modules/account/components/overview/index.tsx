@@ -1,11 +1,11 @@
-import { formatAmount } from "@lib/util/prices";
 import ChevronDown from "@modules/common/icons/chevron-down";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { Customer } from "types/global";
+import { Customer, Order } from "types/global";
+import { currency } from "@lib/util/util";
 
 type OverviewProps = {
     customer: Omit<Customer, "password_hash"> | null;
-    orders: any[] | null;
+    orders: Order[] | null;
 };
 
 const Overview = ({ customer, orders }: OverviewProps) => {
@@ -63,23 +63,19 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                                 {orders && orders.length > 0 ? (
                                     orders.slice(0, 5).map((order) => {
                                         return (
-                                            <li key={order.id} data-testid="order-wrapper" data-value={order.id}>
-                                                <LocalizedClientLink href={`/account/orders/details/${order.id}`}>
+                                            <li key={order.order_id} data-testid="order-wrapper" data-value={order.order_id}>
+                                                <LocalizedClientLink href={`/account/orders/details/${order.order_id}`}>
                                                     <div className="shadow-lg bg-default-100 flex justify-between items-center p-4">
                                                         <div className="grid grid-cols-3 grid-rows-2 text-sm gap-x-4 flex-1">
                                                             <span className="font-semibold">Date placed</span>
                                                             <span className="font-semibold">Order number</span>
                                                             <span className="font-semibold">Total amount</span>
                                                             <span data-testid="order-created-date">{new Date(order.created_at).toDateString()}</span>
-                                                            <span data-testid="order-id" data-value={order.display_id}>
-                                                                #{order.display_id}
+                                                            <span data-testid="order-id" data-value={order.order_id}>
+                                                                #{order.order_id}
                                                             </span>
                                                             <span data-testid="order-amount">
-                                                                {formatAmount({
-                                                                    amount: order.total,
-                                                                    region: order.region,
-                                                                    includeTaxes: false,
-                                                                })}
+                                                                {currency(order.total)}
                                                             </span>
                                                         </div>
                                                         <button className="flex items-center justify-between" data-testid="open-order-button">
@@ -121,7 +117,7 @@ const getProfileCompletion = (customer: Omit<Customer, "password_hash"> | null) 
         count++;
     }
 
-    if (customer.billing_address) {
+    if (customer.billing_addresses) {
         count++;
     }
 

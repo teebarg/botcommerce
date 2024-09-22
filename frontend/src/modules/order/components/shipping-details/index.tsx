@@ -1,7 +1,8 @@
 import { currency } from "@lib/util/util";
+import { Order } from "types/global";
 
 type ShippingDetailsProps = {
-    order: any;
+    order: Order;
 };
 
 const ShippingDetails = ({ order }: ShippingDetailsProps) => {

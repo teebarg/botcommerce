@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { addShippingMethod, completeCart, deleteDiscount, setPaymentSession, updateCart } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { DeliveryOption, PaymentSession } from "types/global";
+import { DeliveryOption, Order, PaymentSession } from "types/global";
 
 export async function cartUpdate(data: any) {
     const cartId = cookies().get("_cart_id")?.value;
@@ -170,19 +170,16 @@ export async function placeOrder() {
 
     if (!cartId) throw new Error("No cartId cookie found");
 
-    let cart;
+    let order: Order;
 
     try {
-        cart = await completeCart(cartId);
+        order = await completeCart(cartId);
         revalidateTag("cart");
+        cookies().set("_cart_id", "", { maxAge: -1 });
+        redirect(`/order/confirmed/${order.order_id}`);
     } catch (error: any) {
         throw error;
     }
 
-    if (cart?.type === "order") {
-        cookies().set("_cart_id", "", { maxAge: -1 });
-        redirect(`/order/confirmed/${cart?.data.id}`);
-    }
-
-    return cart;
+    return order;
 }

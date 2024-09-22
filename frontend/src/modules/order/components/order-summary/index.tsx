@@ -1,4 +1,4 @@
-import { formatAmount } from "@lib/util/prices";
+import { currency } from "@lib/util/util";
 
 type OrderSummaryProps = {
     order: any;
@@ -10,7 +10,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
             return;
         }
 
-        return formatAmount({ amount, region: order.region, includeTaxes: false });
+        return currency(amount);
     };
 
     return (
