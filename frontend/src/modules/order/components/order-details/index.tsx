@@ -1,7 +1,8 @@
+import { Order } from "types/global";
 
 
 type OrderDetailsProps = {
-    order: any;
+    order: Order;
     showStatus?: boolean;
 };
 
@@ -25,7 +26,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
                 Order date: <span data-testid="order-date">{new Date(order.created_at).toDateString()}</span>
             </p>
             <p className="mt-2 text-sky-500">
-                Order number: <span data-testid="order-id">{order.display_id}</span>
+                Order number: <span data-testid="order-id">{order.order_id}</span>
             </p>
 
             <div className="flex items-center text-sm gap-x-4 mt-4">
@@ -33,7 +34,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
                     <>
                         <p>
                             Order status:{" "}
-                            <span className="" data-testid="order-status">
+                            <span data-testid="order-status">
                                 {formatStatus(order.fulfillment_status)}
                             </span>
                         </p>

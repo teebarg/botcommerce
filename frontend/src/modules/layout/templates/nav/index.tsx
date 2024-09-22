@@ -8,9 +8,10 @@ import User from "@modules/common/icons/user";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import Search from "@modules/search/templates/search";
+import { Customer } from "types/global";
 
 const Navbar = async () => {
-    const customer = await getCustomer().catch(() => null);
+    const customer: Customer = await getCustomer().catch(() => null);
 
     return (
         <NextUINavbar className="my-2" maxWidth="full" position="sticky">
@@ -42,11 +43,13 @@ const Navbar = async () => {
                             Checkout
                         </LocalizedClientLink>
                     </NavbarMenuItem>
-                    <NavbarMenuItem>
-                        <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
-                            Admin
-                        </LocalizedClientLink>
-                    </NavbarMenuItem>
+                    {customer.is_superuser && (
+                        <NavbarMenuItem>
+                            <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
+                                Admin
+                            </LocalizedClientLink>
+                        </NavbarMenuItem>
+                    )}
                 </div>
             </NavbarContent>
 

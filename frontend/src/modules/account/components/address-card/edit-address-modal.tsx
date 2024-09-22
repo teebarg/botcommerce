@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { PencilSquare as Edit, Trash } from "nui-react-icons";
 import useToggleState from "@lib/hooks/use-toggle-state";
-import Modal from "@modules/common/components/modal";
+import { Modal } from "@modules/common/components/modal";
 import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@modules/account/actions";
 import Spinner from "@modules/common/icons/spinner";
 import { useFormState } from "react-dom";
@@ -14,12 +14,11 @@ import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
 
 type EditAddressProps = {
-    region: any;
     address: any;
     isActive?: boolean;
 };
 
-const EditAddress: React.FC<EditAddressProps> = ({ region, address, isActive = false }) => {
+const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [removing, setRemoving] = useState(false);
     const { state, open, close: closeModal } = useToggleState(false);

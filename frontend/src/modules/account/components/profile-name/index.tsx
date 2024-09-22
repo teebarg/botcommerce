@@ -31,7 +31,7 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
         <form action={formAction} className="w-full overflow-visible">
             <AccountInfo
                 clearState={clearState}
-                currentInfo={`${customer.first_name} ${customer.last_name}`}
+                currentInfo={`${customer.firstname} ${customer.lastname}`}
                 data-testid="account-name-editor"
                 isError={!!state?.error}
                 isSuccess={successState}

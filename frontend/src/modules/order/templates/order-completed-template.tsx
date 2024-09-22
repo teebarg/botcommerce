@@ -4,9 +4,10 @@ import Items from "@modules/order/components/items";
 import OrderDetails from "@modules/order/components/order-details";
 import ShippingDetails from "@modules/order/components/shipping-details";
 import PaymentDetails from "@modules/order/components/payment-details";
+import { Order } from "types/global";
 
 type OrderCompletedTemplateProps = {
-    order: any;
+    order: Order;
 };
 
 export default function OrderCompletedTemplate({ order }: OrderCompletedTemplateProps) {
@@ -24,7 +25,7 @@ export default function OrderCompletedTemplate({ order }: OrderCompletedTemplate
                     </h1>
                     <OrderDetails order={order} />
                     <h2 className="flex flex-row text-2xl">Summary</h2>
-                    <Items items={order.items} region={order.region} />
+                    <Items items={order.line_items} />
                     <CartTotals data={order} />
                     <ShippingDetails order={order} />
                     <PaymentDetails order={order} />
