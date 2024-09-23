@@ -88,7 +88,7 @@ async def export(data: list, name: str, bucket: Any, email: str, columns: list) 
     except Exception as e:
         logger.error(f"Error in export function: {e}")
         raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
-    
+
 
 
 async def validate_file(file, size: int = 1.5) -> None:

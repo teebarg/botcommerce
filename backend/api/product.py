@@ -3,7 +3,7 @@ from io import BytesIO
 from typing import Annotated, Any
 import asyncio
 
-from services.run_sheet import process_products
+from services.run_sheet import generate_excel_file, process_products
 from services.meilisearch import add_documents_to_index, clear_index, delete_document, delete_index, get_or_create_index, search_documents, update_document
 from fastapi import (
     APIRouter,
@@ -36,21 +36,27 @@ router = APIRouter()
 
 @router.get("/export")
 async def export_products(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
+    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage, background_tasks: BackgroundTasks
 ) -> Any:
     try:
-        statement = "SELECT id, name, slug, description, price, old_price, inventory, image FROM product;"
-        products = db.exec(text(statement))
+        # statement = "SELECT id, name, slug, description, price, old_price, inventory, image FROM product;"
+        # products = db.exec(text(statement))
 
-        file_url = await export(
-            columns=["id","name", "slug", "description", "price", "old_price", "inventory", "image"],
-            data=products,
-            name="Product",
-            bucket=bucket,
-            email=current_user.email,
-        )
+        # file_url = await export(
+        #     columns=["id","name", "slug", "description", "price", "old_price", "inventory", "image"],
+        #     data=products,
+        #     name="Product",
+        #     bucket=bucket,
+        #     email=current_user.email,
+        # )
 
-        return {"message": "Data Export successful. An email with the file URL has been sent.", "file_url": file_url}
+        # Define the background task
+        def run_task():
+            asyncio.run(generate_excel_file(bucket=bucket, email=current_user.email))
+
+        background_tasks.add_task(run_task)
+
+        return {"message": "Data Export successful. An email with the file URL has been sent."}
     except Exception as e:
         logger.error(f"Export products error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -197,7 +203,7 @@ def update(
             detail="Product not found",
         )
     db_product = crud.product.update(db=db, db_obj=db_product, obj_in=product_in)
-    
+
     try:
         # Define the background task
         def update_task(db_product):
@@ -243,18 +249,23 @@ async def upload_products(
     background_tasks.add_task(process_file, contents, id, db, crud.product.bulk_upload)
     return {"batch": batch, "message": "File upload started"}
 
+
 @router.post("/upload-products/")
-async def upload_products_a(file: Annotated[UploadFile, File()]):
+async def upload_products_a(file: Annotated[UploadFile, File()], background_tasks: BackgroundTasks):
     content_type =  file.content_type
-    
+
     if content_type not in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/csv"]:
-        raise HTTPException(status_code=400, detail="Invalid file type. Only CSV/Excel files are supported.")              
+        raise HTTPException(status_code=400, detail="Invalid file type. Only CSV/Excel files are supported.")
 
     await validate_file(file=file)
 
     contents = await file.read()
 
-    asyncio.create_task(process_products(file_content=contents, content_type=content_type))
+    # Define the background task
+    def update_task():
+        asyncio.run(process_products(file_content=contents, content_type=content_type))
+
+    background_tasks.add_task(update_task)
 
     return {"message": "Upload started"}
 
@@ -325,7 +336,7 @@ async def reindex_products(
             for product in products:
                 product_dict = prepare_product_data_for_indexing(product)
                 documents.append(product_dict)
-                
+
             # Add all documents to the 'products' index
             add_documents_to_index(index_name="products", documents=documents)
 
@@ -366,7 +377,7 @@ async def configure_filterable_attributes(
             detail="An error occurred while updating filterable attributes."
         )
 
-    
+
 @router.get("/search/clear-index", response_model=dict)
 async def config_clear_index():
     """
@@ -381,7 +392,7 @@ async def config_clear_index():
             status_code=500,
             detail="An error occurred while clearing index"
         )
-    
+
 
 @router.get("/search/delete-index", response_model=dict)
 async def config_delete_index():
