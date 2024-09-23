@@ -67,8 +67,6 @@ export type InfiniteProductPage = {
 
 export type ProductVariantInfo = Pick<any, "prices">;
 
-export type RegionInfo = Pick<any, "currency_code" | "tax_code" | "tax_rate">;
-
 export type CartWithCheckoutStep = Omit<any, "beforeInsert" | "beforeUpdate" | "afterUpdateOrLoad"> & {
     checkout_step: "address" | "delivery" | "payment";
 };

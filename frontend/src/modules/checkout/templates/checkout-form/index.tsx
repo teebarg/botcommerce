@@ -27,16 +27,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
 
     // cart.checkout_step = cart && getCheckoutStep(cart);
 
-    // get available shipping methods
-    // const availableShippingMethods = await listCartShippingMethods(cart.id).then((methods: any) => methods?.filter((m: any) => !m.is_return));
     const availableShippingMethods: any = [
         { id: 1, name: "Express", amount: 5000 },
         { id: 2, name: "Regular", amount: 2500 },
     ];
 
-    // if (!availableShippingMethods) {
-    //     return null;
-    // }
 
     // get customer if logged in
     const customer = await getCustomer();

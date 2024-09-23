@@ -1,16 +1,10 @@
 import { cache } from "react";
 import sortProducts from "@lib/util/sort-products";
-import transformProductPreview from "@lib/util/transform-product-preview";
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 import { Product, ProductCategoryWithChildren } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
 import { searchDocuments } from "@lib/util/meilisearch";
-
-const emptyResponse = {
-    response: { products: [], count: 0 },
-    nextPage: null,
-};
 
 /**
  * Function for getting custom headers for API requests, including the JWT token and cache revalidation tags.
@@ -430,56 +424,6 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
     }
 });
 
-// Region actions
-export const listRegions = cache(async function () {
-    // return client.regions
-    //     .list()
-    //     .then(({ regions }) => regions)
-    //     .catch((err) => {
-    //         console.log(err);
-    //         return null;
-    //     });
-});
-
-export const retrieveRegion = cache(async function (id: string) {
-    const headers = getHeaders(["regions"]);
-
-    // return client.regions
-    //     .retrieve(id, headers)
-    //     .then(({ region }) => region)
-    //     .catch((err) => Error(err));
-});
-
-const regionMap = new Map<string, any>();
-
-export const getRegion = cache(async function (countryCode: string) {
-    try {
-        if (regionMap.has(countryCode)) {
-            return regionMap.get(countryCode);
-        }
-
-        const regions = await listRegions();
-
-        if (!regions) {
-            return null;
-        }
-
-        regions.forEach((region: any) => {
-            region.countries.forEach((c: any) => {
-                regionMap.set(c.iso_2, region);
-            });
-        });
-
-        const region = countryCode ? regionMap.get(countryCode) : regionMap.get("ng");
-
-        return region;
-    } catch (e: any) {
-        console.log(e.toString());
-
-        return null;
-    }
-});
-
 // Product actions
 export const getProductsById = cache(async function ({ ids }: { ids: string[] }) {
     const headers = getHeaders(["products"]);
@@ -613,13 +557,11 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
 export const getProductsListWithSort = cache(async function getProductsListWithSort({
     page = 0,
     queryParams,
-    sortBy = "created_at",
-    countryCode,
+    sortBy = "created_at"
 }: {
     page?: number;
     queryParams?: any;
     sortBy?: SortOptions;
-    countryCode: string;
 }): Promise<{
     response: { products: Product[]; count: number };
     nextPage: number | null;
@@ -643,11 +585,11 @@ export const getProductsListWithSort = cache(async function getProductsListWithS
 
     const nextPage = count > pageParam + limit ? pageParam + limit : null;
 
-    const paginatedProducts = sortedProducts.slice(pageParam, pageParam + limit);
+    const pagProducts = sortedProducts.slice(pageParam, pageParam + limit);
 
     return {
         response: {
-            products: paginatedProducts,
+            products: pagProducts,
             count,
         },
         nextPage,

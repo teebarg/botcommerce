@@ -24,7 +24,7 @@ export default async function Addresses() {
                     checkout.
                 </p>
             </div>
-            <AddressBook customer={customer} region={null} />
+            <AddressBook customer={customer} />
         </div>
     );
 }

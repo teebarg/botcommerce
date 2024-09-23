@@ -12,6 +12,7 @@ import { Customer } from "types/global";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
+    const isAdmin: boolean = Boolean(customer?.is_superuser)
 
     return (
         <NextUINavbar className="my-2" maxWidth="full" position="sticky">
@@ -43,7 +44,7 @@ const Navbar = async () => {
                             Checkout
                         </LocalizedClientLink>
                     </NavbarMenuItem>
-                    {customer.is_superuser && (
+                    {isAdmin && (
                         <NavbarMenuItem>
                             <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
                                 Admin

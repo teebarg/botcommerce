@@ -21,8 +21,6 @@ const Addresses = ({
     cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null;
     customer: Omit<any, "password_hash"> | null;
 }) => {
-    console.log(cart)
-    console.log(cart && cart.shipping_address)
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -92,7 +90,6 @@ const Addresses = ({
                                         <p className="font-normal text-default-600">
                                             {cart.shipping_address.postal_code}, {cart.shipping_address.city}
                                         </p>
-                                        <p className="font-normal text-default-600">{cart.shipping_address.country_code?.toUpperCase()}</p>
                                     </div>
 
                                     <div className="flex flex-col w-1/3 " data-testid="shipping-contact-summary">
@@ -117,7 +114,6 @@ const Addresses = ({
                                                 <p className="font-normal text-default-600">
                                                     {cart.billing_address.postal_code}, {cart.billing_address.city}
                                                 </p>
-                                                <p className="font-normal text-default-600">{cart.billing_address.country_code?.toUpperCase()}</p>
                                             </>
                                         )}
                                     </div>

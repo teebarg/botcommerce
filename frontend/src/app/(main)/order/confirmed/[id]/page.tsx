@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { retrieveOrder } from "@lib/data";
-import { enrichLineItems } from "@modules/cart/actions";
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template";
 import { notFound } from "next/navigation";
 
@@ -15,14 +14,7 @@ async function getOrder(id: string) {
         return notFound();
     }
 
-    const enrichedItems = await enrichLineItems(order.items, order.region_id);
-
-    return {
-        order: {
-            ...order,
-            items: enrichedItems as any[],
-        } as any,
-    };
+    return order;
 }
 
 export const metadata: Metadata = {

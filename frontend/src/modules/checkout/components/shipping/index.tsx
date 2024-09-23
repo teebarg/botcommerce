@@ -2,7 +2,6 @@
 
 import { RadioGroup } from "@headlessui/react";
 import { CheckCircleSolid } from "nui-react-icons";
-import { formatAmount } from "@lib/util/prices";
 import Radio from "@modules/common/components/radio";
 import Spinner from "@modules/common/icons/spinner";
 import ErrorMessage from "@modules/checkout/components/error-message";
@@ -53,9 +52,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
     };
 
     const handleChange = (value: string) => {
-        console.log(",,s,,,,,", value);
         const item: DeliveryOption = availableShippingMethods?.find((item: DeliveryOption) => item.id == value);
-        console.log(item);
         set(item);
     };
 
@@ -73,7 +70,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     })}
                 >
                     Delivery
-                    {!isOpen && cart.shipping_method && <CheckCircleSolid />}
+                    {!isOpen && cart.shipping_method?.name && <CheckCircleSolid />}
                 </h2>
                 {!isOpen && cart?.shipping_address && cart?.billing_address && cart?.email && (
                     <button className="text-default-700 hover:text-blue-600" data-testid="edit-delivery-button" onClick={handleEdit}>
@@ -131,12 +128,11 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             ) : (
                 <div>
                     <div className="text-small-regular">
-                        {cart && cart.shipping_method && (
+                        {cart && cart.shipping_method?.name && (
                             <div className="flex flex-col w-1/3">
                                 <p className="font-medium mb-1 text-base">Method</p>
                                 <p className="font-normal text-default-600 text-base">
-                                    {cart.shipping_method?.name} (
-                                    {currency(cart.shipping_method.amount)})
+                                    {cart.shipping_method?.name} ({currency(cart.shipping_method.amount)})
                                 </p>
                             </div>
                         )}

@@ -12,7 +12,7 @@ import { paymentInfoMap } from "@lib/constants";
 import clsx from "clsx";
 import { Tooltip } from "@nextui-org/tooltip";
 import Button from "@modules/common/components/button";
-import { Cart } from "types/global";
+import { Cart, PaymentSession } from "types/global";
 
 const payMethods = [
     { id: "stripe", provider_id: "Stripe" },
@@ -20,8 +20,7 @@ const payMethods = [
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
-    console.log("youppppppppppppp");
-    console.log(cart);
+    console.log(cart)
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -33,12 +32,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const paymentReady = (cart?.payment_session && cart?.shipping_method) || paidByGiftcard;
-    console.log("paidByGiftcard");
-    console.log(paidByGiftcard);
-    console.log(paymentReady);
-    console.log(cart?.payment_session);
-    console.log(cart?.shipping_method);
+    const paymentReady = (cart?.payment_session && cart?.shipping_method?.name);
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -53,10 +47,9 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const set = async (providerId: string) => {
         setIsLoading(true);
-        console.log("44 Payment");
         const method = payMethods.find((item) => item.provider_id == providerId)
 
-        await setPaymentMethod(method)
+        await setPaymentMethod(method as PaymentSession)
             .catch((err) => setError(err.toString()))
             .finally(() => {
                 setIsLoading(false);
@@ -146,7 +139,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                 </div>
 
                 <div className={isOpen ? "hidden" : "block"}>
-                    {cart && paymentReady && cart.payment_session ? (
+                    {cart && paymentReady && cart.payment_session.provider_id ? (
                         <div className="flex items-start gap-x-1 w-full">
                             <div className="flex flex-col w-1/3">
                                 <p className="font-medium text-base mb-1">Payment method</p>

@@ -103,7 +103,7 @@ The app folder contains all Next.js App Router pages and layouts, and takes care
 
 ```
 .
-└── [countryCode]
+|____
     ├── (checkout)
         └── checkout
     └── (main)
@@ -130,7 +130,7 @@ This structure enables efficient routing and organization of different parts of 
 
 The lib directory contains all utilities like the client functions, util functions, config and constants.
 
-The most important file here is `/lib/data/index.ts`. This file defines various functions for interacting with the API, using the JS client. The functions cover a range of actions related to shopping carts, orders, shipping, authentication, customer management, regions, products, collections, and categories. It also includes utility functions for handling headers and errors, as well as some functions for sorting and transforming product data.
+The most important file here is `/lib/data/index.ts`. This file defines various functions for interacting with the API, using the JS client. The functions cover a range of actions related to shopping carts, orders, shipping, authentication, customer management, products, collections, and categories. It also includes utility functions for handling headers and errors, as well as some functions for sorting and transforming product data.
 
 These functions are used in different Server Actions.
 

@@ -112,10 +112,10 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                         />
                     </div>
                     <Input
-                        data-testid="billing-province-input"
-                        defaultValue={customer.billing_address?.province || undefined}
+                        data-testid="billing-state-input"
+                        defaultValue={customer.billing_address?.state || undefined}
                         label="Province"
-                        name="billing_address.province"
+                        name="billing_address.state"
                     />
                 </div>
             </AccountInfo>
@@ -132,9 +132,8 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
 //       address_1: customer.billing_address?.address_1 || undefined,
 //       address_2: customer.billing_address?.address_2 || undefined,
 //       city: customer.billing_address?.city || undefined,
-//       province: customer.billing_address?.province || undefined,
+//       state: customer.billing_address?.state || undefined,
 //       postal_code: customer.billing_address?.postal_code || undefined,
-//       country_code: customer.billing_address?.country_code || undefined,
 //     },
 //   }
 // }

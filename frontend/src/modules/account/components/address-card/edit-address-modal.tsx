@@ -76,9 +76,8 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                         <span data-testid="address-postal-city">
                             {address.postal_code}, {address.city}
                         </span>
-                        <span data-testid="address-province-country">
-                            {address.province && `${address.province}, `}
-                            {address.country_code?.toUpperCase()}
+                        <span data-testid="address-state-country">
+                            {address.state && `${address.state}`}
                         </span>
                     </p>
                 </div>
@@ -166,9 +165,9 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                             <Input
                                 autoComplete="address-level1"
                                 data-testid="state-input"
-                                defaultValue={address.province || undefined}
-                                label="Province / State"
-                                name="province"
+                                defaultValue={address.state || undefined}
+                                label="State"
+                                name="state"
                             />
                             <Input
                                 autoComplete="phone"

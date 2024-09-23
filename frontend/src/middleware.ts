@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Middleware to handle region selection and onboarding status.
+ * Middleware to handle onboarding status.
  */
 export async function middleware(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
@@ -10,7 +10,6 @@ export async function middleware(request: NextRequest) {
     const checkoutStep = searchParams.get("step");
     const cartIdCookie = request.cookies.get("_cart_id");
 
-    // check if one of the country codes is in the url
     if ((!cartId || cartIdCookie)) {
         return NextResponse.next();
     }

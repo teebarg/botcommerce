@@ -1,9 +1,6 @@
+import { currency } from "./util";
 
-import { formatAmount } from "@lib/util/prices";
-import { RegionInfo } from "types/global";
-
-
-export function getProductPrice({ product, variantId, region }: { product: any; variantId?: string; region: RegionInfo }) {
+export function getProductPrice({ product, variantId }: { product: any; variantId?: string; }) {
     if (!product || !product.id) {
         throw new Error("No product provided");
     }
@@ -16,7 +13,7 @@ export function getProductPrice({ product, variantId, region }: { product: any; 
     };
 
     const cheapestPrice = () => {
-        if (!product || !product.variants?.length || !region) {
+        if (!product || !product.variants?.length) {
             return null;
         }
 
@@ -28,28 +25,20 @@ export function getProductPrice({ product, variantId, region }: { product: any; 
 
         return {
             calculated_price_number: cheapestVariant.calculated_price,
-            calculated_price: formatAmount({
-                amount: cheapestVariant.calculated_price,
-                region,
-                includeTaxes: false,
-            }),
+            calculated_price: currency(cheapestVariant.calculated_price),
             original_price_number: cheapestVariant.original_price,
-            original_price: formatAmount({
-                amount: cheapestVariant.original_price,
-                region,
-                includeTaxes: false,
-            }),
+            original_price: currency(cheapestVariant.original_price),
             price_type: cheapestVariant.calculated_price_type,
             percentage_diff: getPercentageDiff(cheapestVariant.original_price, cheapestVariant.calculated_price),
         };
     };
 
     const variantPrice = () => {
-        if (!product || !variantId || !region) {
+        if (!product || !variantId) {
             return null;
         }
 
-        const variant = product.variants.find((v) => v.id === variantId || v.sku === variantId) as unknown as any;
+        const variant = product.variants.find((v: any) => v.id === variantId || v.sku === variantId) as unknown as any;
 
         if (!variant) {
             return null;
@@ -57,17 +46,9 @@ export function getProductPrice({ product, variantId, region }: { product: any; 
 
         return {
             calculated_price_number: variant.calculated_price,
-            calculated_price: formatAmount({
-                amount: variant.calculated_price,
-                region,
-                includeTaxes: false,
-            }),
+            calculated_price: currency(variant.calculated_price),
             original_price_number: variant.original_price,
-            original_price: formatAmount({
-                amount: variant.original_price,
-                region,
-                includeTaxes: false,
-            }),
+            original_price: currency(variant.original_price),
             price_type: variant.calculated_price_type,
             percentage_diff: getPercentageDiff(variant.original_price, variant.calculated_price),
         };

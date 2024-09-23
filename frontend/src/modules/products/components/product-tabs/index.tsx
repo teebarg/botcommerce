@@ -44,10 +44,6 @@ const ProductInfoTab = ({ product }: ProductTabsProps) => {
                         <p>{product.material ? product.material : "-"}</p>
                     </div>
                     <div>
-                        <span className="font-semibold">Country of origin</span>
-                        <p>{product.origin_country ? product.origin_country : "-"}</p>
-                    </div>
-                    <div>
                         <span className="font-semibold">Type</span>
                         <p>{product.type ? product.type.value : "-"}</p>
                     </div>

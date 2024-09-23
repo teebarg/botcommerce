@@ -5,12 +5,17 @@ import OrderDetails from "@modules/order/components/order-details";
 import ShippingDetails from "@modules/order/components/shipping-details";
 import PaymentDetails from "@modules/order/components/payment-details";
 import { Order } from "types/global";
+import { notFound } from "next/navigation";
 
 type OrderCompletedTemplateProps = {
     order: Order;
 };
 
 export default function OrderCompletedTemplate({ order }: OrderCompletedTemplateProps) {
+
+    if (!order) {
+        return notFound();
+    }
 
     return (
         <div className="py-6 min-h-[calc(100vh-64px)]">
@@ -25,7 +30,7 @@ export default function OrderCompletedTemplate({ order }: OrderCompletedTemplate
                     </h1>
                     <OrderDetails order={order} />
                     <h2 className="flex flex-row text-2xl">Summary</h2>
-                    <Items items={order.line_items} />
+                    <Items items={order?.line_items} />
                     <CartTotals data={order} />
                     <ShippingDetails order={order} />
                     <PaymentDetails order={order} />

@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 /**
- * Use this component to create a Next.js `<Link />` that persists the current country code in the url,
+ * Use this component to create a Next.js `<Link />`,
  * without having to explicitly pass it as a prop.
  */
 const LocalizedClientLink = ({
