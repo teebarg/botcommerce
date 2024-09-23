@@ -5,9 +5,9 @@ import clsx from "clsx";
 import { siteConfig } from "@lib/config";
 
 import PaymentButton from "../payment-button";
-import { Cart } from "types/global";
+import { Cart, Customer } from "types/global";
 
-const Review = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> }) => {
+const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">, customer: Customer }) => {
     const searchParams = useSearchParams();
 
     const isOpen = searchParams.get("step") === "review";
@@ -38,7 +38,7 @@ const Review = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_tot
                             </p>
                         </div>
                     </div>
-                    <PaymentButton cart={cart} data-testid="submit-order-button" />
+                    <PaymentButton cart={cart} data-testid="submit-order-button" customer={customer} />
                 </>
             )}
         </div>

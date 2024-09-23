@@ -1,7 +1,9 @@
 import datetime
 from io import BytesIO
 from typing import Annotated, Any
+import asyncio
 
+from services.run_sheet import process_products
 from services.meilisearch import add_documents_to_index, clear_index, delete_document, delete_index, get_or_create_index, search_documents, update_document
 from fastapi import (
     APIRouter,
@@ -11,7 +13,6 @@ from fastapi import (
     HTTPException,
     Query,
     UploadFile,
-    Depends
 )
 from sqlalchemy.sql import text
 
@@ -38,11 +39,11 @@ async def export_products(
     current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
 ) -> Any:
     try:
-        statement = "SELECT name, slug, description, price, old_price FROM product;"
+        statement = "SELECT id, name, slug, description, price, old_price, inventory, image FROM product;"
         products = db.exec(text(statement))
 
         file_url = await export(
-            columns=["name", "slug", "description", "price", "old_price"],
+            columns=["id","name", "slug", "description", "price", "old_price", "inventory", "image"],
             data=products,
             name="Product",
             bucket=bucket,
@@ -104,8 +105,6 @@ async def search_products(search_params: dict) -> Any:
     """
     Search products using Meilisearch, sorted by relevance.
     """
-
-    print(search_params)
     search = search_params.get("search", "")
     collections = search_params.get("collections", [])
     minPrice = search_params.get("min_price", 1)
@@ -244,6 +243,21 @@ async def upload_products(
     background_tasks.add_task(process_file, contents, id, db, crud.product.bulk_upload)
     return {"batch": batch, "message": "File upload started"}
 
+@router.post("/upload-products/")
+async def upload_products_a(file: Annotated[UploadFile, File()]):
+    content_type =  file.content_type
+    
+    if content_type not in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/csv"]:
+        raise HTTPException(status_code=400, detail="Invalid file type. Only CSV/Excel files are supported.")              
+
+    await validate_file(file=file)
+
+    contents = await file.read()
+
+    asyncio.create_task(process_products(file_content=contents, content_type=content_type))
+
+    return {"message": "Upload started"}
+
 
 # Upload Image
 @router.patch("/{id}/image", response_model=Any)
@@ -304,6 +318,7 @@ async def reindex_products(
         # Define the background task
         def reindex_task():
             products = crud.product.all(db=db)
+            logger.info(f"Will re-index {len(products)} products")
 
             # Prepare the documents for Meilisearch
             documents = []

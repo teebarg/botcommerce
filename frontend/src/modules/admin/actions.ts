@@ -43,7 +43,7 @@ export async function exportProducts() {
         });
 
         if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            return { success: false, message: res.statusText };
         }
 
         return { success: true, message: "Products exported successfully" };
@@ -110,10 +110,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
             body: JSON.stringify(productData),
         });
 
-        // console.log(res.json())
-
         if (!res.ok) {
-            console.log("is res nit ok?");
             return { success: false, message: "Error creating product" };
         }
 
@@ -121,11 +118,8 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         revalidateTag("products");
         revalidateTag("campaigns");
 
-        // console.log(await res.json())
-
         return { success: true, message: "Product created successfully", data: await res.json() };
     } catch (error) {
-        console.error("Error creating product:", error);
         return { success: false, message: "Error creating product" };
     }
 }
@@ -151,7 +145,6 @@ export async function deleteProduct(productId: string) {
 
         return { success: true, message: "Product deleted successfully" };
     } catch (error) {
-        console.error("Error deleting product:", error);
         return { success: false, message: "Error deleting product" };
     }
 }

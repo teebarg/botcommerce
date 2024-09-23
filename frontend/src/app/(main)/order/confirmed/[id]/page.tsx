@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function OrderConfirmedPage({ params }: Props) {
-    const { order } = await getOrder(params.id);
+    const order = await getOrder(params.id);
 
     return <OrderCompletedTemplate order={order} />;
 }

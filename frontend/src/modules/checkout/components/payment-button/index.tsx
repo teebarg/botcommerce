@@ -1,18 +1,21 @@
 "use client";
 
 import { placeOrder } from "@modules/checkout/actions";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@modules/common/components/button";
-
-import ErrorMessage from "../error-message";
-import { Cart, PaymentSession } from "types/global";
+import { Cart, Customer, PaymentSession } from "types/global";
+import { Modal } from "@modules/common/components/modal";
+import { useSnackbar } from "notistack";
+import { useOverlayTriggerState } from "react-stately";
+import LoginForm from "@modules/account/components/login-form";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
+    customer: Customer;
     "data-testid": string;
 };
 
-const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, "data-testid": dataTestId }) => {
+const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, customer, "data-testid": dataTestId }) => {
     // check customer
     const notReady = !cart || !cart.shipping_address || !cart.billing_address || !cart.email || !cart.shipping_method ? true : false;
 
@@ -23,12 +26,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, "data-testid": data
     }
 
     const paymentSession = cart.payment_session as PaymentSession;
-    console.log("pllkkkj..................")
-    console.log(paymentSession)
 
     switch (paymentSession.id) {
         case "manual":
-            return <ManualTestPaymentButton data-testid={dataTestId} notReady={notReady} />;
+            return <ManualTestPaymentButton data-testid={dataTestId} notReady={notReady} customer={customer} />;
         case "stripe":
             return <Button disabled>Continue to payment</Button>;
         default:
@@ -51,21 +52,36 @@ const GiftCardPaymentButton = () => {
     );
 };
 
-const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
+const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; customer: Customer }) => {
+    const { enqueueSnackbar } = useSnackbar();
+    const modalState = useOverlayTriggerState({});
+
     const [submitting, setSubmitting] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (submitting && customer) {
+            modalState.close()
+            onPaymentCompleted()
+        }
+    }, [customer])
 
     const onPaymentCompleted = async () => {
-        await placeOrder().catch((err) => {
-            setErrorMessage(err.toString());
+        try {
+            await placeOrder()
+        } catch (error: any) {
+            enqueueSnackbar(error.toString())
             setSubmitting(false);
-        });
+        }
     };
 
     const handlePayment = () => {
         setSubmitting(true);
-
-        onPaymentCompleted();
+        if (customer) {
+            onPaymentCompleted()
+            return
+        }
+        // Show login modal
+        modalState.open()
     };
 
     return (
@@ -73,7 +89,13 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
             <Button data-testid="submit-order-button" disabled={notReady} isLoading={submitting} size="lg" onClick={handlePayment}>
                 Place order
             </Button>
-            <ErrorMessage data-testid="manual-payment-error-message" error={errorMessage} />
+            {modalState.isOpen && (
+                <Modal onClose={modalState.close} data-testid="login-modal">
+                    <React.Fragment>
+                    <LoginForm />
+                    </React.Fragment>
+                </Modal>
+            )}
         </>
     );
 };

@@ -20,7 +20,6 @@ const payMethods = [
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
-    console.log(cart)
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -144,7 +143,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                             <div className="flex flex-col w-1/3">
                                 <p className="font-medium text-base mb-1">Payment method</p>
                                 <p className="font-normal text-base text-default-600" data-testid="payment-method-summary">
-                                    {paymentInfoMap[cart.payment_session.provider_id]?.title || cart.payment_session.provider_id}
+                                    {paymentInfoMap[cart.payment_session.id]?.title || cart.payment_session.provider_id}
                                 </p>
                                 {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, cart.payment_session.provider_id) && (
                                     <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'src/modules/checkout/components/payment/index.tsx'" />
@@ -154,7 +153,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                                 <p className="font-medium text-base mb-1">Payment details</p>
                                 <div className="flex gap-2 font-normal text-base text-default-600 items-center" data-testid="payment-details-summary">
                                     <div className="shadow-lg rounded-lg flex items-center h-7 w-fit p-2 bg-default-300">
-                                        {paymentInfoMap[cart.payment_session.provider_id]?.icon || <CreditCard />}
+                                        {paymentInfoMap[cart.payment_session.id]?.icon || <CreditCard />}
                                     </div>
                                     <p>{"Another step will appear"}</p>
                                 </div>

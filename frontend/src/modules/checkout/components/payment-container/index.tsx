@@ -15,9 +15,6 @@ type PaymentContainerProps = {
 };
 
 const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, selectedPaymentOptionId, paymentInfoMap, disabled = false }) => {
-    console.log("PaymentContainer")
-    console.log(paymentSession)
-    console.log(selectedPaymentOptionId)
     const isDevelopment = process.env.NODE_ENV === "development";
 
     return (

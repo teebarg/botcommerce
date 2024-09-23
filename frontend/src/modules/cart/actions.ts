@@ -13,16 +13,8 @@ import { generateId, omit } from "@lib/util/util";
  */
 export async function getOrSetCart() {
     let cartId = cookies().get("_cart_id")?.value;
-    // let cart: any;
-
-    // if (cartId) {
-    //     cart = await getCart(cartId).then((cart: any) => cart);
-    //     console.log("line 23");
-    //     console.log(cart);
-    // }
 
     if (!cartId) {
-        // cart = await createCart().then((res) => res);
         cartId = generateId()
         cookies().set("_cart_id", cartId, {
             maxAge: 60 * 60 * 24 * 7,
@@ -98,40 +90,10 @@ export async function deleteLineItem(lineId: string) {
         return "Missing lineItem ID";
     }
 
-    if (!cartId) {
-        return "Missing cart ID";
-    }
-
     try {
-        await removeItem({ cartId, lineId });
+        await removeItem({ cartId, lineId }); 
         revalidateTag("cart");
     } catch (e) {
         return "Error deleting line item";
     }
-}
-
-export async function enrichLineItems(lineItems: any[]): Promise<any[] | undefined> {
-    // Prepare query parameters
-    // const queryParams = {
-    //     ids: lineItems.map((lineItem) => lineItem.variant.product_id),
-    // };
-
-    // Fetch products by their IDs
-    // const products = await getProductsById(queryParams);
-
-    // If there are no line items or products, return an empty array
-    if (!lineItems?.length) {
-        return [];
-    }
-
-    // Enrich line items with product and variant information
-
-    const enrichedItems = lineItems.map((item) => {
-        // If product and variant are found, enrich the item
-        return {
-            ...item,
-        };
-    }) as any[];
-
-    return enrichedItems;
 }

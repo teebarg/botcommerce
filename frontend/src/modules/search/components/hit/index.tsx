@@ -16,7 +16,6 @@ type HitProps = {
 };
 
 const Hit = ({ hit }: HitProps) => {
-    console.log(hit);
     return (
         <LocalizedClientLink className="block h-full" data-testid="search-result" href={`/products/${hit.slug}`}>
             <div key={hit.id}>

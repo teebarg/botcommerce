@@ -24,7 +24,7 @@ const SkeletonCartPage = () => {
                             <div className="pb-3 flex items-center">
                                 <div className="w-20 h-12 bg-default-400 animate-pulse" />
                             </div>
-                            <Table columns={[" ", " ", " ", " ", " "]}>
+                            <Table columns={[" ", " ", " ", " ", " "]} isDataOnly>
                                 {repeat(3).map((_, index: number) => (
                                     <tr key={index} className="even:bg-content2">
                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-800 sm:pl-3">

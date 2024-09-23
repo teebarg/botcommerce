@@ -110,10 +110,6 @@ export const getProducts = cache(async function (search?: string, collections?: 
 
 export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
     try {
-        console.log(cartId);
-        console.log(quantity);
-        console.log(product_id);
-        console.log("not again");
         const headers = getHeaders(["cart"]);
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`;
         const response = await fetch(url, {
@@ -166,14 +162,27 @@ export async function updateItem({ cartId, lineId, quantity }: { cartId: string;
 export async function removeItem({ cartId, lineId }: { cartId: string; lineId: string }) {
     const headers = getHeaders(["cart"]);
 
-    // return client.carts.lineItems
-    //     .delete(cartId, lineId, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => {
-    //         console.log(err);
+    try {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/${lineId}`;
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+                cartId,
+            },
+        });
 
-    //         return null;
-    //     });
+        if (!response.ok) {
+            throw new Error(`Failed to remove item from cart: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.log(error);
+        return { success: false, message: "error" };
+    }
 }
 
 export async function deleteDiscount(cartId: string, code: string) {
@@ -181,19 +190,6 @@ export async function deleteDiscount(cartId: string, code: string) {
 
     // return client.carts
     //     .deleteDiscount(cartId, code, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => {
-    //         console.log(err);
-
-    //         return null;
-    //     });
-}
-
-export async function createPaymentSessions(cartId: string) {
-    const headers = getHeaders(["cart"]);
-
-    // return client.carts
-    //     .createPaymentSessions(cartId, headers)
     //     .then(({ cart }) => cart)
     //     .catch((err) => {
     //         console.log(err);
@@ -311,7 +307,6 @@ export async function getToken(credentials: any) {
 
         return access_token;
     } catch (error) {
-        console.error("Login error:", error);
         throw new Error("Wrong email or password.");
     }
 }

@@ -26,7 +26,8 @@ from core.config import settings
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
-    database_url=settings.DATABASE_URL
+    database_url=settings.DATABASE_URL,
+    bucket=settings.STORAGE_BUCKET
 )
 
 order_handler = OrderHandler(firebase_config)

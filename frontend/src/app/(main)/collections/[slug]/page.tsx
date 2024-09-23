@@ -34,8 +34,6 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    console.log("track i")
-    console.log(params.slug)
     const collection = await getCollectionBySlug(params.slug);
 
     if (!collection) {
@@ -52,8 +50,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CollectionPage({ params, searchParams }: Props) {
     const { sortBy, page } = searchParams;
-    console.log("track 2")
-    console.log(params.slug)
 
     const collection = await getCollectionBySlug(params.slug).then((collection) => collection);
 

@@ -1,4 +1,4 @@
-import { Cart, CartWithCheckoutStep } from "types/global";
+import { Cart, Customer } from "types/global";
 
 import SignInPrompt from "../components/sign-in-prompt";
 import EmptyCartMessage from "../components/empty-cart-message";
@@ -6,7 +6,7 @@ import EmptyCartMessage from "../components/empty-cart-message";
 import Summary from "./summary";
 import ItemsTemplate from "./items";
 
-const CartTemplate = ({ cart, customer }: { cart: Cart; customer: any }) => {
+const CartTemplate = ({ cart, customer }: { cart: Cart; customer: Customer }) => {
     return (
         <div className="py-12">
             <div className="max-w-7xl mx-auto" data-testid="cart-container">

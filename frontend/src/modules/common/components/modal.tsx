@@ -1,3 +1,4 @@
+import { XMark } from "nui-react-icons";
 import React, { useRef } from "react";
 import { useDialog, useOverlay, usePreventScroll, useModal, OverlayContainer, OverlayProps } from "react-aria";
 
@@ -21,25 +22,24 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, ...prop
         },
         ref
     );
-    // if (!isOpen) return null;
-    // const { modalProps } = useModal();
-    // const { dialogProps, titleProps } = useDialog(props, ref);
 
     return (
         <OverlayContainer>
-            <div {...underlayProps} className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+            <div {...underlayProps} className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur bg-white/50">
                 <div
                     {...overlayProps}
                     // {...dialogProps}
                     // {...modalProps}
                     ref={ref}
-                    className="bg-content1 rounded-lg p-6 max-w-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none"
+                    className="bg-content1 rounded-lg p-10 max-w-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative"
                 >
                     {title && <h2 className="text-lg font-semibold mb-4">{title}</h2>}
+                    <div>
+                        <button className="absolute top-4 right-4" onClick={onClose}>
+                            <XMark size={20} />
+                        </button>
+                    </div>
                     <div>{children}</div>
-                    {/* <button onClick={onClose} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-                        Close
-                    </button> */}
                 </div>
             </div>
         </OverlayContainer>

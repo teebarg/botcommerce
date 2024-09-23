@@ -19,8 +19,6 @@ type ShippingProps = {
 };
 
 const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) => {
-    console.log(availableShippingMethods);
-    console.log(cart);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

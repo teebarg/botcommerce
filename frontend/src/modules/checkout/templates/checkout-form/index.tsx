@@ -1,5 +1,4 @@
-import { createPaymentSessions, getCustomer, listCartShippingMethods } from "@lib/data";
-import { getCheckoutStep } from "@lib/util/get-checkout-step";
+import { getCustomer } from "@lib/data";
 import Addresses from "@modules/checkout/components/addresses";
 import Payment from "@modules/checkout/components/payment";
 import Review from "@modules/checkout/components/review";
@@ -17,13 +16,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
     if (!cartId) {
         return null;
     }
-
-    // create payment sessions and get cart
-    // const cart = (await createPaymentSessions(cartId).then((cart) => cart)) as CartWithCheckoutStep;
-
-    // if (!cart) {
-    //     return null;
-    // }
 
     // cart.checkout_step = cart && getCheckoutStep(cart);
 
@@ -52,7 +44,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
                 </div>
 
                 <div>
-                    <Review cart={cart} />
+                    <Review cart={cart} customer={customer} />
                 </div>
             </div>
         </div>

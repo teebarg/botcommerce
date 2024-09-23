@@ -61,8 +61,8 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
     const handleExport = async () => {
         try {
             setIsExporting(true);
-            await exportProducts();
-            enqueueSnackbar("Products exported successfully", { variant: "success" });
+            const res = await exportProducts();
+            enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
         } catch (error) {
             console.error("Error exporting products:", error);
             enqueueSnackbar("Error exporting products", { variant: "error" });

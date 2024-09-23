@@ -21,7 +21,8 @@ from core.config import settings
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
-    database_url=settings.DATABASE_URL
+    database_url=settings.DATABASE_URL,
+    bucket=settings.STORAGE_BUCKET
 )
 
 cart_handler = CartHandler(firebase_config)
@@ -66,16 +67,12 @@ async def update_cart_details(cart_update: CartDetails, cartId: str = Header(def
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-def delete(db: SessionDep, id: int) -> Message:
+def delete(id: str, cartId: str = Header(default=None)) -> Message:
     """
-    Delete a cart.
+    Delete item from cart.
     """
     try:
-        cart = crud.cart.get(db=db, id=id)
-        if not cart:
-            raise HTTPException(status_code=404, detail="Cart not found")
-        crud.cart.remove(db=db, id=id)
-        return Message(message="Cart deleted successfully")
+        return cart_handler.remove_from_cart(cart_id=cartId, item_id=id)
     except Exception as e:
         raise HTTPException(
             status_code=500,
