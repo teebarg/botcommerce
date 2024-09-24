@@ -16,9 +16,10 @@ export const Chatbot: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isOpen, setIsOpen] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('chatbotOpen') !== 'false';
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("chatbotOpen") !== "false";
         }
+
         return false;
     });
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -81,8 +82,9 @@ export const Chatbot: React.FC = () => {
 
     const toggleChat = () => {
         const newIsOpen = !isOpen;
+
         setIsOpen(newIsOpen);
-        localStorage.setItem('chatbotOpen', newIsOpen.toString());
+        localStorage.setItem("chatbotOpen", newIsOpen.toString());
     };
 
     return (

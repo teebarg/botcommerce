@@ -14,5 +14,6 @@ interface Hits {
  */
 export async function search(query: string) {
     const { hits } = (await searchDocuments("products", query)) as { hits: Hits[] };
+
     return hits;
 }

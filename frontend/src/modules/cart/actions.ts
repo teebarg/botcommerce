@@ -2,8 +2,8 @@
 
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-import { addItem, createCart, getCart, getProductsById, removeItem, updateCart, updateItem } from "@lib/data";
-import { generateId, omit } from "@lib/util/util";
+import { addItem, getCart, removeItem, updateItem } from "@lib/data";
+import { generateId } from "@lib/util/util";
 
 /**
  * Retrieves the cart based on the cartId cookie
@@ -15,7 +15,7 @@ export async function getOrSetCart() {
     let cartId = cookies().get("_cart_id")?.value;
 
     if (!cartId) {
-        cartId = generateId()
+        cartId = generateId();
         cookies().set("_cart_id", cartId, {
             maxAge: 60 * 60 * 24 * 7,
             httpOnly: true,
@@ -24,6 +24,7 @@ export async function getOrSetCart() {
         });
         revalidateTag("cart");
     }
+
     return cartId;
 }
 
@@ -45,7 +46,7 @@ export async function retrieveCart() {
     }
 }
 
-export async function addToCart({ product_id, quantity }: { product_id: string, quantity: number }) {
+export async function addToCart({ product_id, quantity }: { product_id: string; quantity: number }) {
     const cartId = await getOrSetCart();
 
     if (!cartId) {
@@ -91,7 +92,7 @@ export async function deleteLineItem(lineId: string) {
     }
 
     try {
-        await removeItem({ cartId, lineId }); 
+        await removeItem({ cartId, lineId });
         revalidateTag("cart");
     } catch (e) {
         return "Error deleting line item";

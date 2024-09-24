@@ -8,9 +8,9 @@ import { SlideOver } from "@modules/common/components/slideover";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Cart, CartItem } from "types/global";
 import { usePathname } from "next/navigation";
+import { currency } from "@lib/util/util";
 
 import { CartItems } from "../cart-items";
-import { currency } from "@lib/util/util";
 
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;
@@ -26,7 +26,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
 
     const total =
         cart?.items?.reduce((acc: number, item: CartItem) => {
-            return acc + (item.quantity * item.price);
+            return acc + item.quantity * item.price;
         }, 0) || 0;
 
     const state = useOverlayTriggerState({});
@@ -82,9 +82,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                                 <dl className="flex flex-col gap-4 py-4">
                                     <div className="flex justify-between">
                                         <dt className="text-small text-default-500">Subtotal</dt>
-                                        <dd className="text-small font-semibold text-default-700">
-                                            {currency(total)}
-                                        </dd>
+                                        <dd className="text-small font-semibold text-default-700">{currency(total)}</dd>
                                     </div>
                                 </dl>
                                 {cart?.items?.length && (

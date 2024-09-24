@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import { Progress } from "@nextui-org/react";
 import { useSnackbar } from "notistack";
 import { useWebSocket } from "@lib/hooks/use-websocket";
-import { DragNDrop } from "./drag-drop";
 import Button from "@modules/common/components/button";
+
+import { DragNDrop } from "./drag-drop";
 
 interface Props {
     onUpload: (id: string, formData: any) => void;
@@ -24,6 +25,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
 
     useEffect(() => {
         initializeWebsocket(wsUrl);
+
         return () => {
             disconnectWebsocket();
         };
@@ -33,6 +35,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
         if (status) {
             return "Submitting";
         }
+
         return currentMessage?.status == "Processing" ? "Processing" : "Submit";
     };
 
@@ -40,10 +43,12 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
         // e.preventDefault();
         if (!file) {
             enqueueSnackbar("Please select a file", { variant: "error" });
+
             return;
         }
         setStatus(true);
         const formData = new FormData();
+
         formData.append("file", file);
         formData.append("batch", "batch1");
 
@@ -63,14 +68,14 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
     return (
         <React.Fragment>
             <div className="flex gap-2">
-                <DragNDrop onSelect={OnSelect} onError={(message: string) => enqueueSnackbar(message, { variant: "error" })} />
+                <DragNDrop onError={(message: string) => enqueueSnackbar(message, { variant: "error" })} onSelect={OnSelect} />
                 <Button
-                    onClick={() => handleSubmit()}
+                    className="min-w-48 rounded-md"
+                    color="secondary"
                     disabled={status || currentMessage?.status == "Processing"}
                     isLoading={status || currentMessage?.status == "Processing"}
                     variant="shadow"
-                    color="secondary"
-                    className="min-w-48 rounded-md"
+                    onClick={() => handleSubmit()}
                 >
                     {currentStatus()}
                 </Button>
@@ -79,12 +84,12 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
                 {wsMessages && (
                     <Progress
                         aria-label="Downloading..."
-                        size="sm"
-                        value={(currentMessage?.processed_rows / currentMessage?.total_rows) * 100 || 0}
+                        className=""
                         color="success"
                         label={`progress: ${currentMessage?.processed_rows || 0} / ${currentMessage?.total_rows || 0} rows`}
                         showValueLabel={true}
-                        className=""
+                        size="sm"
+                        value={(currentMessage?.processed_rows / currentMessage?.total_rows) * 100 || 0}
                     />
                 )}
             </div>

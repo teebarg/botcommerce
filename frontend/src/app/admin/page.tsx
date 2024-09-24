@@ -69,9 +69,9 @@ export default async function AdminPage() {
                         <div className="flex gap-5">
                             <span className="flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none w-10 h-10 text-tiny bg-default text-default-foreground rounded-full">
                                 <img
-                                    src="https://nextui.org/avatars/avatar-1.png"
-                                    className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0"
                                     alt="avatar"
+                                    className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0"
+                                    src="https://nextui.org/avatars/avatar-1.png"
                                 />
                             </span>
                             <div className="flex flex-col gap-1 items-start justify-center">
@@ -85,7 +85,7 @@ export default async function AdminPage() {
                         <p>Frontend developer and UI/UX enthusiast. Join me on this coding adventure!</p>
                         <span className="pt-2">
                             #FrontendWithZoey
-                            <span className="py-2" aria-label="computer" role="img">
+                            <span aria-label="computer" className="py-2" role="img">
                                 💻
                             </span>
                         </span>
@@ -105,12 +105,12 @@ export default async function AdminPage() {
                 <div className="flex flex-row-reverse justify-between gap-3 items-end">
                     <div className="flex gap-3">
                         <Button color="primary">Add New</Button>
-                        <Button color="secondary" className="min-w-28">
+                        <Button className="min-w-28" color="secondary">
                             Export
                         </Button>
                     </div>
                 </div>
-                <Table pagination={pagination} columns={["", "Firstname", "Email", "Role", "Status", "Created At"]}>
+                <Table columns={["", "Firstname", "Email", "Role", "Status", "Created At"]} pagination={pagination}>
                     {users
                         ?.sort((a: any, b: any) => (a.created_at > b.created_at ? -1 : 1))
                         .map((item: any, index: number) => (

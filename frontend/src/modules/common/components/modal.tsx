@@ -1,6 +1,6 @@
 import { XMark } from "nui-react-icons";
 import React, { useRef } from "react";
-import { useDialog, useOverlay, usePreventScroll, useModal, OverlayContainer, OverlayProps } from "react-aria";
+import { useOverlay, usePreventScroll, OverlayContainer, OverlayProps } from "react-aria";
 
 interface ModalProps extends OverlayProps {
     title?: string;
@@ -11,6 +11,7 @@ interface ModalProps extends OverlayProps {
 
 const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, ...props }) => {
     const ref = useRef<HTMLDivElement>(null);
+
     // const { overlayProps, underlayProps } = useOverlay(props, ref);
     usePreventScroll();
     // Setup the modal with useOverlay for accessibility

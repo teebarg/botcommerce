@@ -20,7 +20,7 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
             <div className="bg-content1 p-12 rounded-lg shadow-md text-center max-w-xl">
                 <CartIcon className="w-24 h-24 text-default-400 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-default-800 mb-2">Your cart is empty</h2>
-                <p className="text-default-600 mb-6">Looks like you haven't added any items to your cart yet.</p>
+                <p className="text-default-600 mb-6">{`Looks like you haven't added any items to your cart yet.`}</p>
                 <LocalizedClientLink
                     className="inline-flex items-center bg-primary text-white font-semibold py-3 px-6 rounded-md mt-6 transition-colors"
                     href="/collections"
@@ -40,6 +40,7 @@ const fetchCart = async () => {
     }
 
     const cart = await getCart(cartId).then((cart) => cart);
+
     return cart;
 };
 

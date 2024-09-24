@@ -31,7 +31,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const paymentReady = (cart?.payment_session && cart?.shipping_method?.name);
+    const paymentReady = cart?.payment_session && cart?.shipping_method?.name;
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -46,7 +46,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const set = async (providerId: string) => {
         setIsLoading(true);
-        const method = payMethods.find((item) => item.provider_id == providerId)
+        const method = payMethods.find((item) => item.provider_id == providerId);
 
         await setPaymentMethod(method as PaymentSession)
             .catch((err) => setError(err.toString()))

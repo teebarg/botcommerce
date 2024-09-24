@@ -76,9 +76,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                         <span data-testid="address-postal-city">
                             {address.postal_code}, {address.city}
                         </span>
-                        <span data-testid="address-state-country">
-                            {address.state && `${address.state}`}
-                        </span>
+                        <span data-testid="address-state-country">{address.state && `${address.state}`}</span>
                     </p>
                 </div>
                 <div className="flex items-center gap-x-4">
@@ -97,12 +95,10 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                 </div>
             </div>
 
-            <Modal close={close} data-testid="edit-address-modal" isOpen={state}>
-                <Modal.Title>
+            <Modal data-testid="edit-address-modal" isOpen={state} onClose={close}>
+                <React.Fragment>
                     <h3 className="mb-2">Edit address</h3>
-                </Modal.Title>
-                <form action={formAction}>
-                    <Modal.Body>
+                    <form action={formAction}>
                         <div className="grid grid-cols-1 gap-y-2 w-full py-2 px-6">
                             <div className="grid grid-cols-2 gap-x-2">
                                 <Input
@@ -177,16 +173,14 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 name="phone"
                             />
                         </div>
-                    </Modal.Body>
-                    <Modal.Footer>
                         <div className="flex gap-3 mt-6">
                             <Button className="h-10" color="secondary" data-testid="cancel-button" type="reset" onClick={close}>
                                 Cancel
                             </Button>
                             <FormButton data-testid="save-button">Save</FormButton>
                         </div>
-                    </Modal.Footer>
-                </form>
+                    </form>
+                </React.Fragment>
             </Modal>
         </>
     );

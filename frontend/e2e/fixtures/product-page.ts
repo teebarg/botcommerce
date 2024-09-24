@@ -35,7 +35,6 @@ export class ProductPage extends BasePage {
 
     async clickAddProduct() {
         await this.addProductButton.click();
-        await this.cartDropdown.cartDropdown.waitFor({ state: "visible" });
     }
 
     async selectOption(option: string) {

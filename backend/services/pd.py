@@ -1,6 +1,3 @@
-from core.logging import logger
-
-
 def data_to_excel(items, filename: str = "export.xlsx"):
     return "filename"
     # try:

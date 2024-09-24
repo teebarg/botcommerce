@@ -23,17 +23,21 @@ class ContactFormCreate(BaseModel):
     phone: str | int | None = ""
     message: str = "bearer"
 
+
 class NewsletterCreate(BaseModel):
     email: str
+
 
 class UploadStatus(BaseModel):
     total_rows: int
     processed_rows: int
     status: str
 
+
 class CartItemIn(BaseModel):
     product_id: str
     quantity: int
+
 
 class CartDetails(BaseModel):
     shipping_address: Optional[dict] = None
@@ -41,6 +45,7 @@ class CartDetails(BaseModel):
     email: Optional[str] = None
     shipping_method: Optional[dict] = None
     payment_session: Optional[dict] = None
+
 
 class OrderDetails(BaseModel):
     fulfillments: Optional[list[dict]] = None

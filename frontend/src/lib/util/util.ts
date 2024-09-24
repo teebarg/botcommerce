@@ -111,6 +111,7 @@ const generateId = (prefix: string = "cart_", length: number = 25): string => {
 
     for (let i = 0; i < length; i++) {
         const randomIndex = Math.floor(Math.random() * chars.length);
+
         id += chars[randomIndex];
     }
 

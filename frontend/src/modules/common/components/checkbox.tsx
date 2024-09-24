@@ -36,7 +36,7 @@ const Checkbox: React.FC<CheckboxProps> = (props) => {
                                 "w-4 h-4 bg-white rounded-[50%] absolute top-0.5 transition-[left] duration-300 ease-in-out",
                                 state.isSelected ? "left-5" : "left-0"
                             )}
-                        ></div>
+                        />
                     </div>
                 </label>
                 <span className="text-sm">{props.label}</span>

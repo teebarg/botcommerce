@@ -33,7 +33,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
 
     return (
         <div className="py-2 px-2 flex justify-between items-center mt-4">
-            <div className="w-[30%]"></div>
+            <div className="w-[30%]" />
             <Pag
                 showControls
                 classNames={{

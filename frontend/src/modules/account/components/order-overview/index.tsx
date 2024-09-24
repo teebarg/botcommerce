@@ -2,9 +2,9 @@
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import Button from "@modules/common/components/button";
+import { Order } from "types/global";
 
 import OrderCard from "../order-card";
-import { Order } from "types/global";
 
 const OrderOverview = ({ orders }: { orders: any[] }) => {
     if (orders?.length) {

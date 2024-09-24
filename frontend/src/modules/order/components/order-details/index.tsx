@@ -1,6 +1,5 @@
 import { Order } from "types/global";
 
-
 type OrderDetailsProps = {
     order: Order;
     showStatus?: boolean;
@@ -33,10 +32,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
                 {showStatus && (
                     <>
                         <p>
-                            Order status:{" "}
-                            <span data-testid="order-status">
-                                {formatStatus(order.fulfillment_status)}
-                            </span>
+                            Order status: <span data-testid="order-status">{formatStatus(order.fulfillment_status)}</span>
                         </p>
                         <p>
                             Payment status: <span data-testid="order-payment-status">{formatStatus(order.payment_status)}</span>

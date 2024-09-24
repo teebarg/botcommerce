@@ -11,9 +11,6 @@ type ProductActionsProps = {
 };
 
 export default function ProductActions({ product, disabled }: ProductActionsProps) {
-    if (!product) {
-        return null;
-    }
     const [isAdding, setIsAdding] = useState(false);
 
     // check if the selected variant is in stock
@@ -27,13 +24,17 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
         return false;
     }, []);
 
+    if (!product) {
+        return null;
+    }
+
     // add the selected variant to the cart
     const handleAddToCart = async () => {
         setIsAdding(true);
 
         await addToCart({
             product_id: product.id.toString(),
-            quantity: 1
+            quantity: 1,
         });
 
         setIsAdding(false);

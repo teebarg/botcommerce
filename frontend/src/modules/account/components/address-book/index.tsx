@@ -1,9 +1,8 @@
-
 import React from "react";
+import { Customer } from "types/global";
 
 import AddAddress from "../address-card/add-address";
 import EditAddress from "../address-card/edit-address-modal";
-import { Customer } from "types/global";
 
 type AddressBookProps = {
     customer: Omit<Customer, "password_hash">;

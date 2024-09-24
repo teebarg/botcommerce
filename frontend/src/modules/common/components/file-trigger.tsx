@@ -30,7 +30,14 @@ const FileTrigger: React.FC<FileTriggerProps> = ({ onSelect, acceptedFileTypes, 
         <React.Fragment>
             {child}
             <VisuallyHidden>
-                <input ref={inputRef} type="file" onChange={handleChange} aria-hidden="true" multiple={allowsMultiple} accept={acceptedFileTypes?.join(',')} />
+                <input
+                    ref={inputRef}
+                    accept={acceptedFileTypes?.join(",")}
+                    aria-hidden="true"
+                    multiple={allowsMultiple}
+                    type="file"
+                    onChange={handleChange}
+                />
             </VisuallyHidden>
         </React.Fragment>
     );

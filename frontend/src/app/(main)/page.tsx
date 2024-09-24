@@ -91,9 +91,7 @@ export default async function Home() {
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.hits?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} />
-                            ))}
+                            {trending?.hits?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
                         </div>
                     </div>
                 </div>
@@ -118,9 +116,7 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
-                            {latest?.hits?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} />
-                            ))}
+                            {latest?.hits?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
                         </div>
                     </div>
                 </div>

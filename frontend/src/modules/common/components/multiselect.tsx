@@ -19,11 +19,11 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ name, options, className, def
     return (
         <div className={`flex w-full flex-col gap-2 ${className}`}>
             <Select
-                selectionMode="multiple"
                 label={props.label}
-                variant={props.variant}
                 placeholder={props.placeholder}
                 selectedKeys={value}
+                selectionMode="multiple"
+                variant={props.variant}
                 onSelectionChange={setValue}
                 {...props}
             >
@@ -31,7 +31,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ name, options, className, def
                     <SelectItem key={option.value}>{option.label}</SelectItem>
                 ))}
             </Select>
-            <input type="hidden" name={name} value={JSON.stringify(Array.from(value))} />
+            <input name={name} type="hidden" value={JSON.stringify(Array.from(value))} />
         </div>
     );
 };

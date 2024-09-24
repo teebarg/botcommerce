@@ -11,7 +11,6 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const order: Order = await retrieveOrder(params.id);
 
-
     if (!order) {
         notFound();
     }

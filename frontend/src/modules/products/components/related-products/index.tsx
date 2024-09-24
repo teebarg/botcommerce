@@ -1,7 +1,7 @@
 import { getProductsList } from "@lib/data";
+import { Product } from "types/global";
 
 import ProductPreview from "../product-preview";
-import { Product } from "types/global";
 
 type RelatedProductsProps = {
     product: any;

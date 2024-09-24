@@ -1,16 +1,16 @@
 "use client";
 
 import React, { cloneElement, isValidElement, useState } from "react";
-
 import { Pagination as PaginationType } from "types/global";
-import { Pagination } from "../pagination";
 import { Input } from "@nextui-org/input";
 import { PlusIcon, SearchIcon } from "nui-react-icons";
-import Button from "../button";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
 import { exportProducts, indexProducts } from "@modules/admin/actions";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+
+import Button from "../button";
+import { Pagination } from "../pagination";
 import { SlideOver } from "../slideover";
 
 interface Props {
@@ -62,6 +62,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
         try {
             setIsExporting(true);
             const res = await exportProducts();
+
             enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
         } catch (error) {
             console.error("Error exporting products:", error);
@@ -82,24 +83,24 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                                 base: "w-full sm:max-w-[44%]",
                                 inputWrapper: "border-1",
                             }}
+                            defaultValue={searchQuery}
                             placeholder="Search by name..."
                             startContent={<SearchIcon className="text-default-300" />}
-                            defaultValue={searchQuery}
                             variant="bordered"
                             onClear={() => onClear()}
                             onValueChange={onSearchChange}
                         />
                         <div className="flex gap-3">
-                            <Button onClick={() => state.open()} color="primary" endContent={<PlusIcon />}>
+                            <Button color="primary" endContent={<PlusIcon />} onClick={() => state.open()}>
                                 Add New
                             </Button>
                             {canExport && (
-                                <Button isLoading={isExporting} disabled={isExporting} onClick={handleExport} color="secondary" className="min-w-28">
+                                <Button className="min-w-28" color="secondary" disabled={isExporting} isLoading={isExporting} onClick={handleExport}>
                                     Export
                                 </Button>
                             )}
                             {canIndex && (
-                                <Button isLoading={isIndexing} disabled={isIndexing} onClick={handleIndex} color="secondary" className="min-w-28">
+                                <Button className="min-w-28" color="secondary" disabled={isIndexing} isLoading={isIndexing} onClick={handleIndex}>
                                     Index
                                 </Button>
                             )}

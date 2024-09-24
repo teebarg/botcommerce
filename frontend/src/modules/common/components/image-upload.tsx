@@ -25,10 +25,12 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
         e.preventDefault();
         if (!file) {
             enqueueSnackbar("Please select a file", { variant: "error" });
+
             return;
         }
         setStatus(true);
         const formData = new FormData();
+
         formData.append("file", file);
 
         try {
@@ -47,6 +49,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
         // eslint-disable-next-line no-undef
         if (files[0]) {
             const reader = new FileReader();
+
             reader.onloadend = () => {
                 setPreview(reader?.result);
                 setDirty(true);
@@ -63,7 +66,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                 {preview && (
                     <React.Fragment>
                         <div className="flex gap-1">
-                            <Image width={300} alt="Product Image" src={preview} className="max-h-52" />
+                            <Image alt="Product Image" className="max-h-52" src={preview} width={300} />
                             <Button isIconOnly onPress={() => setPreview(undefined)}>
                                 <EditIcon size={24} />
                             </Button>
@@ -72,20 +75,20 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                 )}
                 {!preview && (
                     <DragNDrop
-                        onSelect={OnSelect}
-                        onError={(message: string) => enqueueSnackbar(message, { variant: "error" })}
-                        allowsMultiple={false}
                         acceptedFiles={[FileTypes.jpeg, FileTypes.jpg, FileTypes.png, FileTypes.avif]}
+                        allowsMultiple={false}
+                        onError={(message: string) => enqueueSnackbar(message, { variant: "error" })}
+                        onSelect={OnSelect}
                     />
                 )}
                 {preview && isDirty && (
                     <Button
-                        onClick={handleSubmit}
+                        className="min-w-24 mt-2"
+                        color="secondary"
                         isDisabled={status}
                         isLoading={status}
                         variant="shadow"
-                        color="secondary"
-                        className="min-w-24 mt-2"
+                        onClick={handleSubmit}
                     >
                         Upload{status ? "ing" : ""}
                     </Button>

@@ -1,6 +1,7 @@
 import { Product } from "types/global";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Suspense } from "react";
+
 import ProductActions from "../product-actions";
 
 interface ComponentProps {

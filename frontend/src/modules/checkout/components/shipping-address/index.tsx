@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Checkbox } from "@nextui-org/checkbox";
 import { Input } from "@nextui-org/input";
+import { Cart } from "types/global";
 
 import AddressSelect from "../address-select";
-import { Cart } from "types/global";
 
 const ShippingAddress = ({
     customer,
     cart,
     checked,
-    onChange
+    onChange,
 }: {
     customer: Omit<any, "password_hash"> | null;
     cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null;

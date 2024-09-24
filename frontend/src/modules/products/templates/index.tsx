@@ -7,9 +7,9 @@ import { Image } from "@nextui-org/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ArrowUpRightMini, ChevronRightIcon, StarIcon } from "nui-react-icons";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
+import { Product } from "types/global";
 
 import ProductDetails from "./details";
-import { Product } from "types/global";
 
 type ProductTemplateProps = {
     product: Product;

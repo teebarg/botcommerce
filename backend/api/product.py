@@ -1,10 +1,8 @@
+import asyncio
 import datetime
 from io import BytesIO
 from typing import Annotated, Any
-import asyncio
 
-from services.run_sheet import generate_excel_file, process_products
-from services.meilisearch import add_documents_to_index, clear_index, delete_document, delete_index, get_or_create_index, search_documents, update_document
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -14,7 +12,6 @@ from fastapi import (
     Query,
     UploadFile,
 )
-from sqlalchemy.sql import text
 
 import crud
 from core import deps
@@ -22,13 +19,23 @@ from core.deps import (
     SessionDep,
 )
 from core.logging import logger
-from models.generic import Product, ProductPublic, Products
+from models.generic import Product, ProductPublic
 from models.message import Message
 from models.product import (
     ProductCreate,
     ProductUpdate,
 )
-from services.export import export, process_file, validate_file
+from services.export import process_file, validate_file
+from services.meilisearch import (
+    add_documents_to_index,
+    clear_index,
+    delete_document,
+    delete_index,
+    get_or_create_index,
+    search_documents,
+    update_document,
+)
+from services.run_sheet import generate_excel_file, process_products
 
 # Create a router for products
 router = APIRouter()
@@ -36,27 +43,21 @@ router = APIRouter()
 
 @router.get("/export")
 async def export_products(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage, background_tasks: BackgroundTasks
+    current_user: deps.CurrentUser,
+    db: SessionDep,
+    bucket: deps.Storage,
+    background_tasks: BackgroundTasks,
 ) -> Any:
     try:
-        # statement = "SELECT id, name, slug, description, price, old_price, inventory, image FROM product;"
-        # products = db.exec(text(statement))
-
-        # file_url = await export(
-        #     columns=["id","name", "slug", "description", "price", "old_price", "inventory", "image"],
-        #     data=products,
-        #     name="Product",
-        #     bucket=bucket,
-        #     email=current_user.email,
-        # )
-
         # Define the background task
         def run_task():
             asyncio.run(generate_excel_file(bucket=bucket, email=current_user.email))
 
         background_tasks.add_task(run_task)
 
-        return {"message": "Data Export successful. An email with the file URL has been sent."}
+        return {
+            "message": "Data Export successful. An email with the file URL has been sent."
+        }
     except Exception as e:
         logger.error(f"Export products error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
@@ -88,22 +89,28 @@ async def index(
     search_params = {
         "limit": limit,
         "offset": (page - 1) * limit,
-        "sort": ["created_at:desc"],  # Sort by latest (assuming there's a 'created_at' field)
+        "sort": [
+            "created_at:desc"
+        ],  # Sort by latest (assuming there's a 'created_at' field)
     }
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
     search_results = search_documents(
-        index_name="products",
-        query=search,
-        **search_params
+        index_name="products", query=search, **search_params
     )
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
 
-    return {"products": search_results["hits"], "page": page, "limit": limit, "total_count": total_count, "total_pages": total_pages}
+    return {
+        "products": search_results["hits"],
+        "page": page,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+    }
 
 
 @router.post("/search", response_model=Any)
@@ -135,16 +142,19 @@ async def search_products(search_params: dict) -> Any:
         search_params["filter"] = " AND ".join(filters)
 
     search_results = search_documents(
-        index_name="products",
-        query=search,
-        **search_params
+        index_name="products", query=search, **search_params
     )
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
 
-    return {"products": search_results["hits"], "page": page, "limit": limit, "total_count": total_count, "total_pages": total_pages}
-
+    return {
+        "products": search_results["hits"],
+        "page": page,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+    }
 
 
 @router.post("/")
@@ -166,8 +176,7 @@ def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
 
         add_documents_to_index(index_name="products", documents=[product_data])
     except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
     return product
 
 
@@ -251,11 +260,19 @@ async def upload_products(
 
 
 @router.post("/upload-products/")
-async def upload_products_a(file: Annotated[UploadFile, File()], background_tasks: BackgroundTasks):
-    content_type =  file.content_type
+async def upload_products_a(
+    file: Annotated[UploadFile, File()], background_tasks: BackgroundTasks
+):
+    content_type = file.content_type
 
-    if content_type not in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/csv"]:
-        raise HTTPException(status_code=400, detail="Invalid file type. Only CSV/Excel files are supported.")
+    if content_type not in [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/csv",
+    ]:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file type. Only CSV/Excel files are supported.",
+        )
 
     await validate_file(file=file)
 
@@ -317,10 +334,7 @@ async def upload_product_image(
 
 
 @router.post("/reindex", dependencies=[], response_model=Message)
-async def reindex_products(
-    db: SessionDep,
-    background_tasks: BackgroundTasks
-):
+async def reindex_products(db: SessionDep, background_tasks: BackgroundTasks):
     """
     Re-index all products in the database to Meilisearch.
     This operation is performed asynchronously in the background.
@@ -329,7 +343,7 @@ async def reindex_products(
         # Define the background task
         def reindex_task():
             products = crud.product.all(db=db)
-            logger.info(f"Starting re-indexing..........")
+            logger.info("Starting re-indexing..........")
 
             # Prepare the documents for Meilisearch
             documents = []
@@ -350,8 +364,8 @@ async def reindex_products(
         logger.error(f"Error during product reindexing: {e}")
         raise HTTPException(
             status_code=500,
-            detail="An error occurred while starting the reindexing process."
-        )
+            detail="An error occurred while starting the reindexing process.",
+        ) from e
 
 
 @router.post("/configure-filterable-attributes", response_model=Message)
@@ -366,16 +380,18 @@ async def configure_filterable_attributes(
         # Update the filterable attributes
         index.update_filterable_attributes(["collections", "price"])
         # Update the sortable attributes
-        index.update_sortable_attributes(['created_at', 'price'])
+        index.update_sortable_attributes(["created_at", "price"])
 
         logger.info(f"Updated filterable attributes: {attributes}")
-        return Message(message=f"Filterable attributes updated successfully: {attributes}")
+        return Message(
+            message=f"Filterable attributes updated successfully: {attributes}"
+        )
     except Exception as e:
         logger.error(f"Error updating filterable attributes: {e}")
         raise HTTPException(
             status_code=500,
-            detail="An error occurred while updating filterable attributes."
-        )
+            detail="An error occurred while updating filterable attributes.",
+        ) from e
 
 
 @router.get("/search/clear-index", response_model=dict)
@@ -389,9 +405,8 @@ async def config_clear_index():
     except Exception as e:
         logger.error(f"Error clearing index: {e}")
         raise HTTPException(
-            status_code=500,
-            detail="An error occurred while clearing index"
-        )
+            status_code=500, detail="An error occurred while clearing index"
+        ) from e
 
 
 @router.get("/search/delete-index", response_model=dict)
@@ -405,11 +420,13 @@ async def config_delete_index():
     except Exception as e:
         logger.error(f"Error dropping index: {e}")
         raise HTTPException(
-            status_code=500,
-            detail="An error occurred while dropping index"
-        )
+            status_code=500, detail="An error occurred while dropping index"
+        ) from e
+
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
-    product_dict['collections'] = [collection.name for collection in product.collections]
+    product_dict["collections"] = [
+        collection.name for collection in product.collections
+    ]
     return product_dict

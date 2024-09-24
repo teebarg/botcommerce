@@ -7,8 +7,8 @@ export type Customer = {
     is_active?: boolean;
     is_superuser?: number;
     created_at?: string;
-    billing_addresses?: Record<string, any>[]
-    shipping_addresses?: Record<string, any>[]
+    billing_addresses?: Record<string, any>[];
+    shipping_addresses?: Record<string, any>[];
 };
 
 export type Product = {
@@ -103,63 +103,65 @@ export enum FileTypes {
 }
 
 export type Cart = {
-    cart_id: string
-    customer_id: string
-    email: string
-    items: CartItem[]
-    checkout_step?: "address" | "delivery" | "payment"
-    subtotal: number
-    tax_total: number
-    delivery_fee: number
+    cart_id: string;
+    customer_id: string;
+    email: string;
+    items: CartItem[];
+    checkout_step?: "address" | "delivery" | "payment";
+    subtotal: number;
+    tax_total: number;
+    delivery_fee: number;
     total: number;
-    billing_address: Record<string, any>
-    shipping_address: Record<string, any>
-    shipping_method: any
-    payment_session: any
-    gift_cards: any
+    billing_address: Record<string, any>;
+    shipping_address: Record<string, any>;
+    shipping_method: any;
+    payment_session: any;
+    gift_cards: any;
 };
 
 export type CartItem = {
-    item_id: string
-    product_id: string
-    slug: string
-    name: string
-    description?: string
-    image?: string
-    quantity: number
-    price: number
-    created_at: string
+    item_id: string;
+    product_id: string;
+    slug: string;
+    name: string;
+    description?: string;
+    image?: string;
+    quantity: number;
+    price: number;
+    created_at: string;
 };
 
 export type DeliveryOption = {
-    id: string
-    name: string
-    amount: number
-}
+    id: string;
+    name: string;
+    amount: number;
+};
 
 export type PaymentSession = {
-    id: string
-    provider_id: string
-}
+    id: string;
+    provider_id: string;
+};
 
 export type Order = {
-    order_id: string
-    status?: "pending" | "processing" | "fulfilled"
-    fulfillment_status: "fulfilled" | "not_fulfilled"
-    cart_id: string
-    customer_id: string
-    email: string
-    line_items: CartItem[]
-    checkout_step?: "address" | "delivery" | "payment"
-    subtotal: number
-    tax_total: number
-    delivery_fee: number
+    order_id: string;
+    status?: "pending" | "processing" | "fulfilled";
+    fulfillment_status: "fulfilled" | "not_fulfilled";
+    cart_id: string;
+    customer_id: string;
+    email: string;
+    line_items: CartItem[];
+    checkout_step?: "address" | "delivery" | "payment";
+    subtotal: number;
+    tax_total: number;
+    delivery_fee: number;
     total: number;
-    billing_address: Record<string, any>
-    shipping_address: Record<string, any>
-    shipping_method: Record<string, any>
-    payment_session: Record<string, any>
-    fulfillments: Record<string, any>[]
-    payment_status: "pending" | "paid"
-    created_at: string
+    billing_address: Record<string, any>;
+    shipping_address: Record<string, any>;
+    shipping_method: Record<string, any>;
+    payment_session: Record<string, any>;
+    fulfillments: Record<string, any>[];
+    payment_status: "pending" | "paid";
+    created_at: string;
 };
+
+export type SortOptions = "price_asc" | "price_desc" | "created_at";

@@ -5,7 +5,7 @@ from typing import Annotated, Generator, Union
 import firebase_admin
 import jwt
 from fastapi import Cookie, Depends, HTTPException, Response, status
-from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
+from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from firebase_admin import credentials, storage
 from google.cloud.storage.bucket import Bucket
 from jwt.exceptions import InvalidTokenError

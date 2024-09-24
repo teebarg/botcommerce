@@ -32,9 +32,7 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
                 <div className="flex flex-col w-1/3" data-testid="shipping-method-summary">
                     <p className="font-medium text-base mb-1">Method</p>
                     <p className="font-normal text-default-600">
-                        {order.shipping_method?.shipping_option?.name} (
-                        {currency(order.shipping_method?.amount)}
-                        )
+                        {order.shipping_method?.shipping_option?.name} ({currency(order.shipping_method?.amount)})
                     </p>
                 </div>
             </div>

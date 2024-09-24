@@ -11,6 +11,7 @@ const customSerializer = (key: string, value: any): any => {
     if (value instanceof Date || value instanceof RegExp) {
         return value.toString();
     }
+
     return value;
 };
 
@@ -20,6 +21,7 @@ const getOrCreateIndex = async (indexName: string): Promise<Index> => {
     } catch (error) {
         if (error instanceof MeiliSearchApiError && error.message.includes("index_not_found")) {
             await client.createIndex(indexName);
+
             return client.index(indexName);
         }
         throw error;
@@ -28,11 +30,13 @@ const getOrCreateIndex = async (indexName: string): Promise<Index> => {
 
 const addDocumentsToIndex = async <T extends Record<string, any>>(indexName: string, documents: T[]): Promise<void> => {
     const index = await getOrCreateIndex(indexName);
+
     await index.addDocuments(documents, { primaryKey: "id" });
 };
 
 const searchDocuments = async <T>(indexName: string, query: string, options: SearchParams = {}): Promise<any> => {
     const index = await getOrCreateIndex(indexName);
+
     return await index.search(query, options);
 };
 
@@ -52,16 +56,19 @@ const multiSearchDocuments = async <T>(
 
 const updateDocument = async <T extends Record<string, any>>(indexName: string, document: T): Promise<void> => {
     const index = await getOrCreateIndex(indexName);
+
     await index.updateDocuments([document]);
 };
 
 const deleteDocument = async (indexName: string, documentId: string | number): Promise<void> => {
     const index = await getOrCreateIndex(indexName);
+
     await index.deleteDocument(documentId);
 };
 
 const clearIndex = async (indexName: string): Promise<void> => {
     const index = await getOrCreateIndex(indexName);
+
     await index.deleteAllDocuments();
 };
 

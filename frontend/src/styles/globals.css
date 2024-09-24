@@ -62,7 +62,7 @@
     }
 
     .combobox {
-       @apply w-full relative min-h-10 inline-flex flex-col;
+        @apply w-full relative min-h-10 inline-flex flex-col;
     }
 
     .combobox-input {

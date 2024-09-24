@@ -18,15 +18,7 @@ const AddressSelect = ({ addresses, cart }: AddressSelectProps) => {
 
         if (savedAddress) {
             cartUpdate({
-                shipping_address: omit(savedAddress, [
-                    "id",
-                    "created_at",
-                    "updated_at",
-                    "country",
-                    "deleted_at",
-                    "metadata",
-                    "customer_id",
-                ]) as any,
+                shipping_address: omit(savedAddress, ["id", "created_at", "updated_at", "country", "deleted_at", "metadata", "customer_id"]) as any,
             });
         }
     };
@@ -81,9 +73,7 @@ const AddressSelect = ({ addresses, cart }: AddressSelectProps) => {
                                                 <span>
                                                     {address.postal_code}, {address.city}
                                                 </span>
-                                                <span>
-                                                    {address.state && `${address.state}`}
-                                                </span>
+                                                <span>{address.state && `${address.state}`}</span>
                                             </div>
                                         </div>
                                     </div>

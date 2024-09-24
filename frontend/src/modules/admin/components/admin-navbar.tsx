@@ -1,5 +1,4 @@
 import { Navbar as NextUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@nextui-org/navbar";
-
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";

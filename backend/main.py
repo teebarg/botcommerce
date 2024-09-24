@@ -13,10 +13,15 @@ from api.order import router as order_router
 from api.order_item import router as order_item_router
 from api.product import router as product_router
 from api.tag import router as tag_router
+
 # from api.websocket import consume_events
 from api.websocket import router as websocket_router
 from core.config import settings
-from core.utils import generate_contact_form_email, generate_newsletter_email, send_email
+from core.utils import (
+    generate_contact_form_email,
+    generate_newsletter_email,
+    send_email,
+)
 from models.generic import ContactFormCreate, NewsletterCreate
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
@@ -134,12 +139,14 @@ async def newsletter(data: NewsletterCreate):
     )
     return {"message": "Email sent successfully"}
 
+
 # @app.on_event("startup")
 # async def startup_event():
 #     import asyncio
 
 #     loop = asyncio.get_event_loop()
 #     loop.create_task(consume_events())
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):

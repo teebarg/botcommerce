@@ -1,14 +1,7 @@
-import json
 from typing import Dict
 
 # import aio_pika
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from sqlmodel import Session, select
-
-from core.config import settings
-from core.logging import logger
-from db.engine import engine
-from models.generic import User
 
 
 class ConnectionManager:

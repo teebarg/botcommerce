@@ -1,7 +1,8 @@
 "use client";
 
-import { DropZone } from "react-aria-components";
 import type { FileDropItem } from "react-aria";
+
+import { DropZone } from "react-aria-components";
 import React from "react";
 import { CancelIcon, UploadIcon } from "nui-react-icons";
 import { FileTrigger } from "@modules/common/components/file-trigger";
@@ -28,6 +29,7 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
             // Check file size (in kilobytes)
             if (file.size > maxFileSize * 1024) {
                 onError?.(`File ${file.name} size exceeds ${maxFileSize} KB`);
+
                 return;
             } else {
                 return true;
@@ -52,21 +54,23 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
 
                 await files.forEach(async (item: FileDropItem) => {
                     const file = await item.getFile();
+
                     selectedFiles.push(file);
                 });
                 handleSelectedFiles(selectedFiles);
             }}
         >
             {files[0] && (
-                <button type="button" className="absolute top-3 right-4" onClick={handleCancel}>
-                    <CancelIcon size={24} aria-hidden="true" />
+                <button className="absolute top-3 right-4" type="button" onClick={handleCancel}>
+                    <CancelIcon aria-hidden="true" size={24} />
                 </button>
             )}
             <FileTrigger
-                allowsMultiple={allowsMultiple}
                 acceptedFileTypes={acceptedFiles}
+                allowsMultiple={allowsMultiple}
                 onSelect={(e: FileList | null) => {
                     const files = Array.from(e ?? []);
+
                     handleSelectedFiles(files);
                 }}
             >
@@ -75,12 +79,12 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
                     <p>
                         Drop your files here or <button className="link">browse.</button>
                     </p>
-                    <button type="button" className="btn-custom group min-w-48 bg-primary text-primary-foreground">
+                    <button className="btn-custom group min-w-48 bg-primary text-primary-foreground" type="button">
                         Select
                     </button>
                 </div>
             </FileTrigger>
-            <div slot="label" className="mt-4">
+            <div className="mt-4" slot="label">
                 {files?.map((file: File, index: number) => (
                     <span key={index} className="block">
                         {file.name}

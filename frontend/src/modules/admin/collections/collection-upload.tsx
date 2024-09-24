@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
+
 import { bulkUploadProducts } from "../actions";
 import { Excel } from "../components/file-uploader";
 
-interface CollectionProps {
-}
+interface CollectionProps {}
 
 const CollectionUpload: React.FC<CollectionProps> = () => {
     const id = "nK12eRTbo";
@@ -19,7 +19,7 @@ const CollectionUpload: React.FC<CollectionProps> = () => {
 
     return (
         <div className="">
-            <Excel onUpload={handleUpload} wsUrl={wsUrl} />
+            <Excel wsUrl={wsUrl} onUpload={handleUpload} />
         </div>
     );
 };

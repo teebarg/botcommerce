@@ -51,6 +51,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
 
     const handleChange = (value: string) => {
         const item: DeliveryOption = availableShippingMethods?.find((item: DeliveryOption) => item.id == value);
+
         set(item);
     };
 

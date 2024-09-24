@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
+
 import { bulkUploadProducts } from "../actions";
 import { Excel } from "../components/file-uploader";
 
-interface ProductUploadProps {
-}
+interface ProductUploadProps {}
 
 const ProductUpload: React.FC<ProductUploadProps> = () => {
     const id = "nK12eRTbo";
 
-    const domain = process.env.NODE_ENV === 'development' ? "ws://backend:4000" : `wss://${process.env.NEXT_PUBLIC_DOMAIN}`;
+    const domain = process.env.NODE_ENV === "development" ? "ws://backend:4000" : `wss://${process.env.NEXT_PUBLIC_DOMAIN}`;
     const wsUrl = `${domain}/api/ws/upload/${id}`;
 
     const handleUpload = async (id: string, formData: any) => {
@@ -19,7 +19,7 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
 
     return (
         <div className="">
-            <Excel onUpload={handleUpload} wsUrl={wsUrl} />
+            <Excel wsUrl={wsUrl} onUpload={handleUpload} />
         </div>
     );
 };

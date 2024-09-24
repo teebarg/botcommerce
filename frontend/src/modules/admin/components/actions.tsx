@@ -37,6 +37,7 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
             enqueueSnackbar("Error deleting product", { variant: "error" });
         }
     };
+
     return (
         <React.Fragment>
             <div className="relative flex items-center gap-2">

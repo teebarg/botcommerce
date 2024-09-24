@@ -1,6 +1,4 @@
 import { cache } from "react";
-import sortProducts from "@lib/util/sort-products";
-import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 import { Product, ProductCategoryWithChildren } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
@@ -20,7 +18,9 @@ const getHeaders = (tags: string[] = []) => {
     } as Record<string, any>;
 
     const token = cookies().get("access_token")?.value;
+
     headers["X-Auth"] = token ?? "";
+
     return headers;
 };
 
@@ -40,6 +40,7 @@ export async function createCart(data = {}) {
     }
 
     const cart = await response.json();
+
     return cart;
 }
 
@@ -61,6 +62,7 @@ export async function updateCart(cartId: string, data: any) {
     }
 
     const updatedCart = await response.json();
+
     return updatedCart;
 }
 
@@ -81,6 +83,7 @@ export const getCart = cache(async function (cartId: string) {
     }
 
     const cart = await response.json();
+
     return cart;
 });
 
@@ -97,6 +100,7 @@ export const getProducts = cache(async function (search?: string, collections?: 
         },
     }).catch((error) => {
         console.error("Error fetching products:", error);
+
         return null;
     });
 
@@ -105,6 +109,7 @@ export const getProducts = cache(async function (search?: string, collections?: 
     }
 
     const data = await res.json();
+
     return data;
 });
 
@@ -127,15 +132,18 @@ export async function addItem({ cartId, product_id, quantity }: { cartId: string
         }
 
         const result = await response.json();
+
         return result;
     } catch (error) {
         console.log(error);
+
         return { success: false, message: "error" };
     }
 }
 
 export async function updateItem({ cartId, lineId, quantity }: { cartId: string; lineId: string; quantity: number }) {
     const headers = getHeaders(["cart"]);
+
     try {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
         const response = await fetch(url, {
@@ -153,6 +161,7 @@ export async function updateItem({ cartId, lineId, quantity }: { cartId: string;
         }
 
         const result = await response.json();
+
         return result;
     } catch (e) {
         return "Error adding item to cart";
@@ -178,9 +187,11 @@ export async function removeItem({ cartId, lineId }: { cartId: string; lineId: s
         }
 
         const result = await response.json();
+
         return result;
     } catch (error) {
         console.log(error);
+
         return { success: false, message: "error" };
     }
 }
@@ -216,14 +227,16 @@ export async function completeCart(cartId: string) {
             headers: {
                 "Content-Type": "application/json",
                 ...headers,
-                cartId
+                cartId,
             },
         });
+
         if (!res.ok) {
             throw new Error(res.statusText);
         }
 
         const data = await res.json();
+
         return data;
     } catch (error) {
         return { message: error, status: "error" };
@@ -242,39 +255,18 @@ export const retrieveOrder = cache(async function (id: string) {
                 ...headers,
             },
         });
+
         if (!res.ok) {
             throw new Error(res.statusText);
         }
 
         const data = await res.json();
+
         return data;
     } catch (error) {
         return { message: error, status: "error" };
     }
 });
-
-// Shipping actions
-export const listCartShippingMethods = cache(async function (cartId: string) {
-    const headers = getHeaders(["shipping"]);
-
-    // return client.shippingOptions
-    //     .listCartOptions(cartId, headers)
-    //     .then(({ shipping_options }) => shipping_options)
-    //     .catch((err) => {
-    //         console.log(err);
-
-    //         return null;
-    //     });
-});
-
-export async function addShippingMethod({ cartId, shippingMethodId }: { cartId: string; shippingMethodId: string }) {
-    const headers = getHeaders(["cart"]);
-
-    // return client.carts
-    //     .addShippingMethod(cartId, { option_id: shippingMethodId }, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => Error(err));
-}
 
 // Authentication actions
 export async function getToken(credentials: any) {
@@ -320,15 +312,6 @@ export async function authenticate(credentials: any) {
     //     .catch((err) => Error(err));
 }
 
-export const getSession = cache(async function getSession() {
-    const headers = getHeaders(["auth"]);
-
-    // return client.auth
-    //     .getSession(headers)
-    //     .then(({ customer }) => customer)
-    //     .catch((err) => Error(err));
-});
-
 // Customer actions
 export async function getCustomer() {
     const headers = getHeaders(["customer"]);
@@ -342,6 +325,7 @@ export async function getCustomer() {
             },
             credentials: "include",
         });
+
         if (!res.ok) {
             throw new Error("Login failed");
         }
@@ -408,42 +392,17 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
                 ...headers,
             },
         });
+
         if (!res.ok) {
             throw new Error("Login failed");
         }
 
         const data = await res.json();
+
         return data;
     } catch (error) {
         return { message: error, status: "error" };
     }
-});
-
-// Product actions
-export const getProductsById = cache(async function ({ ids }: { ids: string[] }) {
-    const headers = getHeaders(["products"]);
-
-    // return client.products
-    //     .list({ id: ids, region_id: regionId }, headers)
-    //     .then(({ products }) => products)
-    //     .catch((err) => {
-    //         console.log(err);
-
-    //         return null;
-    //     });
-});
-
-export const retrievePricedProductById = cache(async function ({ id, regionId }: { id: string; regionId?: string }) {
-    const headers = getHeaders(["products"]);
-
-    // return client.products
-    //     .retrieve(`${id}?region_id=${regionId}`, headers)
-    //     .then(({ product }) => product)
-    //     .catch((err) => {
-    //         console.log(err);
-
-    //         return null;
-    //     });
 });
 
 export const getProduct = cache(async function (slug: string): Promise<any> {
@@ -489,6 +448,7 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
         }
 
         const data = await response.json();
+
         return data;
     } catch (error) {
         console.error("Error fetching products:", error);
@@ -515,10 +475,11 @@ interface SearchResult {
 }
 
 export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
-    console.log(searchParams)
+    console.log(searchParams);
     const { query = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
 
     const filters: string[] = [];
+
     if (collections.length > 0) {
         filters.push(`collections IN [${collections.join(",")}]`);
     }
@@ -550,89 +511,9 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
     };
 }
 
-export const getProductsListWithSort = cache(async function getProductsListWithSort({
-    page = 0,
-    queryParams,
-    sortBy = "created_at"
-}: {
-    page?: number;
-    queryParams?: any;
-    sortBy?: SortOptions;
-}): Promise<{
-    response: { products: Product[]; count: number };
-    nextPage: number | null;
-    queryParams?: any;
-}> {
-    const limit = queryParams?.limit || 12;
-
-    const {
-        response: { products, count },
-    } = await getProductsList({
-        pageParam: 0,
-        queryParams: {
-            ...queryParams,
-            limit: 100,
-        },
-    });
-
-    const sortedProducts = sortProducts(products, sortBy);
-
-    const pageParam = (page - 1) * limit;
-
-    const nextPage = count > pageParam + limit ? pageParam + limit : null;
-
-    const pagProducts = sortedProducts.slice(pageParam, pageParam + limit);
-
-    return {
-        response: {
-            products: pagProducts,
-            count,
-        },
-        nextPage,
-        queryParams,
-    };
-});
-
-export const getHomepageProducts = cache(async function getHomepageProducts({ collectionHandles }: { collectionHandles?: string[] }) {
-    const collectionProductsMap = new Map<string, Product[]>();
-
-    const { collections } = await getCollectionsList(0, 3);
-
-    if (!collectionHandles) {
-        collectionHandles = collections.map((collection: any) => collection.slug);
-    }
-
-    console.log("collection handles");
-    console.log(collectionHandles);
-
-    for (const slug of collectionHandles ?? []) {
-        const products = await getProductsByCollectionHandle({
-            slug,
-            limit: 3,
-        });
-
-        collectionProductsMap.set(slug, products.response.products);
-    }
-
-    return collectionProductsMap;
-});
-
-// Collection actions
-export const retrieveCollection = cache(async function (id: string) {
-    // return client.collections
-    //     .retrieve(id, {
-    //         next: {
-    //             tags: ["collections"],
-    //         },
-    //     })
-    //     .then(({ collection }) => collection)
-    //     .catch((err) => {
-    //         throw err;
-    //     });
-});
-
 export const getCollectionsList = cache(async function (search: string = "", page: number = 1, limit: number = 100): Promise<any> {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, { search, page, limit });
+
     try {
         const response = await fetch(url, {
             next: {
@@ -647,6 +528,7 @@ export const getCollectionsList = cache(async function (search: string = "", pag
         return await response.json();
     } catch (error) {
         console.error("Error fetching collections:", error);
+
         return { message: "Error fetching collections" };
     }
 });
@@ -660,9 +542,11 @@ export const getCollectionBySlug = cache(async function (slug: string): Promise<
         }
 
         const collection = await response.json();
+
         return collection;
     } catch (error) {
         console.error("Error fetching collection by slug:", error);
+
         return null;
     }
 });

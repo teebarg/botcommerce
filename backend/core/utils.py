@@ -1,19 +1,20 @@
-from datetime import datetime
+import random
 import re
+import string
 import unicodedata
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import emails  # type: ignore
+from firebase_cart import Order
 from jinja2 import Environment, FileSystemLoader, Template
 
 from core.config import settings
 from core.logging import logger
 from models.generic import User
-import random
-import string
-from firebase_cart import Order
+
 
 @dataclass
 class EmailData:
@@ -153,7 +154,13 @@ def generate_newsletter_email(email: str) -> EmailData:
     subject = f"{project_name} - New Newsletter Email"
     html_content = render_email_template(
         template_name="newsletter.html",
-        context={"project_name": settings.PROJECT_NAME, "email": email, "project_website": settings.DOMAIN, "unsubscribe_link": "", "current_year": datetime.now().year},
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "email": email,
+            "project_website": settings.DOMAIN,
+            "unsubscribe_link": "",
+            "current_year": datetime.now().year,
+        },
     )
     return EmailData(html_content=html_content, subject=subject)
 
@@ -180,7 +187,7 @@ def generate_slug(name: str) -> str:
     return name
 
 
-def generate_id(prefix='cart_', length=25):
+def generate_id(prefix="cart_", length=25):
     chars = string.ascii_uppercase + string.digits
-    unique_part = ''.join(random.choice(chars) for _ in range(length))
+    unique_part = "".join(random.choice(chars) for _ in range(length))
     return prefix + unique_part

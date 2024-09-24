@@ -3,11 +3,11 @@
 import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { siteConfig } from "@lib/config";
-
-import PaymentButton from "../payment-button";
 import { Cart, Customer } from "types/global";
 
-const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">, customer: Customer }) => {
+import PaymentButton from "../payment-button";
+
+const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">; customer: Customer }) => {
     const searchParams = useSearchParams();
 
     const isOpen = searchParams.get("step") === "review";
@@ -15,7 +15,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
     // const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
     // const previousStepsCompleted = cart.shipping_address && cart.shipping_method && (cart.payment_session || paidByGiftcard);
-    const previousStepsCompleted = cart?.shipping_address && cart?.shipping_method && (cart?.payment_session);
+    const previousStepsCompleted = cart?.shipping_address && cart?.shipping_method && cart?.payment_session;
 
     return (
         <div>
@@ -38,7 +38,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
                             </p>
                         </div>
                     </div>
-                    <PaymentButton cart={cart} data-testid="submit-order-button" customer={customer} />
+                    <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
                 </>
             )}
         </div>

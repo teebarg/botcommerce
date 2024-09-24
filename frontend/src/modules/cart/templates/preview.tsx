@@ -5,9 +5,9 @@ import React from "react";
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
 import LineItemPrice from "@modules/common/components/line-item-price";
 import Image from "next/image";
+import { CartItem } from "types/global";
 
 import Control from "./control";
-import { CartItem } from "types/global";
 
 type ItemsTemplateProps = {
     items?: CartItem[];

@@ -1,10 +1,8 @@
-import asyncio
-import os
 from datetime import datetime
-from io import BytesIO, StringIO
+from io import StringIO
 from typing import Any, Dict
-import pandas as pd
 
+import pandas as pd
 from fastapi import (
     HTTPException,
 )
@@ -72,7 +70,7 @@ async def export(data: list, name: str, bucket: Any, email: str, columns: list) 
 
         # Upload to Firebase
         blob = bucket.blob(f"exports/{filename}")
-        blob.upload_from_string(csv_content, content_type='text/csv')
+        blob.upload_from_string(csv_content, content_type="text/csv")
         blob.make_public()
         download_url = blob.public_url
 
@@ -87,8 +85,7 @@ async def export(data: list, name: str, bucket: Any, email: str, columns: list) 
         return download_url
     except Exception as e:
         logger.error(f"Error in export function: {e}")
-        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
-
+        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}") from e
 
 
 async def validate_file(file, size: int = 1.5) -> None:

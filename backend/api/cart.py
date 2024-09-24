@@ -1,28 +1,21 @@
-from core.utils import generate_id
-from services.meilisearch import get_document_by_id
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Header
-)
+from typing import Any
 
-import crud
+from fastapi import APIRouter, Depends, Header, HTTPException
+from firebase_cart import CartHandler, CartItem, FirebaseConfig
+
+from core.config import settings
 from core.deps import (
-    SessionDep,
-    UserCart,
     get_current_user,
 )
-from models.generic import CartDetails, CartItemIn, CartPublic
+from core.utils import generate_id
+from models.generic import CartDetails, CartItemIn
 from models.message import Message
-from firebase_cart import CartHandler, CartItem, Cart, FirebaseConfig
-from typing import Any
-from core.config import settings
+from services.meilisearch import get_document_by_id
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
     database_url=settings.DATABASE_URL,
-    bucket=settings.STORAGE_BUCKET
+    bucket=settings.STORAGE_BUCKET,
 )
 
 cart_handler = CartHandler(firebase_config)
@@ -57,11 +50,15 @@ async def create_cart():
 
 @router.post("/update")
 async def update_cart(cart_in: CartItemIn, cartId: str = Header(default=None)):
-    return cart_handler.update_cart_quantity(cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity)
+    return cart_handler.update_cart_quantity(
+        cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity
+    )
 
 
 @router.patch("/update-cart-details")
-async def update_cart_details(cart_update: CartDetails, cartId: str = Header(default=None)):
+async def update_cart_details(
+    cart_update: CartDetails, cartId: str = Header(default=None)
+):
     update_data = cart_update.dict(exclude_unset=True)
     return cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
 

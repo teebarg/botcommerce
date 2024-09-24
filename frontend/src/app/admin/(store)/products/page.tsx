@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 
 const fetchProducts = async (search = "", page = 1, limit = 10) => {
     const products = await getProducts(search, undefined, page, limit);
+
     return products;
 };
 
@@ -37,22 +38,20 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                         <ProductUpload />
                     </div>
                     <Table
-                        form={<ProductForm type="create" collections={collections} />}
-                        columns={["No", "Image", "Name", "Description", "Price", "Old Price", "Created At"]}
-                        pagination={pagination}
                         canExport
                         canIndex
+                        columns={["No", "Image", "Name", "Description", "Price", "Old Price", "Created At"]}
+                        form={<ProductForm collections={collections} type="create" />}
+                        pagination={pagination}
                         searchQuery={search}
                     >
                         {products
                             ?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                             .map((item: Product, index: number) => (
                                 <tr key={item.id} className="even:bg-content2">
+                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        {(page - 1) * limit + index + 1}
-                                    </td>
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        <Badge content="" color={item.is_active ? "success" : "danger"} shape="circle" placement="bottom-right">
+                                        <Badge color={item.is_active ? "success" : "danger"} content="" placement="bottom-right" shape="circle">
                                             <Avatar radius="md" src={item.image} />
                                         </Badge>
                                     </td>
@@ -72,7 +71,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                         {new Date(item.created_at as string).toLocaleDateString()}
                                     </td>
                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
-                                        <Actions item={item} form={<ProductForm type="update" collections={collections} current={item} />} deleteAction={deleteProduct} />
+                                        <Actions
+                                            deleteAction={deleteProduct}
+                                            form={<ProductForm collections={collections} current={item} type="update" />}
+                                            item={item}
+                                        />
                                     </td>
                                 </tr>
                             ))}

@@ -34,7 +34,7 @@ startTest:
 	@echo "$(YELLOW)Starting docker environment...$(RESET)"
 	docker compose -p $(PROJECT_SLUG) up --build
 
-updateTest: 
+updateTest:
 	docker compose -p $(PROJECT_SLUG) up --build -d
 
 stopTest:
@@ -97,6 +97,14 @@ scaffold: ## Scaffold a resource
 	@cd scripts && python scaffold.py run -n $(name)
 
 pre-commit:
+	npx concurrently --kill-others-on-fail --prefix "[{name}]" --names "frontend:lint,frontend:build,backend:lint,backend:test" \
+	--prefix-colors "bgRed.bold.white,bgGreen.bold.white,bgBlue.bold.white,bgMagenta.bold.white" \
+    "cd frontend && npm run lint:check" \
+    "cd frontend && npm run build" \
+	"cd backend && make format" \
+	"cd backend && make test"
+
+pre-commit-docker:
 	npx concurrently --kill-others-on-fail --prefix "[{name}]" --names "frontend:lint,frontend:test,frontend:build,backend:lint,backend:test" \
 	--prefix-colors "bgRed.bold.white,bgGreen.bold.white,bgBlue.bold.white,bgMagenta.bold.white" \
     "docker exec botcommerce-frontend-1 npm run lint:check" \

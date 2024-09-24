@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {  getCollectionBySlug, getCollectionsList } from "@lib/data";
-import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
+import { getCollectionBySlug, getCollectionsList } from "@lib/data";
 import { CollectionTemplate } from "@modules/collections/templates";
+import { SortOptions } from "types/global";
 
 type Props = {
     params: { slug: string };

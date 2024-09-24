@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -10,7 +9,7 @@ export async function middleware(request: NextRequest) {
     const checkoutStep = searchParams.get("step");
     const cartIdCookie = request.cookies.get("_cart_id");
 
-    if ((!cartId || cartIdCookie)) {
+    if (!cartId || cartIdCookie) {
         return NextResponse.next();
     }
 

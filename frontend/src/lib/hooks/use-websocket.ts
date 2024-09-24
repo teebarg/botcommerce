@@ -23,6 +23,7 @@ const useWebSocket = ({ onOpen, onClose, type = [] }: Props) => {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+
             if (type.length && !type.includes(data.type)) {
                 return;
             }

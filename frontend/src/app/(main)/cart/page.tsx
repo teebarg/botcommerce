@@ -1,4 +1,3 @@
-
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import CartTemplate from "@modules/cart/templates";
@@ -29,7 +28,7 @@ const fetchCart = async () => {
 };
 
 export default async function Cart() {
-    const cart = await fetchCart() as CartType;
+    const cart = (await fetchCart()) as CartType;
     const customer = await getCustomer();
 
     return <CartTemplate cart={cart} customer={customer} />;

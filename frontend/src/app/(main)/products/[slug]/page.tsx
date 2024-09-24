@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductsList, getProduct, getProducts } from "@lib/data";
+import { getProductsList, getProduct } from "@lib/data";
 import ProductTemplate from "@modules/products/templates";
 
 type Props = {
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-    const product  = await getProduct(params.slug);
+    const product = await getProduct(params.slug);
 
     if (!product) {
         notFound();

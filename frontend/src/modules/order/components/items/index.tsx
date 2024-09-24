@@ -14,7 +14,7 @@ type ItemsProps = {
 const Items = ({ items }: ItemsProps) => {
     return (
         <div className="flex flex-col">
-            <Table columns={["Image", "", "Quantity", "Price", "Total"]} isDataOnly>
+            <Table isDataOnly columns={["Image", "", "Quantity", "Price", "Total"]}>
                 {items
                     ?.sort((a: CartItem, b: CartItem) => (a.created_at > b.created_at ? -1 : 1))
                     .map((item: CartItem, index: number) => (

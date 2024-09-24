@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { search } from "@modules/search/actions";
-import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
 import { CollectionTemplate } from "@modules/collections/templates";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import { SortOptions } from "types/global";
 
 export const metadata: Metadata = {
     title: "Search",
@@ -36,7 +36,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
                     Clear
                 </LocalizedClientLink>
             </div>
-            <CollectionTemplate page={page} searchParams={searchParams} sortBy={sortBy} query={query} />
+            <CollectionTemplate page={page} query={query} searchParams={searchParams} sortBy={sortBy} />
         </>
     );
 }

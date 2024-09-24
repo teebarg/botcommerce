@@ -29,11 +29,11 @@ export default async function CollectionsPage({ searchParams }: { searchParams: 
                         <ProductUpload />
                     </div>
                     <Table
-                        form={<CollectionForm type="create" />}
-                        columns={["S/N", "Name", "Status", "Created At", "Actions"]}
-                        pagination={pagination}
                         canExport
                         canIndex
+                        columns={["S/N", "Name", "Status", "Created At", "Actions"]}
+                        form={<CollectionForm type="create" />}
+                        pagination={pagination}
                         searchQuery={search}
                     >
                         {collections
@@ -45,19 +45,19 @@ export default async function CollectionsPage({ searchParams }: { searchParams: 
                                         <div className="font-bold truncate max-w-32">{item?.name}</div>
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <Chip title={item.is_active ? "Active" : "Inactive"} color={item.is_active ? "success" : "danger"} />
+                                        <Chip color={item.is_active ? "success" : "danger"} title={item.is_active ? "Active" : "Inactive"} />
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         {new Date(item.created_at as string).toLocaleDateString()}
                                     </td>
                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
-                                        <Actions item={item} form={<CollectionForm type="update" current={item} />} deleteAction={deleteCollection} />
+                                        <Actions deleteAction={deleteCollection} form={<CollectionForm current={item} type="update" />} item={item} />
                                     </td>
                                 </tr>
                             ))}
                         {collections?.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="text-center py-4 text-lg text-default-500">
+                                <td className="text-center py-4 text-lg text-default-500" colSpan={5}>
                                     No collections found.
                                 </td>
                             </tr>

@@ -39,7 +39,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
                     return (
                         <div key={i.item_id} className="flex flex-col gap-y-2" data-testid="order-item">
                             <div className="h-20 w-20 relative">
-                                <Image src={i.image as string} alt={i.name} fill />
+                                <Image fill alt={i.name} src={i.image as string} />
                             </div>
                             <div className="flex items-center text-sm text-default-700">
                                 <span className="text-default-700 font-semibold" data-testid="item-title">

@@ -3,12 +3,11 @@ import { ChevronRightIcon, ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCategoriesList, getCollectionsList, searchProducts } from "@lib/data";
-import { Product } from "types/global";
-import { SortOptions } from "@modules/store/components/refinement-list/sort-products";
+import { Product, SortOptions } from "types/global";
+import { ProductCard } from "@modules/products/components/product-card";
 
 import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
-import { ProductCard } from "@modules/products/components/product-card";
 
 interface ComponentProps {
     query?: string;

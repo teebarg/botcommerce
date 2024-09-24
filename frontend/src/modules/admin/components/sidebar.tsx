@@ -55,7 +55,7 @@ const Sidebar: React.FC<Props> = () => {
             subMenu: "Admin",
             icon: <AdminIcon />,
             suffix: (
-                <Badge content="5" color="danger" className="mr-4 -mt-0.5">
+                <Badge className="mr-4 -mt-0.5" color="danger" content="5">
                     {""}
                 </Badge>
             ),
@@ -153,7 +153,7 @@ const Sidebar: React.FC<Props> = () => {
             href: "/calendar",
             icon: <CalendarIcon />,
             suffix: (
-                <Chip color="success" variant="flat" size="sm">
+                <Chip color="success" size="sm" variant="flat">
                     New
                 </Chip>
             ),
@@ -181,16 +181,17 @@ const Sidebar: React.FC<Props> = () => {
         return item.map((menuItem: MenuItem | SubMenu, index: number) => {
             if ("subMenu" in menuItem) {
                 return (
-                    <SubMenu key={index} label={menuItem.subMenu} icon={menuItem.icon}>
+                    <SubMenu key={index} icon={menuItem.icon} label={menuItem.subMenu}>
                         {menuItems(menuItem.menuItems)}
                     </SubMenu>
                 );
             }
+
             return (
                 <MenuItem
                     key={index}
                     component={<Link href={menuItem.href} />}
-                    suffix={<ChevronRightIcon strokeWidth={2.5} width="2em" height="2em" className="hidden" />}
+                    suffix={<ChevronRightIcon className="hidden" height="2em" strokeWidth={2.5} width="2em" />}
                 >
                     {menuItem.label}
                 </MenuItem>
@@ -230,10 +231,10 @@ const Sidebar: React.FC<Props> = () => {
                         {section2.map((menuItem, index) => (
                             <MenuItem
                                 key={index}
+                                component={<Link href={menuItem.href} />}
+                                disabled={menuItem.disabled}
                                 icon={menuItem.icon}
                                 suffix={menuItem.suffix}
-                                disabled={menuItem.disabled}
-                                component={<Link href={menuItem.href} />}
                             >
                                 {menuItem.label}
                             </MenuItem>

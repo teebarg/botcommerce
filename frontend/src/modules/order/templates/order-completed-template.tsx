@@ -12,7 +12,6 @@ type OrderCompletedTemplateProps = {
 };
 
 export default function OrderCompletedTemplate({ order }: OrderCompletedTemplateProps) {
-
     if (!order) {
         return notFound();
     }

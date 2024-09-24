@@ -17,7 +17,6 @@ interface ComboBoxProps {
     name: string;
     items: ComboBoxItem[];
     [key: string]: any;
-    // children: React.ReactNode;
 }
 
 const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
@@ -77,10 +76,10 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
                     <input
                         {...inputProps}
                         ref={inputRef}
+                        className="combobox-input"
                         style={{
                             boxSizing: "border-box",
                         }}
-                        className="combobox-input"
                     />
                     <ChevronDownIcon
                         className={clsx("absolute right-3 w-4 h-4 transition-transform duration-150 ease motion-reduce:transition-none", {

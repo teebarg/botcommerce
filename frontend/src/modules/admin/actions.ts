@@ -26,6 +26,7 @@ export async function indexProducts() {
         return await res.json();
     } catch (error) {
         console.error("Error creating product index:", error);
+
         return null;
     }
 }
@@ -49,6 +50,7 @@ export async function exportProducts() {
         return { success: true, message: "Products exported successfully" };
     } catch (error) {
         console.error("Error exporting products:", error);
+
         return { success: false, message: "Error exporting products" };
     }
 }
@@ -77,6 +79,7 @@ export async function uploadProductImage({ productId, formData }: { productId: s
         return { success: true, message: "Image upload successful", data: await res.json() };
     } catch (error) {
         console.error("Error uploading product image:", error);
+
         return { success: false, message: "Error uploading product image" };
     }
 }
@@ -181,6 +184,7 @@ export async function createCollection(currentState: unknown, formData: FormData
         return { success: true, message: "Collection created successfully", data: await res.json() };
     } catch (error) {
         console.error("Error creating collection:", error);
+
         return { success: false, message: "Error creating collection" };
     }
 }
@@ -209,6 +213,7 @@ export async function updateCollection(collectionId: string, collectionData: any
         return { success: true, message: "Collection updated successfully", data: await res.json() };
     } catch (error) {
         console.error("Error updating collection:", error);
+
         return { success: false, message: "Error updating collection" };
     }
 }
@@ -235,6 +240,7 @@ export async function deleteCollection(collectionId: string) {
         return { success: true, message: "Collection deleted successfully" };
     } catch (error) {
         console.error("Error deleting collection:", error);
+
         return { success: false, message: "Error deleting collection" };
     }
 }
@@ -260,6 +266,7 @@ export async function getCollections(page: number = 1, limit: number = 10) {
         return await res.json();
     } catch (error) {
         console.error("Error fetching collections:", error);
+
         return null;
     }
 }
@@ -271,12 +278,15 @@ export async function bulkUploadProducts({ id, formData }: { id: string; formDat
             body: formData,
             credentials: "include",
         });
+
         if (!res.ok) {
             const errorText = await res.text();
+
             return null;
         }
         // Revalidate the UI data
         revalidateTag("products");
+
         return await res.json();
 
         // // Revalidate the UI data
@@ -285,6 +295,7 @@ export async function bulkUploadProducts({ id, formData }: { id: string; formDat
         // return "Bulk product update successful";
     } catch (e) {
         console.error("Error during bulk product update:", e);
+
         return "Error updating products";
     }
 }

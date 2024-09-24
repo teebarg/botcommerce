@@ -7,12 +7,12 @@ import { useFormState } from "react-dom";
 import compareAddresses from "@lib/util/compare-addresses";
 import { FormButton } from "@modules/common/components/form-button";
 import { useState } from "react";
+import { Cart } from "types/global";
 
 import BillingAddress from "../billing_address";
 import ShippingAddress from "../shipping-address";
 import { setAddresses } from "../../actions";
 import ErrorMessage from "../error-message";
-import { Cart } from "types/global";
 
 const Addresses = ({
     cart,
@@ -59,7 +59,7 @@ const Addresses = ({
                             customer={customer}
                             onChange={() => setSameAsSBilling(!sameAsSBilling)}
                         />
-                        <input checked={sameAsSBilling} className="hidden" name="same_as_billing" type="checkbox" readOnly />
+                        <input readOnly checked={sameAsSBilling} className="hidden" name="same_as_billing" type="checkbox" />
                         {!sameAsSBilling && (
                             <div>
                                 <h2 className="text-2xl gap-x-4 pb-6 pt-8">Billing address</h2>

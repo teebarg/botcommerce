@@ -29,7 +29,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, customer, "data-tes
 
     switch (paymentSession.id) {
         case "manual":
-            return <ManualTestPaymentButton data-testid={dataTestId} notReady={notReady} customer={customer} />;
+            return <ManualTestPaymentButton customer={customer} data-testid={dataTestId} notReady={notReady} />;
         case "stripe":
             return <Button disabled>Continue to payment</Button>;
         default:
@@ -60,16 +60,16 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
 
     useEffect(() => {
         if (submitting && customer) {
-            modalState.close()
-            onPaymentCompleted()
+            modalState.close();
+            onPaymentCompleted();
         }
-    }, [customer])
+    }, [customer]);
 
     const onPaymentCompleted = async () => {
         try {
-            await placeOrder()
+            await placeOrder();
         } catch (error: any) {
-            enqueueSnackbar(error.toString())
+            enqueueSnackbar(error.toString());
             setSubmitting(false);
         }
     };
@@ -77,11 +77,12 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
     const handlePayment = () => {
         setSubmitting(true);
         if (customer) {
-            onPaymentCompleted()
-            return
+            onPaymentCompleted();
+
+            return;
         }
         // Show login modal
-        modalState.open()
+        modalState.open();
     };
 
     return (
@@ -90,9 +91,9 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
                 Place order
             </Button>
             {modalState.isOpen && (
-                <Modal onClose={modalState.close} data-testid="login-modal">
+                <Modal data-testid="login-modal" onClose={modalState.close}>
                     <React.Fragment>
-                    <LoginForm />
+                        <LoginForm />
                     </React.Fragment>
                 </Modal>
             )}

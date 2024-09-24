@@ -1,15 +1,11 @@
 from typing import Any
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Query,
-    Header
-)
-from sqlmodel import func, select
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from firebase_cart import FirebaseConfig, Order, OrderHandler
+from sqlmodel import select
 
 from core import deps
+from core.config import settings
 from core.deps import (
     CurrentUser,
     SessionDep,
@@ -21,13 +17,11 @@ from core.utils import generate_invoice_email, send_email
 from models.generic import OrderDetails
 from models.message import Message
 from services.export import export
-from firebase_cart import FirebaseConfig, OrderHandler, Order
-from core.config import settings
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
     database_url=settings.DATABASE_URL,
-    bucket=settings.STORAGE_BUCKET
+    bucket=settings.STORAGE_BUCKET,
 )
 
 order_handler = OrderHandler(firebase_config)
@@ -37,9 +31,7 @@ router = APIRouter()
 
 
 @router.get("/", dependencies=[Depends(get_current_user)])
-def index(
-    user: CurrentUser
-) -> list[Order]:
+def index(user: CurrentUser) -> list[Order]:
     """
     Retrieve orders.
     """
@@ -47,10 +39,7 @@ def index(
     return orders
 
 
-@router.get(
-    "/admin/all",
-    dependencies=[Depends(get_current_active_superuser)]
-)
+@router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
 def admin_index(
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -63,11 +52,7 @@ def admin_index(
 
 
 @router.post("/", dependencies=[Depends(get_current_user)])
-def create(
-    *,
-    user: CurrentUser,
-    cartId: str = Header(default=None)
-) -> Order:
+def create(*, user: CurrentUser, cartId: str = Header(default=None)) -> Order:
     """
     Create new order.
     """
@@ -93,15 +78,14 @@ def read(order_id: str, user: CurrentUser) -> Any:
     if not user:
         return {"message": "User details not found"}
 
-    order_details = order_handler.get_order(order_id=order_id, user_id=user.id, is_admin=user.is_superuser)
-    
+    order_details = order_handler.get_order(
+        order_id=order_id, user_id=user.id, is_admin=user.is_superuser
+    )
+
     return order_details
 
 
-@router.patch(
-    "/{id}",
-    dependencies=[Depends(get_current_active_superuser)]
-)
+@router.patch("/{id}", dependencies=[Depends(get_current_active_superuser)])
 def update(
     *,
     id: str,
@@ -110,9 +94,10 @@ def update(
     """
     Update a order.
     """
-    res = order_handler.update_order(order_id=id, update_data= update_data, is_admin=True)
+    res = order_handler.update_order(
+        order_id=id, update_data=update_data, is_admin=True
+    )
     return res
-
 
 
 @router.post("/export")

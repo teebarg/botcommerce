@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { addShippingMethod, completeCart, deleteDiscount, setPaymentSession, updateCart } from "@lib/data";
+import { completeCart, deleteDiscount, updateCart } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { DeliveryOption, Order, PaymentSession } from "types/global";

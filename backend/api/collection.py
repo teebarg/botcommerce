@@ -105,11 +105,10 @@ def get_by_slug(slug: str, db: SessionDep) -> Collection:
     """
     Get a collection by its slug.
     """
-    collection = crud.collection.get_by_key(db=db, key="slug",value=slug)
+    collection = crud.collection.get_by_key(db=db, key="slug", value=slug)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
     return collection
-
 
 
 @router.patch(

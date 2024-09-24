@@ -5,9 +5,9 @@ import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
 import Thumbnail from "@modules/products/components/thumbnail";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Table } from "@modules/common/components/table";
+import { CartItem } from "types/global";
 
 import Control from "./control";
-import { CartItem } from "types/global";
 
 type ItemsTemplateProps = {
     items: CartItem[];
@@ -19,7 +19,7 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
             <div className="pb-3 flex items-center">
                 <h3 className="text-[2rem] leading-[2.75rem]">Cart</h3>
             </div>
-            <Table columns={["Item", "", "Quantity", "Price", "Total"]} isDataOnly>
+            <Table isDataOnly columns={["Item", "", "Quantity", "Price", "Total"]}>
                 {items
                     ?.sort((a: CartItem, b: CartItem) => (a.created_at > b.created_at ? -1 : 1))
                     .map((item: CartItem) => (

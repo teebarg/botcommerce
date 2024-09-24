@@ -31,6 +31,7 @@ export async function logCustomerIn(_currentState: unknown, formData: FormData) 
     try {
         await getToken({ email, password });
         revalidateTag("customer");
+
         return { error: false, message: "Authentication successful" };
     } catch (error: any) {
         return { error: true, message: error.toString() };
