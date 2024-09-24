@@ -36,7 +36,7 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", onConfirm, onClose }) =>
                         </p>
                     </div>
                     <div className="flex justify-end gap-2 mt-8">
-                        <Button color="default" variant="shadow" onClose={onClose} className="min-w-36">
+                        <Button color="default" variant="shadow" onPress={onClose} className="min-w-36">
                             Close
                         </Button>
                         <div>

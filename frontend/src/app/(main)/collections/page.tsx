@@ -12,8 +12,6 @@ type Props = {
     };
 };
 
-export const PRODUCT_LIMIT = 12;
-
 export async function generateStaticParams() {
     const { collections } = await getCollectionsList();
 
@@ -21,9 +19,9 @@ export async function generateStaticParams() {
         return [];
     }
 
-    const collectionHandles = collections.map((collection: any) => collection.slug);
+    const collectionSlugs = collections.map((collection: any) => collection.slug);
 
-    const staticParams = collectionHandles
+    const staticParams = collectionSlugs
         .map((slug: string) => ({
             slug,
         }))

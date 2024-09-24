@@ -53,7 +53,7 @@ async def process_products(file_content, content_type: str):
             for index, row in batch.iterrows():
                 name = row.get("name", "")
                 product_data = {
-                    "id": row["id"],
+                    "id": row.get("id", ""),
                     "name": name,
                     "slug": row.get("slug", name.lower().replace(" ", "-")),
                     "description": row.get("description", ""),
@@ -101,11 +101,13 @@ async def create_or_update_products_in_db(products: List):
                         setattr(product, key, value)
                     session.add(product)
                 else:
+                    del product_data["id"]
                     # Create new product
-                    new_product = Product(**product_data)
-                    session.add(new_product)
+                    product = Product(**product_data)
+                    session.add(product)
 
                 session.commit()
+                session.refresh(product)
 
                 if type(collections) is not str:
                     continue

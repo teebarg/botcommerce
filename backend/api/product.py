@@ -329,7 +329,7 @@ async def reindex_products(
         # Define the background task
         def reindex_task():
             products = crud.product.all(db=db)
-            logger.info(f"Will re-index {len(products)} products")
+            logger.info(f"Starting re-indexing..........")
 
             # Prepare the documents for Meilisearch
             documents = []

@@ -515,6 +515,7 @@ interface SearchResult {
 }
 
 export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
+    console.log(searchParams)
     const { query = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
 
     const filters: string[] = [];
