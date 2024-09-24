@@ -51,15 +51,18 @@ async def process_products(file_content, content_type: str):
             # Extract and process the products
             products_to_create_or_update = []
             for index, row in batch.iterrows():
+                name = row.get("name", "")
                 product_data = {
                     "id": row["id"],
-                    "name": row["name"],
-                    "slug": row["slug"],
-                    "description": row["description"],
-                    "price": row["price"],
-                    "old_price": row["old_price"],
-                    "inventory": row["inventory"],
-                    "image": row["image"],
+                    "name": name,
+                    "slug": row.get("slug", name.lower().replace(" ", "-")),
+                    "description": row.get("description", ""),
+                    "price": row.get("price", 0),
+                    "old_price": row.get("old_price", 0),
+                    "inventory": row.get("inventory", 1),
+                    "is_active": row.get("is_active", True),
+                    "ratings": row.get("ratings", 4.7),
+                    "image": row.get("image", ""),
                 }
                 collections = row.get("collections", "")  # Handling multiple collections
 
@@ -202,45 +205,3 @@ async def generate_excel_file(bucket: Any, email: str):
         logger.debug("Product export complete")
 
         return download_url
-
-
-async def export(data: list, name: str, bucket: Any, email: str, columns: list) -> str:
-    try:
-        # Convert data to CSV
-        df = pd.DataFrame(data, columns=columns)
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, index=False)
-        csv_content = csv_buffer.getvalue()
-
-        # Generate a unique filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{name}_export_{timestamp}.csv"
-
-        # Upload to Firebase
-        blob = bucket.blob(f"exports/{filename}")
-        blob.upload_from_string(csv_content, content_type='text/csv')
-        blob.make_public()
-        download_url = blob.public_url
-
-        # Send email with download link
-        email_data = generate_data_export_email(download_link=download_url)
-        send_email(
-            email_to=email,
-            subject=f"{name} Export Ready",
-            html_content=email_data.html_content,
-        )
-
-        return download_url
-    except Exception as e:
-        logger.error(f"Error in export function: {e}")
-        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
-
-
-def upload_to_firebase_from_memory(file_stream: BytesIO, destination: str) -> str:
-    bucket = storage.bucket()
-    blob = bucket.blob(destination)
-    blob.upload_from_file(file_stream, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    blob.make_public()  # Makes the file publicly accessible
-    return blob.public_url  # Return the download URL
-
-
