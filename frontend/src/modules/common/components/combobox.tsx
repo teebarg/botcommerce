@@ -53,6 +53,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
     );
 
     const { buttonProps } = useButton(triggerProps, triggerRef);
+    const { autoFocus, ...validListBoxProps } = listBoxProps;
 
     return (
         <div className="combobox">
@@ -89,7 +90,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
                 </button>
                 {state.isOpen && (
                     <div ref={popoverRef} className="combobox-popover z-50">
-                        <ul {...listBoxProps} ref={listBoxRef} className="combobox-listbox">
+                        <ul {...validListBoxProps} ref={listBoxRef} className="combobox-listbox">
                             {[...state.collection].map((item) => (
                                 <li
                                     key={item.key}

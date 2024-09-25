@@ -1,7 +1,7 @@
 import { Product } from "types/global";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
-import PreviewPrice from "./price";
+import ProductActions from "../product-actions";
 
 export default async function ProductPreview({ product }: { product: Product }) {
     return (
@@ -17,7 +17,7 @@ export default async function ProductPreview({ product }: { product: Product }) 
                     <div className="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">
                         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-default-500 opacity-50" />
                         <span className="relative text-lg font-semibold text-default-50">
-                            {product.price && <PreviewPrice price={product.price} />}
+                            <ProductActions product={product} />
                         </span>
                     </div>
                 </div>

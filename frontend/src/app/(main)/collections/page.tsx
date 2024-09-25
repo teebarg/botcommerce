@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { CollectionTemplate } from "@modules/collections/templates";
 import { SortOptions } from "types/global";
+import { getCollectionsList } from "@lib/data";
 
 type Props = {
     params: { slug: string };
@@ -11,23 +12,23 @@ type Props = {
     };
 };
 
-// export async function generateStaticParams() {
-//     const { collections } = await getCollectionsList();
+export async function generateStaticParams() {
+    const { collections } = await getCollectionsList();
 
-//     if (!collections) {
-//         return [];
-//     }
+    if (!collections) {
+        return [];
+    }
 
-//     const collectionSlugs = collections.map((collection: any) => collection.slug);
+    const collectionSlugs = collections.map((collection: any) => collection.slug);
 
-//     const staticParams = collectionSlugs
-//         .map((slug: string) => ({
-//             slug,
-//         }))
-//         .flat();
+    const staticParams = collectionSlugs
+        .map((slug: string) => ({
+            slug,
+        }))
+        .flat();
 
-//     return staticParams;
-// }
+    return staticParams;
+}
 
 export async function generateMetadata(): Promise<Metadata> {
     const metadata = {
