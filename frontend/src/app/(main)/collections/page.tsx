@@ -10,7 +10,7 @@ type Props = {
     };
 };
 
-export const revalidate = 3
+export const revalidate = 3;
 
 export async function generateMetadata(): Promise<Metadata> {
     const metadata = {

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 
-export const revalidate = 3
+export const revalidate = 3;
 
 export default async function Home() {
     const {

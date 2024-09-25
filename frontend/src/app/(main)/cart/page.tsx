@@ -6,7 +6,7 @@ import ItemsTemplate from "@modules/cart/templates/items";
 import Summary from "@modules/cart/templates/summary";
 import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
-export const revalidate = 3
+export const revalidate = 3;
 
 export const metadata: Metadata = {
     title: "Cart | TBO Store",
