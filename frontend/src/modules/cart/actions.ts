@@ -40,8 +40,6 @@ export async function retrieveCart() {
 
         return cart;
     } catch (e) {
-        console.log(e);
-
         return null;
     }
 }

@@ -1,35 +1,54 @@
 import { Metadata } from "next";
-import { cookies } from "next/headers";
-import CartTemplate from "@modules/cart/templates";
-import { getCart, getCustomer } from "@lib/data";
-import { Cart as CartType } from "types/global";
+import { getCustomer } from "@lib/data";
+import { retrieveCart } from "@modules/cart/actions";
+import SignInPrompt from "@modules/cart/components/sign-in-prompt";
+import ItemsTemplate from "@modules/cart/templates/items";
+import Summary from "@modules/cart/templates/summary";
+import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
+
+export const revalidate = 3
 
 export const metadata: Metadata = {
-    title: "Cart",
+    title: "Cart | TBO Store",
     description: "View your cart",
 };
 
-const fetchCart = async () => {
-    const cartId = cookies().get("_cart_id")?.value;
-
-    if (!cartId) {
-        return null;
-    }
-
-    const cart = await getCart(cartId).then((cart: CartType) => cart);
-
-    if (!cart) {
-        return null;
-    }
-
-    // cart.checkout_step = cart && getCheckoutStep(cart);
-
-    return cart;
-};
-
 export default async function Cart() {
-    const cart = (await fetchCart()) as CartType;
+    const cart = await retrieveCart();
     const customer = await getCustomer();
 
-    return <CartTemplate cart={cart} customer={customer} />;
+    return (
+        <div className="py-12">
+            <div className="max-w-7xl mx-auto" data-testid="cart-container">
+                {cart?.items.length ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8">
+                        <div className="flex flex-col bg-content1 p-6 gap-y-6 rounded-md">
+                            {!customer && (
+                                <>
+                                    <SignInPrompt />
+                                    <hr className="tb-divider" />
+                                </>
+                            )}
+                            <ItemsTemplate items={cart?.items} />
+                        </div>
+                        <div className="relative">
+                            <div className="flex flex-col gap-y-8 sticky top-12">
+                                {cart && (
+                                    <>
+                                        <div className="bg-content1 p-6 rounded-md">
+                                            <Summary cart={cart} />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div>
+                        <EmptyCartMessage />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }

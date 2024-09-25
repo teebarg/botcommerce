@@ -19,10 +19,12 @@ export type Product = {
     price: number;
     old_price: number;
     image: string;
-    images: string[];
+    images?: string[];
     is_active?: boolean;
     ratings?: number;
+    inventory?: number;
     created_at?: string;
+    collections: string[];
 };
 
 export type Collection = {

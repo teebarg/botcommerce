@@ -429,10 +429,6 @@ export const getProduct = cache(async function (slug: string): Promise<any> {
 
 export const getProductsList = cache(async function (queryParams: any): Promise<any> {
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`;
-    // const headers = getHeaders([]);
-
-    console.log(queryParams);
-
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -475,7 +471,6 @@ interface SearchResult {
 }
 
 export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
-    console.log(searchParams);
     const { query = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
 
     const filters: string[] = [];

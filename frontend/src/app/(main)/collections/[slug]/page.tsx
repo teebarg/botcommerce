@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCollectionBySlug, getCollectionsList } from "@lib/data";
 import { CollectionTemplate } from "@modules/collections/templates";
-import { SortOptions } from "types/global";
+import { Collection, SortOptions } from "types/global";
 
 type Props = {
     params: { slug: string };
@@ -13,24 +13,18 @@ type Props = {
     };
 };
 
+export const revalidate = 60
+
 export async function generateStaticParams() {
-    const { collections } = await getCollectionsList();
+    const { collections }: { collections: Collection[] } = await getCollectionsList();
 
     if (!collections) {
         return [];
     }
 
-    const collectionHandles = collections.map((collection: any) => collection.slug);
-
-    const staticParams = collectionHandles
-        .map((slug: any) => ({
-            slug,
-        }))
-        .flat();
-
-    console.log(staticParams);
-
-    return staticParams;
+    return collections.map((collection: Collection) => ({
+        slug: String(collection.slug),
+    }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

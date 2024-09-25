@@ -9,7 +9,7 @@ interface Hits {
 }
 
 /**
- * Uses MeiliSearch or Algolia to search for a query
+ * Uses MeiliSearch to search for a query
  * @param {string} query - search query
  */
 export async function search(query: string) {

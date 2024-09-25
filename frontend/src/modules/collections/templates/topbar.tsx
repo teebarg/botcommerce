@@ -1,6 +1,5 @@
 "use client";
 
-import { Select, SelectItem } from "@nextui-org/select";
 import React from "react";
 import { FunnelIcon } from "nui-react-icons";
 import useWatch from "@lib/hooks/use-watch";
@@ -8,6 +7,7 @@ import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import Button from "@modules/common/components/button";
 
 import { filters } from "./data";
+import { ComboBox } from "@modules/common/components/combobox";
 
 interface ComponentProps {
     count: any;
@@ -17,10 +17,10 @@ interface ComponentProps {
 
 const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy }) => {
     const { updateQuery } = useUpdateQuery(1000);
-    const [value, setValue] = React.useState<any>(new Set([sortBy || "created_at:desc"]));
+    const [value, setValue] = React.useState<string>(sortBy || "created_at:desc");
 
     useWatch(value, (newValue: any) => {
-        updateQuery([{ key: "sortBy", value: newValue.values().next().value }]);
+        updateQuery([{ key: "sortBy", value: newValue }]);
     });
 
     return (
@@ -41,20 +41,15 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy }) =>
                     </div>
                 </div>
                 <div className="flex items-center gap-1 flex-1 sm:flex-initial">
-                    <label className="hidden sm:block" htmlFor="filter">
-                        Sort by
-                    </label>
-                    <Select
-                        className="min-w-[15rem] max-w-xs flex-1"
-                        id="filter"
+                    <ComboBox
                         placeholder="Filter products"
-                        selectedKeys={value}
+                        className="min-w-[15rem] max-w-xs flex-1"
+                        name="filter"
+                        label="Filter"
+                        items={filters}
                         onSelectionChange={setValue}
-                    >
-                        {filters.map((filter) => (
-                            <SelectItem key={filter.key}>{filter.label}</SelectItem>
-                        ))}
-                    </Select>
+                        selectedKey={value}
+                    />
                 </div>
             </div>
         </header>

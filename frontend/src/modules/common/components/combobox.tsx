@@ -8,7 +8,7 @@ import clsx from "clsx";
 import { ChevronDownIcon } from "nui-react-icons";
 
 interface ComboBoxItem {
-    id: number;
+    id: number | string;
     name: string;
 }
 
@@ -67,13 +67,13 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
                     className={clsx(
                         "relative px-3 w-full inline-flex shadow-sm outline-none border-medium border-default-200",
                         "hover:border-default-400 transition-colors motion-reduce:transition-none",
-                        "rounded-medium flex-col items-start justify-center gap-0 h-14 min-h-14 py-2",
+                        "rounded-medium flex-col items-start justify-center gap-0 h-10 min-h-10 py-2",
                         {
                             "border-default-foreground": state.isOpen,
                         }
                     )}
                 >
-                    <input className="hidden" name={name} value={state.selectedKey} />
+                    <input className="hidden" name={name} value={state.selectedKey} readOnly />
                     <input
                         {...inputProps}
                         ref={inputRef}

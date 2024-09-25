@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { Pagination as PaginationType } from "types/global";
 import React from "react";
 import Button from "@modules/common/components/button";
-// import { Card, CardHeader, CardBody, CardFooter, Avatar } from "@nextui-org/react";
 import { Table } from "@modules/common/components/table";
 
 const users = [
@@ -64,7 +63,7 @@ export default async function AdminPage() {
     return (
         <React.Fragment>
             <div className="px-8 py-4">
-                <div className="flex flex-col relative overflow-hidden h-auto text-foreground box-border bg-content1 outline-none shadow-medium rounded-large transition-transform-background max-w-[340px] mb-8">
+                <div className="flex flex-col relative overflow-hidden h-auto text-foreground box-border bg-content1 outline-none shadow-medium rounded-large transition-transform-background max-w-[340px] mb-12 p-6">
                     <div className="flex p-3 z-10 w-full items-center shrink-0 overflow-inherit color-inherit rounded-t-large justify-between">
                         <div className="flex gap-5">
                             <span className="flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none w-10 h-10 text-tiny bg-default text-default-foreground rounded-full">
@@ -102,15 +101,7 @@ export default async function AdminPage() {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-row-reverse justify-between gap-3 items-end">
-                    <div className="flex gap-3">
-                        <Button color="primary">Add New</Button>
-                        <Button className="min-w-28" color="secondary">
-                            Export
-                        </Button>
-                    </div>
-                </div>
-                <Table columns={["", "Firstname", "Email", "Role", "Status", "Created At"]} pagination={pagination}>
+                <Table columns={["", "Firstname", "Email", "Role", "Status", "Created At"]} pagination={pagination} canExport>
                     {users
                         ?.sort((a: any, b: any) => (a.created_at > b.created_at ? -1 : 1))
                         .map((item: any, index: number) => (
