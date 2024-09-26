@@ -5,14 +5,8 @@ import { CartComponent } from "./cart-component";
 
 interface ComponentProps {}
 
-const fetchCart = async () => {
-    const cart = await retrieveCart();
-
-    return cart;
-};
-
 const Cart: React.FC<ComponentProps> = async () => {
-    const cart = await fetchCart();
+    const cart = await retrieveCart();
 
     return <CartComponent cart={cart} />;
 };

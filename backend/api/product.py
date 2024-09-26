@@ -378,7 +378,7 @@ async def configure_filterable_attributes(
     try:
         index = get_or_create_index("products")
         # Update the filterable attributes
-        index.update_filterable_attributes(["collections", "name","price", "slug"])
+        index.update_filterable_attributes(["collections", "name", "price", "slug"])
         # Update the sortable attributes
         index.update_sortable_attributes(["created_at", "price"])
 

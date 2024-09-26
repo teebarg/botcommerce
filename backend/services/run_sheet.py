@@ -163,18 +163,14 @@ async def update_collections(product, collections, session: Session):
 
 
 async def update_images(product, images, session: Session):
-    session.exec(
-        delete(ProductImages).where(ProductImages.product_id == product.id)
-    )
+    session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
     session.commit()
 
     if images and type(images) is not str:
         return
 
     for item in images.split("|"):
-        session.add(
-            ProductImages(product_id=product.id, image=item)
-        )
+        session.add(ProductImages(product_id=product.id, image=item))
 
     session.commit()
 
@@ -240,7 +236,9 @@ async def generate_excel_file(bucket: Any, email: str):
 
             # Fetch product images as a |-separated string
             images = session.exec(
-                select(ProductImages.image).where(ProductImages.product_id == product.id)
+                select(ProductImages.image).where(
+                    ProductImages.product_id == product.id
+                )
             ).all()
 
             # Create a comma-separated string of collection names

@@ -62,6 +62,7 @@ class ProductImages(SQLModel, table=True):
     product_id: int | None = Field(default=None, foreign_key="product.id")
     product: "Product" = Relationship(back_populates="images")
 
+
 class ProductBrand(SQLModel, table=True):
     product_id: int = Field(foreign_key="product.id", primary_key=True)
     brand_id: int = Field(foreign_key="brand.id", primary_key=True)
