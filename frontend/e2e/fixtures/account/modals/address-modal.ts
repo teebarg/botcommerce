@@ -1,4 +1,5 @@
 import { Page, Locator } from "@playwright/test";
+
 import { BaseModal } from "../../base/base-modal";
 
 export class AddressModal extends BaseModal {

@@ -12,6 +12,7 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Navigate to a product page", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.highlight()
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
@@ -68,6 +69,7 @@ test.describe("Checkout flow tests", async () => {
 
     await test.step("Verify the products ordered are correct", async () => {
       const product = await orderPage.getProduct("Sweatshirt", "M")
+
       await expect(product.name).toContainText("Sweatshirt")
       await expect(product.variant).toContainText("M")
       await expect(product.quantity).toContainText("1")
@@ -75,6 +77,7 @@ test.describe("Checkout flow tests", async () => {
 
     await test.step("Verify the shipping info is correct", async () => {
       const address = orderPage.shippingAddressSummary
+
       await expect(address).toContainText("First")
       await expect(address).toContainText("Last")
       await expect(address).toContainText("123 Fake street")
@@ -83,10 +86,12 @@ test.describe("Checkout flow tests", async () => {
       await expect(address).toContainText("US")
 
       const contact = orderPage.shippingContactSummary
+
       await expect(contact).toContainText("test@example.com")
       await expect(contact).toContainText("3031112222")
 
       const method = orderPage.shippingMethodSummary
+
       await expect(method).toContainText("FakeEx Standard")
     })
   })
@@ -100,6 +105,7 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Navigate to a product page", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.highlight()
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
@@ -186,6 +192,7 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Make sure the edits are reflected in the container", async () => {
       await test.step("Check shipping address summary", async () => {
         const shippingColumn = checkoutPage.shippingAddressSummary
+
         await expect(shippingColumn).toContainText("First1")
         await expect(shippingColumn).toContainText("Last1")
         await expect(shippingColumn).toContainText("123 Fake Road")
@@ -196,12 +203,14 @@ test.describe("Checkout flow tests", async () => {
 
       await test.step("Check shipping contact summary", async () => {
         const contactColumn = checkoutPage.shippingContactSummary
+
         await expect(contactColumn).toContainText("tester@example.com")
         await expect(contactColumn).toContainText("3231112222")
       })
 
       await test.step("Check billing summary", async () => {
         const billingColumn = checkoutPage.billingAddressSummary
+
         await expect(billingColumn).toContainText("Farst")
         await expect(billingColumn).toContainText("List")
         await expect(billingColumn).toContainText("321 Fake street")
@@ -220,6 +229,7 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Navigate to a product page", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.highlight()
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
@@ -319,6 +329,7 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Navigate to a product page", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.highlight()
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
@@ -367,6 +378,7 @@ test.describe("Checkout flow tests", async () => {
 
     await test.step("Ensure the shipping column reflects the entered data", async () => {
       const shippingColumn = checkoutPage.shippingAddressSummary
+
       await expect(shippingColumn).toContainText("First")
       await expect(shippingColumn).toContainText("Last")
       await expect(shippingColumn).toContainText("123 Fake street")
@@ -377,12 +389,14 @@ test.describe("Checkout flow tests", async () => {
 
     await test.step("Ensure the contact column reflects the entered data", async () => {
       const contactColumn = checkoutPage.shippingContactSummary
+
       await expect(contactColumn).toContainText("test@example.com")
       await expect(contactColumn).toContainText("3031112222")
     })
 
     await test.step("Ensure the billing column reflects the entered data", async () => {
       const billingColumn = checkoutPage.billingAddressSummary
+
       await expect(billingColumn).toContainText("First")
       await expect(billingColumn).toContainText("Last")
       await expect(billingColumn).toContainText("123 Fake street")
@@ -395,6 +409,7 @@ test.describe("Checkout flow tests", async () => {
       await checkoutPage.billingAddressCheckbox.check()
       await checkoutPage.submitAddressButton.click()
       const billingColumn = checkoutPage.billingAddressSummary
+
       await expect(billingColumn).toContainText("are the same.")
     })
   })
@@ -408,6 +423,7 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Navigate to a product page", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.highlight()
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
@@ -516,12 +532,14 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Navigate to the product page - go to the store page and click on the Sweatshirt product", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
     })
 
     let sweatshirtSmallPrice = 0
     let sweatshirtMediumPrice = 0
+
     await test.step("Add the sweatshirts to the cart", async () => {
       await productPage.selectOption("S")
       sweatshirtSmallPrice = getFloatValue(
@@ -540,11 +558,13 @@ test.describe("Checkout flow tests", async () => {
     await test.step("Navigate to another product - Sweatpants", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatpants")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
     })
 
     let sweatpantsSmallPrice = 0
+
     await test.step("Add the small sweatpants to the cart", async () => {
       await productPage.selectOption("S")
       sweatpantsSmallPrice = getFloatValue(
@@ -565,6 +585,7 @@ test.describe("Checkout flow tests", async () => {
       )
       const calculatedTotal =
         2 * sweatpantsSmallPrice + sweatshirtSmallPrice + sweatshirtMediumPrice
+
       expect(compareFloats(total, calculatedTotal)).toBe(0)
       await cartPage.checkoutButton.click()
       await checkoutPage.container.waitFor({ state: "visible" })
@@ -576,6 +597,7 @@ test.describe("Checkout flow tests", async () => {
       )
       const calculatedTotal =
         2 * sweatpantsSmallPrice + sweatshirtSmallPrice + sweatpantsSmallPrice
+
       expect(compareFloats(total, calculatedTotal)).toBe(0)
     })
   })

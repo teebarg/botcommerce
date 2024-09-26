@@ -1,4 +1,5 @@
 import { Page, Locator } from "@playwright/test";
+
 import { BaseModal } from "./base-modal";
 import { NavMenu } from "./nav-menu";
 
@@ -20,6 +21,7 @@ export class SearchModal extends BaseModal {
 
     async open() {
         const menu = new NavMenu(this.page);
+
         await menu.open();
         await menu.searchLink.click();
         await this.container.waitFor({ state: "visible" });
@@ -28,6 +30,7 @@ export class SearchModal extends BaseModal {
     async close() {
         const viewport = this.page.viewportSize();
         const y = viewport ? viewport.height / 2 : 100;
+
         await this.page.mouse.click(1, y, { clickCount: 2, delay: 100 });
         await this.container.waitFor({ state: "hidden" });
     }

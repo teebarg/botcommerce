@@ -101,7 +101,7 @@ export default async function AdminPage() {
                         </div>
                     </div>
                 </div>
-                <Table columns={["", "Firstname", "Email", "Role", "Status", "Created At"]} pagination={pagination} canExport>
+                <Table canExport columns={["", "Firstname", "Email", "Role", "Status", "Created At"]} pagination={pagination}>
                     {users
                         ?.sort((a: any, b: any) => (a.created_at > b.created_at ? -1 : 1))
                         .map((item: any, index: number) => (

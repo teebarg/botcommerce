@@ -18,6 +18,7 @@ test.describe("Addresses tests", () => {
 
         await test.step("Inputs and saves the new address", async () => {
             const modal = addressesPage.addAddressModal;
+
             await modal.firstNameInput.fill("First");
             await modal.lastNameInput.fill("Last");
             await modal.companyInput.fill("FirstCorp");
@@ -37,6 +38,7 @@ test.describe("Addresses tests", () => {
         await test.step("Navigate to a product page and add a product to the cart", async () => {
             await storePage.goto();
             const product = await storePage.getProduct("Sweatshirt");
+
             await product.locator.highlight();
             await product.locator.click();
             await productPage.container.waitFor({ state: "visible" });
@@ -71,6 +73,7 @@ test.describe("Addresses tests", () => {
 
         await test.step("Input and save a new address", async () => {
             const { addAddressModal } = addressesPage;
+
             await addAddressModal.firstNameInput.fill("First");
             await addAddressModal.lastNameInput.fill("Last");
             await addAddressModal.companyInput.fill("MyCorp");
@@ -86,6 +89,7 @@ test.describe("Addresses tests", () => {
         });
 
         let addressContainer: ReturnType<AddressesPage["getAddressContainer"]>;
+
         await test.step("Make sure the address container was appended to the page", async () => {
             addressContainer = addressesPage.getAddressContainer("First Last");
             await expect(addressContainer.name).toHaveText("First Last");
@@ -209,6 +213,7 @@ test.describe("Addresses tests", () => {
         });
 
         let addressContainer: ReturnType<AddressesPage["getAddressContainer"]>;
+
         for (let i = 0; i < 10; i++) {
             await test.step("Open up the new address modal", async () => {
                 await addressesPage.newAddressButton.click();
@@ -216,6 +221,7 @@ test.describe("Addresses tests", () => {
             });
             await test.step("Input and save a new address", async () => {
                 const { addAddressModal } = addressesPage;
+
                 await addAddressModal.firstNameInput.fill(`First-${i}`);
                 await addAddressModal.lastNameInput.fill(`Last-${i}`);
                 await addAddressModal.companyInput.fill(`MyCorp-${i}`);

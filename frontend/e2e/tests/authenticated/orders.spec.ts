@@ -6,6 +6,7 @@ test.describe("Account orders page tests", async () => {
         await accountAddressesPage.newAddressButton.click();
         await test.step("Add default address", async () => {
             const modal = accountAddressesPage.addAddressModal;
+
             await modal.container.waitFor({ state: "visible" });
             await modal.firstNameInput.fill("First");
             await modal.lastNameInput.fill("Last");
@@ -41,6 +42,7 @@ test.describe("Account orders page tests", async () => {
         await test.step("Navigate to a product page", async () => {
             await storePage.goto();
             const product = await storePage.getProduct("Sweatshirt");
+
             await product.locator.highlight();
             await product.locator.click();
             await productPage.container.waitFor({ state: "visible" });
@@ -73,11 +75,13 @@ test.describe("Account orders page tests", async () => {
         });
 
         let orderId = "";
+
         await test.step("Verify the order page information is correct", async () => {
             orderId = (await publicOrderPage.orderId.textContent()) || "";
 
             await test.step("Verify the products ordered are correct", async () => {
                 const product = await publicOrderPage.getProduct("Sweatshirt", "M");
+
                 await expect(product.name).toContainText("Sweatshirt");
                 await expect(product.variant).toContainText("M");
                 await expect(product.quantity).toContainText("1");
@@ -85,6 +89,7 @@ test.describe("Account orders page tests", async () => {
 
             await test.step("Verify the shipping info is correct", async () => {
                 const address = publicOrderPage.shippingAddressSummary;
+
                 await expect(address).toContainText("First");
                 await expect(address).toContainText("Last");
                 await expect(address).toContainText("123 Fake Street");
@@ -93,10 +98,12 @@ test.describe("Account orders page tests", async () => {
                 await expect(address).toContainText("US");
 
                 const contact = publicOrderPage.shippingContactSummary;
+
                 await expect(contact).toContainText("test@example.com");
                 await expect(contact).toContainText("3031112222");
 
                 const method = publicOrderPage.shippingMethodSummary;
+
                 await expect(method).toContainText("FakeEx Standard");
             });
         });
@@ -104,6 +111,7 @@ test.describe("Account orders page tests", async () => {
         await test.step("Verify the account orders page displays a result", async () => {
             await accountOrdersPage.goto();
             const order = await accountOrdersPage.getOrderById(orderId);
+
             expect(order.items.length).toBe(1);
             expect(order.items[0].title).toContainText("Sweatshirt");
             expect(order.items[0].quantity).toHaveText("1");
@@ -118,6 +126,7 @@ test.describe("Account orders page tests", async () => {
 
             await test.step("Verify the products ordered are correct", async () => {
                 const product = await accountOrderPage.getProduct("Sweatshirt", "M");
+
                 await expect(product.name).toContainText("Sweatshirt");
                 await expect(product.variant).toContainText("M");
                 await expect(product.quantity).toContainText("1");
@@ -125,6 +134,7 @@ test.describe("Account orders page tests", async () => {
 
             await test.step("Verify the shipping info is correct", async () => {
                 const address = accountOrderPage.shippingAddressSummary;
+
                 await expect(address).toContainText("First");
                 await expect(address).toContainText("Last");
                 await expect(address).toContainText("123 Fake Street");
@@ -133,11 +143,13 @@ test.describe("Account orders page tests", async () => {
                 await expect(address).toContainText("US");
 
                 const contact = accountOrderPage.shippingContactSummary;
+
                 await contact.highlight();
                 await expect(contact.getByText("test@example.com")).toBeVisible();
                 await expect(contact.getByText("3031112222")).toBeVisible();
 
                 const method = accountOrderPage.shippingMethodSummary;
+
                 await method.highlight();
                 await expect(method).toContainText("FakeEx Standard");
             });
@@ -162,6 +174,7 @@ test.describe("Account orders page tests", async () => {
             await test.step("Navigate to the sweatshirt product page", async () => {
                 await storePage.goto();
                 const product = await storePage.getProduct("Sweatshirt");
+
                 await product.locator.highlight();
                 await product.locator.click();
                 await productPage.container.waitFor({ state: "visible" });
@@ -181,6 +194,7 @@ test.describe("Account orders page tests", async () => {
             await test.step("Navigate to the sweatshirt product page", async () => {
                 await storePage.goto();
                 const product = await storePage.getProduct("Sweatpants");
+
                 await product.locator.highlight();
                 await product.locator.click();
                 await productPage.container.waitFor({ state: "visible" });
@@ -204,6 +218,7 @@ test.describe("Account orders page tests", async () => {
         });
 
         let orderId = "";
+
         await test.step("Checkout process", async () => {
             await test.step("Enter in the first step of the checkout process", async () => {
                 await checkoutPage.selectSavedAddress("123 Fake Street");
@@ -229,6 +244,7 @@ test.describe("Account orders page tests", async () => {
             await test.step("Navigate to the account orders page, verify information, and navigate to the order page", async () => {
                 await accountOrdersPage.goto();
                 const order = await accountOrdersPage.getOrderById(orderId);
+
                 expect(order.itemsLocator).toHaveCount(3);
                 expect(order.itemsLocator.filter({ hasText: "Sweatpants" })).toHaveCount(2);
                 expect(order.itemsLocator.filter({ hasText: "Sweatshirt" })).toHaveCount(1);
@@ -238,16 +254,19 @@ test.describe("Account orders page tests", async () => {
 
             await test.step("Verify information on the order page", async () => {
                 const sweatshirt = await accountOrderPage.getProduct("Sweatshirt", "M");
+
                 await expect(sweatshirt.name).toContainText("Sweatshirt");
                 await expect(sweatshirt.variant).toContainText("M");
                 await expect(sweatshirt.quantity).toContainText("2");
 
                 const smallSweatpants = await accountOrderPage.getProduct("Sweatpants", "S");
+
                 await expect(smallSweatpants.name).toContainText("Sweatpants");
                 await expect(smallSweatpants.variant).toContainText("S");
                 await expect(smallSweatpants.quantity).toContainText("1");
 
                 const mediumSweatpants = await accountOrderPage.getProduct("Sweatpants", "M");
+
                 await expect(mediumSweatpants.name).toContainText("Sweatpants");
                 await expect(mediumSweatpants.variant).toContainText("M");
                 await expect(mediumSweatpants.quantity).toContainText("1");
@@ -265,10 +284,12 @@ test.describe("Account orders page tests", async () => {
     }) => {
         let firstOrderId = "";
         let secondOrderId = "";
+
         await test.step("Make the first order", async () => {
             await test.step("Navigate to a product page", async () => {
                 await storePage.goto();
                 const product = await storePage.getProduct("Sweatshirt");
+
                 await product.locator.highlight();
                 await product.locator.click();
                 await productPage.container.waitFor({ state: "visible" });
@@ -308,6 +329,7 @@ test.describe("Account orders page tests", async () => {
             await test.step("Navigate to a product page", async () => {
                 await storePage.goto();
                 const product = await storePage.getProduct("Sweatpants");
+
                 await product.locator.highlight();
                 await product.locator.click();
                 await productPage.container.waitFor({ state: "visible" });
@@ -347,12 +369,14 @@ test.describe("Account orders page tests", async () => {
             await accountOrdersPage.goto();
             await test.step("Verify the first order info", async () => {
                 const order = await accountOrdersPage.getOrderById(firstOrderId);
+
                 await expect(order.itemsLocator).toHaveCount(1);
                 await expect(order.items[0].title).toContainText("Sweatshirt");
                 await expect(order.items[0].quantity).toHaveText("1");
             });
             await test.step("Verify the second order info", async () => {
                 const order = await accountOrdersPage.getOrderById(secondOrderId);
+
                 await expect(order.itemsLocator).toHaveCount(1);
                 await expect(order.items[0].title).toContainText("Sweatpants");
                 await expect(order.items[0].quantity).toHaveText("1");

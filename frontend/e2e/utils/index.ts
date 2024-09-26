@@ -4,6 +4,7 @@ export function getFloatValue(s: string) {
 
 export function compareFloats(f1: number, f2: number) {
     const diff = f1 - f2;
+
     if (Math.abs(diff) < 0.01) {
         return 0;
     } else if (diff < 0) {

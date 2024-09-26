@@ -18,6 +18,7 @@ test.describe("Cart tests", async () => {
     await test.step("Navigate to the product page", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
     })
@@ -27,6 +28,7 @@ test.describe("Cart tests", async () => {
       await productPage.addProductButton.click()
       await expect(cartDropdown.navCartLink).toContainText("(1)")
       const cartItem = await cartDropdown.getCartItem("Sweatshirt", "S")
+
       await expect(cartItem.locator).toBeVisible()
       await expect(cartItem.variant).toContainText("S")
       await expect(cartItem.quantity).toContainText("1")
@@ -34,6 +36,7 @@ test.describe("Cart tests", async () => {
       await cartDropdown.close()
       await cartPage.container.waitFor({ state: "visible" })
       const productInCart = await cartPage.getProduct("Sweatshirt", "S")
+
       await expect(productInCart.productRow).toBeVisible()
       await expect(productInCart.quantitySelect).toHaveValue("1")
       await page.goBack()
@@ -45,6 +48,7 @@ test.describe("Cart tests", async () => {
       await productPage.addProductButton.click()
       await expect(cartDropdown.navCartLink).toContainText("(2)")
       const cartItem = await cartDropdown.getCartItem("Sweatshirt", "S")
+
       await expect(cartItem.locator).toBeVisible()
       await expect(cartItem.variant).toContainText("S")
       await expect(cartItem.quantity).toContainText("2")
@@ -52,6 +56,7 @@ test.describe("Cart tests", async () => {
       await cartDropdown.close()
       await cartPage.container.waitFor({ state: "visible" })
       const productInCart = await cartPage.getProduct("Sweatshirt", "S")
+
       await expect(productInCart.productRow).toBeVisible()
       await expect(productInCart.quantitySelect).toHaveValue("2")
       await page.goBack()
@@ -63,6 +68,7 @@ test.describe("Cart tests", async () => {
       await productPage.addProductButton.click()
       await expect(cartDropdown.navCartLink).toContainText("(3)")
       const mediumCartItem = await cartDropdown.getCartItem("Sweatshirt", "M")
+
       await expect(mediumCartItem.locator).toBeVisible()
       await expect(mediumCartItem.variant).toContainText("M")
       await expect(mediumCartItem.quantity).toContainText("1")
@@ -70,9 +76,11 @@ test.describe("Cart tests", async () => {
       await cartDropdown.close()
       await cartPage.container.waitFor({ state: "visible" })
       const mediumProductInCart = await cartPage.getProduct("Sweatshirt", "M")
+
       await expect(mediumProductInCart.productRow).toBeVisible()
       await expect(mediumProductInCart.quantitySelect).toHaveValue("1")
       const smallProductInCart = await cartPage.getProduct("Sweatshirt", "S")
+
       await expect(smallProductInCart.productRow).toBeVisible()
       await expect(smallProductInCart.quantitySelect).toHaveValue("2")
     })
@@ -88,6 +96,7 @@ test.describe("Cart tests", async () => {
     await test.step("Navigate to the product page - go to the store page and click on the Sweatshirt product", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
     })
@@ -97,6 +106,7 @@ test.describe("Cart tests", async () => {
       await productPage.addProductButton.click()
       await expect(cartDropdown.navCartLink).toContainText("(1)")
       const sweatshirtItem = await cartDropdown.getCartItem("Sweatshirt", "S")
+
       await expect(sweatshirtItem.locator).toBeVisible()
       await expect(sweatshirtItem.variant).toHaveText("Variant: S")
       await expect(sweatshirtItem.quantity).toContainText("1")
@@ -106,6 +116,7 @@ test.describe("Cart tests", async () => {
     await test.step("Navigate to another product - Sweatpants", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatpants")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
     })
@@ -115,10 +126,12 @@ test.describe("Cart tests", async () => {
       await productPage.addProductButton.click()
       await expect(cartDropdown.navCartLink).toContainText("(2)")
       const sweatpantsItem = await cartDropdown.getCartItem("Sweatpants", "S")
+
       await expect(sweatpantsItem.locator).toBeVisible()
       await expect(sweatpantsItem.variant).toHaveText("Variant: S")
       await expect(sweatpantsItem.quantity).toContainText("1")
       const sweatshirtItem = await cartDropdown.getCartItem("Sweatshirt", "S")
+
       await expect(sweatshirtItem.locator).toBeVisible()
       await expect(sweatshirtItem.quantity).toContainText("1")
       await cartDropdown.goToCartButton.click()
@@ -128,9 +141,11 @@ test.describe("Cart tests", async () => {
 
     await test.step("Verify the quantities in the cart", async () => {
       const sweatpantsProduct = await cartPage.getProduct("Sweatpants", "S")
+
       await expect(sweatpantsProduct.productRow).toBeVisible()
       await expect(sweatpantsProduct.quantitySelect).toHaveValue("1")
       const sweatshirtProduct = await cartPage.getProduct("Sweatshirt", "S")
+
       await expect(sweatshirtProduct.productRow).toBeVisible()
       await expect(sweatshirtProduct.quantitySelect).toHaveValue("1")
     })
@@ -144,12 +159,14 @@ test.describe("Cart tests", async () => {
     await test.step("Navigate to the product page - go to the store page and click on the Hoodie product", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Hoodie")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
     })
 
     let hoodieSmallPrice = 0
     let hoodieMediumPrice = 0
+
     await test.step("Add the hoodie to the cart", async () => {
       await productPage.selectOption("S")
       hoodieSmallPrice = getFloatValue(
@@ -169,11 +186,13 @@ test.describe("Cart tests", async () => {
     await test.step("Navigate to another product - Longsleeve", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Longsleeve")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
     })
 
     let longsleeveSmallPrice = 0
+
     await test.step("Add the small longsleeve to the cart", async () => {
       await productPage.selectOption("S")
       longsleeveSmallPrice = getFloatValue(
@@ -196,6 +215,7 @@ test.describe("Cart tests", async () => {
       )
       const calculatedTotal =
         3 * longsleeveSmallPrice + hoodieSmallPrice + hoodieMediumPrice
+
       expect(compareFloats(total, calculatedTotal)).toBe(0)
     })
   })

@@ -407,15 +407,14 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
 
 export const getProductBySlug = async function (slug: string): Promise<any> {
     try {
-        const {hits} = await searchDocuments<Product>("products", "", {
+        const { hits } = await searchDocuments<Product>("products", "", {
             filter: `slug = "${slug}"`,
-            limit: 1
-        })
+            limit: 1,
+        });
 
-        if (hits.length == 0)
-            return null
+        if (hits.length == 0) return null;
 
-        return hits[0]
+        return hits[0];
     } catch (error) {
         return null;
     }
@@ -445,6 +444,7 @@ export const getProduct = cache(async function (slug: string): Promise<any> {
 
 export const getProductsList = cache(async function (queryParams: any): Promise<any> {
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`;
+
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -598,34 +598,5 @@ export const getCategoriesList = cache(async function (
     return {
         product_categories: [],
         count: 0,
-    };
-});
-
-export const getCategoryByHandle = cache(async function (categoryHandle: string[]): Promise<any> {
-    const handles = categoryHandle.map((slug: string, index: number) => categoryHandle.slice(0, index + 1).join("/"));
-
-    const product_categories = [] as ProductCategoryWithChildren[];
-
-    for (const slug of handles) {
-        // const category = await client.productCategories
-        //     .list(
-        //         {
-        //             slug: slug,
-        //         },
-        //         {
-        //             next: {
-        //                 tags: ["categories"],
-        //             },
-        //         }
-        //     )
-        //     .then(({ product_categories: { [0]: category } }) => category)
-        //     .catch(() => {
-        //         return {} as any;
-        //     });
-        // product_categories.push(category);
-    }
-
-    return {
-        product_categories,
     };
 });

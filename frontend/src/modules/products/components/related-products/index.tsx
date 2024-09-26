@@ -16,8 +16,8 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
             params.collections = [...product.collections];
         }
 
-        params.limit = 4
-        params.sort = "created_at:desc"
+        params.limit = 4;
+        params.sort = "created_at:desc";
 
         return params;
     };

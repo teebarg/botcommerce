@@ -4,7 +4,9 @@ async function getDatabaseClient() {
     testEnvChecks();
     const env = getEnv();
     const client = new Client(env.superuser);
+
     await client.connect();
+
     return client;
 }
 
@@ -28,13 +30,16 @@ function getEnv() {
 
 async function testEnvChecks() {
     const env = getEnv();
+
     if (!env.testDatabase.startsWith("test_")) {
         const msg = "Please make sure your test environment database name starts with test_";
+
         console.error(msg);
         throw new Error(msg);
     }
     if (env.testDatabase === env.productionDatabase) {
         const msg = "Please make sure your test environment database and production environment database names are not equal";
+
         console.error(msg);
         throw new Error(msg);
     }
@@ -42,6 +47,7 @@ async function testEnvChecks() {
 
 async function createTemplateDatabase(client: Client) {
     const { user, testDatabase, testDatabaseTemplate } = getEnv();
+
     try {
         // close current connections
         await client.query(`
@@ -67,6 +73,7 @@ async function createTemplateDatabase(client: Client) {
 async function createTestDatabase(client: Client) {
     const { user, testDatabase, testDatabaseTemplate } = getEnv();
     const deleteDatabase = `${testDatabase}_del`;
+
     // drop connections and alter database name
     await client.query(`
     SELECT pg_terminate_backend(pid)
@@ -85,6 +92,7 @@ async function createTestDatabase(client: Client) {
 
 export async function resetDatabase() {
     const client = await getDatabaseClient();
+
     await createTemplateDatabase(client);
     await createTestDatabase(client);
     await client.end();
@@ -93,6 +101,7 @@ export async function resetDatabase() {
 export async function dropTemplate() {
     const client = await getDatabaseClient();
     const env = getEnv();
+
     await client.query(`ALTER DATABASE ${env.testDatabaseTemplate} is_template false`);
     await client.query(`DROP DATABASE ${env.testDatabaseTemplate}`);
     await client.end();

@@ -1,4 +1,5 @@
 import { ElementHandle, Locator, Page } from "@playwright/test";
+
 import { BasePage } from "./base/base-page";
 
 export class CheckoutPage extends BasePage {
@@ -166,13 +167,16 @@ export class CheckoutPage extends BasePage {
         const addressOption = this.shippingAddressOption.filter({
             hasText: address,
         });
+
         await addressOption.getByTestId("shipping-address-radio").click();
 
         const selectHandle = await this.shippingAddressSelect.elementHandle();
+
         await this.page.waitForFunction(
             (opts) => {
                 const select = opts[0];
                 const choice = opts[1];
+
                 return (select.textContent || "").includes(choice);
             },
             [selectHandle, address] as [ElementHandle, string]
@@ -188,6 +192,7 @@ export class CheckoutPage extends BasePage {
             hasText: code,
         });
         const amount = giftCardRow.getByTestId("gift-card-amount");
+
         return {
             locator: giftCardRow,
             code: giftCardRow.getByTestId("gift-card-code"),
@@ -200,6 +205,7 @@ export class CheckoutPage extends BasePage {
     async getDiscount(code: string) {
         const discount = this.discountRow;
         const amount = discount.getByTestId("discount-amount");
+
         return {
             locator: discount,
             code: discount.getByTestId("discount-code"),

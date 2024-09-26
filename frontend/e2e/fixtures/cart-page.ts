@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { BasePage } from "./base/base-page";
 
 export class CartPage extends BasePage {
@@ -63,6 +64,7 @@ export class CartPage extends BasePage {
             .filter({
                 hasText: `Variant: ${variant}`,
             });
+
         return {
             productRow,
             title: productRow.getByTestId("product-title"),
@@ -79,6 +81,7 @@ export class CartPage extends BasePage {
             hasText: code,
         });
         const amount = giftCardRow.getByTestId("gift-card-amount");
+
         return {
             locator: giftCardRow,
             code: giftCardRow.getByTestId("gift-card-code"),
@@ -91,6 +94,7 @@ export class CartPage extends BasePage {
     async getDiscount(code: string) {
         const discount = this.discountRow;
         const amount = discount.getByTestId("discount-amount");
+
         return {
             locator: discount,
             code: discount.getByTestId("discount-code"),

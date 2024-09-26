@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { BasePage } from "./base/base-page";
 import { MobileActionsModal } from "./modals/mobile-actions-modal";
 
@@ -40,6 +41,7 @@ export class ProductPage extends BasePage {
     async selectOption(option: string) {
         await this.page.mouse.move(0, 0); // hides the checkout container
         const optionButton = this.productOptions.getByTestId("option-button").filter({ hasText: option });
+
         await optionButton.click({ clickCount: 2 });
     }
 }

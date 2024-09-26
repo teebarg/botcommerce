@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { BasePage } from "./base/base-page";
 
 export class CategoryPage extends BasePage {
@@ -24,6 +25,7 @@ export class CategoryPage extends BasePage {
 
     async getProduct(name: string) {
         const product = this.productWrapper.filter({ hasText: name });
+
         return {
             locator: product,
             title: product.getByTestId("product-title"),
@@ -36,6 +38,7 @@ export class CategoryPage extends BasePage {
         const link = this.sortByContainer.getByTestId("sort-by-link").filter({
             hasText: sortString,
         });
+
         await link.click();
         // wait for page change
         await this.page.waitForFunction(
@@ -43,6 +46,7 @@ export class CategoryPage extends BasePage {
                 if (!linkElement) {
                     return true;
                 }
+
                 return linkElement.dataset.active === "true";
             },
             await link.elementHandle()

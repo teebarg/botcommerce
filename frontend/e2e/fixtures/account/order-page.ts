@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { AccountPage } from "./account-page";
 
 export class OrderPage extends AccountPage {
@@ -58,6 +59,7 @@ export class OrderPage extends AccountPage {
             .filter({
                 hasText: `Variant: ${variant}`,
             });
+
         return {
             productRow,
             name: productRow.getByTestId("product-name"),

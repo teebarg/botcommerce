@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { AccountPage } from "./account-page";
 
 export class OverviewPage extends AccountPage {
@@ -25,6 +26,7 @@ export class OverviewPage extends AccountPage {
 
     async getOrder(orderId: string) {
         const order = this.ordersWrapper.locator(`[data-testid="order-wrapper"][data-value="${orderId}"]`);
+
         return {
             locator: order,
             id: await order.getAttribute("value"),

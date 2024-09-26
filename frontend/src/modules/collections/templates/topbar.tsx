@@ -5,9 +5,9 @@ import { FunnelIcon } from "nui-react-icons";
 import useWatch from "@lib/hooks/use-watch";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import Button from "@modules/common/components/button";
+import { ComboBox } from "@modules/common/components/combobox";
 
 import { filters } from "./data";
-import { ComboBox } from "@modules/common/components/combobox";
 
 interface ComponentProps {
     count: any;
@@ -42,13 +42,13 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy }) =>
                 </div>
                 <div className="flex items-center gap-1 flex-1 sm:flex-initial">
                     <ComboBox
-                        placeholder="Filter products"
                         className="min-w-[15rem] max-w-xs flex-1"
-                        name="filter"
-                        label="Filter"
                         items={filters}
-                        onSelectionChange={setValue}
+                        label="Filter"
+                        name="filter"
+                        placeholder="Filter products"
                         selectedKey={value}
+                        onSelectionChange={setValue}
                     />
                 </div>
             </div>

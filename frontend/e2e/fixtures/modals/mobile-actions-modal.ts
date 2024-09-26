@@ -1,4 +1,5 @@
 import { Page, Locator } from "@playwright/test";
+
 import { BaseModal } from "../base/base-modal";
 
 export class MobileActionsModal extends BaseModal {
@@ -17,6 +18,7 @@ export class MobileActionsModal extends BaseModal {
 
     async selectOption(option: string) {
         const optionButton = this.getOption(option);
+
         await optionButton.click();
     }
 }

@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { CategoryPage } from "./category-page";
 
 export class StorePage extends CategoryPage {

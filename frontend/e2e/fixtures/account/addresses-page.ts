@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { AccountPage } from "./account-page";
 import { AddressModal } from "./modals/address-modal";
 
@@ -20,6 +21,7 @@ export class AddressesPage extends AccountPage {
 
     getAddressContainer(text: string) {
         const container = this.page.getByTestId("address-container").filter({ hasText: text });
+
         return {
             container,
             editButton: container.getByTestId("address-edit-button"),

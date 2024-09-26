@@ -22,6 +22,7 @@ export class CartDropdown {
     async close() {
         if (await this.cartDropdown.isVisible()) {
             const box = await this.cartDropdown.boundingBox();
+
             if (!box) {
                 return;
             }
@@ -39,6 +40,7 @@ export class CartDropdown {
             .filter({
                 hasText: `Variant: ${variant}`,
             });
+
         return {
             locator: cartItem,
             productLink: cartItem.getByTestId("product-link"),

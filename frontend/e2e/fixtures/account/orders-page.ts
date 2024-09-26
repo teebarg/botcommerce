@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { AccountPage } from "./account-page";
 
 export class OrdersPage extends AccountPage {
@@ -35,6 +36,7 @@ export class OrdersPage extends AccountPage {
                 quantity: orderItem.getByTestId("item-quantity"),
             };
         });
+
         return {
             card,
             displayId: card.getByTestId("order-display-id"),

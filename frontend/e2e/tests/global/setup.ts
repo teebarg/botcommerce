@@ -1,4 +1,5 @@
 import { test as setup } from "@playwright/test";
+
 import { seedData } from "../../data/seed";
 import { OverviewPage as AccountOverviewPage } from "../../fixtures/account/overview-page";
 import { LoginPage } from "../../fixtures/account/login-page";
@@ -10,6 +11,7 @@ setup("Seed data and create session for authenticated user", async ({ page }) =>
 
     const loginPage = new LoginPage(page);
     const accountPage = new AccountOverviewPage(page);
+
     await loginPage.goto();
     await loginPage.emailInput.fill(user?.email!);
     await loginPage.passwordInput.fill(user?.password!);

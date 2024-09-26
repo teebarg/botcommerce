@@ -10,7 +10,7 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-    const {results: products} = await getDocuments("products")
+    const { results: products } = await getDocuments("products");
 
     return products.map((product: Product) => ({
         slug: String(product.slug),
@@ -18,7 +18,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const product = await getProductBySlug(params.slug)
+    const product = await getProductBySlug(params.slug);
 
     if (!product) {
         notFound();
@@ -36,7 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-    const product = await getProductBySlug(params.slug)
+    const product = await getProductBySlug(params.slug);
+
     if (!product) {
         notFound();
     }

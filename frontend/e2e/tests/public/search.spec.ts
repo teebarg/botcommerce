@@ -5,6 +5,7 @@ test.describe("Search tests", async () => {
     productPage,
   }) => {
     const searchModal = productPage.searchModal
+
     await searchModal.open()
     await searchModal.searchInput.fill("Sweatshirt")
     await searchModal.searchResult
@@ -19,6 +20,7 @@ test.describe("Search tests", async () => {
     productPage,
   }) => {
     const searchModal = productPage.searchModal
+
     await searchModal.open()
     await searchModal.searchInput.fill("Does Not Sweatshirt")
     await expect(searchModal.noSearchResultsContainer).toBeVisible()
@@ -44,6 +46,7 @@ test.describe("Search tests", async () => {
     loginPage,
   }) => {
     const searchModal = storePage.searchModal
+
     await test.step("Navigate to the store page and open and close search modal", async () => {
       await storePage.goto()
       await searchModal.open()
@@ -54,6 +57,7 @@ test.describe("Search tests", async () => {
     await test.step("Navigate to the product page and open and close search modal", async () => {
       await storePage.goto()
       const product = await storePage.getProduct("Sweatshirt")
+
       await product.locator.click()
       await productPage.container.waitFor({ state: "visible" })
       await searchModal.open()

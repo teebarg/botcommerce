@@ -1,5 +1,6 @@
-import { NavMenu } from "./nav-menu";
 import { Page, Locator } from "@playwright/test";
+
+import { NavMenu } from "./nav-menu";
 import { SearchModal } from "./search-modal";
 
 export class BasePage {
@@ -25,6 +26,7 @@ export class BasePage {
 
     async clickCategoryLink(category: string) {
         const link = this.categoriesList.getByTestId("category-link");
+
         await link.click();
     }
 }

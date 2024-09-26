@@ -13,6 +13,7 @@ export class BaseModal {
 
     async close() {
         const button = this.container.getByTestId("close-modal-button");
+
         await button.click();
     }
 

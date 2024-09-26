@@ -36,6 +36,7 @@ export class NavMenu {
             };
         }
         const countryLink = this.navMenu.getByTestId(`select-${country.toLowerCase()}-choice`);
+
         await this.shippingToLink.hover();
         await this.shippingToMenu.waitFor({
             state: "visible",

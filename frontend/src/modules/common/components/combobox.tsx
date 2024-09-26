@@ -73,7 +73,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
                         }
                     )}
                 >
-                    <input className="hidden" name={name} value={state.selectedKey} readOnly />
+                    <input readOnly className="hidden" name={name} value={state.selectedKey} />
                     <input
                         {...inputProps}
                         ref={inputRef}

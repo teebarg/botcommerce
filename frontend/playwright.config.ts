@@ -1,5 +1,6 @@
-import { defineConfig, devices } from "@playwright/test";
 import path from "path";
+
+import { defineConfig, devices } from "@playwright/test";
 import "dotenv/config.js";
 
 export const STORAGE_STATE = path.join(__dirname, "playwright/.auth/user.json");

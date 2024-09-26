@@ -1,6 +1,8 @@
 import { Locator, Page } from "@playwright/test";
-import { AccountPage } from "./account-page";
+
 import { camelCase } from "../../utils";
+
+import { AccountPage } from "./account-page";
 
 export class ProfilePage extends AccountPage {
     profileWrapper: Locator;
@@ -118,6 +120,7 @@ export class ProfilePage extends AccountPage {
 
     async getEditorInputs(editor: Locator) {
         const editButton = editor.getByTestId("edit-button");
+
         if ((await editButton.getAttribute("active")) !== "true") {
             await editButton.click();
         }
@@ -126,11 +129,14 @@ export class ProfilePage extends AccountPage {
         const o = {
             editButton,
         } as { [k: string]: Locator };
+
         for (const input of await inputs.all()) {
             const testId = (await input.getAttribute("data-testid")) as string;
             const key = camelCase(testId);
+
             o[key] = input;
         }
+
         return o;
     }
 

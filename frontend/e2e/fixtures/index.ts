@@ -1,5 +1,7 @@
-import { test as base, Page } from "@playwright/test";
+import { test as base } from "@playwright/test";
+
 import { resetDatabase } from "../data/reset";
+
 import { CartPage } from "./cart-page";
 import { CategoryPage } from "./category-page";
 import { CheckoutPage } from "./checkout-page";
@@ -29,26 +31,32 @@ export const fixtures = base.extend<{
     ],
     cartPage: async ({ page }, use) => {
         const cartPage = new CartPage(page);
+
         await use(cartPage);
     },
     categoryPage: async ({ page }, use) => {
         const categoryPage = new CategoryPage(page);
+
         await use(categoryPage);
     },
     checkoutPage: async ({ page }, use) => {
         const checkoutPage = new CheckoutPage(page);
+
         await use(checkoutPage);
     },
     orderPage: async ({ page }, use) => {
         const orderPage = new OrderPage(page);
+
         await use(orderPage);
     },
     productPage: async ({ page }, use) => {
         const productPage = new ProductPage(page);
+
         await use(productPage);
     },
     storePage: async ({ page }, use) => {
         const storePage = new StorePage(page);
+
         await use(storePage);
     },
 });
