@@ -405,6 +405,22 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
     }
 });
 
+export const getProductBySlug = async function (slug: string): Promise<any> {
+    try {
+        const {hits} = await searchDocuments<Product>("products", "", {
+            filter: `slug = "${slug}"`,
+            limit: 1
+        })
+
+        if (hits.length == 0)
+            return null
+
+        return hits[0]
+    } catch (error) {
+        return null;
+    }
+};
+
 export const getProduct = cache(async function (slug: string): Promise<any> {
     try {
         const headers = getHeaders(["products"]);
@@ -546,26 +562,6 @@ export const getCollectionBySlug = cache(async function (slug: string): Promise<
     }
 });
 
-export const getProductsByCollectionHandle = cache(async function getProductsByCollectionHandle({
-    page = 1,
-    slug,
-    limit = 1,
-}: {
-    page?: number;
-    slug: string;
-    limit: number;
-}): Promise<any> {
-    const { id } = await getCollectionBySlug(slug).then((collection: any) => collection);
-
-    const res = await getProductsList({ collections: [id], page })
-        .then((res: any) => res)
-        .catch((err: any) => {
-            throw err;
-        });
-
-    return res;
-});
-
 // Category actions
 export const listCategories = cache(async function () {
     const headers = {
@@ -631,36 +627,5 @@ export const getCategoryByHandle = cache(async function (categoryHandle: string[
 
     return {
         product_categories,
-    };
-});
-
-export const getProductsByCategoryHandle = cache(async function ({
-    pageParam = 0,
-    slug,
-    countryCode,
-}: {
-    pageParam?: number;
-    slug: string;
-    countryCode: string;
-    currencyCode?: string;
-}): Promise<{
-    response: { products: Product[]; count: number };
-    nextPage: number | null;
-}> {
-    const { id } = await getCategoryByHandle([slug]).then((res: any) => res.product_categories[0]);
-
-    const { response, nextPage } = await getProductsList({
-        pageParam,
-        queryParams: { category_id: [id] },
-        countryCode,
-    })
-        .then((res: any) => res)
-        .catch((err: any) => {
-            throw err;
-        });
-
-    return {
-        response,
-        nextPage,
     };
 });

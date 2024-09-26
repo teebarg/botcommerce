@@ -14,7 +14,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
     const { subtotal, discount_total, gift_card_total, tax_total, delivery_fee, total } = data;
 
     const getAmount = (amount: number | null | undefined) => {
-        return currency(amount || 0);
+        return currency(Number(amount) || 0);
     };
 
     return (

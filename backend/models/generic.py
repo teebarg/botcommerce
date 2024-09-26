@@ -55,6 +55,13 @@ class OrderDetails(BaseModel):
 
 
 # Shared properties
+class ProductImages(SQLModel, table=True):
+    __tablename__ = "product_images"
+    id: int | None = Field(default=None, primary_key=True)
+    image: str
+    product_id: int | None = Field(default=None, foreign_key="product.id")
+    product: "Product" = Relationship(back_populates="images")
+
 class ProductBrand(SQLModel, table=True):
     product_id: int = Field(foreign_key="product.id", primary_key=True)
     brand_id: int = Field(foreign_key="brand.id", primary_key=True)
@@ -73,9 +80,9 @@ class ProductTag(SQLModel, table=True):
 class Brand(BrandBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str
-    products: list["Product"] = Relationship(
-        back_populates="brands", link_model=ProductBrand
-    )
+    # products: list["Product"] = Relationship(
+    #     back_populates="brands", link_model=ProductBrand
+    # )
 
 
 class Collection(CollectionBase, table=True):
@@ -89,29 +96,31 @@ class Collection(CollectionBase, table=True):
 class Tag(TagBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str
-    products: list["Product"] = Relationship(
-        back_populates="tags", link_model=ProductTag
-    )
+    # products: list["Product"] = Relationship(
+    #     back_populates="tags", link_model=ProductTag
+    # )
 
 
 class Product(ProductBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str
+    images: list["ProductImages"] = Relationship(back_populates="product")
     collections: list["Collection"] = Relationship(
         back_populates="products", link_model=ProductCollection
     )
-    tags: list["Tag"] = Relationship(back_populates="products", link_model=ProductTag)
-    brands: list["Brand"] = Relationship(
-        back_populates="products", link_model=ProductBrand
-    )
+    # tags: list["Tag"] = Relationship(back_populates="products", link_model=ProductTag)
+    # brands: list["Brand"] = Relationship(
+    #     back_populates="products", link_model=ProductBrand
+    # )
 
 
 class ProductPublic(ProductBase):
     id: int
     slug: str
+    images: list[ProductImages] = []
     collections: list[Collection] = []
-    tags: list[Tag] = []
-    brands: list[Brand] = []
+    # tags: list[Tag] = []
+    # brands: list[Brand] = []
 
 
 class Products(SQLModel):

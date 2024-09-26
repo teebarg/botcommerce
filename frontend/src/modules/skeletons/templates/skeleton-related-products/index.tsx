@@ -3,7 +3,7 @@ import SkeletonProductPreview from "@modules/skeletons/components/skeleton-produ
 
 const SkeletonRelatedProducts = () => {
     return (
-        <div className="product-page-constraint">
+        <div>
             <div className="flex flex-col gap-8 items-center text-center mb-8">
                 <div className="w-20 h-6 animate-pulse bg-gray-100" />
                 <div className="flex flex-col gap-4 items-center text-center mb-16">

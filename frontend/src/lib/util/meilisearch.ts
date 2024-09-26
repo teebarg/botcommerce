@@ -34,6 +34,13 @@ const addDocumentsToIndex = async <T extends Record<string, any>>(indexName: str
     await index.addDocuments(documents, { primaryKey: "id" });
 };
 
+const getDocuments = async <T>(indexName: string, limit: number = 1000): Promise<any> => {
+    const index = await getOrCreateIndex(indexName);
+
+    const documents = await index.getDocuments({ limit }); // Set a large limit to fetch many documents at once
+    return documents;
+};
+
 const searchDocuments = async <T>(indexName: string, query: string, options: SearchParams = {}): Promise<any> => {
     const index = await getOrCreateIndex(indexName);
 
@@ -76,4 +83,4 @@ const deleteIndex = async (indexName: string): Promise<void> => {
     await client.deleteIndex(indexName);
 };
 
-export { getOrCreateIndex, addDocumentsToIndex, searchDocuments, multiSearchDocuments, updateDocument, deleteDocument, clearIndex, deleteIndex };
+export { getOrCreateIndex, addDocumentsToIndex, getDocuments, searchDocuments, multiSearchDocuments, updateDocument, deleteDocument, clearIndex, deleteIndex };

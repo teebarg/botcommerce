@@ -58,8 +58,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                         />
                         <ScrollShadow hideScrollBar className="mt-8 w-full" orientation="horizontal">
                             <div className="flex gap-2 w-[800px]">
-                                {product?.images?.map((image: any, index: number) => (
-                                    <Image key={image.id} alt={`Product image ${index + 1}`} className="w-[200px] h-[150px]" src={image.url} />
+                                {product?.images?.map((image: string, index: number) => (
+                                    <Image key={index} alt={`Product image ${index + 1}`} className="w-[200px] h-[150px]" src={image} />
                                 ))}
                             </div>
                         </ScrollShadow>
@@ -100,7 +100,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     </div>
                 </div>
             </div>
-            <div className="max-w-7xl mx-auto px-6 my-16 sm:my-32" data-testid="related-products-container">
+            <div className="max-w-7xl mx-auto px-6 my-4" data-testid="related-products-container">
                 <Suspense fallback={<SkeletonRelatedProducts />}>
                     <RelatedProducts product={product} />
                 </Suspense>

@@ -4,9 +4,10 @@ import { useMemo, useState } from "react";
 import { addToCart } from "@modules/cart/actions";
 import { currency } from "@lib/util/util";
 import Button from "@modules/common/components/button";
+import { Product } from "types/global";
 
 type ProductActionsProps = {
-    product: any;
+    product: Product;
     disabled?: boolean;
 };
 

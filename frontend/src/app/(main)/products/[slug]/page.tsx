@@ -1,28 +1,24 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductsList, getProduct } from "@lib/data";
+import { getProductBySlug } from "@lib/data";
 import ProductTemplate from "@modules/products/templates";
+import { getDocuments } from "@lib/util/meilisearch";
+import { Product } from "types/global";
 
 type Props = {
     params: { slug: string };
 };
 
 export async function generateStaticParams() {
-    const { products } = await getProductsList({ page: 1, limit: 100000 });
+    const {results: products} = await getDocuments("products")
 
-    const staticParams = products
-        .map((product: any) => ({
-            slug: product.slug,
-        }))
-        .flat();
-
-    return staticParams;
+    return products.map((product: Product) => ({
+        slug: String(product.slug),
+    }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { slug } = params;
-
-    const product = await getProduct(slug);
+    const product = await getProductBySlug(params.slug)
 
     if (!product) {
         notFound();
@@ -40,8 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-    const product = await getProduct(params.slug);
-
+    const product = await getProductBySlug(params.slug)
     if (!product) {
         notFound();
     }

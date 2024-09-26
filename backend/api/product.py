@@ -378,7 +378,7 @@ async def configure_filterable_attributes(
     try:
         index = get_or_create_index("products")
         # Update the filterable attributes
-        index.update_filterable_attributes(["collections", "price"])
+        index.update_filterable_attributes(["collections", "name","price", "slug"])
         # Update the sortable attributes
         index.update_sortable_attributes(["created_at", "price"])
 
@@ -429,4 +429,5 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["collections"] = [
         collection.name for collection in product.collections
     ]
+    product_dict["images"] = [image.image for image in product.images]
     return product_dict

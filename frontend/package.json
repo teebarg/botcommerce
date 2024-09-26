@@ -9,7 +9,7 @@
         "nextjs"
     ],
     "scripts": {
-        "dev": "next dev --turbo",
+        "dev": "next dev",
         "build": "npm run prettier && next build",
         "start": "next start",
         "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",

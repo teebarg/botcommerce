@@ -13,7 +13,7 @@ type Props = {
     };
 };
 
-export const revalidate = 60;
+export const revalidate = 6;
 
 export async function generateStaticParams() {
     const { collections }: { collections: Collection[] } = await getCollectionsList();

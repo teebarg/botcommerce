@@ -14,7 +14,7 @@ from api.websocket import manager
 from core.logging import logger
 from core.utils import generate_data_export_email, send_email
 from db.engine import engine
-from models.generic import Collection, Product, ProductCollection
+from models.generic import Collection, Product, ProductCollection, ProductImages
 
 
 async def process_products(file_content, content_type: str):
@@ -39,10 +39,8 @@ async def process_products(file_content, content_type: str):
         batch_size = 500
         num_batches = (len(df) // batch_size) + 1
 
-        # Collect product IDs from the sheet to compare later
-        sheet_product_ids = set(
-            df["id"].dropna()
-        )  # Ensure no NaN values in the product IDs
+        # Track all product slugs from the sheet
+        product_slugs_in_sheet = set(df["slug"].unique())
 
         for i in range(num_batches):
             batch = df[i * batch_size : (i + 1) * batch_size]
@@ -57,8 +55,8 @@ async def process_products(file_content, content_type: str):
                     "name": name,
                     "slug": row.get("slug", name.lower().replace(" ", "-")),
                     "description": row.get("description", ""),
-                    "price": row.get("price", 0),
-                    "old_price": row.get("old_price", 0),
+                    "price": int(row.get("price", 0)),
+                    "old_price": int(row.get("old_price", 0)),
                     "inventory": row.get("inventory", 1),
                     "is_active": row.get("is_active", True),
                     "ratings": row.get("ratings", 4.7),
@@ -68,8 +66,10 @@ async def process_products(file_content, content_type: str):
                     "collections", ""
                 )  # Handling multiple collections
 
+                images = row.get("images", "")
+
                 # Add product data to be processed later
-                products_to_create_or_update.append((product_data, collections))
+                products_to_create_or_update.append((product_data, collections, images))
 
             # Process the batch
             await create_or_update_products_in_db(products_to_create_or_update)
@@ -86,7 +86,7 @@ async def process_products(file_content, content_type: str):
             )
 
         # After processing, delete products not in the sheet
-        await delete_products_not_in_sheet(sheet_product_ids)
+        await delete_products_not_in_sheet(product_slugs_in_sheet)
 
         logger.info("Sheet processed successfully")
     except Exception as e:
@@ -103,7 +103,7 @@ async def process_products(file_content, content_type: str):
 
 async def create_or_update_products_in_db(products: List):
     with Session(engine) as session:
-        for product_data, collections in products:
+        for product_data, collections, images in products:
             logger.info(f"Processing product {product_data['name']}")
             try:
                 # Check if the product exists
@@ -125,12 +125,8 @@ async def create_or_update_products_in_db(products: List):
                 session.commit()
                 session.refresh(product)
 
-                if type(collections) is not str:
-                    continue
-
-                # Handle collections
-                if collections:
-                    await update_collections(product, collections, session)
+                await update_collections(product, collections, session)
+                await update_images(product, images, session)
 
             except SQLAlchemyError as e:
                 logger.error("Error updating product" + str(e))
@@ -152,6 +148,9 @@ async def update_collections(product, collections, session: Session):
     )
     session.commit()
 
+    if collections and type(collections) is not str:
+        return
+
     for item in collections.split(","):
         collection = session.exec(
             select(Collection).where(Collection.slug == item)
@@ -163,38 +162,36 @@ async def update_collections(product, collections, session: Session):
     session.commit()
 
 
-async def delete_products_not_in_sheet(sheet_product_ids: set):
+async def update_images(product, images, session: Session):
+    session.exec(
+        delete(ProductImages).where(ProductImages.product_id == product.id)
+    )
+    session.commit()
+
+    if images and type(images) is not str:
+        return
+
+    for item in images.split("|"):
+        session.add(
+            ProductImages(product_id=product.id, image=item)
+        )
+
+    session.commit()
+
+
+async def delete_products_not_in_sheet(product_slugs_in_sheet: set):
     try:
         with Session(engine) as session:
-            # Get all product IDs from the database
-            db_product_ids = {
-                product.id for product in session.exec(select(Product)).all()
-            }
+            # Query the database after all insertions and updates
+            existing_slugs_in_db = set(session.exec(select(Product.slug)).all())
 
-            # Identify products that need to be deleted (exist in DB but not in the sheet)
-            product_ids_to_delete = db_product_ids - sheet_product_ids
-
-            if product_ids_to_delete:
-                logger.info(
-                    f"Deleting {len(product_ids_to_delete)} products not in the sheet."
-                )
-
-                # Delete product-collection associations for the products
-                for product_id in product_ids_to_delete:
-                    session.exec(
-                        delete(ProductCollection).where(
-                            ProductCollection.product_id == product_id
-                        )
-                    )
-
-                # Now delete the products
-                session.exec(
-                    delete(Product).where(Product.id.in_(product_ids_to_delete))
-                )
-
+            # Remove products from the database that are not in the sheet
+            slugs_to_remove = existing_slugs_in_db - product_slugs_in_sheet
+            if slugs_to_remove:
+                session.exec(delete(Product).where(Product.slug.in_(slugs_to_remove)))
                 session.commit()
                 logger.info(
-                    f"Successfully deleted {len(product_ids_to_delete)} products."
+                    f"Successfully deleted {len(product_slugs_in_sheet)} products."
                 )
             else:
                 logger.info("No products to delete. All products are in the sheet.")
@@ -241,8 +238,14 @@ async def generate_excel_file(bucket: Any, email: str):
                 .where(ProductCollection.product_id == product.id)
             ).all()
 
+            # Fetch product images as a |-separated string
+            images = session.exec(
+                select(ProductImages.image).where(ProductImages.product_id == product.id)
+            ).all()
+
             # Create a comma-separated string of collection names
             collections_str = ",".join(collections)
+            images_str = "|".join(images)
 
             # Append product data to list
             product_data.append(
@@ -258,6 +261,7 @@ async def generate_excel_file(bucket: Any, email: str):
                     "image": product.image,
                     "is_active": product.is_active,
                     "collections": collections_str,
+                    "images": images_str,
                 }
             )
 
