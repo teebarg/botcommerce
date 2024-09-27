@@ -2,7 +2,6 @@ from datetime import datetime
 from io import BytesIO
 from typing import Any, List
 
-import pandas as pd
 from fastapi import (
     HTTPException,
 )
@@ -15,58 +14,79 @@ from core.logging import logger
 from core.utils import generate_data_export_email, send_email
 from db.engine import engine
 from models.generic import Collection, Product, ProductCollection, ProductImages
+import csv
+from openpyxl import load_workbook, Workbook
 
 
 async def process_products(file_content, content_type: str):
     try:
         # Create a BytesIO stream from the file content
         file_stream = BytesIO(file_content)
-
-        # Read the file into a pandas DataFrame
+        
         if content_type in [
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "text/xlsx",
         ]:
-            df = pd.read_excel(file_stream)  # Handle Excel files
+            # Read Excel file using openpyxl
+            workbook = load_workbook(file_stream)
+            sheet = workbook.active
+            rows = list(sheet.iter_rows(values_only=True))
+            headers = rows[0]
+            data_rows = rows[1:]
+
         elif content_type == "text/csv":
-            df = pd.read_csv(file_stream)  # Handle CSV files
+            # Read CSV file using csv module
+            file_stream.seek(0)
+            csv_reader = csv.reader(file_stream.decode('utf-8').splitlines())
+            rows = list(csv_reader)
+            headers = rows[0]
+            data_rows = rows[1:]
+
         else:
             raise ValueError(
                 "Unsupported file format. Please upload a CSV or Excel file."
             )
 
         # Batch size and iteration setup
-        batch_size = 500
-        num_batches = (len(df) // batch_size) + 1
-
+        batch_size = 5
+        # batch_size = 500
+        num_batches = (len(data_rows) // batch_size) + 1
         # Track all product slugs from the sheet
-        product_slugs_in_sheet = set(df["slug"].unique())
+        product_slugs_in_sheet = set()
 
         for i in range(num_batches):
-            batch = df[i * batch_size : (i + 1) * batch_size]
+            batch = data_rows[i * batch_size: (i + 1) * batch_size]
             logger.info(f"Processing batch {i + 1}")
 
             # Extract and process the products
             products_to_create_or_update = []
-            for _index, row in batch.iterrows():
-                name = row.get("name", "")
-                product_data = {
-                    "id": row.get("id", ""),
-                    "name": name,
-                    "slug": row.get("slug", name.lower().replace(" ", "-")),
-                    "description": row.get("description", ""),
-                    "price": int(row.get("price", 0)),
-                    "old_price": int(row.get("old_price", 0)),
-                    "inventory": row.get("inventory", 1),
-                    "is_active": row.get("is_active", True),
-                    "ratings": row.get("ratings", 4.7),
-                    "image": row.get("image", ""),
-                }
-                collections = row.get(
-                    "collections", ""
-                )  # Handling multiple collections
+            for row in batch:
+                row_data = dict(zip(headers, row))
+                name = row_data.get("name", "")
 
-                images = row.get("images", "")
+                active = row_data.get("is_active", True)
+                is_active = row_data.get("is_active", True)
+                if isinstance(is_active, str):
+                    is_active = True if active == "TRUE" else False
+
+
+                product_data = {
+                    "id": row_data.get("id", ""),
+                    "name": name,
+                    "slug": row_data.get("slug", name.lower().replace(" ", "-")),
+                    "description": row_data.get("description", ""),
+                    "price": int(row_data.get("price", 0)),
+                    "old_price": int(row_data.get("old_price", 0)),
+                    "inventory": row_data.get("inventory", 1),
+                    "is_active": is_active,
+                    "ratings": row_data.get("ratings", 4.7),
+                    "image": row_data.get("image", ""),
+                }
+
+                # print(product_data)
+                collections = row_data.get("collections", "")
+                images = row_data.get("images", "")
+                product_slugs_in_sheet.add(product_data["slug"])
 
                 # Add product data to be processed later
                 products_to_create_or_update.append((product_data, collections, images))
@@ -124,9 +144,9 @@ async def create_or_update_products_in_db(products: List):
 
                 session.commit()
                 session.refresh(product)
-
                 await update_collections(product, collections, session)
                 await update_images(product, images, session)
+                
 
             except SQLAlchemyError as e:
                 logger.error("Error updating product" + str(e))
@@ -148,7 +168,7 @@ async def update_collections(product, collections, session: Session):
     )
     session.commit()
 
-    if collections and type(collections) is not str:
+    if not collections or collections is None or type(collections) is not str:
         return
 
     for item in collections.split(","):
@@ -166,7 +186,7 @@ async def update_images(product, images, session: Session):
     session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
     session.commit()
 
-    if images and type(images) is not str:
+    if not images or images is None or type(images) is not str:
         return
 
     for item in images.split("|"):
@@ -222,8 +242,19 @@ async def generate_excel_file(bucket: Any, email: str):
         if not products:
             raise HTTPException(status_code=404, detail="No products found")
 
-        # Create a list to store product data
-        product_data = []
+        # Create a workbook and select the active worksheet
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = "Products"
+
+        # Define the header row
+        headers = [
+            "id", "name", "slug", "description", "price", "old_price", 
+            "inventory", "ratings", "image", "is_active", "collections", "images"
+        ]
+        sheet.append(headers)
+
+        # Fetch product data and append each product as a row
         for product in products:
             # Fetch product collections as a comma-separated string
             collections = session.exec(
@@ -245,32 +276,17 @@ async def generate_excel_file(bucket: Any, email: str):
             collections_str = ",".join(collections)
             images_str = "|".join(images)
 
-            # Append product data to list
-            product_data.append(
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "slug": product.slug,
-                    "description": product.description,
-                    "price": product.price,
-                    "old_price": product.old_price,
-                    "inventory": product.inventory,
-                    "ratings": product.ratings,
-                    "image": product.image,
-                    "is_active": product.is_active,
-                    "collections": collections_str,
-                    "images": images_str,
-                }
-            )
+            # Append the product data as a row
+            sheet.append([
+                product.id, product.name, product.slug, product.description,
+                product.price, product.old_price, product.inventory,
+                product.ratings, product.image, product.is_active,
+                collections_str, images_str
+            ])
 
-        # Create a DataFrame from the product data
-        df = pd.DataFrame(product_data)
-
-        # Use BytesIO to create an in-memory Excel file
+        # Create an in-memory Excel file using BytesIO
         output = BytesIO()
-        df.to_excel(output, index=False, engine="openpyxl")
-
-        # Move the stream to the start of the file
+        workbook.save(output)
         output.seek(0)
 
         # Generate a unique filename
@@ -283,7 +299,7 @@ async def generate_excel_file(bucket: Any, email: str):
             output,
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
-        blob.make_public()  # Makes the file publicly accessible
+        blob.make_public()  # Make the file publicly accessible
         download_url = blob.public_url
 
         # Send email with download link
