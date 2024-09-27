@@ -58,31 +58,32 @@ async def send_status_update(task_id: str):
 
 async def export(data: list, name: str, bucket: Any, email: str, columns: list) -> str:
     try:
-        # Convert data to CSV
-        df = pd.DataFrame(data, columns=columns)
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, index=False)
-        csv_content = csv_buffer.getvalue()
+        return ""
+        # # Convert data to CSV
+        # df = pd.DataFrame(data, columns=columns)
+        # csv_buffer = StringIO()
+        # df.to_csv(csv_buffer, index=False)
+        # csv_content = csv_buffer.getvalue()
 
-        # Generate a unique filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{name}_export_{timestamp}.csv"
+        # # Generate a unique filename
+        # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # filename = f"{name}_export_{timestamp}.csv"
 
-        # Upload to Firebase
-        blob = bucket.blob(f"exports/{filename}")
-        blob.upload_from_string(csv_content, content_type="text/csv")
-        blob.make_public()
-        download_url = blob.public_url
+        # # Upload to Firebase
+        # blob = bucket.blob(f"exports/{filename}")
+        # blob.upload_from_string(csv_content, content_type="text/csv")
+        # blob.make_public()
+        # download_url = blob.public_url
 
-        # Send email with download link
-        email_data = generate_data_export_email(download_link=download_url)
-        send_email(
-            email_to=email,
-            subject=f"{name} Export Ready",
-            html_content=email_data.html_content,
-        )
+        # # Send email with download link
+        # email_data = generate_data_export_email(download_link=download_url)
+        # send_email(
+        #     email_to=email,
+        #     subject=f"{name} Export Ready",
+        #     html_content=email_data.html_content,
+        # )
 
-        return download_url
+        # return download_url
     except Exception as e:
         logger.error(f"Error in export function: {e}")
         raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}") from e
