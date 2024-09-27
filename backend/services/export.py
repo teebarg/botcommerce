@@ -2,7 +2,6 @@ from datetime import datetime
 from io import StringIO
 from typing import Any, Dict
 
-import pandas as pd
 from fastapi import (
     HTTPException,
 )
