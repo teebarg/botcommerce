@@ -48,7 +48,8 @@ async def process_products(file_content, content_type: str):
             )
 
         # Batch size and iteration setup
-        batch_size = 500
+        batch_size = 5
+        # batch_size = 500
         num_batches = (len(data_rows) // batch_size) + 1
         # Track all product slugs from the sheet
         product_slugs_in_sheet = set()
