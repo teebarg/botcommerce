@@ -44,7 +44,7 @@ export default function ContactForm() {
                 />
                 <div className="flex gap-4">
                     <Checkbox defaultSelected required name="agreement">
-                        I allow this website to store my submission so they can respond to my inquiry.
+                        <span className="text-gray-700">I allow this website to store my submission so they can respond to my inquiry.</span>
                     </Checkbox>
                 </div>
                 <FormButton fullWidth={true}>Submit</FormButton>
