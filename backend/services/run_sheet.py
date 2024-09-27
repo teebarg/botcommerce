@@ -22,19 +22,6 @@ async def process_products(file_content, content_type: str):
     try:
         # Create a BytesIO stream from the file content
         file_stream = BytesIO(file_content)
-
-        # # Read the file into a pandas DataFrame
-        # if content_type in [
-        #     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        #     "text/xlsx",
-        # ]:
-        #     df = pd.read_excel(file_stream)  # Handle Excel files
-        # elif content_type == "text/csv":
-        #     df = pd.read_csv(file_stream)  # Handle CSV files
-        # else:
-        #     raise ValueError(
-        #         "Unsupported file format. Please upload a CSV or Excel file."
-        #     )
         
         if content_type in [
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -60,14 +47,6 @@ async def process_products(file_content, content_type: str):
                 "Unsupported file format. Please upload a CSV or Excel file."
             )
 
-
-        # # Batch size and iteration setup
-        # batch_size = 500
-        # num_batches = (len(df) // batch_size) + 1
-
-        # # Track all product slugs from the sheet
-        # product_slugs_in_sheet = set(df["slug"].unique())
-
         # Batch size and iteration setup
         batch_size = 500
         num_batches = (len(data_rows) // batch_size) + 1
@@ -75,35 +54,15 @@ async def process_products(file_content, content_type: str):
         product_slugs_in_sheet = set()
 
         for i in range(num_batches):
-            # batch = df[i * batch_size : (i + 1) * batch_size]
-            # logger.info(f"Processing batch {i + 1}")
             batch = data_rows[i * batch_size: (i + 1) * batch_size]
             logger.info(f"Processing batch {i + 1}")
 
             # Extract and process the products
             products_to_create_or_update = []
-            # for _index, row in batch.iterrows():
             for row in batch:
                 row_data = dict(zip(headers, row))
                 name = row_data.get("name", "")
-                # name = row.get("name", "")
-                # product_data = {
-                #     "id": row.get("id", ""),
-                #     "name": name,
-                #     "slug": row.get("slug", name.lower().replace(" ", "-")),
-                #     "description": row.get("description", ""),
-                #     "price": int(row.get("price", 0)),
-                #     "old_price": int(row.get("old_price", 0)),
-                #     "inventory": row.get("inventory", 1),
-                #     "is_active": row.get("is_active", True),
-                #     "ratings": row.get("ratings", 4.7),
-                #     "image": row.get("image", ""),
-                # }
-                # collections = row.get(
-                #     "collections", ""
-                # )  # Handling multiple collections
 
-                # images = row.get("images", "")
                 active = row_data.get("is_active", True)
                 is_active = row_data.get("is_active", True)
                 if isinstance(is_active, str):
@@ -352,89 +311,3 @@ async def generate_excel_file(bucket: Any, email: str):
         logger.debug("Product export complete")
 
         return download_url
-
-
-# # Export products
-# async def generate_excel_file(bucket: Any, email: str):
-#     logger.debug("Products export started.......")
-#     with Session(engine) as session:
-#         # Fetch products and their collections
-#         products = session.exec(select(Product)).all()
-
-#         if not products:
-#             raise HTTPException(status_code=404, detail="No products found")
-
-#         # Create a list to store product data
-#         product_data = []
-#         for product in products:
-#             # Fetch product collections as a comma-separated string
-#             collections = session.exec(
-#                 select(Collection.slug)
-#                 .join(
-#                     ProductCollection, Collection.id == ProductCollection.collection_id
-#                 )
-#                 .where(ProductCollection.product_id == product.id)
-#             ).all()
-
-#             # Fetch product images as a |-separated string
-#             images = session.exec(
-#                 select(ProductImages.image).where(
-#                     ProductImages.product_id == product.id
-#                 )
-#             ).all()
-
-#             # Create a comma-separated string of collection names
-#             collections_str = ",".join(collections)
-#             images_str = "|".join(images)
-
-#             # Append product data to list
-#             product_data.append(
-#                 {
-#                     "id": product.id,
-#                     "name": product.name,
-#                     "slug": product.slug,
-#                     "description": product.description,
-#                     "price": product.price,
-#                     "old_price": product.old_price,
-#                     "inventory": product.inventory,
-#                     "ratings": product.ratings,
-#                     "image": product.image,
-#                     "is_active": product.is_active,
-#                     "collections": collections_str,
-#                     "images": images_str,
-#                 }
-#             )
-
-#         # Create a DataFrame from the product data
-#         df = pd.DataFrame(product_data)
-
-#         # Use BytesIO to create an in-memory Excel file
-#         output = BytesIO()
-#         df.to_excel(output, index=False, engine="openpyxl")
-
-#         # Move the stream to the start of the file
-#         output.seek(0)
-
-#         # Generate a unique filename
-#         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-#         filename = f"product_export_{timestamp}.xlsx"
-
-#         # Upload the in-memory file to Firebase
-#         blob = bucket.blob(f"exports/{filename}")
-#         blob.upload_from_file(
-#             output,
-#             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-#         )
-#         blob.make_public()  # Makes the file publicly accessible
-#         download_url = blob.public_url
-
-#         # Send email with download link
-#         email_data = generate_data_export_email(download_link=download_url)
-#         send_email(
-#             email_to=email,
-#             subject="Product Export Ready",
-#             html_content=email_data.html_content,
-#         )
-#         logger.debug("Product export complete")
-
-#         return download_url
