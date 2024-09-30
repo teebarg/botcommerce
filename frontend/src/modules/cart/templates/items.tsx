@@ -64,7 +64,6 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-sm font-medium line-clamp-1">{item.name}</h3>
-                                        {/* <p className="text-sm text-gray-500">{currency(item.price)} each</p> */}
                                         <Control item={item} />
                                     </div>
                                     <div className="flex flex-col items-end">

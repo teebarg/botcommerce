@@ -72,9 +72,17 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                     </ol>
                 </nav>
                 <div className="flex gap-6 mt-6">
-                    <CollectionsSideBar categories={product_categories} collections={collections} />
+                    <div className="hidden md:block">
+                        <CollectionsSideBar categories={product_categories} collections={collections} />
+                    </div>
                     <div className="w-full flex-1 flex-col">
-                        <CollectionsTopBar count={pagination.total_count} slug={collection?.title} sortBy={sortBy} />
+                        <CollectionsTopBar
+                            categories={product_categories}
+                            collections={collections}
+                            count={pagination.total_count}
+                            slug={collection?.title}
+                            sortBy={sortBy}
+                        />
                         <main className="mt-4 w-full overflow-visible px-1">
                             <div className="block rounded-medium border-medium border-dashed border-divider px-2 py-4 min-h-[50vh]">
                                 {products.length === 0 ? (
