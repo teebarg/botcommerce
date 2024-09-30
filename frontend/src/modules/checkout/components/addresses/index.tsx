@@ -93,7 +93,7 @@ const Addresses = ({
                                     </div>
 
                                     <div className="flex flex-col w-full md:w-1/3" data-testid="shipping-contact-summary">
-                                        <p className="font-medium mb-1">Contact2222</p>
+                                        <p className="font-medium mb-1">Contact</p>
                                         <p className="font-normal text-default-600">{cart.shipping_address.phone}</p>
                                         <p className="font-normal text-default-600">{cart.email}</p>
                                     </div>
