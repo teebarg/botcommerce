@@ -7,9 +7,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Table } from "@modules/common/components/table";
 import { CartItem } from "types/global";
 import Image from "next/image";
+import { currency } from "@lib/util/util";
 
 import Control from "./control";
-import { currency } from "@lib/util/util";
 
 type ItemsTemplateProps = {
     items: CartItem[];
@@ -60,7 +60,7 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
                             .map((item: CartItem, index: number) => (
                                 <div key={index} className="flex items-center space-x-4 py-4 border-b">
                                     <div className="w-20 h-20 object-cover rounded relative">
-                                        <Image src={item.image as string} alt="Wireless Earbuds" fill />
+                                        <Image fill alt={item.name} src={item.image as string} />
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-sm font-medium line-clamp-1">{item.name}</h3>

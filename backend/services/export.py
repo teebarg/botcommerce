@@ -1,5 +1,3 @@
-from datetime import datetime
-from io import StringIO
 from typing import Any, Dict
 
 from fastapi import (
@@ -11,7 +9,6 @@ from core.deps import (
     SessionDep,
 )
 from core.logging import logger
-from core.utils import generate_data_export_email, send_email
 from models.generic import UploadStatus
 
 upload_statuses: Dict[str, UploadStatus] = {}

@@ -53,7 +53,7 @@ const Items = ({ items }: ItemsProps) => {
                             .map((item: CartItem) => (
                                 <div key={item.item_id} className="flex items-center space-x-4 py-4 border-b">
                                     <div className="w-20 h-20 object-cover rounded relative">
-                                        <Image src={item.image as string} alt="Wireless Earbuds" fill />
+                                        <Image fill alt={item.name} src={item.image as string} />
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-sm font-medium line-clamp-1">{item.name}</h3>

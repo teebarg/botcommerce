@@ -57,9 +57,11 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
 
     return (
         <div className="combobox">
-            {label && (<label className="combobox-label" {...labelProps}>
-                {label}
-            </label>)}
+            {label && (
+                <label className="combobox-label" {...labelProps}>
+                    {label}
+                </label>
+            )}
             <div className="relative inline-block">
                 <button
                     {...buttonProps}
