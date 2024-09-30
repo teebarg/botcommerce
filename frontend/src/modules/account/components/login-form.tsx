@@ -13,7 +13,7 @@ type Props = {
     setCurrentView?: (view: LOGIN_VIEW) => void; // eslint-disable-line
 };
 
-const LoginForm = ({ setCurrentView }: Props) => {
+const CheckoutLoginForm = ({ setCurrentView }: Props) => {
     const { enqueueSnackbar } = useSnackbar();
     const [state, formAction] = useFormState(logCustomerIn, null);
 
@@ -26,10 +26,9 @@ const LoginForm = ({ setCurrentView }: Props) => {
     });
 
     return (
-        // <div className="max-w-md w-full flex flex-col items-center bg-background p-8 rounded-lg ml-[5rem]" data-testid="login-page">
         <div>
-            <h1 className="text-center text-2xl uppercase font-medium mb-1">Welcome back</h1>
-            <p className="text-center text-base mb-8">Sign in to access an enhanced shopping experience.</p>
+            <h1 className="text-center text-2xl uppercase font-medium mb-1">Sign In</h1>
+            <p className="text-center text-base mb-8">Sign in to place your order.</p>
             <form action={formAction} className="w-full">
                 <div className="flex flex-col w-full gap-y-4">
                     <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
@@ -54,4 +53,4 @@ const LoginForm = ({ setCurrentView }: Props) => {
     );
 };
 
-export default LoginForm;
+export default CheckoutLoginForm;

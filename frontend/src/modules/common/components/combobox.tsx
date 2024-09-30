@@ -13,13 +13,13 @@ interface ComboBoxItem {
 }
 
 interface ComboBoxProps {
-    label: string;
+    label?: string;
     name: string;
     items: ComboBoxItem[];
     [key: string]: any;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
+const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
     const { contains } = useFilter({ sensitivity: "base" });
 
     const state = useComboBoxState({
@@ -57,9 +57,9 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, ...props }) => {
 
     return (
         <div className="combobox">
-            <label className="combobox-label" {...labelProps}>
-                {props.label}
-            </label>
+            {label && (<label className="combobox-label" {...labelProps}>
+                {label}
+            </label>)}
             <div className="relative inline-block">
                 <button
                     {...buttonProps}

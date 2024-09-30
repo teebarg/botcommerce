@@ -57,7 +57,7 @@ const ShippingAddress = ({
                     <AddressSelect addresses={customer.shipping_addresses} cart={cart} />
                 </div>
             )}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                     isRequired
                     autoComplete="given-name"

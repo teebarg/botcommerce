@@ -83,7 +83,7 @@ const Navbar = async () => {
                 </NavbarItem>
                 <NavbarMenuToggle className="sm:hidden" />
             </NavbarContent>
-            <NavbarMenu className="pt-12 mt-20">
+            <NavbarMenu className="pt-7">
                 <Search />
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item: any, index: number) => (

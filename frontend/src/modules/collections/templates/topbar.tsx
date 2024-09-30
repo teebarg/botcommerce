@@ -24,7 +24,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy }) =>
     });
 
     return (
-        <header className="relative z-20 flex flex-col gap-2 rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3">
+        <header className="relative z-20 flex flex-col sm:gap-2 rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3">
             <div className="flex items-center gap-1 md:hidden md:gap-2">
                 <h2 className="text-large font-medium capitalize">{slug}</h2>
                 <span className="text-small text-default-400">({count})</span>
@@ -37,14 +37,13 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy }) =>
                     </Button>
                     <div className="hidden items-center gap-1 md:flex">
                         <h2 className="text-medium font-medium capitalize">{slug ?? "Collections"}</h2>
-                        <span className="text-small text-default-400">({count})</span>
+                        <span className="text-small text-default-400">({count}ppp)</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-1 flex-1 sm:flex-initial">
                     <ComboBox
                         className="min-w-[15rem] max-w-xs flex-1"
                         items={filters}
-                        label="Filter"
                         name="filter"
                         placeholder="Filter products"
                         selectedKey={value}
