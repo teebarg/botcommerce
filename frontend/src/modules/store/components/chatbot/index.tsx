@@ -88,7 +88,7 @@ export const Chatbot: React.FC = () => {
     };
 
     return (
-        <div className="fixed bottom-8 right-6 z-50">
+        <div className="fixed bottom-8 right-6 z-30">
             {isOpen ? (
                 <div className="w-[90vw] sm:w-[30rem] h-[30rem] flex flex-col overflow-hidden rounded-lg bg-default-200 shadow">
                     <div className="px-4 py-5 sm:px-6 flex justify-between bg-fuchsia-400 text-white">

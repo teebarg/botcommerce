@@ -69,7 +69,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     return (
         <div>
             <Badge color="danger" content={totalItems} shape="circle">
-                <button className="cursor-pointer p-1 inline-block" onClick={state.open}>
+                <button className="cursor-pointer p-1 inline-block text-default-500" onClick={state.open}>
                     <CartIcon size={32} />
                 </button>
             </Badge>

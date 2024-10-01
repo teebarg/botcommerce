@@ -7,7 +7,7 @@ import { Cart, Customer, PaymentSession } from "types/global";
 import { Modal } from "@modules/common/components/modal";
 import { useSnackbar } from "notistack";
 import { useOverlayTriggerState } from "react-stately";
-import LoginForm from "@modules/account/components/login-form";
+import CheckoutLoginForm from "@modules/account/components/login-form";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -93,7 +93,7 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
             {modalState.isOpen && (
                 <Modal data-testid="login-modal" onClose={modalState.close}>
                     <React.Fragment>
-                        <LoginForm />
+                        <CheckoutLoginForm />
                     </React.Fragment>
                 </Modal>
             )}

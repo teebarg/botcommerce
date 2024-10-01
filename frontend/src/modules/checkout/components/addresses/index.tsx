@@ -78,8 +78,8 @@ const Addresses = ({
                     <div className="text-sm">
                         {cart && cart.shipping_address ? (
                             <div className="flex items-start gap-x-8">
-                                <div className="flex items-start gap-x-1 w-full text-base">
-                                    <div className="flex flex-col w-1/3" data-testid="shipping-address-summary">
+                                <div className="flex items-start flex-wrap gap-x-1 w-full text-base space-y-4 md:space-y-0">
+                                    <div className="flex flex-col w-full md:w-1/3" data-testid="shipping-address-summary">
                                         <p className="font-medium mb-1">Shipping Address</p>
                                         <p className="font-normal text-default-600">
                                             {cart.shipping_address.first_name} {cart.shipping_address.last_name}
@@ -92,13 +92,13 @@ const Addresses = ({
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-col w-1/3 " data-testid="shipping-contact-summary">
+                                    <div className="flex flex-col w-full md:w-1/3" data-testid="shipping-contact-summary">
                                         <p className="font-medium mb-1">Contact</p>
                                         <p className="font-normal text-default-600">{cart.shipping_address.phone}</p>
                                         <p className="font-normal text-default-600">{cart.email}</p>
                                     </div>
 
-                                    <div className="flex flex-col w-1/3" data-testid="billing-address-summary">
+                                    <div className="flex flex-col w-full md:w-1/3" data-testid="billing-address-summary">
                                         <p className="font-medium mb-1">Billing Address</p>
 
                                         {sameAsSBilling ? (

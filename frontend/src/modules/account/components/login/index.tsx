@@ -14,7 +14,7 @@ type Props = {
 };
 
 const Login = ({ setCurrentView }: Props) => {
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
     const [state, formAction] = useFormState(logCustomerIn, null);
 
     useWatch(state, () => {
@@ -26,7 +26,7 @@ const Login = ({ setCurrentView }: Props) => {
     });
 
     return (
-        <div className="max-w-md w-full flex flex-col items-center bg-background p-8 rounded-lg ml-[5rem]" data-testid="login-page">
+        <div className="max-w-md w-full flex flex-col items-center bg-background p-2 md:p-8 rounded-lg ml-0 md:ml-[5rem]" data-testid="login-page">
             <h1 className="text-2xl uppercase font-medium mb-1">Welcome back</h1>
             <p className="text-center text-base mb-8">Sign in to access an enhanced shopping experience.</p>
             <form action={formAction} className="w-full">

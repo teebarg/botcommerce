@@ -43,9 +43,7 @@ const AdminNavbar = async () => {
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item: any, index: number) => (
                         <NavbarMenuItem key={`${item}-${index}`}>
-                            <LocalizedClientLink href={item.href}>
-                                {item.label}
-                            </LocalizedClientLink>
+                            <LocalizedClientLink href={item.href}>{item.label}</LocalizedClientLink>
                         </NavbarMenuItem>
                     ))}
                 </div>

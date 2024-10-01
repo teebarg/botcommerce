@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 from io import BytesIO
 from typing import Any, List
@@ -5,6 +6,7 @@ from typing import Any, List
 from fastapi import (
     HTTPException,
 )
+from openpyxl import Workbook, load_workbook
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.sql import delete
 from sqlmodel import Session, select
@@ -14,15 +16,13 @@ from core.logging import logger
 from core.utils import generate_data_export_email, send_email
 from db.engine import engine
 from models.generic import Collection, Product, ProductCollection, ProductImages
-import csv
-from openpyxl import load_workbook, Workbook
 
 
 async def process_products(file_content, content_type: str):
     try:
         # Create a BytesIO stream from the file content
         file_stream = BytesIO(file_content)
-        
+
         if content_type in [
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "text/xlsx",
@@ -37,7 +37,7 @@ async def process_products(file_content, content_type: str):
         elif content_type == "text/csv":
             # Read CSV file using csv module
             file_stream.seek(0)
-            csv_reader = csv.reader(file_stream.decode('utf-8').splitlines())
+            csv_reader = csv.reader(file_stream.decode("utf-8").splitlines())
             rows = list(csv_reader)
             headers = rows[0]
             data_rows = rows[1:]
@@ -55,7 +55,7 @@ async def process_products(file_content, content_type: str):
         product_slugs_in_sheet = set()
 
         for i in range(num_batches):
-            batch = data_rows[i * batch_size: (i + 1) * batch_size]
+            batch = data_rows[i * batch_size : (i + 1) * batch_size]
             logger.info(f"Processing batch {i + 1}")
 
             # Extract and process the products
@@ -68,7 +68,6 @@ async def process_products(file_content, content_type: str):
                 is_active = row_data.get("is_active", True)
                 if isinstance(is_active, str):
                     is_active = True if active == "TRUE" else False
-
 
                 product_data = {
                     "id": row_data.get("id", ""),
@@ -146,7 +145,6 @@ async def create_or_update_products_in_db(products: List):
                 session.refresh(product)
                 await update_collections(product, collections, session)
                 await update_images(product, images, session)
-                
 
             except SQLAlchemyError as e:
                 logger.error("Error updating product" + str(e))
@@ -249,8 +247,18 @@ async def generate_excel_file(bucket: Any, email: str):
 
         # Define the header row
         headers = [
-            "id", "name", "slug", "description", "price", "old_price", 
-            "inventory", "ratings", "image", "is_active", "collections", "images"
+            "id",
+            "name",
+            "slug",
+            "description",
+            "price",
+            "old_price",
+            "inventory",
+            "ratings",
+            "image",
+            "is_active",
+            "collections",
+            "images",
         ]
         sheet.append(headers)
 
@@ -277,12 +285,22 @@ async def generate_excel_file(bucket: Any, email: str):
             images_str = "|".join(images)
 
             # Append the product data as a row
-            sheet.append([
-                product.id, product.name, product.slug, product.description,
-                product.price, product.old_price, product.inventory,
-                product.ratings, product.image, product.is_active,
-                collections_str, images_str
-            ])
+            sheet.append(
+                [
+                    product.id,
+                    product.name,
+                    product.slug,
+                    product.description,
+                    product.price,
+                    product.old_price,
+                    product.inventory,
+                    product.ratings,
+                    product.image,
+                    product.is_active,
+                    collections_str,
+                    images_str,
+                ]
+            )
 
         # Create an in-memory Excel file using BytesIO
         output = BytesIO()
