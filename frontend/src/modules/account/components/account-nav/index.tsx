@@ -36,6 +36,21 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
                                 <li>
                                     <LocalizedClientLink
                                         className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                                        data-testid="overview-link"
+                                        href="/account"
+                                    >
+                                        <>
+                                            <div className="flex items-center gap-x-2">
+                                                <User size={20} />
+                                                <span>Overview</span>
+                                            </div>
+                                            <ChevronDown className="transform -rotate-90" />
+                                        </>
+                                    </LocalizedClientLink>
+                                </li>
+                                <li>
+                                    <LocalizedClientLink
+                                        className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
                                         data-testid="profile-link"
                                         href="/account/profile"
                                     >

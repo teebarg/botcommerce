@@ -11,7 +11,7 @@ type OverviewProps = {
 const Overview = ({ customer, orders }: OverviewProps) => {
     return (
         <div data-testid="overview-page-wrapper">
-            <div className="mt-4 md:mt-0">
+            <div className="mt-8 sm:mt-0">
                 <div className="text-xl flex justify-between items-center mb-4">
                     <span data-testid="welcome-message" data-value={customer?.firstname}>
                         Hello {customer?.firstname}
@@ -55,7 +55,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-y-4">
+                        <div className="hidden sm:flex flex-col gap-y-4">
                             <div className="flex items-center gap-x-2">
                                 <h3 className="text-lg">Recent orders</h3>
                             </div>
