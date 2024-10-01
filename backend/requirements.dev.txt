@@ -6,4 +6,4 @@ httpx>=0.25.0,<0.28
 ruff==0.6.3
 isort==5.13.2
 pre-commit==3.8.0
-mypy==1.10.1
+mypy==1.11.2
