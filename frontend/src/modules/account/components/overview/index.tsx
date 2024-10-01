@@ -11,7 +11,7 @@ type OverviewProps = {
 const Overview = ({ customer, orders }: OverviewProps) => {
     return (
         <div data-testid="overview-page-wrapper">
-            <div className="hidden sm:block">
+            <div className="mt-4 md:mt-0">
                 <div className="text-xl flex justify-between items-center mb-4">
                     <span data-testid="welcome-message" data-value={customer?.firstname}>
                         Hello {customer?.firstname}
