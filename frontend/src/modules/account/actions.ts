@@ -185,9 +185,8 @@ export async function addCustomerShippingAddress(_currentState: Record<string, u
     } as any;
 
     try {
-        await addShippingAddress(customer).then(() => {
-            revalidateTag("customer");
-        });
+        await addShippingAddress(customer);
+        revalidateTag("customer");
 
         return { success: true, error: null };
     } catch (error: any) {

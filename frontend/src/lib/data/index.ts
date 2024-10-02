@@ -336,6 +336,32 @@ export async function getCustomer() {
     }
 }
 
+
+// Customer actions
+export async function getAdresses() {
+    const headers = getHeaders(["addresses"]);
+
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+            },
+            credentials: "include",
+        });
+
+        if (!res.ok) {
+            throw new Error(`${res.statusText}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        return null;
+    }
+}
+
+
 export async function createCustomer(data: any) {
     const headers = getHeaders(["customer"]);
 

@@ -17,7 +17,7 @@ from core import security
 from core.config import settings
 from core.logging import logger
 from db.engine import engine
-from models.generic import Address, Cart, Order, User
+from models.generic import Address, Cart, User
 from models.token import TokenPayload
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -172,6 +172,3 @@ def get_order_path_param(
             )
         return order
     raise HTTPException(status_code=404, detail="Order not found.")
-
-
-CurrentOrder = Annotated[Order, Depends(get_order_path_param)]

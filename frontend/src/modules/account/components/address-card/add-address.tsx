@@ -44,7 +44,7 @@ const AddAddress = () => {
             </button>
 
             {modalState.isOpen && (
-                <Modal data-testid="add-address-modal" onClose={modalState.close}>
+                <Modal data-testid="add-address-modal" onClose={modalState.close}> 
                     <React.Fragment>
                         <form action={formAction}>
                             <div className="flex flex-col gap-y-2 w-full py-4">
