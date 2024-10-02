@@ -12,9 +12,10 @@ import { Input } from "@nextui-org/input";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
+import { Address } from "types/global";
 
 type EditAddressProps = {
-    address: any;
+    address: Address;
     isActive?: boolean;
 };
 
@@ -61,13 +62,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
             >
                 <div className="flex flex-col">
                     <h3 className="text-left text-sm" data-testid="address-name">
-                        {address.first_name} {address.last_name}
+                        {address.firstname} {address.lastname}
                     </h3>
-                    {address.company && (
+                    {/* {address.company && (
                         <p className="text-sm" data-testid="address-company">
                             {address.company}
                         </p>
-                    )}
+                    )} */}
                     <p className="flex flex-col text-left text-base mt-2">
                         <span data-testid="address-address">
                             {address.address_1}
@@ -105,17 +106,17 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                     isRequired
                                     autoComplete="given-name"
                                     data-testid="first-name-input"
-                                    defaultValue={address.first_name || undefined}
+                                    defaultValue={address.firstname || undefined}
                                     label="First name"
-                                    name="first_name"
+                                    name="firstname"
                                 />
                                 <Input
                                     isRequired
                                     autoComplete="family-name"
                                     data-testid="last-name-input"
-                                    defaultValue={address.last_name || undefined}
+                                    defaultValue={address.lastname || undefined}
                                     label="Last name"
-                                    name="last_name"
+                                    name="lastname"
                                 />
                             </div>
                             <Input

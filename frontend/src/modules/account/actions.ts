@@ -198,8 +198,8 @@ export async function updateCustomerShippingAddress(currentState: Record<string,
     const addressId = currentState.addressId as string;
 
     const address = {
-        first_name: formData.get("first_name") as string,
-        last_name: formData.get("last_name") as string,
+        firstname: formData.get("firstname") as string,
+        lastname: formData.get("lastname") as string,
         address_1: formData.get("address_1") as string,
         address_2: formData.get("address_2") as string,
         city: formData.get("city") as string,
@@ -219,7 +219,7 @@ export async function updateCustomerShippingAddress(currentState: Record<string,
     }
 }
 
-export async function deleteCustomerShippingAddress(addressId: string) {
+export async function deleteCustomerShippingAddress(addressId: string | number) {
     try {
         await deleteShippingAddress(addressId).then(() => {
             revalidateTag("customer");

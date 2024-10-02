@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 export default async function Addresses() {
     const customer = await getCustomer();
-    const addresses = await getAdresses();
+    const { addresses } = await getAdresses();
 
-    console.log(addresses)
+    console.log(addresses);
 
     if (!customer) {
         notFound();
@@ -27,7 +27,7 @@ export default async function Addresses() {
                     checkout.
                 </p>
             </div>
-            <AddressBook customer={customer} />
+            <AddressBook addresses={addresses} />
         </div>
     );
 }

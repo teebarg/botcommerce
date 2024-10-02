@@ -389,7 +389,7 @@ export async function addShippingAddress(data: any) {
     //     .catch((err) => Error(err));
 }
 
-export async function deleteShippingAddress(addressId: string) {
+export async function deleteShippingAddress(addressId: string | number) {
     const headers = getHeaders(["customer"]);
 
     // return client.customers.addresses
