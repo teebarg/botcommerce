@@ -10,9 +10,11 @@ export const metadata: Metadata = {
 
 export default async function Addresses() {
     const customer = await getCustomer();
-    const { addresses } = await getAdresses();
-
-    console.log(addresses);
+    const addRes = await getAdresses();
+    if (!addRes) {
+        return null;
+    }
+    const { addresses } = addRes;
 
     if (!customer) {
         notFound();

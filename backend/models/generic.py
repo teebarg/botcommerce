@@ -168,8 +168,8 @@ class CartPublic(CartBase):
 class Address(AddressBase, table=True):
     __tablename__ = "addresses"
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int | None = Field(default=None, foreign_key="user.id")
-    user: User | None = Relationship(back_populates="addresses")
+    user_id: int = Field(default=None, foreign_key="user.id")
+    user: User = Relationship(back_populates="addresses")
 
 
 class AddressPublic(AddressBase):

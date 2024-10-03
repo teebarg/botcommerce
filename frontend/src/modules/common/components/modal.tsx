@@ -26,13 +26,13 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, ...prop
 
     return (
         <OverlayContainer>
-            <div {...underlayProps} className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur bg-white/50">
+            <div {...underlayProps} className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur bg-white/40">
                 <div
                     {...overlayProps}
                     // {...dialogProps}
                     // {...modalProps}
                     ref={ref}
-                    className="bg-content1 rounded-lg p-10 max-w-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative"
+                    className="bg-default-200 rounded-lg p-10 max-w-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative"
                 >
                     {title && <h2 className="text-lg font-semibold mb-4">{title}</h2>}
                     <div>

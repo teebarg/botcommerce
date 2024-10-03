@@ -171,22 +171,20 @@ export async function updateCustomerPassword(
 }
 
 export async function addCustomerShippingAddress(_currentState: Record<string, unknown>, formData: FormData) {
-    const customer = {
-        address: {
-            first_name: formData.get("first_name") as string,
-            last_name: formData.get("last_name") as string,
-            address_1: formData.get("address_1") as string,
-            address_2: formData.get("address_2") as string,
-            city: formData.get("city") as string,
-            postal_code: formData.get("postal_code") as string,
-            state: formData.get("state") as string,
-            phone: formData.get("phone") as string,
-        },
+    const address = {
+        firstname: formData.get("firstname") as string,
+        lastname: formData.get("lastname") as string,
+        address_1: formData.get("address_1") as string,
+        address_2: formData.get("address_2") as string,
+        city: formData.get("city") as string,
+        postal_code: formData.get("postal_code") as string,
+        state: formData.get("state") as string,
+        phone: formData.get("phone") as string,
     } as any;
 
     try {
-        await addShippingAddress(customer);
-        revalidateTag("customer");
+        await addShippingAddress(address);
+        revalidateTag("address");
 
         return { success: true, error: null };
     } catch (error: any) {
@@ -209,9 +207,8 @@ export async function updateCustomerShippingAddress(currentState: Record<string,
     } as any;
 
     try {
-        await updateShippingAddress(addressId, address).then(() => {
-            revalidateTag("customer");
-        });
+        await updateShippingAddress(addressId, address);
+        revalidateTag("address");
 
         return { success: true, error: null, addressId };
     } catch (error: any) {
@@ -221,9 +218,8 @@ export async function updateCustomerShippingAddress(currentState: Record<string,
 
 export async function deleteCustomerShippingAddress(addressId: string | number) {
     try {
-        await deleteShippingAddress(addressId).then(() => {
-            revalidateTag("customer");
-        });
+        await deleteShippingAddress(addressId);
+        revalidateTag("address");
 
         return { success: true, error: null };
     } catch (error: any) {

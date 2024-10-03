@@ -342,7 +342,7 @@ export async function getAdresses() {
     const headers = getHeaders(["addresses"]);
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -380,31 +380,76 @@ export async function updateCustomer(data: any) {
     //     .catch((err) => Error(err));
 }
 
-export async function addShippingAddress(data: any) {
-    const headers = getHeaders(["customer"]);
+export async function addShippingAddress(createData: any) {
+    const headers = getHeaders(["addresses"]);
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers
+            },
+            body: JSON.stringify(createData),
+        });
 
-    // return client.customers.addresses
-    //     .addAddress(data, headers)
-    //     .then(({ customer }) => customer)
-    //     .catch((err) => Error(err));
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        const data = await res.json();
+
+        return data;
+    } catch (error) {
+        throw new Error(`Error: ${error}`);
+    }
 }
 
 export async function deleteShippingAddress(addressId: string | number) {
     const headers = getHeaders(["customer"]);
 
-    // return client.customers.addresses
-    //     .deleteAddress(addressId, headers)
-    //     .then(({ customer }) => customer)
-    //     .catch((err) => Error(err));
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/${addressId}`, {
+            method: "DELETE",
+            headers: {
+                "accept": "application/json",
+                ...headers
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        const data = await res.json();
+
+        return data;
+    } catch (error) {
+        throw new Error(`Error: ${error}`);
+    }
 }
 
-export async function updateShippingAddress(addressId: string, data: any) {
-    const headers = getHeaders(["customer"]);
+export async function updateShippingAddress(addressId: string, updateData: any) {
+    const headers = getHeaders(["addresses"]);
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/${addressId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers
+            },
+            body: JSON.stringify(updateData),
+        });
 
-    // return client.customers.addresses
-    //     .updateAddress(addressId, data, headers)
-    //     .then(({ customer }) => customer)
-    //     .catch((err) => Error(err));
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        const data = await res.json();
+
+        return data;
+    } catch (error) {
+        throw new Error(`Error: ${error}`);
+    }
 }
 
 export const listCustomerOrders = cache(async function (limit: number = 10, offset: number = 0) {

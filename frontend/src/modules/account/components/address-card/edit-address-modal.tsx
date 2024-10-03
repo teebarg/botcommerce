@@ -13,6 +13,7 @@ import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
 import { Address } from "types/global";
 import { useOverlayTriggerState } from "react-stately";
+import { ComboBox } from "@modules/common/components/combobox";
 
 type EditAddressProps = {
     address: Address;
@@ -82,7 +83,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                         Edit
                     </button>
                     <button
-                        className="text-sm text-default-800 flex items-center gap-x-2"
+                        className="text-sm text-danger-500 flex items-center gap-x-2"
                         data-testid="address-delete-button"
                         onClick={removeAddress}
                     >
@@ -96,7 +97,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                     <React.Fragment>
                         <h3 className="mb-2">Edit address</h3>
                         <form action={formAction}>
-                            <div className="grid grid-cols-1 gap-y-2 w-full py-2 px-6">
+                            <div className="grid grid-cols-1 gap-y-2 w-full py-2">
                                 <div className="grid grid-cols-2 gap-x-2">
                                     <Input
                                         isRequired
@@ -115,13 +116,6 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         name="lastname"
                                     />
                                 </div>
-                                {/* <Input
-                                autoComplete="organization"
-                                data-testid="company-input"
-                                defaultValue={address.company || undefined}
-                                label="Company"
-                                name="company"
-                            /> */}
                                 <Input
                                     isRequired
                                     autoComplete="address-line1"
@@ -139,6 +133,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                                 <div className="grid grid-cols-[144px_1fr] gap-x-2">
                                     <Input
+                                        type="number"
                                         isRequired
                                         autoComplete="postal-code"
                                         data-testid="postal-code-input"
@@ -155,12 +150,17 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         name="city"
                                     />
                                 </div>
-                                <Input
-                                    autoComplete="address-level1"
+                                <ComboBox
                                     data-testid="state-input"
-                                    defaultValue={address.state || undefined}
+                                    items={[
+                                        { id: "Lagos", name: "Lagos" },
+                                        { id: "Abuja", name: "Abuja" },
+                                        { id: "Rivers", name: "Rivers" },
+                                    ]}
                                     label="State"
                                     name="state"
+                                    placeholder="Select State"
+                                    defaultInputValue={address.state || undefined}
                                 />
                                 <Input
                                     autoComplete="phone"
@@ -171,10 +171,12 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                             </div>
                             <div className="flex gap-3 mt-6">
-                                <Button className="h-10" color="secondary" data-testid="cancel-button" type="reset" onClick={modalState.close}>
+                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
                                     Cancel
                                 </Button>
-                                <FormButton data-testid="save-button">Save</FormButton>
+                                <FormButton color="primary" data-testid="save-button">
+                                    Save
+                                </FormButton>
                             </div>
                         </form>
                     </React.Fragment>
