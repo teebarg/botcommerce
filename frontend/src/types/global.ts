@@ -179,5 +179,5 @@ export type Address = {
     postal_code: string;
     state: string;
     phone: string;
-    id: number | string;
+    id: string;
 };
