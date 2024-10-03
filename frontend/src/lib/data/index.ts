@@ -379,6 +379,7 @@ export async function updateCustomer(data: any) {
 
 export async function addShippingAddress(createData: any) {
     const headers = getHeaders(["addresses"]);
+
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/`, {
             method: "POST",
@@ -427,6 +428,7 @@ export async function deleteShippingAddress(addressId: string | number) {
 
 export async function updateShippingAddress(addressId: string, updateData: any) {
     const headers = getHeaders(["addresses"]);
+
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/${addressId}`, {
             method: "PATCH",
@@ -451,6 +453,7 @@ export async function updateShippingAddress(addressId: string, updateData: any) 
 
 export async function updateBillingAddress(updateData: any) {
     const headers = getHeaders(["addresses"]);
+
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/billing_address`, {
             method: "POST",

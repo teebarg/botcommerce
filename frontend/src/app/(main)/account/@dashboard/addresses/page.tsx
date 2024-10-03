@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 export default async function Addresses() {
     const customer = await getCustomer();
     const addRes = await getAdresses();
+
     if (!addRes) {
         return null;
     }

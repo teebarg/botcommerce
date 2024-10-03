@@ -4,10 +4,10 @@ import React, { useEffect, useMemo } from "react";
 import { useFormState } from "react-dom";
 import { updateCustomerBillingAddress } from "@modules/account/actions";
 import { Input } from "@nextui-org/input";
-
-import AccountInfo from "../account-info";
 import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
+
+import AccountInfo from "../account-info";
 
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;
@@ -108,11 +108,11 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                     </div>
                     <ComboBox
                         data-testid="billing-state-input"
+                        defaultInputValue={customer.billing_address?.state || undefined}
                         items={states}
                         label="State"
                         name="billing_address.state"
                         placeholder="Select State"
-                        defaultInputValue={customer.billing_address?.state || undefined}
                     />
                 </div>
             </AccountInfo>

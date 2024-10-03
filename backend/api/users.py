@@ -20,9 +20,7 @@ async def read_user_me(db: SessionDep, user: CurrentUser) -> UserPublic:
     """
     # Retrieve shipping addresses
     shipping_addresses = db.exec(
-        select(Address).where(
-            Address.user_id == user.id, Address.is_billing == False
-        )
+        select(Address).where(Address.user_id == user.id, Address.is_billing.is_(False))
     ).all()
 
     # Retrieve billing address

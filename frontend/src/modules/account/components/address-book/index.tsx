@@ -1,5 +1,5 @@
 import React from "react";
-import { Address, Customer } from "types/global";
+import { Address } from "types/global";
 
 import AddAddress from "../address-card/add-address";
 import EditAddress from "../address-card/edit-address-modal";

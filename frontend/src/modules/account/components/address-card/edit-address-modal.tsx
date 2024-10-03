@@ -130,13 +130,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                                 <div className="grid grid-cols-[144px_1fr] gap-x-2">
                                     <Input
-                                        type="number"
                                         isRequired
                                         autoComplete="postal-code"
                                         data-testid="postal-code-input"
                                         defaultValue={address.postal_code || undefined}
                                         label="Postal code"
                                         name="postal_code"
+                                        type="number"
                                     />
                                     <Input
                                         isRequired
@@ -149,11 +149,11 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 </div>
                                 <ComboBox
                                     data-testid="state-input"
+                                    defaultInputValue={address.state || undefined}
                                     items={states}
                                     label="State"
                                     name="state"
                                     placeholder="Select State"
-                                    defaultInputValue={address.state || undefined}
                                 />
                                 <Input
                                     autoComplete="phone"
