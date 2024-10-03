@@ -1,5 +1,4 @@
 import secrets
-from datetime import datetime, timezone
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -138,6 +137,12 @@ class User(UserBase, table=True):
     addresses: List["Address"] = Relationship(back_populates="user")
 
 
+class UserPublic(UserBase):
+    id: int | None
+    shipping_addresses: list["Address"] = []
+    billing_address: "Address"
+
+
 class Cart(CartBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
@@ -203,3 +208,12 @@ class OrderItems(SQLModel):
     limit: int
     total_count: int
     total_pages: int
+
+
+# Shared properties
+# class User(BaseModel):
+#     email: EmailStr | None = Field(unique=True, index=True, max_length=255)
+#     is_active: bool = True
+#     is_superuser: bool = False
+#     firstname: str | None = Field(default=None, max_length=255)
+#     lastname: str | None = Field(default=None, max_length=255)

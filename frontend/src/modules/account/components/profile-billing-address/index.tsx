@@ -6,6 +6,8 @@ import { updateCustomerBillingAddress } from "@modules/account/actions";
 import { Input } from "@nextui-org/input";
 
 import AccountInfo from "../account-info";
+import { ComboBox } from "@modules/common/components/combobox";
+import { states } from "@modules/collections/templates/data";
 
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;
@@ -35,9 +37,8 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
         return (
             <div className="flex flex-col font-semibold" data-testid="current-info">
                 <span>
-                    {customer.billing_address.first_name} {customer.billing_address.last_name}
+                    {customer.billing_address.firstname} {customer.billing_address.lastname}
                 </span>
-                <span>{customer.billing_address.company}</span>
                 <span>
                     {customer.billing_address.address_1}
                     {customer.billing_address.address_2 ? `, ${customer.billing_address.address_2}` : ""}
@@ -64,24 +65,18 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                         <Input
                             isRequired
                             data-testid="billing-first-name-input"
-                            defaultValue={customer.billing_address?.first_name || undefined}
+                            defaultValue={customer.billing_address?.firstname || undefined}
                             label="First name"
-                            name="billing_address.first_name"
+                            name="billing_address.firstname"
                         />
                         <Input
                             isRequired
                             data-testid="billing-last-name-input"
-                            defaultValue={customer.billing_address?.last_name || undefined}
+                            defaultValue={customer.billing_address?.lastname || undefined}
                             label="Last name"
-                            name="billing_address.last_name"
+                            name="billing_address.lastname"
                         />
                     </div>
-                    <Input
-                        data-testid="billing-company-input"
-                        defaultValue={customer.billing_address?.company || undefined}
-                        label="Company"
-                        name="billing_address.company"
-                    />
                     <Input
                         isRequired
                         data-testid="billing-address-1-input"
@@ -111,11 +106,13 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                             name="billing_address.city"
                         />
                     </div>
-                    <Input
+                    <ComboBox
                         data-testid="billing-state-input"
-                        defaultValue={customer.billing_address?.state || undefined}
-                        label="Province"
+                        items={states}
+                        label="State"
                         name="billing_address.state"
+                        placeholder="Select State"
+                        defaultInputValue={customer.billing_address?.state || undefined}
                     />
                 </div>
             </AccountInfo>

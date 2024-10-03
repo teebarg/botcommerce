@@ -11,6 +11,7 @@ import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
 import { useOverlayTriggerState } from "react-stately";
 import { ComboBox } from "@modules/common/components/combobox";
+import { states } from "@modules/collections/templates/data";
 
 const AddAddress = () => {
     const { enqueueSnackbar } = useSnackbar();
@@ -45,7 +46,7 @@ const AddAddress = () => {
             </button>
 
             {modalState.isOpen && (
-                <Modal data-testid="add-address-modal" onClose={modalState.close}> 
+                <Modal data-testid="add-address-modal" onClose={modalState.close}>
                     <React.Fragment>
                         <form action={formAction}>
                             <div className="flex flex-col gap-y-2 w-full py-4">
@@ -65,24 +66,16 @@ const AddAddress = () => {
                                     />
                                     <Input isRequired autoComplete="locality" data-testid="city-input" label="City" name="city" />
                                 </div>
-                                <ComboBox
-                                    data-testid="state-input"
-                                    items={[
-                                        { id: "Lagos", name: "Lagos" },
-                                        { id: "Abuja", name: "Abuja" },
-                                        { id: "Rivers", name: "Rivers" },
-                                    ]}
-                                    label="State"
-                                    name="state"
-                                    placeholder="Select State"
-                                />
+                                <ComboBox data-testid="state-input" items={states} label="State" name="state" placeholder="Select State" />
                                 <Input autoComplete="phone" data-testid="phone-input" label="Phone" name="phone" />
                             </div>
                             <div className="flex gap-3 mt-6">
                                 <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
                                     Cancel
                                 </Button>
-                                <FormButton color="primary" data-testid="save-button">Save</FormButton>
+                                <FormButton color="primary" data-testid="save-button">
+                                    Save
+                                </FormButton>
                             </div>
                         </form>
                     </React.Fragment>

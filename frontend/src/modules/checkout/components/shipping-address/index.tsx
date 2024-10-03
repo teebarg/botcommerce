@@ -17,10 +17,9 @@ const ShippingAddress = ({
     onChange: () => void;
 }) => {
     const [formData, setFormData] = useState({
-        "shipping_address.first_name": cart?.shipping_address?.first_name || "",
-        "shipping_address.last_name": cart?.shipping_address?.last_name || "",
+        "shipping_address.firstname": cart?.shipping_address?.firstname || "",
+        "shipping_address.lastname": cart?.shipping_address?.lastname || "",
         "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
-        "shipping_address.company": cart?.shipping_address?.company || "",
         "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
         "shipping_address.city": cart?.shipping_address?.city || "",
         "shipping_address.state": cart?.shipping_address?.state || "",
@@ -30,10 +29,9 @@ const ShippingAddress = ({
 
     useEffect(() => {
         setFormData({
-            "shipping_address.first_name": cart?.shipping_address?.first_name || "",
-            "shipping_address.last_name": cart?.shipping_address?.last_name || "",
+            "shipping_address.firstname": cart?.shipping_address?.firstname || "",
+            "shipping_address.lastname": cart?.shipping_address?.lastname || "",
             "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
-            "shipping_address.company": cart?.shipping_address?.company || "",
             "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
             "shipping_address.city": cart?.shipping_address?.city || "",
             "shipping_address.state": cart?.shipping_address?.state || "",
@@ -53,7 +51,7 @@ const ShippingAddress = ({
         <React.Fragment>
             {customer && (customer.shipping_addresses?.length || 0) > 0 && (
                 <div className="shadow-md bg-default-50 w-full rounded-lg mb-6 flex flex-col gap-y-4 p-5">
-                    <p className="text-small-regular">{`Hi ${customer.first_name}, do you want to use one of your saved addresses?`}</p>
+                    <p className="text-small-regular">{`Hi ${customer.firstname}, do you want to use one of your saved addresses?`}</p>
                     <AddressSelect addresses={customer.shipping_addresses} cart={cart} />
                 </div>
             )}
@@ -63,8 +61,8 @@ const ShippingAddress = ({
                     autoComplete="given-name"
                     data-testid="shipping-first-name-input"
                     label="First name"
-                    name="shipping_address.first_name"
-                    value={formData["shipping_address.first_name"]}
+                    name="shipping_address.firstname"
+                    value={formData["shipping_address.firstname"]}
                     onChange={handleChange}
                 />
                 <Input
@@ -72,8 +70,8 @@ const ShippingAddress = ({
                     autoComplete="family-name"
                     data-testid="shipping-last-name-input"
                     label="Last name"
-                    name="shipping_address.last_name"
-                    value={formData["shipping_address.last_name"]}
+                    name="shipping_address.lastname"
+                    value={formData["shipping_address.lastname"]}
                     onChange={handleChange}
                 />
                 <Input
@@ -83,14 +81,6 @@ const ShippingAddress = ({
                     label="Address"
                     name="shipping_address.address_1"
                     value={formData["shipping_address.address_1"]}
-                    onChange={handleChange}
-                />
-                <Input
-                    autoComplete="organization"
-                    data-testid="shipping-company-input"
-                    label="Company"
-                    name="shipping_address.company"
-                    value={formData["shipping_address.company"]}
                     onChange={handleChange}
                 />
                 <Input

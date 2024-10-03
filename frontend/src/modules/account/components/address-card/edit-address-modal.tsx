@@ -14,6 +14,7 @@ import Button from "@modules/common/components/button";
 import { Address } from "types/global";
 import { useOverlayTriggerState } from "react-stately";
 import { ComboBox } from "@modules/common/components/combobox";
+import { states } from "@modules/collections/templates/data";
 
 type EditAddressProps = {
     address: Address;
@@ -82,11 +83,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                         <Edit />
                         Edit
                     </button>
-                    <button
-                        className="text-sm text-danger-500 flex items-center gap-x-2"
-                        data-testid="address-delete-button"
-                        onClick={removeAddress}
-                    >
+                    <button className="text-sm text-danger-500 flex items-center gap-x-2" data-testid="address-delete-button" onClick={removeAddress}>
                         {removing ? <Spinner /> : <Trash />}
                         Remove
                     </button>
@@ -152,11 +149,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 </div>
                                 <ComboBox
                                     data-testid="state-input"
-                                    items={[
-                                        { id: "Lagos", name: "Lagos" },
-                                        { id: "Abuja", name: "Abuja" },
-                                        { id: "Rivers", name: "Rivers" },
-                                    ]}
+                                    items={states}
                                     label="State"
                                     name="state"
                                     placeholder="Select State"

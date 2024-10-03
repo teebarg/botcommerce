@@ -1,6 +1,15 @@
 "use server";
 
-import { addShippingAddress, authenticate, createCustomer, deleteShippingAddress, getToken, updateCustomer, updateShippingAddress } from "@lib/data";
+import {
+    addShippingAddress,
+    authenticate,
+    createCustomer,
+    deleteShippingAddress,
+    getToken,
+    updateBillingAddress,
+    updateCustomer,
+    updateShippingAddress,
+} from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
@@ -228,24 +237,22 @@ export async function deleteCustomerShippingAddress(addressId: string | number) 
 }
 
 export async function updateCustomerBillingAddress(_currentState: Record<string, unknown>, formData: FormData) {
-    const customer = {
-        billing_address: {
-            first_name: formData.get("billing_address.first_name"),
-            last_name: formData.get("billing_address.last_name"),
-            company: formData.get("billing_address.company"),
-            address_1: formData.get("billing_address.address_1"),
-            address_2: formData.get("billing_address.address_2"),
-            city: formData.get("billing_address.city"),
-            postal_code: formData.get("billing_address.postal_code"),
-            province: formData.get("billing_address.province"),
-            phone: formData.get("billing_address.phone"),
-        },
+    const billing_address = {
+        firstname: formData.get("billing_address.firstname"),
+        lastname: formData.get("billing_address.lastname"),
+        company: formData.get("billing_address.company"),
+        address_1: formData.get("billing_address.address_1"),
+        address_2: formData.get("billing_address.address_2"),
+        city: formData.get("billing_address.city"),
+        postal_code: formData.get("billing_address.postal_code"),
+        state: formData.get("billing_address.state"),
+        phone: formData.get("billing_address.phone"),
+        is_billing: true,
     } as any;
 
     try {
-        await updateCustomer(customer).then(() => {
-            revalidateTag("customer");
-        });
+        await updateBillingAddress(billing_address);
+        revalidateTag("customer");
 
         return { success: true, error: null };
     } catch (error: any) {
