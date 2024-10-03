@@ -1,5 +1,4 @@
 import secrets
-from datetime import datetime, timezone
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -10,7 +9,6 @@ from models.brand import BrandBase
 from models.cart import CartBase
 from models.cart_item import CartItemBase
 from models.collection import CollectionBase
-from models.order import OrderBase
 from models.order_item import OrderItemBase
 from models.product import ProductBase
 from models.tag import TagBase
@@ -137,7 +135,12 @@ class User(UserBase, table=True):
     hashed_password: str = secrets.token_urlsafe(6)
     carts: List["Cart"] = Relationship(back_populates="user")
     addresses: List["Address"] = Relationship(back_populates="user")
-    orders: List["Order"] = Relationship(back_populates="user")
+
+
+class UserPublic(UserBase):
+    id: int | None
+    shipping_addresses: list["Address"] = []
+    billing_address: "Address"
 
 
 class Cart(CartBase, table=True):
@@ -170,8 +173,8 @@ class CartPublic(CartBase):
 class Address(AddressBase, table=True):
     __tablename__ = "addresses"
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int | None = Field(default=None, foreign_key="user.id")
-    user: User | None = Relationship(back_populates="addresses")
+    user_id: int = Field(default=None, foreign_key="user.id")
+    user: User = Relationship(back_populates="addresses")
 
 
 class AddressPublic(AddressBase):
@@ -186,25 +189,10 @@ class Addresses(SQLModel):
     total_pages: int
 
 
-class Order(OrderBase, table=True):
-    __tablename__ = "orders"
-    id: Optional[int] = Field(default=None, primary_key=True)
-    order_number: str | None = Field(default=None, max_length=255)
-    order_date: datetime | None = Field(default=datetime.now(timezone.utc))
-    status: str | None = Field(default=None, max_length=255)
-    user_id: int | None = Field(default=None, foreign_key="user.id")
-    user: User | None = Relationship(back_populates="orders")
-    shipping_id: int | None = Field(default=None, foreign_key="addresses.id")
-    shipping: Address = Relationship()
-
-    items: list["OrderItem"] = Relationship(back_populates="order")
-
-
 class OrderItem(OrderItemBase, table=True):
     __tablename__ = "order_items"
     id: Optional[int] = Field(default=None, primary_key=True)
     order_id: int | None = Field(default=None, foreign_key="orders.id")
-    order: Order | None = Relationship(back_populates="items")
     product_id: int | None = Field(default=None, foreign_key="product.id")
     product: Product = Relationship()
 
@@ -212,22 +200,6 @@ class OrderItem(OrderItemBase, table=True):
 class OrderItemPublic(OrderItemBase):
     id: int
     product: Product
-
-
-class OrderPublic(OrderBase):
-    id: int
-    order_number: str
-    order_date: datetime
-    status: str
-    items: list["OrderItemPublic"] = []
-
-
-class Orders(SQLModel):
-    orders: list[OrderPublic]
-    page: int
-    limit: int
-    total_count: int
-    total_pages: int
 
 
 class OrderItems(SQLModel):

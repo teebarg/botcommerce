@@ -89,6 +89,28 @@ def read(address: CurrentAddress) -> AddressPublic:
     return address
 
 
+@router.post(
+    "/billing_address",
+    dependencies=[Depends(get_current_user)],
+    response_model=AddressPublic,
+)
+def set_billing_address(db: SessionDep, user: CurrentUser, address: AddressCreate):
+    # Check if the user already has a billing address
+    existing_address = db.exec(
+        select(Address).where(Address.user_id == user.id, Address.is_billing)
+    ).first()
+
+    if existing_address:
+        # Update the existing billing address with the new data
+        existing_address.is_billing = True
+        db_address = crud.address.update(db=db, db_obj=existing_address, obj_in=address)
+        return db_address
+
+    address.is_billing = True
+    address = crud.address.create(db=db, obj_in=address, user_id=user.id)
+    return address
+
+
 @router.patch(
     "/{id}",
     dependencies=[Depends(get_address_param)],

@@ -13,6 +13,7 @@ from api.order import router as order_router
 from api.order_item import router as order_item_router
 from api.product import router as product_router
 from api.tag import router as tag_router
+from api.users import router as user_router
 
 # from api.websocket import consume_events
 from api.websocket import router as websocket_router
@@ -32,6 +33,12 @@ app.include_router(
     websocket_router,
     prefix="/api/ws",
     tags=["Websockets"],
+)
+
+app.include_router(
+    user_router,
+    prefix="/api/users",
+    tags=["users"],
 )
 
 app.include_router(

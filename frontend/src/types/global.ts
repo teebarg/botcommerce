@@ -167,3 +167,17 @@ export type Order = {
 };
 
 export type SortOptions = "price_asc" | "price_desc" | "created_at";
+
+export type Address = {
+    created_at: string;
+    updated_at: string;
+    firstname: string;
+    lastname: string;
+    address_1: string;
+    address_2: string;
+    city: string;
+    postal_code: string;
+    state: string;
+    phone: string;
+    id: string;
+};

@@ -35,4 +35,10 @@ const filters = [
     { id: "price:desc", name: "Price: High -> Low" },
 ];
 
-export { openingHours, filters };
+const states = [
+    { id: "Lagos", name: "Lagos" },
+    { id: "Abuja", name: "Abuja" },
+    { id: "Rivers", name: "Rivers" },
+];
+
+export { openingHours, filters, states };
