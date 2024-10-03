@@ -6,10 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from models.address import AddressBase
 from models.brand import BrandBase
-from models.cart import CartBase
-from models.cart_item import CartItemBase
 from models.collection import CollectionBase
-from models.order_item import OrderItemBase
 from models.product import ProductBase
 from models.tag import TagBase
 from models.user import UserBase
@@ -133,7 +130,6 @@ class Products(SQLModel):
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str = secrets.token_urlsafe(6)
-    carts: List["Cart"] = Relationship(back_populates="user")
     addresses: List["Address"] = Relationship(back_populates="user")
 
 
@@ -141,33 +137,6 @@ class UserPublic(UserBase):
     id: int | None
     shipping_addresses: list["Address"] = []
     billing_address: "Address"
-
-
-class Cart(CartBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
-    items: list["CartItem"] = Relationship(back_populates="cart")
-
-    user_id: int | None = Field(default=None, foreign_key="user.id")
-    user: User | None = Relationship(back_populates="carts")
-
-
-class CartItem(CartItemBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    cart_id: int = Field(default=None, foreign_key="cart.id")
-    cart: Cart | None = Relationship(back_populates="items")
-    product_id: int | None = Field(default=None, foreign_key="product.id")
-    product: Product = Relationship()
-
-
-class CartItemPublic(CartItemBase):
-    id: int
-    product: Product
-
-
-class CartPublic(CartBase):
-    id: int
-    items: list[CartItemPublic] = []
 
 
 class Address(AddressBase, table=True):
@@ -183,27 +152,6 @@ class AddressPublic(AddressBase):
 
 class Addresses(SQLModel):
     addresses: list[AddressPublic]
-    page: int
-    limit: int
-    total_count: int
-    total_pages: int
-
-
-class OrderItem(OrderItemBase, table=True):
-    __tablename__ = "order_items"
-    id: Optional[int] = Field(default=None, primary_key=True)
-    order_id: int | None = Field(default=None, foreign_key="orders.id")
-    product_id: int | None = Field(default=None, foreign_key="product.id")
-    product: Product = Relationship()
-
-
-class OrderItemPublic(OrderItemBase):
-    id: int
-    product: Product
-
-
-class OrderItems(SQLModel):
-    order_items: list[OrderItemPublic]
     page: int
     limit: int
     total_count: int

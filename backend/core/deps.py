@@ -1,10 +1,8 @@
-import uuid
-from datetime import timedelta
 from typing import Annotated, Generator, Union
 
 import firebase_admin
 import jwt
-from fastapi import Cookie, Depends, HTTPException, Response, status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from firebase_admin import credentials, storage
 from google.cloud.storage.bucket import Bucket
@@ -17,7 +15,7 @@ from core import security
 from core.config import settings
 from core.logging import logger
 from db.engine import engine
-from models.generic import Address, Cart, User
+from models.generic import Address, Product, User
 from models.token import TokenPayload
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -103,39 +101,10 @@ def get_address_param(id: str, db: SessionDep, current_user: CurrentUser) -> Add
 CurrentAddress = Annotated[User, Depends(get_address_param)]
 
 
-def get_cart(
-    db: SessionDep,
-    response: Response,
-    session_id: Annotated[Union[str, None], Cookie()] = None,
-) -> Cart:
-    if session_id is None:
-        session_id = str(uuid.uuid4())
-
-    response.set_cookie(
-        key="session_id",
-        value=session_id,
-        max_age=timedelta(days=30),
-        secure=True,
-        httponly=True,
-    )
-
-    if cart := crud.cart.get_by_key(db=db, key="session_id", value=session_id):
-        return cart
-
-    cart = Cart(**{"session_id": session_id})
-    db.add(cart)
-    db.commit()
-    db.refresh(cart)
-    return cart
-
-
-def get_product_path_param(id: str, db: SessionDep) -> Cart:
+def get_product_path_param(id: str, db: SessionDep) -> Product:
     if product := crud.product.get(db=db, id=id):
         return product
     raise HTTPException(status_code=404, detail="Product not found.")
-
-
-UserCart = Annotated[Cart, Depends(get_cart)]
 
 
 def get_current_active_superuser(current_user: CurrentUser) -> User:
@@ -147,28 +116,3 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
 
 
 AdminUser = Annotated[User, Depends(get_current_active_superuser)]
-
-
-def get_cart_path_param(id: str, db: SessionDep, current_user: CurrentUser) -> Cart:
-    if cart := crud.cart.get(db=db, id=id):
-        if not current_user.is_superuser and current_user.id != cart.user_id:
-            raise HTTPException(
-                status_code=401, detail="Unauthorized to access this cart."
-            )
-        return cart
-    raise HTTPException(status_code=404, detail="Cart not found.")
-
-
-CurrentCart = Annotated[Cart, Depends(get_cart_path_param)]
-
-
-def get_order_path_param(
-    order_number: str, db: SessionDep, current_user: CurrentUser
-) -> Cart:
-    if order := crud.order.get_by_key(db=db, key="order_number", value=order_number):
-        if not current_user.is_superuser:
-            raise HTTPException(
-                status_code=401, detail="Unauthorized to access this order."
-            )
-        return order
-    raise HTTPException(status_code=404, detail="Order not found.")
