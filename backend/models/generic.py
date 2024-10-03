@@ -208,12 +208,3 @@ class OrderItems(SQLModel):
     limit: int
     total_count: int
     total_pages: int
-
-
-# Shared properties
-# class User(BaseModel):
-#     email: EmailStr | None = Field(unique=True, index=True, max_length=255)
-#     is_active: bool = True
-#     is_superuser: bool = False
-#     firstname: str | None = Field(default=None, max_length=255)
-#     lastname: str | None = Field(default=None, max_length=255)

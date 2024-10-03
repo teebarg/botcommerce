@@ -62,11 +62,6 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                     <h3 className="text-left text-sm" data-testid="address-name">
                         {address.firstname} {address.lastname}
                     </h3>
-                    {/* {address.company && (
-                        <p className="text-sm" data-testid="address-company">
-                            {address.company}
-                        </p>
-                    )} */}
                     <p className="flex flex-col text-left text-base mt-2">
                         <span data-testid="address-address">
                             {address.address_1}
