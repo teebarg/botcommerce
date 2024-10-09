@@ -5,7 +5,7 @@ import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-relat
 import { notFound } from "next/navigation";
 import { Image } from "@nextui-org/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowUpRightMini, ChevronRightIcon, StarIcon } from "nui-react-icons";
+import { ArrowUpRightMini, ChevronRight, StarIcon } from "nui-react-icons";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { Product } from "types/global";
 
@@ -30,14 +30,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                         </li>
                         <li className="flex items-center" data-slot="base">
                             <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
-                                <ChevronRightIcon />
+                                <ChevronRight />
                             </span>
                             <LocalizedClientLink href="/collections">Collection</LocalizedClientLink>
                         </li>
                         {product?.name && (
                             <li className="flex items-center" data-slot="base">
                                 <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
-                                    <ChevronRightIcon />
+                                    <ChevronRight />
                                 </span>
                                 <span>{product.name}</span>
                             </li>
