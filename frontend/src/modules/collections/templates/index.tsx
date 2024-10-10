@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRightIcon, ExclamationIcon } from "nui-react-icons";
+import { ChevronRight, ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCategoriesList, getCollectionsList, searchProducts } from "@lib/data";
@@ -55,7 +55,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                         <li className="flex items-center" data-slot="base">
                             <LocalizedClientLink href="/">Home</LocalizedClientLink>
                             <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
-                                <ChevronRightIcon />
+                                <ChevronRight />
                             </span>
                         </li>
                         <li className="flex items-center" data-slot="base">
@@ -64,7 +64,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                         {collection?.title && (
                             <li className="flex items-center" data-slot="base">
                                 <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
-                                    <ChevronRightIcon />
+                                    <ChevronRight />
                                 </span>
                                 <span>{collection.title}</span>
                             </li>

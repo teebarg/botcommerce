@@ -4,6 +4,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.activities import router as activities_router
 from api.address import router as address_router
 from api.brand import router as brand_router
 from api.cart import router as cart_router
@@ -73,6 +74,12 @@ app.include_router(
     address_router,
     prefix="/api/address",
     tags=["addresses"],
+)
+
+app.include_router(
+    activities_router,
+    prefix="/api/activities",
+    tags=["activities"],
 )
 
 app.include_router(

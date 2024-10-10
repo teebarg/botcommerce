@@ -2,7 +2,7 @@
 
 import React, { ReactNode } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem, SubMenu, sidebarClasses, MenuItemStyles, menuClasses } from "react-pro-sidebar";
-import { AdminIcon, CalendarIcon, ChevronRightIcon, ComponentsIcon, DocumentIcon, EcommerceIcon, ProfileIcon } from "nui-react-icons";
+import { AdminIcon, CalendarIcon, ChevronRight, ComponentsIcon, DocumentIcon, EcommerceIcon, ProfileIcon } from "nui-react-icons";
 import { Badge, Chip } from "@nextui-org/react";
 import Link from "next/link";
 
@@ -191,7 +191,7 @@ const Sidebar: React.FC<Props> = () => {
                 <MenuItem
                     key={index}
                     component={<Link href={menuItem.href} />}
-                    suffix={<ChevronRightIcon className="hidden" height="2em" strokeWidth={2.5} width="2em" />}
+                    suffix={<ChevronRight className="hidden" height="2em" strokeWidth={2.5} width="2em" />}
                 >
                     {menuItem.label}
                 </MenuItem>

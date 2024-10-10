@@ -1,3 +1,4 @@
+from .activities import activities  # noqa: F401
 from .address import address  # noqa: F401
 from .brand import brand  # noqa: F401
 from .collection import collection  # noqa: F401
