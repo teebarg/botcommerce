@@ -1,8 +1,58 @@
-import React from "react";
+import { fetchWithAuth } from "@lib/util/api";
+import React, { useEffect, useState } from "react";
 
 interface Props {}
+interface Activity {
+    id: number;
+    activity_type: string;
+    description: string;
+    timestamp: string;
+    action_download_url: string;
+    is_success: boolean;
+}
 
 const Activity: React.FC<Props> = () => {
+    const [activities, setActivities] = useState<Activity[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [liveActivity, setLiveActivity] = useState<any>(null);
+
+    useEffect(() => {
+        fetchActivities();
+        // Establish WebSocket connection to listen for real-time updates
+        const userId = 1; // Example user_id, you can fetch the actual user ID
+        const ws = new WebSocket(`ws://localhost:8000/ws/activities/`);
+
+        ws.onmessage = (event) => {
+            // Update the live activity message
+            setLiveActivity(event.data);
+
+            // Optionally, you could fetch recent activities after receiving the message
+            // fetchActivities();
+        };
+
+        ws.onclose = () => {
+            console.log("WebSocket connection closed");
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, []);
+
+    const fetchActivities = async () => {
+        setLoading(true);
+        const { data, error } = await fetchWithAuth<any>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/`);
+
+        if (error) {
+            setError(error);
+        } else if (data) {
+            setActivities(data);
+        }
+
+        setLoading(false);
+    };
+
     return (
         <React.Fragment>
             {/* <div className="bg-grey-0 shadow-dropdown rounded-rounded fixed top-[64px] bottom-2 right-3 flex w-[400px] flex-col overflow-x-hidden rounded z-[1]"> */}

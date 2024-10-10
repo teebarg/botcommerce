@@ -2,6 +2,7 @@ import secrets
 from typing import List, Optional
 
 from pydantic import BaseModel
+from models.activities import ActivityBase
 from sqlmodel import Field, Relationship, SQLModel
 
 from models.address import AddressBase
@@ -131,12 +132,24 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str = secrets.token_urlsafe(6)
     addresses: List["Address"] = Relationship(back_populates="user")
+    activity_logs: List["ActivityLog"] = Relationship(back_populates="user")
 
 
 class UserPublic(UserBase):
     id: int | None
     shipping_addresses: list["Address"] = []
     billing_address: "Address"
+
+
+class ActivityLog(ActivityBase, table=True):
+    __tablename__ = 'activity_logs'
+
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    user_id: int = Field(foreign_key="user.id")
+    activity_type: str | None = Field(index=True, max_length=255) # E.g., "purchase", "viewed product", "profile updated"
+    description: str | None = Field(max_length=255)
+
+    user: User = Relationship(back_populates="activity_logs")
 
 
 class Address(AddressBase, table=True):

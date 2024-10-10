@@ -3,6 +3,7 @@ import datetime
 from io import BytesIO
 from typing import Annotated, Any
 
+from models.activities import ActivityCreate
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -16,6 +17,7 @@ from fastapi import (
 import crud
 from core import deps
 from core.deps import (
+    CurrentUser,
     SessionDep,
 )
 from core.logging import logger
@@ -261,7 +263,7 @@ async def upload_products(
 
 @router.post("/upload-products/")
 async def upload_products_a(
-    file: Annotated[UploadFile, File()], background_tasks: BackgroundTasks
+    db: SessionDep, user: CurrentUser, file: Annotated[UploadFile, File()], background_tasks: BackgroundTasks
 ):
     content_type = file.content_type
 
@@ -281,6 +283,13 @@ async def upload_products_a(
     # Define the background task
     def update_task():
         asyncio.run(process_products(file_content=contents, content_type=content_type))
+        # Log this order creation as an activity
+        activity_log = ActivityCreate(
+            user_id=user.id,
+            activity_type="purchase",
+            description=f"User placed an order with total amount"
+        )
+        crud.activities.create(db=db, activity_log=activity_log)
 
     background_tasks.add_task(update_task)
 
