@@ -49,14 +49,11 @@ class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
         # Broadcast the new activity to all connected clients
         asyncio.run(
             manager.broadcast(
-                id="1", data=new_activity.model_dump(mode="json"), type="product_export"
+                id="1", data=new_activity.model_dump(mode="json"), type="activity"
             )
         )
 
-
-    def create_product_upload_activity(
-        self, db: Session, user_id: int, filename: str
-    ):
+    def create_product_upload_activity(self, db: Session, user_id: int, filename: str):
         new_activity = self.create(
             db=db,
             user_id=user_id,
@@ -71,7 +68,7 @@ class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
         # Broadcast the new activity to all connected clients
         asyncio.run(
             manager.broadcast(
-                id="1", data=new_activity.model_dump(mode="json"), type="product_upload"
+                id="1", data=new_activity.model_dump(mode="json"), type="activity"
             )
         )
 

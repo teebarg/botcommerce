@@ -9,12 +9,11 @@ import Button from "@modules/common/components/button";
 import { DragNDrop } from "./drag-drop";
 
 interface Props {
-    onUpload: (id: string, formData: any) => void;
+    onUpload: (formData: any) => void;
     wsUrl: string;
 }
 
 const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
-    const id = "nK12eRTbo";
     const { enqueueSnackbar } = useSnackbar();
 
     const [file, setFile] = useState<File>();
@@ -53,7 +52,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
         formData.append("batch", "batch1");
 
         try {
-            await onUpload(id, formData);
+            await onUpload(formData);
         } catch (error) {
             enqueueSnackbar(`Error uploading file: ${error}`, { variant: "error" });
             setStatus(false);

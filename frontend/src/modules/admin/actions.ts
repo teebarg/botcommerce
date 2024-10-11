@@ -273,6 +273,7 @@ export async function getCollections(page: number = 1, limit: number = 10) {
 
 export async function bulkUploadProducts({ formData }: { formData: FormData }) {
     const accessToken = cookies().get("access_token")?.value as string;
+
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {
             method: "POST",
@@ -283,7 +284,7 @@ export async function bulkUploadProducts({ formData }: { formData: FormData }) {
         });
 
         if (!res.ok) {
-            throw new Error(res.statusText)
+            throw new Error(res.statusText);
         }
         // Revalidate the UI data
         revalidateTag("products");

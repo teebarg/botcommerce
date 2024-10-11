@@ -7,6 +7,8 @@ import { useButton } from "@react-aria/button";
 import { Bell } from "nui-react-icons";
 import { fetchWithAuth } from "@lib/util/api";
 import { useSnackbar } from "notistack";
+import { useWebSocket } from "@lib/hooks/use-websocket";
+import useWatch from "@lib/hooks/use-watch";
 
 import Activity from "./activity";
 
@@ -33,25 +35,24 @@ const ActivityTray: React.FC<Props> = () => {
     const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const { messages: wsMessages, connect: initializeWebsocket, disconnect: disconnectWebsocket } = useWebSocket({ type: ["activity"] });
+
+    const currentMessage = wsMessages[wsMessages.length - 1];
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/activities/`;
+
     useEffect(() => {
         fetchActivities();
-        // Establish WebSocket connection to listen for real-time updates
-        const userId = 1; // Example user_id, you can fetch the actual user ID
-        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS}/api/ws/activities/`);
-
-        ws.onmessage = (event) => {
-            // Update the live activity message
-            setActivities((prev) => [JSON.parse(event.data), ...prev]);
-        };
-
-        ws.onclose = () => {
-            console.log("WebSocket connection closed");
-        };
+        initializeWebsocket(wsUrl);
 
         return () => {
-            ws.close();
+            disconnectWebsocket();
         };
     }, []);
+
+    useWatch(currentMessage, () => {
+        // Update the live activity message
+        setActivities((prev) => [currentMessage, ...prev]);
+    });
 
     // Update the position of the popover relative to the button
     useEffect(() => {

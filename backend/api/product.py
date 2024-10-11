@@ -7,7 +7,6 @@ from fastapi import (
     APIRouter,
     BackgroundTasks,
     File,
-    Form,
     HTTPException,
     Query,
     UploadFile,
@@ -26,7 +25,7 @@ from models.product import (
     ProductCreate,
     ProductUpdate,
 )
-from services.export import process_file, validate_file
+from services.export import validate_file
 from services.meilisearch import (
     add_documents_to_index,
     clear_index,
@@ -277,7 +276,9 @@ async def upload_products_a(
     def update_task():
         asyncio.run(process_products(file_content=contents, content_type=content_type))
 
-        crud.activities.create_product_upload_activity(db=db, user_id=user.id, filename=file.filename)
+        crud.activities.create_product_upload_activity(
+            db=db, user_id=user.id, filename=file.filename
+        )
 
     background_tasks.add_task(update_task)
 
