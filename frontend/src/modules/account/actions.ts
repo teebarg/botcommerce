@@ -4,6 +4,7 @@ import {
     addShippingAddress,
     authenticate,
     createCustomer,
+    deleteActivities,
     deleteShippingAddress,
     getToken,
     updateBillingAddress,
@@ -328,5 +329,16 @@ export async function newsletterForm(_currentState: resType, formData: FormData)
         }
     } catch (error: any) {
         return { success: false, message: error.toString() };
+    }
+}
+
+export async function deleteActivity(id: string | number) {
+    try {
+        await deleteActivities(id);
+        revalidateTag("activities");
+
+        return { success: true, error: null };
+    } catch (error: any) {
+        return { success: false, error: error.toString() };
     }
 }

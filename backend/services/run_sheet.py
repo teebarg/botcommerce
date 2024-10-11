@@ -97,8 +97,8 @@ async def process_products(file_content, content_type: str):
             await manager.broadcast(
                 id="sheet",
                 data={
-                    "total_rows": num_batches,
-                    "processed_rows": {i + 1},
+                    "total_rows": num_batches * batch_size,
+                    "processed_rows": (i + 1) * batch_size,
                     "status": "processing",
                 },
                 type="sheet-processor",

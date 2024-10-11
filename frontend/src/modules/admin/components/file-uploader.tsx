@@ -36,7 +36,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
             return "Submitting";
         }
 
-        return currentMessage?.status == "Processing" ? "Processing" : "Submit";
+        return currentMessage?.status == "processing" ? "Processing" : "Submit";
     };
 
     const handleSubmit = async () => {
@@ -56,7 +56,6 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
             await onUpload(id, formData);
         } catch (error) {
             enqueueSnackbar(`Error uploading file: ${error}`, { variant: "error" });
-        } finally {
             setStatus(false);
         }
     };
@@ -72,8 +71,8 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
                 <Button
                     className="min-w-48 rounded-md"
                     color="secondary"
-                    disabled={status || currentMessage?.status == "Processing"}
-                    isLoading={status || currentMessage?.status == "Processing"}
+                    disabled={status || currentMessage?.status == "processing"}
+                    isLoading={status || currentMessage?.status == "processing"}
                     variant="shadow"
                     onClick={() => handleSubmit()}
                 >

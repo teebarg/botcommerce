@@ -1,5 +1,6 @@
-from sqlmodel import Field
 from typing import Optional
+
+from sqlmodel import Field
 
 from models.base import BaseModel
 

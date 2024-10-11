@@ -5,12 +5,15 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useOverlay, OverlayContainer } from "@react-aria/overlays";
 import { useButton } from "@react-aria/button";
 import { Bell } from "nui-react-icons";
+import { fetchWithAuth } from "@lib/util/api";
+import { useSnackbar } from "notistack";
 
 import Activity from "./activity";
 
 interface Props {}
 
 const ActivityTray: React.FC<Props> = () => {
+    const { enqueueSnackbar } = useSnackbar();
     const state = useOverlayTriggerState({});
     const buttonRef = React.useRef(null);
     const overlayRef = React.useRef(null);
@@ -27,6 +30,29 @@ const ActivityTray: React.FC<Props> = () => {
         overlayRef
     );
 
+    const [activities, setActivities] = useState<Activity[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchActivities();
+        // Establish WebSocket connection to listen for real-time updates
+        const userId = 1; // Example user_id, you can fetch the actual user ID
+        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS}/api/ws/activities/`);
+
+        ws.onmessage = (event) => {
+            // Update the live activity message
+            setActivities((prev) => [JSON.parse(event.data), ...prev]);
+        };
+
+        ws.onclose = () => {
+            console.log("WebSocket connection closed");
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, []);
+
     // Update the position of the popover relative to the button
     useEffect(() => {
         if (state.isOpen && buttonRef.current) {
@@ -41,6 +67,23 @@ const ActivityTray: React.FC<Props> = () => {
         }
     }, [state.isOpen]);
 
+    const fetchActivities = async () => {
+        setLoading(true);
+        const { data, error } = await fetchWithAuth<any>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/`);
+
+        if (error) {
+            enqueueSnackbar(`Error: ${error}`, { variant: "error" });
+        } else if (data) {
+            setActivities(data);
+        }
+
+        setLoading(false);
+    };
+
+    const onRemove = async (id: string | number) => {
+        setActivities((prev) => prev.filter((activity) => activity.id !== id));
+    };
+
     return (
         <React.Fragment>
             {/* <div className="relative"> */}
@@ -52,14 +95,14 @@ const ActivityTray: React.FC<Props> = () => {
                     <div
                         {...overlayProps}
                         ref={overlayRef}
-                        className="absolute p-1 flex flex-col w-[450px] overflow-auto rounded-md bg-content1 z-40 shadow-lg"
+                        className="absolute flex flex-col w-[450px] overflow-auto rounded-md bg-content1 z-40 shadow-lg"
                         style={{
                             top: popoverPosition.top,
                             right: popoverPosition.right,
                             height: popoverPosition.height,
                         }}
                     >
-                        <Activity />
+                        {loading ? <div className="h-full">Loadinng</div> : <Activity activities={activities} onRemove={onRemove} />}
                     </div>
                 </OverlayContainer>
             )}

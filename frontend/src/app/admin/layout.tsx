@@ -3,7 +3,7 @@ import React from "react";
 import Sidebar from "@modules/admin/components/sidebar";
 import AdminNavbar from "@modules/admin/components/admin-navbar";
 import { getCustomer } from "@lib/data";
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 
@@ -15,8 +15,9 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
     const customer = await getCustomer().catch(() => null);
 
     if (!customer) {
-        redirect('/account')
+        redirect("/account");
     }
+
     return (
         <React.Fragment>
             <div className="flex min-h-screen">

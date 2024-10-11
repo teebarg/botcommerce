@@ -14,7 +14,7 @@ const CollectionUpload: React.FC<CollectionProps> = () => {
     const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/upload/${id}`;
 
     const handleUpload = async (id: string, formData: any) => {
-        await bulkUploadProducts({ id, formData });
+        await bulkUploadProducts({ formData });
     };
 
     return (

@@ -2,9 +2,9 @@ import secrets
 from typing import List, Optional
 
 from pydantic import BaseModel
-from models.activities import ActivityBase
 from sqlmodel import Field, Relationship, SQLModel
 
+from models.activities import ActivityBase
 from models.address import AddressBase
 from models.brand import BrandBase
 from models.collection import CollectionBase
@@ -142,11 +142,13 @@ class UserPublic(UserBase):
 
 
 class ActivityLog(ActivityBase, table=True):
-    __tablename__ = 'activity_logs'
+    __tablename__ = "activity_logs"
 
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     user_id: int = Field(foreign_key="user.id")
-    activity_type: str | None = Field(index=True, max_length=255) # E.g., "purchase", "viewed product", "profile updated"
+    activity_type: str | None = Field(
+        index=True, max_length=255
+    )  # E.g., "purchase", "viewed product", "profile updated"
     description: str | None = Field(max_length=255)
 
     user: User = Relationship(back_populates="activity_logs")

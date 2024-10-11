@@ -55,9 +55,9 @@ router = APIRouter()
 
 
 # WebSocket route for clients to listen for real-time updates
-@router.websocket("/ws/activities/")
-async def websocket_endpoint(websocket: WebSocket, user_id: int):
-    await manager.connect(id=1, websocket=websocket)
+@router.websocket("/activities/")
+async def ws_activities(websocket: WebSocket):
+    await manager.connect(id="1", websocket=websocket)
     try:
         while True:
             await websocket.receive_text()  # WebSocket remains open
