@@ -271,28 +271,25 @@ export async function getCollections(page: number = 1, limit: number = 10) {
     }
 }
 
-export async function bulkUploadProducts({ id, formData }: { id: string; formData: any }) {
+export async function bulkUploadProducts({ formData }: { formData: FormData }) {
+    const accessToken = cookies().get("access_token")?.value as string;
+
     try {
-        const res = await fetch(`${process.env.BACKEND_URL}/api/product/excel/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {
             method: "POST",
             body: formData,
-            credentials: "include",
+            headers: {
+                "X-Auth": accessToken,
+            },
         });
 
         if (!res.ok) {
-            const errorText = await res.text();
-
-            return null;
+            throw new Error(res.statusText);
         }
         // Revalidate the UI data
         revalidateTag("products");
 
         return await res.json();
-
-        // // Revalidate the UI data
-        // revalidateTag("products");
-
-        // return "Bulk product update successful";
     } catch (e) {
         console.error("Error during bulk product update:", e);
 

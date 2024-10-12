@@ -3,7 +3,7 @@ import { Product } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
-import { getProducts } from "@lib/data";
+import { getCustomer, getProducts } from "@lib/data";
 import { Badge } from "@nextui-org/badge";
 import { Avatar } from "@nextui-org/avatar";
 import { currency } from "@lib/util/util";
@@ -27,7 +27,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
     const { products, ...pagination } = await fetchProducts(search, page, limit);
-    const { collections } = await getCollections(1, 100);
+    const { collections } = (await getCollections(1, 100)) as { collections: [] };
+    const customer = await getCustomer().catch(() => null);
 
     return (
         <React.Fragment>
@@ -35,7 +36,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                 <div className="max-w-7xl mx-auto p-8">
                     <h1 className="text-2xl font-semibold mb-2">Products</h1>
                     <div className="py-4">
-                        <ProductUpload />
+                        <ProductUpload customer={customer} />
                     </div>
                     <Table
                         canExport

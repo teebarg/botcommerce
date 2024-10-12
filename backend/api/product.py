@@ -7,7 +7,6 @@ from fastapi import (
     APIRouter,
     BackgroundTasks,
     File,
-    Form,
     HTTPException,
     Query,
     UploadFile,
@@ -16,6 +15,7 @@ from fastapi import (
 import crud
 from core import deps
 from core.deps import (
+    CurrentUser,
     SessionDep,
 )
 from core.logging import logger
@@ -25,7 +25,7 @@ from models.product import (
     ProductCreate,
     ProductUpdate,
 )
-from services.export import process_file, validate_file
+from services.export import validate_file
 from services.meilisearch import (
     add_documents_to_index,
     clear_index,
@@ -51,7 +51,13 @@ async def export_products(
     try:
         # Define the background task
         def run_task():
-            asyncio.run(generate_excel_file(bucket=bucket, email=current_user.email))
+            download_url = asyncio.run(
+                generate_excel_file(bucket=bucket, email=current_user.email)
+            )
+
+            crud.activities.create_product_export_activity(
+                db=db, user_id=current_user.id, download_url=download_url
+            )
 
         background_tasks.add_task(run_task)
 
@@ -244,24 +250,12 @@ def delete(db: SessionDep, id: int) -> Message:
     return Message(message="Product deleted successfully")
 
 
-@router.post("/excel/{id}")
-async def upload_products(
-    file: Annotated[UploadFile, File()],
-    batch: Annotated[str, Form()],
-    id: str,
-    db: SessionDep,
-    background_tasks: BackgroundTasks,
-):
-    await validate_file(file=file)
-
-    contents = await file.read()
-    background_tasks.add_task(process_file, contents, id, db, crud.product.bulk_upload)
-    return {"batch": batch, "message": "File upload started"}
-
-
 @router.post("/upload-products/")
-async def upload_products_a(
-    file: Annotated[UploadFile, File()], background_tasks: BackgroundTasks
+async def upload_products(
+    db: SessionDep,
+    user: CurrentUser,
+    file: Annotated[UploadFile, File()],
+    background_tasks: BackgroundTasks,
 ):
     content_type = file.content_type
 
@@ -280,7 +274,15 @@ async def upload_products_a(
 
     # Define the background task
     def update_task():
-        asyncio.run(process_products(file_content=contents, content_type=content_type))
+        asyncio.run(
+            process_products(
+                file_content=contents, content_type=content_type, user_id=user.id
+            )
+        )
+
+        crud.activities.create_product_upload_activity(
+            db=db, user_id=user.id, filename=file.filename
+        )
 
     background_tasks.add_task(update_task)
 

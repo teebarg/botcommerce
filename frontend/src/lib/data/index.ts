@@ -696,3 +696,51 @@ export const getCategoriesList = cache(async function (
         count: 0,
     };
 });
+
+export const getActivites = cache(async function (limit: number = 10) {
+    const headers = getHeaders(["activities"]);
+
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities`, {
+            method: "GET",
+            headers: {
+                accept: "application/json",
+                ...headers,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        const data = await res.json();
+
+        return data;
+    } catch (error) {
+        return { message: error, status: "error" };
+    }
+});
+
+export async function deleteActivities(id: string | number) {
+    const headers = getHeaders(["activities"]);
+
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/${id}`, {
+            method: "DELETE",
+            headers: {
+                accept: "application/json",
+                ...headers,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        const data = await res.json();
+
+        return data;
+    } catch (error) {
+        throw new Error(`Error: ${error}`);
+    }
+}

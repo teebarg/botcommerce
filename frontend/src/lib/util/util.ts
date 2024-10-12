@@ -118,4 +118,16 @@ const generateId = (prefix: string = "cart_", length: number = 25): string => {
     return id;
 };
 
-export { imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId };
+// Helper function to format timestamps into "time ago"
+const timeAgo = (timestamp: string) => {
+    const now = new Date();
+    const activityDate = new Date(timestamp);
+    const diff = Math.floor((now.getTime() - activityDate.getTime()) / 1000);
+
+    if (diff < 60) return `${diff} seconds ago`;
+    else if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    else if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    else return `${Math.floor(diff / 86400)} days ago`;
+};
+
+export { imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo };

@@ -1,20 +1,20 @@
 "use client";
 
 import React from "react";
+import { Customer } from "types/global";
 
 import { bulkUploadProducts } from "../actions";
 import { Excel } from "../components/file-uploader";
 
-interface CollectionProps {}
+interface CollectionProps {
+    customer: Customer;
+}
 
-const CollectionUpload: React.FC<CollectionProps> = () => {
-    const id = "nK12eRTbo";
+const CollectionUpload: React.FC<CollectionProps> = ({ customer }) => {
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/${customer.id}/`;
 
-    // const domain = process.env.NODE_ENV === 'development' ? "ws://backend:4000" : `wss://${process.env.NEXT_PUBLIC_DOMAIN}`;
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/upload/${id}`;
-
-    const handleUpload = async (id: string, formData: any) => {
-        await bulkUploadProducts({ id, formData });
+    const handleUpload = async (formData: any) => {
+        await bulkUploadProducts({ formData });
     };
 
     return (

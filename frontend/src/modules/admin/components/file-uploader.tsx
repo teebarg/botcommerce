@@ -9,12 +9,11 @@ import Button from "@modules/common/components/button";
 import { DragNDrop } from "./drag-drop";
 
 interface Props {
-    onUpload: (id: string, formData: any) => void;
+    onUpload: (formData: any) => void;
     wsUrl: string;
 }
 
 const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
-    const id = "nK12eRTbo";
     const { enqueueSnackbar } = useSnackbar();
 
     const [file, setFile] = useState<File>();
@@ -36,7 +35,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
             return "Submitting";
         }
 
-        return currentMessage?.status == "Processing" ? "Processing" : "Submit";
+        return currentMessage?.status == "processing" ? "Processing" : "Submit";
     };
 
     const handleSubmit = async () => {
@@ -53,7 +52,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
         formData.append("batch", "batch1");
 
         try {
-            await onUpload(id, formData);
+            await onUpload(formData);
         } catch (error) {
             enqueueSnackbar(`Error uploading file: ${error}`, { variant: "error" });
         } finally {
@@ -72,8 +71,8 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
                 <Button
                     className="min-w-48 rounded-md"
                     color="secondary"
-                    disabled={status || currentMessage?.status == "Processing"}
-                    isLoading={status || currentMessage?.status == "Processing"}
+                    disabled={status || currentMessage?.status == "processing"}
+                    isLoading={status || currentMessage?.status == "processing"}
                     variant="shadow"
                     onClick={() => handleSubmit()}
                 >

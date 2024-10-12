@@ -18,7 +18,7 @@ const parseCookieValue = (value: string | null): any => {
 };
 
 export const useCookie = () => {
-    const setCookie = (name: string, value: any, options: CookieOptions = {}) => {
+    const setCookie = (name: string, value: any, options: CookieOptions = {}): void => {
         const encodedValue = encodeURIComponent(JSON.stringify(value));
         const optionsString = Object.entries(options)
             .map(([key, value]) => `${key}=${value}`)
@@ -27,11 +27,12 @@ export const useCookie = () => {
         document.cookie = `${name}=${encodedValue}; ${optionsString}`;
     };
 
-    const getCookie = (name: string): any => {
+    const getCookie = (name: string): string | undefined => {
+        if (typeof document === "undefined") return undefined;
         const cookies = document.cookie.split("; ");
         const cookie = cookies.find((cookie) => cookie.startsWith(`${name}=`));
 
-        if (!cookie) return null;
+        if (!cookie) return undefined;
         const [, value] = cookie.split("=");
 
         return parseCookieValue(decodeURIComponent(value));

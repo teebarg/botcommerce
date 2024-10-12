@@ -4,6 +4,7 @@ import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import { ThemeSwitch } from "@modules/common/components/theme-switch";
 import { siteConfig } from "@lib/config";
+import ActivityTray from "@modules/common/components/activity-tray";
 
 const AdminNavbar = async () => {
     const customer = await getCustomer().catch(() => null);
@@ -24,9 +25,10 @@ const AdminNavbar = async () => {
                         Store
                     </LocalizedClientLink>
                 </NavbarItem>
-                <NavbarItem className="flex gap-2 items-baseline justify-center">
+                <NavbarItem className="flex items-center gap-2.5">
                     {/* <Notification /> */}
                     <ThemeSwitch />
+                    <ActivityTray customer={customer} />
                 </NavbarItem>
                 <NavbarItem className="flex">
                     {customer ? (

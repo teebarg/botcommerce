@@ -6,7 +6,7 @@ import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
 import { getCart } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowRightOnRectangle, CartIcon, ChevronRightIcon } from "nui-react-icons";
+import { ArrowRightOnRectangle, CartIcon, ChevronRight } from "nui-react-icons";
 
 export const metadata: Metadata = {
     title: "Clothings | TBO Store | Checkout",
@@ -65,7 +65,7 @@ export default async function Checkout() {
                                         <li className="flex items-center" data-slot="base">
                                             <LocalizedClientLink href={"/"}>Home</LocalizedClientLink>
                                             <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
-                                                <ChevronRightIcon />
+                                                <ChevronRight />
                                             </span>
                                         </li>
                                         <li className="flex items-center" data-slot="base">
