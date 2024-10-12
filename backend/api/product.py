@@ -251,7 +251,7 @@ def delete(db: SessionDep, id: int) -> Message:
 
 
 @router.post("/upload-products/")
-async def upload_products_a(
+async def upload_products(
     db: SessionDep,
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
@@ -274,7 +274,11 @@ async def upload_products_a(
 
     # Define the background task
     def update_task():
-        asyncio.run(process_products(file_content=contents, content_type=content_type))
+        asyncio.run(
+            process_products(
+                file_content=contents, content_type=content_type, user_id=user.id
+            )
+        )
 
         crud.activities.create_product_upload_activity(
             db=db, user_id=user.id, filename=file.filename

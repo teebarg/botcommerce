@@ -18,7 +18,7 @@ from db.engine import engine
 from models.generic import Collection, Product, ProductCollection, ProductImages
 
 
-async def process_products(file_content, content_type: str):
+async def process_products(file_content, content_type: str, user_id: int):
     try:
         # Create a BytesIO stream from the file content
         file_stream = BytesIO(file_content)
@@ -94,18 +94,19 @@ async def process_products(file_content, content_type: str):
             await create_or_update_products_in_db(products_to_create_or_update)
 
             # Send WebSocket update
-            await manager.broadcast(
-                id="sheet",
+            await broadcast_channel(
                 data={
                     "total_rows": num_batches * batch_size,
                     "processed_rows": (i + 1) * batch_size,
                     "status": "processing",
                 },
-                type="sheet-processor",
+                user_id=user_id,
             )
 
         # After processing, delete products not in the sheet
-        await delete_products_not_in_sheet(product_slugs_in_sheet)
+        await delete_products_not_in_sheet(
+            product_slugs_in_sheet=product_slugs_in_sheet, user_id=user_id
+        )
 
         logger.info("Sheet processed successfully")
     except Exception as e:
@@ -193,7 +194,7 @@ async def update_images(product, images, session: Session):
     session.commit()
 
 
-async def delete_products_not_in_sheet(product_slugs_in_sheet: set):
+async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int):
     try:
         with Session(engine) as session:
             # Query the database after all insertions and updates
@@ -210,14 +211,14 @@ async def delete_products_not_in_sheet(product_slugs_in_sheet: set):
             else:
                 logger.info("No products to delete. All products are in the sheet.")
 
-            await manager.broadcast(
-                id="sheet",
+            await broadcast_channel(
                 data={
                     "message": "Products successfully synced with the sheet",
                     "status": "completed",
                 },
-                type="sheet-processor",
+                user_id=user_id,
             )
+
     except SQLAlchemyError as e:
         logger.error(f"An error occurred while deleting products. Error {e}")
         await manager.broadcast(
@@ -330,3 +331,11 @@ async def generate_excel_file(bucket: Any, email: str):
         logger.debug("Product export complete")
 
         return download_url
+
+
+async def broadcast_channel(data, user_id: int):
+    await manager.broadcast(
+        id=str(user_id),
+        data=data,
+        type="sheet-processor",
+    )

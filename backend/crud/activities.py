@@ -19,6 +19,14 @@ class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
+
+        # Broadcast the new activity to all connected clients
+        asyncio.run(
+            manager.broadcast(
+                id=str(user_id), data=db_obj.model_dump(mode="json"), type="activities"
+            )
+        )
+
         return db_obj
 
     # Get recent activity logs for a specific user
@@ -31,11 +39,10 @@ class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
             .all()
         )
 
-    # Get recent activity logs for a specific user
     def create_product_export_activity(
         self, db: Session, user_id: int, download_url: str
     ):
-        new_activity = self.create(
+        self.create(
             db=db,
             user_id=user_id,
             activity_log=ActivityCreate(
@@ -46,15 +53,8 @@ class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
             ),
         )
 
-        # Broadcast the new activity to all connected clients
-        asyncio.run(
-            manager.broadcast(
-                id="1", data=new_activity.model_dump(mode="json"), type="activity"
-            )
-        )
-
     def create_product_upload_activity(self, db: Session, user_id: int, filename: str):
-        new_activity = self.create(
+        self.create(
             db=db,
             user_id=user_id,
             activity_log=ActivityCreate(
@@ -63,13 +63,6 @@ class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
                 description="Product Upload Successful",
                 is_success=True,
             ),
-        )
-
-        # Broadcast the new activity to all connected clients
-        asyncio.run(
-            manager.broadcast(
-                id="1", data=new_activity.model_dump(mode="json"), type="activity"
-            )
         )
 
 

@@ -55,6 +55,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
             await onUpload(formData);
         } catch (error) {
             enqueueSnackbar(`Error uploading file: ${error}`, { variant: "error" });
+        } finally {
             setStatus(false);
         }
     };

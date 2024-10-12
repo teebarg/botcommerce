@@ -55,49 +55,13 @@ router = APIRouter()
 
 
 # WebSocket route for clients to listen for real-time updates
-@router.websocket("/activities/")
-async def ws_activities(websocket: WebSocket):
-    await manager.connect(id="1", websocket=websocket)
-    try:
-        while True:
-            await websocket.receive_text()  # WebSocket remains open
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-
-
-@router.websocket("/users/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
+@router.websocket("/{id}/")
+async def websocket(id: str, websocket: WebSocket):
     """
     Handles the WebSocket endpoint.
 
     Args:
-        websocket (WebSocket): The WebSocket connection.
-
-    Returns:
-        None
-    """
-    await manager.connect(id=user_id, websocket=websocket)
-    try:
-        await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-
-
-@router.websocket("/{user_id}")
-async def ws_notification_endpoint(websocket: WebSocket, user_id: str):
-    await manager.connect(id=user_id, websocket=websocket)
-    try:
-        await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-
-
-@router.websocket("/upload/{id}")
-async def upload_ws(websocket: WebSocket, id: str):
-    """
-    Handles the WebSocket endpoint.
-
-    Args:
+        id (str): User id.
         websocket (WebSocket): The WebSocket connection.
 
     Returns:
@@ -105,7 +69,8 @@ async def upload_ws(websocket: WebSocket, id: str):
     """
     await manager.connect(id=id, websocket=websocket)
     try:
-        await websocket.receive_text()
+        while True:
+            await websocket.receive_text()  # WebSocket remains open
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
