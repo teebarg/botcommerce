@@ -24,8 +24,8 @@ async def log_activity(db: SessionDep, user: CurrentUser, activity: ActivityCrea
 
     # Broadcast the new activity to all connected clients
     await manager.broadcast(
-        id="1", data=new_activity.model_dump(mode="json"), type="activities"
-    )  # Send the update to all WebSocket clients
+        id=str(user.id), data=new_activity.model_dump(mode="json"), type="activities"
+    )
 
     return new_activity
 
