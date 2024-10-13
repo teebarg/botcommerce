@@ -618,6 +618,28 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
     };
 }
 
+export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, { search, page, limit });
+
+    try {
+        const response = await fetch(url, {
+            next: {
+                tags: ["categories"],
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch categories");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+
+        return { message: "Error fetching categories" };
+    }
+};
+
 export const getCollectionsList = cache(async function (search: string = "", page: number = 1, limit: number = 100): Promise<any> {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, { search, page, limit });
 

@@ -100,12 +100,20 @@ class Category(CategoryBase, table=True):
         sa_relationship_kwargs={"remote_side": "Category.id"}
     )
 
+    # Relationship to subcategories (self-referential)
+    children: List["Category"] = Relationship(
+        back_populates="parent",  # Linking parent to children
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+
 
 class CategoryPublic(CategoryBase):
     id: int
     slug: str
     parent_id: Optional[int]
     parent: Optional["Category"] = None
+    # Include subcategories (optional)
+    children: List["CategoryPublic"] = []
 
 
 class Collection(CollectionBase, table=True):
