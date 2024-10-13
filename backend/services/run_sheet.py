@@ -15,7 +15,7 @@ from api.websocket import manager
 from core.logging import logger
 from core.utils import generate_data_export_email, send_email
 from db.engine import engine
-from models.generic import Collection, Product, ProductCollection, ProductImages
+from models.generic import Category, Collection, Product, ProductCategory, ProductCollection, ProductImages
 
 
 async def process_products(file_content, content_type: str, user_id: int):
@@ -54,6 +54,16 @@ async def process_products(file_content, content_type: str, user_id: int):
         # Track all product slugs from the sheet
         product_slugs_in_sheet = set()
 
+        # Send WebSocket update
+        await broadcast_channel(
+            data={
+                "total_rows": num_batches * batch_size,
+                "processed_rows": 1,
+                "status": "processing",
+            },
+            user_id=user_id,
+        )
+
         for i in range(num_batches):
             batch = data_rows[i * batch_size : (i + 1) * batch_size]
             logger.info(f"Processing batch {i + 1}")
@@ -82,13 +92,13 @@ async def process_products(file_content, content_type: str, user_id: int):
                     "image": row_data.get("image", ""),
                 }
 
-                # print(product_data)
+                categories = row_data.get("categories", "")
                 collections = row_data.get("collections", "")
                 images = row_data.get("images", "")
                 product_slugs_in_sheet.add(product_data["slug"])
 
                 # Add product data to be processed later
-                products_to_create_or_update.append((product_data, collections, images))
+                products_to_create_or_update.append((product_data, categories, collections, images))
 
             # Process the batch
             await create_or_update_products_in_db(products_to_create_or_update)
@@ -123,7 +133,7 @@ async def process_products(file_content, content_type: str, user_id: int):
 
 async def create_or_update_products_in_db(products: List):
     with Session(engine) as session:
-        for product_data, collections, images in products:
+        for product_data, categories, collections, images in products:
             logger.info(f"Processing product {product_data['name']}")
             try:
                 # Check if the product exists
@@ -144,6 +154,7 @@ async def create_or_update_products_in_db(products: List):
 
                 session.commit()
                 session.refresh(product)
+                await update_categories(product=product, categories=categories, session=session)
                 await update_collections(product, collections, session)
                 await update_images(product, images, session)
 
@@ -159,9 +170,29 @@ async def create_or_update_products_in_db(products: List):
                 )
                 session.rollback()
 
+async def update_categories(product, categories, session: Session):
+    session.exec(
+        delete(ProductCategory).where(ProductCategory.product_id == product.id)
+    )
+    session.commit()
+
+    if not categories or categories is None or type(categories) is not str:
+        return
+
+    print("categories........")
+    print(categories)
+
+    for item in categories.split(","):
+        category = session.exec(
+            select(Category).where(Category.slug == item.strip())
+        ).first()
+        session.add(
+            ProductCategory(product_id=product.id, category_id=category.id)
+        )
+
+    session.commit()
 
 async def update_collections(product, collections, session: Session):
-    # Assuming collections are stored in the product_collections table
     session.exec(
         delete(ProductCollection).where(ProductCollection.product_id == product.id)
     )
@@ -172,7 +203,7 @@ async def update_collections(product, collections, session: Session):
 
     for item in collections.split(","):
         collection = session.exec(
-            select(Collection).where(Collection.slug == item)
+            select(Collection).where(Collection.slug == item.strip())
         ).first()
         session.add(
             ProductCollection(product_id=product.id, collection_id=collection.id)
@@ -189,7 +220,7 @@ async def update_images(product, images, session: Session):
         return
 
     for item in images.split("|"):
-        session.add(ProductImages(product_id=product.id, image=item))
+        session.add(ProductImages(product_id=product.id, image=item.strip()))
 
     session.commit()
 
@@ -235,7 +266,6 @@ async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int
 async def generate_excel_file(bucket: Any, email: str):
     logger.debug("Products export started.......")
     with Session(engine) as session:
-        # Fetch products and their collections
         products = session.exec(select(Product)).all()
 
         if not products:
@@ -258,6 +288,7 @@ async def generate_excel_file(bucket: Any, email: str):
             "ratings",
             "image",
             "is_active",
+            "categories",
             "collections",
             "images",
         ]
@@ -265,6 +296,14 @@ async def generate_excel_file(bucket: Any, email: str):
 
         # Fetch product data and append each product as a row
         for product in products:
+            categories = session.exec(
+                select(Category.slug)
+                .join(
+                    ProductCategory, Category.id == ProductCategory.category_id
+                )
+                .where(ProductCategory.product_id == product.id)
+            ).all()
+
             # Fetch product collections as a comma-separated string
             collections = session.exec(
                 select(Collection.slug)
@@ -282,6 +321,7 @@ async def generate_excel_file(bucket: Any, email: str):
             ).all()
 
             # Create a comma-separated string of collection names
+            categories_str = ",".join(categories)
             collections_str = ",".join(collections)
             images_str = "|".join(images)
 
@@ -298,6 +338,7 @@ async def generate_excel_file(bucket: Any, email: str):
                     product.ratings,
                     product.image,
                     product.is_active,
+                    categories_str,
                     collections_str,
                     images_str,
                 ]

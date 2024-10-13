@@ -8,6 +8,7 @@ from api.activities import router as activities_router
 from api.address import router as address_router
 from api.brand import router as brand_router
 from api.cart import router as cart_router
+from api.category import router as category_router
 from api.collection import router as collection_router
 from api.order import router as order_router
 from api.product import router as product_router
@@ -44,6 +45,12 @@ app.include_router(
     product_router,
     prefix="/api/product",
     tags=["products"],
+)
+
+app.include_router(
+    category_router,
+    prefix="/api/category",
+    tags=["categories"],
 )
 
 app.include_router(

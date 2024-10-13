@@ -1,6 +1,7 @@
 import secrets
 from typing import List, Optional
 
+from models.category import CategoryBase
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -59,10 +60,14 @@ class ProductImages(SQLModel, table=True):
     product: "Product" = Relationship(back_populates="images")
 
 
-class ProductBrand(SQLModel, table=True):
-    product_id: int = Field(foreign_key="product.id", primary_key=True)
-    brand_id: int = Field(foreign_key="brand.id", primary_key=True)
+# class ProductBrand(SQLModel, table=True):
+#     product_id: int = Field(foreign_key="product.id", primary_key=True)
+#     brand_id: int = Field(foreign_key="brand.id", primary_key=True)
 
+class ProductCategory(SQLModel, table=True):
+    __tablename__ = "product_categories"
+    product_id: int = Field(foreign_key="product.id", primary_key=True)
+    category_id: int = Field(foreign_key="categories.id", primary_key=True)
 
 class ProductCollection(SQLModel, table=True):
     product_id: int = Field(foreign_key="product.id", primary_key=True)
@@ -80,6 +85,27 @@ class Brand(BrandBase, table=True):
     # products: list["Product"] = Relationship(
     #     back_populates="brands", link_model=ProductBrand
     # )
+
+
+class Category(CategoryBase, table=True):
+    __tablename__ = "categories"
+    id: int | None = Field(default=None, primary_key=True)
+    slug: str
+    # parent_id: int = None
+    parent_id: Optional[int] = Field(foreign_key="categories.id")
+    products: list["Product"] = Relationship(back_populates="categories", link_model=ProductCategory)
+    # parent: "Category" = Relationship()
+    # Relationship to child categories (self-referential)
+    parent: Optional["Category"] = Relationship(
+        sa_relationship_kwargs={"remote_side": "Category.id"}
+    )
+
+
+class CategoryPublic(CategoryBase):
+    id: int
+    slug: str
+    parent_id: Optional[int]
+    parent: Optional["Category"] = None
 
 
 class Collection(CollectionBase, table=True):
@@ -102,6 +128,9 @@ class Product(ProductBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str
     images: list["ProductImages"] = Relationship(back_populates="product")
+    categories: list["Category"] = Relationship(
+        back_populates="products", link_model=ProductCategory
+    )
     collections: list["Collection"] = Relationship(
         back_populates="products", link_model=ProductCollection
     )
