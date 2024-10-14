@@ -21,7 +21,7 @@ export default async function CategoriesPage({ searchParams }: { searchParams: {
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "100", 10);
     const { categories: cat } = await getCategories(search, page, limit);
-    const categories = cat.filter((cat: any) => !!cat.children.length);
+    const categories = cat.filter((cat: any) => !cat.parent_id);
     console.log(cat);
     console.log(categories);
     const customer = await getCustomer().catch(() => null);

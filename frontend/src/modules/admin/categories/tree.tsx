@@ -55,14 +55,12 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                     <button className="btn btn-ghost btn-small">
                                         <Plus />
                                     </button>
-                                    <div>
-                                        <button
-                                            className="btn btn-ghost btn-small h-xlarge w-xlarge focus-visible:border-violet-60 focus-visible:shadow-input focus:shadow-none focus-visible:outline-none"
-                                            type="button"
-                                        >
-                                            <EllipsisHorizontal />
-                                        </button>
-                                    </div>
+                                    <button
+                                        className="btn btn-ghost btn-small h-xlarge w-xlarge focus:shadow-none focus-visible:outline-none"
+                                        type="button"
+                                    >
+                                        <EllipsisHorizontal />
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -87,14 +85,12 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                     <button className="btn btn-ghost btn-small">
                                                         <Plus />
                                                     </button>
-                                                    <div>
-                                                        <button
-                                                            className="btn btn-ghost btn-small h-xlarge w-xlarge focus-visible:border-violet-60 focus-visible:shadow-input focus:shadow-none focus-visible:outline-none"
-                                                            type="button"
-                                                        >
-                                                            <EllipsisHorizontal />
-                                                        </button>
-                                                    </div>
+                                                    <button
+                                                        className="btn btn-ghost btn-small h-xlarge w-xlarge focus:shadow-none focus-visible:outline-none"
+                                                        type="button"
+                                                    >
+                                                        <EllipsisHorizontal />
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
