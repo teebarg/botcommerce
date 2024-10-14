@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Collection, Product } from "types/global";
+import { Category, Collection, Product } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
@@ -10,6 +10,7 @@ import { Chip } from "@modules/common/components/chip";
 import { deleteCollection } from "@modules/admin/actions";
 import { ChevronDown, DotsSix, EllipsisHorizontal, EllipsisVertical, Folder, Plus, Tag } from "nui-react-icons";
 import CategoryTree from "@modules/admin/categories/tree";
+import AddCategory from "@modules/admin/categories/add-categories";
 
 export const metadata: Metadata = {
     title: "Children clothing | TBO Store",
@@ -21,7 +22,8 @@ export default async function CategoriesPage({ searchParams }: { searchParams: {
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "100", 10);
     const { categories: cat } = await getCategories(search, page, limit);
-    const categories = cat.filter((cat: any) => !cat.parent_id);
+    const categories = cat?.filter((cat: Category) => !cat.parent_id);
+    console.log("cat-----------------------");
     console.log(cat);
     console.log(categories);
     const customer = await getCustomer().catch(() => null);
@@ -46,28 +48,22 @@ export default async function CategoriesPage({ searchParams }: { searchParams: {
                                                     <h1 className="text-default-700 font-semibold">Product Categories</h1>
                                                     <h3 className="text-default-600 text-sm pt-1.5">Helps you to keep your products organized.</h3>
                                                 </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <div>
-                                                        <button type="button" className="btn btn-secondary btn-small flex items-center">
-                                                            <span className="mr-2 last:mr-0">Add category</span>
-                                                        </button>
-                                                    </div>
+                                                <div>
+                                                    <AddCategory />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="px-8">
                                             <div className="flex flex-col grow">
                                                 <div style={{ pointerEvents: "initial", position: "relative" }}>
-                                                    <div className="">
+                                                    <div>
                                                         <CategoryTree categories={categories} />
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="min-h-[40px]" />
                                 </div>
-                                <div className="h-xlarge w-full" />
                             </div>
                         </div>
                     </React.Fragment>

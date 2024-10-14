@@ -181,3 +181,15 @@ export type Address = {
     phone: string;
     id: string;
 };
+
+
+export type Category = {
+    id: number;
+    name: string;
+    slug?: string;
+    is_active: boolean;
+    children: Record<string, any>;
+    parent_id: number;
+    created_at: string;
+    updated_at: string;
+};

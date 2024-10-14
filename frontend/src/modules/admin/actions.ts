@@ -152,6 +152,43 @@ export async function deleteProduct(productId: string) {
     }
 }
 
+export async function createCategory(currentState: unknown, formData: FormData) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const categoryUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category`;
+
+    const id = formData.get("id");
+    const type = formData.get("type") as string;
+
+    const url = type === "create" ? `${categoryUrl}/` : `${categoryUrl}/${id}`;
+
+    try {
+        const res = await fetch(url, {
+            method: type === "create" ? "POST" : "PATCH",
+            headers: {
+                "X-Auth": accessToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: formData.get("name"),
+                is_active: Boolean(formData.get("is_active")) ?? false,
+            }),
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("categories");
+
+        return { success: true, message: "Category created successfully", data: await res.json() };
+    } catch (error) {
+        console.error("Error creating category:", error);
+
+        return { success: false, message: "Error creating category" };
+    }
+}
+
 export async function createCollection(currentState: unknown, formData: FormData) {
     const accessToken = cookies().get("access_token")?.value as string;
     const collectionUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection`;

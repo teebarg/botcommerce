@@ -9,10 +9,11 @@ import { useFormState } from "react-dom";
 import { Checkbox } from "@modules/common/components/checkbox";
 import { useRouter } from "next/navigation";
 
-import { createCollection } from "../actions";
+import { createCategory } from "../actions";
+import { Category } from "types/global";
 
 interface Props {
-    current?: any;
+    current?: Category;
     type?: "create" | "update";
     onClose?: () => void;
 }
@@ -21,12 +22,12 @@ interface ChildRef {
     // submit: () => void;
 }
 
-const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current = { name: "", is_active: true } }, ref) => {
+const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current = { name: "", is_active: true } }, ref) => {
     const router = useRouter();
     const isCreate = type === "create";
 
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(createCollection, {
+    const [state, formAction] = useFormState(createCategory, {
         success: false,
         message: "",
         data: null,
@@ -36,7 +37,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
 
     React.useEffect(() => {
         if (state.success) {
-            enqueueSnackbar(state.message || "Collection created successfully", { variant: "success" });
+            enqueueSnackbar(state.message || "Category created successfully", { variant: "success" });
             // Leave the slider open and clear form
             if (formRef.current) {
                 formRef.current.reset();
@@ -55,7 +56,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                                 <input readOnly className="hidden" name="type" type="text" value={type} />
                                 <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                 <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
-                                <Checkbox isSelected={current.is_active} label="Is Active" name="is_active" />
+                                <Checkbox defaultSelected={current.is_active} label="Is Active" name="is_active" />
                             </div>
                         </div>
                     </div>
@@ -73,6 +74,6 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     );
 });
 
-CollectionForm.displayName = "CollectionForm";
+CategoryForm.displayName = "CategoryForm";
 
-export { CollectionForm };
+export { CategoryForm };

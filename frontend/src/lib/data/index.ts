@@ -3,6 +3,7 @@ import { Product, ProductCategoryWithChildren } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
 import { searchDocuments } from "@lib/util/meilisearch";
+import { revalidateTag } from "next/cache";
 
 /**
  * Function for getting custom headers for API requests, including the JWT token and cache revalidation tags.
@@ -620,6 +621,7 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
 
 export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, { search, page, limit });
+    revalidateTag("categories");
 
     try {
         const response = await fetch(url, {

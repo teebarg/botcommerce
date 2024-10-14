@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import { Metadata } from "next";
-import { Collection, Product } from "types/global";
+import { Category, Collection, Product } from "types/global";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
 import { getCategories, getCollectionsList, getCustomer } from "@lib/data";
@@ -11,62 +11,58 @@ import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
 import { Chip } from "@modules/common/components/chip";
 import { deleteCollection } from "@modules/admin/actions";
-import { ChevronDown, DotsSix, EllipsisHorizontal, EllipsisVertical, Folder, Plus, Tag } from "nui-react-icons";
-
-let items = [
-    { id: 1, title: "Documents", children: [{ id: 2, title: "Project", children: [{ id: 3, title: "Weekly Report", children: [] }] }] },
-    {
-        id: 4,
-        title: "Photos",
-        children: [
-            { id: 5, title: "Image 1", children: [] },
-            { id: 6, title: "Image 2", children: [] },
-        ],
-    },
-];
+import { ChevronDown, ChevronRight, DotsSix, EllipsisHorizontal, EllipsisVertical, Folder, Plus, Tag } from "nui-react-icons";
+import clsx from "clsx";
+import CategoryAction from "./categories-control";
 
 interface Props {
-    categories: any;
+    categories: Category[];
 }
 
 const CategoryTree: React.FC<Props> = ({ categories }) => {
+    const [open, setOpen] = useState<number[]>([]);
+
+    const handleClick = (id: number) => {
+        if (open.includes(id)) {
+            setOpen(open.filter((item) => item !== id));
+        } else {
+            setOpen([...open, id]);
+        }
+        console.log(open);
+    };
+
     return (
         <React.Fragment>
-            <ol className="">
-                {categories.map((item: any, index: number) => (
-                    <li className="" key={index}>
+            <ol>
+                {categories.map((item: Category, index: number) => (
+                    <li className="h-14" key={index}>
                         <div className="flex h-[40px] items-center">
                             <div className="flex w-[32px] items-center">
-                                <span className="" draggable="true">
+                                <span draggable="true">
                                     <DotsSix className="cursor-grab" />
                                 </span>
                             </div>
                             <div className="flex w-full items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className="flex cursor-pointer items-center">
-                                        <ChevronDown />
-                                    </div>
+                                    <button onClick={() => handleClick(item.id)} className="flex items-center" disabled={item?.children.length == 0}>
+                                        <ChevronRight
+                                            className={clsx("transition-transform duration-300 text-default-800", {
+                                                "rotate-90": open.includes(item.id),
+                                                "!text-default-500": item?.children.length == 0,
+                                            })}
+                                        />
+                                    </button>
                                     <div className="flex items-center">
                                         <Folder />
                                     </div>
-                                    <span className="select-none text-xs font-medium">Children</span>
+                                    <span className="select-none text-xs font-medium capitalize">{item.name}</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <button className="btn btn-ghost btn-small">
-                                        <Plus />
-                                    </button>
-                                    <button
-                                        className="btn btn-ghost btn-small h-xlarge w-xlarge focus:shadow-none focus-visible:outline-none"
-                                        type="button"
-                                    >
-                                        <EllipsisHorizontal />
-                                    </button>
-                                </div>
+                                <CategoryAction category={item} />
                             </div>
                         </div>
-                        {item.children && (
+                        {item.children && open.includes(item.id) && (
                             <ol>
-                                {item.children.map((item: any, index: number) => (
+                                {item.children.map((item: Category, index: number) => (
                                     <li className="ml-10" key={index}>
                                         <div className="flex h-[40px] items-center">
                                             <div className="flex w-[32px] items-center">
@@ -79,19 +75,9 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                     <div className="flex w-[32px] items-center justify-center">
                                                         <Tag />
                                                     </div>
-                                                    <span className="ml-2 select-none text-xs font-medium text-gray-400">Boys</span>
+                                                    <span className="ml-2 select-none text-xs font-medium text-gray-400 capitalize">{item.name}</span>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <button className="btn btn-ghost btn-small">
-                                                        <Plus />
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-ghost btn-small h-xlarge w-xlarge focus:shadow-none focus-visible:outline-none"
-                                                        type="button"
-                                                    >
-                                                        <EllipsisHorizontal />
-                                                    </button>
-                                                </div>
+                                                <CategoryAction category={item} />
                                             </div>
                                         </div>
                                     </li>

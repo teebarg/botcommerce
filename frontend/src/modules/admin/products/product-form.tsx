@@ -100,7 +100,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     <input readOnly className="hidden" name="type" type="text" value={type} />
                                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                     <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
-                                    <Checkbox isSelected={current.is_active} label="Is Active" name="is_active" />
+                                    <Checkbox defaultSelected={current.is_active} label="Is Active" name="is_active" />
                                     <Textarea
                                         defaultValue={current.description}
                                         name="description"
