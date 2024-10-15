@@ -171,6 +171,7 @@ export async function createCategory(currentState: unknown, formData: FormData) 
             body: JSON.stringify({
                 name: formData.get("name"),
                 is_active: Boolean(formData.get("is_active")) ?? false,
+                parent_id: formData.get("parent_id") ?? null,
             }),
         });
 

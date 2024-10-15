@@ -19,10 +19,11 @@ import { SlideOver } from "@modules/common/components/slideover";
 import { CategoryForm } from "./category-form";
 
 interface Props {
+    canAdd?: boolean;
     category?: Category;
 }
 
-const CategoryAction: React.FC<Props> = ({ category }) => {
+const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
     const slideOverState = useOverlayTriggerState({});
     const [isNew, setIsNew] = useState<boolean>(true);
 
@@ -38,9 +39,11 @@ const CategoryAction: React.FC<Props> = ({ category }) => {
     return (
         <React.Fragment>
             <div className="flex items-center gap-2">
-                <button onClick={openModal}>
-                    <Plus />
-                </button>
+                {canAdd && (
+                    <button onClick={openModal}>
+                        <Plus />
+                    </button>
+                )}
                 <Dropdown trigger={<EllipsisHorizontal />}>
                     <div>
                         <div className="bg-white border-gray-200 rounded-lg shadow-md p-3 border min-w-[100px] text-sm font-medium">
@@ -76,7 +79,15 @@ const CategoryAction: React.FC<Props> = ({ category }) => {
                     title={isNew ? "Add Category" : "Edit Category"}
                     onClose={slideOverState.close}
                 >
-                    {slideOverState.isOpen && <CategoryForm type={isNew ? "create" : "update"} current={category} onClose={slideOverState.close} />}
+                    {slideOverState.isOpen && (
+                        <CategoryForm
+                            type={isNew ? "create" : "update"}
+                            current={isNew ? undefined : category}
+                            onClose={slideOverState.close}
+                            hasParent
+                            parent_id={category?.id}
+                        />
+                    )}
                 </SlideOver>
             )}
         </React.Fragment>

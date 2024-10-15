@@ -35,8 +35,8 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
         <React.Fragment>
             <ol>
                 {categories.map((item: Category, index: number) => (
-                    <li className="h-14" key={index}>
-                        <div className="flex h-[40px] items-center">
+                    <li className="flex flex-col min-h-10" key={index}>
+                        <div className="flex items-center">
                             <div className="flex w-[32px] items-center">
                                 <span draggable="true">
                                     <DotsSix className="cursor-grab" />
@@ -61,10 +61,10 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                             </div>
                         </div>
                         {item.children && open.includes(item.id) && (
-                            <ol>
+                            <ol className="mt-4 mb-4 block">
                                 {item.children.map((item: Category, index: number) => (
                                     <li className="ml-10" key={index}>
-                                        <div className="flex h-[40px] items-center">
+                                        <div className="flex items-center">
                                             <div className="flex w-[32px] items-center">
                                                 <span className="" draggable="true">
                                                     <DotsSix className="cursor-grab" />
@@ -77,7 +77,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                     </div>
                                                     <span className="ml-2 select-none text-xs font-medium text-gray-400 capitalize">{item.name}</span>
                                                 </div>
-                                                <CategoryAction category={item} />
+                                                <CategoryAction category={item} canAdd={false} />
                                             </div>
                                         </div>
                                     </li>
