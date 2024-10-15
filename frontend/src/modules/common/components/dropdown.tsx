@@ -4,12 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useOverlay, OverlayContainer } from "@react-aria/overlays";
 import { useButton } from "@react-aria/button";
-import { Bell } from "nui-react-icons";
-import { fetchWithAuth } from "@lib/util/api";
 import { useSnackbar } from "notistack";
 import { useWebSocket } from "@lib/hooks/use-websocket";
 import useWatch from "@lib/hooks/use-watch";
-import { Customer } from "types/global";
 
 import Activity from "./activity";
 
@@ -52,8 +49,6 @@ const Dropdown: React.FC<Props> = ({ children, trigger }) => {
     useEffect(() => {
         if (state.isOpen && buttonRef.current) {
             const rect = (buttonRef.current as HTMLElement).getBoundingClientRect();
-
-            console.log(rect)
 
             setPopoverPosition({
                 top: rect.bottom + window.scrollY + 5, // Position just below the button

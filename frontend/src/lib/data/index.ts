@@ -621,6 +621,7 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
 
 export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, { search, page, limit });
+
     revalidateTag("categories");
 
     try {

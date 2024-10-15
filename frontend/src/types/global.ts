@@ -182,7 +182,6 @@ export type Address = {
     id: string;
 };
 
-
 export type Category = {
     id: number;
     name: string;

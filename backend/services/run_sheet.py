@@ -15,7 +15,14 @@ from api.websocket import manager
 from core.logging import logger
 from core.utils import generate_data_export_email, send_email
 from db.engine import engine
-from models.generic import Category, Collection, Product, ProductCategory, ProductCollection, ProductImages
+from models.generic import (
+    Category,
+    Collection,
+    Product,
+    ProductCategory,
+    ProductCollection,
+    ProductImages,
+)
 
 
 async def process_products(file_content, content_type: str, user_id: int):
@@ -98,7 +105,9 @@ async def process_products(file_content, content_type: str, user_id: int):
                 product_slugs_in_sheet.add(product_data["slug"])
 
                 # Add product data to be processed later
-                products_to_create_or_update.append((product_data, categories, collections, images))
+                products_to_create_or_update.append(
+                    (product_data, categories, collections, images)
+                )
 
             # Process the batch
             await create_or_update_products_in_db(products_to_create_or_update)
@@ -154,7 +163,9 @@ async def create_or_update_products_in_db(products: List):
 
                 session.commit()
                 session.refresh(product)
-                await update_categories(product=product, categories=categories, session=session)
+                await update_categories(
+                    product=product, categories=categories, session=session
+                )
                 await update_collections(product, collections, session)
                 await update_images(product, images, session)
 
@@ -170,27 +181,24 @@ async def create_or_update_products_in_db(products: List):
                 )
                 session.rollback()
 
+
 async def update_categories(product, categories, session: Session):
     session.exec(
         delete(ProductCategory).where(ProductCategory.product_id == product.id)
     )
     session.commit()
 
-    if not categories or categories is None or type(categories) is not str:
+    if not categories or categories is None or not isinstance(categories, str):
         return
-
-    print("categories........")
-    print(categories)
 
     for item in categories.split(","):
         category = session.exec(
             select(Category).where(Category.slug == item.strip())
         ).first()
-        session.add(
-            ProductCategory(product_id=product.id, category_id=category.id)
-        )
+        session.add(ProductCategory(product_id=product.id, category_id=category.id))
 
     session.commit()
+
 
 async def update_collections(product, collections, session: Session):
     session.exec(
@@ -198,7 +206,7 @@ async def update_collections(product, collections, session: Session):
     )
     session.commit()
 
-    if not collections or collections is None or type(collections) is not str:
+    if not collections or collections is None or not isinstance(collections, str):
         return
 
     for item in collections.split(","):
@@ -216,7 +224,7 @@ async def update_images(product, images, session: Session):
     session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
     session.commit()
 
-    if not images or images is None or type(images) is not str:
+    if not images or images is None or not isinstance(images, str):
         return
 
     for item in images.split("|"):
@@ -298,9 +306,7 @@ async def generate_excel_file(bucket: Any, email: str):
         for product in products:
             categories = session.exec(
                 select(Category.slug)
-                .join(
-                    ProductCategory, Category.id == ProductCategory.category_id
-                )
+                .join(ProductCategory, Category.id == ProductCategory.category_id)
                 .where(ProductCategory.product_id == product.id)
             ).all()
 

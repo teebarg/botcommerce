@@ -11,7 +11,7 @@ from fastapi import (
     UploadFile,
 )
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import func, or_, select
+from sqlmodel import SQLModel, func, or_, select
 
 import crud
 from core import deps
@@ -27,10 +27,10 @@ from models.category import (
 from models.generic import Category, CategoryPublic
 from models.message import Message
 from services.export import export, process_file, validate_file
-from sqlmodel import SQLModel
 
 # Create a router for categories
 router = APIRouter()
+
 
 class Categories(SQLModel):
     categories: list[CategoryPublic]
@@ -39,10 +39,8 @@ class Categories(SQLModel):
     total_count: int
     total_pages: int
 
-@router.get(
-    "/",
-    dependencies=[]
-)
+
+@router.get("/", dependencies=[])
 def index(
     db: SessionDep,
     name: str = "",
@@ -116,10 +114,7 @@ def get_by_slug(slug: str, db: SessionDep) -> Category:
     return category
 
 
-@router.patch(
-    "/{id}",
-    dependencies=[Depends(get_current_user)]
-)
+@router.patch("/{id}", dependencies=[Depends(get_current_user)])
 def update(
     *,
     db: SessionDep,
@@ -213,9 +208,7 @@ async def autocomplete(
     statement = select(Category)
     if search:
         statement = statement.where(
-            or_(
-                Category.name.like(f"%{search}%"), Category.slug.like(f"%{search}%")
-            )
+            or_(Category.name.like(f"%{search}%"), Category.slug.like(f"%{search}%"))
         )
 
     data = db.exec(statement)

@@ -1,21 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-
-import { Metadata } from "next";
-import { Category, Collection, Product } from "types/global";
-import { Table } from "@modules/common/components/table";
-import ProductUpload from "@modules/admin/products/product-upload";
-import { getCategories, getCollectionsList, getCustomer } from "@lib/data";
-import { Actions } from "@modules/admin/components/actions";
-import { CollectionForm } from "@modules/admin/collections/collection-form";
-import { Chip } from "@modules/common/components/chip";
-import { deleteCollection } from "@modules/admin/actions";
-import { ChevronDown, DotsSix, EllipsisHorizontal, EllipsisVertical, Folder, PencilSquare, Plus, Tag, Trash } from "nui-react-icons";
+import { Category } from "types/global";
+import { deleteCategory } from "@modules/admin/actions";
+import { EllipsisHorizontal, PencilSquare, Plus, Trash } from "nui-react-icons";
 import clsx from "clsx";
 import Dropdown from "@modules/common/components/dropdown";
 import { useOverlayTriggerState } from "react-stately";
 import { SlideOver } from "@modules/common/components/slideover";
+import { Modal } from "@modules/common/components/modal";
+import { Confirm } from "@modules/common/components/confirm";
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "notistack";
+
 import { CategoryForm } from "./category-form";
 
 interface Props {
@@ -24,8 +21,11 @@ interface Props {
 }
 
 const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
+    const { enqueueSnackbar } = useSnackbar();
     const slideOverState = useOverlayTriggerState({});
+    const deleteModalState = useOverlayTriggerState({});
     const [isNew, setIsNew] = useState<boolean>(true);
+    const router = useRouter();
 
     const editModal = () => {
         setIsNew(false);
@@ -36,6 +36,20 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
         setIsNew(true);
         slideOverState.open();
     };
+
+    const onConfirmDelete = async () => {
+        if (!category) {
+            return;
+        }
+        try {
+            await deleteCategory(category.id);
+            router.refresh();
+            deleteModalState.close();
+        } catch (error) {
+            enqueueSnackbar("Error deleting category", { variant: "error" });
+        }
+    };
+
     return (
         <React.Fragment>
             <div className="flex items-center gap-2">
@@ -61,6 +75,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                                         "pointer-events-none select-none opacity-50": category?.children.length > 0,
                                     })}
                                     disabled={category?.children.length > 0}
+                                    onClick={deleteModalState.open}
                                 >
                                     <span className="mr-2">
                                         <Trash />
@@ -76,19 +91,24 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                 <SlideOver
                     className="bg-default-50"
                     isOpen={slideOverState.isOpen}
-                    title={isNew ? "Add Category" : "Edit Category"}
+                    title={isNew ? `Add SubCat to ${category?.name}` : "Edit Category"}
                     onClose={slideOverState.close}
                 >
                     {slideOverState.isOpen && (
                         <CategoryForm
-                            type={isNew ? "create" : "update"}
-                            current={isNew ? undefined : category}
-                            onClose={slideOverState.close}
                             hasParent
+                            current={isNew ? undefined : category}
                             parent_id={category?.id}
+                            type={isNew ? "create" : "update"}
+                            onClose={slideOverState.close}
                         />
                     )}
                 </SlideOver>
+            )}
+            {deleteModalState.isOpen && (
+                <Modal onClose={deleteModalState.close}>
+                    <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
+                </Modal>
             )}
         </React.Fragment>
     );

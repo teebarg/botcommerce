@@ -78,7 +78,6 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 categories.append(category)
         return categories
 
-
     def get_collection_update(
         self, db: Session, update: Product
     ) -> Optional[list[Collection]]:

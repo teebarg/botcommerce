@@ -5,14 +5,15 @@ Revises: 309221ea6570
 Create Date: 2024-10-13 08:09:21.208657
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision: str = 'c80c4f5551a2'
-down_revision: Union[str, None] = '309221ea6570'
+revision: str = "c80c4f5551a2"
+down_revision: Union[str, None] = "309221ea6570"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

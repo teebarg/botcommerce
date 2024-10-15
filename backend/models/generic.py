@@ -1,13 +1,13 @@
 import secrets
 from typing import List, Optional
 
-from models.category import CategoryBase
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 
 from models.activities import ActivityBase
 from models.address import AddressBase
 from models.brand import BrandBase
+from models.category import CategoryBase
 from models.collection import CollectionBase
 from models.product import ProductBase
 from models.tag import TagBase
@@ -64,10 +64,12 @@ class ProductImages(SQLModel, table=True):
 #     product_id: int = Field(foreign_key="product.id", primary_key=True)
 #     brand_id: int = Field(foreign_key="brand.id", primary_key=True)
 
+
 class ProductCategory(SQLModel, table=True):
     __tablename__ = "product_categories"
     product_id: int = Field(foreign_key="product.id", primary_key=True)
     category_id: int = Field(foreign_key="categories.id", primary_key=True)
+
 
 class ProductCollection(SQLModel, table=True):
     product_id: int = Field(foreign_key="product.id", primary_key=True)
@@ -93,7 +95,9 @@ class Category(CategoryBase, table=True):
     slug: str
     # parent_id: int = None
     parent_id: Optional[int] = Field(foreign_key="categories.id")
-    products: list["Product"] = Relationship(back_populates="categories", link_model=ProductCategory)
+    products: list["Product"] = Relationship(
+        back_populates="categories", link_model=ProductCategory
+    )
     # parent: "Category" = Relationship()
     # Relationship to child categories (self-referential)
     parent: Optional["Category"] = Relationship(
@@ -103,7 +107,7 @@ class Category(CategoryBase, table=True):
     # Relationship to subcategories (self-referential)
     children: List["Category"] = Relationship(
         back_populates="parent",  # Linking parent to children
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
     )
 
 

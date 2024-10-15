@@ -161,6 +161,17 @@ export async function createCategory(currentState: unknown, formData: FormData) 
 
     const url = type === "create" ? `${categoryUrl}/` : `${categoryUrl}/${id}`;
 
+    const body: Record<string, any> = {
+        name: formData.get("name"),
+        is_active: Boolean(formData.get("is_active")) ?? false,
+    };
+
+    const parent_id = formData.get("parent_id");
+
+    if (parent_id) {
+        body["parent_id"] = parent_id;
+    }
+
     try {
         const res = await fetch(url, {
             method: type === "create" ? "POST" : "PATCH",
@@ -168,11 +179,7 @@ export async function createCategory(currentState: unknown, formData: FormData) 
                 "X-Auth": accessToken,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                name: formData.get("name"),
-                is_active: Boolean(formData.get("is_active")) ?? false,
-                parent_id: formData.get("parent_id") ?? null,
-            }),
+            body: JSON.stringify(body),
         });
 
         if (!res.ok) {
@@ -187,6 +194,31 @@ export async function createCategory(currentState: unknown, formData: FormData) 
         console.error("Error creating category:", error);
 
         return { success: false, message: "Error creating category" };
+    }
+}
+
+export async function deleteCategory(id: number) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
+
+    try {
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "X-Auth": accessToken,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("categories");
+
+        return { success: true, message: "Category deleted successfully" };
+    } catch (error) {
+        return { success: false, message: "Error deleting category" };
     }
 }
 

@@ -8,9 +8,9 @@ import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Checkbox } from "@modules/common/components/checkbox";
 import { useRouter } from "next/navigation";
+import { Category } from "types/global";
 
 import { createCategory } from "../actions";
-import { Category } from "types/global";
 
 interface Props {
     current?: Category;
@@ -57,7 +57,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(
             <React.Fragment>
                 <div className="mx-auto w-full pb-8">
                     <form ref={formRef} action={formAction} className="h-full flex flex-col">
-                        <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll py-6">
+                        <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll">
                             <div className="relative flex-1">
                                 <div className="space-y-8 ">
                                     <input readOnly className="hidden" name="type" type="text" value={type} />

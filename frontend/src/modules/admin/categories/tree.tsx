@@ -1,18 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-
-import { Metadata } from "next";
-import { Category, Collection, Product } from "types/global";
-import { Table } from "@modules/common/components/table";
-import ProductUpload from "@modules/admin/products/product-upload";
-import { getCategories, getCollectionsList, getCustomer } from "@lib/data";
-import { Actions } from "@modules/admin/components/actions";
-import { CollectionForm } from "@modules/admin/collections/collection-form";
+import { Category } from "types/global";
 import { Chip } from "@modules/common/components/chip";
-import { deleteCollection } from "@modules/admin/actions";
-import { ChevronDown, ChevronRight, DotsSix, EllipsisHorizontal, EllipsisVertical, Folder, Plus, Tag } from "nui-react-icons";
+import { ChevronRight, DotsSix, Folder, Tag } from "nui-react-icons";
 import clsx from "clsx";
+
 import CategoryAction from "./categories-control";
 
 interface Props {
@@ -35,16 +28,16 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
         <React.Fragment>
             <ol>
                 {categories.map((item: Category, index: number) => (
-                    <li className="flex flex-col min-h-10" key={index}>
+                    <li key={index} className="flex flex-col min-h-10">
                         <div className="flex items-center">
                             <div className="flex w-[32px] items-center">
                                 <span draggable="true">
                                     <DotsSix className="cursor-grab" />
                                 </span>
                             </div>
-                            <div className="flex w-full items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <button onClick={() => handleClick(item.id)} className="flex items-center" disabled={item?.children.length == 0}>
+                            <div className="flex items-center w-full">
+                                <div className="flex items-center gap-4 flex-1">
+                                    <button className="flex items-center" disabled={item?.children.length == 0} onClick={() => handleClick(item.id)}>
                                         <ChevronRight
                                             className={clsx("transition-transform duration-300 text-default-800", {
                                                 "rotate-90": open.includes(item.id),
@@ -55,7 +48,12 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                     <div className="flex items-center">
                                         <Folder />
                                     </div>
-                                    <span className="select-none text-xs font-medium capitalize">{item.name}</span>
+                                    <span className="select-none text-sm font-medium capitalize flex-1">{item.name}</span>
+                                    <Chip
+                                        className="mr-2"
+                                        color={item.is_active ? "success" : "danger"}
+                                        title={item.is_active ? "active" : "inactive"}
+                                    />
                                 </div>
                                 <CategoryAction category={item} />
                             </div>
@@ -63,7 +61,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                         {item.children && open.includes(item.id) && (
                             <ol className="mt-4 mb-4 block">
                                 {item.children.map((item: Category, index: number) => (
-                                    <li className="ml-10" key={index}>
+                                    <li key={index} className="ml-10 min-h-10">
                                         <div className="flex items-center">
                                             <div className="flex w-[32px] items-center">
                                                 <span className="" draggable="true">
@@ -77,7 +75,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                     </div>
                                                     <span className="ml-2 select-none text-xs font-medium text-gray-400 capitalize">{item.name}</span>
                                                 </div>
-                                                <CategoryAction category={item} canAdd={false} />
+                                                <CategoryAction canAdd={false} category={item} />
                                             </div>
                                         </div>
                                     </li>
