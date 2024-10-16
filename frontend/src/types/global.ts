@@ -187,7 +187,7 @@ export type Category = {
     name: string;
     slug?: string;
     is_active: boolean;
-    children: Record<string, any>;
+    children: any;
     parent_id: number;
     created_at: string;
     updated_at: string;

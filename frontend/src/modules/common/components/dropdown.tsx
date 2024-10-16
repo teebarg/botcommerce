@@ -4,11 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useOverlay, OverlayContainer } from "@react-aria/overlays";
 import { useButton } from "@react-aria/button";
-import { useSnackbar } from "notistack";
-import { useWebSocket } from "@lib/hooks/use-websocket";
-import useWatch from "@lib/hooks/use-watch";
-
-import Activity from "./activity";
 
 interface Props {
     children: React.ReactNode;
@@ -16,7 +11,6 @@ interface Props {
 }
 
 const Dropdown: React.FC<Props> = ({ children, trigger }) => {
-    const { enqueueSnackbar } = useSnackbar();
     const state = useOverlayTriggerState({});
     const buttonRef = React.useRef(null);
     const overlayRef = React.useRef(null);
@@ -32,18 +26,6 @@ const Dropdown: React.FC<Props> = ({ children, trigger }) => {
         },
         overlayRef
     );
-
-    const [activities, setActivities] = useState<Activity[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const { messages: wsMessages, connect: initializeWebsocket, disconnect: disconnectWebsocket } = useWebSocket({ type: ["activities"] });
-
-    const currentMessage = wsMessages[wsMessages.length - 1];
-
-    useWatch(currentMessage, () => {
-        // Update the live activity message
-        setActivities((prev) => [currentMessage, ...prev]);
-    });
 
     // Update the position of the popover relative to the button
     useEffect(() => {

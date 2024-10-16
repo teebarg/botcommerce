@@ -5,7 +5,7 @@ import { useCheckbox } from "@react-aria/checkbox";
 import { AriaCheckboxProps } from "react-aria";
 
 interface CheckboxProps extends AriaCheckboxProps {
-    label: string;
+    label?: string;
 }
 
 const Checkbox: React.FC<CheckboxProps> = (props) => {

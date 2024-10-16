@@ -3,8 +3,8 @@
 import React, { ReactNode } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem, SubMenu, sidebarClasses, MenuItemStyles, menuClasses } from "react-pro-sidebar";
 import { AdminIcon, CalendarIcon, ChevronRight, ComponentsIcon, DocumentIcon, EcommerceIcon, ProfileIcon } from "nui-react-icons";
-import { Badge, Chip } from "@nextui-org/react";
 import Link from "next/link";
+import { Chip } from "@modules/common/components/chip";
 
 interface Props {}
 
@@ -54,11 +54,11 @@ const Sidebar: React.FC<Props> = () => {
         {
             subMenu: "Admin",
             icon: <AdminIcon />,
-            suffix: (
-                <Badge className="mr-4 -mt-0.5" color="danger" content="5">
-                    {""}
-                </Badge>
-            ),
+            // suffix: (
+            //     <Badge className="mr-4 -mt-0.5" color="danger" content="5">
+            //         {""}
+            //     </Badge>
+            // ),
             menuItems: [
                 {
                     label: "Dashboad",
@@ -156,11 +156,7 @@ const Sidebar: React.FC<Props> = () => {
             label: "Calendar",
             href: "/calendar",
             icon: <CalendarIcon />,
-            suffix: (
-                <Chip color="success" size="sm" variant="flat">
-                    New
-                </Chip>
-            ),
+            suffix: <Chip color="success" size="sm" title="New" />,
         },
         {
             label: "Documentation",

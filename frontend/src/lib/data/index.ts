@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { Product, ProductCategoryWithChildren } from "types/global";
+import { Product } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
 import { searchDocuments } from "@lib/util/meilisearch";
@@ -697,29 +697,6 @@ export const listCategories = cache(async function () {
     //     .catch((err) => {
     //         throw err;
     //     });
-});
-
-export const getCategoriesList = cache(async function (
-    offset: number = 0,
-    limit: number = 100
-): Promise<{
-    product_categories: ProductCategoryWithChildren[];
-    count: number;
-}> {
-    // const { product_categories, count } = await client.productCategories
-    //     .list({ limit, offset }, { next: { tags: ["categories"] } })
-    //     .catch((err) => {
-    //         throw err;
-    //     });
-
-    // return {
-    //     product_categories,
-    //     count,
-    // };
-    return {
-        product_categories: [],
-        count: 0,
-    };
 });
 
 export const getActivites = cache(async function (limit: number = 10) {
