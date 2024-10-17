@@ -45,12 +45,8 @@ export default function ContactForm() {
                     validationBehavior="native"
                 />
                 <div className="flex gap-4">
-                    <Checkbox
-                        defaultSelected
-                        label="I  allow this website to store my submission so they can respond to my inquiry."
-                        name="agreement"
-                    >
-                        <span className="text-gray-700">I allow this website to store my submission so they can respond to my inquiry.</span>
+                    <Checkbox defaultSelected name="agreement">
+                        <span className="text-gray-700">I allow this website to store my submission.</span>
                     </Checkbox>
                 </div>
                 <FormButton color="primary" fullWidth={true}>

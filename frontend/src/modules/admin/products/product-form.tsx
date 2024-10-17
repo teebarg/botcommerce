@@ -9,10 +9,22 @@ import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
 import { MultiSelect } from "@modules/common/components/multiselect";
-import { Checkbox } from "@modules/common/components/checkbox";
 import { useRouter } from "next/navigation";
 
 import { createProduct, uploadProductImage } from "../actions";
+import { Switch } from "@modules/common/components/switch";
+import { Multiselect } from "@modules/common/components/multi-select";
+
+const options = [
+    { id: "1", name: "React" },
+    { id: "2", name: "TypeScript" },
+    { id: "3", name: "Tailwind CSS" },
+    { id: "4", name: "Next.js" },
+    { id: "5", name: "Node.js" },
+    { id: "6", name: "GraphQL" },
+    { id: "7", name: "PostgreSQL" },
+    { id: "8", name: "MongoDB" },
+];
 
 interface Props {
     current?: any;
@@ -100,7 +112,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     <input readOnly className="hidden" name="type" type="text" value={type} />
                                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                     <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
-                                    <Checkbox defaultSelected={current.is_active} label="Is Active" name="is_active" />
+                                    <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
                                     <Textarea
                                         defaultValue={current.description}
                                         name="description"
@@ -121,6 +133,14 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                         name="collections"
                                         options={collectionOptions}
                                         placeholder="Select Collections"
+                                        variant="bordered"
+                                    />
+                                    <Multiselect
+                                        defaultValue={["1", "2"]}
+                                        label="Categories"
+                                        name="categories"
+                                        options={options}
+                                        placeholder="Select Categories"
                                         variant="bordered"
                                     />
                                     <Input required defaultValue={current.price} label="Price" name="price" placeholder="Ex. 2500" type="number" />

@@ -3,7 +3,9 @@ import { useToggleState } from "@react-stately/toggle";
 import clsx from "clsx";
 import { AriaSwitchProps, useFocusRing, useSwitch } from "react-aria";
 
-interface SwitchProps extends AriaSwitchProps {}
+interface SwitchProps extends AriaSwitchProps {
+    label?: string
+}
 
 const Switch: React.FC<SwitchProps> = (props) => {
     let state = useToggleState(props);
@@ -40,7 +42,7 @@ const Switch: React.FC<SwitchProps> = (props) => {
                         />
                     </div>
                 </label>
-                <span className="text-sm">{props.children}</span>
+                <span className="text-sm">{props.label}</span>
             </div>
         </React.Fragment>
     );
