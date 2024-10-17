@@ -8,29 +8,18 @@ import { ImageUpload } from "@modules/common/components/image-upload";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
-import { MultiSelect } from "@modules/common/components/multiselect";
 import { useRouter } from "next/navigation";
 
 import { createProduct, uploadProductImage } from "../actions";
 import { Switch } from "@modules/common/components/switch";
-import { Multiselect } from "@modules/common/components/multi-select";
-
-const options = [
-    { id: "1", name: "React" },
-    { id: "2", name: "TypeScript" },
-    { id: "3", name: "Tailwind CSS" },
-    { id: "4", name: "Next.js" },
-    { id: "5", name: "Node.js" },
-    { id: "6", name: "GraphQL" },
-    { id: "7", name: "PostgreSQL" },
-    { id: "8", name: "MongoDB" },
-];
+import { Multiselect } from "@modules/common/components/multiselect";
+import { Category, Collection } from "types/global";
 
 interface Props {
     current?: any;
     type?: "create" | "update";
-    tags?: { id: number; name: string }[];
-    collections?: { id: number; name: string }[];
+    categories?: Category[];
+    collections?: Collection[];
     onClose?: () => void;
 }
 
@@ -39,15 +28,18 @@ interface ChildRef {
 }
 
 const ProductForm = forwardRef<ChildRef, Props>(
-    ({ type = "create", onClose, current = { name: "", is_active: true }, tags = [], collections = [] }, ref) => {
+    ({ type = "create", onClose, current = { name: "", is_active: true }, categories = [], collections = [] }, ref) => {
         const router = useRouter();
-        const selectedTags = current?.tags?.map((item: any) => item.id) ?? [];
-        const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
+        // const selectedTags = current?.tags?.map((item: any) => item.id) ?? [];
+        const [selectedCategories, setSelectedCategories] = React.useState<number[]>([]);
+        const [selectedCollections, setSelectedCollections] = React.useState<number[]>([]);
         const isCreate = type === "create";
 
         React.useEffect(() => {
-            const selected_collections = collections.filter((item) => current?.collections?.includes(item.name)).map((item) => item?.id?.toString());
+            const selected_categories = categories.filter((item) => current?.categories?.includes(item.name)).map((item) => item.id);
+            const selected_collections = collections.filter((item) => current?.collections?.includes(item.name)).map((item) => item.id);
 
+            setSelectedCategories(selected_categories);
             setSelectedCollections(selected_collections);
         }, [current.collections]);
 
@@ -71,18 +63,6 @@ const ProductForm = forwardRef<ChildRef, Props>(
                 }
             }
         }, [state, enqueueSnackbar]);
-
-        const collectionOptions = React.useMemo(() => {
-            return collections.map((item) => {
-                return { value: item.id, label: item.name };
-            });
-        }, collections);
-
-        const tagOptions = React.useMemo(() => {
-            return tags.map((item) => {
-                return { value: item.id, label: item.name };
-            });
-        }, tags);
 
         const handleUpload = async (data: any) => {
             try {
@@ -119,27 +99,27 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                         placeholder="Product description"
                                         variant="bordered"
                                     />
-                                    <MultiSelect
+                                    {/* <MultiSelect
                                         defaultValue={selectedTags}
                                         label="Tags"
                                         name="tags"
                                         options={tagOptions}
                                         placeholder="Select Tags"
                                         variant="bordered"
-                                    />
-                                    <MultiSelect
+                                    /> */}
+                                    <Multiselect
                                         defaultValue={selectedCollections}
                                         label="Collections"
                                         name="collections"
-                                        options={collectionOptions}
+                                        options={collections}
                                         placeholder="Select Collections"
                                         variant="bordered"
                                     />
                                     <Multiselect
-                                        defaultValue={["1", "2"]}
+                                        defaultValue={selectedCategories}
                                         label="Categories"
                                         name="categories"
-                                        options={options}
+                                        options={categories}
                                         placeholder="Select Categories"
                                         variant="bordered"
                                     />

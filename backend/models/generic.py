@@ -156,6 +156,7 @@ class ProductPublic(ProductBase):
     id: int
     slug: str
     images: list[ProductImages] = []
+    categories: list[Category] = []
     collections: list[Collection] = []
     # tags: list[Tag] = []
     # brands: list[Brand] = []

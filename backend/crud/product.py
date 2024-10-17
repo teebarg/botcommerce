@@ -47,7 +47,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             if "tags" in update_data:
                 db_obj.tags = self.get_tag_update(db=db, update=obj_in)
             if "categories" in update_data:
-                db_obj.collections = self.get_categories_update(db=db, update=obj_in)
+                db_obj.categories = self.get_categories_update(db=db, update=obj_in)
             if "collections" in update_data:
                 db_obj.collections = self.get_collection_update(db=db, update=obj_in)
 
