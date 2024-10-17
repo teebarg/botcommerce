@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { Product } from "types/global";
 import React from "react";
-import { Image } from "@nextui-org/image";
 import { LocationIcon, MailIcon } from "nui-react-icons";
 import { openingHours } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
@@ -47,7 +46,7 @@ export default async function Home() {
                 <div>
                     <div className="max-w-7xl mx-auto relative sm:flex sm:flex-row-reverse bg-[#fee3f1] rounded-xl my-4 sm:my-8 min-h-72">
                         <div className="sm:w-1/2">
-                            <Image alt="banner" className="w-full" radius="none" src={imgSrc(`banners%2Fhero4.webp`)} />
+                            <img alt="banner" className="w-full" src={imgSrc(`banners%2Fhero4.webp`)} />
                         </div>
                         <div className="sm:w-1/2 sm:flex flex-col items-center justify-center text-gray-600 py-8 sm:py-0 px-2 sm:px-0">
                             <h1 className="text-4xl font-semibold">Explore thrifts for kids</h1>
@@ -63,7 +62,7 @@ export default async function Home() {
                 </div>
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 min-h-48">
-                        <Image alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner1.avif`)} />
+                        <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner1.avif`)} />
                         <div className="grid grid-cols-2 md:flex flex-wrap mt-4 sm:mt-0 mx-auto sm:absolute bottom-16 right-4 gap-2 ml-auto z-10 px-4 md:px-0">
                             {["Boy", "Girl", "Toddler Boy", "Toddler Boy"].map((item: string, index: number) => (
                                 <Button key={index} className="min-w-36" size="lg" variant="flat">
@@ -78,13 +77,13 @@ export default async function Home() {
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Collections</p>
                         <div className="md:grid grid-cols-2 gap-4">
                             <div className="md:grid grid-cols-2 gap-4">
-                                <Image alt="cat1" src={imgSrc(`banners%2Fcat1.jpeg`)} />
-                                <Image alt="cat2" src={imgSrc(`banners%2Fcat2.jpeg`)} />
-                                <Image alt="cat4" src={imgSrc(`banners%2Fcat4.jpeg`)} />
-                                <Image alt="cat3" src={imgSrc(`banners%2Fcat3.jpeg`)} />
+                                <img alt="cat1" src={imgSrc(`banners%2Fcat1.jpeg`)} />
+                                <img alt="cat2" src={imgSrc(`banners%2Fcat2.jpeg`)} />
+                                <img alt="cat4" src={imgSrc(`banners%2Fcat4.jpeg`)} />
+                                <img alt="cat3" src={imgSrc(`banners%2Fcat3.jpeg`)} />
                             </div>
                             <div>
-                                <Image alt="cat5" className="h-[inherit]" src={imgSrc(`banners%2Fcat5.avif`)} />
+                                <img alt="cat5" className="h-[inherit]" src={imgSrc(`banners%2Fcat5.avif`)} />
                             </div>
                         </div>
                     </div>
@@ -99,7 +98,7 @@ export default async function Home() {
                 </div>
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 min-h-48">
-                        <Image alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner2.avif`)} />
+                        <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner2.avif`)} />
                         <div className="grid grid-cols-2 md:flex flex-wrap sm:absolute bottom-16 left-4 gap-2 ml-auto z-10 mt-4 sm:mt-0 px-4 md:px-0">
                             {["Shorts", "Tops", "Shoes", "Gowns"].map((item: string, index: number) => (
                                 <Button key={index} className="min-w-36" size="lg" variant="flat">

@@ -17,6 +17,11 @@ const useUpdateQuery = (delay = 500) => {
             const params = new URLSearchParams(searchParams);
 
             data.forEach(({ key, value }) => {
+                if (!value || value === "") {
+                    params.delete(key);
+
+                    return;
+                }
                 params.set(key, value);
             });
             router.push(`${pathname}?${params.toString()}`);
