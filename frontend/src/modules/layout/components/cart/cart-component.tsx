@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@nextui-org/badge";
 import { CartIcon } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
@@ -11,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { currency } from "@lib/util/util";
 
 import { CartItems } from "../cart-items";
+import { Badge } from "@modules/common/components/badge";
 
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;
@@ -68,9 +68,9 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
 
     return (
         <div>
-            <Badge color="danger" content={totalItems} shape="circle">
-                <button className="cursor-pointer p-1 inline-block text-default-500" onClick={state.open}>
-                    <CartIcon size={32} />
+            <Badge color="danger" content={totalItems} size="md">
+                <button className="h-full w-full flex items-center justify-center bg-content1 text-default-500" onClick={state.open}>
+                    <CartIcon className="h-10 w-10" />
                 </button>
             </Badge>
             {state.isOpen && (

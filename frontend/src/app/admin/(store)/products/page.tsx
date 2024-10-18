@@ -3,13 +3,14 @@ import { Product } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
-import { getCustomer, getProducts } from "@lib/data";
-import { Badge } from "@nextui-org/badge";
+import { getCategories, getCustomer, getProducts } from "@lib/data";
 import { Avatar } from "@nextui-org/avatar";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteProduct, getCollections } from "@modules/admin/actions";
 import { ProductForm } from "@modules/admin/products/product-form";
+import { Badge } from "@modules/common/components/badge";
+import { CheckMini } from "nui-react-icons";
 
 export const metadata: Metadata = {
     title: "Children clothing | TBO Store",
@@ -28,6 +29,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
     const limit = parseInt(searchParams.limit || "10", 10);
     const { products, ...pagination } = await fetchProducts(search, page, limit);
     const { collections } = (await getCollections(1, 100)) as { collections: [] };
+    const { categories } = await getCategories();
+
     const customer = await getCustomer().catch(() => null);
 
     return (
@@ -42,7 +45,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                         canExport
                         canIndex
                         columns={["No", "Image", "Name", "Description", "Price", "Old Price", "Created At"]}
-                        form={<ProductForm collections={collections} type="create" />}
+                        form={<ProductForm categories={categories} collections={collections} type="create" />}
                         pagination={pagination}
                         searchQuery={search}
                     >
@@ -52,8 +55,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                 <tr key={item.id} className="even:bg-content2">
                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        <Badge color={item.is_active ? "success" : "danger"} content="" placement="bottom-right" shape="circle">
-                                            <Avatar radius="md" src={item.image} />
+                                        <Badge
+                                            color={item.is_active ? "success" : "danger"}
+                                            content={<CheckMini viewBox="0 0 20 20" />}
+                                            placement="bottom-right"
+                                            size="md"
+                                        >
+                                            <Avatar radius="md" src={item.image} className="h-full w-full" />
                                         </Badge>
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
@@ -74,7 +82,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
                                         <Actions
                                             deleteAction={deleteProduct}
-                                            form={<ProductForm collections={collections} current={item} type="update" />}
+                                            form={<ProductForm categories={categories} collections={collections} current={item} type="update" />}
                                             item={item}
                                         />
                                     </td>

@@ -6,7 +6,7 @@ import crud
 from core.logging import logger
 from core.utils import generate_slug
 from crud.base import CRUDBase
-from models.generic import Collection, Product, Tag
+from models.generic import Category, Collection, Product, Tag
 from models.product import (
     ProductCreate,
     ProductUpdate,
@@ -20,6 +20,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             update={
                 "slug": generate_slug(name=obj_in.name),
                 "tags": self.get_tag_update(db=db, update=obj_in),
+                "categories": self.get_categories_update(db=db, update=obj_in),
                 "collections": self.get_collection_update(db=db, update=obj_in),
             },
         )
@@ -45,6 +46,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             #     db_obj.slug = generate_slug(name=update_data.get("name", ""))
             if "tags" in update_data:
                 db_obj.tags = self.get_tag_update(db=db, update=obj_in)
+            if "categories" in update_data:
+                db_obj.categories = self.get_categories_update(db=db, update=obj_in)
             if "collections" in update_data:
                 db_obj.collections = self.get_collection_update(db=db, update=obj_in)
 
@@ -65,6 +68,15 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 db.commit()
             except Exception as e:
                 logger.error(e)
+
+    def get_categories_update(
+        self, db: Session, update: Product
+    ) -> Optional[list[Category]]:
+        categories: list[Category] = []
+        for i in update.categories:
+            if category := crud.category.get(db=db, id=i):
+                categories.append(category)
+        return categories
 
     def get_collection_update(
         self, db: Session, update: Product

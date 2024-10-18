@@ -69,12 +69,10 @@ async def export_products(
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get(
-    "/",
-    response_model=Any,
-)
+@router.get("/")
 async def index(
     search: str = "",
+    categories: str = Query(default=""),
     collections: str = Query(default=""),
     maxPrice: int = Query(default=1000000, gt=0),
     minPrice: int = Query(default=1, gt=0),
@@ -87,6 +85,8 @@ async def index(
     filters = []
     # if tag:
     #     filters.append(f"tag = '{tag}'")
+    if categories:
+        filters.append(f"categories IN [{categories}]")
     if collections:
         filters.append(f"collections IN [{collections}]")
     if minPrice and maxPrice:
@@ -119,12 +119,13 @@ async def index(
     }
 
 
-@router.post("/search", response_model=Any)
+@router.post("/search")
 async def search_products(search_params: dict) -> Any:
     """
     Search products using Meilisearch, sorted by relevance.
     """
     search = search_params.get("search", "")
+    categories = search_params.get("categories", [])
     collections = search_params.get("collections", [])
     minPrice = search_params.get("min_price", 1)
     maxPrice = search_params.get("max_price", 1000000)
@@ -133,6 +134,8 @@ async def search_products(search_params: dict) -> Any:
     sort = search_params.get("sort", "created_at:desc")
 
     filters = []
+    if categories:
+        filters.append(f"categories IN [{','.join(categories)}]")
     if collections:
         filters.append(f"collections IN [{','.join(collections)}]")
     if minPrice and maxPrice:
@@ -186,7 +189,7 @@ def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
     return product
 
 
-@router.get("/{slug}", response_model=ProductPublic)
+@router.get("/{slug}")
 def read(slug: str, db: SessionDep) -> ProductPublic:
     """
     Get a specific product by slug.
@@ -197,10 +200,7 @@ def read(slug: str, db: SessionDep) -> ProductPublic:
         raise HTTPException(status_code=404, detail="Product not found")
 
 
-@router.patch(
-    "/{id}",
-    response_model=ProductPublic,
-)
+@router.patch("/{id}")
 def update(
     *,
     db: SessionDep,
@@ -370,17 +370,19 @@ async def reindex_products(db: SessionDep, background_tasks: BackgroundTasks):
         ) from e
 
 
-@router.post("/configure-filterable-attributes", response_model=Message)
+@router.post("/configure-filterable-attributes")
 async def configure_filterable_attributes(
     attributes: list[str],
-):
+) -> Message:
     """
     Configure filterable attributes for the products index in Meilisearch.
     """
     try:
         index = get_or_create_index("products")
         # Update the filterable attributes
-        index.update_filterable_attributes(["collections", "name", "price", "slug"])
+        index.update_filterable_attributes(
+            ["categories", "collections", "name", "price", "slug"]
+        )
         # Update the sortable attributes
         index.update_sortable_attributes(["created_at", "price"])
 
@@ -411,8 +413,8 @@ async def config_clear_index():
         ) from e
 
 
-@router.get("/search/delete-index", response_model=dict)
-async def config_delete_index():
+@router.get("/search/delete-index")
+async def config_delete_index() -> dict:
     """
     Drop the products index in Meilisearch.
     """
@@ -431,5 +433,6 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["collections"] = [
         collection.name for collection in product.collections
     ]
+    product_dict["categories"] = [category.name for category in product.categories]
     product_dict["images"] = [image.image for image in product.images]
     return product_dict

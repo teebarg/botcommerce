@@ -14,11 +14,13 @@ class ProductBase(BaseModel):
 
 # Properties to receive via API on creation
 class ProductCreate(ProductBase):
+    categories: list[int] = []
     collections: list[int] = []
     tags: list[int] = []
 
 
 # Properties to receive via API on update, all are optional
 class ProductUpdate(ProductBase):
+    categories: list[int] = []
     collections: list[int] = []
     tags: list[int] = []

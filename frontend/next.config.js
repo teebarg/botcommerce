@@ -13,8 +13,8 @@ const nextConfig = {
             },
             {
                 protocol: "https",
-                hostname: "assets.theplace.com",
-            },
+                hostname: "firebasestorage.googleapis.com"
+            }
         ],
     },
 };
