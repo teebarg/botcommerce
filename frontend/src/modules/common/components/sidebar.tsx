@@ -1,5 +1,10 @@
+"use client";
+
 import React, { useState } from "react";
 import { Calendar, Check, ChevronDown, ChevronRight, CogSixTooth, Component, DocumentText, User, Users, Window } from "nui-react-icons";
+import clsx from "clsx";
+import { usePathname } from 'next/navigation';
+import Link from "next/link";
 
 interface MenuItem {
     label: string;
@@ -7,6 +12,7 @@ interface MenuItem {
     icon?: React.ReactNode;
     suffix?: React.ReactNode;
     disabled?: boolean;
+    exact?: boolean; // Whether to match the route exactly
 }
 
 interface SubMenuItem {
@@ -16,41 +22,84 @@ interface SubMenuItem {
     menuItems: (MenuItem | SubMenuItem)[];
 }
 
+const MenuLink = ({ href, className, children, disabled }: { href: string; className: string; children: React.ReactNode; disabled?: boolean }) => {
+    if (disabled) {
+        return <span className={className}>{children}</span>;
+    }
+
+    return (
+        <Link href={href} className={className}>
+            {children}
+        </Link>
+    );
+};
+
 const SubMenuComponent: React.FC<{
     item: SubMenuItem;
     level?: number;
-}> = ({ item, level = 0 }) => {
+    isCollapsed?: boolean;
+}> = ({ item, isCollapsed, level = 0 }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [height, setHeight] = useState<number>(0);
+    const pathname = usePathname();
     const contentRef = React.useRef<HTMLDivElement>(null);
 
+    const isActive = (href: string, exact = false) => 
+        exact ? pathname === href : pathname.startsWith(href);
+
+    const isChildActive = (items: (MenuItem | SubMenuItem)[]): boolean => {
+        return items.some((subItem) => {
+            if ("subMenu" in subItem) {
+                return isChildActive(subItem.menuItems);
+            }
+            return isActive(subItem.href, subItem.exact);
+        });
+    };
+
     React.useEffect(() => {
-        if (contentRef.current) {
-            setHeight(isOpen ? contentRef.current.scrollHeight : 0);
+        if (isChildActive(item.menuItems)) {
+            setIsOpen(true);
         }
-    }, [isOpen]);
+    }, [pathname]);
 
     return (
         <div className="w-full">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`
-                    w-full flex items-center justify-between p-2 hover:bg-gray-100/50
+                    w-full flex items-center justify-between p-4 text-default-500 hover:text-default-600
                     transition-colors duration-200 group
                     ${level === 0 ? "pl-4" : `pl-${level * 4 + 4}`}
-                    text-gray-700 hover:text-gray-900 rounded-lg
+                    ${level === 1 ? "hover:bg-content2 bg-content1" : ""}
+                    ${level === 2 ? "hover:bg-content2 bg-content3" : ""}
+                    ${isChildActive(item.menuItems) ? "bg-gray-100/50 text-blue-900" : ""}
                 `}
             >
                 <div className="flex items-center gap-2">
-                    {item.icon && <div className="text-gray-500 group-hover:text-gray-700 transition-colors duration-200">{item.icon}</div>}
-                    <span className="text-sm font-medium">{item.subMenu}</span>
+                    {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
+                    <span
+                        className={clsx("text-sm font-medium", {
+                            hidden: isCollapsed,
+                        })}
+                    >
+                        {item.subMenu}
+                    </span>
                 </div>
-                <div className={`transform transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                <div
+                    className={clsx("text-sm font-medium transform transition-transform duration-200", {
+                        hidden: isCollapsed,
+                        "rotate-180": isOpen,
+                    })}
+                >
                     <ChevronDown size={18} />
                 </div>
             </button>
 
-            <div style={{ height: `${height}px` }} className="overflow-hidden transition-all duration-300 ease-in-out">
+            <div
+                className={`
+                    overflow-hidden transition-all duration-300 ease-in-out
+                    ${isOpen ? "max-h-96" : "max-h-0"}
+                `}
+            >
                 <div ref={contentRef}>
                     {item.menuItems.map((subItem, index) =>
                         "subMenu" in subItem ? (
@@ -68,28 +117,42 @@ const SubMenuComponent: React.FC<{
 const MenuItemComponent: React.FC<{
     item: MenuItem;
     level?: number;
-}> = ({ item, level = 0 }) => {
+    isCollapsed?: boolean;
+}> = ({ item, isCollapsed, level = 0 }) => {
+    const pathname = usePathname();
+    const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
     return (
-        <a
+        <MenuLink
             href={item.href}
-            className={`
-                flex items-center justify-between p-2
-                ${level === 0 ? "pl-4" : `pl-${level * 4 + 4}`}
-                ${item.disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100/50 cursor-pointer"}
-                text-gray-700 hover:text-gray-900 rounded-lg
-                transition-all duration-200 group
-            `}
+            className={clsx(
+                "flex items-center justify-between p-4 transition-all duration-200 group",
+                `${item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-600"} ${
+                    level === 0 ? "pl-4" : `pl-${level * 4 + 4}`
+                }`,
+                {
+                    "hover:bg-content2 bg-content1": level === 1,
+                    "hover:bg-content2 bg-content3 pl-12": level === 2,
+                    "hover:bg-content3 bg-content4 pl-16": level === 3,
+                    "hover:bg-blue-500 bg-blue-800": active,
+                }
+            )}
         >
             <div className="flex items-center gap-2">
-                {item.icon && <div className="text-gray-500 group-hover:text-gray-700 transition-colors duration-200">{item.icon}</div>}
-                <span className="text-sm font-medium">{item.label}</span>
+                {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
+                <span
+                    className={clsx("text-sm font-medium", {
+                        hidden: isCollapsed,
+                    })}
+                >
+                    {item.label}
+                </span>
             </div>
             {item.suffix && <div className="flex items-center">{item.suffix}</div>}
-        </a>
+        </MenuLink>
     );
 };
 
-const Sidebar: React.FC = () => {
+const SideBar: React.FC = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const navItems: (MenuItem | SubMenuItem)[] = [
         {
@@ -124,9 +187,11 @@ const Sidebar: React.FC = () => {
                         {
                             label: "Input",
                             href: "/input",
+                            icon: <CogSixTooth size={20} />,
                         },
                         {
                             subMenu: "More",
+                            icon: <CogSixTooth size={20} />,
                             menuItems: [
                                 {
                                     label: "Checkbox",
@@ -151,6 +216,7 @@ const Sidebar: React.FC = () => {
             label: "Profile",
             href: "/profile",
             icon: <User size={20} />,
+            suffix: <span className="bg-pink-100 text-pink-500 text-xs font-medium px-2 py-0.5 rounded-full">New</span>,
         },
         {
             label: "Calendar",
@@ -175,21 +241,21 @@ const Sidebar: React.FC = () => {
 
     return (
         <div
-            className={`
-        h-screen bg-white border-r border-gray-200 flex flex-col
-        transition-all duration-300 ease-in-out
-        ${isCollapsed ? "w-20" : "w-80"}
-      `}
+            className={clsx(
+                "h-screen bg-gradient-to-b from-default-100 via-danger-100 to-secondary-100 bg-white border-r border-gray-200 flex flex-col",
+                "transition-all duration-300 ease-in-out w-[20rem] text-default-500",
+                {
+                    "!w-20": isCollapsed,
+                }
+            )}
         >
-            <div className="p-4 flex items-center justify-between">
+            <div className="p-4 flex items-center justify-between mb-4">
                 <h1
-                    className={`
-          text-2xl font-bold text-gray-800
-          transition-opacity duration-200
-          ${isCollapsed ? "opacity-0 w-0" : "opacity-100"}
-        `}
+                    className={clsx("font-semibold text-3xl transition-opacity duration-200 opacity-100", {
+                        "!opacity-0 w-0": isCollapsed,
+                    })}
                 >
-                    Logo
+                    Botcommerce
                 </h1>
                 <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                     <ChevronRight size={20} className={`transform transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
@@ -197,39 +263,27 @@ const Sidebar: React.FC = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto">
-                <div
-                    className={`
-          px-4 mb-2
-          transition-opacity duration-200
-          ${isCollapsed ? "opacity-0" : "opacity-70"}
-        `}
-                >
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">General</p>
+                <div className={`px-4 mb-2 transition-opacity duration-200 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
+                    <p className="text-xs font-semibold text-default-500 uppercase tracking-wider">General</p>
                 </div>
 
-                <nav className="space-y-1">
+                <nav>
                     {navItems.map((item, index) =>
                         "subMenu" in item ? (
-                            <SubMenuComponent key={index} item={item as SubMenuItem} />
+                            <SubMenuComponent key={index} item={item as SubMenuItem} isCollapsed={isCollapsed} />
                         ) : (
-                            <MenuItemComponent key={index} item={item as MenuItem} />
+                            <MenuItemComponent key={index} item={item as MenuItem} isCollapsed={isCollapsed} />
                         )
                     )}
                 </nav>
 
-                <div
-                    className={`
-          px-4 mb-2 mt-8
-          transition-opacity duration-200
-          ${isCollapsed ? "opacity-0" : "opacity-70"}
-        `}
-                >
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Extra</p>
+                <div className={`px-4 mb-2 mt-8 transition-opacity duration-200 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
+                    <p className="text-xs font-semibold text-default-500 uppercase tracking-wider">Extra</p>
                 </div>
 
-                <nav className="space-y-1">
+                <nav>
                     {extraItems.map((item, index) => (
-                        <MenuItemComponent key={index} item={item} />
+                        <MenuItemComponent key={index} item={item} isCollapsed={isCollapsed} />
                     ))}
                 </nav>
             </div>
@@ -237,4 +291,4 @@ const Sidebar: React.FC = () => {
     );
 };
 
-export { Sidebar };
+export { SideBar };
