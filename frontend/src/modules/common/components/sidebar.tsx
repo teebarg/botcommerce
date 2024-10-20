@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Calendar, Check, ChevronDown, ChevronRight, CogSixTooth, Component, DocumentText, User, Users, Window } from "nui-react-icons";
+import { Calendar, Check, ChevronRight, CogSixTooth, Component, DocumentText, EcommerceIcon, User, Users, Window } from "nui-react-icons";
 import clsx from "clsx";
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 interface MenuItem {
@@ -43,8 +43,7 @@ const SubMenuComponent: React.FC<{
     const pathname = usePathname();
     const contentRef = React.useRef<HTMLDivElement>(null);
 
-    const isActive = (href: string, exact = false) => 
-        exact ? pathname === href : pathname.startsWith(href);
+    const isActive = (href: string, exact = true) => (exact ? pathname === href : pathname.startsWith(href));
 
     const isChildActive = (items: (MenuItem | SubMenuItem)[]): boolean => {
         return items.some((subItem) => {
@@ -71,7 +70,6 @@ const SubMenuComponent: React.FC<{
                     ${level === 0 ? "pl-4" : `pl-${level * 4 + 4}`}
                     ${level === 1 ? "hover:bg-content2 bg-content1" : ""}
                     ${level === 2 ? "hover:bg-content2 bg-content3" : ""}
-                    ${isChildActive(item.menuItems) ? "bg-gray-100/50 text-blue-900" : ""}
                 `}
             >
                 <div className="flex items-center gap-2">
@@ -87,10 +85,10 @@ const SubMenuComponent: React.FC<{
                 <div
                     className={clsx("text-sm font-medium transform transition-transform duration-200", {
                         hidden: isCollapsed,
-                        "rotate-180": isOpen,
+                        "rotate-90": isOpen,
                     })}
                 >
-                    <ChevronDown size={18} />
+                    <ChevronRight size={18} />
                 </div>
             </button>
 
@@ -120,7 +118,9 @@ const MenuItemComponent: React.FC<{
     isCollapsed?: boolean;
 }> = ({ item, isCollapsed, level = 0 }) => {
     const pathname = usePathname();
-    const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+    // const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+    const active = pathname === item.href;
+
     return (
         <MenuLink
             href={item.href}
@@ -133,7 +133,7 @@ const MenuItemComponent: React.FC<{
                     "hover:bg-content2 bg-content1": level === 1,
                     "hover:bg-content2 bg-content3 pl-12": level === 2,
                     "hover:bg-content3 bg-content4 pl-16": level === 3,
-                    "hover:bg-blue-500 bg-blue-800": active,
+                    "hover:!bg-blue-500 !bg-blue-800": active,
                 }
             )}
         >
@@ -168,6 +168,36 @@ const SideBar: React.FC = () => {
                     label: "Users",
                     href: "/admin/users",
                     icon: <Users size={18} />,
+                },
+            ],
+        },
+        {
+            subMenu: "Store",
+            icon: <EcommerceIcon size={20} />,
+            menuItems: [
+                {
+                    label: "Products",
+                    href: "/admin/products",
+                },
+                {
+                    label: "Categories",
+                    href: "/admin/categories",
+                },
+                {
+                    label: "Collections",
+                    href: "/admin/collections",
+                },
+                {
+                    label: "Tags",
+                    href: "/admin/tags",
+                },
+                {
+                    label: "Orders",
+                    href: "/orders",
+                },
+                {
+                    label: "Credit card",
+                    href: "/credit-card",
                 },
             ],
         },
@@ -239,11 +269,22 @@ const SideBar: React.FC = () => {
         },
     ];
 
+    const navs = [
+        {
+            group: "General",
+            iems: navItems,
+        },
+        {
+            group: "Extra",
+            iems: extraItems,
+        },
+    ];
+
     return (
         <div
             className={clsx(
-                "h-screen bg-gradient-to-b from-default-100 via-danger-100 to-secondary-100 bg-white border-r border-gray-200 flex flex-col",
-                "transition-all duration-300 ease-in-out w-[20rem] text-default-500",
+                "h-screen bg-gradient-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
+                "transition-all duration-300 ease-in-out w-[22rem] text-default-500",
                 {
                     "!w-20": isCollapsed,
                 }
@@ -263,7 +304,24 @@ const SideBar: React.FC = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto">
-                <div className={`px-4 mb-2 transition-opacity duration-200 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
+                {navs.map((nav, index: number) => (
+                    <React.Fragment key={index}>
+                        <div className={`px-4 mb-2 transition-opacity duration-200 mt-8 first:mt-0 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
+                            <p className="text-xs font-bold text-default-500 uppercase tracking-wider">{nav.group}</p>
+                        </div>
+
+                        <nav>
+                            {nav.iems.map((item, index: number) =>
+                                "subMenu" in item ? (
+                                    <SubMenuComponent key={index} item={item as SubMenuItem} isCollapsed={isCollapsed} />
+                                ) : (
+                                    <MenuItemComponent key={index} item={item as MenuItem} isCollapsed={isCollapsed} />
+                                )
+                            )}
+                        </nav>
+                    </React.Fragment>
+                ))}
+                {/* <div className={`px-4 mb-2 transition-opacity duration-200 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
                     <p className="text-xs font-semibold text-default-500 uppercase tracking-wider">General</p>
                 </div>
 
@@ -285,7 +343,7 @@ const SideBar: React.FC = () => {
                     {extraItems.map((item, index) => (
                         <MenuItemComponent key={index} item={item} isCollapsed={isCollapsed} />
                     ))}
-                </nav>
+                </nav> */}
             </div>
         </div>
     );
