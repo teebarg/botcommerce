@@ -14,7 +14,7 @@ export function FormButton({
     "data-testid": dataTestId,
 }: {
     children: React.ReactNode;
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success" | undefined;
+    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
     variant?: "solid" | "bordered" | "flat" | "shadow";
     size?: "sm" | "md" | "lg";
     fullWidth?: boolean;

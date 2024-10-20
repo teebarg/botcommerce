@@ -4,7 +4,7 @@ import clsx from "clsx";
 interface BadgeProps {
     children: React.ReactNode;
     content?: React.ReactNode | string;
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success" | undefined;
+    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
     placement?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
     size?: "sm" | "md" | "lg";
     isBordered?: boolean;
