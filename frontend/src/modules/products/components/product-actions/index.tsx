@@ -64,9 +64,9 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
                     className="w-full"
                     color="default"
                     data-testid="add-product-button"
-                    disabled={!inStock || !!disabled || isAdding}
+                    isDisabled={!inStock || !!disabled || isAdding}
                     isLoading={isAdding}
-                    onClick={handleAddToCart}
+                    onPress={handleAddToCart}
                 >
                     {!inStock ? "Out of stock" : "Add to cart"}
                 </Button>

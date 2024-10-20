@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Progress } from "@nextui-org/react";
 import { useSnackbar } from "notistack";
 import { useWebSocket } from "@lib/hooks/use-websocket";
 import Button from "@modules/common/components/button";
+import { ProgressBar } from "@modules/common/components/progress-bar";
 
 import { DragNDrop } from "./drag-drop";
 
@@ -71,23 +71,19 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
                 <Button
                     className="min-w-48 rounded-md"
                     color="secondary"
-                    disabled={status || currentMessage?.status == "processing"}
+                    isDisabled={status || currentMessage?.status == "processing"}
                     isLoading={status || currentMessage?.status == "processing"}
                     variant="shadow"
-                    onClick={() => handleSubmit()}
+                    onPress={() => handleSubmit()}
                 >
                     {currentStatus()}
                 </Button>
             </div>
             <div className="mt-8">
                 {wsMessages && (
-                    <Progress
+                    <ProgressBar
                         aria-label="Downloading..."
-                        className=""
-                        color="success"
                         label={`progress: ${currentMessage?.processed_rows || 0} / ${currentMessage?.total_rows || 0} rows`}
-                        showValueLabel={true}
-                        size="sm"
                         value={(currentMessage?.processed_rows / currentMessage?.total_rows) * 100 || 0}
                     />
                 )}

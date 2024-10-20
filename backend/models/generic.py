@@ -7,6 +7,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from models.activities import ActivityBase
 from models.address import AddressBase
 from models.brand import BrandBase
+from models.category import CategoryBase
 from models.collection import CollectionBase
 from models.product import ProductBase
 from models.tag import TagBase
@@ -59,9 +60,15 @@ class ProductImages(SQLModel, table=True):
     product: "Product" = Relationship(back_populates="images")
 
 
-class ProductBrand(SQLModel, table=True):
+# class ProductBrand(SQLModel, table=True):
+#     product_id: int = Field(foreign_key="product.id", primary_key=True)
+#     brand_id: int = Field(foreign_key="brand.id", primary_key=True)
+
+
+class ProductCategory(SQLModel, table=True):
+    __tablename__ = "product_categories"
     product_id: int = Field(foreign_key="product.id", primary_key=True)
-    brand_id: int = Field(foreign_key="brand.id", primary_key=True)
+    category_id: int = Field(foreign_key="categories.id", primary_key=True)
 
 
 class ProductCollection(SQLModel, table=True):
@@ -80,6 +87,36 @@ class Brand(BrandBase, table=True):
     # products: list["Product"] = Relationship(
     #     back_populates="brands", link_model=ProductBrand
     # )
+
+
+class Category(CategoryBase, table=True):
+    __tablename__ = "categories"
+    id: int | None = Field(default=None, primary_key=True)
+    slug: str
+    parent_id: Optional[int] = Field(foreign_key="categories.id")
+    products: list["Product"] = Relationship(
+        back_populates="categories", link_model=ProductCategory
+    )
+
+    # Relationship to child categories (self-referential)
+    parent: Optional["Category"] = Relationship(
+        sa_relationship_kwargs={"remote_side": "Category.id"}
+    )
+
+    # Relationship to subcategories (self-referential)
+    children: List["Category"] = Relationship(
+        back_populates="parent",  # Linking parent to children
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
+
+
+class CategoryPublic(CategoryBase):
+    id: int
+    slug: str
+    parent_id: Optional[int]
+    parent: Optional["Category"] = None
+    # Include subcategories (optional)
+    children: List["CategoryPublic"] = []
 
 
 class Collection(CollectionBase, table=True):
@@ -102,6 +139,9 @@ class Product(ProductBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str
     images: list["ProductImages"] = Relationship(back_populates="product")
+    categories: list["Category"] = Relationship(
+        back_populates="products", link_model=ProductCategory
+    )
     collections: list["Collection"] = Relationship(
         back_populates="products", link_model=ProductCollection
     )
@@ -115,6 +155,7 @@ class ProductPublic(ProductBase):
     id: int
     slug: str
     images: list[ProductImages] = []
+    categories: list[Category] = []
     collections: list[Collection] = []
     # tags: list[Tag] = []
     # brands: list[Brand] = []

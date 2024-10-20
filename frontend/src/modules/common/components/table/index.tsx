@@ -3,7 +3,7 @@
 import React, { cloneElement, isValidElement, useState } from "react";
 import { Pagination as PaginationType } from "types/global";
 import { Input } from "@nextui-org/input";
-import { PlusIcon, SearchIcon } from "nui-react-icons";
+import { Plus, SearchIcon } from "nui-react-icons";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
 import { exportProducts, indexProducts } from "@modules/admin/actions";
@@ -91,16 +91,22 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                             onValueChange={onSearchChange}
                         />
                         <div className="flex gap-3">
-                            <Button color="primary" endContent={<PlusIcon />} onClick={() => state.open()}>
+                            <Button color="primary" endContent={<Plus />} onPress={() => state.open()}>
                                 Add New
                             </Button>
                             {canExport && (
-                                <Button className="min-w-28" color="secondary" disabled={isExporting} isLoading={isExporting} onClick={handleExport}>
+                                <Button
+                                    className="min-w-28"
+                                    color="secondary"
+                                    isDisabled={isExporting}
+                                    isLoading={isExporting}
+                                    onPress={handleExport}
+                                >
                                     Export
                                 </Button>
                             )}
                             {canIndex && (
-                                <Button className="min-w-28" color="secondary" disabled={isIndexing} isLoading={isIndexing} onClick={handleIndex}>
+                                <Button className="min-w-28" color="secondary" isDisabled={isIndexing} isLoading={isIndexing} onPress={handleIndex}>
                                     Index
                                 </Button>
                             )}

@@ -8,17 +8,18 @@ import { ImageUpload } from "@modules/common/components/image-upload";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
-import { MultiSelect } from "@modules/common/components/multiselect";
-import { Checkbox } from "@modules/common/components/checkbox";
 import { useRouter } from "next/navigation";
+import { Switch } from "@modules/common/components/switch";
+import { Multiselect } from "@modules/common/components/multiselect";
+import { Category, Collection } from "types/global";
 
 import { createProduct, uploadProductImage } from "../actions";
 
 interface Props {
     current?: any;
     type?: "create" | "update";
-    tags?: { id: number; name: string }[];
-    collections?: { id: number; name: string }[];
+    categories?: Category[];
+    collections?: Collection[];
     onClose?: () => void;
 }
 
@@ -27,15 +28,17 @@ interface ChildRef {
 }
 
 const ProductForm = forwardRef<ChildRef, Props>(
-    ({ type = "create", onClose, current = { name: "", is_active: true }, tags = [], collections = [] }, ref) => {
+    ({ type = "create", onClose, current = { name: "", is_active: true }, categories = [], collections = [] }, ref) => {
         const router = useRouter();
-        const selectedTags = current?.tags?.map((item: any) => item.id) ?? [];
-        const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
+        const [selectedCategories, setSelectedCategories] = React.useState<number[]>([]);
+        const [selectedCollections, setSelectedCollections] = React.useState<number[]>([]);
         const isCreate = type === "create";
 
         React.useEffect(() => {
-            const selected_collections = collections.filter((item) => current?.collections?.includes(item.name)).map((item) => item?.id?.toString());
+            const selected_categories = categories.filter((item) => current?.categories?.includes(item.name)).map((item) => item.id);
+            const selected_collections = collections.filter((item) => current?.collections?.includes(item.name)).map((item) => item.id);
 
+            setSelectedCategories(selected_categories);
             setSelectedCollections(selected_collections);
         }, [current.collections]);
 
@@ -59,18 +62,6 @@ const ProductForm = forwardRef<ChildRef, Props>(
                 }
             }
         }, [state, enqueueSnackbar]);
-
-        const collectionOptions = React.useMemo(() => {
-            return collections.map((item) => {
-                return { value: item.id, label: item.name };
-            });
-        }, collections);
-
-        const tagOptions = React.useMemo(() => {
-            return tags.map((item) => {
-                return { value: item.id, label: item.name };
-            });
-        }, tags);
 
         const handleUpload = async (data: any) => {
             try {
@@ -100,27 +91,27 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     <input readOnly className="hidden" name="type" type="text" value={type} />
                                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                     <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
-                                    <Checkbox isSelected={current.is_active} label="Is Active" name="is_active" />
+                                    <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
                                     <Textarea
                                         defaultValue={current.description}
                                         name="description"
                                         placeholder="Product description"
                                         variant="bordered"
                                     />
-                                    <MultiSelect
-                                        defaultValue={selectedTags}
-                                        label="Tags"
-                                        name="tags"
-                                        options={tagOptions}
-                                        placeholder="Select Tags"
-                                        variant="bordered"
-                                    />
-                                    <MultiSelect
+                                    <Multiselect
                                         defaultValue={selectedCollections}
                                         label="Collections"
                                         name="collections"
-                                        options={collectionOptions}
+                                        options={collections}
                                         placeholder="Select Collections"
+                                        variant="bordered"
+                                    />
+                                    <Multiselect
+                                        defaultValue={selectedCategories}
+                                        label="Categories"
+                                        name="categories"
+                                        options={categories}
+                                        placeholder="Select Categories"
                                         variant="bordered"
                                     />
                                     <Input required defaultValue={current.price} label="Price" name="price" placeholder="Ex. 2500" type="number" />
@@ -136,7 +127,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                             </div>
                         </div>
                         <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-50 w-full right-0 z-50">
-                            <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                            <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
                                 Cancel
                             </Button>
                             <FormButton className="min-w-32" color="primary" variant="shadow">

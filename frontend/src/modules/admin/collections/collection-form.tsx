@@ -6,8 +6,8 @@ import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
-import { Checkbox } from "@modules/common/components/checkbox";
 import { useRouter } from "next/navigation";
+import { Switch } from "@modules/common/components/switch";
 
 import { createCollection } from "../actions";
 
@@ -55,12 +55,12 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                                 <input readOnly className="hidden" name="type" type="text" value={type} />
                                 <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                 <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
-                                <Checkbox isSelected={current.is_active} label="Is Active" name="is_active" />
+                                <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-50 w-full right-0 z-50">
-                        <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                        <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
                             Cancel
                         </Button>
                         <FormButton className="min-w-32" color="primary" variant="shadow">

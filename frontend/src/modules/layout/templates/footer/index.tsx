@@ -1,9 +1,10 @@
-import { getCategoriesList, getCollectionsList } from "@lib/data";
+import { getCategories, getCollectionsList } from "@lib/data";
 import { siteConfig } from "@lib/config";
 import { GithubIcon, YoutubeIcon, TwitterIcon, WhatsAppIcon } from "nui-react-icons";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import Link from "next/link";
 import NewsletterForm from "@modules/store/components/newsletter";
+import { Category } from "types/global";
 
 const about = [
     {
@@ -41,7 +42,8 @@ const legal = [
 
 export default async function Footer() {
     const { collections } = await getCollectionsList(undefined, 1, 6);
-    const { product_categories } = await getCategoriesList(1, 6);
+    const { categories: cat } = await getCategories("", 1, 100);
+    const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (
         <footer className="flex w-full flex-col">
@@ -91,18 +93,14 @@ export default async function Footer() {
                                     </div>
                                 </div>
                             )}
-                            {product_categories && product_categories?.length > 0 && (
+                            {categories?.length > 0 && (
                                 <div>
                                     <div>
                                         <h3 className="text-small font-semibold text-default-600">Categories</h3>
                                         <ul className="mt-6 space-y-4" data-testid="footer-categories">
-                                            {product_categories?.slice(0, 6).map((c) => {
-                                                if (c.parent_category) {
-                                                    return;
-                                                }
-
+                                            {categories?.map((c: Category) => {
                                                 const children =
-                                                    c.category_children?.map((child) => ({
+                                                    c.children?.map((child: Category) => ({
                                                         name: child.name,
                                                         slug: child.slug,
                                                         id: child.id,
@@ -119,7 +117,7 @@ export default async function Footer() {
                                                         </LocalizedClientLink>
                                                         {children && (
                                                             <ul className="ml-4">
-                                                                {children?.map((child) => (
+                                                                {children?.map((child: Category) => (
                                                                     <li key={child.id}>
                                                                         <LocalizedClientLink
                                                                             className="text-small hover:opacity-80 transition-opacity text-default-400"

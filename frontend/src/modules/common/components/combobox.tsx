@@ -5,7 +5,7 @@ import { useComboBox } from "@react-aria/combobox";
 import { useFilter } from "@react-aria/i18n";
 import React from "react";
 import clsx from "clsx";
-import { ChevronDownIcon } from "nui-react-icons";
+import { ChevronDown } from "nui-react-icons";
 
 interface ComboBoxItem {
     id: number | string;
@@ -53,7 +53,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
     );
 
     const { buttonProps } = useButton(triggerProps, triggerRef);
-    const { autoFocus, ...validListBoxProps } = listBoxProps;
+    const { autoFocus, linkBehavior, shouldFocusOnHover, shouldSelectOnPressUp, shouldUseVirtualFocus, ...validListBoxProps } = listBoxProps;
 
     return (
         <div className="combobox">
@@ -84,7 +84,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
                             boxSizing: "border-box",
                         }}
                     />
-                    <ChevronDownIcon
+                    <ChevronDown
                         className={clsx("absolute right-3 w-4 h-4 transition-transform duration-150 ease motion-reduce:transition-none", {
                             "rotate-180": state.isOpen,
                         })}

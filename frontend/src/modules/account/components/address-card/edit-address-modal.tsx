@@ -159,7 +159,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                             </div>
                             <div className="flex gap-3 mt-6">
-                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
+                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onPress={modalState.close}>
                                     Cancel
                                 </Button>
                                 <FormButton color="primary" data-testid="save-button">

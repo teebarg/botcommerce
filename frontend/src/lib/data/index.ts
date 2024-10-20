@@ -1,8 +1,9 @@
 import { cache } from "react";
-import { Product, ProductCategoryWithChildren } from "types/global";
+import { Product } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
-import { searchDocuments } from "@lib/util/meilisearch";
+import { searchDocuments, urlToList } from "@lib/util/meilisearch";
+import { revalidateTag } from "next/cache";
 
 /**
  * Function for getting custom headers for API requests, including the JWT token and cache revalidation tags.
@@ -566,6 +567,7 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
 
 interface SearchParams {
     query?: string;
+    categories?: string;
     collections?: string[];
     min_price?: number;
     max_price?: number;
@@ -583,10 +585,22 @@ interface SearchResult {
 }
 
 export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
-    const { query = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
+    const {
+        query = "",
+        categories = "",
+        collections = [],
+        min_price = 1,
+        max_price = 1000000,
+        page = 1,
+        limit = 20,
+        sort = "created_at:desc",
+    } = searchParams;
 
     const filters: string[] = [];
 
+    if (categories) {
+        filters.push(`categories IN [${urlToList(categories)}]`);
+    }
     if (collections.length > 0) {
         filters.push(`collections IN [${collections.join(",")}]`);
     }
@@ -617,6 +631,30 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
         total_pages: totalPages,
     };
 }
+
+export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, { search, page, limit });
+
+    revalidateTag("categories");
+
+    try {
+        const response = await fetch(url, {
+            next: {
+                tags: ["categories"],
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch categories");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+
+        return { message: "Error fetching categories" };
+    }
+};
 
 export const getCollectionsList = cache(async function (search: string = "", page: number = 1, limit: number = 100): Promise<any> {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, { search, page, limit });
@@ -672,29 +710,6 @@ export const listCategories = cache(async function () {
     //     .catch((err) => {
     //         throw err;
     //     });
-});
-
-export const getCategoriesList = cache(async function (
-    offset: number = 0,
-    limit: number = 100
-): Promise<{
-    product_categories: ProductCategoryWithChildren[];
-    count: number;
-}> {
-    // const { product_categories, count } = await client.productCategories
-    //     .list({ limit, offset }, { next: { tags: ["categories"] } })
-    //     .catch((err) => {
-    //         throw err;
-    //     });
-
-    // return {
-    //     product_categories,
-    //     count,
-    // };
-    return {
-        product_categories: [],
-        count: 0,
-    };
 });
 
 export const getActivites = cache(async function (limit: number = 10) {

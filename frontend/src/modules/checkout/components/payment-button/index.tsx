@@ -31,9 +31,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, customer, "data-tes
         case "manual":
             return <ManualTestPaymentButton customer={customer} data-testid={dataTestId} notReady={notReady} />;
         case "stripe":
-            return <Button disabled>Continue to payment</Button>;
+            return <Button isDisabled>Continue to payment</Button>;
         default:
-            return <Button disabled>Select a payment method</Button>;
+            return <Button isDisabled>Select a payment method</Button>;
     }
 };
 
@@ -46,7 +46,7 @@ const GiftCardPaymentButton = () => {
     };
 
     return (
-        <Button data-testid="submit-order-button" isLoading={submitting} onClick={handleOrder}>
+        <Button data-testid="submit-order-button" isLoading={submitting} onPress={handleOrder}>
             Place order
         </Button>
     );
@@ -87,7 +87,7 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
 
     return (
         <>
-            <Button data-testid="submit-order-button" disabled={notReady} isLoading={submitting} size="lg" onClick={handlePayment}>
+            <Button data-testid="submit-order-button" isDisabled={notReady} isLoading={submitting} size="lg" onPress={handlePayment}>
                 Place order
             </Button>
             {modalState.isOpen && (

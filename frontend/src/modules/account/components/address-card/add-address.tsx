@@ -70,7 +70,7 @@ const AddAddress = () => {
                                 <Input autoComplete="phone" data-testid="phone-input" label="Phone" name="phone" />
                             </div>
                             <div className="flex gap-3 mt-6">
-                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
+                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onPress={modalState.close}>
                                     Cancel
                                 </Button>
                                 <FormButton color="primary" data-testid="save-button">

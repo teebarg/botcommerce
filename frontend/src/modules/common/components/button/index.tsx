@@ -2,20 +2,19 @@
 
 import React from "react";
 import clsx from "clsx";
-import { useButton } from "react-aria";
+import { AriaButtonProps, useButton } from "react-aria";
 import { useRef } from "react";
 
-interface Props {
+interface Props extends AriaButtonProps {
     children: React.ReactNode;
     endContent?: React.ReactNode;
     startContent?: React.ReactNode;
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success" | undefined;
+    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
     variant?: "solid" | "bordered" | "flat" | "shadow";
     size?: "sm" | "md" | "lg";
     isLoading?: boolean;
     className?: string;
     style?: React.CSSProperties;
-    [key: string]: any;
 }
 
 const Button: React.FC<Props> = ({
@@ -44,7 +43,9 @@ const Button: React.FC<Props> = ({
                 {...buttonProps}
                 ref={ref}
                 className={clsx(
-                    `z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal subpixel-antialiased overflow-hidden tap-highlight-transparent data-[pressed=true]:scale-[0.97] outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 [&>svg]:max-w-[theme(spacing.8)] transition-transform-colors-opacity motion-reduce:transition-none bg-${color} text-${color}-foreground data-[hover=true]:opacity-hover`,
+                    `z-0 group relative inline-flex items-center justify-center box-border appearance-none 
+                    select-none whitespace-nowrap font-normal overflow-hidden outline-none transition-transform-colors-opacity 
+                    motion-reduce:transition-none bg-${color} text-${color}-foreground`,
                     className,
                     variant == "shadow" ? `shadow-lg shadow-${color}/40` : "",
                     buttonProps.disabled ? "opacity-disabled pointer-events-none" : "",

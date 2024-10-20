@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, Image } from "@nextui-org/react";
 import { EditIcon } from "nui-react-icons";
 import { DragNDrop } from "@modules/admin/components/drag-drop";
 import { FileTypes } from "types/global";
 import { useSnackbar } from "notistack";
+
+import Button from "./button";
 
 interface Props {
     onUpload: (formData: any) => void;
@@ -66,8 +67,8 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                 {preview && (
                     <React.Fragment>
                         <div className="flex gap-1">
-                            <Image alt="Product Image" className="max-h-52" src={preview} width={300} />
-                            <Button isIconOnly onPress={() => setPreview(undefined)}>
+                            <img alt="Product" className="max-h-52" src={preview} width={300} />
+                            <Button onPress={() => setPreview(undefined)}>
                                 <EditIcon size={24} />
                             </Button>
                         </div>
@@ -88,7 +89,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                         isDisabled={status}
                         isLoading={status}
                         variant="shadow"
-                        onClick={handleSubmit}
+                        onPress={handleSubmit}
                     >
                         Upload{status ? "ing" : ""}
                     </Button>

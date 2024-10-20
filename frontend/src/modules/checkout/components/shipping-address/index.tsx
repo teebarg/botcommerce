@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Checkbox } from "@nextui-org/checkbox";
 import { Input } from "@nextui-org/input";
 import { Cart } from "types/global";
+import { Checkbox } from "@modules/common/components/checkbox";
 
 import AddressSelect from "../address-select";
 
@@ -111,7 +111,7 @@ const ShippingAddress = ({
                 />
             </div>
             <div className="my-8">
-                <Checkbox data-testid="billing-address-checkbox" isSelected={checked} onValueChange={onChange}>
+                <Checkbox data-testid="billing-address-checkbox" defaultSelected={checked} onChange={onChange}>
                     Billing address same as shipping address
                 </Checkbox>
             </div>

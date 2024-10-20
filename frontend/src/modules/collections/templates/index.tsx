@@ -2,8 +2,8 @@ import React from "react";
 import { ChevronRight, ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { getCategoriesList, getCollectionsList, searchProducts } from "@lib/data";
-import { Product, SortOptions } from "types/global";
+import { getCategories, getCollectionsList, searchProducts } from "@lib/data";
+import { Category, Product, SortOptions } from "types/global";
 import { ProductCard } from "@modules/products/components/product-card";
 
 import { CollectionsTopBar } from "./topbar";
@@ -24,7 +24,8 @@ interface ComponentProps {
 
 const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, productsIds, sortBy, searchParams }) => {
     const { collections } = await getCollectionsList();
-    const { product_categories } = await getCategoriesList();
+    const { categories: cat } = await getCategories();
+    const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
     const queryParams: any = {
         query,
@@ -38,7 +39,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     }
 
     if (searchParams?.cat_ids) {
-        queryParams["category_id"] = searchParams?.cat_ids?.split(",");
+        queryParams["categories"] = searchParams?.cat_ids;
     }
 
     if (productsIds) {
@@ -73,11 +74,11 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                 </nav>
                 <div className="flex gap-6 mt-6">
                     <div className="hidden md:block">
-                        <CollectionsSideBar categories={product_categories} collections={collections} />
+                        <CollectionsSideBar categories={categories} collections={collections} />
                     </div>
                     <div className="w-full flex-1 flex-col">
                         <CollectionsTopBar
-                            categories={product_categories}
+                            categories={categories}
                             collections={collections}
                             count={pagination.total_count}
                             slug={collection?.title}

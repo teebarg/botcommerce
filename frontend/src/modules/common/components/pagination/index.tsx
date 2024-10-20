@@ -47,10 +47,10 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                 onChange={onPageChange}
             />
             <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                <Button disabled={pagination?.total_pages === 1 || page == 1} size="sm" variant="flat" onClick={onPreviousPage}>
+                <Button isDisabled={pagination?.total_pages === 1 || page == 1} size="sm" variant="flat" onPress={onPreviousPage}>
                     Previous
                 </Button>
-                <Button disabled={pagination?.total_pages === 1 || page == pagination?.total_pages} size="sm" variant="flat" onClick={onNextPage}>
+                <Button isDisabled={pagination?.total_pages === 1 || page == pagination?.total_pages} size="sm" variant="flat" onPress={onNextPage}>
                     Next
                 </Button>
             </div>

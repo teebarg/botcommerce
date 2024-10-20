@@ -3,7 +3,6 @@ import ProductActions from "@modules/products/components/product-actions";
 import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
 import { notFound } from "next/navigation";
-import { Image } from "@nextui-org/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ArrowUpRightMini, ChevronRight, StarIcon } from "nui-react-icons";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
@@ -50,16 +49,11 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                             <StarIcon className="max-h-[80%]" height="1em" role="img" width="1em" />
                             <span className="flex-1 text-inherit font-normal px-2 pl-1">Popular</span>
                         </div>
-                        <Image
-                            alt={product.name}
-                            className="h-[60vh]"
-                            classNames={{ wrapper: "!max-w-full flex justify-center" }}
-                            src={product.image as string}
-                        />
+                        <img alt={product.name} className="h-[60vh]" src={product.image as string} />
                         <ScrollShadow hideScrollBar className="mt-8 w-full" orientation="horizontal">
                             <div className="flex gap-2 w-[800px]">
                                 {product?.images?.map((image: string, index: number) => (
-                                    <Image key={index} alt={`Product image ${index + 1}`} className="w-[200px] h-[150px]" src={image} />
+                                    <img key={index} alt={`Product ${index + 1}`} className="w-[200px] h-[150px]" src={image} />
                                 ))}
                             </div>
                         </ScrollShadow>
