@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { AriaSwitchProps, useFocusRing, useSwitch } from "react-aria";
 
 interface SwitchProps extends AriaSwitchProps {
-    label?: string
+    label?: string;
 }
 
 const Switch: React.FC<SwitchProps> = (props) => {
@@ -18,14 +18,14 @@ const Switch: React.FC<SwitchProps> = (props) => {
         <React.Fragment>
             <div className="flex items-center gap-2">
                 <label
-                    style={{
-                        opacity: props.isDisabled ? 0.4 : 1,
-                    }}
                     className={clsx(
                         "inline-flex items-center cursor-pointer select-none",
                         "py-1 px-2.5 rounded-3xl transition-colors duration-300 ease-in-out",
                         isSelected ? "bg-green-500" : "bg-gray-300"
                     )}
+                    style={{
+                        opacity: props.isDisabled ? 0.4 : 1,
+                    }}
                 >
                     <input {...inputProps} {...focusProps} ref={ref} className="absolute opacity-0 w-0 h-0" />
                     <div

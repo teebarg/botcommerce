@@ -128,10 +128,10 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     <Button
                         className="mt-6"
                         data-testid="submit-payment-button"
-                        disabled={!cart?.payment_session && !paidByGiftcard}
+                        isDisabled={!cart?.payment_session && !paidByGiftcard}
                         isLoading={isLoading}
                         size="lg"
-                        onClick={handleSubmit}
+                        onPress={handleSubmit}
                     >
                         Continue to review
                     </Button>

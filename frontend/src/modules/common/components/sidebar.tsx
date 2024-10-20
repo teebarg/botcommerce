@@ -28,7 +28,7 @@ const MenuLink = ({ href, className, children, disabled }: { href: string; class
     }
 
     return (
-        <Link href={href} className={className}>
+        <Link className={className} href={href}>
             {children}
         </Link>
     );
@@ -50,6 +50,7 @@ const SubMenuComponent: React.FC<{
             if ("subMenu" in subItem) {
                 return isChildActive(subItem.menuItems);
             }
+
             return isActive(subItem.href, subItem.exact);
         });
     };
@@ -63,7 +64,6 @@ const SubMenuComponent: React.FC<{
     return (
         <div className="w-full">
             <button
-                onClick={() => setIsOpen(!isOpen)}
                 className={`
                     w-full flex items-center justify-between p-4 text-default-500 hover:text-default-600
                     transition-colors duration-200 group
@@ -71,6 +71,7 @@ const SubMenuComponent: React.FC<{
                     ${level === 1 ? "hover:bg-content2 bg-content1" : ""}
                     ${level === 2 ? "hover:bg-content2 bg-content3" : ""}
                 `}
+                onClick={() => setIsOpen(!isOpen)}
             >
                 <div className="flex items-center gap-2">
                     {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
@@ -123,7 +124,6 @@ const MenuItemComponent: React.FC<{
 
     return (
         <MenuLink
-            href={item.href}
             className={clsx(
                 "flex items-center justify-between p-4 transition-all duration-200 group",
                 `${item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-600"} ${
@@ -133,9 +133,10 @@ const MenuItemComponent: React.FC<{
                     "hover:bg-content2 bg-content1": level === 1,
                     "hover:bg-content2 bg-content3 pl-12": level === 2,
                     "hover:bg-content3 bg-content4 pl-16": level === 3,
-                    "hover:!bg-blue-500 !bg-blue-800": active,
+                    "!bg-rose-200 text-rose-800 hover:!text-rose-700": active,
                 }
             )}
+            href={item.href}
         >
             <div className="flex items-center gap-2">
                 {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
@@ -163,6 +164,11 @@ const SideBar: React.FC = () => {
                     label: "Dashboard",
                     href: "/admin",
                     icon: <Window size={18} />,
+                },
+                {
+                    label: "Settings",
+                    href: "/admin/settings",
+                    icon: <CogSixTooth size={18} />,
                 },
                 {
                     label: "Users",
@@ -211,12 +217,22 @@ const SideBar: React.FC = () => {
                     icon: <Component size={18} />,
                 },
                 {
+                    label: "Layout",
+                    href: "/layout",
+                    icon: <Component size={18} />,
+                },
+                {
                     subMenu: "Forms",
                     icon: <Component size={18} />,
                     menuItems: [
                         {
                             label: "Input",
                             href: "/input",
+                            icon: <CogSixTooth size={20} />,
+                        },
+                        {
+                            label: "Select",
+                            href: "/secret",
                             icon: <CogSixTooth size={20} />,
                         },
                         {
@@ -298,8 +314,8 @@ const SideBar: React.FC = () => {
                 >
                     Botcommerce
                 </h1>
-                <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                    <ChevronRight size={20} className={`transform transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
+                <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200" onClick={() => setIsCollapsed(!isCollapsed)}>
+                    <ChevronRight className={`transform transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} size={20} />
                 </button>
             </div>
 
@@ -313,37 +329,14 @@ const SideBar: React.FC = () => {
                         <nav>
                             {nav.iems.map((item, index: number) =>
                                 "subMenu" in item ? (
-                                    <SubMenuComponent key={index} item={item as SubMenuItem} isCollapsed={isCollapsed} />
+                                    <SubMenuComponent key={index} isCollapsed={isCollapsed} item={item as SubMenuItem} />
                                 ) : (
-                                    <MenuItemComponent key={index} item={item as MenuItem} isCollapsed={isCollapsed} />
+                                    <MenuItemComponent key={index} isCollapsed={isCollapsed} item={item as MenuItem} />
                                 )
                             )}
                         </nav>
                     </React.Fragment>
                 ))}
-                {/* <div className={`px-4 mb-2 transition-opacity duration-200 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
-                    <p className="text-xs font-semibold text-default-500 uppercase tracking-wider">General</p>
-                </div>
-
-                <nav>
-                    {navItems.map((item, index) =>
-                        "subMenu" in item ? (
-                            <SubMenuComponent key={index} item={item as SubMenuItem} isCollapsed={isCollapsed} />
-                        ) : (
-                            <MenuItemComponent key={index} item={item as MenuItem} isCollapsed={isCollapsed} />
-                        )
-                    )}
-                </nav>
-
-                <div className={`px-4 mb-2 mt-8 transition-opacity duration-200 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
-                    <p className="text-xs font-semibold text-default-500 uppercase tracking-wider">Extra</p>
-                </div>
-
-                <nav>
-                    {extraItems.map((item, index) => (
-                        <MenuItemComponent key={index} item={item} isCollapsed={isCollapsed} />
-                    ))}
-                </nav> */}
             </div>
         </div>
     );

@@ -25,7 +25,7 @@ interface ComponentProps {
 const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, productsIds, sortBy, searchParams }) => {
     const { collections } = await getCollectionsList();
     const { categories: cat } = await getCategories();
-    const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
+    const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
     const queryParams: any = {
         query,
@@ -39,7 +39,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     }
 
     if (searchParams?.cat_ids) {
-        queryParams["category_id"] = searchParams?.cat_ids?.split(",");
+        queryParams["categories"] = searchParams?.cat_ids;
     }
 
     if (productsIds) {

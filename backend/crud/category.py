@@ -1,8 +1,5 @@
-from typing import Any, Dict
+from sqlmodel import Session
 
-from sqlmodel import Session, select
-
-from core.logging import logger
 from core.utils import generate_slug
 from crud.base import CRUDBase
 from models.category import CategoryCreate, CategoryUpdate
@@ -19,20 +16,6 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
-
-    async def bulk_upload(self, db: Session, *, records: list[Dict[str, Any]]) -> None:
-        for category in records:
-            try:
-                if model := db.exec(
-                    select(Category).where(Category.name == category.get("slug"))
-                ).first():
-                    model.sqlmodel_update(category)
-                else:
-                    model = Category(**category)
-                    db.add(model)
-                db.commit()
-            except Exception as e:
-                logger.error(e)
 
 
 category = CRUDCategory(Category)

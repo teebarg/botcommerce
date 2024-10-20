@@ -8,9 +8,9 @@ import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Category } from "types/global";
+import { Switch } from "@modules/common/components/switch";
 
 import { createCategory } from "../actions";
-import { Switch } from "@modules/common/components/switch";
 
 interface Props {
     current?: Category;
@@ -26,10 +26,6 @@ interface ChildRef {
 
 const CategoryForm = forwardRef<ChildRef, Props>(
     ({ type = "create", onClose, current = { name: "", is_active: true, parent_id: null }, hasParent = false, parent_id = null }, ref) => {
-        console.log("hasParent");
-        console.log(hasParent);
-        console.log(current);
-        console.log(parent_id);
         const router = useRouter();
         const isCreate = type === "create";
 
@@ -69,7 +65,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(
                             </div>
                         </div>
                         <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-50 w-full right-0 z-50">
-                            <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                            <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
                                 Cancel
                             </Button>
                             <FormButton className="min-w-32" color="primary" variant="shadow">

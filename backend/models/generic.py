@@ -93,12 +93,11 @@ class Category(CategoryBase, table=True):
     __tablename__ = "categories"
     id: int | None = Field(default=None, primary_key=True)
     slug: str
-    # parent_id: int = None
     parent_id: Optional[int] = Field(foreign_key="categories.id")
     products: list["Product"] = Relationship(
         back_populates="categories", link_model=ProductCategory
     )
-    # parent: "Category" = Relationship()
+
     # Relationship to child categories (self-referential)
     parent: Optional["Category"] = Relationship(
         sa_relationship_kwargs={"remote_side": "Category.id"}

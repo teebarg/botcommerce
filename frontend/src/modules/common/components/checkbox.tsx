@@ -1,8 +1,8 @@
+import type { AriaCheckboxProps } from "@react-types/checkbox";
+
 import React, { useRef } from "react";
 import { useToggleState } from "@react-stately/toggle";
 import clsx from "clsx";
-// import { useCheckbox } from "@react-aria";
-import type { AriaCheckboxProps } from "@react-types/checkbox";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { useFocusRing } from "@react-aria/focus";
 import { mergeProps } from "@react-aria/utils";
@@ -27,8 +27,8 @@ const Checkbox: React.FC<CheckboxProps> = (props) => {
         props.isDisabled
             ? "border-gray-300"
             : isFocusVisible || isSelected
-            ? "border-indigo-500 group-active:border-indigo-600"
-            : "border-gray-500 group-active:border-gray-600",
+              ? "border-indigo-500 group-active:border-indigo-600"
+              : "border-gray-500 group-active:border-gray-600",
         "w-5",
         "h-5",
         "flex",
@@ -50,14 +50,14 @@ const Checkbox: React.FC<CheckboxProps> = (props) => {
                 <VisuallyHidden>
                     <input {...mergeProps(inputProps, focusProps)} ref={ref} />
                 </VisuallyHidden>
-                <div className={checkboxClassName} aria-hidden="true">
+                <div aria-hidden="true" className={checkboxClassName}>
                     <svg className="stroke-current w-3 h-3" viewBox="0 0 18 18">
                         <polyline
-                            points="1 9 7 14 15 4"
                             fill="none"
-                            strokeWidth={3}
+                            points="1 9 7 14 15 4"
                             strokeDasharray={22}
                             strokeDashoffset={isSelected ? 44 : 66}
+                            strokeWidth={3}
                             style={{
                                 transition: "all 400ms",
                             }}

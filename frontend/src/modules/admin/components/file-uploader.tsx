@@ -71,10 +71,10 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
                 <Button
                     className="min-w-48 rounded-md"
                     color="secondary"
-                    disabled={status || currentMessage?.status == "processing"}
+                    isDisabled={status || currentMessage?.status == "processing"}
                     isLoading={status || currentMessage?.status == "processing"}
                     variant="shadow"
-                    onClick={() => handleSubmit()}
+                    onPress={() => handleSubmit()}
                 >
                     {currentStatus()}
                 </Button>

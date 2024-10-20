@@ -195,6 +195,9 @@ async def update_categories(product, categories, session: Session):
         category = session.exec(
             select(Category).where(Category.slug == item.strip())
         ).first()
+        if not category:
+            logger.debug(f"Category `{item.strip()}` doesn't exist, skipping...")
+            continue
         session.add(ProductCategory(product_id=product.id, category_id=category.id))
 
     session.commit()
@@ -213,6 +216,9 @@ async def update_collections(product, collections, session: Session):
         collection = session.exec(
             select(Collection).where(Collection.slug == item.strip())
         ).first()
+        if not collection:
+            logger.debug(f"Collection `{item.strip()}` doesn't exist, skipping...")
+            continue
         session.add(
             ProductCollection(product_id=product.id, collection_id=collection.id)
         )

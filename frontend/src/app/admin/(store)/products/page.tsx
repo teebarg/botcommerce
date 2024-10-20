@@ -61,7 +61,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                             placement="bottom-right"
                                             size="md"
                                         >
-                                            <Avatar radius="md" src={item.image} className="h-full w-full" />
+                                            <Avatar className="h-full w-full" radius="md" src={item.image} />
                                         </Badge>
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">

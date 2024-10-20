@@ -84,6 +84,10 @@ const deleteIndex = async (indexName: string): Promise<void> => {
     await client.deleteIndex(indexName);
 };
 
+const urlToList = (url: string): string[] => {
+    return url.split(",").map((item) => `"${item.replace("-", " ")}"`);
+};
+
 export {
     getOrCreateIndex,
     addDocumentsToIndex,
@@ -94,4 +98,5 @@ export {
     deleteDocument,
     clearIndex,
     deleteIndex,
+    urlToList,
 };

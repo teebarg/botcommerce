@@ -8,9 +8,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Cart, CartItem } from "types/global";
 import { usePathname } from "next/navigation";
 import { currency } from "@lib/util/util";
+import { Badge } from "@modules/common/components/badge";
 
 import { CartItems } from "../cart-items";
-import { Badge } from "@modules/common/components/badge";
 
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;

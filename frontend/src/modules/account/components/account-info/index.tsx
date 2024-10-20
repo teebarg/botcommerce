@@ -71,7 +71,7 @@ const AccountInfo = ({
                         data-testid="edit-button"
                         type={state ? "reset" : "button"}
                         variant="bordered"
-                        onClick={handleToggle}
+                        onPress={handleToggle}
                     >
                         {state ? "Cancel" : "Edit"}
                     </Button>

@@ -14,7 +14,7 @@ const AddCategory: React.FC<Props> = () => {
 
     return (
         <React.Fragment>
-            <Button variant="bordered" onClick={slideOverState.open}>
+            <Button variant="bordered" onPress={slideOverState.open}>
                 <span>Add category</span>
             </Button>
             {slideOverState.isOpen && (

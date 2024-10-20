@@ -47,7 +47,7 @@ export const Cookie: FC<CookieProps> = () => {
                                 backgroundOrigin: "border-box",
                                 backgroundClip: "padding-box, border-box",
                             }}
-                            onClick={handleCookie}
+                            onPress={handleCookie}
                         >
                             Accept All
                         </Button>

@@ -21,7 +21,6 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
         } else {
             setOpen([...open, id]);
         }
-        console.log(open);
     };
 
     return (
@@ -39,7 +38,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                 <div className="flex items-center gap-4 flex-1">
                                     <button className="flex items-center" disabled={item?.children.length == 0} onClick={() => handleClick(item.id)}>
                                         <ChevronRight
-                                            className={clsx("transition-transform duration-300 text-default-800", {
+                                            className={clsx("transition-transform duration-300 text-default-700", {
                                                 "rotate-90": open.includes(item.id),
                                                 "!text-default-500": item?.children.length == 0,
                                             })}
@@ -73,7 +72,9 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                     <div className="flex w-[32px] items-center justify-center">
                                                         <Tag />
                                                     </div>
-                                                    <span className="ml-2 select-none text-xs font-medium text-gray-400 capitalize">{item.name}</span>
+                                                    <span className="ml-2 select-none text-xs font-medium text-default-600 capitalize">
+                                                        {item.name}
+                                                    </span>
                                                 </div>
                                                 <CategoryAction canAdd={false} category={item} />
                                             </div>

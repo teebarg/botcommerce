@@ -43,7 +43,7 @@ const GoogleLogin: React.FC<Props> = () => {
                 size="lg"
                 startContent={<img alt="Google" className="w-6" src="/google.svg" />}
                 variant="flat"
-                onClick={() => handleGoogleSignIn()}
+                onPress={() => handleGoogleSignIn()}
             >
                 Sign in with Google
             </Button>

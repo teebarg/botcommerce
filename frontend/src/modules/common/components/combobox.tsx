@@ -53,7 +53,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
     );
 
     const { buttonProps } = useButton(triggerProps, triggerRef);
-    const { autoFocus, ...validListBoxProps } = listBoxProps;
+    const { autoFocus, linkBehavior, shouldFocusOnHover, shouldSelectOnPressUp, shouldUseVirtualFocus, ...validListBoxProps } = listBoxProps;
 
     return (
         <div className="combobox">

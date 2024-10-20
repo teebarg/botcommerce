@@ -6,7 +6,7 @@ import { Category, Collection } from "types/global";
 import { CheckboxGroup } from "@modules/common/components/checkbox-group";
 
 interface ComponentProps {
-    collections: any[];
+    collections: Collection[];
     categories: Category[];
 }
 

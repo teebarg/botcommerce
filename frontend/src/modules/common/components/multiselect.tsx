@@ -15,7 +15,6 @@ interface MultiselectProps {
 const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, defaultValue, ...props }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(new Set());
-    console.log(selectedKeys);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +30,7 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
         };
 
         document.addEventListener("mousedown", handleClickOutside);
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
@@ -42,6 +42,7 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
 
     const toggleOption = (optionId: string | number) => {
         const newKeys = new Set(selectedKeys);
+
         if (newKeys.has(optionId)) {
             newKeys.delete(optionId);
         } else {
@@ -52,12 +53,12 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
 
     return (
         <React.Fragment>
-            <div className="group relative w-full" ref={containerRef} data-has-label={label ? "true" : "false"}>
+            <div ref={containerRef} className="group relative w-full" data-has-label={label ? "true" : "false"}>
                 <label className="hidden group-data-[has-label=true]:block text-xs font-medium text-gray-700 mb-1">{label}</label>
                 <button
+                    className="relative w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="relative w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
                     <div className="flex flex-wrap gap-1">
                         {selectedItems.length === 0 ? (
@@ -70,11 +71,11 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
                                 >
                                     {item.name}
                                     <button
+                                        className="ml-1 hover:bg-blue-200 rounded-full"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             toggleOption(item.id);
                                         }}
-                                        className="ml-1 hover:bg-blue-200 rounded-full"
                                     >
                                         <XMarkMini className="" />
                                     </button>
@@ -83,7 +84,7 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
                         )}
                     </div>
                     <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                        <ChevronDownMini className="text-gray-400" aria-hidden="true" />
+                        <ChevronDownMini aria-hidden="true" className="text-gray-400" />
                     </span>
                 </button>
 

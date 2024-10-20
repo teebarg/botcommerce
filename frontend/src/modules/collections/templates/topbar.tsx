@@ -8,6 +8,7 @@ import Button from "@modules/common/components/button";
 import { ComboBox } from "@modules/common/components/combobox";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { SlideOver } from "@modules/common/components/slideover";
+import { Category, Collection } from "types/global";
 
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
@@ -16,8 +17,8 @@ interface ComponentProps {
     count: any;
     slug?: string;
     sortBy?: string;
-    categories?: any[];
-    collections?: any[];
+    categories?: Category[];
+    collections?: Collection[];
 }
 
 const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, categories = [], collections = [] }) => {
@@ -38,7 +39,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, cate
                 </div>
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
-                        <Button className="md:hidden" type="button" onPress={state.open}>
+                        <Button className="md:hidden" onPress={state.open}>
                             <FunnelIcon className="text-default-500" focusable="false" role="img" size={16} />
                             Filters
                         </Button>

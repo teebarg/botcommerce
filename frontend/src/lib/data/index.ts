@@ -2,7 +2,7 @@ import { cache } from "react";
 import { Product } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
-import { searchDocuments } from "@lib/util/meilisearch";
+import { searchDocuments, urlToList } from "@lib/util/meilisearch";
 import { revalidateTag } from "next/cache";
 
 /**
@@ -567,6 +567,7 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
 
 interface SearchParams {
     query?: string;
+    categories?: string;
     collections?: string[];
     min_price?: number;
     max_price?: number;
@@ -584,10 +585,22 @@ interface SearchResult {
 }
 
 export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
-    const { query = "", collections = [], min_price = 1, max_price = 1000000, page = 1, limit = 20, sort = "created_at:desc" } = searchParams;
+    const {
+        query = "",
+        categories = "",
+        collections = [],
+        min_price = 1,
+        max_price = 1000000,
+        page = 1,
+        limit = 20,
+        sort = "created_at:desc",
+    } = searchParams;
 
     const filters: string[] = [];
 
+    if (categories) {
+        filters.push(`categories IN [${urlToList(categories)}]`);
+    }
     if (collections.length > 0) {
         filters.push(`collections IN [${collections.join(",")}]`);
     }

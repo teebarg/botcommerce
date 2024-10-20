@@ -86,7 +86,6 @@ export async function uploadProductImage({ productId, formData }: { productId: s
 
 export async function createProduct(currentState: unknown, formData: FormData) {
     const accessToken = cookies().get("access_token")?.value as string;
-    // const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`;
     const productId = formData.get("id") as string;
     const type = formData.get("type") as string;
 
@@ -97,7 +96,6 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         name: formData.get("name"),
         is_active: Boolean(formData.get("is_active")) ?? false,
         description: formData.get("description"),
-        // tags: JSON.parse(formData.get("tags") as string) ?? [],
         categories: JSON.parse(formData.get("categories") as string) ?? [],
         collections: JSON.parse(formData.get("collections") as string) ?? [],
         price: formData.get("price") ?? 0,

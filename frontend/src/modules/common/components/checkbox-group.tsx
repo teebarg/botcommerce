@@ -9,7 +9,7 @@ interface CheckboxGroupProps {
 }
 
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, item }) => {
-    const { updateQuery } = useUpdateQuery(1000);
+    const { updateQuery } = useUpdateQuery(200);
     const [dataSet, setDataSet] = useState(new Set());
 
     const searchParams = useSearchParams();
@@ -17,7 +17,6 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
     // Handle parent checkbox change
     const handleParentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const checked = e.target.checked;
-        // const checkedIds = checked ? checkboxes.map((checkbox) => checkbox.slug) : [];
         const newSet = new Set(dataSet);
 
         if (checked) {
@@ -46,7 +45,6 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
         //     setParentChecked(true); // Check parent if all children are checked
         // }
 
-        // updateURL(checkedIds); // Update the URL with the new checked IDs
         const newSet = new Set(dataSet);
 
         if (checked) {
@@ -62,8 +60,6 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
     // Sync the checked state with URL on component mount
     useEffect(() => {
         const catIdsFromURL = searchParams.get("cat_ids")?.split(",") || [];
-        // const ids = item.children.map((i: any) => i.slug);
-        // const newIds = [item.slug, ...ids];
         const newSet = new Set(catIdsFromURL);
 
         setDataSet(newSet);

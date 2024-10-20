@@ -9,11 +9,11 @@ import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { Textarea } from "@nextui-org/input";
 import { useRouter } from "next/navigation";
-
-import { createProduct, uploadProductImage } from "../actions";
 import { Switch } from "@modules/common/components/switch";
 import { Multiselect } from "@modules/common/components/multiselect";
 import { Category, Collection } from "types/global";
+
+import { createProduct, uploadProductImage } from "../actions";
 
 interface Props {
     current?: any;
@@ -30,7 +30,6 @@ interface ChildRef {
 const ProductForm = forwardRef<ChildRef, Props>(
     ({ type = "create", onClose, current = { name: "", is_active: true }, categories = [], collections = [] }, ref) => {
         const router = useRouter();
-        // const selectedTags = current?.tags?.map((item: any) => item.id) ?? [];
         const [selectedCategories, setSelectedCategories] = React.useState<number[]>([]);
         const [selectedCollections, setSelectedCollections] = React.useState<number[]>([]);
         const isCreate = type === "create";
@@ -99,14 +98,6 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                         placeholder="Product description"
                                         variant="bordered"
                                     />
-                                    {/* <MultiSelect
-                                        defaultValue={selectedTags}
-                                        label="Tags"
-                                        name="tags"
-                                        options={tagOptions}
-                                        placeholder="Select Tags"
-                                        variant="bordered"
-                                    /> */}
                                     <Multiselect
                                         defaultValue={selectedCollections}
                                         label="Collections"
@@ -136,7 +127,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                             </div>
                         </div>
                         <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-50 w-full right-0 z-50">
-                            <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                            <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
                                 Cancel
                             </Button>
                             <FormButton className="min-w-32" color="primary" variant="shadow">

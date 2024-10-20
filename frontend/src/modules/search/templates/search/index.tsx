@@ -17,7 +17,7 @@ export default function Search() {
 
     return (
         <React.Fragment>
-            <Button color="default" endContent={<Kbd keys={["command"]}>K</Kbd>} startContent={<MagnifyingGlassMini />} onClick={modalState.open}>
+            <Button color="default" endContent={<Kbd keys={["command"]}>K</Kbd>} startContent={<MagnifyingGlassMini />} onPress={modalState.open}>
                 Search products, brands and categories...
             </Button>
             {modalState.isOpen && (

@@ -7,9 +7,9 @@ import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
+import { Switch } from "@modules/common/components/switch";
 
 import { createCollection } from "../actions";
-import { Switch } from "@modules/common/components/switch";
 
 interface Props {
     current?: any;
@@ -60,7 +60,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                         </div>
                     </div>
                     <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-50 w-full right-0 z-50">
-                        <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                        <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
                             Cancel
                         </Button>
                         <FormButton className="min-w-32" color="primary" variant="shadow">

@@ -91,16 +91,22 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                             onValueChange={onSearchChange}
                         />
                         <div className="flex gap-3">
-                            <Button color="primary" endContent={<Plus />} onClick={() => state.open()}>
+                            <Button color="primary" endContent={<Plus />} onPress={() => state.open()}>
                                 Add New
                             </Button>
                             {canExport && (
-                                <Button className="min-w-28" color="secondary" disabled={isExporting} isLoading={isExporting} onClick={handleExport}>
+                                <Button
+                                    className="min-w-28"
+                                    color="secondary"
+                                    isDisabled={isExporting}
+                                    isLoading={isExporting}
+                                    onPress={handleExport}
+                                >
                                     Export
                                 </Button>
                             )}
                             {canIndex && (
-                                <Button className="min-w-28" color="secondary" disabled={isIndexing} isLoading={isIndexing} onClick={handleIndex}>
+                                <Button className="min-w-28" color="secondary" isDisabled={isIndexing} isLoading={isIndexing} onPress={handleIndex}>
                                     Index
                                 </Button>
                             )}
