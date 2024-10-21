@@ -1,3 +1,7 @@
+from typing import Optional
+
+from pydantic import BaseModel as BM
+
 from models.base import BaseModel
 
 
@@ -24,3 +28,14 @@ class ProductUpdate(ProductBase):
     categories: list[int] = []
     collections: list[int] = []
     tags: list[int] = []
+
+
+class ProductSearch(BM):
+    query: Optional[str] = ""
+    categories: Optional[str] = ""
+    collections: Optional[str] = ""
+    min_price: Optional[int] = 0
+    max_price: Optional[int] = 100
+    page: Optional[int] = 1
+    limit: Optional[int] = 20
+    sort: Optional[str] = "created_at:desc"

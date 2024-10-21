@@ -13,7 +13,7 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
         const params: any = {};
 
         if (product.collections) {
-            params.collections = [...product.collections];
+            params.collections = product.collections.join(",");
         }
 
         params.limit = 4;

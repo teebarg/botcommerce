@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { Product } from "types/global";
+import { Product, SearchParams } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
 import { searchDocuments, urlToList } from "@lib/util/meilisearch";
@@ -565,17 +565,6 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
     }
 });
 
-interface SearchParams {
-    query?: string;
-    categories?: string;
-    collections?: string[];
-    min_price?: number;
-    max_price?: number;
-    page?: number;
-    limit?: number;
-    sort?: string;
-}
-
 interface SearchResult {
     products: Product[];
     page: number;
@@ -584,11 +573,43 @@ interface SearchResult {
     total_pages: number;
 }
 
+export async function search(searchParams: SearchParams): Promise<SearchResult> {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`, {
+            method: "POST",
+            headers: {
+                accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(searchParams),
+            next: {
+                tags: ["search"],
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch search");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching search:", error);
+
+        return {
+            products: [],
+            page: 1,
+            limit: 20,
+            total_count: 0,
+            total_pages: 0,
+        };
+    }
+}
+
 export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
     const {
         query = "",
         categories = "",
-        collections = [],
+        collections = "",
         min_price = 1,
         max_price = 1000000,
         page = 1,
@@ -601,8 +622,8 @@ export async function searchProducts(searchParams: SearchParams): Promise<Search
     if (categories) {
         filters.push(`categories IN [${urlToList(categories)}]`);
     }
-    if (collections.length > 0) {
-        filters.push(`collections IN [${collections.join(",")}]`);
+    if (collections) {
+        filters.push(`collections IN [${urlToList(collections)}]`);
     }
     if (min_price && max_price) {
         filters.push(`price >= ${min_price} AND price <= ${max_price}`);

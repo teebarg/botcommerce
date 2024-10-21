@@ -18,9 +18,9 @@ export default function UserDropDown({ customer }: any) {
                         <div className="inline-flex items-center justify-center gap-2 rounded-small outline-none transition-transform">
                             <span className="flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-default">
                                 <img
-                                    src={customer?.image || "https://i.pravatar.cc/150?u=a042581f4e29026024d"}
-                                    className="flex object-cover w-full h-full"
                                     alt="avatar"
+                                    className="flex object-cover w-full h-full"
+                                    src={customer?.image || "https://i.pravatar.cc/150?u=a042581f4e29026024d"}
                                 />
                             </span>
                             <div className="inline-flex flex-col items-start">

@@ -14,6 +14,7 @@ import crud
 from core import security
 from core.config import settings
 from core.logging import logger
+from crud.search import SearchService, get_search_service
 from db.engine import engine
 from models.generic import Address, Product, User
 from models.token import TokenPayload
@@ -116,3 +117,5 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
 
 
 AdminUser = Annotated[User, Depends(get_current_active_superuser)]
+
+SearchService = Annotated[SearchService, Depends(get_search_service)]

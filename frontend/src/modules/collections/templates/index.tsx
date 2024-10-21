@@ -2,8 +2,8 @@ import React from "react";
 import { ChevronRight, ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { getCategories, getCollectionsList, searchProducts } from "@lib/data";
-import { Category, Product, SortOptions } from "types/global";
+import { getCategories, getCollectionsList, search } from "@lib/data";
+import { Category, Collection, Product, SearchParams, SortOptions } from "types/global";
 import { ProductCard } from "@modules/products/components/product-card";
 
 import { CollectionsTopBar } from "./topbar";
@@ -11,23 +11,22 @@ import { CollectionsSideBar } from "./sidebar";
 
 interface ComponentProps {
     query?: string;
-    productsIds?: (string | number)[];
-    collection?: any;
-    page?: string;
+    collection?: Collection;
+    page?: number;
     sortBy?: SortOptions;
     searchParams?: {
-        page?: string;
+        page?: number;
         sortBy?: SortOptions;
         cat_ids?: string;
     };
 }
 
-const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, productsIds, sortBy, searchParams }) => {
+const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, sortBy, searchParams }) => {
     const { collections } = await getCollectionsList();
     const { categories: cat } = await getCategories();
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
-    const queryParams: any = {
+    const queryParams: SearchParams = {
         query,
         limit: 12,
         page: page ?? 1,
@@ -35,18 +34,14 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     };
 
     if (collection?.id) {
-        queryParams["collections"] = [collection.slug];
+        queryParams["collections"] = collection.slug as string;
     }
 
     if (searchParams?.cat_ids) {
         queryParams["categories"] = searchParams?.cat_ids;
     }
 
-    if (productsIds) {
-        queryParams["id"] = productsIds;
-    }
-
-    const { products, ...pagination } = await searchProducts(queryParams);
+    const { products, ...pagination } = await search(queryParams);
 
     return (
         <React.Fragment>
@@ -62,12 +57,12 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                         <li className="flex items-center" data-slot="base">
                             <LocalizedClientLink href="/collections">Collection</LocalizedClientLink>
                         </li>
-                        {collection?.title && (
+                        {collection?.name && (
                             <li className="flex items-center" data-slot="base">
                                 <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
                                     <ChevronRight />
                                 </span>
-                                <span>{collection.title}</span>
+                                <span>{collection.name}</span>
                             </li>
                         )}
                     </ol>
@@ -81,7 +76,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                             categories={categories}
                             collections={collections}
                             count={pagination.total_count}
-                            slug={collection?.title}
+                            slug={collection?.slug}
                             sortBy={sortBy}
                         />
                         <main className="mt-4 w-full overflow-visible px-1">

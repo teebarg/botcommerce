@@ -13,6 +13,7 @@ const Kbd: React.FC<Props> = ({ keys = [], className, children }) => {
         shift: "⇧", // Shift symbol
         option: "⌥", // Option symbol
     };
+
     return (
         <React.Fragment>
             <kbd
