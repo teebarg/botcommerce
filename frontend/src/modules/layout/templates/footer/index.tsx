@@ -111,7 +111,7 @@ export default async function Footer() {
                                                         <LocalizedClientLink
                                                             className="text-small hover:opacity-80 transition-opacity text-default-400"
                                                             data-testid="category-link"
-                                                            href={`/categories/${c.slug}`}
+                                                            href={`/collections?cat_ids=${c.slug}`}
                                                         >
                                                             {c.name}
                                                         </LocalizedClientLink>
@@ -122,7 +122,7 @@ export default async function Footer() {
                                                                         <LocalizedClientLink
                                                                             className="text-small hover:opacity-80 transition-opacity text-default-400"
                                                                             data-testid="category-link"
-                                                                            href={`/categories/${child.slug}`}
+                                                                            href={`/collections?cat_ids=${child.slug}`}
                                                                         >
                                                                             {child.name}
                                                                         </LocalizedClientLink>

@@ -7,7 +7,7 @@ import { Collection, SortOptions } from "types/global";
 type Props = {
     params: { slug: string };
     searchParams: {
-        page?: string;
+        page?: number;
         sortBy?: SortOptions;
         cat_ids?: string;
     };

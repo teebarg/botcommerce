@@ -192,3 +192,14 @@ export type Category = {
     created_at: string;
     updated_at: string;
 };
+
+export interface SearchParams {
+    query?: string;
+    categories?: string;
+    collections?: string;
+    min_price?: number;
+    max_price?: number;
+    page?: number;
+    limit?: number;
+    sort?: string;
+}

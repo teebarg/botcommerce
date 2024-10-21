@@ -64,6 +64,10 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = "password"
     USERS_OPEN_REGISTRATION: bool = False
 
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str = "password"
+
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
     SMTP_PORT: int = 587

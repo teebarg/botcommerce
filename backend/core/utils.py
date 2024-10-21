@@ -30,6 +30,10 @@ def format_image(image: str):
     return f"https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/products%2F{image}?alt=media"
 
 
+def url_to_list(url: str) -> list[str]:
+    return [f'{item.replace("-", " ")}' for item in url.split(",")]
+
+
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
     # Set up Jinja2 environment and add the custom filter
     template_path = Path(__file__).parent.parent / "email-templates" / "build"

@@ -4,13 +4,13 @@ import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
 import { getCategories, getCustomer, getProducts } from "@lib/data";
-import { Avatar } from "@nextui-org/avatar";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteProduct, getCollections } from "@modules/admin/actions";
 import { ProductForm } from "@modules/admin/products/product-form";
 import { Badge } from "@modules/common/components/badge";
 import { CheckMini } from "nui-react-icons";
+import { Avatar } from "@modules/common/components/avatar";
 
 export const metadata: Metadata = {
     title: "Children clothing | TBO Store",

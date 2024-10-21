@@ -4,7 +4,7 @@ import { SortOptions } from "types/global";
 
 type Props = {
     searchParams: {
-        page?: string;
+        page?: number;
         sortBy?: SortOptions;
         cat_ids?: string;
     };

@@ -19,10 +19,12 @@ from core.deps import (
     SessionDep,
 )
 from core.logging import logger
+from core.utils import url_to_list
 from models.generic import Product, ProductPublic
 from models.message import Message
 from models.product import (
     ProductCreate,
+    ProductSearch,
     ProductUpdate,
 )
 from services.export import validate_file
@@ -86,7 +88,7 @@ async def index(
     # if tag:
     #     filters.append(f"tag = '{tag}'")
     if categories:
-        filters.append(f"categories IN [{categories}]")
+        filters.append(f"categories IN {url_to_list(categories)}")
     if collections:
         filters.append(f"collections IN [{collections}]")
     if minPrice and maxPrice:
@@ -120,26 +122,25 @@ async def index(
 
 
 @router.post("/search")
-async def search_products(search_params: dict) -> Any:
+async def search_products(params: ProductSearch, service: deps.SearchService) -> Any:
     """
     Search products using Meilisearch, sorted by relevance.
     """
-    search = search_params.get("search", "")
-    categories = search_params.get("categories", [])
-    collections = search_params.get("collections", [])
-    minPrice = search_params.get("min_price", 1)
-    maxPrice = search_params.get("max_price", 1000000)
-    page = int(search_params.get("page", 1))
-    limit = int(search_params.get("limit", 20))
-    sort = search_params.get("sort", "created_at:desc")
+    categories = params.categories
+    collections = params.collections
+    min_price = params.min_price
+    max_price = params.max_price
+    limit = params.limit
+    page = params.page
+    sort = params.sort
 
     filters = []
     if categories:
-        filters.append(f"categories IN [{','.join(categories)}]")
+        filters.append(f"categories IN {url_to_list(categories)}")
     if collections:
-        filters.append(f"collections IN [{','.join(collections)}]")
-    if minPrice and maxPrice:
-        filters.append(f"price >= {minPrice} AND price <= {maxPrice}")
+        filters.append(f"collections IN {url_to_list(collections)}")
+    if min_price and max_price:
+        filters.append(f"price >= {min_price} AND price <= {max_price}")
 
     search_params = {
         "limit": limit,
@@ -150,9 +151,13 @@ async def search_products(search_params: dict) -> Any:
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
-    search_results = search_documents(
-        index_name="products", query=search, **search_params
+    search_results = await service.search_products(
+        query=params.query, filters=search_params
     )
+
+    # search_results = search_documents(
+    #     index_name="products", query=params.query, **search_params
+    # )
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
@@ -207,6 +212,7 @@ def update(
     id: int,
     product_in: ProductUpdate,
     background_tasks: BackgroundTasks,
+    service: deps.SearchService,
 ) -> ProductPublic:
     """
     Update a product.
@@ -221,11 +227,12 @@ def update(
 
     try:
         # Define the background task
-        def update_task(db_product):
+        def update_task(db_product: Product):
             # Prepare product data for Meilisearch indexing
             product_data = prepare_product_data_for_indexing(db_product)
 
             update_document(index_name="products", document=product_data)
+            service.invalidate_product_cache(product_id=db_product.id)
 
         background_tasks.add_task(update_task, db_product=db_product)
         return db_product
