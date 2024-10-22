@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Kbd } from "@nextui-org/kbd";
 import { MagnifyingGlassMini } from "nui-react-icons";
 import { SEARCH_INDEX_NAME, searchClient } from "@lib/search-client";
 import Hit from "@modules/search/components/hit";
@@ -11,6 +10,7 @@ import SearchInput from "@modules/search/components/search-input";
 import Button from "@modules/common/components/button";
 import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
+import { Kbd } from "@modules/common/components/kbd";
 
 export default function Search() {
     const modalState = useOverlayTriggerState({});
@@ -26,12 +26,9 @@ export default function Search() {
                         <div className="flex items-center w-full px-4 border-b border-default-400/50 dark:border-default-100">
                             <MagnifyingGlassMini />
                             <SearchInput />
-                            <Kbd
-                                className="hidden md:block border-none px-2 py-1 ml-2 font-medium text-[0.6rem] cursor-pointer"
-                                onClick={modalState.close}
-                            >
-                                ESC
-                            </Kbd>
+                            <button onClick={modalState.close}>
+                                <Kbd className="hidden md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
+                            </button>
                         </div>
                         <div className="max-h-[70vh] min-h-[70vh] overflow-y-auto">
                             <Hits hitComponent={Hit} />

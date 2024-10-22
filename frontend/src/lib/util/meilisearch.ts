@@ -85,7 +85,7 @@ const deleteIndex = async (indexName: string): Promise<void> => {
 };
 
 const urlToList = (url: string): string[] => {
-    return url.split(",").map((item) => `"${item.replace("-", " ")}"`);
+    return url?.split(",").map((item) => `"${item.replace("-", " ")}"`);
 };
 
 export {

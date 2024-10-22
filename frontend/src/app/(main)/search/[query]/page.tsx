@@ -13,7 +13,7 @@ type Params = {
     params: { query: string };
     searchParams: {
         sortBy?: SortOptions;
-        page?: string;
+        page?: number;
     };
 };
 

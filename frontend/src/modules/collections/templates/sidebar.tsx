@@ -29,7 +29,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories 
                 <hr className="shrink-0 border-none w-full h-divider my-3 bg-default-100" />
                 <div className="flex flex-col">
                     <span className="mb-2">Categories</span>
-                    {categories.map((item: Category, index: number) => (
+                    {categories?.map((item: Category, index: number) => (
                         <CheckboxGroup key={index} checkboxes={item.children} groupName={item.name} item={item} />
                     ))}
                 </div>

@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 
 interface Props {
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success" | undefined;
+    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
     size?: "sm" | "md" | "lg";
 }
 
