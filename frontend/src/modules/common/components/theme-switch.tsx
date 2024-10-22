@@ -29,7 +29,8 @@ export const ThemeSwitch: FC<AriaSwitchProps> = (props) => {
             <VisuallyHidden>
                 <input {...inputProps} ref={ref} onChange={onChange} />
             </VisuallyHidden>
-            <div onClick={onChange} className="cursor-pointer">
+            {/* eslint-disable jsx-a11y/no-static-element-interactions */}
+            <div className="cursor-pointer" onClick={onChange}>
                 {!state.isSelected || isSSR ? <SunFilledIcon size={30} /> : <MoonFilledIcon size={30} />}
             </div>
         </span>

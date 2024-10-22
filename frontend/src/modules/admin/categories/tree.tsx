@@ -26,7 +26,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
     return (
         <React.Fragment>
             <ol>
-                {categories.map((item: Category, index: number) => (
+                {categories?.map((item: Category, index: number) => (
                     <li key={index} className="flex flex-col min-h-10">
                         <div className="flex items-center">
                             <div className="flex w-[32px] items-center">
