@@ -34,20 +34,6 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     }
 }
 
-export async function logCustomerIn(_currentState: unknown, formData: FormData) {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    try {
-        await getToken({ email, password });
-        revalidateTag("customer");
-
-        return { error: false, message: "Authentication successful" };
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
-    }
-}
-
 export async function googleLogin(customer: { firstname: string; lastname: string; password: string; email: string }) {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/social`, {
@@ -267,7 +253,7 @@ export async function signOut() {
     });
     revalidateTag("auth");
     revalidateTag("customer");
-    redirect(`/account`);
+    redirect(`/`);
 }
 
 type resType = {

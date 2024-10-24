@@ -29,7 +29,7 @@ const useUpdateQuery = (delay = 500) => {
         [searchParams]
     );
 
-    return { updateQuery }; 
+    return { updateQuery };
 };
 
 export { useUpdateQuery };

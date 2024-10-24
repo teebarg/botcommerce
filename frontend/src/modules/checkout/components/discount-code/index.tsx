@@ -1,10 +1,9 @@
 "use client";
 
-import { InformationCircleSolid } from "nui-react-icons";
+import { InformationCircleSolid, Trash } from "nui-react-icons";
 import React, { useMemo } from "react";
 import { useFormState } from "react-dom";
 import Input from "@modules/common/components/input";
-import Trash from "@modules/common/icons/trash";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { removeDiscount, removeGiftCard, submitDiscountForm } from "@modules/checkout/actions";
 import { FormButton } from "@modules/common/components/form-button";

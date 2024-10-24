@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { PencilSquare as Edit, Trash } from "nui-react-icons";
+import { PencilSquare as Edit, Spinner, Trash } from "nui-react-icons";
 import { Modal } from "@modules/common/components/modal";
 import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@modules/account/actions";
-import Spinner from "@modules/common/icons/spinner";
 import { useFormState } from "react-dom";
 import clsx from "clsx";
 import { Input } from "@nextui-org/input";

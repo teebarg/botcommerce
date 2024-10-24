@@ -7,9 +7,10 @@ import { FormButton } from "@modules/common/components/form-button";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@modules/account/components/google";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { signUp } from "../action";
 import { useFormState } from "react-dom";
 import React from "react";
+
+import { signUp } from "../action";
 
 type Props = {};
 
@@ -56,7 +57,7 @@ const SignUpForm: React.FC<Props> = () => {
             </form>
             <span className="text-center text-default-800 text-sm mt-6">
                 Already a member?{" "}
-                <LocalizedClientLink href={"/sign-in"} className="text-blue-500">
+                <LocalizedClientLink className="text-blue-500" href={"/sign-in"}>
                     Join us.
                 </LocalizedClientLink>
             </span>

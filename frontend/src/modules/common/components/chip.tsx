@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 interface Props {
     title: string;
-    color: "default" | "primary" | "secondary" | "success" | "warning" | "danger";
+    color?: "default" | "primary" | "secondary" | "success" | "warning" | "danger";
     size?: "sm" | "md" | "lg";
     className?: string;
 }
@@ -17,9 +17,9 @@ const Chip: React.FC<Props> = ({ title, className = "", color = "primary", size 
                     "box-border whitespace-nowrap px-1 rounded-full",
                     `bg-${color} text-${color}-foreground ${className}`,
                     {
-                        "h-6 text-xs": size == "sm",
-                        "h-7 text-small": size == "md",
-                        "h-8 text-sm": size == "lg",
+                        "h-5 text-xs": size == "sm",
+                        "h-6 text-small": size == "md",
+                        "h-7 text-sm": size == "lg",
                     }
                 )}
             >

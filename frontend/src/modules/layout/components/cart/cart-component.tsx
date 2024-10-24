@@ -8,7 +8,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Cart, CartItem } from "types/global";
 import { usePathname } from "next/navigation";
 import { currency } from "@lib/util/util";
-import { Badge } from "@modules/common/components/badge";
+import { Chip } from "@modules/common/components/chip";
 
 import { CartItems } from "../cart-items";
 
@@ -68,11 +68,15 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
 
     return (
         <div>
-            <Badge color="danger" content={totalItems} size="md">
+            <div className="flex items-center gap-0.5">
                 <button className="h-full w-full flex items-center justify-center bg-content1 text-default-500" onClick={state.open}>
                     <CartIcon className="h-10 w-10" />
                 </button>
-            </Badge>
+                <div>
+                    <Chip size="sm" title={totalItems.toString()} />
+                    <p className="font-semibold text-sm">Cart</p>
+                </div>
+            </div>
             {state.isOpen && (
                 <SlideOver
                     className="bg-default-50"

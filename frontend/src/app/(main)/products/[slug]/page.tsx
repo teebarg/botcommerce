@@ -25,10 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: `${product.name} | TBO Store`,
+        title: `${product.name} | Botcommerce Store`,
         description: `${product.description}`,
         openGraph: {
-            title: `${product.name} | TBO Store`,
+            title: `${product.name} | Botcommerce Store`,
             description: `${product.description}`,
             images: product.image ? [product.image] : [],
         },

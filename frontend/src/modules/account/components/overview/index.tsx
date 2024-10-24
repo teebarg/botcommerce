@@ -1,7 +1,7 @@
-import ChevronDown from "@modules/common/icons/chevron-down";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Customer, Order } from "types/global";
 import { currency } from "@lib/util/util";
+import { ChevronDown } from "nui-react-icons";
 
 type OverviewProps = {
     customer: Omit<Customer, "password_hash"> | null;
