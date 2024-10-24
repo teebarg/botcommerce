@@ -22,9 +22,7 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     }
 }
 
-export async function signIn(prevState: any, formData: FormData) {
-    console.log(prevState);
-    console.log(formData);
+export async function signIn(_prevState: unknown, formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 

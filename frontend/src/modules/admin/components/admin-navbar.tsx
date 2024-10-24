@@ -34,7 +34,7 @@ const AdminNavbar = async () => {
                     {customer ? (
                         <UserDropDown customer={customer} />
                     ) : (
-                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/admin">
+                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>
                         </LocalizedClientLink>
                     )}
