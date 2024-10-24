@@ -9,7 +9,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { ArrowRightOnRectangle, CartIcon, ChevronRight } from "nui-react-icons";
 
 export const metadata: Metadata = {
-    title: "Clothings | TBO Store | Checkout",
+    title: "Clothings | Botcommerce Store | Checkout",
 };
 
 interface EmptyCartProps {}

@@ -8,24 +8,24 @@ const Terms = () => {
             <h1 className="text-3xl font-bold mb-8 text-center text-foreground">Terms and Conditions</h1>
 
             <div className="bg-content1 rounded-lg shadow-lg p-8 mb-8">
-                <h2 className="text-2xl font-semibold mb-4 text-foreground">Welcome to TBO Stores</h2>
+                <h2 className="text-2xl font-semibold mb-4 text-foreground">Welcome to Botcommerce Stores</h2>
                 <p className="mb-4 text-foreground">
-                    {`These terms and conditions outline the rules and regulations for the use of TBO Stores' website and services. By accessing this
-                    website, we assume you accept these terms and conditions in full. Do not continue to use TBO Stores' website if you do not accept
+                    {`These terms and conditions outline the rules and regulations for the use of Botcommerce Stores' website and services. By accessing this
+                    website, we assume you accept these terms and conditions in full. Do not continue to use Botcommerce Stores' website if you do not accept
                     all of the terms and conditions stated on this page.`}
                 </p>
                 <h2 className="text-xl font-semibold mb-4 text-foreground">1. License to Use</h2>
                 <p className="mb-4 text-foreground">
-                    Unless otherwise stated, TBO Stores and/or its licensors own the intellectual property rights for all material on TBO Stores. All
-                    intellectual property rights are reserved. You may view and/or print pages from{" "}
+                    Unless otherwise stated, Botcommerce Stores and/or its licensors own the intellectual property rights for all material on
+                    Botcommerce Stores. All intellectual property rights are reserved. You may view and/or print pages from{" "}
                     <span className="underline">{siteConfig.baseUrl}</span> for your own personal use subject to restrictions set in these terms and
                     conditions.
                 </p>
                 <h2 className="text-xl font-semibold mb-4 text-foreground">2. User Comments</h2>
                 <p className="mb-4 text-foreground">
                     {`Certain parts of this website offer the opportunity for users to post and exchange opinions, information, material and data
-                    ('Comments') in areas of the website. TBO Stores does not screen, edit, publish or review Comments prior to their appearance on
-                    the website and Comments do not reflect the views or opinions of TBO Stores, its agents or affiliates. Comments reflect the view
+                    ('Comments') in areas of the website. Botcommerce Stores does not screen, edit, publish or review Comments prior to their appearance on
+                    the website and Comments do not reflect the views or opinions of Botcommerce Stores, its agents or affiliates. Comments reflect the view
                     and opinion of the person who posts such view or opinion.`}
                 </p>
                 <h2 className="text-xl font-semibold mb-4 text-foreground">3. Reservation of Rights</h2>

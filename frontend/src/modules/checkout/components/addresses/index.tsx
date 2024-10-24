@@ -1,8 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { CheckCircleSolid } from "nui-react-icons";
-import Spinner from "@modules/common/icons/spinner";
+import { CheckCircleSolid, Spinner } from "nui-react-icons";
 import { useFormState } from "react-dom";
 import compareAddresses from "@lib/util/compare-addresses";
 import { FormButton } from "@modules/common/components/form-button";

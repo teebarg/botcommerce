@@ -10,7 +10,7 @@ import { Chip } from "@modules/common/components/chip";
 import { deleteCollection } from "@modules/admin/actions";
 
 export const metadata: Metadata = {
-    title: "Children clothing | TBO Store",
+    title: "Children clothing | Botcommerce Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 

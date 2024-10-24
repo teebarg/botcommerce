@@ -1,34 +1,37 @@
-import { useFormState } from "react-dom";
-import { LOGIN_VIEW } from "@modules/account/templates/login-template";
-import { logCustomerIn } from "@modules/account/actions";
+"use client";
+
 import { Input } from "@nextui-org/input";
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { FormButton } from "@modules/common/components/form-button";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { GoogleLogin } from "@modules/account/components/google";
+import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import { useFormState } from "react-dom";
+import React from "react";
+import { redirect } from "next/navigation";
 
-import { GoogleLogin } from "../google";
+import { signIn } from "../action";
 
-type Props = {
-    setCurrentView: (view: LOGIN_VIEW) => void; // eslint-disable-line
-};
+type Props = {};
 
-const Login = ({ setCurrentView }: Props) => {
+const LoginForm: React.FC<Props> = () => {
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(logCustomerIn, null);
+    const [state, formAction] = useFormState(signIn, null);
 
     useWatch(state, () => {
         if (state?.error) {
             enqueueSnackbar(state.message, {
                 variant: "error",
             });
+
+            return;
         }
+        redirect("/");
     });
 
     return (
-        <div className="max-w-md w-full flex flex-col items-center bg-background p-2 md:p-8 rounded-lg ml-0 md:ml-[5rem]" data-testid="login-page">
-            <h1 className="text-2xl uppercase font-medium mb-1">Welcome back</h1>
-            <p className="text-center text-base mb-8">Sign in to access an enhanced shopping experience.</p>
+        <React.Fragment>
             <form action={formAction} className="w-full">
                 <div className="flex flex-col w-full gap-y-4">
                     <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
@@ -40,17 +43,16 @@ const Login = ({ setCurrentView }: Props) => {
             </form>
             <span className="text-center text-default-800 text-sm mt-6">
                 Not a member?{" "}
-                <button className="underline" data-testid="register-button" onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}>
-                    Join us
-                </button>
-                .
+                <LocalizedClientLink className="text-blue-500" href={"/sign-up"}>
+                    Join us.
+                </LocalizedClientLink>
             </span>
             <hr className="tb-divider my-6" />
             <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
                 <GoogleLogin />
             </GoogleOAuthProvider>
-        </div>
+        </React.Fragment>
     );
 };
 
-export default Login;
+export { LoginForm };

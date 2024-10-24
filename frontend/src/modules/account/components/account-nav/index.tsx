@@ -1,10 +1,8 @@
 "use client";
 
-import { ArrowRightOnRectangle } from "nui-react-icons";
+import { ArrowRightOnRectangle, ChevronDown, User } from "nui-react-icons";
 import { usePathname } from "next/navigation";
-import ChevronDown from "@modules/common/icons/chevron-down";
 import { signOut } from "@modules/account/actions";
-import User from "@modules/common/icons/user";
 import MapPin from "@modules/common/icons/map-pin";
 import Package from "@modules/common/icons/package";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";

@@ -6,7 +6,7 @@ import CategoryTree from "@modules/admin/categories/tree";
 import AddCategory from "@modules/admin/categories/add-categories";
 
 export const metadata: Metadata = {
-    title: "Children clothing | TBO Store",
+    title: "Children clothing | Botcommerce Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 

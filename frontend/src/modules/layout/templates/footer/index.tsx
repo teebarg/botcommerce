@@ -51,7 +51,7 @@ export default async function Footer() {
                 <div className="xl:grid xl:grid-cols-3 xl:gap-8">
                     <div className="space-y-4 md:pr-8">
                         <div className="flex items-center justify-start">
-                            <span className="text-4xl font-semibold">TBO</span>
+                            <span className="text-4xl font-semibold">Botcommerce</span>
                         </div>
                         <p className="text-small text-default-500">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring

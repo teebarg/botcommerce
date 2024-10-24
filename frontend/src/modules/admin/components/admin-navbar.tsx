@@ -14,7 +14,7 @@ const AdminNavbar = async () => {
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand as="li" className="gap-3 max-w-fit">
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/admin">
-                        <p className="font-bold text-inherit">TBO</p>
+                        <p className="font-bold text-inherit">Botcommerce</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
             </NavbarContent>
@@ -34,7 +34,7 @@ const AdminNavbar = async () => {
                     {customer ? (
                         <UserDropDown customer={customer} />
                     ) : (
-                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/admin">
+                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>
                         </LocalizedClientLink>
                     )}

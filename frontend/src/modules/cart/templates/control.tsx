@@ -3,10 +3,10 @@
 import CartItemSelect from "@modules/cart/components/cart-item-select";
 import DeleteButton from "@modules/common/components/delete-button";
 import { updateLineItem } from "@modules/cart/actions";
-import Spinner from "@modules/common/icons/spinner";
 import { useState } from "react";
 import { useSnackbar } from "notistack";
 import { CartItem } from "types/global";
+import { Spinner } from "nui-react-icons";
 
 type ItemsTemplateProps = {
     item: CartItem;

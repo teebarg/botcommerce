@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     const metadata = {
-        title: `${collection.name} | TBO Store`,
+        title: `${collection.name} | Botcommerce Store`,
         description: `${collection.name} collection`,
     } as Metadata;
 

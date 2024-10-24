@@ -1,4 +1,4 @@
-import Spinner from "@modules/common/icons/spinner";
+import { Spinner } from "nui-react-icons";
 
 export default function Loading() {
     return (

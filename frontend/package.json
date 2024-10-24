@@ -1,12 +1,13 @@
 {
-    "name": "tbo-frontend",
+    "name": "botcommerce-frontend",
     "version": "1.0.3",
     "private": true,
     "author": "Adeniyi <neyostica2000@yahoo.com> (https://www.niyi.com.ng)",
     "description": "A robust e-commerce storefront built with Next.js 14",
     "keywords": [
-        "tbo",
-        "nextjs"
+        "botcommerce",
+        "nextjs",
+        "react"
     ],
     "scripts": {
         "dev": "next dev",

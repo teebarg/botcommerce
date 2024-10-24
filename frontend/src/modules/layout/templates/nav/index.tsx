@@ -4,7 +4,6 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Navbar as NextUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@nextui-org/navbar";
 import { siteConfig } from "@lib/config";
 import { ThemeSwitch } from "@modules/common/components/theme-switch";
-import User from "@modules/common/icons/user";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import Search from "@modules/search/templates/search";
@@ -19,8 +18,7 @@ const Navbar = async () => {
             <NavbarContent className="basis-1/5 sm:basis-full flex" justify="start">
                 <NavbarBrand as="li" className="gap-3 max-w-fit">
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/">
-                        <User />
-                        <p className="font-bold text-inherit text-2xl">TBO</p>
+                        <p className="font-bold text-inherit text-2xl">Botcommerce</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
                 <div className="hidden sm:flex gap-2">
@@ -76,7 +74,7 @@ const Navbar = async () => {
                     {customer ? (
                         <UserDropDown customer={customer} />
                     ) : (
-                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/account">
+                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>
                         </LocalizedClientLink>
                     )}

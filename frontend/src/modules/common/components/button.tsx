@@ -52,7 +52,6 @@ const Button: React.FC<Props> = ({
                     sizeCss[size]
                 )}
                 style={style}
-                {...props}
             >
                 {isLoading && (
                     <div aria-label="Loading" className="relative inline-flex flex-col gap-2 items-center justify-center">

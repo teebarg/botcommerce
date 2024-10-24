@@ -1,4 +1,4 @@
-# TBO Python Service
+# Botcommerce Python Service
 
 [![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)](https://python.org)
 
