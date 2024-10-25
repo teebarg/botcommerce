@@ -2,7 +2,7 @@
 
 import { SelectHTMLAttributes, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import clsx from "clsx";
-import ChevronDown from "@modules/common/icons/chevron-down";
+import { ChevronDown } from "nui-react-icons";
 
 type NativeSelectProps = {
     placeholder?: string;

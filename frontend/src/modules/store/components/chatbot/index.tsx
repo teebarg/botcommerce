@@ -92,7 +92,7 @@ export const Chatbot: React.FC = () => {
             {isOpen ? (
                 <div className="w-[90vw] sm:w-[30rem] h-[30rem] flex flex-col overflow-hidden rounded-lg bg-default-200 shadow">
                     <div className="px-4 py-5 sm:px-6 flex justify-between bg-fuchsia-400 text-white">
-                        <p className="font-semibold">TBO Web Chat</p>
+                        <p className="font-semibold">Botcommerce Web Chat</p>
                         <button className="" onClick={toggleChat}>
                             <XMark size={20} />
                         </button>

@@ -7,7 +7,7 @@ import Summary from "@modules/cart/templates/summary";
 import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
 export const metadata: Metadata = {
-    title: "Cart | TBO Store",
+    title: "Cart | Botcommerce Store",
     description: "View your cart",
 };
 

@@ -14,7 +14,7 @@ export const revalidate = 3;
 
 export async function generateMetadata(): Promise<Metadata> {
     const metadata = {
-        title: `Collections | TBO Store`,
+        title: `Collections | Botcommerce Store`,
         description: "Collections",
     } as Metadata;
 

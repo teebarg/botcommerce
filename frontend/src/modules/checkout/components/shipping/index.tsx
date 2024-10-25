@@ -1,9 +1,8 @@
 "use client";
 
 import { RadioGroup } from "@headlessui/react";
-import { CheckCircleSolid } from "nui-react-icons";
+import { CheckCircleSolid, Spinner } from "nui-react-icons";
 import Radio from "@modules/common/components/radio";
-import Spinner from "@modules/common/icons/spinner";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { setShippingMethod } from "@modules/checkout/actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";

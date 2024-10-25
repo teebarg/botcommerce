@@ -1,4 +1,5 @@
 import csv
+import time
 from datetime import datetime
 from io import BytesIO
 from typing import Any, List
@@ -25,7 +26,16 @@ from models.generic import (
 )
 
 
+async def broadcast_channel(data, user_id: int):
+    await manager.broadcast(
+        id=str(user_id),
+        data=data,
+        type="sheet-processor",
+    )
+
+
 async def process_products(file_content, content_type: str, user_id: int):
+    start_time = time.time()  # Start timing the process
     try:
         # Create a BytesIO stream from the file content
         file_stream = BytesIO(file_content)
@@ -55,8 +65,7 @@ async def process_products(file_content, content_type: str, user_id: int):
             )
 
         # Batch size and iteration setup
-        batch_size = 5
-        # batch_size = 500
+        batch_size = 20
         num_batches = (len(data_rows) // batch_size) + 1
         # Track all product slugs from the sheet
         product_slugs_in_sheet = set()
@@ -80,9 +89,9 @@ async def process_products(file_content, content_type: str, user_id: int):
             for row in batch:
                 row_data = dict(zip(headers, row))
                 name = row_data.get("name", "")
-
                 active = row_data.get("is_active", True)
                 is_active = row_data.get("is_active", True)
+
                 if isinstance(is_active, str):
                     is_active = True if active == "TRUE" else False
 
@@ -128,6 +137,10 @@ async def process_products(file_content, content_type: str, user_id: int):
         )
 
         logger.info("Sheet processed successfully")
+        end_time = time.time()
+        logger.info(
+            f"Total processing time: {end_time - start_time:.2f} seconds"
+        )  # Log total time
     except Exception as e:
         logger.error(f"An error occurred while processing. Error{e}")
         await manager.broadcast(
@@ -140,53 +153,107 @@ async def process_products(file_content, content_type: str, user_id: int):
         )
 
 
+# async def create_or_update_products_in_db2(products: List):
+#     try:
+#         with Session(engine) as session:
+#             product_objects = []
+#             for product_data, categories, collections, images in products:
+#                 logger.info(f"Processing product {product_data['name']}")
+
+#                 # Check if product exists
+#                 product = session.exec(select(Product).where(Product.id == product_data["id"])).first()
+
+#                 if product:
+#                     for key, value in product_data.items():
+#                         setattr(product, key, value)
+#                     product_objects.append(product)
+#                 else:
+#                     del product_data["id"]
+#                     product = Product(**product_data)
+#                     product_objects.append(product)
+
+#             # Use bulk operations for efficiency
+#             session.bulk_save_objects(product_objects)
+#             session.commit()
+
+#             for product_data, categories, collections, images in products:
+#                 product = session.exec(select(Product).where(Product.slug == product_data["slug"])).first()
+#                 await update_categories(product=product, categories=categories, session=session)
+#                 await update_collections(product=product, collections=collections, session=session)
+#                 await update_images(product=product, images=images, session=session)
+#                 session.commit()
+
+#     except SQLAlchemyError as e:
+#         logger.error(f"Error updating product: {str(e)}")
+#         await manager.broadcast(
+#             id="sheet",
+#             data={"message": f"Error processing product: {str(e)}", "status": "error"},
+#             type="sheet-processor",
+#         )
+
+
 async def create_or_update_products_in_db(products: List):
     with Session(engine) as session:
-        for product_data, categories, collections, images in products:
-            logger.info(f"Processing product {product_data['name']}")
-            try:
-                # Check if the product exists
-                product = session.exec(
-                    select(Product).where(Product.id == product_data["id"])
-                ).first()
+        try:
+            product_slugs = [product_data["slug"] for product_data, _, _, _ in products]
+            existing_products = (
+                session.execute(select(Product).where(Product.slug.in_(product_slugs)))
+                .scalars()
+                .all()
+            )
+
+            existing_slugs = {prod.slug for prod in existing_products}
+
+            for product_data, categories, collections, images in products:
+                logger.info(f"Processing product {product_data['name']}")
+                slug = product_data["slug"]
+                product = next(
+                    (prod for prod in existing_products if prod.slug == slug), None
+                )
 
                 if product:
-                    # Update existing product
                     for key, value in product_data.items():
                         setattr(product, key, value)
-                    session.add(product)
                 else:
-                    del product_data["id"]
-                    # Create new product
                     product = Product(**product_data)
                     session.add(product)
 
-                session.commit()
-                session.refresh(product)
-                await update_categories(
-                    product=product, categories=categories, session=session
-                )
-                await update_collections(product, collections, session)
-                await update_images(product, images, session)
+            session.commit()
 
-            except SQLAlchemyError as e:
-                logger.error("Error updating product" + str(e))
-                await manager.broadcast(
-                    id="sheet",
-                    data={
-                        "message": f"Error processing product: {str(e)}",
-                        "status": "error",
-                    },
-                    type="sheet-processor",
-                )
-                session.rollback()
+            # Update related models
+            await update_related_models(products, session)
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            logger.error(f"Error in batch update: {str(e)}")
+            await manager.broadcast(
+                id="sheet",
+                data={
+                    "message": f"Error processing product: {str(e)}",
+                    "status": "error",
+                },
+                type="sheet-processor",
+            )
+            raise
+
+
+async def update_related_models(products: List, session: Session):
+    for product_data, categories, collections, images in products:
+        product = session.execute(
+            select(Product).where(Product.slug == product_data["slug"])
+        ).scalar_one_or_none()
+
+        if product:
+            await update_categories(product, categories, session)
+            await update_collections(product, collections, session)
+            await update_images(product, images, session)
+            session.commit()
 
 
 async def update_categories(product, categories, session: Session):
     session.exec(
         delete(ProductCategory).where(ProductCategory.product_id == product.id)
     )
-    session.commit()
 
     if not categories or categories is None or not isinstance(categories, str):
         return
@@ -200,14 +267,11 @@ async def update_categories(product, categories, session: Session):
             continue
         session.add(ProductCategory(product_id=product.id, category_id=category.id))
 
-    session.commit()
-
 
 async def update_collections(product, collections, session: Session):
     session.exec(
         delete(ProductCollection).where(ProductCollection.product_id == product.id)
     )
-    session.commit()
 
     if not collections or collections is None or not isinstance(collections, str):
         return
@@ -223,20 +287,15 @@ async def update_collections(product, collections, session: Session):
             ProductCollection(product_id=product.id, collection_id=collection.id)
         )
 
-    session.commit()
-
 
 async def update_images(product, images, session: Session):
     session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
-    session.commit()
 
     if not images or images is None or not isinstance(images, str):
         return
 
     for item in images.split("|"):
         session.add(ProductImages(product_id=product.id, image=item.strip()))
-
-    session.commit()
 
 
 async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int):
@@ -248,6 +307,29 @@ async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int
             # Remove products from the database that are not in the sheet
             slugs_to_remove = existing_slugs_in_db - product_slugs_in_sheet
             if slugs_to_remove:
+                # First, delete associated records in related tables
+                products_to_remove = session.exec(
+                    select(Product).where(Product.slug.in_(slugs_to_remove))
+                ).all()
+
+                for product in products_to_remove:
+                    session.exec(
+                        delete(ProductCollection).where(
+                            ProductCollection.product_id == product.id
+                        )
+                    )
+                    session.exec(
+                        delete(ProductCategory).where(
+                            ProductCategory.product_id == product.id
+                        )
+                    )
+                    session.exec(
+                        delete(ProductImages).where(
+                            ProductImages.product_id == product.id
+                        )
+                    )
+
+                # Now delete the products
                 session.exec(delete(Product).where(Product.slug.in_(slugs_to_remove)))
                 session.commit()
                 logger.info(
@@ -384,11 +466,3 @@ async def generate_excel_file(bucket: Any, email: str):
         logger.debug("Product export complete")
 
         return download_url
-
-
-async def broadcast_channel(data, user_id: int):
-    await manager.broadcast(
-        id=str(user_id),
-        data=data,
-        type="sheet-processor",
-    )

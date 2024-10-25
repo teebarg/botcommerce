@@ -13,7 +13,7 @@ import { CheckMini } from "nui-react-icons";
 import { Avatar } from "@modules/common/components/avatar";
 
 export const metadata: Metadata = {
-    title: "Children clothing | TBO Store",
+    title: "Children clothing | Botcommerce Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 

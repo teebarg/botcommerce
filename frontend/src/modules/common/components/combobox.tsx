@@ -1,11 +1,9 @@
 import { Item } from "@react-stately/collections";
-import { useButton } from "@react-aria/button";
 import { useComboBoxState } from "@react-stately/combobox";
-import { useComboBox } from "@react-aria/combobox";
-import { useFilter } from "@react-aria/i18n";
 import React from "react";
 import clsx from "clsx";
 import { ChevronDown } from "nui-react-icons";
+import { useComboBox, useFilter, useButton } from "react-aria";
 
 interface ComboBoxItem {
     id: number | string;
@@ -15,16 +13,18 @@ interface ComboBoxItem {
 interface ComboBoxProps {
     label?: string;
     name: string;
+    defaultInputValue?: string;
+    placeholder?: string;
+    className?: string;
     items: ComboBoxItem[];
     [key: string]: any;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
+const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className, ...props }) => {
     const { contains } = useFilter({ sensitivity: "base" });
 
     const state = useComboBoxState({
         defaultFilter: contains,
-        // inputValue: "",
         children: (item: ComboBoxItem) => <Item key={item.id}>{item.name}</Item>,
         ...props,
     });
@@ -56,7 +56,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
     const { autoFocus, linkBehavior, shouldFocusOnHover, shouldSelectOnPressUp, shouldUseVirtualFocus, ...validListBoxProps } = listBoxProps;
 
     return (
-        <div className="combobox">
+        <div className={clsx("combobox", className)}>
             {label && (
                 <label className="combobox-label" {...labelProps}>
                     {label}
@@ -80,6 +80,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, ...props }) => {
                         {...inputProps}
                         ref={inputRef}
                         className="combobox-input"
+                        placeholder={placeholder}
                         style={{
                             boxSizing: "border-box",
                         }}

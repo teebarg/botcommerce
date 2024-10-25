@@ -4,10 +4,41 @@ import { NextRequest, NextResponse } from "next/server";
  * Middleware to handle onboarding status.
  */
 export async function middleware(request: NextRequest) {
-    const searchParams = request.nextUrl.searchParams;
+    const { pathname, searchParams } = request.nextUrl;
+    const sessionCookie = request.cookies.get("access_token");
+
     const cartId = searchParams.get("cart_id");
     const checkoutStep = searchParams.get("step");
     const cartIdCookie = request.cookies.get("_cart_id");
+
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
+
+    const token = sessionCookie?.value;
+
+    if (["/sign-in", "/sign-up"].includes(pathname) && token) {
+        console.log("User is authenticated and visiting auth, routing back to referer");
+        const referer = request.headers.get("referer") as string;
+
+        // Avoid redirecting to the sign-in page if referer is /sign-in
+        if (referer?.includes("/sign-in") || referer?.includes("/sign-up")) {
+            const url = new URL(callbackUrl, request.url);
+
+            return NextResponse.redirect(url);
+        }
+
+        const url = new URL(referer || "/", request.url);
+
+        return NextResponse.redirect(url);
+    }
+
+    if (!["/sign-in", "/sign-up"].includes(pathname) && !token) {
+        console.log("route to sign-in");
+        const url = new URL(`/sign-in`, request.url);
+
+        url.searchParams.set("callbackUrl", pathname);
+
+        return NextResponse.redirect(url);
+    }
 
     if (!cartId || cartIdCookie) {
         return NextResponse.next();
@@ -32,5 +63,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/((?!api|_next/static|favicon.ico).*)"],
+    matcher: ["/sign-in", "/sign-up", "/account", "/admin/:path*", "/admin"],
 };
