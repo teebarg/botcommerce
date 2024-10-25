@@ -71,7 +71,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
                     <div
                         {...overlayProps}
                         ref={overlayRef}
-                        className="absolute overflow-auto rounded-md bg-inherit z-40 shadow-lg min-w-[250px]"
+                        className="absolute overflow-auto rounded-md bg-inherit z-40 shadow-lg min-w-[150px]"
                         style={{
                             top: popoverPosition.top,
                             left: popoverPosition.left,

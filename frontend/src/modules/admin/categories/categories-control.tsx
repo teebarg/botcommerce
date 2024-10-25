@@ -58,7 +58,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                         <Plus />
                     </button>
                 )}
-                <Dropdown trigger={<EllipsisHorizontal />}>
+                <Dropdown trigger={<EllipsisHorizontal />} align="end">
                     <div>
                         <div className="bg-default-100 rounded-lg shadow-md p-3 min-w-[100px] text-sm font-medium">
                             <div className="mb-2">
