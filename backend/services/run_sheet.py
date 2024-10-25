@@ -1,5 +1,5 @@
-import time
 import csv
+import time
 from datetime import datetime
 from io import BytesIO
 from typing import Any, List
@@ -32,6 +32,7 @@ async def broadcast_channel(data, user_id: int):
         data=data,
         type="sheet-processor",
     )
+
 
 async def process_products(file_content, content_type: str, user_id: int):
     start_time = time.time()  # Start timing the process
@@ -137,7 +138,9 @@ async def process_products(file_content, content_type: str, user_id: int):
 
         logger.info("Sheet processed successfully")
         end_time = time.time()
-        logger.info(f"Total processing time: {end_time - start_time:.2f} seconds")  # Log total time
+        logger.info(
+            f"Total processing time: {end_time - start_time:.2f} seconds"
+        )  # Log total time
     except Exception as e:
         logger.error(f"An error occurred while processing. Error{e}")
         await manager.broadcast(
@@ -156,7 +159,7 @@ async def process_products(file_content, content_type: str, user_id: int):
 #             product_objects = []
 #             for product_data, categories, collections, images in products:
 #                 logger.info(f"Processing product {product_data['name']}")
-                
+
 #                 # Check if product exists
 #                 product = session.exec(select(Product).where(Product.id == product_data["id"])).first()
 
@@ -193,16 +196,20 @@ async def create_or_update_products_in_db(products: List):
     with Session(engine) as session:
         try:
             product_slugs = [product_data["slug"] for product_data, _, _, _ in products]
-            existing_products = session.execute(
-                select(Product).where(Product.slug.in_(product_slugs))
-            ).scalars().all()
+            existing_products = (
+                session.execute(select(Product).where(Product.slug.in_(product_slugs)))
+                .scalars()
+                .all()
+            )
 
             existing_slugs = {prod.slug for prod in existing_products}
 
             for product_data, categories, collections, images in products:
                 logger.info(f"Processing product {product_data['name']}")
                 slug = product_data["slug"]
-                product = next((prod for prod in existing_products if prod.slug == slug), None)
+                product = next(
+                    (prod for prod in existing_products if prod.slug == slug), None
+                )
 
                 if product:
                     for key, value in product_data.items():
@@ -220,13 +227,13 @@ async def create_or_update_products_in_db(products: List):
             session.rollback()
             logger.error(f"Error in batch update: {str(e)}")
             await manager.broadcast(
-                    id="sheet",
-                    data={
-                        "message": f"Error processing product: {str(e)}",
-                        "status": "error",
-                    },
-                    type="sheet-processor",
-                )
+                id="sheet",
+                data={
+                    "message": f"Error processing product: {str(e)}",
+                    "status": "error",
+                },
+                type="sheet-processor",
+            )
             raise
 
 
@@ -316,13 +323,19 @@ async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int
 
                 for product in products_to_remove:
                     session.exec(
-                        delete(ProductCollection).where(ProductCollection.product_id == product.id)
+                        delete(ProductCollection).where(
+                            ProductCollection.product_id == product.id
+                        )
                     )
                     session.exec(
-                        delete(ProductCategory).where(ProductCategory.product_id == product.id)
+                        delete(ProductCategory).where(
+                            ProductCategory.product_id == product.id
+                        )
                     )
                     session.exec(
-                        delete(ProductImages).where(ProductImages.product_id == product.id)
+                        delete(ProductImages).where(
+                            ProductImages.product_id == product.id
+                        )
                     )
 
                 # Now delete the products
@@ -462,4 +475,3 @@ async def generate_excel_file(bucket: Any, email: str):
         logger.debug("Product export complete")
 
         return download_url
-

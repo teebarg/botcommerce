@@ -69,7 +69,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     return (
         <div>
             <div className="flex items-center gap-0.5">
-                <button className="h-full w-full flex items-center justify-center bg-content1 text-default-500" onClick={state.open}>
+                <button className="h-full w-full flex items-center justify-center text-default-500" onClick={state.open}>
                     <CartIcon className="h-10 w-10" />
                 </button>
                 <div>
