@@ -8,9 +8,11 @@ import { useButton } from "@react-aria/button";
 interface Props {
     children: React.ReactNode;
     trigger: React.ReactNode;
+    align?: "start" | "end" | "center";
+    sideOffset?: number;
 }
 
-const Dropdown: React.FC<Props> = ({ children, trigger }) => {
+const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOffset = 4 }) => {
     const state = useOverlayTriggerState({});
     const buttonRef = React.useRef(null);
     const overlayRef = React.useRef(null);
@@ -29,17 +31,35 @@ const Dropdown: React.FC<Props> = ({ children, trigger }) => {
 
     // Update the position of the popover relative to the button
     useEffect(() => {
-        if (state.isOpen && buttonRef.current) {
-            const rect = (buttonRef.current as HTMLElement).getBoundingClientRect();
+        if (state.isOpen && buttonRef.current && overlayRef.current) {
+            const updatePosition = () => {
+                const rect = (buttonRef.current as HTMLElement | null)?.getBoundingClientRect();
+                const contentRect = (overlayRef.current as HTMLElement | null)?.getBoundingClientRect();
 
-            setPopoverPosition({
-                top: rect.bottom + window.scrollY + 5, // Position just below the button
-                left: rect.left, // Align horizontally with the button
-                // right: 10, // Align horizontally with the button
-                // height: window.innerHeight - rect.bottom - 20,
-            });
+                if (!rect || !contentRect) return;
+
+                let left = rect.left;
+                if (align === "end") {
+                    left = rect.right - contentRect.width;
+                } else if (align === "center") {
+                    left = rect.left + (rect.width - contentRect.width) / 2;
+                }
+
+                // Ensure the dropdown stays within viewport bounds
+                const viewportWidth = window.innerWidth;
+                left = Math.max(4, Math.min(left, viewportWidth - contentRect.width - 4));
+
+                setPopoverPosition({
+                    top: rect.bottom + sideOffset,
+                    left,
+                });
+            };
+
+            updatePosition();
+            window.addEventListener("resize", updatePosition);
+            return () => window.removeEventListener("resize", updatePosition);
         }
-    }, [state.isOpen]);
+    }, [state.isOpen, align, sideOffset, buttonRef, overlayRef]);
 
     return (
         <React.Fragment>
@@ -51,7 +71,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger }) => {
                     <div
                         {...overlayProps}
                         ref={overlayRef}
-                        className="absolute overflow-auto rounded-md bg-inherit z-40 shadow-lg"
+                        className="absolute overflow-auto rounded-md bg-inherit z-40 shadow-lg min-w-[150px]"
                         style={{
                             top: popoverPosition.top,
                             left: popoverPosition.left,

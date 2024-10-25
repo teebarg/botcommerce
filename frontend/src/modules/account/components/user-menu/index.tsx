@@ -30,8 +30,9 @@ export default function UserDropDown({ customer }: any) {
                         </div>
                     </React.Fragment>
                 }
+                align="end"
             >
-                <div className="bg-content1 box-border rounded-lg shadow-md p-3 min-w-[150px] text-sm font-medium">
+                <div className="bg-content1 box-border rounded-lg shadow-md p-3 min-w-[200px] text-sm font-medium">
                     <div key="user" className="h-14 gap-2">
                         <p className="font-bold">Signed in as</p>
                         <p className="font-bold">@{customer?.firstname}</p>
