@@ -254,7 +254,6 @@ async def update_categories(product, categories, session: Session):
     session.exec(
         delete(ProductCategory).where(ProductCategory.product_id == product.id)
     )
-    # session.commit()
 
     if not categories or categories is None or not isinstance(categories, str):
         return
@@ -268,14 +267,11 @@ async def update_categories(product, categories, session: Session):
             continue
         session.add(ProductCategory(product_id=product.id, category_id=category.id))
 
-    # session.commit()
-
 
 async def update_collections(product, collections, session: Session):
     session.exec(
         delete(ProductCollection).where(ProductCollection.product_id == product.id)
     )
-    # session.commit()
 
     if not collections or collections is None or not isinstance(collections, str):
         return
@@ -291,20 +287,15 @@ async def update_collections(product, collections, session: Session):
             ProductCollection(product_id=product.id, collection_id=collection.id)
         )
 
-    # session.commit()
-
 
 async def update_images(product, images, session: Session):
     session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
-    # session.commit()
 
     if not images or images is None or not isinstance(images, str):
         return
 
     for item in images.split("|"):
         session.add(ProductImages(product_id=product.id, image=item.strip()))
-
-    # session.commit()
 
 
 async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int):
