@@ -53,7 +53,8 @@
         "react-aria": "^3.34.3",
         "react-aria-components": "^1.2.1",
         "react-dom": "18.3.1",
-        "react-instantsearch-hooks-web": "^6.29.0"
+        "react-instantsearch-hooks-web": "^6.29.0",
+        "tailwind-merge": "^2.5.4"
     },
     "devDependencies": {
         "@babel/core": "^7.17.5",
