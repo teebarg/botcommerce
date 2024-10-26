@@ -3,15 +3,16 @@ import { getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Navbar as NextUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@nextui-org/navbar";
 import { siteConfig } from "@lib/config";
-import { ThemeSwitch } from "@modules/common/components/theme-switch";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
+import { getThemeToggler } from "@lib/theme/get-theme-button";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
     const isAdmin: boolean = Boolean(customer?.is_superuser);
+    const ThemeButton = getThemeToggler();
 
     return (
         <NextUINavbar className="my-2" maxWidth="full" position="sticky">
@@ -53,8 +54,8 @@ const Navbar = async () => {
             </NavbarContent>
 
             <NavbarContent className="flex basis-1/5 sm:basis-full" justify="end">
-                <NavbarItem className="flex gap-2">
-                    <ThemeSwitch />
+                <NavbarItem className="flex items-center">
+                    <ThemeButton />
                 </NavbarItem>
                 <NavbarItem className="hidden lg:flex">
                     <Search />
