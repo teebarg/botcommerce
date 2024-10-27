@@ -9,7 +9,6 @@ import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { Product } from "types/global";
 
 import ProductDetails from "./details";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "components/ui/accordion";
 
 type ProductTemplateProps = {
     product: Product;
@@ -61,38 +60,6 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     </div>
                     <div className="flex flex-col">
                         <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
-                        <Accordion className="shadow-sm">
-                            <AccordionItem value="item-1">
-                                <AccordionTrigger value="item-1">
-                                    <span className="text-left">What makes our platform unique?</span>
-                                </AccordionTrigger>
-                                <AccordionContent value="item-1" className="px-4">
-                                    Our platform combines cutting-edge technology with intuitive design, offering unparalleled performance and user
-                                    experience. We focus on delivering real-time solutions while maintaining the highest standards of security and
-                                    reliability.
-                                </AccordionContent>
-                            </AccordionItem>
-
-                            <AccordionItem value="item-2">
-                                <AccordionTrigger value="item-2">
-                                    <span className="text-left">How secure is your service?</span>
-                                </AccordionTrigger>
-                                <AccordionContent value="item-2" className="px-4">
-                                    We implement industry-leading security measures, including end-to-end encryption, regular security audits, and
-                                    compliance with international data protection standards. Your data's safety is our top priority.
-                                </AccordionContent>
-                            </AccordionItem>
-
-                            <AccordionItem value="item-3">
-                                <AccordionTrigger value="item-3">
-                                    <span className="text-left">What support options are available?</span>
-                                </AccordionTrigger>
-                                <AccordionContent value="item-3" className="px-4">
-                                    We offer 24/7 customer support through multiple channels including live chat, email, and phone. Our dedicated
-                                    support team is always ready to assist you with any questions or concerns you may have.
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
                         <div className="my-2 flex items-center gap-2">
                             <p className="text-small text-default-400">669 reviews</p>
                         </div>

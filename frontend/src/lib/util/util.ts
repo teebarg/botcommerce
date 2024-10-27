@@ -130,5 +130,4 @@ const timeAgo = (timestamp: string) => {
     else return `${Math.floor(diff / 86400)} days ago`;
 };
 
-
 export { imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo };

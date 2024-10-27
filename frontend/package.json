@@ -26,7 +26,6 @@
     "dependencies": {
         "@headlessui/react": "^1.6.1",
         "@meilisearch/instant-meilisearch": "^0.7.1",
-        "@nextui-org/accordion": "^2.0.38",
         "@nextui-org/input": "2.2.4",
         "@nextui-org/navbar": "2.0.36",
         "@nextui-org/radio": "^2.1.4",
@@ -34,6 +33,7 @@
         "@nextui-org/system": "2.2.5",
         "@nextui-org/theme": "2.2.9",
         "@nextui-org/tooltip": "^2.0.39",
+        "@react-aria/button": "^3.10.1",
         "@react-aria/combobox": "^3.10.3",
         "@react-aria/dialog": "^3.5.19",
         "@react-aria/ssr": "3.9.4",

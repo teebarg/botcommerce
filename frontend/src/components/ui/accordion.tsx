@@ -25,7 +25,7 @@ export function Accordion({
 
     return (
         <AccordionContext.Provider value={{ expanded, setExpanded, allowMultiple }}>
-            <div className={cn("divide-y rounded-lg", className)}>{children}</div>
+            <div className={cn("divide-y", className)}>{children}</div>
         </AccordionContext.Provider>
     );
 }
@@ -82,7 +82,7 @@ export function AccordionTrigger({ children, value, className }: { children: Rea
                     data-open={isExpanded}
                 >
                     <ChevronDown
-                        className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200", {
+                        className={cn("h-4 w-4 shrink-0 transition-transform duration-400", {
                             "rotate-180": isExpanded,
                         })}
                     />
@@ -102,7 +102,7 @@ export function AccordionContent({ children, value, className }: { children: Rea
         <div
             data-open={isExpanded}
             className={cn(
-                "py-2 overflow-hidden transition-all duration-300 ease-in-out",
+                "overflow-hidden transition-all duration-1000 ease-in-out",
                 isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0",
                 className
             )}
