@@ -2,10 +2,10 @@
 
 import React from "react";
 import { notFound } from "next/navigation";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import FastDelivery from "@modules/common/icons/fast-delivery";
 import Refresh from "@modules/common/icons/refresh";
 import Back from "@modules/common/icons/back";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "components/ui/accordion";
 
 type ProductDetailsProps = {
     product: any;
@@ -89,12 +89,23 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
 
     return (
         <React.Fragment>
-            <Accordion className="px-0">
-                <AccordionItem key={1} aria-label="Product Information" title="Product Information">
-                    <ProductInfoTab product={product} />
+            <Accordion className="shadow-sm">
+                <AccordionItem value="item-1">
+                    <AccordionTrigger value="item-1">
+                        <span className="text-left">Product Information</span>
+                    </AccordionTrigger>
+                    <AccordionContent value="item-1" className="px-4">
+                        <ProductInfoTab product={product} />
+                    </AccordionContent>
                 </AccordionItem>
-                <AccordionItem key={2} aria-label="Shipping & Returns" title="Shipping & Returns">
-                    <ShippingInfoTab />
+
+                <AccordionItem value="item-2">
+                    <AccordionTrigger value="item-2">
+                        <span className="text-left">Shipping & Returns</span>
+                    </AccordionTrigger>
+                    <AccordionContent value="item-2" className="px-4">
+                        <ShippingInfoTab />
+                    </AccordionContent>
                 </AccordionItem>
             </Accordion>
         </React.Fragment>

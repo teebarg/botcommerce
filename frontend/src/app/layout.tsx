@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { Providers } from "./providers";
 import { NotificationProviders } from "./notistack-providers";
 import OverlayClientProvider from "./overlay-providers";
+import { ThemeScript } from "@lib/theme/theme-script";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -23,14 +24,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html
-            suppressHydrationWarning
-            className={clsx("dark scroll-smooth antialiased", lexend.variable, outfit.className)}
-            data-mode="light"
-            lang="en"
-        >
+        <html suppressHydrationWarning className={clsx("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">
+            <head>
+                <ThemeScript />
+            </head>
             <body className="min-h-screen bg-background">
-                <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+                <Providers>
                     <NotificationProviders>
                         <OverlayClientProvider>
                             <div className="relative flex flex-col min-h-screen">{children}</div>

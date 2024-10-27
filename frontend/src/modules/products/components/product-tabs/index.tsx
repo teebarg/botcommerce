@@ -1,9 +1,9 @@
 "use client";
 
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@components/ui/accordion";
 import Back from "@modules/common/icons/back";
 import FastDelivery from "@modules/common/icons/fast-delivery";
 import Refresh from "@modules/common/icons/refresh";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
 
 type ProductTabsProps = {
     product: any;
@@ -23,10 +23,13 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
 
     return (
         <div className="w-full">
-            <Accordion>
-                {tabs.map((tab, i) => (
-                    <AccordionItem key={i} title={tab.label} value={tab.label}>
-                        {tab.component}
+            <Accordion className="shadow-sm">
+                {tabs.map((tab, index: number) => (
+                    <AccordionItem key={index} value={tab.label}>
+                        <AccordionTrigger value={`item-${index}`}>
+                            <span className="text-left">{tab.label}</span>
+                        </AccordionTrigger>
+                        <AccordionContent value={`item-${index}`}>{tab.component}</AccordionContent>
                     </AccordionItem>
                 ))}
             </Accordion>

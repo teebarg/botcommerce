@@ -3,6 +3,8 @@ import { Pagination as PaginationType } from "types/global";
 import React from "react";
 import Button from "@modules/common/components/button";
 import { Table } from "@modules/common/components/table";
+import { Card, CardHeader, CardTitle, CardContent } from "components/ui/card";
+import { Activity, CreditCard, Users } from "nui-react-icons";
 
 const users = [
     {
@@ -47,6 +49,33 @@ const users = [
     },
 ];
 
+const stats = [
+    {
+        title: "Total Revenue",
+        icon: <Users className="text-default-500" />,
+        content: "$45,231.89",
+        subContent: "+20.1% from last month",
+    },
+    {
+        title: "Subscriptions",
+        icon: <Users className="text-default-500" />,
+        content: "+3402",
+        subContent: "+20.1% from last month",
+    },
+    {
+        title: "Active Now",
+        icon: <Activity className="text-default-500" />,
+        content: "+304",
+        subContent: "+20.1% from last month",
+    },
+    {
+        title: "Sales",
+        icon: <CreditCard className="text-default-500" />,
+        content: "+102304",
+        subContent: "+20.1% from last month",
+    },
+];
+
 const pagination: PaginationType = {
     page: 1,
     limit: 5,
@@ -63,6 +92,22 @@ export default async function AdminPage() {
     return (
         <React.Fragment>
             <div className="px-8 py-4">
+                <div className="grid gap-6 mb-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+                        {stats.map((item, index: any) => (
+                            <Card key={index}>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
+                                    {item.icon}
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{item.content}</div>
+                                    <p className="text-xs text-muted-foreground">{item.subContent}</p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
                 <div className="flex flex-col relative overflow-hidden h-auto text-foreground box-border bg-content1 outline-none shadow-medium rounded-large transition-transform-background max-w-[340px] mb-12 p-6">
                     <div className="flex p-3 z-10 w-full items-center shrink-0 overflow-inherit color-inherit rounded-t-large justify-between">
                         <div className="flex gap-5">
