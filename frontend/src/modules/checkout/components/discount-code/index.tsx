@@ -7,8 +7,8 @@ import Input from "@modules/common/components/input";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { removeDiscount, removeGiftCard, submitDiscountForm } from "@modules/checkout/actions";
 import { FormButton } from "@modules/common/components/form-button";
-import { Tooltip } from "@nextui-org/tooltip";
 import { currency } from "@lib/util/util";
+import { Tooltip } from "@components/ui/tooltip";
 
 type DiscountCodeProps = {
     cart: Omit<any, "refundable_amount" | "refunded_total">;

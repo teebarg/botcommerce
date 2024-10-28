@@ -1,13 +1,15 @@
 import React, { Suspense } from "react";
 import { getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { Navbar as NextUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@nextui-org/navbar";
+// import { Navbar as NextUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@nextui-org/navbar";
 import { siteConfig } from "@lib/config";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
+import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuItem, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
+// import { NavbarItem, NavbarMenu } from "@nextui-org/navbar";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -15,9 +17,10 @@ const Navbar = async () => {
     const ThemeButton = getThemeToggler();
 
     return (
-        <NextUINavbar className="my-2" maxWidth="full" position="sticky">
+        // <NextUINavbar className="my-2" maxWidth="full" position="sticky">
+        <NavigationBar className="my-2">
             <NavbarContent className="basis-1/5 sm:basis-full flex" justify="start">
-                <NavbarBrand as="li" className="gap-3 max-w-fit">
+                <NavbarBrand className="gap-3 max-w-fit">
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/">
                         <p className="font-bold text-inherit text-2xl">Botcommerce</p>
                     </LocalizedClientLink>
@@ -94,7 +97,8 @@ const Navbar = async () => {
                     ))}
                 </div>
             </NavbarMenu>
-        </NextUINavbar>
+        </NavigationBar>
+        //</NextUINavbar>
     );
 };
 

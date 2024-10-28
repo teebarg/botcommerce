@@ -29,7 +29,7 @@ const CartItems: React.FC<ComponentProps> = ({ cartItems }) => {
             <div>
                 <h2 className="font-medium text-default-500">Your Cart</h2>
                 <hr className="tb-divider mt-4" />
-                <ItemsPreviewTemplate items={cartItems} />
+                <ItemsPreviewTemplate items={cartItems} className="max-h-[80vh]" />
             </div>
         </div>
     );

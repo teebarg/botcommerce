@@ -1,10 +1,10 @@
 "use client";
 
 import { InformationCircleSolid } from "nui-react-icons";
-import { Tooltip } from "@nextui-org/tooltip";
 import React from "react";
 import { Cart } from "types/global";
 import { currency } from "@lib/util/util";
+import { Tooltip } from "@components/ui/tooltip";
 
 type CartTotalsProps = {
     data: Omit<Cart, "refundable_amount" | "refunded_total"> | any;
@@ -25,7 +25,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                         <dt className="text-small text-default-500">
                             <span className="flex gap-x-1 items-center">
                                 Subtotal
-                                <Tooltip content="Cart total excluding shipping and taxes." placement="right">
+                                <Tooltip content="Cart total excluding shipping and taxes." position="right">
                                     <span>
                                         <InformationCircleSolid />
                                     </span>

@@ -32,7 +32,6 @@ def get_db() -> Generator:
 SessionDep = Annotated[Session, Depends(get_db)]
 # TokenDep = Annotated[str, Depends(reusable_oauth2)]
 TokenDep = Annotated[Union[str, None], Depends(APIKeyHeader(name="X-Auth"))]
-# TokenDep2 = Annotated[Union[str, None], Cookie()]
 
 
 def get_storage() -> Generator:

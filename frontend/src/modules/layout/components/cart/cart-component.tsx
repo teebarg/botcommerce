@@ -42,7 +42,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     const timedOpen = () => {
         state.open();
 
-        const timer = setTimeout(closeSlideOver, 15000);
+        const timer = setTimeout(closeSlideOver, 60000);
 
         setActiveTimer(timer);
     };

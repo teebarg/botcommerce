@@ -2,13 +2,13 @@
 
 import { Confirm } from "@modules/common/components/confirm";
 import { Modal } from "@modules/common/components/modal";
-import { Tooltip } from "@nextui-org/tooltip";
 import { DeleteIcon, EditIcon, EyeIcon } from "nui-react-icons";
 import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { useSnackbar } from "notistack";
 import { SlideOver } from "@modules/common/components/slideover";
 import { useRouter } from "next/navigation";
+import { Tooltip } from "@components/ui/tooltip";
 
 interface Props {
     item: any;

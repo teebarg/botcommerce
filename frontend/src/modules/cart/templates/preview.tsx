@@ -8,15 +8,17 @@ import Image from "next/image";
 import { CartItem } from "types/global";
 
 import Control from "./control";
+import { cn } from "@lib/util/cn";
 
 type ItemsTemplateProps = {
+    className?: string;
     items?: CartItem[];
 };
 
-const ItemsPreviewTemplate = ({ items }: ItemsTemplateProps) => {
+const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
     return (
         <React.Fragment>
-            <ul className="max-h-[40vh] overflow-y-auto">
+            <ul className={cn("max-h-[40vh] overflow-y-auto", className)}>
                 {items
                     ?.sort((a: CartItem, b: CartItem) => {
                         return a.created_at > b.created_at ? -1 : 1;
@@ -39,7 +41,7 @@ const ItemsPreviewTemplate = ({ items }: ItemsTemplateProps) => {
                             <div>
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-default-500">{item.quantity}x</span>
-                                    <span className="text-sm font-semibold text-default-700">
+                                    <span className="text-sm text-default-700">
                                         <LineItemUnitPrice item={item} style="tight" />
                                     </span>
                                 </div>

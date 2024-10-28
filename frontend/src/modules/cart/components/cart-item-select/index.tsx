@@ -1,8 +1,8 @@
 "use client";
 
 import { SelectHTMLAttributes, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import clsx from "clsx";
 import { ChevronDown } from "nui-react-icons";
+import { cn } from "@lib/util/cn";
 
 type NativeSelectProps = {
     placeholder?: string;
@@ -27,7 +27,7 @@ const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(({ place
     return (
         <div>
             <span
-                className={clsx(
+                className={cn(
                     "bg-default-100 [&_svg]:text-default-400 border-default-400 justify-center overflow-hidden rounded-md relative flex items-center border text-default-800 group",
                     className,
                     {
