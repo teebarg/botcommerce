@@ -1,15 +1,13 @@
 import React, { Suspense } from "react";
 import { getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-// import { Navbar as NextUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@nextui-org/navbar";
 import { siteConfig } from "@lib/config";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
-import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuItem, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-// import { NavbarItem, NavbarMenu } from "@nextui-org/navbar";
+import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -26,32 +24,32 @@ const Navbar = async () => {
                     </LocalizedClientLink>
                 </NavbarBrand>
                 <div className="hidden sm:flex gap-2">
-                    <NavbarMenuItem>
+                    <NavbarItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/"}>
                             Home
                         </LocalizedClientLink>
-                    </NavbarMenuItem>
-                    <NavbarMenuItem>
+                    </NavbarItem>
+                    <NavbarItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/collections"}>
                             Collections
                         </LocalizedClientLink>
-                    </NavbarMenuItem>
-                    <NavbarMenuItem>
+                    </NavbarItem>
+                    <NavbarItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/cart"}>
                             Cart
                         </LocalizedClientLink>
-                    </NavbarMenuItem>
-                    <NavbarMenuItem>
+                    </NavbarItem>
+                    <NavbarItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/checkout"}>
                             Checkout
                         </LocalizedClientLink>
-                    </NavbarMenuItem>
+                    </NavbarItem>
                     {isAdmin && (
-                        <NavbarMenuItem>
+                        <NavbarItem>
                             <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
                                 Admin
                             </LocalizedClientLink>
-                        </NavbarMenuItem>
+                        </NavbarItem>
                     )}
                 </div>
             </NavbarContent>
@@ -85,18 +83,20 @@ const Navbar = async () => {
                 </NavbarItem>
                 <NavbarMenuToggle className="sm:hidden" />
             </NavbarContent>
-            <NavbarMenu className="pt-7">
-                <Search />
-                <div className="mx-4 mt-2 flex flex-col gap-2">
-                    {siteConfig.navItems.map((item: any, index: number) => (
-                        <NavbarMenuItem key={`${item}-${index}`}>
-                            <LocalizedClientLink className="" href={item.href}>
-                                {item.label}
-                            </LocalizedClientLink>
-                        </NavbarMenuItem>
-                    ))}
-                </div>
-            </NavbarMenu>
+            <div className="block sm:hidden">
+                <NavbarMenu>
+                    <Search />
+                    <div className="mx-4 mt-2 flex flex-col gap-2">
+                        {siteConfig.navItems.map((item: any, index: number) => (
+                            <NavbarItem key={`${item}-${index}`}>
+                                <LocalizedClientLink className="" href={item.href}>
+                                    {item.label}
+                                </LocalizedClientLink>
+                            </NavbarItem>
+                        ))}
+                    </div>
+                </NavbarMenu>
+            </div>
         </NavigationBar>
         //</NextUINavbar>
     );

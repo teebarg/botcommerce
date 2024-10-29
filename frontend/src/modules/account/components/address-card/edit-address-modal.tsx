@@ -6,7 +6,6 @@ import { Modal } from "@modules/common/components/modal";
 import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@modules/account/actions";
 import { useFormState } from "react-dom";
 import clsx from "clsx";
-import { Input } from "@nextui-org/input";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
@@ -14,6 +13,7 @@ import { Address } from "types/global";
 import { useOverlayTriggerState } from "react-stately";
 import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
+import { Input } from "@components/ui/input";
 
 type EditAddressProps = {
     address: Address;
@@ -50,7 +50,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
     };
 
     return (
-        <>
+        <React.Fragment>
             <div
                 className={clsx("border rounded-lg p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors", {
                     "border-gray-900": isActive,
@@ -85,7 +85,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
             </div>
             {modalState.isOpen && (
                 <Modal data-testid="edit-address-modal" onClose={modalState.close}>
-                    <React.Fragment>
+                    <div className="p-8">
                         <h3 className="mb-2">Edit address</h3>
                         <form action={formAction}>
                             <div className="grid grid-cols-1 gap-y-2 w-full py-2">
@@ -162,14 +162,14 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                     Cancel
                                 </Button>
                                 <FormButton color="primary" data-testid="save-button">
-                                    Save
+                                    Update
                                 </FormButton>
                             </div>
                         </form>
-                    </React.Fragment>
+                    </div>
                 </Modal>
             )}
-        </>
+        </React.Fragment>
     );
 };
 

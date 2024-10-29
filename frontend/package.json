@@ -26,8 +26,6 @@
     "dependencies": {
         "@headlessui/react": "^1.6.1",
         "@meilisearch/instant-meilisearch": "^0.7.1",
-        "@nextui-org/input": "2.2.4",
-        "@nextui-org/navbar": "2.0.36",
         "@nextui-org/system": "2.2.5",
         "@nextui-org/theme": "2.2.9",
         "@react-aria/button": "^3.10.1",
@@ -38,6 +36,7 @@
         "@react-oauth/google": "^0.12.1",
         "@react-stately/collections": "^3.11.0",
         "@react-stately/combobox": "^3.9.2",
+        "@react-stately/toggle": "^3.7.8",
         "@types/react-instantsearch-core": "^6.26.10",
         "clsx": "^2.1.1",
         "date-fns": "^4.1.0",

@@ -1,5 +1,5 @@
+import { Input } from "@components/ui/input";
 import React, { useState, useEffect } from "react";
-import { Input } from "@nextui-org/input";
 import { Cart } from "types/global";
 
 const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
@@ -27,10 +27,10 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
         });
     }, [cart?.billing_address]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: string, name: string) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: e,
         });
     };
 
@@ -44,7 +44,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="First name"
                     name="billing_address.first_name"
                     value={formData["billing_address.first_name"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.firstname")}
                 />
                 <Input
                     isRequired
@@ -53,7 +53,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="Last name"
                     name="billing_address.last_name"
                     value={formData["billing_address.last_name"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.last_name")}
                 />
                 <Input
                     isRequired
@@ -62,7 +62,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="Address"
                     name="billing_address.address_1"
                     value={formData["billing_address.address_1"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.address_1")}
                 />
                 <Input
                     autoComplete="organization"
@@ -70,7 +70,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="Company"
                     name="billing_address.company"
                     value={formData["billing_address.company"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.company")}
                 />
                 <Input
                     isRequired
@@ -79,7 +79,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="Postal code"
                     name="billing_address.postal_code"
                     value={formData["billing_address.postal_code"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.postal_code")}
                 />
                 <Input
                     isRequired
@@ -88,7 +88,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="City"
                     name="billing_address.city"
                     value={formData["billing_address.city"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.city")}
                 />
                 <Input
                     autoComplete="address-level1"
@@ -96,7 +96,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="State"
                     name="billing_address.state"
                     value={formData["billing_address.state"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.state")}
                 />
                 <Input
                     autoComplete="tel"
@@ -104,7 +104,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="Phone"
                     name="billing_address.phone"
                     value={formData["billing_address.phone"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "billing_address.phone")}
                 />
             </div>
         </>

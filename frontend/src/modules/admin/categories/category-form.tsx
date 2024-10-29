@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useRef } from "react";
-import { Input } from "@nextui-org/input";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
@@ -11,6 +10,7 @@ import { Category } from "types/global";
 import { Switch } from "@modules/common/components/switch";
 
 import { createCategory } from "../actions";
+import { Input } from "@components/ui/input";
 
 interface Props {
     current?: Category;
@@ -59,7 +59,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(
                                     <input readOnly className="hidden" name="type" type="text" value={type} />
                                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                     {hasParent && parent_id && <input readOnly className="hidden" name="parent_id" type="text" value={parent_id} />}
-                                    <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
+                                    <Input isRequired defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
                                     <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
                                 </div>
                             </div>

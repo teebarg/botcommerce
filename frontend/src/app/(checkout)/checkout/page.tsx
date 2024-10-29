@@ -54,7 +54,7 @@ export default async function Checkout() {
     return (
         <>
             {" "}
-            <div className="relative flex min-h-dvh flex-col bg-background bg-radial pt-16" id="app-container">
+            <div className="relative flex min-h-dvh flex-col bg-background bg-radial pt-4 sm:pt-16" id="app-container">
                 <div className="flex items-center justify-center p-4">
                     <section className="flex w-full max-w-7xl flex-col lg:flex-row lg:gap-8">
                         <div className="w-full">

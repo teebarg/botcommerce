@@ -3,9 +3,9 @@
 import React, { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { updateCustomerEmail } from "@modules/account/actions";
-import { Input } from "@nextui-org/input";
 
 import AccountInfo from "../account-info";
+import { Input } from "@components/ui/input";
 
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;

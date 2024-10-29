@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@nextui-org/input";
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { FormButton } from "@modules/common/components/form-button";
@@ -12,6 +11,7 @@ import React from "react";
 import { redirect } from "next/navigation";
 
 import { signIn } from "../action";
+import { Input } from "@components/ui/input";
 
 type Props = {};
 

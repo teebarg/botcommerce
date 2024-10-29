@@ -1,19 +1,20 @@
 "use client";
 
 import React, { forwardRef, useRef } from "react";
-import { Input } from "@nextui-org/input";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { ImageUpload } from "@modules/common/components/image-upload";
 import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
-import { Textarea } from "@nextui-org/input";
 import { useRouter } from "next/navigation";
 import { Switch } from "@modules/common/components/switch";
 import { Multiselect } from "@modules/common/components/multiselect";
 import { Category, Collection } from "types/global";
 
 import { createProduct, uploadProductImage } from "../actions";
+import { Input } from "@components/ui/input";
+import { Number } from "@components/ui/number";
+import { TextArea } from "@components/ui/textarea";
 
 interface Props {
     current?: any;
@@ -90,14 +91,9 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     </div>
                                     <input readOnly className="hidden" name="type" type="text" value={type} />
                                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
-                                    <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
+                                    <Input isRequired defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
                                     <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
-                                    <Textarea
-                                        defaultValue={current.description}
-                                        name="description"
-                                        placeholder="Product description"
-                                        variant="bordered"
-                                    />
+                                    <TextArea defaultValue={current.description} name="description" placeholder="Product description custom" />
                                     <Multiselect
                                         defaultValue={selectedCollections}
                                         label="Collections"
@@ -114,19 +110,34 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                         placeholder="Select Categories"
                                         variant="bordered"
                                     />
-                                    <Input required defaultValue={current.price} label="Price" name="price" placeholder="Ex. 2500" type="number" />
-                                    <Input
-                                        required
+                                    <Number
+                                        isRequired
+                                        defaultValue={current.price}
+                                        label="Price"
+                                        name="price"
+                                        placeholder="Ex. 2500"
+                                        description="Product's price"
+                                        formatOptions={{
+                                            style: "currency",
+                                            currency: "NGN",
+                                        }}
+                                    />
+                                    <Number
+                                        isRequired
                                         defaultValue={current.old_price}
                                         label="Old Price"
                                         name="old_price"
                                         placeholder="Ex. 2500"
-                                        type="number"
+                                        description="Product's old price"
+                                        formatOptions={{
+                                            style: "currency",
+                                            currency: "NGN",
+                                        }}
                                     />
                                 </div>
                             </div>
                         </div>
-                        <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-50 w-full right-0 z-50">
+                        <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-50 w-full right-0 z-50">
                             <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
                                 Cancel
                             </Button>

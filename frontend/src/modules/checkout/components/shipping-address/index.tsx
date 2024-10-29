@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Input } from "@nextui-org/input";
 import { Cart } from "types/global";
 import { Checkbox } from "@modules/common/components/checkbox";
 
 import AddressSelect from "../address-select";
+import { Input } from "@components/ui/input";
 
 const ShippingAddress = ({
     customer,
@@ -40,10 +40,10 @@ const ShippingAddress = ({
         });
     }, [cart?.shipping_address, cart?.email]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: string, name: string) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: e,
         });
     };
 
@@ -63,7 +63,7 @@ const ShippingAddress = ({
                     label="First name"
                     name="shipping_address.firstname"
                     value={formData["shipping_address.firstname"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "shipping_address.firstname")}
                 />
                 <Input
                     isRequired
@@ -72,7 +72,7 @@ const ShippingAddress = ({
                     label="Last name"
                     name="shipping_address.lastname"
                     value={formData["shipping_address.lastname"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "shipping_address.lastname")}
                 />
                 <Input
                     isRequired
@@ -81,7 +81,7 @@ const ShippingAddress = ({
                     label="Address"
                     name="shipping_address.address_1"
                     value={formData["shipping_address.address_1"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "shipping_address.address_1")}
                 />
                 <Input
                     isRequired
@@ -90,7 +90,7 @@ const ShippingAddress = ({
                     label="Postal code"
                     name="shipping_address.postal_code"
                     value={formData["shipping_address.postal_code"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "shipping_address.postal_code")}
                 />
                 <Input
                     isRequired
@@ -99,7 +99,7 @@ const ShippingAddress = ({
                     label="City"
                     name="shipping_address.city"
                     value={formData["shipping_address.city"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "shipping_address.city")}
                 />
                 <Input
                     autoComplete="address-level1"
@@ -107,7 +107,7 @@ const ShippingAddress = ({
                     label="State"
                     name="shipping_address.state"
                     value={formData["shipping_address.state"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "shipping_address.state")}
                 />
             </div>
             <div className="my-8">
@@ -122,10 +122,10 @@ const ShippingAddress = ({
                     data-testid="shipping-email-input"
                     label="Email"
                     name="email"
-                    title="Enter a valid email address."
+                    placeholder="Enter a valid email address."
                     type="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "email")}
                 />
                 <Input
                     autoComplete="tel"
@@ -133,7 +133,7 @@ const ShippingAddress = ({
                     label="Phone"
                     name="shipping_address.phone"
                     value={formData["shipping_address.phone"]}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange(e, "shipping_address.phone")}
                 />
             </div>
         </React.Fragment>

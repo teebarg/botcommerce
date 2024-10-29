@@ -1,5 +1,4 @@
 import { useFormState } from "react-dom";
-import { Input } from "@nextui-org/input";
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { FormButton } from "@modules/common/components/form-button";
@@ -8,6 +7,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { signIn } from "@modules/auth/action";
 
 import { GoogleLogin } from "./google";
+import { Input } from "@components/ui/input";
 
 type Props = {};
 
