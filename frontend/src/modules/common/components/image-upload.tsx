@@ -69,7 +69,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                     <React.Fragment>
                         <div className="flex gap-1">
                             <div className="h-72 w-80 rounded-lg overflow-hidden relative">
-                                <Image alt="Product" src={preview} fill />
+                                <Image fill alt="Product" src={preview} />
                             </div>
                             <Button onPress={() => setPreview(undefined)}>
                                 <EditIcon size={24} />

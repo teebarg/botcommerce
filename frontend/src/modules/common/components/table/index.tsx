@@ -7,11 +7,11 @@ import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
 import { exportProducts, indexProducts } from "@modules/admin/actions";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Input } from "@components/ui/input";
 
 import Button from "../button";
 import { Pagination } from "../pagination";
 import { SlideOver } from "../slideover";
-import { Input } from "@components/ui/input";
 
 interface Props {
     children: React.ReactNode;
@@ -85,8 +85,8 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                             defaultValue={searchQuery}
                             placeholder="Search by name..."
                             startContent={<SearchIcon className="text-default-300" />}
-                            onClear={() => onClear()}
                             onChange={onSearchChange}
+                            onClear={() => onClear()}
                         />
                         <div className="flex gap-3">
                             <Button color="primary" endContent={<Plus />} onPress={() => state.open()}>

@@ -83,20 +83,19 @@ const Navbar = async () => {
                 </NavbarItem>
                 <NavbarMenuToggle className="sm:hidden" />
             </NavbarContent>
-            <div className="block sm:hidden">
-                <NavbarMenu>
-                    <Search />
-                    <div className="mx-4 mt-2 flex flex-col gap-2">
-                        {siteConfig.navItems.map((item: any, index: number) => (
-                            <NavbarItem key={`${item}-${index}`}>
-                                <LocalizedClientLink className="" href={item.href}>
-                                    {item.label}
-                                </LocalizedClientLink>
-                            </NavbarItem>
-                        ))}
-                    </div>
-                </NavbarMenu>
-            </div>
+            <NavbarMenu>
+                <p>skksks</p>
+                <Search />
+                <div className="mx-4 mt-2 flex flex-col gap-2">
+                    {siteConfig.navItems.map((item: any, index: number) => (
+                        <NavbarItem key={`${item}-${index}`}>
+                            <LocalizedClientLink className="" href={item.href}>
+                                {item.label}
+                            </LocalizedClientLink>
+                        </NavbarItem>
+                    ))}
+                </div>
+            </NavbarMenu>
         </NavigationBar>
         //</NextUINavbar>
     );

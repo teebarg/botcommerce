@@ -3,8 +3,9 @@ import { InformationCircleSolid } from "nui-react-icons";
 import React from "react";
 import clsx from "clsx";
 import Radio from "@modules/common/components/radio";
-import PaymentTest from "../payment-test";
 import { Tooltip } from "@components/ui/tooltip";
+
+import PaymentTest from "../payment-test";
 
 type PaymentContainerProps = {
     paymentSession: any;

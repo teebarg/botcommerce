@@ -9,9 +9,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { useFormState } from "react-dom";
 import React from "react";
 import { redirect } from "next/navigation";
+import { Input } from "@components/ui/input";
 
 import { signIn } from "../action";
-import { Input } from "@components/ui/input";
 
 type Props = {};
 

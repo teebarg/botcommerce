@@ -8,9 +8,9 @@ import { GoogleLogin } from "@modules/account/components/google";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { useFormState } from "react-dom";
 import React from "react";
+import { Input } from "@components/ui/input";
 
 import { signUp } from "../action";
-import { Input } from "@components/ui/input";
 
 type Props = {};
 

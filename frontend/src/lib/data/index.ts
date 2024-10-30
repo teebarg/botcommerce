@@ -333,6 +333,7 @@ export async function getCustomer() {
         return await res.json();
     } catch (error) {
         console.log(error);
+
         return null;
     }
 }

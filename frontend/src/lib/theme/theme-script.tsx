@@ -12,6 +12,7 @@ declare global {
 
 const code = function () {
     const localStorageKey = "__PREFERRED_THEME__";
+
     window.__onThemeChange = function () {};
 
     function setTheme(newTheme: Theme) {

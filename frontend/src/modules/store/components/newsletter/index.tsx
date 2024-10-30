@@ -24,9 +24,9 @@ export default function NewsletterForm() {
         <form ref={formRef} action={formAction}>
             <div className="mt-6 sm:flex sm:max-w-lg lg:mt-0 items-center">
                 <Input
-                    size="sm"
                     name="email"
                     placeholder="email@gmail.com"
+                    size="sm"
                     startContent={<MailIcon className="text-2xl text-default-500 pointer-events-none flex-shrink-0" />}
                     type="email"
                 />

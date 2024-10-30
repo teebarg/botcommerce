@@ -129,7 +129,7 @@ export const Chatbot: React.FC = () => {
                     </div>
                     <div className="p-3 px-4 py-4 sm:px-6">
                         <div className="flex">
-                            <Input size="sm" placeholder="Type a message..." value={input} onChange={setInput} />
+                            <Input placeholder="Type a message..." size="sm" value={input} onChange={setInput} />
                             <Button className="ml-2" color="secondary" onPress={handleSend}>
                                 <ArrowUpRightMini size={20} />
                             </Button>

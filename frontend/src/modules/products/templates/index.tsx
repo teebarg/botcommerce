@@ -6,9 +6,9 @@ import { notFound } from "next/navigation";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ArrowUpRightMini, ChevronRight, DeliveryIcon } from "nui-react-icons";
 import { Product } from "types/global";
+import Image from "next/image";
 
 import ProductDetails from "./details";
-import Image from "next/image";
 
 type ProductTemplateProps = {
     product: Product;
@@ -48,7 +48,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                         <div className="flex flex-col gap-4">
                             {product?.images?.map((image: string, index: number) => (
                                 <div key={index} className="w-[80px] h-[80px] relative rounded-lg overflow-hidden">
-                                    <Image alt={`Product ${index + 1}`} fill src={image} />
+                                    <Image fill alt={`Product ${index + 1}`} src={image} />
                                 </div>
                             ))}
                         </div>

@@ -6,9 +6,9 @@ import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
 import LineItemPrice from "@modules/common/components/line-item-price";
 import Image from "next/image";
 import { CartItem } from "types/global";
+import { cn } from "@lib/util/cn";
 
 import Control from "./control";
-import { cn } from "@lib/util/cn";
 
 type ItemsTemplateProps = {
     className?: string;

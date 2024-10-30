@@ -10,11 +10,11 @@ import { useRouter } from "next/navigation";
 import { Switch } from "@modules/common/components/switch";
 import { Multiselect } from "@modules/common/components/multiselect";
 import { Category, Collection } from "types/global";
-
-import { createProduct, uploadProductImage } from "../actions";
 import { Input } from "@components/ui/input";
 import { Number } from "@components/ui/number";
 import { TextArea } from "@components/ui/textarea";
+
+import { createProduct, uploadProductImage } from "../actions";
 
 interface Props {
     current?: any;
@@ -113,26 +113,26 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     <Number
                                         isRequired
                                         defaultValue={current.price}
-                                        label="Price"
-                                        name="price"
-                                        placeholder="Ex. 2500"
                                         description="Product's price"
                                         formatOptions={{
                                             style: "currency",
                                             currency: "NGN",
                                         }}
+                                        label="Price"
+                                        name="price"
+                                        placeholder="Ex. 2500"
                                     />
                                     <Number
                                         isRequired
                                         defaultValue={current.old_price}
-                                        label="Old Price"
-                                        name="old_price"
-                                        placeholder="Ex. 2500"
                                         description="Product's old price"
                                         formatOptions={{
                                             style: "currency",
                                             currency: "NGN",
                                         }}
+                                        label="Old Price"
+                                        name="old_price"
+                                        placeholder="Ex. 2500"
                                     />
                                 </div>
                             </div>

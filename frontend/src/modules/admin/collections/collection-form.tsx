@@ -7,9 +7,9 @@ import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Switch } from "@modules/common/components/switch";
+import { Input } from "@components/ui/input";
 
 import { createCollection } from "../actions";
-import { Input } from "@components/ui/input";
 
 interface Props {
     current?: any;

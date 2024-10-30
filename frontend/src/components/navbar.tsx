@@ -6,6 +6,7 @@ import { useOverlay, OverlayContainer } from "@react-aria/overlays";
 import { usePreventScroll } from "react-aria";
 import { XMark } from "nui-react-icons";
 import { usePathname } from "next/navigation";
+import { useMediaQuery } from "@lib/hooks/use-media-query";
 
 type NavbarContextType = {
     expanded: boolean;
@@ -20,12 +21,12 @@ export const Navbar = ({ children, className }: { children: React.ReactNode; cla
     return (
         <NavbarContext.Provider value={{ expanded, setExpanded }}>
             <nav
-                data-menu-open={expanded}
                 className={cn(
                     "flex z-40 w-full items-center justify-center data-[menu-open=true]:border-none sticky top-0 inset-x-0 backdrop-blur-lg",
                     "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 bg-background/70 my-2 h-16",
                     className
                 )}
+                data-menu-open={expanded}
             >
                 <header className="z-40 flex px-6 gap-4 w-full flex-row relative flex-nowrap items-center justify-between h-4 max-w-full">
                     {children}
@@ -65,21 +66,30 @@ export const NavbarContent = ({ children, className, justify }: { children: Reac
 
 export const NavbarItem = ({ children, className, active }: { children: React.ReactNode; className?: string; active?: boolean }) => {
     return (
-        <li data-active={active} className={cn("text-large data-[active=true]:font-semibold", className)}>
+        <li className={cn("text-large data-[active=true]:font-semibold", className)} data-active={active}>
             {children}
         </li>
     );
 };
 
 export const NavbarMenu = ({ children, className }: { children: React.ReactNode; className?: string }) => {
+    const { isMobile } = useMediaQuery();
+
+    if (!isMobile) {
+        return;
+    }
+
+    return <NavbarMenuOverlay className={className}>{children}</NavbarMenuOverlay>;
+};
+
+export const NavbarMenuOverlay = ({ children, className }: { children: React.ReactNode; className?: string }) => {
     const context = useContext(NavbarContext);
+
     if (!context) throw new Error("NavbarTrigger must be used within NavbarItem");
 
     const currentPath = usePathname();
 
-    if (context.expanded) {
-        usePreventScroll();
-    }
+    usePreventScroll();
 
     const overlayRef = React.useRef(null);
 
@@ -125,6 +135,7 @@ export const NavbarMenu = ({ children, className }: { children: React.ReactNode;
 
 export const NavbarMenuToggle = ({ className }: { children?: React.ReactNode; className?: string }) => {
     const context = useContext(NavbarContext);
+
     if (!context) throw new Error("NavbarTrigger must be used within NavbarItem");
 
     const isExpanded = context.expanded;
@@ -132,17 +143,18 @@ export const NavbarMenuToggle = ({ className }: { children?: React.ReactNode; cl
     const handleClick = () => {
         context.setExpanded(!isExpanded);
     };
+
     return (
         <button
-            onClick={handleClick}
+            aria-pressed={isExpanded}
             className={cn(
                 "group flex items-center justify-center w-6 h-full rounded-small tap-highlight-transparent outline-none data-[focus-visible=true]:z-10",
                 "data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2",
                 className
             )}
-            type="button"
-            aria-pressed={isExpanded}
             data-open={isExpanded}
+            type="button"
+            onClick={handleClick}
         >
             <span className="w-full h-full pointer-events-none flex flex-col items-center justify-center text-inherit group-data-[pressed=true]:opacity-70 transition-opacity before:content-[''] before:block before:h-px before:w-6 before:bg-current before:transition-transform before:duration-150 before:-translate-y-1 before:rotate-0 group-data-[open=true]:before:translate-y-px group-data-[open=true]:before:rotate-45 after:content-[''] after:block after:h-px after:w-6 after:bg-current after:transition-transform after:duration-150 after:translate-y-1 after:rotate-0 group-data-[open=true]:after:translate-y-0 group-data-[open=true]:after:-rotate-45" />
         </button>
