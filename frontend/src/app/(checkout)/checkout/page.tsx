@@ -6,7 +6,7 @@ import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
 import { getCart } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowRightOnRectangle, CartIcon, ChevronRight } from "nui-react-icons";
+import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 
 export const metadata: Metadata = {
     title: "Clothings | Botcommerce Store | Checkout",
@@ -18,7 +18,7 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
             <div className="bg-content1 p-12 rounded-lg shadow-md text-center max-w-xl">
-                <CartIcon className="w-24 h-24 text-default-400 mx-auto mb-4" />
+                <Cart className="w-24 h-24 text-default-400 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-default-800 mb-2">Your cart is empty</h2>
                 <p className="text-default-600 mb-6">{`Looks like you haven't added any items to your cart yet.`}</p>
                 <LocalizedClientLink

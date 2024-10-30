@@ -1,6 +1,6 @@
 "use client";
 
-import { CartIcon } from "nui-react-icons";
+import { Cart as CartIcon } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 import { SlideOver } from "@modules/common/components/slideover";

@@ -44,7 +44,7 @@
         "meilisearch": "^0.42.0",
         "next": "14.2.4",
         "notistack": "^3.0.1",
-        "nui-react-icons": "^0.0.16",
+        "nui-react-icons": "^0.0.17",
         "pg": "^8.11.3",
         "react": "18.3.1",
         "react-aria": "^3.34.3",

@@ -4,7 +4,7 @@ import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
 import { notFound } from "next/navigation";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowUpRightMini, ChevronRight, DeliveryIcon } from "nui-react-icons";
+import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import { Product } from "types/global";
 import Image from "next/image";
 
@@ -71,7 +71,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                         </div>
                         <div className="mt-6 flex flex-col gap-1">
                             <div className="mb-4 flex items-center gap-2 text-default-700">
-                                <DeliveryIcon />
+                                <Delivery />
                                 <p className="text-small font-medium">Free shipping and 30 days return</p>
                             </div>
                             <LocalizedClientLink

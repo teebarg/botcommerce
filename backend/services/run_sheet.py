@@ -161,7 +161,9 @@ async def process_products(file_content, content_type: str, user_id: int):
 #                 logger.info(f"Processing product {product_data['name']}")
 
 #                 # Check if product exists
-#                 product = session.exec(select(Product).where(Product.id == product_data["id"])).first()
+#                 product = session.exec(
+#                       select(Product).where(Product.id == product_data["id"])
+#                     ).first()
 
 #                 if product:
 #                     for key, value in product_data.items():
@@ -177,12 +179,17 @@ async def process_products(file_content, content_type: str, user_id: int):
 #             session.commit()
 
 #             for product_data, categories, collections, images in products:
-#                 product = session.exec(select(Product).where(Product.slug == product_data["slug"])).first()
-#                 await update_categories(product=product, categories=categories, session=session)
-#                 await update_collections(product=product, collections=collections, session=session)
+#                 product = session.exec(
+#                   select(Product).where(Product.slug == product_data["slug"])
+#                       ).first()
+#                 await update_categories(
+#                       product=product, categories=categories, session=session
+#                        )
+#                 await update_collections(
+#                       product=product, collections=collections, session=session
+#                        )
 #                 await update_images(product=product, images=images, session=session)
 #                 session.commit()
-
 #     except SQLAlchemyError as e:
 #         logger.error(f"Error updating product: {str(e)}")
 #         await manager.broadcast(
@@ -202,9 +209,9 @@ async def create_or_update_products_in_db(products: List):
                 .all()
             )
 
-            existing_slugs = {prod.slug for prod in existing_products}
+            _existing_slugs = {prod.slug for prod in existing_products}
 
-            for product_data, categories, collections, images in products:
+            for product_data, _categories, _collections, _images in products:
                 logger.info(f"Processing product {product_data['name']}")
                 slug = product_data["slug"]
                 product = next(
