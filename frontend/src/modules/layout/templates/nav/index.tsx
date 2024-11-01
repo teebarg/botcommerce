@@ -15,7 +15,6 @@ const Navbar = async () => {
     const ThemeButton = getThemeToggler();
 
     return (
-        // <NextUINavbar className="my-2" maxWidth="full" position="sticky">
         <NavigationBar className="my-2">
             <NavbarContent className="basis-1/5 sm:basis-full flex" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">
@@ -97,7 +96,6 @@ const Navbar = async () => {
                 </div>
             </NavbarMenu>
         </NavigationBar>
-        //</NextUINavbar>
     );
 };
 

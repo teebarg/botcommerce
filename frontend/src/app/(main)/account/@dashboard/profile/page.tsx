@@ -30,7 +30,7 @@ export default async function Profile() {
             </div>
             <div className="flex flex-col gap-y-8 w-full">
                 <ProfileName customer={customer} />
-                <hr className="tb-dividerr" />
+                <hr className="tb-divider" />
                 <ProfileEmail customer={customer} />
                 <hr className="tb-divider" />
                 <ProfilePhone customer={customer} />

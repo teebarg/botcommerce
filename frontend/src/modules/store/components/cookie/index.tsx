@@ -43,7 +43,7 @@ export const Cookie: FC<CookieProps> = () => {
                             style={{
                                 border: "2px solid transparent",
                                 backgroundImage:
-                                    "linear-gradient(hsl(var(--nextui-background)), hsl(var(--nextui-background))),linear-gradient(83.87deg, #f54180, #9353d3)",
+                                    "linear-gradient(hsl(var(--background)), hsl(var(--background))),linear-gradient(83.87deg, #f54180, #9353d3)",
                                 backgroundOrigin: "border-box",
                                 backgroundClip: "padding-box, border-box",
                             }}

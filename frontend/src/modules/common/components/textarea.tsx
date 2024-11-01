@@ -24,13 +24,13 @@ const TextArea: React.FC<TextAreaProps> = (props) => {
                 data-slot="base"
             >
                 <div
-                    className="relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-200 group-data-[focus=true]:bg-default-100 min-h-10 rounded-medium flex-col items-start justify-center gap-0 !h-auto transition-background motion-reduce:transition-none !duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background h-14 py-2 !bg-white/70 hover:!bg-white/50 focus:!bg-white/50 !text-blue-700"
+                    className="relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-200 group-data-[focus=true]:bg-default-100 min-h-10 rounded-medium flex-col items-start justify-center gap-0 !h-auto transition-background motion-reduce:transition-none !duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background py-2  hover:!bg-white/50 focus:!bg-white/50"
                     data-slot="input-wrapper"
                     style={{ cursor: "text" }}
                 >
                     <label
                         {...labelProps}
-                        className="z-10 pointer-events-none subpixel-antialiased block text-foreground-500 cursor-text relative will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-default-600 group-data-[filled-within=true]:pointer-events-auto group-data-[filled-within=true]:scale-85 pb-0.5 pe-2 max-w-full text-ellipsis overflow-hidden !text-black/60 font-semibold text-lg"
+                        className="z-10 pointer-events-none subpixel-antialiased block text-foreground-500 cursor-text relative will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-default-600 group-data-[filled-within=true]:pointer-events-auto group-data-[filled-within=true]:scale-85 pb-0.5 pe-2 max-w-full text-ellipsis overflow-hidden font-semibold text-lg"
                     >
                         {label}
                     </label>
