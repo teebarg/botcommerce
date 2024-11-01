@@ -58,7 +58,7 @@ export const siteConfig = {
     links: {
         github: "https://github.com/teebarg",
         twitter: "https://twitter.com",
-        docs: "https://nextui.org",
+        docs: "",
         youtube: "https://youtube.com",
         whatsapp: "https://youtube.com",
     },

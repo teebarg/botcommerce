@@ -1,5 +1,3 @@
-import { nextui } from "@nextui-org/theme";
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
@@ -9,16 +7,134 @@ module.exports = {
         "./src/modules/**/*.{js,ts,jsx,tsx}",
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
-        "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
         extend: {
+            backgroundColor: {
+                "content1": "hsl(var( --content1))",
+                "content2": "hsl(var( --content2))",
+                "content3": "hsl(var( --content3))",
+                "content4": "hsl(var( --content4))",
+                "content1-foreground": "hsl(var( --content1-foreground))",
+                "content2-foreground": "hsl(var( --content2-foreground))",
+                "content3-foreground": "hsl(var( --content3-foreground))",
+                "content4-foreground": "hsl(var( --content4-foreground))",
+            },
+            borderRadius: {
+                small: "var(--radius-small)",
+                medium: "var(--radius-medium)",
+                large: "var(--radius-large)",
+            },
+            fontSize: {
+                "2xs": ["var(--font-size-tiny)", { lineHeight: "var(--line-height-tiny)" }],
+                small: ["var(--font-size-small)", { lineHeight: "var(--line-height-small)" }],
+                medium: ["var(--font-size-medium)", { lineHeight: "var(--line-height-medium)" }],
+                large: ["var(--font-size-large)", { lineHeight: "var(--line-height-large)" }],
+            },
             fontFamily: {
                 sans: "var(--font-inter)",
                 display: "var(--font-lexend)",
             },
+            colors: {
+                background: {
+                    DEFAULT: "hsl(var(--background))",
+                    50: "hsl(var(--background-50))",
+                    100: "hsl(var(--background-100))",
+                    200: "hsl(var(--background-200))",
+                    300: "hsl(var(--background-300))",
+                    400: "hsl(var(--background-400))",
+                    500: "hsl(var(--background-500))",
+                    600: "hsl(var(--background-600))",
+                    700: "hsl(var(--background-700))",
+                    800: "hsl(var(--background-800))",
+                    900: "hsl(var(--background-900))",
+                },
+                foreground: {
+                    DEFAULT: "hsl(var(--foreground))",
+                    50: "hsl(var(--foreground-50))",
+                    100: "hsl(var(--foreground-100))",
+                    200: "hsl(var(--foreground-200))",
+                    300: "hsl(var(--foreground-300))",
+                    400: "hsl(var(--foreground-400))",
+                    500: "hsl(var(--foreground-500))",
+                    600: "hsl(var(--foreground-600))",
+                    700: "hsl(var(--foreground-700))",
+                    800: "hsl(var(--foreground-800))",
+                    900: "hsl(var(--foreground-900))",
+                },
+                default: {
+                    DEFAULT: "hsl(var(--default))",
+                    50: "hsl(var(--default-50))",
+                    100: "hsl(var(--default-100))",
+                    200: "hsl(var(--default-200))",
+                    300: "hsl(var(--default-300))",
+                    400: "hsl(var(--default-400))",
+                    500: "hsl(var(--default-500))",
+                    600: "hsl(var(--default-600))",
+                    700: "hsl(var(--default-700))",
+                    800: "hsl(var(--default-800))",
+                    900: "hsl(var(--default-900))",
+                    "default-foreground": "hsl(var(--default-foreground))",
+                },
+                primary: {
+                    DEFAULT: "hsl(var(--primary))",
+                    50: "hsl(var(--primary-50))",
+                    100: "hsl(var(--primary-100))",
+                    200: "hsl(var(--primary-200))",
+                    300: "hsl(var(--primary-300))",
+                    400: "hsl(var(--primary-400))",
+                    500: "hsl(var(--primary-500))",
+                    600: "hsl(var(--primary-600))",
+                    700: "hsl(var(--primary-700))",
+                    800: "hsl(var(--primary-800))",
+                    900: "hsl(var(--primary-900))",
+                    "primary-foreground": "hsl(var(--primary-foreground))",
+                },
+                secondary: {
+                    DEFAULT: "hsl(var(--secondary))",
+                    foreground: "hsl(var(--secondary-foreground))",
+                },
+                muted: {
+                    DEFAULT: "hsl(var(--muted))",
+                    foreground: "hsl(var(--muted-foreground))",
+                },
+                border: "hsl(var(--border))",
+                divider: "hsl(var(--divider))",
+                input: "hsl(var(--input))",
+                ring: "hsl(var(--ring))",
+            },
+            keyframes: {
+                blob: {
+                    "0%": {
+                        transform: "translate(0, 0) scale(1)",
+                    },
+                    "33%": {
+                        transform: "translate(30px, -50px) scale(1.1)",
+                    },
+                    "66%": {
+                        transform: "translate(-20px, 20px) scale(0.9)",
+                    },
+                    "100%": {
+                        transform: "translate(0, 0) scale(1)",
+                    },
+                },
+                "spinner-spin": {
+                    "0%": {
+                        transform: "rotate(0deg)",
+                    },
+                    "100%": {
+                        transform: "rotate(360deg)",
+                    },
+                },
+            },
+            animation: {
+                blob: "blob 15s infinite",
+                "blob-delayed": "blob 15s infinite 2s",
+                "spinner-ease-spin": "spinner-spin 0.8s ease infinite",
+                "spinner-linear-spin": "spinner-spin 0.8s linear infinite",
+            },
         },
     },
     darkMode: "class",
-    plugins: [nextui()],
+    plugins: [],
 };

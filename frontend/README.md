@@ -140,7 +140,7 @@ This is where all the components, templates and Server Actions are, grouped by s
 
 ### `/styles` directory
 
-`global.css` imports Tailwind classes and defines a couple of global CSS classes. Tailwind and NextUI classes are used for styling throughout the app.
+`global.css` imports Tailwind classes and defines a couple of global CSS classes. Tailwind classes are used for styling throughout the app.
 
 ### `/types` directory
 

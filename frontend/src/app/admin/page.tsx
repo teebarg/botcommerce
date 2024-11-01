@@ -115,7 +115,7 @@ export default async function AdminPage() {
                                 <img
                                     alt="avatar"
                                     className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0"
-                                    src="https://nextui.org/avatars/avatar-1.png"
+                                    src=""
                                 />
                             </span>
                             <div className="flex flex-col gap-1 items-start justify-center">

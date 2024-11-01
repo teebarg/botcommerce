@@ -4,7 +4,6 @@ import { Lexend, Outfit } from "next/font/google";
 import clsx from "clsx";
 import { ThemeScript } from "@lib/theme/theme-script";
 
-import { Providers } from "./providers";
 import { NotificationProviders } from "./notistack-providers";
 import OverlayClientProvider from "./overlay-providers";
 
@@ -29,13 +28,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <ThemeScript />
             </head>
             <body className="min-h-screen bg-background">
-                <Providers>
-                    <NotificationProviders>
-                        <OverlayClientProvider>
-                            <div className="relative flex flex-col min-h-screen">{children}</div>
-                        </OverlayClientProvider>
-                    </NotificationProviders>
-                </Providers>
+                <NotificationProviders>
+                    <OverlayClientProvider>
+                        <div className="relative flex flex-col min-h-screen">{children}</div>
+                    </OverlayClientProvider>
+                </NotificationProviders>
             </body>
         </html>
     );
