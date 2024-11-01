@@ -16,7 +16,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories 
             <div className="h-full w-full max-w-sm rounded-medium p-6 bg-default-50">
                 <div>
                     <span className="text-sm">Collections</span>
-                    <hr className="shrink-0 border-none w-full h-[2px] my-1 bg-default-100" />
+                    <hr className="shrink-0 border-none w-full h-[1px] my-1 bg-default-100" />
                     <div className="block mb-6 space-y-1">
                         {collections?.map((item: Collection, index: number) => (
                             <LocalizedClientLink key={index} className="block text-base" href={`/collections/${item.slug}`}>
@@ -26,7 +26,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories 
                     </div>
                 </div>
                 <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>
-                <hr className="shrink-0 border-none w-full h-[2px] my-3 bg-default-100" />
+                <hr className="shrink-0 border-none w-full h-[1px] my-3 bg-default-100" />
                 <div className="flex flex-col">
                     <span className="mb-2">Categories</span>
                     {categories?.map((item: Category, index: number) => (

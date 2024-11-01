@@ -72,9 +72,9 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                 <button className="h-full w-full flex items-center justify-center text-default-500" onClick={state.open}>
                     <CartIcon className="h-10 w-10" />
                 </button>
-                <div>
+                <div className="flex flex-col items-center justify-center">
                     <Chip size="sm" title={totalItems.toString()} />
-                    <p className="font-semibold text-sm">Cart</p>
+                    <p className="font-semibold text-sm mt-0">Cart</p>
                 </div>
             </div>
             {state.isOpen && (

@@ -10,12 +10,12 @@ interface Props extends AriaTextFieldProps {
     endContent?: React.ReactNode;
     size?: "sm" | "md" | "lg";
     hidden?: boolean;
-    className?: string;
+    classNames?: Record<"base" | "inputWrapper", string>;
     errorMessage?: string;
     onClear?: () => void;
 }
 
-const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent, startContent, ...props }) => {
+const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent, startContent, classNames, ...props }) => {
     const [isFocused, setIsFocused] = useState<boolean>(false);
     const [isHovered, setIsHovered] = useState<boolean>(false);
     let { label } = props;
@@ -25,7 +25,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
     return (
         <React.Fragment>
             <div
-                className="group flex flex-col data-[hidden=true]:hidden w-full"
+                className={cn("group flex flex-col data-[hidden=true]:hidden w-full", classNames?.["base"])}
                 data-filled={isFocused || Boolean(inputProps.value) || Boolean(props.placeholder)}
                 data-filled-within={isFocused || Boolean(inputProps.value) || Boolean(props.placeholder)}
                 data-focus={isFocused}
@@ -49,7 +49,8 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             "h-10 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",
                             "h-16 py-2.5": size === "lg",
-                        }
+                        },
+                        classNames?.["inputWrapper"]
                     )}
                     data-focus={isFocused}
                     data-hover={isHovered ? "true" : "false"}

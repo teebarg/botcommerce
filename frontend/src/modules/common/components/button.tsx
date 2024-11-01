@@ -32,9 +32,9 @@ const Button: React.FC<Props> = ({
     const ref = useRef<HTMLButtonElement | null>(null);
     const { buttonProps } = useButton(props, ref);
     const sizeCss = {
-        sm: "px-3 min-w-16 h-8 text-tiny gap-2 rounded-small",
-        md: "px-4 min-w-20 h-10 text-small gap-2 rounded-medium",
-        lg: "px-6 min-w-24 h-12 text-medium gap-3 rounded-large",
+        sm: "px-3 min-w-16 h-10 text-tiny gap-2 rounded-small",
+        md: "px-4 min-w-20 h-12 text-small gap-2 rounded-medium",
+        lg: "px-6 min-w-24 h-14 text-medium gap-3 rounded-large",
     };
 
     return (
@@ -43,8 +43,8 @@ const Button: React.FC<Props> = ({
                 {...buttonProps}
                 ref={ref}
                 className={clsx(
-                    `z-0 group relative inline-flex items-center justify-center box-border appearance-none 
-                    select-none whitespace-nowrap font-normal overflow-hidden outline-none transition-transform-colors-opacity 
+                    `z-0 group relative inline-flex items-center justify-center box-border appearance-none
+                    select-none whitespace-nowrap font-normal overflow-hidden outline-none transition-transform-colors-opacity
                     motion-reduce:transition-none bg-${color} text-${color}-foreground`,
                     className,
                     variant == "shadow" ? `shadow-lg shadow-${color}/40` : "",
