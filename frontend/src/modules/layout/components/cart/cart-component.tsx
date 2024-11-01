@@ -1,6 +1,6 @@
 "use client";
 
-import { CartIcon } from "nui-react-icons";
+import { Cart as CartIcon } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 import { SlideOver } from "@modules/common/components/slideover";
@@ -42,7 +42,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     const timedOpen = () => {
         state.open();
 
-        const timer = setTimeout(closeSlideOver, 15000);
+        const timer = setTimeout(closeSlideOver, 60000);
 
         setActiveTimer(timer);
     };

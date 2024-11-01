@@ -5,6 +5,7 @@ import { EditIcon } from "nui-react-icons";
 import { DragNDrop } from "@modules/admin/components/drag-drop";
 import { FileTypes } from "types/global";
 import { useSnackbar } from "notistack";
+import Image from "next/image";
 
 import Button from "./button";
 
@@ -67,7 +68,9 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                 {preview && (
                     <React.Fragment>
                         <div className="flex gap-1">
-                            <img alt="Product" className="max-h-52" src={preview} width={300} />
+                            <div className="h-72 w-80 rounded-lg overflow-hidden relative">
+                                <Image fill alt="Product" src={preview} />
+                            </div>
                             <Button onPress={() => setPreview(undefined)}>
                                 <EditIcon size={24} />
                             </Button>

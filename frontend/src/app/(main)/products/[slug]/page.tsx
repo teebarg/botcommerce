@@ -5,6 +5,8 @@ import ProductTemplate from "@modules/products/templates";
 import { getDocuments } from "@lib/util/meilisearch";
 import { Product } from "types/global";
 
+export const revalidate = 2;
+
 type Props = {
     params: { slug: string };
 };

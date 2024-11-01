@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { updateCustomerName } from "@modules/account/actions";
-import { Input } from "@nextui-org/input";
+import { Input } from "@components/ui/input";
 
 import AccountInfo from "../account-info";
 
@@ -38,8 +38,8 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
                 label="Name"
             >
                 <div className="grid grid-cols-2 gap-x-4">
-                    <Input required data-testid="first-name-input" defaultValue={customer.first_name} label="First name" name="first_name" />
-                    <Input required data-testid="last-name-input" defaultValue={customer.last_name} label="Last name" name="last_name" />
+                    <Input isRequired data-testid="first-name-input" defaultValue={customer.first_name} label="First name" name="first_name" />
+                    <Input isRequired data-testid="last-name-input" defaultValue={customer.last_name} label="Last name" name="last_name" />
                 </div>
             </AccountInfo>
         </form>

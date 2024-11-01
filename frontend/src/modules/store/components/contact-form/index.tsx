@@ -1,13 +1,13 @@
 "use client";
 
-import { Input } from "@nextui-org/input";
 import { useFormState } from "react-dom";
 import { submitContactForm } from "@modules/account/actions";
 import { FormButton } from "@modules/common/components/form-button";
 import { useEffect, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { Checkbox } from "@modules/common/components/checkbox";
-import { TextArea } from "@modules/common/components/textarea";
+import { Input } from "@components/ui/input";
+import { TextArea } from "@components/ui/textarea";
 
 const inputClass = {
     inputWrapper: "!bg-white/70 hover:!bg-white/50 focus:!bg-white/50 !text-blue-700",
@@ -33,9 +33,9 @@ export default function ContactForm() {
     return (
         <form ref={formRef} action={formAction}>
             <div className="mt-10 space-y-4">
-                <Input required classNames={inputClass} label="Name" name="name" placeholder="Ex. John....." />
-                <Input required classNames={inputClass} label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
-                <Input classNames={inputClass} label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
+                <Input isRequired label="Name" name="name" placeholder="Ex. John....." />
+                <Input isRequired label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
+                <Input label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
                 <TextArea
                     isRequired
                     description="Your message to us"

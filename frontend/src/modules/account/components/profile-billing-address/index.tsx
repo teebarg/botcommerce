@@ -3,9 +3,9 @@
 import React, { useEffect, useMemo } from "react";
 import { useFormState } from "react-dom";
 import { updateCustomerBillingAddress } from "@modules/account/actions";
-import { Input } from "@nextui-org/input";
 import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
+import { Input } from "@components/ui/input";
 
 import AccountInfo from "../account-info";
 
@@ -119,20 +119,5 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
         </form>
     );
 };
-
-// const mapBillingAddressToFormData = ({ customer }: MyInformationProps) => {
-//   return {
-//     billing_address: {
-//       first_name: customer.billing_address?.first_name || undefined,
-//       last_name: customer.billing_address?.last_name || undefined,
-//       company: customer.billing_address?.company || undefined,
-//       address_1: customer.billing_address?.address_1 || undefined,
-//       address_2: customer.billing_address?.address_2 || undefined,
-//       city: customer.billing_address?.city || undefined,
-//       state: customer.billing_address?.state || undefined,
-//       postal_code: customer.billing_address?.postal_code || undefined,
-//     },
-//   }
-// }
 
 export default ProfileBillingAddress;

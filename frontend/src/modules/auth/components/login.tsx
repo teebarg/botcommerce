@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@nextui-org/input";
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { FormButton } from "@modules/common/components/form-button";
@@ -10,6 +9,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { useFormState } from "react-dom";
 import React from "react";
 import { redirect } from "next/navigation";
+import { Input } from "@components/ui/input";
 
 import { signIn } from "../action";
 

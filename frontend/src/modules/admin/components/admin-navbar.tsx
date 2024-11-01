@@ -1,19 +1,19 @@
-import { Navbar as NextUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@nextui-org/navbar";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import { siteConfig } from "@lib/config";
 import ActivityTray from "@modules/common/components/activity-tray";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
+import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 
 const AdminNavbar = async () => {
     const customer = await getCustomer().catch(() => null);
     const ThemeButton = getThemeToggler();
 
     return (
-        <NextUINavbar maxWidth="xl" position="sticky">
+        <NavigationBar>
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-                <NavbarBrand as="li" className="gap-3 max-w-fit">
+                <NavbarBrand className="gap-3 max-w-fit">
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/admin">
                         <p className="font-bold text-inherit">Botcommerce</p>
                     </LocalizedClientLink>
@@ -45,13 +45,13 @@ const AdminNavbar = async () => {
             <NavbarMenu>
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item: any, index: number) => (
-                        <NavbarMenuItem key={`${item}-${index}`}>
+                        <NavbarItem key={`${item}-${index}`}>
                             <LocalizedClientLink href={item.href}>{item.label}</LocalizedClientLink>
-                        </NavbarMenuItem>
+                        </NavbarItem>
                     ))}
                 </div>
             </NavbarMenu>
-        </NextUINavbar>
+        </NavigationBar>
     );
 };
 

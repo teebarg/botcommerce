@@ -1,12 +1,12 @@
 "use client";
 
-import { Input } from "@nextui-org/input";
 import { useFormState } from "react-dom";
 import { newsletterForm } from "@modules/account/actions";
 import { FormButton } from "@modules/common/components/form-button";
 import { useEffect, useRef } from "react";
 import { MailIcon } from "nui-react-icons";
 import { useSnackbar } from "notistack";
+import { Input } from "@components/ui/input";
 
 export default function NewsletterForm() {
     const { enqueueSnackbar } = useSnackbar();
@@ -22,10 +22,11 @@ export default function NewsletterForm() {
 
     return (
         <form ref={formRef} action={formAction}>
-            <div className="mt-6 sm:flex sm:max-w-lg lg:mt-0">
+            <div className="mt-6 sm:flex sm:max-w-lg lg:mt-0 items-center">
                 <Input
                     name="email"
                     placeholder="email@gmail.com"
+                    size="sm"
                     startContent={<MailIcon className="text-2xl text-default-500 pointer-events-none flex-shrink-0" />}
                     type="email"
                 />

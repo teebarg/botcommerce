@@ -6,7 +6,7 @@ import { updateLineItem } from "@modules/cart/actions";
 import { useState } from "react";
 import { useSnackbar } from "notistack";
 import { CartItem } from "types/global";
-import { Spinner } from "nui-react-icons";
+import { Spinner } from "@components/spinner";
 
 type ItemsTemplateProps = {
     item: CartItem;

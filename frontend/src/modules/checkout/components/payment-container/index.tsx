@@ -3,7 +3,7 @@ import { InformationCircleSolid } from "nui-react-icons";
 import React from "react";
 import clsx from "clsx";
 import Radio from "@modules/common/components/radio";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Tooltip } from "@components/ui/tooltip";
 
 import PaymentTest from "../payment-test";
 
@@ -28,14 +28,11 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, sel
                 value={paymentSession.provider_id}
             >
                 <div className="flex items-center justify-between ">
-                    <div className="flex items-center gap-x-4">
+                    <div className="flex items-center gap-x-4 relative">
                         <Radio checked={selectedPaymentOptionId === paymentSession.provider_id} />
                         <p className="text-base">{paymentInfoMap[paymentSession.provider_id]?.title || paymentSession.provider_id}</p>
                         {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, paymentSession.provider_id) && (
-                            <Tooltip
-                                className="min-w-fit"
-                                content="You can add a user-friendly name and icon for this payment provider in 'src/modules/checkout/components/payment/index.tsx'"
-                            >
+                            <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'src/modules/checkout/components/payment/index.tsx'">
                                 <span>
                                     <InformationCircleSolid />
                                 </span>

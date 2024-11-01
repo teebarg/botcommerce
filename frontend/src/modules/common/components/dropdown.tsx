@@ -39,6 +39,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
                 if (!rect || !contentRect) return;
 
                 let left = rect.left;
+
                 if (align === "end") {
                     left = rect.right - contentRect.width;
                 } else if (align === "center") {
@@ -47,6 +48,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
 
                 // Ensure the dropdown stays within viewport bounds
                 const viewportWidth = window.innerWidth;
+
                 left = Math.max(4, Math.min(left, viewportWidth - contentRect.width - 4));
 
                 setPopoverPosition({
@@ -57,6 +59,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
 
             updatePosition();
             window.addEventListener("resize", updatePosition);
+
             return () => window.removeEventListener("resize", updatePosition);
         }
     }, [state.isOpen, align, sideOffset, buttonRef, overlayRef]);

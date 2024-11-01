@@ -94,7 +94,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     <AccordionTrigger value="item-1">
                         <span className="text-left">Product Information</span>
                     </AccordionTrigger>
-                    <AccordionContent value="item-1" className="px-4">
+                    <AccordionContent className="px-4" value="item-1">
                         <ProductInfoTab product={product} />
                     </AccordionContent>
                 </AccordionItem>
@@ -103,7 +103,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     <AccordionTrigger value="item-2">
                         <span className="text-left">Shipping & Returns</span>
                     </AccordionTrigger>
-                    <AccordionContent value="item-2" className="px-4">
+                    <AccordionContent className="px-4" value="item-2">
                         <ShippingInfoTab />
                     </AccordionContent>
                 </AccordionItem>

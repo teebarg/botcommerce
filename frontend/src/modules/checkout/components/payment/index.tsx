@@ -9,9 +9,9 @@ import PaymentContainer from "@modules/checkout/components/payment-container";
 import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
 import clsx from "clsx";
-import { Tooltip } from "@nextui-org/tooltip";
 import Button from "@modules/common/components/button";
 import { Cart, PaymentSession } from "types/global";
+import { Tooltip } from "@components/ui/tooltip";
 
 const payMethods = [
     { id: "stripe", provider_id: "Stripe" },

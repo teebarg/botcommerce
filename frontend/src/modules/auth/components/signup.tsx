@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@nextui-org/input";
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { FormButton } from "@modules/common/components/form-button";
@@ -9,6 +8,7 @@ import { GoogleLogin } from "@modules/account/components/google";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { useFormState } from "react-dom";
 import React from "react";
+import { Input } from "@components/ui/input";
 
 import { signUp } from "../action";
 

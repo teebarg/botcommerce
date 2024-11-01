@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { updateCustomerPassword } from "@modules/account/actions";
 import { useFormState } from "react-dom";
-import { Input } from "@nextui-org/input";
+import { Input } from "@components/ui/input";
 
 import AccountInfo from "../account-info";
 

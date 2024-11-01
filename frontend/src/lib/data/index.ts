@@ -327,7 +327,28 @@ export async function getCustomer() {
         });
 
         if (!res.ok) {
-            throw new Error("Login failed");
+            throw new Error(res.statusText);
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.log(error);
+
+        return null;
+    }
+}
+
+export async function logOut() {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/logout`, {
+            method: "POST",
+            headers: {
+                accept: "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
         }
 
         return await res.json();

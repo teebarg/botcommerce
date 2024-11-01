@@ -2,12 +2,12 @@
 
 import React, { cloneElement, isValidElement, useState } from "react";
 import { Pagination as PaginationType } from "types/global";
-import { Input } from "@nextui-org/input";
 import { Plus, SearchIcon } from "nui-react-icons";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
 import { exportProducts, indexProducts } from "@modules/admin/actions";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Input } from "@components/ui/input";
 
 import Button from "../button";
 import { Pagination } from "../pagination";
@@ -78,17 +78,15 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between gap-3 items-end">
                         <Input
-                            isClearable
-                            classNames={{
-                                base: "w-full sm:max-w-[44%]",
-                                inputWrapper: "border-1",
-                            }}
+                            // classNames={{
+                            //     base: "w-full sm:max-w-[44%]",
+                            //     inputWrapper: "border-1",
+                            // }}
                             defaultValue={searchQuery}
                             placeholder="Search by name..."
                             startContent={<SearchIcon className="text-default-300" />}
-                            variant="bordered"
+                            onChange={onSearchChange}
                             onClear={() => onClear()}
-                            onValueChange={onSearchChange}
                         />
                         <div className="flex gap-3">
                             <Button color="primary" endContent={<Plus />} onPress={() => state.open()}>

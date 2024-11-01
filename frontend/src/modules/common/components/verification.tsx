@@ -26,6 +26,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
         if (!/^\d*$/.test(value)) return;
 
         const newCode = [...code];
+
         newCode[index] = value;
         setCode(newCode);
 
@@ -53,6 +54,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
         const numbers = pastedData.match(/\d/g)?.slice(0, 6) || [];
 
         const newCode = [...code];
+
         numbers.forEach((num, index) => {
             if (index < 6) newCode[index] = num;
         });
@@ -67,8 +69,10 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
     // Handle code submission
     const handleSubmit = async () => {
         const completeCode = code.join("");
+
         if (completeCode.length !== 6) {
             setError("Please enter all 6 digits");
+
             return;
         }
 
@@ -104,6 +108,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
             const timer = setInterval(() => {
                 setResendTimer((prev) => prev - 1);
             }, 1000);
+
             return () => clearInterval(timer);
         } else {
             setResendDisabled(false);
@@ -124,7 +129,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                             </p>
                             <div className="flex gap-2 items-center justify-center">
                                 <p className="font-medium text-sm text-default-500">{email}</p>
-                                <button className="" aria-label="Edit" onClick={onEditEmail}>
+                                <button aria-label="Edit" className="" onClick={onEditEmail}>
                                     <Pencil />
                                 </button>
                             </div>
@@ -140,32 +145,32 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                                             ref={(el) => {
                                                 inputRefs.current[index] = el;
                                             }}
-                                            className="v-input bg-background focus:border-rose-400 focus:ring-1 focus:ring-rose-400"
-                                            id={`digit-${index}-field`}
-                                            autoComplete="one-time-code"
+                                            aria-disabled="false"
+                                            aria-invalid="false"
                                             aria-label={`Digit-${index + 1}`}
-                                            maxLength={1}
+                                            aria-required="false"
+                                            autoComplete="one-time-code"
+                                            className="v-input bg-background focus:border-rose-400 focus:ring-1 focus:ring-rose-400"
+                                            disabled={isLoading}
+                                            id={`digit-${index}-field`}
                                             inputMode="numeric"
+                                            maxLength={1}
                                             name={`codeInput-${index}`}
                                             type="text"
-                                            aria-invalid="false"
-                                            aria-required="false"
-                                            aria-disabled="false"
                                             value={code[index]}
                                             onChange={(e) => handleInputChange(index, e.target.value)}
                                             onKeyDown={(e) => handleKeyDown(index, e)}
                                             onPaste={handlePaste}
-                                            disabled={isLoading}
                                         />
                                     ))}
                                 </div>
                                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                             </div>
                             <button
-                                onClick={handleResend}
-                                disabled={resendDisabled}
                                 className="font-medium text-sm text-blue-600 hover:text-blue-700 
                                      disabled:text-gray-400 disabled:cursor-not-allowed"
+                                disabled={resendDisabled}
+                                onClick={handleResend}
                             >
                                 {resendDisabled ? `Resend code in ${resendTimer}s` : "Didn't receive a code? Resend"}
                             </button>
@@ -175,8 +180,8 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                                 className="cl-internal-ttumny border-0 shadow-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300
                                      disabled:cursor-not-allowed transition-colors"
                                 data-localization-key="formButtonPrimary"
-                                onClick={handleSubmit}
                                 disabled={isLoading || code.join("").length !== 6}
+                                onClick={handleSubmit}
                             >
                                 {isLoading ? (
                                     <div

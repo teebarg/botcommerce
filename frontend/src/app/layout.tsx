@@ -2,11 +2,11 @@ import { Metadata } from "next";
 import "styles/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import clsx from "clsx";
+import { ThemeScript } from "@lib/theme/theme-script";
 
 import { Providers } from "./providers";
 import { NotificationProviders } from "./notistack-providers";
 import OverlayClientProvider from "./overlay-providers";
-import { ThemeScript } from "@lib/theme/theme-script";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 

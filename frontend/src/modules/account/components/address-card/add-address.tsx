@@ -5,13 +5,13 @@ import React, { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { Modal } from "@modules/common/components/modal";
 import { addCustomerShippingAddress } from "@modules/account/actions";
-import { Input } from "@nextui-org/input";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
 import { useOverlayTriggerState } from "react-stately";
 import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
+import { Input } from "@components/ui/input";
 
 const AddAddress = () => {
     const { enqueueSnackbar } = useSnackbar();
@@ -47,7 +47,7 @@ const AddAddress = () => {
 
             {modalState.isOpen && (
                 <Modal data-testid="add-address-modal" onClose={modalState.close}>
-                    <React.Fragment>
+                    <div className="p-8">
                         <form action={formAction}>
                             <div className="flex flex-col gap-y-2 w-full py-4">
                                 <div className="grid grid-cols-2 gap-x-2">
@@ -78,7 +78,7 @@ const AddAddress = () => {
                                 </FormButton>
                             </div>
                         </form>
-                    </React.Fragment>
+                    </div>
                 </Modal>
             )}
         </>

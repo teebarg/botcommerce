@@ -13,6 +13,7 @@ export default function UserDropDown({ customer }: any) {
     return (
         <React.Fragment>
             <Dropdown
+                align="end"
                 trigger={
                     <React.Fragment>
                         <div className="inline-flex items-center justify-center gap-2 rounded-small outline-none transition-transform">
@@ -30,7 +31,6 @@ export default function UserDropDown({ customer }: any) {
                         </div>
                     </React.Fragment>
                 }
-                align="end"
             >
                 <div className="bg-content1 box-border rounded-lg shadow-md p-3 min-w-[200px] text-sm font-medium">
                     <div key="user" className="h-14 gap-2">

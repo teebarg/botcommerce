@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Input } from "@nextui-org/input";
 import Button from "@modules/common/components/button";
 import { ArrowUpRightMini, XMark } from "nui-react-icons";
 import { useSnackbar } from "notistack";
+import { Input } from "@components/ui/input";
 
 interface Message {
     text: string;
@@ -129,7 +129,7 @@ export const Chatbot: React.FC = () => {
                     </div>
                     <div className="p-3 px-4 py-4 sm:px-6">
                         <div className="flex">
-                            <Input fullWidth placeholder="Type a message..." value={input} onChange={(e) => setInput(e.target.value)} />
+                            <Input placeholder="Type a message..." size="sm" value={input} onChange={setInput} />
                             <Button className="ml-2" color="secondary" onPress={handleSend}>
                                 <ArrowUpRightMini size={20} />
                             </Button>
