@@ -11,7 +11,7 @@ import { TextArea } from "@components/ui/textarea";
 
 const inputClass = {
     inputWrapper: "!bg-white/70 hover:!bg-white/50 focus:!bg-white/50 !text-blue-700",
-    label: "!text-black/60 font-semibold text-lg",
+    label: "!text-black/50 font-medium text-lg",
     description: "text-black/30 font-medium",
     input: "focus:!bg-transparent !text-gray-600 !bg-transparent",
     innerWrapper: "focus:!bg-white/50",
@@ -33,10 +33,11 @@ export default function ContactForm() {
     return (
         <form ref={formRef} action={formAction}>
             <div className="mt-10 space-y-4">
-                <Input isRequired label="Name" name="name" placeholder="Ex. John....." />
-                <Input isRequired label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
-                <Input label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
+                <Input classNames={inputClass} isRequired label="Name" name="name" placeholder="Ex. John....." />
+                <Input classNames={inputClass} isRequired label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
+                <Input classNames={inputClass} label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
                 <TextArea
+                    classNames={inputClass}
                     isRequired
                     description="Your message to us"
                     label="Description"

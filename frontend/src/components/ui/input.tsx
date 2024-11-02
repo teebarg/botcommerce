@@ -10,7 +10,7 @@ interface Props extends AriaTextFieldProps {
     endContent?: React.ReactNode;
     size?: "sm" | "md" | "lg";
     hidden?: boolean;
-    classNames?: Record<"base" | "inputWrapper", string>;
+    classNames?: Record<"base" | "inputWrapper" | "label" | "innerWrapper" | "description" | "input", string>;
     errorMessage?: string;
     onClear?: () => void;
 }
@@ -67,14 +67,18 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             "max-w-full text-ellipsis overflow-hidden",
                             {
                                 "after:content-['*']": props.isRequired,
-                            }
+                            },
+                            classNames?.["label"]
                         )}
                         data-slot="label"
                     >
                         {label}
                     </label>
                     <div
-                        className="inline-flex w-full items-center h-full box-border group-data-[has-label=true]:items-end pb-0.5"
+                        className={cn(
+                            "inline-flex w-full items-center h-full box-border group-data-[has-label=true]:items-end pb-0.5",
+                            classNames?.["innerWrapper"]
+                        )}
                         data-slot="inner-wrapper"
                     >
                         {startContent}
@@ -84,7 +88,8 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             className={cn(
                                 "w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none",
                                 "data-[has-start-content=true]:ps-1.5 data-[has-end-content=true]:pe-1.5 file:cursor-pointer file:bg-transparent file:border-0",
-                                "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground"
+                                "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground",
+                                classNames?.["input"]
                             )}
                             data-filled={Boolean(inputProps.value)}
                             data-filled-within="true"
@@ -101,7 +106,11 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                 </div>
                 <div className="hidden group-data-[has-helper=true]:flex p-1 relative flex-col gap-1.5" data-slot="helper-wrapper">
                     {props.description && (
-                        <div {...descriptionProps} className="text-tiny text-foreground-400" data-slot="description">
+                        <div
+                            {...descriptionProps}
+                            className={cn("text-tiny text-foreground-400", classNames?.["description"])}
+                            data-slot="description"
+                        >
                             {props.description}
                         </div>
                     )}
