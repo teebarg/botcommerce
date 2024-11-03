@@ -33,12 +33,12 @@ export default function ContactForm() {
     return (
         <form ref={formRef} action={formAction}>
             <div className="mt-10 space-y-4">
-                <Input classNames={inputClass} isRequired label="Name" name="name" placeholder="Ex. John....." />
-                <Input classNames={inputClass} isRequired label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
+                <Input isRequired classNames={inputClass} label="Name" name="name" placeholder="Ex. John....." />
+                <Input isRequired classNames={inputClass} label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
                 <Input classNames={inputClass} label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
                 <TextArea
-                    classNames={inputClass}
                     isRequired
+                    classNames={inputClass}
                     description="Your message to us"
                     label="Description"
                     name="message"

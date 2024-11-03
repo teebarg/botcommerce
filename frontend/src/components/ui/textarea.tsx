@@ -92,12 +92,12 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                                 "data-[hide-scroll=true]:scrollbar-hide group-data-[has-value=true]:text-default-foreground pt-0 transition-height !duration-100 motion-reduce:transition-none",
                                 classNames?.["input"]
                             )}
+                            data-hide-scroll="true"
                             data-slot="input"
                             style={{ height: "60px !important" }}
+                            onInput={adjustHeight}
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
-                            data-hide-scroll="true"
-                            onInput={adjustHeight}
                         />
                     </div>
                 </div>

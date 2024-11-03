@@ -5,12 +5,14 @@ import * as React from "react";
 import { useState } from "react";
 import { useTextField } from "react-aria";
 
+type InputClassNames = Partial<Record<"base" | "inputWrapper" | "label" | "innerWrapper" | "description" | "input", string>>;
+
 interface Props extends AriaTextFieldProps {
     startContent?: React.ReactNode;
     endContent?: React.ReactNode;
     size?: "sm" | "md" | "lg";
     hidden?: boolean;
-    classNames?: Record<"base" | "inputWrapper" | "label" | "innerWrapper" | "description" | "input", string>;
+    classNames?: InputClassNames;
     errorMessage?: string;
     onClear?: () => void;
 }
