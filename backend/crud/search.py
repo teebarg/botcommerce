@@ -88,30 +88,3 @@ class SearchService:
 # Dependencies
 async def get_search_service():
     return SearchService(redis_client)
-
-
-# Routes
-# @app.post("/api/products/{product_id}/view")
-# async def view_product(
-#     product_id: str,
-#     user_id: str,
-#     service: SearchService = Depends(get_search_service)
-# ):
-#     service.add_to_recently_viewed(user_id, product_id)
-#     return {"status": "success"}
-
-# @app.get("/api/users/{user_id}/recently-viewed")
-# async def get_recent_products(
-#     user_id: str,
-#     service: SearchService = Depends(get_search_service)
-# ):
-#     products = service.get_recently_viewed(user_id)
-#     return {"products": products}
-
-# @app.post("/api/products/{product_id}/update")
-# async def update_product(
-#     product_id: str,
-#     service: SearchService = Depends(get_search_service)
-# ):
-#     service.invalidate_product_cache(product_id)
-#     return {"status": "success"}

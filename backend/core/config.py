@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "postgres"
+    POSTGRES_PORT: int = 5432
     STORAGE_BUCKET: str = "bucket"
     SQLALCHEMY_DATABASE_URI: str | None = None
 
@@ -53,6 +54,7 @@ class Settings(BaseSettings):
                 username=info.data.get("POSTGRES_USER"),
                 password=info.data.get("POSTGRES_PASSWORD"),
                 host=info.data.get("POSTGRES_SERVER"),
+                port=info.data.get("POSTGRES_PORT"),
                 path=f"{info.data.get('POSTGRES_DB') or ''}",
             )
         )
@@ -86,6 +88,9 @@ class Settings(BaseSettings):
 
     MEILI_MASTER_KEY: str = "masterKey"
     MEILI_HOST: str = "http://meilisearch:7700"
+
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
 
     model_config = SettingsConfigDict(env_file=".env")
 
