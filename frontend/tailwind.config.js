@@ -21,6 +21,9 @@ module.exports = {
                 "content4-foreground": "hsl(var( --content4-foreground))",
                 divider: "hsl(var(--divider) / var(--divider-opacity, 1))",
             },
+            borderColor: {
+                divider: "hsl(var(--divider) / var(--divider-opacity, 1))",
+            },
             borderRadius: {
                 small: "var(--radius-small)",
                 medium: "var(--radius-medium)",
