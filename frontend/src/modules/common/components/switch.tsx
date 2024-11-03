@@ -1,7 +1,8 @@
 import React from "react";
 import { useToggleState } from "@react-stately/toggle";
 import clsx from "clsx";
-import { AriaSwitchProps, useFocusRing, useSwitch } from "react-aria";
+import { AriaSwitchProps, useSwitch } from "@react-aria/switch";
+import { useFocusRing } from "@react-aria/focus";
 
 interface SwitchProps extends AriaSwitchProps {
     label?: string;
