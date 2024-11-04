@@ -1,5 +1,5 @@
 import React from "react";
-import { AriaProgressBarProps, useProgressBar } from "react-aria";
+import { AriaProgressBarProps, useProgressBar } from "@react-aria/progress";
 
 interface ProgressBarProps extends AriaProgressBarProps {
     label?: string;

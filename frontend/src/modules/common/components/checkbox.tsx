@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { useFocusRing } from "@react-aria/focus";
 import { mergeProps } from "@react-aria/utils";
-import { useCheckbox } from "react-aria";
+import { useCheckbox } from "@react-aria/checkbox";
 
 interface CheckboxProps extends AriaCheckboxProps {}
 

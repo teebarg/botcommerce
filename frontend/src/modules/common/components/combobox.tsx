@@ -3,7 +3,9 @@ import { useComboBoxState } from "@react-stately/combobox";
 import React from "react";
 import clsx from "clsx";
 import { ChevronDown } from "nui-react-icons";
-import { useComboBox, useFilter, useButton } from "react-aria";
+import { useButton } from "@react-aria/button";
+import { useComboBox } from "@react-aria/combobox";
+import { useFilter } from "@react-aria/i18n";
 
 interface ComboBoxItem {
     id: number | string;

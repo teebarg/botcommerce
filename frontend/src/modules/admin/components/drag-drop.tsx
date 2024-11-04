@@ -1,6 +1,6 @@
 "use client";
 
-import type { FileDropItem } from "react-aria";
+import type { FileDropItem } from "@react-aria/dnd";
 
 import { DropZone } from "react-aria-components";
 import React from "react";

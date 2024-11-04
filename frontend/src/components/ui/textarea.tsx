@@ -1,9 +1,9 @@
-import type { AriaTextFieldProps } from "react-aria";
+import type { AriaTextFieldProps } from "@react-types/textfield";
 
 import { cn } from "@lib/util/cn";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { useTextField } from "react-aria";
+import { useTextField } from "@react-aria/textfield";
 
 interface Props extends AriaTextFieldProps {
     hidden?: boolean;

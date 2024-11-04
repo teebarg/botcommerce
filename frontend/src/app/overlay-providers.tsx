@@ -1,6 +1,6 @@
 "use client";
 
-import { OverlayProvider } from "react-aria";
+import { OverlayProvider } from "@react-aria/overlays";
 import React from "react";
 
 interface Props {

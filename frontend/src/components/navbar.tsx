@@ -2,8 +2,7 @@
 
 import { cn } from "@lib/util/cn";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useOverlay, OverlayContainer } from "@react-aria/overlays";
-import { usePreventScroll } from "react-aria";
+import { useOverlay, OverlayContainer, usePreventScroll } from "@react-aria/overlays";
 import { XMark } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import { useMediaQuery } from "@lib/hooks/use-media-query";

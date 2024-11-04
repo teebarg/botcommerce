@@ -1,10 +1,11 @@
-import type { AriaNumberFieldProps } from "react-aria";
+import type { AriaNumberFieldProps } from "@react-aria/numberfield";
 
 import { cn } from "@lib/util/cn";
 import * as React from "react";
 import { useState } from "react";
 import { useNumberFieldState } from "react-stately";
-import { useLocale, useNumberField } from "react-aria";
+import { useNumberField } from "@react-aria/numberfield";
+import { useLocale } from "@react-aria/i18n";
 
 interface Props extends AriaNumberFieldProps {
     name?: string;

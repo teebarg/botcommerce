@@ -1,9 +1,9 @@
-import type { AriaTextFieldProps } from "react-aria";
+import type { AriaTextFieldProps } from "@react-types/textfield";
 
 import { cn } from "@lib/util/cn";
 import * as React from "react";
 import { useState } from "react";
-import { useTextField } from "react-aria";
+import { useTextField } from "@react-aria/textfield";
 
 type InputClassNames = Partial<Record<"base" | "inputWrapper" | "label" | "innerWrapper" | "description" | "input", string>>;
 

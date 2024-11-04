@@ -2,7 +2,7 @@
 
 import React from "react";
 import clsx from "clsx";
-import { AriaButtonProps, useButton } from "react-aria";
+import { AriaButtonProps, useButton } from "@react-aria/button";
 import { useRef } from "react";
 
 interface Props extends AriaButtonProps {

@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { XMark } from "nui-react-icons";
 import React, { useRef } from "react";
-import { useOverlay, usePreventScroll, OverlayContainer, OverlayProps } from "react-aria";
+import { useOverlay, usePreventScroll, OverlayContainer, OverlayProps } from "@react-aria/overlays";
 
 interface ModalProps extends OverlayProps {
     title?: string;
