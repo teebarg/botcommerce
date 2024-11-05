@@ -28,6 +28,8 @@ module.exports = {
                 small: "var(--radius-small)",
                 medium: "var(--radius-medium)",
                 large: "var(--radius-large)",
+                50: "50%",
+                'top-corners': '5px 5px 0 0',
             },
             borderWidth: {
                 small: "var(--border-width-small)",
@@ -48,6 +50,9 @@ module.exports = {
             fontFamily: {
                 sans: "var(--font-inter)",
                 display: "var(--font-lexend)",
+            },
+            transitionTimingFunction: {
+                "custom-ease": "cubic-bezier(0.6, 0.05, 0.15, 0.95)",
             },
             colors: {
                 background: {
