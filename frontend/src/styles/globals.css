@@ -135,8 +135,8 @@
         --alpha: hsla(0, 0%, 0%, 0.03);
     }
 
-    .drift-controller-icon:after,
-    .drift-controller-icon:before {
+    .chatbot-icon:after,
+    .chatbot-icon:before {
         height: 3px;
         margin: -1px 0 0;
         content: "";
@@ -150,7 +150,7 @@
         border-radius: 3px;
     }
 
-    .drift-controller-icon:after {
+    .chatbot-icon:after {
         -webkit-transform: rotate(45deg);
         -moz-transform: rotate(45deg);
         -ms-transform: rotate(45deg);
@@ -158,7 +158,7 @@
         transform: rotate(45deg);
     }
 
-    .drift-controller-icon:before {
+    .chatbot-icon:before {
         -webkit-transform: rotate(-45deg);
         -moz-transform: rotate(-45deg);
         -ms-transform: rotate(-45deg);
@@ -175,6 +175,32 @@
         padding: 0;
         position: absolute;
         width: 1px;
+    }
+
+    .chatiput-wrapper textarea {
+        resize: none;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        position: absolute;
+        top: 0;
+        left: 0;
+        touch-action: manipulation;
+    }
+
+    .chatiput-wrapper pre, .chatiput-wrapper textarea {
+        width: 114.2%;
+        height: 114.3%;
+        border-radius: 6px;
+        padding: 10px 36px 10px 12px;
+        margin: 0;
+        white-space: pre-wrap;
+        font-size: 16px;
+        transform: scale(.875);
+        transform-origin: top left;
+        line-height: 20px;
+        overflow: auto;
+        -ms-overflow-style: none;
     }
 }
 

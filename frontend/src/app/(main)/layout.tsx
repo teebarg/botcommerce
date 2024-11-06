@@ -5,7 +5,6 @@ import React from "react";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Banner } from "@modules/common/components/banner";
 import { Cookie } from "@modules/store/components/cookie";
-import { Chatbot } from "@modules/store/components/chatbot";
 import ChatBot from "@components/chatbot";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
@@ -31,7 +30,6 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
             <Navbar />
             <main>{props.children}</main>
             <Cookie />
-            <Chatbot />
             <ChatBot />
             <Footer />
         </React.Fragment>
