@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="bot-avatar-image" width="128px" height="128px" viewBox="0 0 128 128" version="1.1">
+  <g id="circle-background" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <rect fill="#ff5a2d" x="0" y="0" width="128" height="128"/>
+    <rect id="circle-background_overlay" fill-opacity="0.85" fill="#FFFFFF" x="0" y="0" width="128" height="128"/>
+  </g>
+  <g id="Body">
+    <path id="Torso" fill-rule="evenodd" clip-rule="evenodd" d="M97.8267 128.181C97.8267 128.181 89.5 104 64.4999 104C39.4998 104 31.1653 128.181 31.1653 128.181H97.8267Z" fill="#ff5a2d"/>
+    <rect id="Neck" x="60.6709" y="95" width="8.35443" height="11.8261" fill="#ff5a2d"/>
+  </g>
+  <g id="Head/head-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <path d="M42.3598179,38.6294787 C49.6808244,37.5431596 57.0018308,37 64.3228372,37 C71.6439551,37 78.965073,37.5431761 86.2861909,38.6295283 C100.200594,40.6942247 109.990943,53.3930251 108.44791,67.3748929 C106.850179,81.8523967 95.7008723,93.437288 81.2951935,95.588399 C74.9930555,96.5294663 69.3356033,97 64.3228369,97 C58.87206,97 52.5240047,96.4436442 45.278671,95.3309327 C31.1979916,93.1684887 20.4692266,81.5801845 19.396199,67.3748929 C18.3295587,53.2541598 28.3522251,40.7079801 42.3598179,38.6294787 Z" id="Head-2" fill="#ff5a2d"/>
+  </g>
+  <g id="Eyes/eyes-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <rect id="eyes-1_oval" fill="#FFFFFF" x="30" y="54" width="68" height="22" rx="10.6368996"/>
+    <ellipse id="eyes-1_left" fill="#ff5a2d" cx="45.8759294" cy="64.8549413" rx="7.87592939" ry="7.85494127"/>
+    <ellipse id="eyes-1_black-overlay_left" fill-opacity="0.5" fill="#000000" cx="45.8759294" cy="64.8549413" rx="7.87592939" ry="7.85494127"/>
+    <ellipse id="eyes-1_right" fill="#ff5a2d" cx="81.8759294" cy="64.8549413" rx="7.87592939" ry="7.85494127"/>
+    <ellipse id="eyes-1_black-overlay_right" fill-opacity="0.5" fill="#000000" cx="81.8759294" cy="64.8549413" rx="7.87592939" ry="7.85494127"/>
+  </g>
+  <g id="Antenna/antenna-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <rect id="Rectangle" fill="#ff5a2d" x="62.6666667" y="20.0731707" width="4" height="18"/>
+    <circle id="Oval" fill="#ff5a2d" cx="64.5" cy="18.5" r="5.5"/>
+    <circle id="Oval" fill-opacity="0.2" fill="#000000" cx="64.5" cy="18.5" r="5.5"/>
+  </g> </svg>

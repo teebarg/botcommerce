@@ -20,4 +20,5 @@ openpyxl==3.1.5
 meilisearch==0.31.5
 firebase-cart==0.1.1
 redis==5.1.1
+# aio-pika==9.4.3
 # supabase==2.9.1
