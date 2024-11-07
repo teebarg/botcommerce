@@ -109,10 +109,10 @@ const ChatBot: React.FC<Props> = () => {
                                 aria-hidden="true"
                                 aria-labelledby="convo__1951869"
                                 className="rounded-md outline-0 align-middle h-2.5 w-2.5 absolute right-0 bottom-0 border-2 border-solid border-white"
+                                role="img"
                                 style={{ strokeWidth: 8 }}
                                 viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
-                                role="img"
                             >
                                 <circle cx="10" cy="10" r="9" />
                             </svg>
@@ -127,7 +127,7 @@ const ChatBot: React.FC<Props> = () => {
                 </header>
                 <div className="h-[calc(100%-48px)] list-none m-0 p-0 overflow-hidden relative">
                     <div className="bottom-3 flex flex-col absolute inset-0 overflow-scroll mr-0 mb-0 pb-12 bg-default h-full w-full">
-                        <div role="grid" tab-index="0" aria-label="Messages from the conversation" className="flex flex-col gap-4">
+                        <div aria-label="Messages from the conversation" className="flex flex-col gap-4" role="grid">
                             {messages.map((message, index) => (
                                 <div key={index} className="relative py-0 px-4 flex flex-col">
                                     {index == 0 && (
@@ -187,21 +187,21 @@ const ChatBot: React.FC<Props> = () => {
                     <div className="py-[3px] px-0 relative flex items-end w-full">
                         <div className="flex max-h-20 overflow-hidden relative flex-1 chatiput-wrapper">
                             <pre> </pre>
-                            <label htmlFor="chat-input" className="visually-hidden">
+                            <label className="visually-hidden" htmlFor="chat-input">
                                 Write a reply...
                             </label>
                             <textarea
+                                aria-label="Write a reply..."
+                                className="placeholder:text-ellipsis text-default-700 border-default-400 focus-visible:outline-none border-solid border"
+                                id="chat-input"
+                                placeholder="Write a reply..."
                                 value={input}
                                 onChange={(event) => setInput(event.target.value)}
-                                className="placeholder:text-ellipsis text-default-700 border-default-400 focus-visible:outline-none border-solid border"
-                                placeholder="Write a reply..."
-                                aria-label="Write a reply..."
-                                id="chat-input"
                             />
                             <button
-                                className="absolute bottom-2 right-3 border-none m-0 p-0 cursor-pointer text-center align-top inline-block h-6 w-6"
                                 aria-expanded="false"
                                 aria-label="open emoji picker"
+                                className="absolute bottom-2 right-3 border-none m-0 p-0 cursor-pointer text-center align-top inline-block h-6 w-6"
                             >
                                 <Smiley />
                             </button>
@@ -211,8 +211,8 @@ const ChatBot: React.FC<Props> = () => {
                                 <CogSixTooth className="text-default-500" />
                             </button>
                             <button
-                                onClick={handleSend}
                                 className="mx-auto m-0 p-0 cursor-pointer border-none text-center align-top inline-block h-6 w-6"
+                                onClick={handleSend}
                             >
                                 <Send className="rounded-md outline-0 h-[14px]" viewBox="0 0 17 16" />
                             </button>
@@ -221,14 +221,12 @@ const ChatBot: React.FC<Props> = () => {
                 </div>
             </div>
             <div
-                onClick={toggleChat}
-                className="outline-none fixed h-14 w-14 cursor-pointer right-4 bottom-4 border-none rounded-[50%] group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
-                aria-label="Open chat with Max in the Drift Widget messenger - Unread messages: 1"
                 aria-disabled="false"
-                aria-hidden="false"
-                role="button"
-                tab-index="0"
+                aria-hidden="true"
+                aria-label="Open chat with Max in the Drift Widget messenger - Unread messages: 1"
+                className="outline-none fixed h-14 w-14 cursor-pointer right-4 bottom-4 border-none rounded-[50%] group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
                 data-open={isOpen ? "true" : "false"}
+                onClick={toggleChat}
             >
                 <div className="cursor-pointer overflow-visible absolute h-full w-full rounded-[50%]" style={{ background: "none" }}>
                     <div className="flex opacity-100 items-center justify-center h-full w-full group-data-[open=true]:opacity-0 group-data-[open=true]:hidden">
