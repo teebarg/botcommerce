@@ -24,7 +24,7 @@ const code = function () {
         document.documentElement.classList.add(newTheme);
     }
 
-    var preferredTheme;
+    let preferredTheme;
 
     try {
         preferredTheme = localStorage.getItem(localStorageKey) as Theme;
@@ -41,7 +41,7 @@ const code = function () {
         }
     };
 
-    var darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     darkQuery.addEventListener("change", function (e) {
         window.__setPreferredTheme(e.matches ? "dark" : "light");
