@@ -1,6 +1,5 @@
 from typing import Dict
 
-# import aio_pika
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 
@@ -75,41 +74,26 @@ async def websocket(id: str, websocket: WebSocket):
         manager.disconnect(websocket)
 
 
-# async def consume_events():
+# async def relay_notifications(queue_name: str):
 #     try:
-#         connection = await aio_pika.connect_robust(f"amqp://{settings.RABBITMQ_HOST}")
+#         connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
 #         channel = await connection.channel()
-#         queue = await channel.declare_queue("auth_queue")
-
-#         async with queue.iterator() as queue_iter:
-#             async for message in queue_iter:
-#                 async with message.process():
-#                     event = json.loads(message.body)
-#                     key = event.get("event")
-#                     if key == "login":
-#                         with Session(engine) as db:
-#                             obj_in = event.get("content", {})
-#                             try:
-#                                 if model := db.exec(
-#                                     select(User).where(
-#                                         User.email == obj_in.get("email")
-#                                     )
-#                                 ).first():
-#                                     model.sqlmodel_update(obj_in)
-#                                 else:
-#                                     # If the record doesn't exist, create a new record
-#                                     model = User(**obj_in)
-#                                     db.add(model)
-
-#                                 db.commit()
-#                             except Exception as e:
-#                                 logger.error(f"Error creating or updating user {e}")
-#                                 raise Exception(e) from e
-#                     elif key == "new_user":
-#                         await manager.broadcast(
-#                             id="nK12eRTbo",
-#                             data=event.get("content", {}),
-#                             type="registration",
-#                         )
+#         queue = await channel.declare_queue(queue_name)
+#         async for message in queue:
+#             await manager.broadcast(
+#                 id="test", data={"message": message.body.decode()}, type=queue.name
+#             )
+#             # await message.ack()
 #     except Exception as e:
-#         logger.error(e)
+#         logger.error(f"An error occurred in relay_notifications - {e}")
+
+
+# @router.websocket("/notifications/test")
+# async def websocket_endpoint(websocket: WebSocket):
+#     await manager.connect(id="test", websocket=websocket)
+#     try:
+#         while True:
+#             await relay_notifications("notifications")
+#     except WebSocketDisconnect as e:
+#         logger.error(f"An error occurred - {e}")
+#         manager.disconnect(websocket)

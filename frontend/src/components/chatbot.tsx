@@ -16,14 +16,15 @@ const ChatBot: React.FC<Props> = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
-    const [isOpen, setIsOpen] = useState(() => {
-        if (typeof window !== "undefined") {
-            return localStorage.getItem("chatbotOpen") !== "false";
-        }
-
-        return false;
-    });
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // Set isOpen after hydration
+        const savedIsOpen = localStorage.getItem("chatbotOpen") !== "false";
+
+        setIsOpen(savedIsOpen);
+    }, []);
 
     useEffect(() => {
         if (!isOpen) return; // Don't set initial messages if chat is closed
@@ -91,10 +92,8 @@ const ChatBot: React.FC<Props> = () => {
     return (
         <React.Fragment>
             <div
-                className={cn(
-                    "right-4 bottom-20 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[400px] mt-8 mx-6 mb-0 shadow-lg",
-                    isOpen ? "block" : "hidden"
-                )}
+                className="right-4 bottom-20 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
+                data-open={isOpen ? "true" : "false"}
             >
                 <header className="py-2 px-3 overflow-hidden rounded-top-corners max-h-full text-white" style={{ background: "rgb(255, 90, 45)" }}>
                     <div aria-hidden="false" className="flex items-center">

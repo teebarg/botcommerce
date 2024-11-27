@@ -147,19 +147,44 @@ async def newsletter(data: NewsletterCreate):
     return {"message": "Email sent successfully"}
 
 
-# @app.on_event("startup")
-# async def startup_event():
-#     import asyncio
+# @app.post("/api/test-notification")
+# async def update_order():
+#     connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
+#     channel = await connection.channel()
+#     message = "Order 1 status: 10"
+#     # Declaring queue
+#     queue = await channel.declare_queue("notifications")
+#     await channel.default_exchange.publish(
+#         aio_pika.Message(body=message.encode()), routing_key=queue.name
+#     )
+#     return {"message": "Order status update sent"}
 
-#     loop = asyncio.get_event_loop()
-#     loop.create_task(consume_events())
+# @app.on_event("startup")
+# async def listen_for_notifications():
+#     connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
+#     channel = await connection.channel()
+
+#     # Listen to order updates
+#     order_queue = await channel.declare_queue("notifications-1")
+#     asyncio.create_task(process_updates(order_queue))
+
+
+# async def process_updates(queue):
+#     async for message in queue:
+#         async with message.process():
+#             order_data = message.body.decode()
+#             connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
+#             channel = await connection.channel()
+#             product_queue = await channel.declare_queue("product_update")
+#             await channel.default_exchange.publish(
+#                 aio_pika.Message(body=order_data.encode()),
+#                 routing_key=product_queue.name,
+#             )
 
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        return super().default(obj)
+        return obj.isoformat() if isinstance(obj, datetime) else super().default(obj)
 
 
 app.json_encoder = CustomJSONEncoder
