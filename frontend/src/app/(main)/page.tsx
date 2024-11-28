@@ -72,7 +72,7 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-default-50">
+                <div className="bg-default-100">
                     <div className="max-w-6xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Collections</p>
                         <div className="md:grid grid-cols-2 gap-4">
@@ -88,7 +88,7 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-default-50">
+                <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -112,7 +112,7 @@ export default async function Home() {
                     <div className="max-w-7xl mx-auto px-4">
                         <p className="text-primary font-medium">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
-                        <p className="text-default-700">
+                        <p className="text-default-500">
                             {`We provide a curated selection of children's thrifts, ensuring top quality at unbeatable prices. Discover a variety of
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
@@ -127,7 +127,7 @@ export default async function Home() {
                             <div className="sm:w-1/2 sm:pr-10 backdrop-blur bg-white/60 p-4 sm:p-8 rounded-lg shadow-lg shadow-gray-400">
                                 <p className="text-lg font-medium text-primary">GET IN TOUCH</p>
                                 <p className="text-2xl font-semibold text-gray-900">Reach out to us for more information</p>
-                                <p className="text-gray-700">
+                                <p className="text-gray-500">
                                     For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have
                                     about our products and services.
                                 </p>

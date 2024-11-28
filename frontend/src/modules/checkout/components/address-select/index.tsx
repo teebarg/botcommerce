@@ -47,7 +47,7 @@ const AddressSelect = ({ addresses, cart }: AddressSelectProps) => {
                 </Listbox.Button>
                 <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
                     <Listbox.Options
-                        className="absolute z-20 w-full overflow-auto text-sm bg-default-50 border border-top-0 max-h-60 focus:outline-none sm:text-sm"
+                        className="absolute z-20 w-full overflow-auto text-sm bg-default-100 border border-top-0 max-h-60 focus:outline-none sm:text-sm"
                         data-testid="shipping-address-options"
                     >
                         {addresses.map((address) => {
@@ -64,7 +64,7 @@ const AddressSelect = ({ addresses, cart }: AddressSelectProps) => {
                                             <span className="text-left text-base">
                                                 {address.first_name} {address.last_name}
                                             </span>
-                                            {address.company && <span className="text-sm text-default-800">{address.company}</span>}
+                                            {address.company && <span className="text-sm text-default-900">{address.company}</span>}
                                             <div className="flex flex-col text-left text-base mt-2">
                                                 <span>
                                                     {address.address_1}

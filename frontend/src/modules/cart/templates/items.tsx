@@ -27,13 +27,13 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
                         ?.sort((a: CartItem, b: CartItem) => (a.created_at > b.created_at ? -1 : 1))
                         .map((item: CartItem) => (
                             <tr key={item.product_id} className="even:bg-content2">
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-800 sm:pl-3">
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default-900 sm:pl-3">
                                     <LocalizedClientLink className="flex sm:w-20 w-12" href={`/products/${item?.slug}`}>
                                         <Thumbnail size="square" thumbnail={item.image} />
                                     </LocalizedClientLink>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <p className="font-medium text-default-800 truncate max-w-72" data-testid="product-title">
+                                    <p className="font-medium text-default-900 truncate max-w-72" data-testid="product-title">
                                         {item.name}
                                     </p>
                                 </td>
@@ -67,7 +67,7 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
                                         <Control item={item} />
                                     </div>
                                     <div className="flex flex-col items-end">
-                                        <span className="text-sm font-medium text-default-700 flex items-center">
+                                        <span className="text-sm font-medium text-default-900 flex items-center">
                                             {item.quantity} @ {currency(item.price)}
                                         </span>
                                         <span className="text-xl font-medium">{currency(item.price * item.quantity)}</span>

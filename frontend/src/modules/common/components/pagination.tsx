@@ -57,7 +57,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                     <li
                         aria-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         aria-label="previous page button"
-                        className="flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-300 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-200 min-w-9 w-9 h-9 text-small rounded-medium"
+                        className="flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
                         data-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         data-slot="prev"
                         role="button"
@@ -74,7 +74,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                             key={index}
                             aria-current={page == index + 1 ? "true" : undefined}
                             aria-label={`pagination item ${index + 1} ${page == index + 1 ? "active" : ""}`}
-                            className="select-none touch-none bg-transparent transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-300 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-200 min-w-9 w-9 h-9 text-small rounded-medium"
+                            className="select-none touch-none bg-transparent transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
                             data-active={page === index + 1 ? "true" : undefined}
                             data-slot="item"
                             role="button"
@@ -91,7 +91,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                             tabIndex={0}
                             aria-label="dots element"
                             data-slot="item"
-                            className="tap-highlight-transparent select-none touch-none transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-300 data-[disabled=true]:pointer-events-none shadow-sm bg-default-100 [&[data-hover=true]:not([data-active=true])]:bg-default-200 active:bg-default-300 min-w-9 w-9 h-9 text-small rounded-medium group"
+                            className="tap-highlight-transparent select-none touch-none transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none shadow-sm bg-default-100 [&[data-hover=true]:not([data-active=true])]:bg-default-200 active:bg-default-100 min-w-9 w-9 h-9 text-small rounded-medium group"
                         >
                             <svg
                                 aria-hidden="true"
@@ -131,7 +131,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                     <li
                         aria-disabled={pagination?.total_pages === 1 || page == pagination?.total_pages ? "true" : "false"}
                         aria-label="next page button"
-                        className="flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-300 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-200 min-w-9 w-9 h-9 text-small rounded-medium"
+                        className="flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
                         data-disabled={pagination?.total_pages === 1 || page == pagination?.total_pages ? "true" : "false"}
                         data-slot="next"
                         role="button"

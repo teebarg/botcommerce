@@ -43,7 +43,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-200",
+                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-100",
                         "group-data-[focus=true]:bg-default-100 min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-background motion-reduce:transition-none",
                         "!duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus",
                         "group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background",
@@ -64,7 +64,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                         className={cn(
                             "absolute z-10 pointer-events-none origin-top-left rtl:origin-top-right subpixel-antialiased block text-foreground-500 cursor-text",
                             "after:text-danger after:ml-0.5 rtl:after:ml-[unset] rtl:after:mr-0.5 will-change-auto !duration-200 !ease-out motion-reduce:transition-none",
-                            "transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-default-600 group-data-[filled-within=true]:pointer-events-auto",
+                            "transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-default-500 group-data-[filled-within=true]:pointer-events-auto",
                             "group-data-[filled-within=true]:scale-85 text-small group-data-[filled-within=true]:-translate-y-[calc(50%_+_theme(fontSize.small)/2_-_6px)] pe-2",
                             "max-w-full text-ellipsis overflow-hidden",
                             {
@@ -110,7 +110,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                     {props.description && (
                         <div
                             {...descriptionProps}
-                            className={cn("text-tiny text-foreground-400", classNames?.["description"])}
+                            className={cn("text-tiny text-foreground-500", classNames?.["description"])}
                             data-slot="description"
                         >
                             {props.description}

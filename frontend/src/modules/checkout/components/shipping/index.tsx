@@ -71,7 +71,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     {!isOpen && cart.shipping_method?.name && <CheckCircleSolid />}
                 </h2>
                 {!isOpen && cart?.shipping_address && cart?.billing_address && cart?.email && (
-                    <button className="text-default-700 hover:text-blue-600" data-testid="edit-delivery-button" onClick={handleEdit}>
+                    <button className="text-default-900 hover:text-blue-600" data-testid="edit-delivery-button" onClick={handleEdit}>
                         Edit
                     </button>
                 )}
@@ -98,12 +98,12 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                                                 <Radio checked={option.id === cart.shipping_method?.id} />
                                                 <span className="text-base">{option.name}</span>
                                             </div>
-                                            <span className="justify-self-end text-default-800">{currency(option.amount!)}</span>
+                                            <span className="justify-self-end text-default-900">{currency(option.amount!)}</span>
                                         </RadioGroup.Option>
                                     );
                                 })
                             ) : (
-                                <div className="flex flex-col items-center justify-center px-4 py-8 text-default-800">
+                                <div className="flex flex-col items-center justify-center px-4 py-8 text-default-900">
                                     <Spinner />
                                 </div>
                             )}
@@ -129,7 +129,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                         {cart && cart.shipping_method?.name && (
                             <div className="flex flex-col w-1/3">
                                 <p className="font-medium mb-1 text-base">Method</p>
-                                <p className="font-normal text-default-600 text-base">
+                                <p className="font-normal text-default-500 text-base">
                                     {cart.shipping_method?.name} ({currency(cart.shipping_method.amount)})
                                 </p>
                             </div>

@@ -112,12 +112,12 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     ) : paidByGiftcard ? (
                         <div className="flex flex-col w-1/3">
                             <p className="font-medium text-base mb-1">Payment method</p>
-                            <p className="font-normal text-base text-default-600" data-testid="payment-method-summary">
+                            <p className="font-normal text-base text-default-500" data-testid="payment-method-summary">
                                 Gift card
                             </p>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center px-4 py-16 text-default-800">
+                        <div className="flex flex-col items-center justify-center px-4 py-16 text-default-900">
                             <Spinner />
                         </div>
                     )}
@@ -141,7 +141,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                         <div className="flex items-start gap-x-1 w-full flex-wrap space-y-2 md:space-y-0">
                             <div className="flex flex-col w-full md:w-1/3">
                                 <p className="font-medium text-base mb-1">Payment method</p>
-                                <p className="font-normal text-base text-default-600" data-testid="payment-method-summary">
+                                <p className="font-normal text-base text-default-500" data-testid="payment-method-summary">
                                     {paymentInfoMap[cart.payment_session.id]?.title || cart.payment_session.provider_id}
                                 </p>
                                 {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, cart.payment_session.provider_id) && (
@@ -150,8 +150,8 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                             </div>
                             <div className="flex flex-col w-full md:w-1/3">
                                 <p className="font-medium text-base mb-1">Payment details</p>
-                                <div className="flex gap-2 font-normal text-base text-default-600 items-center" data-testid="payment-details-summary">
-                                    <div className="shadow-lg rounded-lg flex items-center h-7 w-fit p-2 bg-default-300">
+                                <div className="flex gap-2 font-normal text-base text-default-500 items-center" data-testid="payment-details-summary">
+                                    <div className="shadow-lg rounded-lg flex items-center h-7 w-fit p-2 bg-default-100">
                                         {paymentInfoMap[cart.payment_session.id]?.icon || <CreditCard />}
                                     </div>
                                     <p>{"Another step will appear"}</p>
@@ -161,7 +161,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     ) : paidByGiftcard ? (
                         <div className="flex flex-col w-1/3">
                             <p className="font-medium text-base mb-1">Payment method</p>
-                            <p className="font-normal text-base text-default-600" data-testid="payment-method-summary">
+                            <p className="font-normal text-base text-default-500" data-testid="payment-method-summary">
                                 Gift card
                             </p>
                         </div>

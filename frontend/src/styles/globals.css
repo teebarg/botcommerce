@@ -106,9 +106,7 @@
         border-radius: 0.375rem;
         border-color: rgba(0, 0, 0, 0.11);
         border-width: 0px;
-        box-shadow:
-            rgba(0, 0, 0, 0.11) 0px 0px 0px 1px,
-            rgba(0, 0, 0, 0.07) 0px 0px 1px 0px;
+        box-shadow: rgba(0, 0, 0, 0.11) 0px 0px 0px 1px, rgba(0, 0, 0, 0.07) 0px 0px 1px 0px;
     }
 
     .cl-internal-ttumny {
@@ -126,10 +124,7 @@
         font-weight: 500;
         font-size: 0.8125rem;
         line-height: 1.38462;
-        box-shadow:
-            rgba(255, 255, 255, 0.07) 0px 1px 1px 0px inset,
-            rgba(34, 42, 53, 0.2) 0px 2px 3px 0px,
-            rgba(0, 0, 0, 0.24) 0px 1px 1px 0px;
+        box-shadow: rgba(255, 255, 255, 0.07) 0px 1px 1px 0px inset, rgba(34, 42, 53, 0.2) 0px 2px 3px 0px, rgba(0, 0, 0, 0.24) 0px 1px 1px 0px;
         border-style: solid;
         border-color: var(--accent);
         width: 100%;
@@ -215,7 +210,64 @@
     .light,
     [data-theme="light"] {
         color-scheme: light;
-        --background: 0 0% 100%;
+        /* Background and Foreground */
+        --background: 0 0% 97%; /* Soft, warm off-white */
+        --foreground-100: 240 4.76% 95.88%;
+        --foreground-500: 0 0% 20%; /* Deep charcoal for primary text */
+        --foreground-900: 0 0% 0%; /* Pure black for emphatic text */
+        --foreground: 0 0% 29%; /* Soft black for standard text */
+
+        /* Content Layers */
+        --content1: 0 0% 100%; /* Pristine white for primary content */
+        --content1-foreground: 0 0% 17%; /* Dark gray for content text */
+        --content2: 0 0% 98%; /* Slightly off-white for secondary content */
+        --content2-foreground: 0 0% 23%; /* Slightly lighter dark gray */
+        --content3: 0 0% 94%; /* Light gray for tertiary content */
+        --content3-foreground: 0 0% 25%; /* Darker text for contrast */
+        --content4: 0 0% 91%; /* Soft gray for quaternary content */
+        --content4-foreground: 0 0% 27%; /* Dark text for readability */
+
+        /* Default State Colors */
+        --default-100: 0 0% 88%; /* Light silver */
+        --default-500: 240 5.2% 33.92%; /* Medium silver */
+        --default-900: 0 0% 38%; /* Dark silver */
+        --default-foreground: 0 0% 100%; /* White text on default */
+        --default: 0 0% 80%; /* Silver accent */
+
+        /* Primary Brand Colors */
+        --primary-100: 43 65% 55%; /* Soft gold highlight */
+        --primary-500: 43 65% 45%; /* Rich gold */
+        --primary-900: 43 65% 35%; /* Deep gold */
+        --primary-foreground: 0 0% 100%; /* White text on gold */
+        --primary: 43 65% 50%; /* Primary brand gold */
+
+        /* Secondary Accent Colors */
+        --secondary-100: 20 25% 40%; /* Light bronze/taupe */
+        --secondary-500: 20 25% 30%; /* Medium bronze */
+        --secondary-900: 20 25% 20%; /* Dark bronze */
+        --secondary-foreground: 0 0% 100%; /* White text on bronze */
+        --secondary: 20 25% 35%; /* Bronze accent */
+
+        /* Semantic Colors */
+        --success-100: 122 39% 49%; /* Soft green */
+        --success-500: 122 61% 39%; /* Medium green */
+        --success-900: 122 61% 29%; /* Dark green */
+        --success-foreground: 0 0% 100%; /* White text on green */
+        --success: 122 50% 45%; /* Success green */
+
+        --warning-100: 45 100% 51%; /* Light amber */
+        --warning-500: 36 100% 50%; /* Medium amber */
+        --warning-900: 33 100% 50%; /* Dark amber */
+        --warning-foreground: 0 0% 0%; /* Black text on amber */
+        --warning: 40 100% 50%; /* Warning amber */
+
+        --danger-100: 4 76% 52%; /* Light red */
+        --danger-500: 4 69% 44%; /* Medium red */
+        --danger-900: 4 82% 34%; /* Dark red */
+        --danger-foreground: 0 0% 100%; /* White text on red */
+        --danger: 4 75% 50%; /* Danger red */
+
+        /* --background: 0 0% 100%;
         --foreground-50: 0 0% 98.04%;
         --foreground-100: 240 4.76% 95.88%;
         --foreground-200: 240 5.88% 90%;
@@ -226,20 +278,20 @@
         --foreground-700: 240 5.26% 26.08%;
         --foreground-800: 240 3.7% 15.88%;
         --foreground-900: 240 5.88% 10%;
-        --foreground: 201.81999999999994 24.44% 8.82%;
+        --foreground: 201.81999999999994 24.44% 8.82%; */
         --divider: 0 0% 6.67%;
         --divider-opacity: 0.15;
         --focus: 212.01999999999998 100% 46.67%;
         --overlay: 0 0% 0%;
-        --content1: 0 0% 100%;
+        /* --content1: 0 0% 100%;
         --content1-foreground: 201.81999999999994 24.44% 8.82%;
         --content2: 240 4.76% 95.88%;
         --content2-foreground: 240 3.7% 15.88%;
         --content3: 240 5.88% 90%;
         --content3-foreground: 240 5.26% 26.08%;
         --content4: 240 4.88% 83.92%;
-        --content4-foreground: 240 5.2% 33.92%;
-        --default-50: 0 0% 98.04%;
+        --content4-foreground: 240 5.2% 33.92%; */
+        /* --default-50: 0 0% 98.04%;
         --default-100: 240 4.76% 95.88%;
         --default-200: 240 5.88% 90%;
         --default-300: 240 4.88% 83.92%;
@@ -310,7 +362,7 @@
         --danger-800: 339.3299999999999 86.54% 20.39%;
         --danger-900: 340 84.91% 10.39%;
         --danger-foreground: 0 0% 100%;
-        --danger: 339.20000000000005 90.36% 51.18%;
+        --danger: 339.20000000000005 90.36% 51.18%; */
         --divider-weight: 1px;
         --disabled-opacity: 0.5;
         --font-size-tiny: 0.75rem;
@@ -338,7 +390,65 @@
     .dark,
     [data-theme="dark"] {
         color-scheme: dark;
-        --background: 0 0% 0%;
+        /* Background and Foreground */
+        --background: 0 0% 7%; /* Deep charcoal */
+        --foreground-100: 240 3.7% 15.88%;
+        --foreground-500: 0 0% 88%; /* Light gray for primary text */
+        --foreground-900: 0 0% 100%; /* Pure white for emphatic text */
+        --foreground: 0 0% 80%; /* Soft light gray for standard text */
+
+        /* Content Layers */
+        --content1: 0 0% 12%; /* Very dark gray for primary content */
+        --content1-foreground: 0 0% 90%; /* Light gray for content text */
+        --content2: 0 0% 15%; /* Slightly lighter dark gray */
+        --content2-foreground: 0 0% 85%; /* Lighter gray text */
+        --content3: 0 0% 17%; /* Medium dark gray */
+        --content3-foreground: 0 0% 81%; /* Light text */
+        --content4: 0 0% 20%; /* Dark gray */
+        --content4-foreground: 0 0% 76%; /* Soft light text */
+
+        /* Default State Colors */
+        --default-100: 0 0% 25%; /* Dark silver */
+        --default-500: 240 4.88% 83.92%; /* Medium dark silver */
+        /* --default-500: 0 0% 38%; */
+        --default-900: 0 0% 63%; /* Light silver */
+        --default-foreground: 0 0% 0%; /* Black text on default */
+        --default: 0 0% 50%; /* Silver accent */
+
+        /* Primary Brand Colors */
+        --primary-100: 43 65% 45%; /* Rich gold */
+        --primary-500: 43 65% 55%; /* Soft gold */
+        --primary-900: 43 65% 65%; /* Light gold */
+        --primary-foreground: 0 0% 0%; /* Black text on gold */
+        --primary: 43 65% 50%; /* Primary brand gold */
+
+        /* Secondary Accent Colors */
+        --secondary-100: 20 25% 35%; /* Dark bronze */
+        --secondary-500: 20 25% 30%; /* Medium bronze */
+        --secondary-900: 20 25% 40%; /* Light bronze/taupe */
+        --secondary-foreground: 0 0% 100%; /* White text on bronze */
+        --secondary: 20 25% 35%; /* Bronze accent */
+
+        /* Semantic Colors */
+        --success-100: 122 61% 29%; /* Dark green */
+        --success-500: 122 61% 39%; /* Medium green */
+        --success-900: 122 39% 49%; /* Soft green */
+        --success-foreground: 0 0% 100%; /* White text on green */
+        --success: 122 50% 45%; /* Success green */
+
+        --warning-100: 33 100% 50%; /* Dark amber */
+        --warning-500: 36 100% 50%; /* Medium amber */
+        --warning-900: 45 100% 51%; /* Light amber */
+        --warning-foreground: 0 0% 0%; /* Black text on amber */
+        --warning: 40 100% 50%; /* Warning amber */
+
+        --danger-100: 4 82% 34%; /* Dark red */
+        --danger-500: 4 69% 44%; /* Medium red */
+        --danger-900: 4 76% 52%; /* Light red */
+        --danger-foreground: 0 0% 100%; /* White text on red */
+        --danger: 4 75% 50%; /* Danger red */
+
+        /* --background: 0 0% 0%;
         --foreground-50: 240 5.88% 10%;
         --foreground-100: 240 3.7% 15.88%;
         --foreground-200: 240 5.26% 26.08%;
@@ -349,12 +459,12 @@
         --foreground-700: 240 5.88% 90%;
         --foreground-800: 240 4.76% 95.88%;
         --foreground-900: 0 0% 98.04%;
-        --foreground: 210 5.56% 92.94%;
+        --foreground: 210 5.56% 92.94%; */
         --focus: 212.01999999999998 100% 46.67%;
         --overlay: 0 0% 0%;
         --divider: 0 0% 100%;
         --divider-opacity: 0.15;
-        --content1: 240 5.88% 10%;
+        /* --content1: 240 5.88% 10%;
         --content1-foreground: 0 0% 98.04%;
         --content2: 240 3.7% 15.88%;
         --content2-foreground: 240 4.76% 95.88%;
@@ -433,7 +543,7 @@
         --danger-800: 340 91.84% 90.39%;
         --danger-900: 339.13 92% 95.1%;
         --danger-foreground: 0 0% 100%;
-        --danger: 339.20000000000005 90.36% 51.18%;
+        --danger: 339.20000000000005 90.36% 51.18%; */
         --divider-weight: 1px;
         --disabled-opacity: 0.5;
         --font-size-tiny: 0.75rem;

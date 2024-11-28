@@ -62,7 +62,7 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
 
                 <Button
                     className="w-full"
-                    color="default"
+                    color="primary"
                     data-testid="add-product-button"
                     isDisabled={!inStock || !!disabled || isAdding}
                     isLoading={isAdding}

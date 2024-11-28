@@ -89,10 +89,10 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
             <div className="text-lg font-semibold pt-7 pl-8 pb-1">Activity</div>
             <div>
                 {activities.map((item: Activity, index: number) => (
-                    <div key={index} className="border-default-200 mx-8 border-b last:border-b-0">
-                        <div className="hover:bg-default-50 -mx-8 flex px-8 py-6">
+                    <div key={index} className="border-default-100 mx-8 border-b last:border-b-0">
+                        <div className="hover:bg-default-100 -mx-8 flex px-8 py-6">
                             <div className="relative h-full w-full">
-                                <div className="text-default-600 flex justify-between">
+                                <div className="text-default-500 flex justify-between">
                                     <div className="flex items-center">
                                         <Logo className="mr-3" />
                                         <span className="text-sm font-semibold">BotCommerce Store</span>
@@ -112,7 +112,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                         <span>{item.description}</span>
                                         <div className="mt-4 flex w-full cursor-pointer items-center">
                                             <div className="border-grey-20p flex items-center justify-center rounded-lg border p-2.5">
-                                                {item.is_success ? <Excel /> : <CancelIcon className="text-default-600" size={18} />}
+                                                {item.is_success ? <Excel /> : <CancelIcon className="text-default-500" size={18} />}
                                             </div>
                                             <div className="relative w-full pl-4 text-left">
                                                 <div className="text-sm max-w-[80%] overflow-hidden truncate">{item.action_download_url}</div>

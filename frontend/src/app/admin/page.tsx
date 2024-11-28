@@ -115,13 +115,13 @@ export default async function AdminPage() {
                                 <img alt="avatar" className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0" src="" />
                             </span>
                             <div className="flex flex-col gap-1 items-start justify-center">
-                                <h4 className="text-small font-semibold leading-none text-default-600">Zoey Lang</h4>
-                                <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                                <h4 className="text-small font-semibold leading-none text-default-900">Zoey Lang</h4>
+                                <h5 className="text-small tracking-tight text-default-500">@zoeylang</h5>
                             </div>
                         </div>
                         <Button className="">Follow</Button>
                     </div>
-                    <div className="relative flex w-full p-3 flex-auto flex-col place-content-inherit align-items-inherit h-auto break-words text-left overflow-y-auto px-3 py-0 text-small text-default-400">
+                    <div className="relative flex w-full p-3 flex-auto flex-col place-content-inherit align-items-inherit h-auto break-words text-left overflow-y-auto px-3 py-0 text-small text-default-500">
                         <p>Frontend developer and UI/UX enthusiast. Join me on this coding adventure!</p>
                         <span className="pt-2">
                             #FrontendWithZoey
@@ -131,14 +131,14 @@ export default async function AdminPage() {
                         </span>
                     </div>
 
-                    <div className="p-3 h-auto flex w-full items-center overflow-hidden color-inherit rounded-b-large gap-3">
+                    <div className="p-3 h-auto flex w-full items-center overflow-hidden color-inherit rounded-b-large gap-3 text-default-500">
                         <div className="flex gap-1">
-                            <p className="font-semibold text-default-400 text-small">4</p>
-                            <p className="text-default-400 text-small">Following</p>
+                            <p className="font-semibold text-small">4</p>
+                            <p className="text-default-500 text-small">Following</p>
                         </div>
                         <div className="flex gap-1">
-                            <p className="font-semibold text-default-400 text-small">97.1K</p>
-                            <p className="text-default-400 text-small">Followers</p>
+                            <p className="font-semibold text-small">97.1K</p>
+                            <p className="text-default-500 text-small">Followers</p>
                         </div>
                     </div>
                 </div>

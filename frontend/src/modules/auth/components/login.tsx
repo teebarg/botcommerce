@@ -41,7 +41,7 @@ const LoginForm: React.FC<Props> = () => {
                     Sign in
                 </FormButton>
             </form>
-            <span className="text-center text-default-800 text-sm mt-6">
+            <span className="text-center text-default-900 text-sm mt-6">
                 Not a member?{" "}
                 <LocalizedClientLink className="text-blue-500" href={"/sign-up"}>
                     Join us.

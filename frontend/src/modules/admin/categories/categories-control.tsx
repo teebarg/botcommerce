@@ -89,7 +89,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
             </div>
             {slideOverState.isOpen && (
                 <SlideOver
-                    className="bg-default-50"
+                    className="bg-default-100"
                     isOpen={slideOverState.isOpen}
                     title={isNew ? `Add SubCat to ${category?.name}` : "Edit Category"}
                     onClose={slideOverState.close}

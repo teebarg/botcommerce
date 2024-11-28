@@ -167,7 +167,7 @@ const ChatBot: React.FC<Props> = () => {
                                                     "relative rounded-xl py-2 px-3 text-sm leading-5 inline-block",
                                                     message.isUser
                                                         ? "bg-orange-700 text-white overflow-hidden max-w-[calc(100%-8px)] float-right"
-                                                        : "bg-content2 text-default-700 overflow-visible max-w-[calc(100%-16px)] float-left"
+                                                        : "bg-content2 text-default-900 overflow-visible max-w-[calc(100%-16px)] float-left"
                                                 )}
                                             >
                                                 <span className="m-0 max-w-full">
@@ -191,7 +191,7 @@ const ChatBot: React.FC<Props> = () => {
                             </label>
                             <textarea
                                 aria-label="Write a reply..."
-                                className="placeholder:text-ellipsis text-default-700 border-default-400 focus-visible:outline-none border-solid border"
+                                className="placeholder:text-ellipsis text-default-900 border-default-500 focus-visible:outline-none border-solid border"
                                 id="chat-input"
                                 placeholder="Write a reply..."
                                 value={input}

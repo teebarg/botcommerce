@@ -16,7 +16,7 @@ const ProductCard: React.FC<ComponentProps> = async ({ product }) => {
                     <img alt={product.name} className="h-full w-full object-cover object-center" src={product.image as string} />
                 </div>
                 <div className="relative mt-4">
-                    <LocalizedClientLink className="font-medium text-default-700 text-base line-clamp-2" href={`/products/${product.slug}`}>
+                    <LocalizedClientLink className="font-medium text-default-900 text-base line-clamp-2" href={`/products/${product.slug}`}>
                         {product.name}
                     </LocalizedClientLink>
                 </div>

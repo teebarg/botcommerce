@@ -25,7 +25,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
             <div className="uppercase text-lg mb-1">
                 #<span data-testid="order-display-id">{order.order_id}</span>
             </div>
-            <div className="flex items-center divide-x divide-gray-50 text-sm text-default-700">
+            <div className="flex items-center divide-x divide-gray-50 text-sm text-default-500">
                 <span className="pr-2" data-testid="order-created-at">
                     {new Date(order.created_at).toDateString()}
                 </span>
@@ -41,8 +41,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
                             <div className="h-20 w-20 relative">
                                 <Image fill alt={i.name} src={i.image as string} />
                             </div>
-                            <div className="flex items-center text-sm text-default-700">
-                                <span className="text-default-700 font-semibold" data-testid="item-title">
+                            <div className="flex items-center text-sm text-default-500">
+                                <span className="text-default-500 font-semibold" data-testid="item-title">
                                     {i.name}
                                 </span>
                                 <span className="ml-2">x</span>
@@ -53,8 +53,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 })}
                 {numberOfProducts > 4 && (
                     <div className="w-full h-full flex flex-col items-center justify-center">
-                        <span className="text-sm text-default-700">+ {numberOfLines - 4}</span>
-                        <span className="text-sm text-default-700">more</span>
+                        <span className="text-sm text-default-900">+ {numberOfLines - 4}</span>
+                        <span className="text-sm text-default-900">more</span>
                     </div>
                 )}
             </div>

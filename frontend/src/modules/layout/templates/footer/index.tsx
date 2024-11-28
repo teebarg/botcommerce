@@ -77,12 +77,12 @@ export default async function Footer() {
                             {collections?.length > 0 && (
                                 <div>
                                     <div>
-                                        <h3 className="text-small font-semibold text-default-600">Collections</h3>
+                                        <h3 className="text-small font-semibold text-default-500">Collections</h3>
                                         <ul className="mt-6 space-y-4">
                                             {collections?.slice(0, 6).map((c: any, index: any) => (
                                                 <li key={index}>
                                                     <LocalizedClientLink
-                                                        className="text-small hover:opacity-80 transition-opacity text-default-400"
+                                                        className="text-small hover:opacity-80 transition-opacity text-default-500"
                                                         href={`/collections/${c.slug}`}
                                                     >
                                                         {c.name}
@@ -96,7 +96,7 @@ export default async function Footer() {
                             {categories?.length > 0 && (
                                 <div>
                                     <div>
-                                        <h3 className="text-small font-semibold text-default-600">Categories</h3>
+                                        <h3 className="text-small font-semibold text-default-500">Categories</h3>
                                         <ul className="mt-6 space-y-4" data-testid="footer-categories">
                                             {categories?.map((c: Category) => {
                                                 const children =
@@ -109,7 +109,7 @@ export default async function Footer() {
                                                 return (
                                                     <li key={c.id}>
                                                         <LocalizedClientLink
-                                                            className="text-small hover:opacity-80 transition-opacity text-default-400"
+                                                            className="text-small hover:opacity-80 transition-opacity text-default-500"
                                                             data-testid="category-link"
                                                             href={`/collections?cat_ids=${c.slug}`}
                                                         >
@@ -120,7 +120,7 @@ export default async function Footer() {
                                                                 {children?.map((child: Category) => (
                                                                     <li key={child.id}>
                                                                         <LocalizedClientLink
-                                                                            className="text-small hover:opacity-80 transition-opacity text-default-400"
+                                                                            className="text-small hover:opacity-80 transition-opacity text-default-500"
                                                                             data-testid="category-link"
                                                                             href={`/collections?cat_ids=${child.slug}`}
                                                                         >
@@ -141,12 +141,12 @@ export default async function Footer() {
                         <div className="md:grid md:grid-cols-2 md:gap-8">
                             <div>
                                 <div>
-                                    <h3 className="text-small font-semibold text-default-600">About Us</h3>
+                                    <h3 className="text-small font-semibold text-default-500">About Us</h3>
                                     <ul className="mt-6 space-y-4">
                                         {about.map((item, index) => (
                                             <li key={index}>
                                                 <LocalizedClientLink
-                                                    className="text-small hover:opacity-80 transition-opacity text-default-400"
+                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
                                                     href={item.to}
                                                 >
                                                     {item.label}
@@ -158,12 +158,12 @@ export default async function Footer() {
                             </div>
                             <div className="mt-10 md:mt-0">
                                 <div>
-                                    <h3 className="text-small font-semibold text-default-600">Legal</h3>
+                                    <h3 className="text-small font-semibold text-default-500">Legal</h3>
                                     <ul className="mt-6 space-y-4">
                                         {legal.map((item, index) => (
                                             <li key={index}>
                                                 <LocalizedClientLink
-                                                    className="text-small hover:opacity-80 transition-opacity text-default-400"
+                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
                                                     href={item.to}
                                                 >
                                                     {item.label}
@@ -176,17 +176,17 @@ export default async function Footer() {
                         </div>
                     </div>
                 </div>
-                <div className="my-10 rounded-medium bg-default-200/20 p-4 sm:my-14 sm:p-8 lg:my-16 lg:flex lg:items-center lg:justify-between lg:gap-2">
+                <div className="my-10 rounded-medium bg-default-100/20 p-4 sm:my-14 sm:p-8 lg:my-16 lg:flex lg:items-center lg:justify-between lg:gap-2">
                     <div>
-                        <h3 className="text-medium font-semibold text-default-600">Subscribe to our newsletter</h3>
-                        <p className="mt-2 text-small text-default-400">
+                        <h3 className="text-medium font-semibold text-default-500">Subscribe to our newsletter</h3>
+                        <p className="mt-2 text-small text-default-500">
                             Receive weekly updates with the newest insights, trends, and tools, straight to your email.
                         </p>
                     </div>
                     <NewsletterForm />
                 </div>
                 <div className="flex flex-wrap justify-between gap-2 pt-8">
-                    <p className="text-small text-default-400">&copy; {new Date().getFullYear()} Online Kiddies Store. All rights reserved.</p>
+                    <p className="text-small text-default-500">&copy; {new Date().getFullYear()} Online Kiddies Store. All rights reserved.</p>
                 </div>
             </div>
         </footer>

@@ -1,7 +1,7 @@
-import clsx from "clsx";
 import { XMark } from "nui-react-icons";
 import React, { useRef } from "react";
 import { useOverlay, usePreventScroll, OverlayContainer, OverlayProps } from "@react-aria/overlays";
+import { cn } from "@lib/util/cn";
 
 interface ModalProps extends OverlayProps {
     title?: string;
@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
                     // {...dialogProps}
                     // {...modalProps}
                     ref={ref}
-                    className={clsx("bg-default-200 rounded-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative", {
+                    className={cn("bg-default-100 rounded-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative", {
                         "max-w-lg": size == "sm",
                         "max-w-2xl": size == "md",
                         "max-w-5xl": size == "lg",

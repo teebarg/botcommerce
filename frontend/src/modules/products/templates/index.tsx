@@ -59,7 +59,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     <div className="flex flex-col">
                         <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
                         <div className="my-2 flex items-center gap-2">
-                            <p className="text-small text-default-400">669 reviews</p>
+                            <p className="text-small text-default-500">669 reviews</p>
                         </div>
                         <div className="max-w-40 mt-2">
                             <Suspense fallback={<ProductActions disabled={true} product={product} />}>
@@ -70,12 +70,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                             <p className="line-clamp-3 text-medium text-default-500">{product.description}</p>
                         </div>
                         <div className="mt-6 flex flex-col gap-1">
-                            <div className="mb-4 flex items-center gap-2 text-default-700">
+                            <div className="mb-4 flex items-center gap-2 text-default-900">
                                 <Delivery />
                                 <p className="text-small font-medium">Free shipping and 30 days return</p>
                             </div>
                             <LocalizedClientLink
-                                className="inline-flex items-center text-small hover:opacity-80 transition-opacity my-2 text-default-400"
+                                className="inline-flex items-center text-small hover:opacity-80 transition-opacity my-2 text-default-500"
                                 href={"/"}
                             >
                                 See guide

@@ -121,7 +121,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                 <div className="flex flex-col gap-8 text-center px-9 py-8">
                     <div>
                         <div className="flex flex-col gap-1 items-stretch justify-start">
-                            <h1 className="font-bold text-lg text-default-700" data-localization-key="signUp.emailCode.title">
+                            <h1 className="font-bold text-lg text-default-900" data-localization-key="signUp.emailCode.title">
                                 Verify your email
                             </h1>
                             <p className="font-medium text-sm text-default-500" data-localization-key="signUp.emailCode.subtitle">

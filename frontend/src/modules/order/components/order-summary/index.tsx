@@ -16,7 +16,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
     return (
         <div>
             <h2 className="text-xl font-semibold">Order Summary</h2>
-            <div className="text-sm text-default-700 my-2">
+            <div className="text-sm text-default-900 my-2">
                 <div className="flex items-center justify-between mb-2">
                     <span>Subtotal</span>
                     <span>{getAmount(order.subtotal)}</span>

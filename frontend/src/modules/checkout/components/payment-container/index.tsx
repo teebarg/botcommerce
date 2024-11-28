@@ -41,7 +41,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, sel
 
                         {paymentSession.provider_id === "manual" && isDevelopment && <PaymentTest className="hidden sm:block" />}
                     </div>
-                    <span className="justify-self-end text-default-800">{paymentInfoMap[paymentSession.provider_id]?.icon}</span>
+                    <span className="justify-self-end text-default-900">{paymentInfoMap[paymentSession.provider_id]?.icon}</span>
                 </div>
                 {paymentSession.provider_id === "manual" && isDevelopment && <PaymentTest className="sm:hidden text-[10px]" />}
             </RadioGroup.Option>

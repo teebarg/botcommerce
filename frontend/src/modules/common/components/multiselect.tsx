@@ -91,14 +91,14 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
 
                 {isOpen && (
                     <div className="absolute z-20 w-full mt-1 bg-default-100 shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
-                        <ul className="divide-y divide-default-300">
+                        <ul className="divide-y divide-default-100">
                             {options.map((option) => (
                                 <li
                                     key={option.id}
                                     className={`
                                         px-3 py-2 flex items-center justify-between cursor-pointer
-                                        ${selectedKeys.has(option.id) ? "bg-default-200" : ""}
-                                        hover:bg-default-50
+                                        ${selectedKeys.has(option.id) ? "bg-default-100" : ""}
+                                        hover:bg-default-100
                                     `}
                                     onClick={() => toggleOption(option.id)}
                                 >

@@ -10,13 +10,13 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             <div className="flex flex-col gap-y-4 lg:max-w-[500px] mx-auto">
                 {product.collection && (
                     <LocalizedClientLink
-                        className="text-medium text-default-500 hover:text-default-600"
+                        className="text-medium text-default-500 hover:text-default-100"
                         href={`/collections/${product.collection.slug}`}
                     >
                         {product.collection.title}
                     </LocalizedClientLink>
                 )}
-                <h2 className="text-3xl leading-10 text-default-800" data-testid="product-title">
+                <h2 className="text-3xl leading-10 text-default-900" data-testid="product-title">
                     {product.title}
                 </h2>
 

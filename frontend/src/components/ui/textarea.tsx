@@ -57,7 +57,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-200 group-data-[focus=true]:bg-default-100",
+                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-100 group-data-[focus=true]:bg-default-100",
                         "min-h-10 rounded-medium flex-col items-start justify-center gap-0 !h-auto transition-background motion-reduce:transition-none !duration-150 outline-none",
                         "group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus group-data-[focus-visible=true]:ring-offset-2",
                         "group-data-[focus-visible=true]:ring-offset-background py-2",
@@ -71,7 +71,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                         {...labelProps}
                         className={cn(
                             "z-10 pointer-events-none origin-top-left rtl:origin-top-right subpixel-antialiased block text-foreground-500 cursor-text relative will-change-auto",
-                            "!duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-default-600",
+                            "!duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-default-500",
                             "group-data-[filled-within=true]:pointer-events-auto group-data-[filled-within=true]:scale-85 text-small pb-0.5 pe-2 max-w-full text-ellipsis overflow-hidden",
                             classNames?.["label"]
                         )}
@@ -103,7 +103,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                 </div>
                 <div className="hidden group-data-[has-helper=true]:flex p-1 relative flex-col gap-1.5" data-slot="helper-wrapper">
                     {props.description && (
-                        <div {...descriptionProps} className={cn("text-tiny text-foreground-400")} data-slot="description">
+                        <div {...descriptionProps} className={cn("text-tiny text-foreground-500")} data-slot="description">
                             {props.description}
                         </div>
                     )}

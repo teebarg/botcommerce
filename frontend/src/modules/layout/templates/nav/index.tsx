@@ -63,7 +63,7 @@ const Navbar = async () => {
                 <NavbarItem className="flex items-center pt-2">
                     <Suspense
                         fallback={
-                            <LocalizedClientLink className="hover:text-default-800 flex gap-2" data-testid="nav-cart-link" href="/cart">
+                            <LocalizedClientLink className="hover:text-default-900 flex gap-2" data-testid="nav-cart-link" href="/cart">
                                 Cart (0)
                             </LocalizedClientLink>
                         }

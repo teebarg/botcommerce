@@ -49,7 +49,7 @@ const SlideOver: React.FC<SlideoverProps> = ({ isOpen, onClose, children, title,
                     {...modalProps}
                     ref={ref}
                     className={clsx(
-                        "fixed flex flex-col top-0 w-[90vw] sm:w-[27%] h-screen shadow-lg transform transition-transform duration-300 z-50 py-5 px-2 bg-default-50 focus-visible:outline-none",
+                        "fixed flex flex-col top-0 w-[90vw] sm:w-[27%] h-screen shadow-lg transform transition-transform duration-300 z-50 py-5 px-2 bg-default-100 focus-visible:outline-none",
                         className,
                         location[direction]
                     )}

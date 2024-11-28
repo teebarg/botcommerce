@@ -20,10 +20,10 @@ export default function OrderCompletedTemplate({ order }: OrderCompletedTemplate
         <div className="sm:py-6 min-h-[calc(100vh-64px)]">
             <div className="flex flex-col justify-center items-center gap-y-10 h-full w-full">
                 <div
-                    className="flex flex-col gap-4 max-w-4xl mx-auto h-full bg-default-50 w-full py-4 sm:py-10 px-4 rounded-md"
+                    className="flex flex-col gap-4 max-w-4xl mx-auto h-full bg-default-100 w-full py-4 sm:py-10 px-4 rounded-md"
                     data-testid="order-complete-container"
                 >
-                    <h1 className="flex flex-col gap-y-3 text-default-800 text-3xl mb-4">
+                    <h1 className="flex flex-col gap-y-3 text-default-900 text-3xl mb-4">
                         <span>Thank you!</span>
                         <span>Your order was placed successfully.</span>
                     </h1>

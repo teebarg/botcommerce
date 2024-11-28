@@ -24,7 +24,7 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", onConfirm, onClose }) =>
                         <div className="flex">
                             <div className="flex items-center">
                                 <div className="flex grow flex-col gap-1">
-                                    <h2 className="text-lg font-semibold leading-6 text-default-800">{title}</h2>
+                                    <h2 className="text-lg font-semibold leading-6 text-default-900">{title}</h2>
                                 </div>
                             </div>
                         </div>
