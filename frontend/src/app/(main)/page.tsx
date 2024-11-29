@@ -10,6 +10,8 @@ import { ProductCard } from "@modules/products/components/product-card";
 import { search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import FlashBanner from "@components/flash";
+import BannerCarousel from "@components/carousel";
 
 export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
@@ -45,29 +47,29 @@ export default async function Home() {
         <React.Fragment>
             <div>
                 <div className="bg-default/10">
-                    <div className="max-w-7xl mx-auto relative sm:grid grid-cols-4 rounded-xl my-4 sm:my-8">
-                        <div className="w-full hidden md:block px-4">
+                    <div className="max-w-7xl mx-auto relative sm:grid grid-cols-4 gap-4 rounded-xl my-4 sm:my-8">
+                        <div className="w-full hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
                             <ul className="bg-primary/10 text-primary-900">
                                 {cats.map((item: any, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink
-                                            href=""
                                             className="text-md font-medium border border-primary/20 px-3 py-3 block hover:bg-primary/20"
+                                            href=""
                                         >
                                             {item}
                                         </LocalizedClientLink>
                                     </li>
                                 ))}
                             </ul>
-                            <LocalizedClientLink href="/collections" className="px-4 pt-4 block hover:text-primary underline underline-offset-4">
+                            <LocalizedClientLink className="px-4 pt-4 block hover:text-primary underline underline-offset-4" href="/collections">
                                 All Products
                             </LocalizedClientLink>
                         </div>
                         <div className="col-span-2">
-                            <img alt="banner" className="w-full" src={imgSrc(`banners%2Fhero4.webp`)} />
+                            <BannerCarousel />
                         </div>
-                        <div className="px-4 w-full">
+                        <div className="w-full">
                             <div className="bg-warning/15 p-4 rounded-lg hidden md:block">
                                 <span className="font-semibold text-lg text-default-900/80">👋 Hello!</span>
                             </div>
@@ -82,8 +84,8 @@ export default async function Home() {
                                     <span className="block text-3xl mt-2 font-bold">Looking Originals?</span>
                                     <span className="block mt-2">Explore the latest premium quality branded products.</span>
                                     <LocalizedClientLink
-                                        href="/collections"
                                         className="inline-block font-semibold bg-transparent rounded-full border-2 border-secondary mt-5 hover:bg-secondary hover:text-white px-4 py-2"
+                                        href="/collections"
                                     >
                                         Visit Shop!
                                     </LocalizedClientLink>
@@ -93,7 +95,7 @@ export default async function Home() {
                                 <span className="font-semibold text-lg">Need Help?</span>
                                 <span className="block">
                                     Visit{" "}
-                                    <LocalizedClientLink href="/support" className="font-semibold hover:text-default-900">
+                                    <LocalizedClientLink className="font-semibold hover:text-default-900" href="/support">
                                         Support Center
                                     </LocalizedClientLink>
                                 </span>
@@ -102,7 +104,7 @@ export default async function Home() {
                     </div>
                 </div>
                 <div className="relative h-28">
-                    <Image src={"/frontend.webp"} alt="banner" fill />
+                    <Image fill alt="banner" src={"/frontend.webp"} />
                 </div>
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -111,27 +113,23 @@ export default async function Home() {
                                 <span className="text-secondary text-3xl font-semibold">Botcommerce</span>
                                 <span className="text-secondary text-lg block mt-4 mb-4">Explore the exclusive beauty and cosmetics collection.</span>
                                 <LocalizedClientLink
-                                    href="/collections"
                                     className="bg-transparent text-secondary border-2 border-secondary rounded-full px-8 py-3 text-md hover:bg-secondary hover:text-white"
+                                    href="/collections"
                                 >
                                     Visit Shop
                                 </LocalizedClientLink>
                             </div>
-                            {/* <div className="max-h-[500px] relative1"> */}
-                            <Image src={"/side-banner.webp"} alt="banner" width={0} height={0} sizes="100vw" className="h-auto w-full" />
-                            {/* </div> */}
+                            <Image alt="banner" className="h-auto w-full" height={0} sizes="100vw" src={"/side-banner.webp"} width={0} />
                         </div>
                         <div className="col-span-3">
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                                {featured?.map((product: Product, index: number) => (
-                                    <ProductCard key={index} product={product} />
-                                ))}
+                                {featured?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
                             </div>
                         </div>
                     </div>
                 </div>
-
+                <FlashBanner />
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 min-h-48">
                         <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner1.avif`)} />
@@ -145,31 +143,13 @@ export default async function Home() {
                     </div>
                 </div>
                 <div className="relative h-28">
-                    <Image src={"/frontend.webp"} alt="banner" fill />
+                    <Image fill alt="banner" src={"/frontend.webp"} />
                 </div>
-                {/* <div className="bg-default-100">
-                    <div className="max-w-6xl mx-auto relative py-8 px-4 md:px-0">
-                        <p className="text-lg uppercase text-primary mb-2 font-semibold">Collections</p>
-                        <div className="md:grid grid-cols-2 gap-4">
-                            <div className="md:grid grid-cols-2 gap-4">
-                                <img alt="cat1" src={imgSrc(`banners%2Fcat1.jpeg`)} />
-                                <img alt="cat2" src={imgSrc(`banners%2Fcat2.jpeg`)} />
-                                <img alt="cat4" src={imgSrc(`banners%2Fcat4.jpeg`)} />
-                                <img alt="cat3" src={imgSrc(`banners%2Fcat3.jpeg`)} />
-                            </div>
-                            <div>
-                                <img alt="cat5" className="h-[inherit]" src={imgSrc(`banners%2Fcat5.avif`)} />
-                            </div>
-                        </div>
-                    </div>
-                </div> */}
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} />
-                            ))}
+                            {trending?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
                         </div>
                     </div>
                 </div>
@@ -194,9 +174,7 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
-                            {latest?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} />
-                            ))}
+                            {latest?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
                         </div>
                     </div>
                 </div>

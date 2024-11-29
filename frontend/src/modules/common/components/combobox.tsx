@@ -69,7 +69,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
                     {...buttonProps}
                     ref={triggerRef}
                     className={cn(
-                        "relative px-3 w-full inline-flex shadow-sm outline-none border-medium border-default-100",
+                        "relative px-3 w-full inline-flex shadow-sm outline-none border-medium border-default-100 bg-content1",
                         "hover:border-default-500 transition-colors motion-reduce:transition-none",
                         "rounded-medium flex-col items-start justify-center gap-0 h-10 min-h-10 py-2",
                         {
