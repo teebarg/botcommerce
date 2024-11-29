@@ -8,18 +8,22 @@ import ContactForm from "@modules/store/components/contact-form";
 import Button from "@modules/common/components/button";
 import { ProductCard } from "@modules/products/components/product-card";
 import { search } from "@lib/data";
+import Image from "next/image";
+import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 
-export const revalidate = 3;
+const cats = ["Electronics", "Health & Beauty", "Men's Fashion", "Women's Fashion", "Sports & Hobby", "Tools", "Kids"];
 
-async function getLandingProducts(collection: string): Promise<any[]> {
+export const revalidate = 1;
+
+async function getLandingProducts(collection: string, limit: number = 4): Promise<any[]> {
     const queryParams: SearchParams = {
         query: "",
-        limit: 4,
+        limit,
         page: 1,
         sort: "created_at:desc",
         collections: collection,
@@ -31,28 +35,103 @@ async function getLandingProducts(collection: string): Promise<any[]> {
 }
 
 export default async function Home() {
-    const [trending, latest] = await Promise.all([getLandingProducts("trending"), getLandingProducts("latest")]);
+    const [trending, latest, featured] = await Promise.all([
+        getLandingProducts("trending"),
+        getLandingProducts("latest"),
+        getLandingProducts("featured", 8),
+    ]);
 
     return (
         <React.Fragment>
             <div>
-                <div>
-                    <div className="max-w-7xl mx-auto relative sm:flex sm:flex-row-reverse bg-[#fee3f1] rounded-xl my-4 sm:my-8 min-h-72">
-                        <div className="sm:w-1/2">
+                <div className="bg-default/10">
+                    <div className="max-w-7xl mx-auto relative sm:grid grid-cols-4 rounded-xl my-4 sm:my-8">
+                        <div className="w-full hidden md:block px-4">
+                            <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
+                            <ul className="bg-primary/10 text-primary-900">
+                                {cats.map((item: any, index: number) => (
+                                    <li key={index}>
+                                        <LocalizedClientLink
+                                            href=""
+                                            className="text-md font-medium border border-primary/20 px-3 py-3 block hover:bg-primary/20"
+                                        >
+                                            {item}
+                                        </LocalizedClientLink>
+                                    </li>
+                                ))}
+                            </ul>
+                            <LocalizedClientLink href="/collections" className="px-4 pt-4 block hover:text-primary underline underline-offset-4">
+                                All Products
+                            </LocalizedClientLink>
+                        </div>
+                        <div className="col-span-2">
                             <img alt="banner" className="w-full" src={imgSrc(`banners%2Fhero4.webp`)} />
                         </div>
-                        <div className="sm:w-1/2 sm:flex flex-col items-center justify-center text-gray-600 py-8 sm:py-0 px-2 sm:px-0">
-                            <h1 className="text-4xl font-semibold">Explore thrifts for kids</h1>
-                            <p>We are obsessed with colourful drip</p>
-                            <p className="text-2xl font-medium mt-1">{`Discover affordable children's thrifts in Lagos`}</p>
-                            <div className="gap-4 mt-6">
-                                <Button className="px-4 py-2 min-w-36 bg-slate-50 text-inherit" size="lg">
-                                    Shop Now
-                                </Button>
+                        <div className="px-4 w-full">
+                            <div className="bg-warning/15 p-4 rounded-lg hidden md:block">
+                                <span className="font-semibold text-lg text-default-900/80">👋 Hello!</span>
+                            </div>
+                            <div className="py-20 text-center block md:hidden">
+                                <span className="text-secondary text-4xl font-bold block">Botcommerce!</span>
+                                <span className="text-secondary text-xl block mt-2">Luxury online shopping.</span>
+                            </div>
+                            <div className="block md:hidden mt-0 md:mt-5">search component</div>
+                            <div className="flex bg-secondary text-secondary-foreground p-4 rounded-lg mt-8 md:mt-4">
+                                <div>
+                                    <span className="block text-xl">Prime Store</span>
+                                    <span className="block text-3xl mt-2 font-bold">Looking Originals?</span>
+                                    <span className="block mt-2">Explore the latest premium quality branded products.</span>
+                                    <LocalizedClientLink
+                                        href="/collections"
+                                        className="inline-block font-semibold bg-transparent rounded-full border-2 border-secondary mt-5 hover:bg-secondary hover:text-white px-4 py-2"
+                                    >
+                                        Visit Shop!
+                                    </LocalizedClientLink>
+                                </div>
+                            </div>
+                            <div className="bg-warning/15 p-4 rounded-lg mt-8 md:mt-4 text-default-900/80">
+                                <span className="font-semibold text-lg">Need Help?</span>
+                                <span className="block">
+                                    Visit{" "}
+                                    <LocalizedClientLink href="/support" className="font-semibold hover:text-default-900">
+                                        Support Center
+                                    </LocalizedClientLink>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div className="relative h-28">
+                    <Image src={"/frontend.webp"} alt="banner" fill />
+                </div>
+                <div className="bg-default-100">
+                    <div className="max-w-7xl mx-auto relative py-8 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="relative hidden md:block">
+                            <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
+                                <span className="text-secondary text-3xl font-semibold">Botcommerce</span>
+                                <span className="text-secondary text-lg block mt-4 mb-4">Explore the exclusive beauty and cosmetics collection.</span>
+                                <LocalizedClientLink
+                                    href="/collections"
+                                    className="bg-transparent text-secondary border-2 border-secondary rounded-full px-8 py-3 text-md hover:bg-secondary hover:text-white"
+                                >
+                                    Visit Shop
+                                </LocalizedClientLink>
+                            </div>
+                            {/* <div className="max-h-[500px] relative1"> */}
+                            <Image src={"/side-banner.webp"} alt="banner" width={0} height={0} sizes="100vw" className="h-auto w-full" />
+                            {/* </div> */}
+                        </div>
+                        <div className="col-span-3">
+                            <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                {featured?.map((product: Product, index: number) => (
+                                    <ProductCard key={index} product={product} />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 min-h-48">
                         <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner1.avif`)} />
@@ -65,7 +144,10 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-default-100">
+                <div className="relative h-28">
+                    <Image src={"/frontend.webp"} alt="banner" fill />
+                </div>
+                {/* <div className="bg-default-100">
                     <div className="max-w-6xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Collections</p>
                         <div className="md:grid grid-cols-2 gap-4">
@@ -80,12 +162,14 @@ export default async function Home() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
+                            {trending?.map((product: Product, index: number) => (
+                                <ProductCard key={index} product={product} />
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -110,7 +194,9 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
-                            {latest?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
+                            {latest?.map((product: Product, index: number) => (
+                                <ProductCard key={index} product={product} />
+                            ))}
                         </div>
                     </div>
                 </div>

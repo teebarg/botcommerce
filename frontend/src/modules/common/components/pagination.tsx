@@ -6,6 +6,7 @@ import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { Pagination as PaginationType } from "types/global";
 
 import Button from "./button";
+import { cn } from "@lib/util/cn";
 
 interface Props {
     pagination: PaginationType;
@@ -58,7 +59,11 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                     <li
                         aria-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         aria-label="previous page button"
-                        className="flex flex-wrap truncate box-border items-center justify-center text-default outline-none data-[disabled=true]:text-default-500 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
+                        className={cn(
+                            "flex flex-wrap truncate box-border items-center justify-center outline-none data-[disabled=true]:opacity-50",
+                            "data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100",
+                            "min-w-9 w-9 h-9 text-small rounded-medium"
+                        )}
                         data-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         data-slot="prev"
                         role="button"
@@ -67,7 +72,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                         onMouseLeave={(e) => e.currentTarget.removeAttribute("data-hover")}
                     >
                         <svg aria-hidden="true" fill="none" focusable="false" height="1em" role="presentation" viewBox="0 0 24 24" width="1em">
-                            <path d="M15.5 19l-7-7 7-7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                            <path d="M15.5 19l-7-7 7-7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                         </svg>
                     </li>
                     {Array.from({ length: pagination?.total_pages }).map((_, index: number) => (
@@ -90,7 +95,11 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                     <li
                         aria-disabled={pagination?.total_pages === 1 || page == pagination?.total_pages ? "true" : "false"}
                         aria-label="next page button"
-                        className="flex flex-wrap truncate box-border items-center justify-center text-default outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
+                        className={cn(
+                            "flex flex-wrap truncate box-border items-center justify-center outline-none data-[disabled=true]:opacity-50",
+                            "data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100",
+                            "min-w-9 w-9 h-9 text-small rounded-medium"
+                        )}
                         data-disabled={pagination?.total_pages === 1 || page == pagination?.total_pages ? "true" : "false"}
                         data-slot="next"
                         role="button"
@@ -108,7 +117,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                             viewBox="0 0 24 24"
                             width="1em"
                         >
-                            <path d="M15.5 19l-7-7 7-7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                            <path d="M15.5 19l-7-7 7-7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                         </svg>
                     </li>
                 </ul>
