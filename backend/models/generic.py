@@ -178,8 +178,8 @@ class User(UserBase, table=True):
 
 class UserPublic(UserBase):
     id: int | None
-    shipping_addresses: list["Address"] = []
-    billing_address: "Address"
+    shipping_addresses: list["Address"] | None = []
+    billing_address: Optional["Address"] = None
 
 
 class ActivityLog(ActivityBase, table=True):

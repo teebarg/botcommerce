@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Product } from "types/global";
+import { Product, SearchParams } from "types/global";
 import React from "react";
 import { LocationIcon, MailIcon } from "nui-react-icons";
 import { openingHours } from "@lib/config";
@@ -7,7 +7,7 @@ import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
 import Button from "@modules/common/components/button";
 import { ProductCard } from "@modules/products/components/product-card";
-import { multiSearchDocuments } from "@lib/util/meilisearch";
+import { search } from "@lib/data";
 
 export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
@@ -16,29 +16,22 @@ export const metadata: Metadata = {
 
 export const revalidate = 3;
 
-export default async function Home() {
-    const {
-        results: [trending, latest],
-    } = await multiSearchDocuments([
-        {
-            indexUid: "products",
-            q: "",
-            limit: 4,
-            sort: ["created_at:desc"],
-            filter: "collections IN ['trending']",
-        },
-        {
-            indexUid: "products",
-            q: "",
-            limit: 4,
-            sort: ["created_at:desc"],
-            filter: "collections IN ['latest']",
-        },
-    ]);
+async function getLandingProducts(collection: string): Promise<any[]> {
+    const queryParams: SearchParams = {
+        query: "",
+        limit: 4,
+        page: 1,
+        sort: "created_at:desc",
+        collections: collection,
+    };
 
-    if (!trending && !latest) {
-        return null;
-    }
+    const { products } = await search(queryParams);
+
+    return products;
+}
+
+export default async function Home() {
+    const [trending, latest] = await Promise.all([getLandingProducts("trending"), getLandingProducts("latest")]);
 
     return (
         <React.Fragment>
@@ -92,7 +85,7 @@ export default async function Home() {
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.hits?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
+                            {trending?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
                         </div>
                     </div>
                 </div>
@@ -117,7 +110,7 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
-                            {latest?.hits?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
+                            {latest?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
                         </div>
                     </div>
                 </div>

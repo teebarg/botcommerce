@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 "use client";
 
 import React from "react";
@@ -46,7 +47,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                 <ul className="flex flex-nowrap h-fit max-w-fit relative gap-1 items-center overflow-visible rounded-medium" data-slot="wrapper">
                     <span
                         aria-hidden="true"
-                        className="absolute flex overflow-visible items-center justify-center origin-center left-0 select-none touch-none pointer-events-none z-20 data-[moving=true]:transition-transform !data-[moving=true]:duration-300 opacity-0 data-[moving]:opacity-100 min-w-9 w-9 h-9 text-small rounded-medium bg-foreground text-background"
+                        className="absolute flex overflow-visible items-center justify-center origin-center select-none touch-none pointer-events-none z-20 data-[moving=true]:transition-transform !data-[moving=true]:duration-300 opacity-0 data-[moving]:opacity-100 min-w-9 w-9 h-9 text-small rounded-medium bg-secondary-900 text-background"
                         data-moving={page !== pagination?.page || false}
                         data-slot="cursor"
                         style={{ transform: `translateX(${40 * page}px) scale(1)` }}
@@ -57,7 +58,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                     <li
                         aria-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         aria-label="previous page button"
-                        className="flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
+                        className="flex flex-wrap truncate box-border items-center justify-center text-default outline-none data-[disabled=true]:text-default-500 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
                         data-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         data-slot="prev"
                         role="button"
@@ -74,7 +75,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                             key={index}
                             aria-current={page == index + 1 ? "true" : undefined}
                             aria-label={`pagination item ${index + 1} ${page == index + 1 ? "active" : ""}`}
-                            className="select-none touch-none bg-transparent transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
+                            className="select-none touch-none bg-default transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
                             data-active={page === index + 1 ? "true" : undefined}
                             data-slot="item"
                             role="button"
@@ -86,52 +87,10 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                             {index + 1}
                         </li>
                     ))}
-                    {/* <li
-                            role="button"
-                            tabIndex={0}
-                            aria-label="dots element"
-                            data-slot="item"
-                            className="tap-highlight-transparent select-none touch-none transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none shadow-sm bg-default-100 [&[data-hover=true]:not([data-active=true])]:bg-default-200 active:bg-default-100 min-w-9 w-9 h-9 text-small rounded-medium group"
-                        >
-                            <svg
-                                aria-hidden="true"
-                                fill="none"
-                                height="1em"
-                                shapeRendering="geometricPrecision"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="1.5"
-                                viewBox="0 0 24 24"
-                                width="1em"
-                                className="group-hover:hidden group-data-[focus-visible=true]:hidden"
-                            >
-                                <circle cx="12" cy="12" fill="currentColor" r="1" />
-                                <circle cx="19" cy="12" fill="currentColor" r="1" />
-                                <circle cx="5" cy="12" fill="currentColor" r="1" />
-                            </svg>
-                            <svg
-                                aria-hidden="true"
-                                fill="none"
-                                focusable="false"
-                                height="1em"
-                                role="presentation"
-                                shapeRendering="geometricPrecision"
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="1.5"
-                                viewBox="0 0 24 24"
-                                width="1em"
-                                className="hidden group-hover:block group-data-[focus-visible=true]:block data-[before=true]:rotate-180"
-                            >
-                                <path d="M13 17l5-5-5-5" />
-                                <path d="M6 17l5-5-5-5" />
-                            </svg>
-                        </li> */}
                     <li
                         aria-disabled={pagination?.total_pages === 1 || page == pagination?.total_pages ? "true" : "false"}
                         aria-label="next page button"
-                        className="flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
+                        className="flex flex-wrap truncate box-border items-center justify-center text-default outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
                         data-disabled={pagination?.total_pages === 1 || page == pagination?.total_pages ? "true" : "false"}
                         data-slot="next"
                         role="button"
