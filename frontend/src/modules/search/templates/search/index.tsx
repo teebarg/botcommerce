@@ -12,12 +12,22 @@ import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
 import { Kbd } from "@modules/common/components/kbd";
 
-export default function Search() {
+interface Props {
+    className?: string;
+}
+
+const Search: React.FC<Props> = ({ className }) => {
     const modalState = useOverlayTriggerState({});
 
     return (
         <React.Fragment>
-            <Button color="default" endContent={<Kbd keys={["command"]}>K</Kbd>} startContent={<MagnifyingGlassMini />} onPress={modalState.open}>
+            <Button
+                className={className}
+                color="default"
+                endContent={<Kbd keys={["command"]}>K</Kbd>}
+                startContent={<MagnifyingGlassMini />}
+                onPress={modalState.open}
+            >
                 Search products, brands and categories...
             </Button>
             {modalState.isOpen && (
@@ -38,4 +48,6 @@ export default function Search() {
             )}
         </React.Fragment>
     );
-}
+};
+
+export default Search;

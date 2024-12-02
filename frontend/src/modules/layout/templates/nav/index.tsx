@@ -8,6 +8,7 @@ import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
+import { HeartIcon } from "nui-react-icons";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -16,14 +17,24 @@ const Navbar = async () => {
 
     return (
         <NavigationBar className="my-2">
-            <NavbarContent className="basis-1/5 sm:basis-full flex" justify="start">
-                <NavbarBrand className="gap-3 max-w-fit">
+            <NavbarContent className="flex flex-1 max-w-7xl mx-auto">
+                <NavbarBrand className="w-[25vw]">
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/">
                         <p className="font-bold text-inherit text-2xl">Botcommerce</p>
                     </LocalizedClientLink>
+                    <LocalizedClientLink className="text-base font-medium" href={"/collections"}>
+                        Collections
+                    </LocalizedClientLink>
+                    {isAdmin && (
+                        // <NavbarItem>
+                        <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
+                            Admin
+                        </LocalizedClientLink>
+                        // </NavbarItem>
+                    )}
                 </NavbarBrand>
-                <div className="hidden sm:flex gap-2">
-                    <NavbarItem>
+                <div className="hidden sm:flex items-center gap-2 flex-1">
+                    {/* <NavbarItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/"}>
                             Home
                         </LocalizedClientLink>
@@ -31,11 +42,6 @@ const Navbar = async () => {
                     <NavbarItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/collections"}>
                             Collections
-                        </LocalizedClientLink>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <LocalizedClientLink className="text-base font-medium" href={"/cart"}>
-                            Cart
                         </LocalizedClientLink>
                     </NavbarItem>
                     <NavbarItem>
@@ -49,16 +55,47 @@ const Navbar = async () => {
                                 Admin
                             </LocalizedClientLink>
                         </NavbarItem>
-                    )}
+                    )} */}
+                    <NavbarItem className="hidden lg:flex flex-1">
+                        <Search className="w-full justify-between" />
+                    </NavbarItem>
+                </div>
+                <div className="w-[25vw] flex gap-4 justify-end">
+                    <NavbarItem className="flex items-center">
+                        <ThemeButton />
+                    </NavbarItem>
+                    <NavbarItem className="flex items-center">
+                        <LocalizedClientLink className="" href={"/wishlist"}>
+                            <HeartIcon />
+                        </LocalizedClientLink>
+                    </NavbarItem>
+                    <NavbarItem className="flex items-center pt-2">
+                        <Suspense
+                            fallback={
+                                <LocalizedClientLink className="hover:text-default-900 flex gap-2" data-testid="nav-cart-link" href="/cart">
+                                    Cart (0)
+                                </LocalizedClientLink>
+                            }
+                        >
+                            <Cart />
+                        </Suspense>
+                    </NavbarItem>
+                    <NavbarItem className="hidden sm:flex">
+                        {customer ? (
+                            <UserDropDown customer={customer} />
+                        ) : (
+                            <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
+                                Log In <span aria-hidden="true">&rarr;</span>
+                            </LocalizedClientLink>
+                        )}
+                    </NavbarItem>
+                    <NavbarMenuToggle className="sm:hidden" />
                 </div>
             </NavbarContent>
 
-            <NavbarContent className="flex basis-1/5 sm:basis-full" justify="end">
+            {/* <NavbarContent className="flex bg-blue-600" justify="end">
                 <NavbarItem className="flex items-center">
                     <ThemeButton />
-                </NavbarItem>
-                <NavbarItem className="hidden lg:flex">
-                    <Search />
                 </NavbarItem>
                 <NavbarItem className="flex items-center pt-2">
                     <Suspense
@@ -81,9 +118,8 @@ const Navbar = async () => {
                     )}
                 </NavbarItem>
                 <NavbarMenuToggle className="sm:hidden" />
-            </NavbarContent>
+            </NavbarContent> */}
             <NavbarMenu>
-                <p>skksks</p>
                 <Search />
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navItems.map((item: any, index: number) => (

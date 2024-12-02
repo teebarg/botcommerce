@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { RadioGroup } from "@headlessui/react";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { CheckCircleSolid, CreditCard, Spinner } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
@@ -12,6 +11,7 @@ import clsx from "clsx";
 import Button from "@modules/common/components/button";
 import { Cart, PaymentSession } from "types/global";
 import { Tooltip } from "@components/ui/tooltip";
+import { RadioGroup } from "@/components/ui/radio-group";
 
 const payMethods = [
     { id: "stripe", provider_id: "Stripe" },
@@ -97,18 +97,16 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
             <div>
                 <div className={isOpen ? "block" : "hidden"}>
                     {!paidByGiftcard ? (
-                        <>
-                            <RadioGroup value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
-                                {payMethods.map((item) => (
-                                    <PaymentContainer
-                                        key={item.id}
-                                        paymentInfoMap={paymentInfoMap}
-                                        paymentSession={item}
-                                        selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
-                                    />
-                                ))}
-                            </RadioGroup>
-                        </>
+                        <RadioGroup name="payment" value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
+                            {payMethods.map((item) => (
+                                <PaymentContainer
+                                    key={item.id}
+                                    paymentInfoMap={paymentInfoMap}
+                                    paymentSession={item}
+                                    selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
+                                />
+                            ))}
+                        </RadioGroup>
                     ) : paidByGiftcard ? (
                         <div className="flex flex-col w-1/3">
                             <p className="font-medium text-base mb-1">Payment method</p>

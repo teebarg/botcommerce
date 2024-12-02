@@ -16,6 +16,10 @@ const about = [
         to: "/latest-news",
     },
     {
+        label: "Support",
+        to: "/support",
+    },
+    {
         label: "Career Opportunities",
         to: "/career-opportunities",
     },

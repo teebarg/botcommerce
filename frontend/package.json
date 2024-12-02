@@ -24,7 +24,6 @@
         "@types/react": "17.0.40"
     },
     "dependencies": {
-        "@headlessui/react": "^1.6.1",
         "@meilisearch/instant-meilisearch": "^0.7.1",
         "@react-aria/button": "^3.10.1",
         "@react-aria/combobox": "^3.10.3",

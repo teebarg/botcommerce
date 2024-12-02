@@ -36,31 +36,31 @@ const SupportPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6 md:p-12 flex flex-col">
+        <div className="min-h-screen bg-content1 p-6 md:p-12 flex flex-col">
             <header className="text-center mb-12">
-                <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">Luxury Client Support</h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                <h1 className="text-4xl font-serif font-bold text-default-900-900 mb-4">Luxury Client Support</h1>
+                <p className="text-xl text-default-500 max-w-2xl mx-auto">
                     {`Personalized assistance for our discerning clients. We're here to ensure your exceptional experience.`}
                 </p>
             </header>
 
             <div className="grid md:grid-cols-3 gap-6 mb-12">
-                <div className="bg-white p-6 rounded-xl shadow-md text-center">
-                    <MailIcon className="mx-auto mb-4 text-indigo-600" size={48} />
+                <div className="bg-default p-6 rounded-xl shadow-md text-center">
+                    <MailIcon className="mx-auto mb-4 text-secondary-500" size={48} />
                     <h3 className="text-xl font-semibold mb-2">Email Support</h3>
-                    <p className="text-gray-600 mb-4">clientcare@luxurystore.com</p>
+                    <p className="text-default-500 mb-4">clientcare@luxurystore.com</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-md text-center">
+                <div className="bg-default p-6 rounded-xl shadow-md text-center">
                     {/* <PhoneCall className="mx-auto mb-4 text-emerald-600" size={48} /> */}
                     <h3 className="text-xl font-semibold mb-2">Phone Concierge</h3>
-                    <p className="text-gray-600 mb-4">+1 (888) LUXURY-CARE</p>
+                    <p className="text-default-500 mb-4">+1 (888) LUXURY-CARE</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-md text-center">
+                <div className="bg-default p-6 rounded-xl shadow-md text-center">
                     {/* <Clock className="mx-auto mb-4 text-amber-600" size={48} /> */}
                     <h3 className="text-xl font-semibold mb-2">Support Hours</h3>
-                    <p className="text-gray-600 mb-4">Mon-Sat: 9am - 7pm EST</p>
+                    <p className="text-default-500 mb-4">Mon-Sat: 9am - 7pm EST</p>
                 </div>
             </div>
 
@@ -71,18 +71,18 @@ const SupportPage = () => {
                     <div key={index} className="mb-4">
                         <button
                             onClick={() => setActiveSection(activeSection === index ? null : index)}
-                            className="w-full bg-white p-4 rounded-lg shadow-sm flex justify-between items-center hover:bg-gray-100 transition"
+                            className="w-full bg-default p-4 rounded-lg shadow-sm flex justify-between items-center hover:bg-default-100 transition"
                         >
                             <span className="text-xl font-semibold">{section.title}</span>
                             <ChevronDown className={`transform transition-transform ${activeSection === index ? "rotate-180" : ""}`} />
                         </button>
 
                         {activeSection === index && (
-                            <div className="bg-white p-6 rounded-b-lg shadow-md">
+                            <div className="bg-default p-6 rounded-b-lg shadow-md">
                                 {section.questions.map((item, qIndex) => (
                                     <div key={qIndex} className="mb-4 last:mb-0">
                                         <h4 className="font-semibold text-lg mb-2">{item.q}</h4>
-                                        <p className="text-gray-600">{item.a}</p>
+                                        <p className="text-default-500">{item.a}</p>
                                     </div>
                                 ))}
                             </div>
@@ -91,25 +91,17 @@ const SupportPage = () => {
                 ))}
             </div>
 
-            <div className="bg-white mt-12 p-8 rounded-xl shadow-lg text-center">
+            <div className="bg-default mt-12 p-8 rounded-xl shadow-lg text-center">
                 {/* <Headphones className="mx-auto mb-4 text-indigo-700" size={60} /> */}
                 <h3 className="text-2xl font-semibold mb-4">Personal Concierge Support</h3>
-                <p className="text-gray-600 max-w-2xl mx-auto mb-6">
+                <p className="text-default-500 max-w-2xl mx-auto mb-6">
                     For personalized assistance beyond our standard support channels, our dedicated concierge team is available to provide white-glove
                     service tailored to your unique needs.
                 </p>
-                <button className="bg-indigo-600 text-white px-8 py-3 rounded-full hover:bg-indigo-700 transition font-semibold">
+                <button className="bg-secondary-500 text-secondary-foreground px-8 py-3 rounded-full hover:bg-secondary-100 transition font-semibold">
                     Request Concierge Assistance
                 </button>
             </div>
-
-            <footer className="mt-12 text-center text-gray-500">
-                <div className="flex items-center justify-center mb-4">
-                    {/* <Shield className="mr-2 text-green-600" size={24} /> */}
-                    <span>Secure & Confidential Support</span>
-                </div>
-                <p>© 2024 Luxury Store. All Rights Reserved.</p>
-            </footer>
         </div>
     );
 };

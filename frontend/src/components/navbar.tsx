@@ -27,7 +27,7 @@ export const Navbar = ({ children, className }: { children: React.ReactNode; cla
                 )}
                 data-menu-open={expanded}
             >
-                <header className="z-40 flex px-6 gap-4 w-full flex-row relative flex-nowrap items-center justify-between h-4 max-w-full">
+                <header className="z-40 flex px-6 gap-4 w-full flex-row relative flex-nowrap items-center justify-between max-w-full">
                     {children}
                 </header>
             </nav>
@@ -39,7 +39,7 @@ export const NavbarBrand = ({ children, className }: { children: React.ReactNode
     return (
         <li
             className={cn(
-                "flex basis-0 flex-row flex-grow flex-nowrap justify-start bg-transparent items-center no-underline text-medium whitespace-nowrap box-border gap-3 max-w-fit",
+                "flex flex-row flex-nowrap justify-start bg-transparent items-center no-underline text-medium whitespace-nowrap box-border gap-3",
                 className
             )}
         >
@@ -52,8 +52,8 @@ export const NavbarContent = ({ children, className, justify }: { children: Reac
     return (
         <ul
             className={cn(
-                "gap-4 h-full flex flex-nowrap items-center data-[justify=start]:justify-start data-[justify=start]:flex-grow data-[justify=start]:basis-0",
-                "data-[justify=center]:justify-center data-[justify=end]:justify-end data-[justify=end]:flex-grow data-[justify=end]:basis-0 basis-1/5 sm:basis-full",
+                "gap-4 h-full flex flex-nowrap items-center data-[justify=start]:justify-start",
+                "data-[justify=center]:justify-center data-[justify=end]:justify-end",
                 className
             )}
             data-justify={justify}

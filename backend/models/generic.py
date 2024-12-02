@@ -2,6 +2,7 @@ import secrets
 from typing import List, Optional
 
 from pydantic import BaseModel
+from models.wishlist import WishlistBase
 from sqlmodel import Field, Relationship, SQLModel
 
 from models.activities import ActivityBase
@@ -212,3 +213,13 @@ class Addresses(SQLModel):
     limit: int
     total_count: int
     total_pages: int
+
+# Database model, database table inferred from class name
+class Wishlist(WishlistBase, table=True):
+    __tablename__ = "wishlists"
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+    user: User = Relationship(back_populates="user")
+    product_id: int = Field(foreign_key="product.id", nullable=False, ondelete="CASCADE")
+    product: Product = Relationship(back_populates="product")
+    

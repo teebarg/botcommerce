@@ -1,8 +1,6 @@
 "use client";
 
-import { RadioGroup as RG } from "@headlessui/react";
-import { CheckCircleSolid, Spinner, StarIcon } from "nui-react-icons";
-import Radio from "@modules/common/components/radio";
+import { CheckCircleSolid, StarIcon } from "nui-react-icons";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { setShippingMethod } from "@modules/checkout/actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -86,34 +84,14 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                             {availableShippingMethods?.map((option) => (
                                 <RadioGroup.Option
                                     key={option.id}
-                                    className={option.id === cart.shipping_method?.id ? "border-primary" : ""}
-                                    value={option.id}
-                                >
-                                    <div className="flex items-center gap-x-4">
-                                        <RadioGroup.Radio checked={option.id === cart.shipping_method?.id} />
-                                        <span className="text-base">{option.name}</span>
-                                    </div>
-                                    <span className="justify-self-end text-default-900">{currency(option.amount)}</span>
-                                </RadioGroup.Option>
-                            ))}
-                        </RadioGroup>
-                        <RadioGroup name="shipping-method" value={cart.shipping_method?.id} onChange={(value: string) => handleChange(value)}>
-                            {availableShippingMethods?.map((option) => (
-                                <RadioGroup.Option
-                                    key={option.id}
                                     className={cn(
-                                        "group relative flex cursor-pointer rounded-lg border p-4 hover:bg-accent/50 transition-all",
-                                        option.id === cart.shipping_method?.id && "border-primary bg-accent/30",
+                                        "group relative transition-all",
+                                        option.id === cart.shipping_method?.id && "border-primary bg-primary/10",
                                         option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
                                     )}
                                     value={option.id}
                                 >
-                                    {/* <div className="flex items-center gap-x-4">
-                                        <RadioGroup.Radio checked={option.id === cart.shipping_method?.id} />
-                                        <span className="text-base">{option.name}</span>
-                                    </div> */}
-                                    {/* <span className="justify-self-end text-default-900">{currency(option.amount)}</span> */}
-                                    <span className="absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-full border">
+                                    <span className="absolute right-8 top-4 flex h-5 w-5 items-center justify-center rounded-full border">
                                         <span
                                             className={cn(
                                                 "h-2.5 w-2.5 rounded-full bg-primary transition-all",
@@ -140,35 +118,6 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                                 </RadioGroup.Option>
                             ))}
                         </RadioGroup>
-                        <RG value={cart.shipping_method?.id} onChange={(value: string) => handleChange(value)}>
-                            {availableShippingMethods ? (
-                                availableShippingMethods.map((option) => {
-                                    return (
-                                        <RG.Option
-                                            key={option.id}
-                                            className={clsx(
-                                                "flex items-center justify-between text-sm cursor-pointer py-4 border rounded-lg px-8 mb-2",
-                                                {
-                                                    "border-blue-400": option.id === cart.shipping_method?.id,
-                                                }
-                                            )}
-                                            data-testid="delivery-option-radio"
-                                            value={option.id}
-                                        >
-                                            <div className="flex items-center gap-x-4">
-                                                <Radio checked={option.id === cart.shipping_method?.id} />
-                                                <span className="text-base">{option.name}</span>
-                                            </div>
-                                            <span className="justify-self-end text-default-900">{currency(option.amount!)}</span>
-                                        </RG.Option>
-                                    );
-                                })
-                            ) : (
-                                <div className="flex flex-col items-center justify-center px-4 py-8 text-default-900">
-                                    <Spinner />
-                                </div>
-                            )}
-                        </RG>
                     </div>
 
                     <ErrorMessage data-testid="delivery-option-error-message" error={error} />

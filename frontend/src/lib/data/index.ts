@@ -586,6 +586,28 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
     }
 });
 
+export const getWishlist = cache(async function (): Promise<any> {
+    try {
+        const headers = getHeaders(["wishlist"]);
+
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/wishlist`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                ...headers,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch product");
+        }
+
+        return await response.json();
+    } catch (error) {
+        return null;
+    }
+});
+
 interface SearchResult {
     products: Product[];
     page: number;
