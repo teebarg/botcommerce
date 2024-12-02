@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 "use client";
 
 import React from "react";
@@ -55,7 +54,6 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                     >
                         {page}
                     </span>
-                    {/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */}
                     <li
                         aria-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         aria-label="previous page button"
