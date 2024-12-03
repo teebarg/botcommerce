@@ -9,8 +9,8 @@ interface ComponentProps {
 const EmptyCartState = () => {
     return (
         <div className="flex flex-col items-center justify-center p-6 rounded-lg shadow-sm h-full">
-            <Cart className="w-20 h-20 text-gray-400 mb-4" />
-            <h2 className="text-2xl font-semibold text-default-800 mb-2">Your cart is empty</h2>
+            <Cart className="w-20 h-20 text-default-500 mb-4" />
+            <h2 className="text-2xl font-semibold text-default-900 mb-2">Your cart is empty</h2>
             <p className="text-default-500 text-center mb-6">{`Looks like you haven't added anything to your cart yet.`}</p>
             <Button color="secondary" variant="shadow">
                 Start Shopping
@@ -20,7 +20,7 @@ const EmptyCartState = () => {
 };
 
 const CartItems: React.FC<ComponentProps> = ({ cartItems }) => {
-    if (cartItems?.length == 0) {
+    if (!cartItems || cartItems?.length == 0) {
         return <EmptyCartState />;
     }
 

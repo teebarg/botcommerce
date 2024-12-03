@@ -16,7 +16,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                     <span data-testid="welcome-message" data-value={customer?.firstname}>
                         Hello {customer?.firstname}
                     </span>
-                    <span className="text-sm text-default-700">
+                    <span className="text-sm text-default-900">
                         Signed in as:{" "}
                         <span className="font-semibold" data-testid="customer-email" data-value={customer?.email}>
                             {customer?.email}

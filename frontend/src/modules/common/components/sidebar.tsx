@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { Calendar, Check, ChevronRight, CogSixTooth, Component, DocumentText, EcommerceIcon, User, Users, Window } from "nui-react-icons";
-import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { cn } from "@lib/util/cn";
 
 interface MenuItem {
     label: string;
@@ -65,7 +65,7 @@ const SubMenuComponent: React.FC<{
         <div className="w-full">
             <button
                 className={`
-                    w-full flex items-center justify-between p-4 text-default-500 hover:text-default-600
+                    w-full flex items-center justify-between p-4 text-default-500 hover:text-default-500
                     transition-colors duration-200 group
                     ${level === 0 ? "pl-4" : `pl-${level * 4 + 4}`}
                     ${level === 1 ? "hover:bg-content2 bg-content1" : ""}
@@ -76,7 +76,7 @@ const SubMenuComponent: React.FC<{
                 <div className="flex items-center gap-2">
                     {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
                     <span
-                        className={clsx("text-sm font-medium", {
+                        className={cn("text-sm font-medium", {
                             hidden: isCollapsed,
                         })}
                     >
@@ -84,7 +84,7 @@ const SubMenuComponent: React.FC<{
                     </span>
                 </div>
                 <div
-                    className={clsx("text-sm font-medium transform transition-transform duration-200", {
+                    className={cn("text-sm font-medium transform transition-transform duration-200", {
                         hidden: isCollapsed,
                         "rotate-90": isOpen,
                     })}
@@ -124,9 +124,9 @@ const MenuItemComponent: React.FC<{
 
     return (
         <MenuLink
-            className={clsx(
+            className={cn(
                 "flex items-center justify-between p-4 transition-all duration-200 group",
-                `${item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-600"} ${
+                `${item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-500"} ${
                     level === 0 ? "pl-4" : `pl-${level * 4 + 4}`
                 }`,
                 {
@@ -141,7 +141,7 @@ const MenuItemComponent: React.FC<{
             <div className="flex items-center gap-2">
                 {item.icon && <div className="text-inherit group-hover:text-inherit transition-colors duration-200">{item.icon}</div>}
                 <span
-                    className={clsx("text-sm font-medium", {
+                    className={cn("text-sm font-medium", {
                         hidden: isCollapsed,
                     })}
                 >
@@ -269,10 +269,7 @@ const SideBar: React.FC = () => {
             href: "/calendar",
             icon: <Calendar size={20} />,
             suffix: (
-                <span
-                    className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full
-          opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                >
+                <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     New
                 </span>
             ),
@@ -298,7 +295,7 @@ const SideBar: React.FC = () => {
 
     return (
         <div
-            className={clsx(
+            className={cn(
                 "h-screen bg-gradient-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
                 "transition-all duration-300 ease-in-out w-[22rem] text-default-500",
                 {
@@ -308,7 +305,7 @@ const SideBar: React.FC = () => {
         >
             <div className="p-4 flex items-center justify-between mb-4">
                 <h1
-                    className={clsx("font-semibold text-3xl transition-opacity duration-200 opacity-100", {
+                    className={cn("font-semibold text-3xl transition-opacity duration-200 opacity-100", {
                         "!opacity-0 w-0": isCollapsed,
                     })}
                 >

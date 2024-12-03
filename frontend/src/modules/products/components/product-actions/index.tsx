@@ -9,9 +9,10 @@ import { Product } from "types/global";
 type ProductActionsProps = {
     product: Product;
     disabled?: boolean;
+    wishlist?: React.ReactNode;
 };
 
-export default function ProductActions({ product, disabled }: ProductActionsProps) {
+export default function ProductActions({ product, disabled, wishlist }: ProductActionsProps) {
     const [isAdding, setIsAdding] = useState(false);
 
     // check if the selected variant is in stock
@@ -42,35 +43,34 @@ export default function ProductActions({ product, disabled }: ProductActionsProp
     };
 
     return (
-        <>
-            <div className="space-y-2">
-                <div className="flex flex-col items-start mb-4">
-                    <div className="flex items-center">
-                        <span className="text-xl font-semibold text-danger">{currency(product.price)}</span>
-                        {product.old_price > product.price && (
-                            <span className="ml-2 text-sm text-gray-500 line-through">{currency(product.old_price)}</span>
-                        )}
-                    </div>
+        <div>
+            <div className="flex flex-col-reverse items-start mb-2">
+                <div className="flex items-center w-full">
+                    <span className="text-xl font-semibold text-danger">{currency(product.price)}</span>
                     {product.old_price > product.price && (
-                        <div className="mt-1">
-                            <span className="text-sm font-medium text-green-600">
-                                Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
-                            </span>
-                        </div>
+                        <span className="ml-2 text-sm text-default-500 line-through">{currency(product.old_price)}</span>
                     )}
+                    <div className="ml-auto">{wishlist}</div>
                 </div>
-
-                <Button
-                    className="w-full"
-                    color="default"
-                    data-testid="add-product-button"
-                    isDisabled={!inStock || !!disabled || isAdding}
-                    isLoading={isAdding}
-                    onPress={handleAddToCart}
-                >
-                    {!inStock ? "Out of stock" : "Add to cart"}
-                </Button>
+                {product.old_price > product.price && (
+                    <div className="mt-1 -mb-1.5">
+                        <span className="text-sm font-medium text-green-600">
+                            Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
+                        </span>
+                    </div>
+                )}
             </div>
-        </>
+
+            <Button
+                className="w-full"
+                color="primary"
+                data-testid="add-product-button"
+                isDisabled={!inStock || !!disabled || isAdding}
+                isLoading={isAdding}
+                onPress={handleAddToCart}
+            >
+                {!inStock ? "Out of stock" : "Add to cart"}
+            </Button>
+        </div>
     );
 }

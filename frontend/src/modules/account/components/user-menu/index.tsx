@@ -25,8 +25,8 @@ export default function UserDropDown({ customer }: any) {
                                 />
                             </span>
                             <div className="inline-flex flex-col items-start">
-                                <span className="text-small text-inherit">{customer?.lastname}</span>
-                                <span className="text-tiny text-foreground-400">{customer?.email}</span>
+                                <span className="text-small text-default-900">{customer?.lastname}</span>
+                                <span className="text-tiny text-default-500">{customer?.email}</span>
                             </div>
                         </div>
                     </React.Fragment>

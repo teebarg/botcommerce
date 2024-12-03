@@ -40,9 +40,7 @@ export async function createCart(data = {}) {
         throw new Error(`Failed to create cart: ${response.statusText}`);
     }
 
-    const cart = await response.json();
-
-    return cart;
+    return await response.json();
 }
 
 export async function updateCart(cartId: string, data: any) {
@@ -62,9 +60,7 @@ export async function updateCart(cartId: string, data: any) {
         throw new Error(`Failed to update cart: ${response.statusText}`);
     }
 
-    const updatedCart = await response.json();
-
-    return updatedCart;
+    return await response.json();
 }
 
 export const getCart = cache(async function (cartId: string) {
@@ -83,9 +79,7 @@ export const getCart = cache(async function (cartId: string) {
         throw new Error(`Failed to create cart: ${response.statusText}`);
     }
 
-    const cart = await response.json();
-
-    return cart;
+    return await response.json();
 });
 
 export const getProducts = cache(async function (search?: string, collections?: string, page?: number, limit?: number) {
@@ -109,9 +103,7 @@ export const getProducts = cache(async function (search?: string, collections?: 
         return null;
     }
 
-    const data = await res.json();
-
-    return data;
+    return await res.json();
 });
 
 export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
@@ -132,13 +124,9 @@ export async function addItem({ cartId, product_id, quantity }: { cartId: string
             throw new Error(`Failed to add item to cart: ${response.statusText}`);
         }
 
-        const result = await response.json();
-
-        return result;
-    } catch (error) {
-        console.log(error);
-
-        return { success: false, message: "error" };
+        return await response.json();
+    } catch (error: any) {
+        return { success: false, message: error.toString() };
     }
 }
 
@@ -161,9 +149,7 @@ export async function updateItem({ cartId, lineId, quantity }: { cartId: string;
             throw new Error(`Failed to add item to cart: ${response.statusText}`);
         }
 
-        const result = await response.json();
-
-        return result;
+        return await response.json();
     } catch (e) {
         return "Error adding item to cart";
     }
@@ -187,13 +173,9 @@ export async function removeItem({ cartId, lineId }: { cartId: string; lineId: s
             throw new Error(`Failed to remove item from cart: ${response.statusText}`);
         }
 
-        const result = await response.json();
-
-        return result;
+        return await response.json();
     } catch (error) {
-        console.log(error);
-
-        return { success: false, message: "error" };
+        return { success: false, message: error instanceof Error ? error.message : "Unknown error occurred" };
     }
 }
 
@@ -236,9 +218,7 @@ export async function completeCart(cartId: string) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -261,9 +241,7 @@ export const retrieveOrder = cache(async function (id: string) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -416,9 +394,7 @@ export async function addShippingAddress(createData: any) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -440,9 +416,7 @@ export async function deleteShippingAddress(addressId: string | number) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -465,9 +439,7 @@ export async function updateShippingAddress(addressId: string, updateData: any) 
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -491,9 +463,7 @@ export async function updateBillingAddress(updateData: any) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -515,9 +485,7 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
             throw new Error("Login failed");
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -577,14 +545,70 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
             throw new Error("Failed to fetch products");
         }
 
-        const data = await response.json();
-
-        return data;
+        return await response.json();
     } catch (error) {
-        console.error("Error fetching products:", error);
         throw error;
     }
 });
+
+export const getWishlist = cache(async function (): Promise<any> {
+    try {
+        const headers = getHeaders(["wishlist"]);
+
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                ...headers,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch wishlist");
+        }
+
+        return await response.json();
+    } catch (error) {
+        return null;
+    }
+});
+
+export async function addWishlist(product_id: number) {
+    const headers = getHeaders(["wishlist"]);
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+        },
+        body: JSON.stringify({ product_id }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to add product to wishlist: ${response.statusText}`);
+    }
+
+    return await response.json();
+}
+
+export async function removeWishlist(product_id: number) {
+    const headers = getHeaders(["wishlist"]);
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist/${product_id}`;
+    const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to remove item from wishlist: ${response.statusText}`);
+    }
+
+    return await response.json();
+}
 
 interface SearchResult {
     products: Product[];
@@ -613,9 +637,7 @@ export async function search(searchParams: SearchParams): Promise<SearchResult> 
         }
 
         return await response.json();
-    } catch (error) {
-        console.error("Error fetching search:", error);
-
+    } catch (_error) {
         return {
             products: [],
             page: 1,
@@ -692,9 +714,7 @@ export const getCategories = async (search: string = "", page: number = 1, limit
 
         return await response.json();
     } catch (error) {
-        console.error("Error fetching categories:", error);
-
-        return { message: "Error fetching categories" };
+        return { message: error instanceof Error ? error.message : "Error fetching categories" };
     }
 };
 
@@ -714,9 +734,7 @@ export const getCollectionsList = cache(async function (search: string = "", pag
 
         return await response.json();
     } catch (error) {
-        console.error("Error fetching collections:", error);
-
-        return { message: "Error fetching collections" };
+        return { message: error instanceof Error ? error.message : "Error fetching collections" };
     }
 });
 
@@ -728,9 +746,7 @@ export const getCollectionBySlug = cache(async function (slug: string): Promise<
             throw new Error(response.statusText);
         }
 
-        const collection = await response.json();
-
-        return collection;
+        return await response.json();
     } catch (error) {
         console.error("Error fetching collection by slug:", error);
 
@@ -770,9 +786,7 @@ export const getActivites = cache(async function (limit: number = 10) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -794,9 +808,7 @@ export async function deleteActivities(id: string | number) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }

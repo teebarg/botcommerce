@@ -42,13 +42,13 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
         <React.Fragment>
             <div className="relative flex items-center gap-2">
                 <Tooltip content="Details">
-                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                    <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
                         {/* <EyeIcon onClick={() => navigate(`/admin/products/${item.id}`)} /> */}
                         <EyeIcon />
                     </span>
                 </Tooltip>
                 <Tooltip content="Edit products">
-                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                    <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
                         <EditIcon onClick={() => slideOverState.open()} />
                     </span>
                 </Tooltip>
@@ -65,7 +65,7 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
                 </Modal>
             )}
             {slideOverState.isOpen && (
-                <SlideOver className="bg-default-50" isOpen={slideOverState.isOpen} title="Edit Product" onClose={slideOverState.close}>
+                <SlideOver className="bg-default-100" isOpen={slideOverState.isOpen} title="Edit Product" onClose={slideOverState.close}>
                     {slideOverState.isOpen && formWithHandler}
                 </SlideOver>
             )}

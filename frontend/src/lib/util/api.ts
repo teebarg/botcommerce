@@ -29,8 +29,6 @@ export async function fetchWithAuth<T>(url: string, options: RequestInit = {}): 
 
         return { data };
     } catch (error) {
-        console.error("API call error:", error);
-
         return {
             error: error instanceof Error ? error.message : "Unknown error occurred",
         };

@@ -6,8 +6,8 @@ import { signOut } from "@modules/account/actions";
 import MapPin from "@modules/common/icons/map-pin";
 import Package from "@modules/common/icons/package";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import clsx from "clsx";
 import { Customer } from "types/global";
+import { cn } from "@lib/util/cn";
 
 const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | null }) => {
     const route = usePathname();
@@ -160,8 +160,8 @@ const AccountNavLink = ({ href, route, children, "data-testid": dataTestId }: Ac
 
     return (
         <LocalizedClientLink
-            className={clsx("text-default-500 hover:text-default-800", {
-                "text-default-800 font-semibold": active,
+            className={cn("text-default-500 hover:text-default-900", {
+                "text-default-900 font-semibold": active,
             })}
             data-testid={dataTestId}
             href={href}

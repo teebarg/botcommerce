@@ -1,4 +1,3 @@
-import { Disclosure } from "@headlessui/react";
 import { useEffect } from "react";
 import useToggleState from "@lib/hooks/use-toggle-state";
 import { useFormStatus } from "react-dom";
@@ -78,24 +77,21 @@ const AccountInfo = ({
                 </div>
             </div>
 
-            <Disclosure>
-                <Disclosure.Panel
-                    static
-                    className={clsx("transition-[max-height,opacity] duration-300 ease-in-out overflow-visible", {
-                        "max-h-[1000px] opacity-100": state,
-                        "max-h-0 opacity-0": !state,
-                    })}
-                >
-                    <div className="flex flex-col gap-y-2 py-4">
-                        <div>{children}</div>
-                        <div className="flex items-center justify-end mt-2">
-                            <Button className="w-full sm:max-w-[140px]" data-testid="save-button" isLoading={pending} type="submit">
-                                Save changes
-                            </Button>
-                        </div>
+            <div
+                className={clsx("static transition-[max-height,opacity] duration-300 ease-in-out overflow-visible", {
+                    "max-h-[1000px] opacity-100": state,
+                    "max-h-0 opacity-0": !state,
+                })}
+            >
+                <div className="flex flex-col gap-y-2 py-4">
+                    <div>{children}</div>
+                    <div className="flex items-center justify-end mt-2">
+                        <Button className="w-full sm:max-w-[140px]" data-testid="save-button" isLoading={pending} type="submit">
+                            Save changes
+                        </Button>
                     </div>
-                </Disclosure.Panel>
-            </Disclosure>
+                </div>
+            </div>
         </div>
     );
 };

@@ -32,7 +32,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                                 </Tooltip>
                             </span>
                         </dt>
-                        <dd className="text-small font-semibold text-default-700">
+                        <dd className="text-small font-semibold text-default-900">
                             <span data-testid="cart-subtotal" data-value={subtotal || 0}>
                                 {getAmount(subtotal)}
                             </span>
@@ -40,7 +40,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                     </div>
                     <div className="flex justify-between">
                         <dt className="text-small text-default-500">Delivery</dt>
-                        <dd className="text-small font-semibold text-default-700">
+                        <dd className="text-small font-semibold text-default-900">
                             <span data-testid="cart-shipping" data-value={delivery_fee || 0}>
                                 {getAmount(delivery_fee)}
                             </span>
@@ -48,7 +48,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                     </div>
                     <div className="flex justify-between">
                         <dt className="text-small text-default-500">Taxes</dt>
-                        <dd className="text-small font-semibold text-default-700">
+                        <dd className="text-small font-semibold text-default-900">
                             <span data-testid="cart-taxes" data-value={tax_total || 0}>
                                 {getAmount(tax_total)}
                             </span>
@@ -76,7 +76,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                     <hr className="tb-divider" />
                     <div className="flex justify-between">
                         <dt className="text-small font-semibold text-default-500">Total</dt>
-                        <dd className="text-small font-semibold text-default-700">
+                        <dd className="text-small font-semibold text-default-900">
                             <span className="text-lg" data-testid="cart-total" data-value={total || 0}>
                                 {getAmount(total)}
                             </span>

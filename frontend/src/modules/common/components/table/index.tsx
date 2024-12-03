@@ -51,7 +51,6 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
             await indexProducts();
             enqueueSnackbar("Products indexed successfully", { variant: "success" });
         } catch (error) {
-            console.error("Error indexing products:", error);
             enqueueSnackbar("Error indexing products", { variant: "error" });
         } finally {
             setIsIndexing(false);
@@ -65,7 +64,6 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
 
             enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
         } catch (error) {
-            console.error("Error exporting products:", error);
             enqueueSnackbar("Error exporting products", { variant: "error" });
         } finally {
             setIsExporting(false);
@@ -84,7 +82,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                             }}
                             defaultValue={searchQuery}
                             placeholder="Search by name..."
-                            startContent={<SearchIcon className="text-default-300" />}
+                            startContent={<SearchIcon className="text-default-500" />}
                             onChange={onSearchChange}
                             onClear={() => onClear()}
                         />
@@ -111,7 +109,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                         </div>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-default-400 text-small">Total {pagination?.total_count} entries</span>
+                        <span className="text-default-500 text-small">Total {pagination?.total_count} entries</span>
                     </div>
                 </div>
             )}
@@ -137,7 +135,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
             </div>
             {pagination && pagination?.total_pages > 1 && <Pagination pagination={pagination} />}
             {state.isOpen && (
-                <SlideOver className="bg-default-50" isOpen={state.isOpen} title="Add New" onClose={closeSlideOver}>
+                <SlideOver className="bg-default-100" isOpen={state.isOpen} title="Add New" onClose={closeSlideOver}>
                     {state.isOpen && formWithHandler}
                 </SlideOver>
             )}

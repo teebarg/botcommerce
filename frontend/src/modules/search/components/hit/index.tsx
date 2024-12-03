@@ -24,7 +24,7 @@ const Hit = ({ hit }: HitProps) => {
                         <img alt={hit.name} className="h-full w-full object-cover object-center" src={hit.image as string} />
                     </div>
                     <div className="relative mt-4">
-                        <span className="font-medium text-default-700 text-base line-clamp-2">{hit.name}</span>
+                        <span className="font-medium text-default-900 text-base line-clamp-2">{hit.name}</span>
                         <p className="text-left text-small text-default-500 truncate mt-1">{hit.description}</p>
                     </div>
                     <div className="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">

@@ -50,7 +50,7 @@ const ShippingAddress = ({
     return (
         <React.Fragment>
             {customer && (customer.shipping_addresses?.length || 0) > 0 && (
-                <div className="shadow-md bg-default-50 w-full rounded-lg mb-6 flex flex-col gap-y-4 p-5">
+                <div className="shadow-md bg-default-100 w-full rounded-lg mb-6 flex flex-col gap-y-4 p-5">
                     <p className="text-small-regular">{`Hi ${customer.firstname}, do you want to use one of your saved addresses?`}</p>
                     <AddressSelect addresses={customer.shipping_addresses} cart={cart} />
                 </div>

@@ -3,9 +3,11 @@ import "styles/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import clsx from "clsx";
 import { ThemeScript } from "@lib/theme/theme-script";
+import { getCustomer } from "@lib/data";
 
 import { NotificationProviders } from "./notistack-providers";
 import OverlayClientProvider from "./overlay-providers";
+import Google from "./google";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -22,6 +24,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    const customer = await getCustomer().catch(() => null);
+
     return (
         <html suppressHydrationWarning className={clsx("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">
             <head>
@@ -31,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <NotificationProviders>
                     <OverlayClientProvider>
                         <div className="relative flex flex-col min-h-screen">{children}</div>
+                        {!customer && <Google />}
                     </OverlayClientProvider>
                 </NotificationProviders>
             </body>

@@ -29,8 +29,8 @@ export default async function CategoriesPage({ searchParams }: { searchParams: {
                                     <div className="px-8 py-8 border-default-100 border-b border-solid">
                                         <div className="flex items-start justify-between">
                                             <div>
-                                                <h1 className="text-default-700 font-semibold text-xl">Product Categories</h1>
-                                                <h3 className="text-default-600 text-sm pt-1.5">Helps you to keep your products organized.</h3>
+                                                <h1 className="text-default-900 font-semibold text-xl">Product Categories</h1>
+                                                <h3 className="text-default-500 text-sm pt-1.5">Helps you to keep your products organized.</h3>
                                             </div>
                                             <div>
                                                 <AddCategory />

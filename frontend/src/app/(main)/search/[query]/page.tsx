@@ -32,7 +32,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
                         {decodeURI(query)} ({hits.length})
                     </h4>
                 </div>
-                <LocalizedClientLink className="text-default-500 hover:text-default-800" href="/collections">
+                <LocalizedClientLink className="text-default-500 hover:text-default-900" href="/collections">
                     Clear
                 </LocalizedClientLink>
             </div>

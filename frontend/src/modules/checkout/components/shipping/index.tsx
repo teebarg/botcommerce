@@ -1,8 +1,6 @@
 "use client";
 
-import { RadioGroup } from "@headlessui/react";
-import { CheckCircleSolid, Spinner } from "nui-react-icons";
-import Radio from "@modules/common/components/radio";
+import { CheckCircleSolid, StarIcon } from "nui-react-icons";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { setShippingMethod } from "@modules/checkout/actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -11,6 +9,9 @@ import clsx from "clsx";
 import Button from "@modules/common/components/button";
 import { Cart, DeliveryOption } from "types/global";
 import { currency } from "@lib/util/util";
+
+import { RadioGroup } from "@/components/ui/radio-group";
+import { cn } from "@/lib/util/cn";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -71,7 +72,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     {!isOpen && cart.shipping_method?.name && <CheckCircleSolid />}
                 </h2>
                 {!isOpen && cart?.shipping_address && cart?.billing_address && cart?.email && (
-                    <button className="text-default-700 hover:text-blue-600" data-testid="edit-delivery-button" onClick={handleEdit}>
+                    <button className="text-default-900 hover:text-blue-600" data-testid="edit-delivery-button" onClick={handleEdit}>
                         Edit
                     </button>
                 )}
@@ -79,34 +80,43 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             {isOpen ? (
                 <div data-testid="delivery-options-container">
                     <div className="pb-8">
-                        <RadioGroup value={cart.shipping_method?.id} onChange={(value: string) => handleChange(value)}>
-                            {availableShippingMethods ? (
-                                availableShippingMethods.map((option) => {
-                                    return (
-                                        <RadioGroup.Option
-                                            key={option.id}
-                                            className={clsx(
-                                                "flex items-center justify-between text-sm cursor-pointer py-4 border rounded-lg px-8 mb-2",
-                                                {
-                                                    "border-blue-400": option.id === cart.shipping_method?.id,
-                                                }
+                        <RadioGroup name="shipping-method" value={cart.shipping_method?.id} onChange={(value: string) => handleChange(value)}>
+                            {availableShippingMethods?.map((option) => (
+                                <RadioGroup.Option
+                                    key={option.id}
+                                    className={cn(
+                                        "group relative transition-all",
+                                        option.id === cart.shipping_method?.id && "border-primary bg-primary/10",
+                                        option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
+                                    )}
+                                    value={option.id}
+                                >
+                                    <span className="absolute right-8 top-4 flex h-5 w-5 items-center justify-center rounded-full border">
+                                        <span
+                                            className={cn(
+                                                "h-2.5 w-2.5 rounded-full bg-primary transition-all",
+                                                option.id === cart.shipping_method?.id ? "scale-100 opacity-100" : "scale-0 opacity-0"
                                             )}
-                                            data-testid="delivery-option-radio"
-                                            value={option.id}
-                                        >
-                                            <div className="flex items-center gap-x-4">
-                                                <Radio checked={option.id === cart.shipping_method?.id} />
-                                                <span className="text-base">{option.name}</span>
-                                            </div>
-                                            <span className="justify-self-end text-default-800">{currency(option.amount!)}</span>
-                                        </RadioGroup.Option>
-                                    );
-                                })
-                            ) : (
-                                <div className="flex flex-col items-center justify-center px-4 py-8 text-default-800">
-                                    <Spinner />
-                                </div>
-                            )}
+                                        />
+                                    </span>
+                                    <div className="flex items-start gap-4">
+                                        {
+                                            <StarIcon
+                                                className={cn(
+                                                    "h-5 w-5 transition-colors",
+                                                    option.id === cart.shipping_method?.id ? "text-primary" : "text-muted-foreground"
+                                                )}
+                                            />
+                                        }
+                                        <div className="space-y-1">
+                                            <p className={cn("font-medium leading-none", option.id === cart.shipping_method?.id && "text-primary")}>
+                                                {option.name}
+                                            </p>
+                                            {option.amount && <p className="text-sm text-muted-foreground">{currency(option.amount)}</p>}
+                                        </div>
+                                    </div>
+                                </RadioGroup.Option>
+                            ))}
                         </RadioGroup>
                     </div>
 
@@ -129,7 +139,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                         {cart && cart.shipping_method?.name && (
                             <div className="flex flex-col w-1/3">
                                 <p className="font-medium mb-1 text-base">Method</p>
-                                <p className="font-normal text-default-600 text-base">
+                                <p className="font-normal text-default-500 text-base">
                                     {cart.shipping_method?.name} ({currency(cart.shipping_method.amount)})
                                 </p>
                             </div>

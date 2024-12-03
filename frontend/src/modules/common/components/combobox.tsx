@@ -1,11 +1,11 @@
 import { Item } from "@react-stately/collections";
 import { useComboBoxState } from "@react-stately/combobox";
 import React from "react";
-import clsx from "clsx";
 import { ChevronDown } from "nui-react-icons";
 import { useButton } from "@react-aria/button";
 import { useComboBox } from "@react-aria/combobox";
 import { useFilter } from "@react-aria/i18n";
+import { cn } from "@lib/util/cn";
 
 interface ComboBoxItem {
     id: number | string;
@@ -58,7 +58,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
     const { autoFocus, linkBehavior, shouldFocusOnHover, shouldSelectOnPressUp, shouldUseVirtualFocus, ...validListBoxProps } = listBoxProps;
 
     return (
-        <div className={clsx("combobox", className)}>
+        <div className={cn("combobox", className)}>
             {label && (
                 <label className="combobox-label" {...labelProps}>
                     {label}
@@ -68,9 +68,9 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
                 <button
                     {...buttonProps}
                     ref={triggerRef}
-                    className={clsx(
-                        "relative px-3 w-full inline-flex shadow-sm outline-none border-medium border-default-200",
-                        "hover:border-default-400 transition-colors motion-reduce:transition-none",
+                    className={cn(
+                        "relative px-3 w-full inline-flex shadow-sm outline-none border-medium border-default-100 bg-content1",
+                        "hover:border-default-500 transition-colors motion-reduce:transition-none",
                         "rounded-medium flex-col items-start justify-center gap-0 h-10 min-h-10 py-2",
                         {
                             "border-default-foreground": state.isOpen,
@@ -88,7 +88,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
                         }}
                     />
                     <ChevronDown
-                        className={clsx("absolute right-3 w-4 h-4 transition-transform duration-150 ease motion-reduce:transition-none", {
+                        className={cn("absolute right-3 w-4 h-4 transition-transform duration-150 ease motion-reduce:transition-none", {
                             "rotate-180": state.isOpen,
                         })}
                     />
@@ -99,7 +99,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
                             {[...state.collection].map((item) => (
                                 <li
                                     key={item.key}
-                                    className={clsx("combobox-option", {
+                                    className={cn("combobox-option", {
                                         "bg-content3": state.selectionManager.isSelected(item.key),
                                     })}
                                     onMouseDown={() => state.selectionManager.select(item.key)}

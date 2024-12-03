@@ -28,7 +28,7 @@ const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(({ place
         <div>
             <span
                 className={cn(
-                    "bg-default-100 [&_svg]:text-default-400 border-default-400 justify-center overflow-hidden rounded-md relative flex items-center border text-default-800 group",
+                    "bg-default-100 [&_svg]:text-default-500 border-default-500 justify-center overflow-hidden rounded-md relative flex items-center border text-default-900 group",
                     className,
                     {
                         "text-default-500": isPlaceholder,

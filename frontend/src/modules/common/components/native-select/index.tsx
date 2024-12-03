@@ -1,6 +1,6 @@
 import { ChevronUpDown } from "nui-react-icons";
 import { SelectHTMLAttributes, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import clsx from "clsx";
+import { cn } from "@lib/util/cn";
 
 export type NativeSelectProps = {
     placeholder?: string;
@@ -26,8 +26,8 @@ const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
         return (
             <div>
                 <div
-                    className={clsx("relative flex items-center text-base border border-default-800 bg-default-500 rounded-md", className, {
-                        "text-default-400": isPlaceholder,
+                    className={cn("relative flex items-center text-base border border-default-900 bg-default-500 rounded-md", className, {
+                        "text-default-500": isPlaceholder,
                     })}
                     onBlur={() => innerRef.current?.blur()}
                     onFocus={() => innerRef.current?.focus()}

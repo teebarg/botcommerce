@@ -79,14 +79,14 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
             </div>
             {state.isOpen && (
                 <SlideOver
-                    className="bg-default-50"
+                    className="bg-default-100"
                     footer={
                         <React.Fragment>
                             <div className="p-2">
                                 <dl className="flex flex-col gap-4 py-4">
                                     <div className="flex justify-between">
                                         <dt className="text-small text-default-500">Subtotal</dt>
-                                        <dd className="text-small font-semibold text-default-700">{currency(total)}</dd>
+                                        <dd className="text-small font-semibold text-default-900">{currency(total)}</dd>
                                     </div>
                                 </dl>
                                 {cart?.items?.length && (

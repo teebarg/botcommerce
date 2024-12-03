@@ -12,6 +12,7 @@ from models.collection import CollectionBase
 from models.product import ProductBase
 from models.tag import TagBase
 from models.user import UserBase
+from models.wishlist import WishlistBase
 
 
 class ContactFormCreate(BaseModel):
@@ -174,12 +175,13 @@ class User(UserBase, table=True):
     hashed_password: str = secrets.token_urlsafe(6)
     addresses: List["Address"] = Relationship(back_populates="user")
     activity_logs: List["ActivityLog"] = Relationship(back_populates="user")
+    wishlists: List["Wishlist"] = Relationship(back_populates="user")
 
 
 class UserPublic(UserBase):
     id: int | None
-    shipping_addresses: list["Address"] = []
-    billing_address: "Address"
+    shipping_addresses: list["Address"] | None = []
+    billing_address: Optional["Address"] = None
 
 
 class ActivityLog(ActivityBase, table=True):
@@ -212,3 +214,15 @@ class Addresses(SQLModel):
     limit: int
     total_count: int
     total_pages: int
+
+
+# Database model, database table inferred from class name
+class Wishlist(WishlistBase, table=True):
+    __tablename__ = "wishlists"
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+    user: User = Relationship(back_populates="wishlists")
+    product_id: int = Field(
+        foreign_key="product.id", nullable=False, ondelete="CASCADE"
+    )
+    # product: Product = Relationship(back_populates="product")

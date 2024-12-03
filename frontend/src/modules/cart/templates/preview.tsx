@@ -31,7 +31,7 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
                             <div className="flex flex-1 flex-col">
                                 <div className="text-sm">
                                     <LocalizedClientLink href={`/products/${item.slug}`} role="link">
-                                        <p className="font-semibold text-default-800 truncate max-w-40">{item.name}</p>
+                                        <p className="font-semibold text-default-900 truncate max-w-40">{item.name}</p>
                                     </LocalizedClientLink>
                                 </div>
                                 <div className="flex gap-2 items-center">
@@ -41,7 +41,7 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
                             <div>
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-default-500">{item.quantity}x</span>
-                                    <span className="text-sm text-default-700">
+                                    <span className="text-sm text-default-900">
                                         <LineItemUnitPrice item={item} style="tight" />
                                     </span>
                                 </div>

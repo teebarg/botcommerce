@@ -17,7 +17,7 @@ const LineItemUnitPrice = ({ item, style = "default" }: LineItemUnitPriceProps) 
             {hasReducedPrice && (
                 <>
                     <p>
-                        {style === "default" && <span className="text-default-400">Original: </span>}
+                        {style === "default" && <span className="text-default-500">Original: </span>}
                         <span className="line-through" data-testid="product-unit-original-price">
                             {currency(originalPrice)}
                         </span>

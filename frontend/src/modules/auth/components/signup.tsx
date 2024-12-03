@@ -40,7 +40,7 @@ const SignUpForm: React.FC<Props> = () => {
                         <Input isRequired autoComplete="new-password" data-testid="password-input" label="Password" name="password" type="password" />
                     </div>
                 </div>
-                <span className="text-center text-default-600 text-sm mt-6">
+                <span className="text-center text-default-500 text-sm mt-6">
                     By creating an account, you agree to Botcommerce Store&apos;s{" "}
                     <LocalizedClientLink className="underline" href="/content/privacy-policy">
                         Privacy Policy
@@ -55,7 +55,7 @@ const SignUpForm: React.FC<Props> = () => {
                     Join Us
                 </FormButton>
             </form>
-            <span className="text-center text-default-800 text-sm mt-6">
+            <span className="text-center text-default-900 text-sm mt-6">
                 Already a member?{" "}
                 <LocalizedClientLink className="text-blue-500" href={"/sign-in"}>
                     Join us.

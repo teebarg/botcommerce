@@ -2,8 +2,8 @@ import React from "react";
 import { ChevronRight, ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { getCategories, getCollectionsList, search } from "@lib/data";
-import { Category, Collection, Product, SearchParams, SortOptions } from "types/global";
+import { getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
+import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 import { ProductCard } from "@modules/products/components/product-card";
 
 import { CollectionsTopBar } from "./topbar";
@@ -23,6 +23,13 @@ interface ComponentProps {
 
 const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, sortBy, searchParams }) => {
     const { collections } = await getCollectionsList();
+    const customer: Customer = await getCustomer().catch(() => null);
+    let wishlist: WishlistItem[] = [];
+
+    if (customer) {
+        wishlist = await getWishlist();
+    }
+
     const { categories: cat } = await getCategories();
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
@@ -99,7 +106,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                     <React.Fragment>
                                         <div className="grid w-full gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-4">
                                             {products.map((product: Product, index: number) => (
-                                                <ProductCard key={index} product={product} />
+                                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                             ))}
                                         </div>
                                         {pagination.total_pages > 1 && <Pagination pagination={pagination} />}

@@ -18,7 +18,7 @@ const AddCategory: React.FC<Props> = () => {
                 <span>Add category</span>
             </Button>
             {slideOverState.isOpen && (
-                <SlideOver className="bg-default-50" isOpen={slideOverState.isOpen} title="Add Category" onClose={slideOverState.close}>
+                <SlideOver className="bg-default-100" isOpen={slideOverState.isOpen} title="Add Category" onClose={slideOverState.close}>
                     {slideOverState.isOpen && <CategoryForm type="create" onClose={slideOverState.close} />}
                 </SlideOver>
             )}
