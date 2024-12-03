@@ -1,6 +1,9 @@
 "use client";
 
+import { Cart, HeartFilledIcon } from "nui-react-icons";
 import React from "react";
+
+import { cn } from "@/lib/util/cn";
 
 interface WishlistItemProps {
     id: string;
@@ -11,25 +14,48 @@ interface WishlistItemProps {
 }
 
 const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, description }) => {
+    const onMoveToCart = (id: string) => {
+        // Handle later
+    };
+
+    const onRemove = (id: string) => {
+        // Handle later
+    };
+
     return (
-        <div className="flex flex-col sm:flex-row items-center gap-6 bg-white shadow-md p-6 rounded-lg">
-            <img src={image} alt={name} className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-md" />
-            <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-800">{name}</h3>
-                <p className="text-gray-600 text-sm mt-2">{description}</p>
-                <div className="mt-4 text-lg font-bold text-gray-800">{price}</div>
+        <div className="group relative bg-background rounded-xl overflow-hidden border border-default/50">
+            <div className="aspect-square overflow-hidden">
+                <img
+                    alt={name}
+                    className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    src={image}
+                />
             </div>
-            <div className="flex flex-col gap-3">
-                <button
-                    className="px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition"
-                >
-                    Move to Cart
-                </button>
-                <button
-                    className="px-4 py-2 border border-red-500 text-red-500 font-medium rounded-md hover:bg-red-500 hover:text-white transition"
-                >
-                    Remove
-                </button>
+
+            <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                    {/* <p className="text-sm font-medium text-muted-foreground">{brand}</p> */}
+                    <h3 className="font-medium line-clamp-2">{name}</h3>
+                    {/* <p className="text-lg font-semibold">${price.toLocaleString()}</p> */}
+                </div>
+
+                <div className="flex gap-3">
+                    <button
+                        className={cn(
+                            "flex-1 flex items-center justify-center gap-2 py-2.5",
+                            "bg-primary text-primary-foreground rounded-md",
+                            "hover:opacity-90 transition-opacity"
+                        )}
+                        onClick={() => onMoveToCart(id)}
+                    >
+                        <Cart className="w-4 h-4" />
+                        <span>Move to Cart</span>
+                    </button>
+
+                    <button className={cn("transition-colors text-secondary")} onClick={() => onRemove(id)}>
+                        <HeartFilledIcon className="w-10 h-10" />
+                    </button>
+                </div>
             </div>
         </div>
     );

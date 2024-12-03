@@ -4,34 +4,34 @@ import { cn } from "@/lib/util/cn";
 
 const buttonConfig: any = {
     primary: {
-        bgColor: "bg-primary",
-        color: "text-primary-foreground",
+        color: "bg-primary text-primary-foreground",
         shadow: "shadow-lg shadow-primary/40",
+        bordered: "border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white",
     },
     secondary: {
-        bgColor: "bg-secondary",
-        color: "text-secondary-foreground",
+        color: "bg-secondary text-secondary-foreground",
         shadow: "shadow-lg shadow-secondary/40",
+        bordered: "border border-secondary-500 text-secondary-500 hover:bg-secondary-500 hover:text-white",
     },
     default: {
-        bgColor: "bg-default",
-        color: "text-default-foreground",
+        color: "bg-default text-default-foreground",
         shadow: "shadow-lg shadow-default/40",
+        bordered: "border border-default-500 text-default-500 hover:bg-default-500 hover:text-white",
     },
     danger: {
-        bgColor: "bg-danger",
-        color: "text-danger-foreground",
+        color: "bg-danger text-danger-foreground",
         shadow: "shadow-lg shadow-danger/40",
+        bordered: "border border-danger-500 text-danger-500 hover:bg-danger-500 hover:text-white",
     },
     warning: {
-        bgColor: "bg-warning",
-        color: "text-warning-foreground",
+        color: "bg-warning text-warning-foreground",
         shadow: "shadow-lg shadow-warning/40",
+        bordered: "border border-warning-500 text-warning-500 hover:bg-warning-500 hover:text-white",
     },
     success: {
-        bgColor: "bg-success",
-        color: "text-success-foreground",
+        color: "bg-success text-success-foreground",
         shadow: "shadow-lg shadow-success/40",
+        bordered: "border border-success-500 text-success-500 hover:bg-success-500 hover:text-white",
     },
 
     // Sizes
@@ -74,12 +74,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 ref={ref}
                 className={cn(
                     "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
-                    "font-normal overflow-hidden outline-none transition-transform-colors-opacity motion-reduce:transition-none",
+                    "font-normal overflow-hidden outline-none transition transition-transform-colors-opacity motion-reduce:transition-none",
                     buttonConfig[size],
-                    buttonConfig[color].bgColor,
+                    // buttonConfig[color].bgColor,
                     variant === "shadow" && buttonConfig[color].shadow,
                     disabled ? "pointer-events-none opacity-50" : "",
                     buttonConfig[color].color,
+                    variant === "bordered" && buttonConfig[color].bordered,
                     className
                 )}
                 disabled={isLoading || disabled} // Combine isLoading and disabled logic

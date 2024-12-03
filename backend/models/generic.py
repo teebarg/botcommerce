@@ -175,6 +175,7 @@ class User(UserBase, table=True):
     hashed_password: str = secrets.token_urlsafe(6)
     addresses: List["Address"] = Relationship(back_populates="user")
     activity_logs: List["ActivityLog"] = Relationship(back_populates="user")
+    wishlists: List["Wishlist"] = Relationship(back_populates="user")
 
 
 class UserPublic(UserBase):
@@ -219,7 +220,6 @@ class Wishlist(WishlistBase, table=True):
     __tablename__ = "wishlists"
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
-    user: User = Relationship(back_populates="user")
+    user: User = Relationship(back_populates="wishlists")
     product_id: int = Field(foreign_key="product.id", nullable=False, ondelete="CASCADE")
-    product: Product = Relationship(back_populates="product")
-    
+    # product: Product = Relationship(back_populates="product")

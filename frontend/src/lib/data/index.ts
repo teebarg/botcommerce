@@ -590,7 +590,7 @@ export const getWishlist = cache(async function (): Promise<any> {
     try {
         const headers = getHeaders(["wishlist"]);
 
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/wishlist`;
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
         const response = await fetch(url, {
             method: "GET",
             headers: {
@@ -599,7 +599,7 @@ export const getWishlist = cache(async function (): Promise<any> {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to fetch product");
+            throw new Error("Failed to fetch wishlist");
         }
 
         return await response.json();
@@ -607,6 +607,45 @@ export const getWishlist = cache(async function (): Promise<any> {
         return null;
     }
 });
+
+export async function addWishlist(product_id: number) {
+    const headers = getHeaders(["wishlist"]);
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+        },
+        body: JSON.stringify({ product_id }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to add product to wishlist: ${response.statusText}`);
+    }
+
+    const updatedCart = await response.json();
+
+    return updatedCart;
+}
+
+export async function removeWishlist(product_id: number) {
+    const headers = getHeaders(["wishlist"]);
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist/${product_id}`;
+    const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to remove item from wishlist: ${response.statusText}`);
+    }
+
+    return await response.json();
+}
 
 interface SearchResult {
     products: Product[];

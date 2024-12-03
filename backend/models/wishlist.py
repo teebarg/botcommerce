@@ -4,19 +4,14 @@ from models.base import BaseModel
 
 
 class WishlistBase(BaseModel):
-    name: str = Field(index=True, unique=True)
+    name: str = Field(index=True)
     description: str | None  = ""
     image: str | None = ""
 
 
 # Properties to receive via API on creation
-class WishlistCreate(WishlistBase):
-    pass
-
-
-# Properties to receive via API on update, all are optional
-class WishlistUpdate(WishlistBase):
-    pass
+class WishlistCreate(SQLModel):
+    product_id: int
 
 
 # Properties to return via API, id is always required
