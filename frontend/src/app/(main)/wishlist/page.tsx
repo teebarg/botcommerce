@@ -42,9 +42,9 @@ export default async function Wishlist() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto mt-6">
             <h1 className="text-3xl font-bold text-center text-default-900">Your Wishlist</h1>
-            <p className="text-center text-default-500 mt-2">Curate your luxury collection.</p>
+            <p className="text-center text-default-500 mt-1">Curate your luxury collection.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
                 {wishlist.map((item: any) => (
                     <WishlistItem key={item.id} {...item} />

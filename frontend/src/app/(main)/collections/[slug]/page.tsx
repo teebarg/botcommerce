@@ -34,12 +34,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         notFound();
     }
 
-    const metadata = {
+    return {
         title: `${collection.name} | Botcommerce Store`,
         description: `${collection.name} collection`,
     } as Metadata;
-
-    return metadata;
 }
 
 export default async function CollectionPage({ params, searchParams }: Props) {

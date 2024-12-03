@@ -47,7 +47,7 @@ def create_user_wishlist_item(item: WishlistCreate, db: SessionDep, user: Curren
     return crud.user.create_wishlist_item(db=db, item=item, user_id=user.id)
 
 
-@router.delete("/wishlist/{product_id}", response_model=Wishlist)
+@router.delete("/wishlist/{product_id}", response_model=Message)
 def remove_user_wishlist_item(product_id: int, db: SessionDep, user: CurrentUser):
     wishlist_item = db.exec(select(Wishlist).where(Wishlist.user_id == user.id).where(Wishlist.product_id == product_id)).first()
     if not wishlist_item:

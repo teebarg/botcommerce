@@ -203,3 +203,13 @@ export interface SearchParams {
     limit?: number;
     sort?: string;
 }
+
+export type WishlistItem = {
+    id: number;
+    name: string;
+    description?: string;
+    user_id?: number;
+    product_id?: number;
+    image: string;
+    created_at?: string;
+};

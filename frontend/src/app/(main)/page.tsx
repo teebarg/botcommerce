@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Product, SearchParams } from "types/global";
+import { Customer, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { LocationIcon, MailIcon } from "nui-react-icons";
 import { openingHours } from "@lib/config";
@@ -7,11 +7,12 @@ import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
 import Button from "@modules/common/components/button";
 import { ProductCard } from "@modules/products/components/product-card";
-import { search } from "@lib/data";
+import { getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import FlashBanner from "@components/flash";
 import BannerCarousel from "@components/carousel";
+import { SMProductCard } from "@/modules/products/components/small-product-card";
 
 export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
@@ -42,6 +43,13 @@ export default async function Home() {
         getLandingProducts("latest"),
         getLandingProducts("featured", 8),
     ]);
+
+    const customer: Customer = await getCustomer().catch(() => null);
+    let wishlist: WishlistItem[] = [];
+
+    if (customer) {
+        wishlist = await getWishlist();
+    }
 
     return (
         <React.Fragment>
@@ -123,8 +131,10 @@ export default async function Home() {
                         </div>
                         <div className="col-span-3">
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                                {featured?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {featured?.map((product: Product, index: number) => (
+                                    <SMProductCard key={index} product={product} wishlist={wishlist} showWishlist={Boolean(customer)} />
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -149,7 +159,9 @@ export default async function Home() {
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
+                            {trending?.map((product: Product, index: number) => (
+                                <ProductCard key={index} product={product} wishlist={[]} />
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -174,7 +186,9 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
-                            {latest?.map((product: Product, index: number) => <ProductCard key={index} product={product} />)}
+                            {latest?.map((product: Product, index: number) => (
+                                <ProductCard key={index} product={product} wishlist={[]} />
+                            ))}
                         </div>
                     </div>
                 </div>

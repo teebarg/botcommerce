@@ -1,25 +1,51 @@
 "use client";
 
 import { Cart, HeartFilledIcon } from "nui-react-icons";
-import React from "react";
+import React, { useState } from "react";
 
 import { cn } from "@/lib/util/cn";
+import { useSnackbar } from "notistack";
+import { removeWish } from "@/modules/products/actions";
+import { addToCart } from "@/modules/cart/actions";
+import { Button } from "@/components/ui/button";
 
 interface WishlistItemProps {
-    id: string;
+    id: number;
     name: string;
     image: string;
-    price: string;
+    price: number;
     description: string;
 }
 
 const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, description }) => {
-    const onMoveToCart = (id: string) => {
+    const { enqueueSnackbar } = useSnackbar();
+    const [isAdding, setIsAdding] = useState<boolean>(false);
+
+    const onRemove = async () => {
         // Handle later
+        try {
+            const res = await removeWish(id);
+            if (!res.success) {
+                enqueueSnackbar(res.error, { variant: "error" });
+                return;
+            }
+
+            enqueueSnackbar("Product Successfully removed from wishlist", { variant: "success" });
+        } catch (error: any) {
+            enqueueSnackbar("An error occurred, please contact support", { variant: "error" });
+        }
     };
 
-    const onRemove = (id: string) => {
-        // Handle later
+    // add the selected variant to the cart
+    const handleAddToCart = async () => {
+        setIsAdding(true);
+
+        await addToCart({
+            product_id: id.toString(),
+            quantity: 1,
+        });
+
+        setIsAdding(false);
     };
 
     return (
@@ -33,26 +59,26 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
             </div>
 
             <div className="p-6 space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-1">
                     {/* <p className="text-sm font-medium text-muted-foreground">{brand}</p> */}
-                    <h3 className="font-medium line-clamp-2">{name}</h3>
+                    <h3 className="font-medium line-clamp-1">{name}</h3>
+                    <p className="text-default-500 line-clamp-1">{description}</p>
                     {/* <p className="text-lg font-semibold">${price.toLocaleString()}</p> */}
                 </div>
 
                 <div className="flex gap-3">
-                    <button
-                        className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-2.5",
-                            "bg-primary text-primary-foreground rounded-md",
-                            "hover:opacity-90 transition-opacity"
-                        )}
-                        onClick={() => onMoveToCart(id)}
+                    <Button
+                        disabled={isAdding}
+                        isLoading={isAdding}
+                        startContent={<Cart className="w-6 h-6" />}
+                        color="primary"
+                        className={"flex-1"}
+                        onClick={handleAddToCart}
                     >
-                        <Cart className="w-4 h-4" />
-                        <span>Move to Cart</span>
-                    </button>
+                        <span>Add to Cart</span>
+                    </Button>
 
-                    <button className={cn("transition-colors text-secondary")} onClick={() => onRemove(id)}>
+                    <button className={cn("transition-colors text-secondary")} onClick={onRemove}>
                         <HeartFilledIcon className="w-10 h-10" />
                     </button>
                 </div>

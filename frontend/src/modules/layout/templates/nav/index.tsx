@@ -8,7 +8,7 @@ import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HeartIcon } from "nui-react-icons";
+import { HeartFilledIcon, HeartIcon } from "nui-react-icons";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -65,9 +65,13 @@ const Navbar = async () => {
                         <ThemeButton />
                     </NavbarItem>
                     <NavbarItem className="flex items-center">
-                        <LocalizedClientLink className="" href={"/wishlist"}>
-                            <HeartIcon />
-                        </LocalizedClientLink>
+                        {customer ? (
+                            <LocalizedClientLink className="" href={"/wishlist"}>
+                                <HeartFilledIcon className="h-8 w-8 text-primary-500" />
+                            </LocalizedClientLink>
+                        ) : (
+                            <HeartIcon className="h-8 w-8" />
+                        )}
                     </NavbarItem>
                     <NavbarItem className="flex items-center pt-2">
                         <Suspense
@@ -80,7 +84,7 @@ const Navbar = async () => {
                             <Cart />
                         </Suspense>
                     </NavbarItem>
-                    <NavbarItem className="hidden sm:flex">
+                    <NavbarItem className="hidden sm:flex items-center">
                         {customer ? (
                             <UserDropDown customer={customer} />
                         ) : (

@@ -40,9 +40,7 @@ export async function createCart(data = {}) {
         throw new Error(`Failed to create cart: ${response.statusText}`);
     }
 
-    const cart = await response.json();
-
-    return cart;
+    return await response.json();
 }
 
 export async function updateCart(cartId: string, data: any) {
@@ -62,9 +60,7 @@ export async function updateCart(cartId: string, data: any) {
         throw new Error(`Failed to update cart: ${response.statusText}`);
     }
 
-    const updatedCart = await response.json();
-
-    return updatedCart;
+    return await response.json();
 }
 
 export const getCart = cache(async function (cartId: string) {
@@ -83,9 +79,7 @@ export const getCart = cache(async function (cartId: string) {
         throw new Error(`Failed to create cart: ${response.statusText}`);
     }
 
-    const cart = await response.json();
-
-    return cart;
+    return await response.json();
 });
 
 export const getProducts = cache(async function (search?: string, collections?: string, page?: number, limit?: number) {
@@ -109,9 +103,7 @@ export const getProducts = cache(async function (search?: string, collections?: 
         return null;
     }
 
-    const data = await res.json();
-
-    return data;
+    return await res.json();
 });
 
 export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
@@ -132,9 +124,7 @@ export async function addItem({ cartId, product_id, quantity }: { cartId: string
             throw new Error(`Failed to add item to cart: ${response.statusText}`);
         }
 
-        const result = await response.json();
-
-        return result;
+        return await response.json();
     } catch (error) {
         console.log(error);
 
@@ -161,9 +151,7 @@ export async function updateItem({ cartId, lineId, quantity }: { cartId: string;
             throw new Error(`Failed to add item to cart: ${response.statusText}`);
         }
 
-        const result = await response.json();
-
-        return result;
+        return await response.json();
     } catch (e) {
         return "Error adding item to cart";
     }
@@ -187,9 +175,7 @@ export async function removeItem({ cartId, lineId }: { cartId: string; lineId: s
             throw new Error(`Failed to remove item from cart: ${response.statusText}`);
         }
 
-        const result = await response.json();
-
-        return result;
+        return await response.json();
     } catch (error) {
         console.log(error);
 
@@ -236,9 +222,7 @@ export async function completeCart(cartId: string) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -261,9 +245,7 @@ export const retrieveOrder = cache(async function (id: string) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -416,9 +398,7 @@ export async function addShippingAddress(createData: any) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -440,9 +420,7 @@ export async function deleteShippingAddress(addressId: string | number) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -465,9 +443,7 @@ export async function updateShippingAddress(addressId: string, updateData: any) 
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -491,9 +467,7 @@ export async function updateBillingAddress(updateData: any) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }
@@ -515,9 +489,7 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
             throw new Error("Login failed");
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -577,9 +549,7 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
             throw new Error("Failed to fetch products");
         }
 
-        const data = await response.json();
-
-        return data;
+        return await response.json();
     } catch (error) {
         console.error("Error fetching products:", error);
         throw error;
@@ -619,14 +589,11 @@ export async function addWishlist(product_id: number) {
         },
         body: JSON.stringify({ product_id }),
     });
-
     if (!response.ok) {
         throw new Error(`Failed to add product to wishlist: ${response.statusText}`);
     }
 
-    const updatedCart = await response.json();
-
-    return updatedCart;
+    return await response.json();
 }
 
 export async function removeWishlist(product_id: number) {
@@ -789,9 +756,7 @@ export const getCollectionBySlug = cache(async function (slug: string): Promise<
             throw new Error(response.statusText);
         }
 
-        const collection = await response.json();
-
-        return collection;
+        return await response.json();
     } catch (error) {
         console.error("Error fetching collection by slug:", error);
 
@@ -831,9 +796,7 @@ export const getActivites = cache(async function (limit: number = 10) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         return { message: error, status: "error" };
     }
@@ -855,9 +818,7 @@ export async function deleteActivities(id: string | number) {
             throw new Error(res.statusText);
         }
 
-        const data = await res.json();
-
-        return data;
+        return await res.json();
     } catch (error) {
         throw new Error(`Error: ${error}`);
     }

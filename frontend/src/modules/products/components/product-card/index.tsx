@@ -1,17 +1,23 @@
-import { Product } from "types/global";
+import { Product, WishlistItem } from "types/global";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Suspense } from "react";
 
 import ProductActions from "../product-actions";
+import { ProductWishList } from "./product-wishlist";
 
 interface ComponentProps {
     product: Product;
+    wishlist: WishlistItem[];
+    showWishlist?: boolean;
 }
 
-const ProductCard: React.FC<ComponentProps> = async ({ product }) => {
+const ProductCard: React.FC<ComponentProps> = async ({ product, wishlist, showWishlist = false }) => {
+    const inWishlist = !!wishlist?.find((wishlist) => wishlist.product_id === product.id);
     return (
         <div key={product.id} className="relative flex flex-col rounded-t-md">
             <div className="relative">
+                {showWishlist && <ProductWishList className="absolute right-6 top-6" product={product} inWishlist={inWishlist} />}
+
                 <div className="relative h-72 w-full overflow-hidden rounded-lg p-2">
                     <img alt={product.name} className="h-full w-full object-cover object-center" src={product.image as string} />
                 </div>
