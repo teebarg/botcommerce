@@ -49,9 +49,7 @@ export async function exportProducts() {
 
         return { success: true, message: "Products exported successfully" };
     } catch (error) {
-        console.error("Error exporting products:", error);
-
-        return { success: false, message: "Error exporting products" };
+        return { success: false, message: error instanceof Error ? error.message : "Error exporting products" };
     }
 }
 
@@ -78,9 +76,7 @@ export async function uploadProductImage({ productId, formData }: { productId: s
 
         return { success: true, message: "Image upload successful", data: await res.json() };
     } catch (error) {
-        console.error("Error uploading product image:", error);
-
-        return { success: false, message: "Error uploading product image" };
+        return { success: false, message: error instanceof Error ? error.message : "Error uploading product image" };
     }
 }
 
@@ -190,9 +186,7 @@ export async function createCategory(currentState: unknown, formData: FormData) 
 
         return { success: true, message: "Category created successfully", data: await res.json() };
     } catch (error) {
-        console.error("Error creating category:", error);
-
-        return { success: false, message: "Error creating category" };
+        return { success: false, message: error instanceof Error ? error.message : "Error creating category" };
     }
 }
 
@@ -252,9 +246,7 @@ export async function createCollection(currentState: unknown, formData: FormData
 
         return { success: true, message: "Collection created successfully", data: await res.json() };
     } catch (error) {
-        console.error("Error creating collection:", error);
-
-        return { success: false, message: "Error creating collection" };
+        return { success: false, message: error instanceof Error ? error.message : "Error creating collection" };
     }
 }
 
@@ -281,9 +273,7 @@ export async function updateCollection(collectionId: string, collectionData: any
 
         return { success: true, message: "Collection updated successfully", data: await res.json() };
     } catch (error) {
-        console.error("Error updating collection:", error);
-
-        return { success: false, message: "Error updating collection" };
+        return { success: false, message: error instanceof Error ? error.message : "Error updating collection" };
     }
 }
 
@@ -308,9 +298,7 @@ export async function deleteCollection(collectionId: string) {
 
         return { success: true, message: "Collection deleted successfully" };
     } catch (error) {
-        console.error("Error deleting collection:", error);
-
-        return { success: false, message: "Error deleting collection" };
+        return { success: false, message: error instanceof Error ? error.message : "Error deleting collection" };
     }
 }
 
@@ -360,8 +348,6 @@ export async function bulkUploadProducts({ formData }: { formData: FormData }) {
 
         return await res.json();
     } catch (e) {
-        console.error("Error during bulk product update:", e);
-
-        return "Error updating products";
+        return e instanceof Error ? e.message : "Unknown error occurred";
     }
 }

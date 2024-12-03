@@ -24,8 +24,8 @@ export function RadioItem({ option, isSelected, name, onSelect }: RadioItemProps
     return (
         <label
             className={cn(
-                "group relative flex cursor-pointer rounded-lg border p-4 hover:bg-accent/50 transition-all",
-                isSelected && "border-primary bg-accent/30",
+                "group relative flex cursor-pointer rounded-lg border p-4 hover:bg-secondary/50 transition-all",
+                isSelected && "border-primary bg-secondary/30",
                 option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
             )}
         >

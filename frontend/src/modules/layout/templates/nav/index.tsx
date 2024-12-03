@@ -26,36 +26,12 @@ const Navbar = async () => {
                         Collections
                     </LocalizedClientLink>
                     {isAdmin && (
-                        // <NavbarItem>
                         <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
                             Admin
                         </LocalizedClientLink>
-                        // </NavbarItem>
                     )}
                 </NavbarBrand>
                 <div className="hidden sm:flex items-center gap-2 flex-1">
-                    {/* <NavbarItem>
-                        <LocalizedClientLink className="text-base font-medium" href={"/"}>
-                            Home
-                        </LocalizedClientLink>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <LocalizedClientLink className="text-base font-medium" href={"/collections"}>
-                            Collections
-                        </LocalizedClientLink>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <LocalizedClientLink className="text-base font-medium" href={"/checkout"}>
-                            Checkout
-                        </LocalizedClientLink>
-                    </NavbarItem>
-                    {isAdmin && (
-                        <NavbarItem>
-                            <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
-                                Admin
-                            </LocalizedClientLink>
-                        </NavbarItem>
-                    )} */}
                     <NavbarItem className="hidden lg:flex flex-1">
                         <Search className="w-full justify-between" />
                     </NavbarItem>
@@ -96,33 +72,6 @@ const Navbar = async () => {
                     <NavbarMenuToggle className="sm:hidden" />
                 </div>
             </NavbarContent>
-
-            {/* <NavbarContent className="flex bg-blue-600" justify="end">
-                <NavbarItem className="flex items-center">
-                    <ThemeButton />
-                </NavbarItem>
-                <NavbarItem className="flex items-center pt-2">
-                    <Suspense
-                        fallback={
-                            <LocalizedClientLink className="hover:text-default-900 flex gap-2" data-testid="nav-cart-link" href="/cart">
-                                Cart (0)
-                            </LocalizedClientLink>
-                        }
-                    >
-                        <Cart />
-                    </Suspense>
-                </NavbarItem>
-                <NavbarItem className="hidden sm:flex">
-                    {customer ? (
-                        <UserDropDown customer={customer} />
-                    ) : (
-                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
-                            Log In <span aria-hidden="true">&rarr;</span>
-                        </LocalizedClientLink>
-                    )}
-                </NavbarItem>
-                <NavbarMenuToggle className="sm:hidden" />
-            </NavbarContent> */}
             <NavbarMenu>
                 <Search />
                 <div className="mx-4 mt-2 flex flex-col gap-2">

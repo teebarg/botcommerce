@@ -5,6 +5,7 @@ Revises: c80c4f5551a2
 Create Date: 2024-12-02 16:43:50.445035
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -13,8 +14,8 @@ import sqlmodel.sql.sqltypes
 
 
 # revision identifiers, used by Alembic.
-revision: str = '16a2a7ec3c5a'
-down_revision: Union[str, None] = 'c80c4f5551a2'
+revision: str = "16a2a7ec3c5a"
+down_revision: Union[str, None] = "c80c4f5551a2"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

@@ -106,7 +106,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                     <React.Fragment>
                                         <div className="grid w-full gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-4">
                                             {products.map((product: Product, index: number) => (
-                                                <ProductCard key={index} product={product} wishlist={wishlist} showWishlist={Boolean(customer)} />
+                                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                             ))}
                                         </div>
                                         {pagination.total_pages > 1 && <Pagination pagination={pagination} />}

@@ -1,5 +1,6 @@
-import { cn } from "@/lib/util/cn";
 import { forwardRef } from "react";
+
+import { cn } from "@/lib/util/cn";
 
 export interface RadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -12,11 +13,11 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(({ className, labe
         <label
             className={cn(
                 "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2",
-                props.checked ? "bg-primary text-primary-foreground" : "bg-popover hover:bg-accent hover:text-accent-foreground",
+                props.checked ? "bg-primary text-primary-foreground" : "bg-popover hover:bg-secondary hover:text-secondary-foreground",
                 className
             )}
         >
-            <input type="radio" className="sr-only" ref={ref} {...props} />
+            <input ref={ref} className="sr-only" type="radio" {...props} />
             <div className="flex w-full items-center justify-between">
                 <div className="flex items-center gap-3">
                     {icon && <div className="flex-shrink-0">{icon}</div>}
@@ -37,3 +38,5 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(({ className, labe
         </label>
     );
 });
+
+Radio.displayName = "Radio";

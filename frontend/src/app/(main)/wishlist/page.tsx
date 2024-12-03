@@ -32,8 +32,8 @@ export default async function Wishlist() {
                 </div>
 
                 <LocalizedClientLink
-                    href="/collections"
                     className="inline-flex items-center justify-center px-8 py-3 font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity"
+                    href="/collections"
                 >
                     Explore Collection
                 </LocalizedClientLink>

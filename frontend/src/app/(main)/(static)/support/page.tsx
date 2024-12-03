@@ -70,8 +70,8 @@ const SupportPage = () => {
                 {faqSections.map((section, index) => (
                     <div key={index} className="mb-4">
                         <button
-                            onClick={() => setActiveSection(activeSection === index ? null : index)}
                             className="w-full bg-default p-4 rounded-lg shadow-sm flex justify-between items-center hover:bg-default-100 transition"
+                            onClick={() => setActiveSection(activeSection === index ? null : index)}
                         >
                             <span className="text-xl font-semibold">{section.title}</span>
                             <ChevronDown className={`transform transition-transform ${activeSection === index ? "rotate-180" : ""}`} />

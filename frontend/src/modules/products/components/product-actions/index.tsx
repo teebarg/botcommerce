@@ -53,7 +53,7 @@ export default function ProductActions({ product, disabled, wishlist }: ProductA
                     <div className="ml-auto">{wishlist}</div>
                 </div>
                 {product.old_price > product.price && (
-                    <div className="mt-1 -mb-3">
+                    <div className="mt-1 -mb-1.5">
                         <span className="text-sm font-medium text-green-600">
                             Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
                         </span>

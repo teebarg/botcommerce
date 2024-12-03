@@ -5,7 +5,7 @@ from models.base import BaseModel
 
 class WishlistBase(BaseModel):
     name: str = Field(index=True)
-    description: str | None  = ""
+    description: str | None = ""
     image: str | None = ""
 
 

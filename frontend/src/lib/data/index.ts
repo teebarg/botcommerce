@@ -125,10 +125,8 @@ export async function addItem({ cartId, product_id, quantity }: { cartId: string
         }
 
         return await response.json();
-    } catch (error) {
-        console.log(error);
-
-        return { success: false, message: "error" };
+    } catch (error: any) {
+        return { success: false, message: error.toString() };
     }
 }
 
@@ -177,9 +175,7 @@ export async function removeItem({ cartId, lineId }: { cartId: string; lineId: s
 
         return await response.json();
     } catch (error) {
-        console.log(error);
-
-        return { success: false, message: "error" };
+        return { success: false, message: error instanceof Error ? error.message : "Unknown error occurred" };
     }
 }
 
@@ -551,7 +547,6 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
 
         return await response.json();
     } catch (error) {
-        console.error("Error fetching products:", error);
         throw error;
     }
 });
@@ -589,6 +584,7 @@ export async function addWishlist(product_id: number) {
         },
         body: JSON.stringify({ product_id }),
     });
+
     if (!response.ok) {
         throw new Error(`Failed to add product to wishlist: ${response.statusText}`);
     }
@@ -641,9 +637,7 @@ export async function search(searchParams: SearchParams): Promise<SearchResult> 
         }
 
         return await response.json();
-    } catch (error) {
-        console.error("Error fetching search:", error);
-
+    } catch (_error) {
         return {
             products: [],
             page: 1,
@@ -720,9 +714,7 @@ export const getCategories = async (search: string = "", page: number = 1, limit
 
         return await response.json();
     } catch (error) {
-        console.error("Error fetching categories:", error);
-
-        return { message: "Error fetching categories" };
+        return { message: error instanceof Error ? error.message : "Error fetching categories" };
     }
 };
 
@@ -742,9 +734,7 @@ export const getCollectionsList = cache(async function (search: string = "", pag
 
         return await response.json();
     } catch (error) {
-        console.error("Error fetching collections:", error);
-
-        return { message: "Error fetching collections" };
+        return { message: error instanceof Error ? error.message : "Error fetching collections" };
     }
 });
 

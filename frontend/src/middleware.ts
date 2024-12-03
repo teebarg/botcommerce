@@ -53,7 +53,6 @@ export async function middleware(request: NextRequest) {
     }
 
     if (["/sign-in", "/sign-up"].includes(pathname) && token) {
-        console.log("User is authenticated and visiting auth, routing back to referer");
         const referer = request.headers.get("referer") as string;
 
         // Avoid redirecting to the sign-in page if referer is /sign-in
@@ -69,7 +68,6 @@ export async function middleware(request: NextRequest) {
     }
 
     if (!["/sign-in", "/sign-up"].includes(pathname) && !token) {
-        console.log("route to sign-in");
         const url = new URL(`/sign-in`, request.url);
 
         url.searchParams.set("callbackUrl", pathname);

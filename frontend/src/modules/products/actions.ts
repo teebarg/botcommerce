@@ -2,8 +2,6 @@
 
 import { addWishlist, removeWishlist } from "@lib/data";
 import { revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 
 export async function removeWish(id: number) {
     try {
@@ -23,7 +21,6 @@ export async function addWish(id: number) {
 
         return { success: true, error: null };
     } catch (error: any) {
-        console.log("🚀 ~ addWish ~ error:", error)
         return { success: false, error: error.toString() };
     }
 }

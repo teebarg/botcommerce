@@ -2,10 +2,12 @@
 
 import { Product } from "types/global";
 import { HeartFilledIcon, HeartIcon } from "nui-react-icons";
-import { Button } from "@/components/ui/button";
 import { useSnackbar } from "notistack";
-import { addWish, removeWish } from "../../actions";
 import { useState } from "react";
+
+import { addWish, removeWish } from "../../actions";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
 
 interface ComponentProps {
@@ -21,6 +23,7 @@ const ProductWishList: React.FC<ComponentProps> = ({ product, inWishlist, classN
         setIsLoading(true);
         try {
             let res;
+
             if (inWishlist) {
                 res = await removeWish(product.id);
             } else {
@@ -29,6 +32,7 @@ const ProductWishList: React.FC<ComponentProps> = ({ product, inWishlist, classN
 
             if (!res.success) {
                 enqueueSnackbar(res.error, { variant: "error" });
+
                 return;
             }
 
@@ -39,11 +43,12 @@ const ProductWishList: React.FC<ComponentProps> = ({ product, inWishlist, classN
             setIsLoading(false);
         }
     };
+
     return (
         <Button
-            onClick={handleClick}
             className={cn("rounded-full px-0 gap-0 min-w-8 data-[hover=true]:opacity-hover z-20 text-secondary-500 bg-transparent", className)}
             disabled={isLoading}
+            onClick={handleClick}
         >
             {inWishlist ? <HeartFilledIcon className="h-8 w-8" /> : <HeartIcon className="h-8 w-8" />}
         </Button>

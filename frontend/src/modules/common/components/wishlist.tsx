@@ -2,9 +2,9 @@
 
 import { Cart, HeartFilledIcon } from "nui-react-icons";
 import React, { useState } from "react";
+import { useSnackbar } from "notistack";
 
 import { cn } from "@/lib/util/cn";
-import { useSnackbar } from "notistack";
 import { removeWish } from "@/modules/products/actions";
 import { addToCart } from "@/modules/cart/actions";
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,10 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
         // Handle later
         try {
             const res = await removeWish(id);
+
             if (!res.success) {
                 enqueueSnackbar(res.error, { variant: "error" });
+
                 return;
             }
 
@@ -68,11 +70,11 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
 
                 <div className="flex gap-3">
                     <Button
+                        className={"flex-1"}
+                        color="primary"
                         disabled={isAdding}
                         isLoading={isAdding}
                         startContent={<Cart className="w-6 h-6" />}
-                        color="primary"
-                        className={"flex-1"}
                         onClick={handleAddToCart}
                     >
                         <span>Add to Cart</span>

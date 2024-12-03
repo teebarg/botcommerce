@@ -12,6 +12,7 @@ import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import FlashBanner from "@components/flash";
 import BannerCarousel from "@components/carousel";
+
 import { SMProductCard } from "@/modules/products/components/small-product-card";
 
 export const metadata: Metadata = {
@@ -116,12 +117,12 @@ export default async function Home() {
                 </div>
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="relative hidden md:block">
+                        <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                                 <span className="text-secondary text-3xl font-semibold">Botcommerce</span>
                                 <span className="text-secondary text-lg block mt-4 mb-4">Explore the exclusive beauty and cosmetics collection.</span>
                                 <LocalizedClientLink
-                                    className="bg-transparent text-secondary border-2 border-secondary rounded-full px-8 py-3 text-md hover:bg-secondary hover:text-white"
+                                    className="bg-transparent text-secondary border-2 border-secondary rounded-full px-8 py-2 hover:bg-secondary/10"
                                     href="/collections"
                                 >
                                     Visit Shop
@@ -133,7 +134,7 @@ export default async function Home() {
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {featured?.map((product: Product, index: number) => (
-                                    <SMProductCard key={index} product={product} wishlist={wishlist} showWishlist={Boolean(customer)} />
+                                    <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                 ))}
                             </div>
                         </div>
@@ -160,7 +161,7 @@ export default async function Home() {
                         <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             {trending?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} wishlist={[]} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
@@ -187,7 +188,7 @@ export default async function Home() {
                         </p>
                         <div className="grid sm:grid-cols-4 gap-8 mt-6">
                             {latest?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} wishlist={[]} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>

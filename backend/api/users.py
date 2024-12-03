@@ -1,17 +1,14 @@
-import crud
-from models.wishlist import WishlistCreate
-from fastapi import (
-    APIRouter,
-    HTTPException
-)
+from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
+import crud
 from core.deps import (
     CurrentUser,
     SessionDep,
 )
 from models.generic import Address, UserPublic, Wishlist
 from models.message import Message
+from models.wishlist import WishlistCreate
 
 # Create a router for users
 router = APIRouter()
@@ -38,9 +35,11 @@ async def read_user_me(db: SessionDep, user: CurrentUser) -> UserPublic:
         "billing_address": billing_address,
     }
 
+
 @router.get("/wishlist", response_model=list[Wishlist])
 def read_user_wishlist(db: SessionDep, user: CurrentUser):
     return crud.user.get_user_wishlist(db=db, user_id=user.id)
+
 
 @router.post("/wishlist", response_model=Wishlist)
 def create_user_wishlist_item(item: WishlistCreate, db: SessionDep, user: CurrentUser):
@@ -49,9 +48,15 @@ def create_user_wishlist_item(item: WishlistCreate, db: SessionDep, user: Curren
 
 @router.delete("/wishlist/{product_id}", response_model=Message)
 def remove_user_wishlist_item(product_id: int, db: SessionDep, user: CurrentUser):
-    wishlist_item = db.exec(select(Wishlist).where(Wishlist.user_id == user.id).where(Wishlist.product_id == product_id)).first()
+    wishlist_item = db.exec(
+        select(Wishlist)
+        .where(Wishlist.user_id == user.id)
+        .where(Wishlist.product_id == product_id)
+    ).first()
     if not wishlist_item:
-        raise HTTPException(status_code=404, detail="Product not found or not owned by user")
+        raise HTTPException(
+            status_code=404, detail="Product not found or not owned by user"
+        )
     db.delete(wishlist_item)
     db.commit()
     return Message(message="Item deleted successfully")

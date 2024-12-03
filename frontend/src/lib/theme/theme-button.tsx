@@ -8,7 +8,7 @@ export default function ThemeToggle() {
     const icon = theme === "dark" ? <SunFilledIcon size={30} /> : <MoonFilledIcon size={30} />;
 
     return (
-        <button type="button" onClick={toggleTheme} className="text-primary">
+        <button className="text-primary" type="button" onClick={toggleTheme}>
             {icon}
         </button>
     );

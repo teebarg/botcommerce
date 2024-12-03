@@ -51,7 +51,6 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
             await indexProducts();
             enqueueSnackbar("Products indexed successfully", { variant: "success" });
         } catch (error) {
-            console.error("Error indexing products:", error);
             enqueueSnackbar("Error indexing products", { variant: "error" });
         } finally {
             setIsIndexing(false);
@@ -65,7 +64,6 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
 
             enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
         } catch (error) {
-            console.error("Error exporting products:", error);
             enqueueSnackbar("Error exporting products", { variant: "error" });
         } finally {
             setIsExporting(false);
