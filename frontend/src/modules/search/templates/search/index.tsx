@@ -37,7 +37,7 @@ const Search: React.FC<Props> = ({ className }) => {
                             <MagnifyingGlassMini />
                             <SearchInput />
                             <button onClick={modalState.close}>
-                                <Kbd className="hidden md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
+                                <Kbd className="md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
                             </button>
                         </div>
                         <div className="max-h-[70vh] min-h-[70vh] overflow-y-auto">

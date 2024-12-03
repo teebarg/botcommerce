@@ -18,7 +18,7 @@ const Navbar = async () => {
     return (
         <NavigationBar className="my-2">
             <NavbarContent className="flex flex-1 max-w-7xl mx-auto">
-                <NavbarBrand className="w-[25vw]">
+                <NavbarBrand className="flex-1 md:w-[25vw]">
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/">
                         <p className="font-bold text-inherit text-2xl">Botcommerce</p>
                     </LocalizedClientLink>
@@ -36,11 +36,11 @@ const Navbar = async () => {
                         <Search className="w-full justify-between" />
                     </NavbarItem>
                 </div>
-                <div className="w-[25vw] flex gap-4 justify-end">
+                <div className="md:w-[25vw] flex gap-4 justify-end items-center">
                     <NavbarItem className="flex items-center">
                         <ThemeButton />
                     </NavbarItem>
-                    <NavbarItem className="flex items-center">
+                    <NavbarItem className="hidden md:flex items-center ">
                         {customer ? (
                             <LocalizedClientLink className="" href={"/wishlist"}>
                                 <HeartFilledIcon className="h-8 w-8 text-primary-500" />
@@ -49,7 +49,7 @@ const Navbar = async () => {
                             <HeartIcon className="h-8 w-8" />
                         )}
                     </NavbarItem>
-                    <NavbarItem className="flex items-center pt-2">
+                    <NavbarItem className="hidden md:flex items-center pt-2">
                         <Suspense
                             fallback={
                                 <LocalizedClientLink className="hover:text-default-900 flex gap-2" data-testid="nav-cart-link" href="/cart">

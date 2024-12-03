@@ -22,7 +22,7 @@ export const Navbar = ({ children, className }: { children: React.ReactNode; cla
             <nav
                 className={cn(
                     "flex z-40 w-full items-center justify-center data-[menu-open=true]:border-none sticky top-0 inset-x-0 backdrop-blur-lg",
-                    "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 bg-background/70 my-2 h-16",
+                    "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 bg-background/70 my-2 h-10",
                     className
                 )}
                 data-menu-open={expanded}
@@ -72,9 +72,13 @@ export const NavbarItem = ({ children, className, active }: { children: React.Re
 };
 
 export const NavbarMenu = ({ children, className }: { children: React.ReactNode; className?: string }) => {
+    const context = useContext(NavbarContext);
+
+    if (!context) throw new Error("NavbarTrigger must be used within NavbarItem");
+
     const { isMobile } = useMediaQuery();
 
-    if (!isMobile) {
+    if (!isMobile || !context.expanded) {
         return;
     }
 

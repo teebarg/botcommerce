@@ -57,7 +57,7 @@ export default async function Home() {
             <div>
                 <div className="bg-default/10">
                     <div className="max-w-7xl mx-auto relative sm:grid grid-cols-4 gap-4 rounded-xl my-4 sm:my-8">
-                        <div className="w-full hidden md:block">
+                        <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
                             <ul className="bg-primary/10 text-primary-900">
                                 {cats.map((item: any, index: number) => (
@@ -78,7 +78,7 @@ export default async function Home() {
                         <div className="col-span-2">
                             <BannerCarousel />
                         </div>
-                        <div className="w-full">
+                        <div className="w-full hidden md:block">
                             <div className="bg-warning/15 p-4 rounded-lg hidden md:block">
                                 <span className="font-semibold text-lg text-default-900/80">👋 Hello!</span>
                             </div>
@@ -116,7 +116,7 @@ export default async function Home() {
                     <Image fill alt="banner" src={"/frontend.webp"} />
                 </div>
                 <div className="bg-default-100">
-                    <div className="max-w-7xl mx-auto relative py-8 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                                 <span className="text-secondary text-3xl font-semibold">Botcommerce</span>

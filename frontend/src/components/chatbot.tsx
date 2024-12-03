@@ -92,7 +92,7 @@ const ChatBot: React.FC<Props> = () => {
     return (
         <React.Fragment>
             <div
-                className="right-4 bottom-20 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
+                className="right-0 sm:right-4 bottom-20 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[90vw] sm:w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
                 data-open={isOpen ? "true" : "false"}
             >
                 <header className="py-2 px-3 overflow-hidden rounded-top-corners max-h-full text-white" style={{ background: "rgb(255, 90, 45)" }}>
@@ -184,7 +184,7 @@ const ChatBot: React.FC<Props> = () => {
                 </div>
                 <div className="absolute bottom-0 w-full leading-4 bg-default" style={{ borderRadius: "0 0 5px 5px", padding: "0 16px 13px" }}>
                     <div className="py-[3px] px-0 relative flex items-end w-full">
-                        <div className="flex max-h-20 overflow-hidden relative flex-1 chatiput-wrapper">
+                        <div className="flex max-h-20 overflow-hidden relative flex-1 chatinput-wrapper">
                             <pre> </pre>
                             <label className="visually-hidden" htmlFor="chat-input">
                                 Write a reply...

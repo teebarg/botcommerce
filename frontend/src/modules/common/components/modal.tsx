@@ -31,7 +31,7 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
         <OverlayContainer>
             <div
                 {...underlayProps}
-                className="group fixed inset-0 flex items-center justify-center z-50 backdrop-blur bg-white/40"
+                className="group fixed inset-0 flex items-center justify-center z-50 backdrop-blur bg-white/40 px-2 md:px-0"
                 data-has-x={hasX ? "true" : "false"}
             >
                 <div

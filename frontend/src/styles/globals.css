@@ -187,7 +187,7 @@ body {
         width: 1px;
     }
 
-    .chatiput-wrapper textarea {
+    .chatinput-wrapper textarea {
         resize: none;
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
@@ -198,8 +198,8 @@ body {
         touch-action: manipulation;
     }
 
-    .chatiput-wrapper pre,
-    .chatiput-wrapper textarea {
+    .chatinput-wrapper pre,
+    .chatinput-wrapper textarea {
         width: 114.2%;
         height: 114.3%;
         border-radius: 6px;

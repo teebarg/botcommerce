@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Cart, Tag } from "nui-react-icons";
 
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+
 interface TimeLeft {
     hours: number;
     minutes: number;
@@ -66,7 +68,7 @@ const FlashBanner: React.FC = () => {
     return (
         <div className="bg-gradient-to-r from-black/80 to-gray-800 text-white p-6 rounded-2xl shadow-2xl max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                <Tag className="w-12 h-12 text-yellow-400" />
+                <Tag className="w-12 h-12 text-yellow-400 hidden md:block" />
                 <div>
                     <h2 className="text-2xl font-bold text-yellow-300">Luxury Flash Sale</h2>
                     <p className="text-sm text-gray-300">Exclusive 24-Hour Deals</p>
@@ -85,10 +87,13 @@ const FlashBanner: React.FC = () => {
                 </div>
             </div>
 
-            <button className="mt-4 md:mt-0 bg-yellow-400 text-black px-6 py-3 rounded-full hover:bg-yellow-500 transition-colors flex items-center space-x-2">
+            <LocalizedClientLink
+                className="mt-4 md:mt-0 bg-yellow-400 text-black px-6 py-1.5 rounded-full hover:bg-yellow-500 transition-colors flex items-center space-x-2"
+                href="/collections"
+            >
                 <Cart className="w-5 h-5" />
                 <span>Shop Now</span>
-            </button>
+            </LocalizedClientLink>
         </div>
     );
 };
