@@ -37,7 +37,7 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
                 isSuccess={successState}
                 label="Name"
             >
-                <div className="grid grid-cols-2 gap-x-4">
+                <div className="grid md:grid-cols-2 gap-4">
                     <Input isRequired data-testid="first-name-input" defaultValue={customer.firstname} label="First name" name="firstname" />
                     <Input isRequired data-testid="last-name-input" defaultValue={customer.lastname} label="Last name" name="lastname" />
                 </div>

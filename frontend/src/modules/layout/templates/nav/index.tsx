@@ -8,7 +8,7 @@ import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HeartFilledIcon, HeartIcon } from "nui-react-icons";
+import { HeartFilledIcon, HeartIcon, HomeIcon, User, UserGroup } from "nui-react-icons";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -22,11 +22,11 @@ const Navbar = async () => {
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/">
                         <p className="font-bold text-inherit text-2xl">Botcommerce</p>
                     </LocalizedClientLink>
-                    <LocalizedClientLink className="text-base font-medium" href={"/collections"}>
+                    <LocalizedClientLink className="text-base font-medium hidden md:block" href={"/collections"}>
                         Collections
                     </LocalizedClientLink>
                     {isAdmin && (
-                        <LocalizedClientLink className="text-base font-medium" href={"/admin"}>
+                        <LocalizedClientLink className="text-base font-medium hidden md:block" href={"/admin"}>
                             Admin
                         </LocalizedClientLink>
                     )}
@@ -38,18 +38,6 @@ const Navbar = async () => {
                 </div>
                 <div className="md:w-[25vw] flex gap-4 justify-end items-center">
                     <NavbarItem className="flex items-center">
-                        <ThemeButton />
-                    </NavbarItem>
-                    <NavbarItem className="hidden md:flex items-center ">
-                        {customer ? (
-                            <LocalizedClientLink className="" href={"/wishlist"}>
-                                <HeartFilledIcon className="h-8 w-8 text-primary-500" />
-                            </LocalizedClientLink>
-                        ) : (
-                            <HeartIcon className="h-8 w-8" />
-                        )}
-                    </NavbarItem>
-                    <NavbarItem className="hidden md:flex items-center pt-2">
                         <Suspense
                             fallback={
                                 <LocalizedClientLink className="hover:text-default-900 flex gap-2" data-testid="nav-cart-link" href="/cart">
@@ -59,6 +47,18 @@ const Navbar = async () => {
                         >
                             <Cart />
                         </Suspense>
+                    </NavbarItem>
+                    <NavbarItem className="flex items-center">
+                        <ThemeButton />
+                    </NavbarItem>
+                    <NavbarItem className="hidden md:flex items-center">
+                        {customer ? (
+                            <LocalizedClientLink className="" href={"/wishlist"}>
+                                <HeartFilledIcon className="h-8 w-8 text-primary-500" />
+                            </LocalizedClientLink>
+                        ) : (
+                            <HeartIcon className="h-8 w-8" />
+                        )}
                     </NavbarItem>
                     <NavbarItem className="hidden sm:flex items-center">
                         {customer ? (
@@ -73,15 +73,48 @@ const Navbar = async () => {
                 </div>
             </NavbarContent>
             <NavbarMenu>
-                <Search />
-                <div className="mx-4 mt-2 flex flex-col gap-2">
+                <Search className="px-0" />
+                <div className="mt-6 flex flex-col gap-2">
+                    <NavbarItem className="flex items-center gap-2">
+                        <HomeIcon className="h-8 w-8" />
+                        <LocalizedClientLink className="" href="/">
+                            Home
+                        </LocalizedClientLink>
+                    </NavbarItem>
+                    <NavbarItem className="flex items-center gap-2">
+                        <HeartIcon className="h-8 w-8" />
+                        <LocalizedClientLink href={"/account/profile"}>Profile</LocalizedClientLink>
+                    </NavbarItem>
                     {siteConfig.navItems.map((item: any, index: number) => (
                         <NavbarItem key={`${item}-${index}`}>
-                            <LocalizedClientLink className="" href={item.href}>
-                                {item.label}
-                            </LocalizedClientLink>
+                            <LocalizedClientLink href={item.href}>{item.label}</LocalizedClientLink>
                         </NavbarItem>
                     ))}
+                    <NavbarItem className="flex items-center gap-2">
+                        <HeartIcon className="h-8 w-8" />
+                        <LocalizedClientLink href={"/wishlist"}>Saved Items</LocalizedClientLink>
+                    </NavbarItem>
+                    {isAdmin && (
+                        <NavbarItem className="flex items-center gap-2">
+                            <UserGroup className="h-8 w-8" />
+                            <LocalizedClientLink href={"/admin"}>Admin</LocalizedClientLink>
+                        </NavbarItem>
+                    )}
+                </div>
+
+                <hr className="tb-divider my-4" />
+
+                <div className="flex flex-col gap-2">
+                    <NavbarItem>
+                        <LocalizedClientLink className="" href="/our-story">
+                            Our Story
+                        </LocalizedClientLink>
+                    </NavbarItem>
+                    <NavbarItem>
+                        <LocalizedClientLink className="" href={"/support"}>
+                            Contact Us
+                        </LocalizedClientLink>
+                    </NavbarItem>
                 </div>
             </NavbarMenu>
         </NavigationBar>

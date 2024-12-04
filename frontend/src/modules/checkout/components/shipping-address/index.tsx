@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Cart } from "types/global";
-import { Checkbox } from "@modules/common/components/checkbox";
 import { Input } from "@components/ui/input";
 
 import AddressSelect from "../address-select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ShippingAddress = ({
     customer,
@@ -111,9 +111,12 @@ const ShippingAddress = ({
                 />
             </div>
             <div className="my-8">
-                <Checkbox data-testid="billing-address-checkbox" defaultSelected={checked} onChange={onChange}>
-                    Billing address same as shipping address
-                </Checkbox>
+                <Checkbox
+                    label="Billing address same as shipping address"
+                    data-testid="billing-address-checkbox"
+                    defaultSelected={checked}
+                    onChange={onChange}
+                />
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
                 <Input

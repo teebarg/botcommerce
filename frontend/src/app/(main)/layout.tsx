@@ -29,7 +29,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
                 </div>
             </div>
             <Navbar />
-            <div className="px-4 py-2 md:hidden sticky top-10 bg-content1 z-30">
+            <div className="px-4 py-2 md:hidden sticky top-12 bg-content1 z-30">
                 <Search className="w-full justify-between" />
             </div>
             <main>{props.children}</main>

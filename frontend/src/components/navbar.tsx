@@ -22,7 +22,7 @@ export const Navbar = ({ children, className }: { children: React.ReactNode; cla
             <nav
                 className={cn(
                     "flex z-40 w-full items-center justify-center data-[menu-open=true]:border-none sticky top-0 inset-x-0 backdrop-blur-lg",
-                    "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 bg-background/70 my-2 h-10",
+                    "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 bg-background/70 my-2 h-auto py-1.5",
                     className
                 )}
                 data-menu-open={expanded}
@@ -78,7 +78,7 @@ export const NavbarMenu = ({ children, className }: { children: React.ReactNode;
 
     const { isMobile } = useMediaQuery();
 
-    if (!isMobile || !context.expanded) {
+    if (!isMobile) {
         return;
     }
 
@@ -92,7 +92,7 @@ export const NavbarMenuOverlay = ({ children, className }: { children: React.Rea
 
     const currentPath = usePathname();
 
-    usePreventScroll();
+    usePreventScroll({ isDisabled: !context.expanded });
 
     const overlayRef = React.useRef(null);
 
@@ -126,7 +126,7 @@ export const NavbarMenuOverlay = ({ children, className }: { children: React.Rea
                         data-open={context.expanded}
                     >
                         <button className="absolute top-4 right-4 block" onClick={() => context.setExpanded(!context.expanded)}>
-                            <XMark size={24} />
+                            <XMark size={32} />
                         </button>
                         {children}
                     </ul>

@@ -61,7 +61,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                 label="Billing address"
             >
                 <div className="grid grid-cols-1 gap-y-2">
-                    <div className="grid grid-cols-2 gap-x-2">
+                    <div className="grid md:grid-cols-2 gap-2">
                         <Input
                             isRequired
                             data-testid="billing-first-name-input"

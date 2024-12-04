@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@modules/common/components/button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -22,7 +22,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                         <Link className="inline-block bg-primary hover:bg-primary-focus text-white font-semibold py-2 px-4 rounded-md mr-4" href="/">
                             Go back to homepage
                         </Link>
-                        <Button className="block mt-6" color="danger" type="button" onPress={() => reset()}>
+                        <Button className="block mt-6" color="danger" type="button" onClick={() => reset()}>
                             Try again
                         </Button>
                     </div>

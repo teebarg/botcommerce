@@ -3,7 +3,7 @@ import useToggleState from "@lib/hooks/use-toggle-state";
 import { useFormStatus } from "react-dom";
 import { useSnackbar } from "notistack";
 import clsx from "clsx";
-import Button from "@modules/common/components/button";
+import { Button } from "@/components/ui/button";
 
 type AccountInfoProps = {
     label: string;
@@ -50,7 +50,7 @@ const AccountInfo = ({
 
     return (
         <div className="text-sm" data-testid={dataTestid}>
-            <div className="flex items-end justify-between">
+            <div className="flex items-start justify-between">
                 <div className="flex flex-col">
                     <span className="uppercase">{label}</span>
                     <div className="flex items-center flex-1 basis-0 justify-end gap-x-4">
@@ -65,12 +65,12 @@ const AccountInfo = ({
                 </div>
                 <div>
                     <Button
-                        className="w-[100px] min-h-[25px] py-1"
-                        color="default"
+                        className="w-[100px] py-1"
+                        color="secondary"
                         data-testid="edit-button"
                         type={state ? "reset" : "button"}
                         variant="bordered"
-                        onPress={handleToggle}
+                        onClick={handleToggle}
                     >
                         {state ? "Cancel" : "Edit"}
                     </Button>

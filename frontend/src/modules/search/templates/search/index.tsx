@@ -7,10 +7,10 @@ import Hit from "@modules/search/components/hit";
 import Hits from "@modules/search/components/hits";
 import { InstantSearch } from "react-instantsearch-hooks-web";
 import SearchInput from "@modules/search/components/search-input";
-import Button from "@modules/common/components/button";
 import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
 import { Kbd } from "@modules/common/components/kbd";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     className?: string;
@@ -26,9 +26,9 @@ const Search: React.FC<Props> = ({ className }) => {
                 color="default"
                 endContent={<Kbd keys={["command"]}>K</Kbd>}
                 startContent={<MagnifyingGlassMini />}
-                onPress={modalState.open}
+                onClick={modalState.open}
             >
-                Search products, brands and categories...
+                Search products and categories...
             </Button>
             {modalState.isOpen && (
                 <Modal hasX={false} size="lg" onClose={modalState.close}>

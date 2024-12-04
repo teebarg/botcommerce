@@ -67,15 +67,13 @@ export async function googleLogin(customer: { firstname: string; lastname: strin
 
 export async function updateCustomerName(_currentState: Record<string, unknown>, formData: FormData) {
     const customer = {
-        first_name: formData.get("first_name"),
-        last_name: formData.get("last_name"),
+        firstname: formData.get("firstname"),
+        lastname: formData.get("lastname"),
     } as any;
 
     try {
-        await updateCustomer(customer).then(() => {
-            revalidateTag("customer");
-        });
-
+        await updateCustomer(customer);
+        revalidateTag("customer");
         return { success: true, error: null };
     } catch (error: any) {
         return { success: false, error: error.toString() };

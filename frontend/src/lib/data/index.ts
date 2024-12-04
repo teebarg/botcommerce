@@ -94,13 +94,11 @@ export const getProducts = cache(async function (search?: string, collections?: 
             ...headers,
         },
     }).catch((error) => {
-        console.error("Error fetching products:", error);
-
-        return null;
+        throw new Error(`Failed to create cart: ${error.statusText}`);
     });
 
-    if (!res) {
-        return null;
+    if (!res.ok) {
+        throw new Error(`Failed to create cart: ${res.statusText}`);
     }
 
     return await res.json();
@@ -177,19 +175,6 @@ export async function removeItem({ cartId, lineId }: { cartId: string; lineId: s
     } catch (error) {
         return { success: false, message: error instanceof Error ? error.message : "Unknown error occurred" };
     }
-}
-
-export async function deleteDiscount(cartId: string, code: string) {
-    const headers = getHeaders(["cart"]);
-
-    // return client.carts
-    //     .deleteDiscount(cartId, code, headers)
-    //     .then(({ cart }) => cart)
-    //     .catch((err) => {
-    //         console.log(err);
-
-    //         return null;
-    //     });
 }
 
 export async function setPaymentSession({ cartId, providerId }: { cartId: string; providerId: string }) {
@@ -309,10 +294,8 @@ export async function getCustomer() {
         }
 
         return await res.json();
-    } catch (error) {
-        console.log(error);
-
-        return null;
+    } catch (error: any) {
+        throw new Error(`${error.statusText}`);
     }
 }
 
@@ -371,10 +354,24 @@ export async function createCustomer(data: any) {
 export async function updateCustomer(data: any) {
     const headers = getHeaders(["customer"]);
 
-    // return client.customers
-    //     .update(data, headers)
-    //     .then(({ customer }) => customer)
-    //     .catch((err) => Error(err));
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return await response.json();
+    } catch (error: any) {
+        throw new Error(`Error: ${error}`);
+    }
 }
 
 export async function addShippingAddress(createData: any) {
@@ -747,10 +744,8 @@ export const getCollectionBySlug = cache(async function (slug: string): Promise<
         }
 
         return await response.json();
-    } catch (error) {
-        console.error("Error fetching collection by slug:", error);
-
-        return null;
+    } catch (error: any) {
+        throw new Error(`Error fetching collection by slug: ${error.statusText}`);
     }
 });
 

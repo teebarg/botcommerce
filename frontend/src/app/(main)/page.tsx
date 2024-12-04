@@ -5,7 +5,6 @@ import { LocationIcon, MailIcon } from "nui-react-icons";
 import { openingHours } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
-import Button from "@modules/common/components/button";
 import { ProductCard } from "@modules/products/components/product-card";
 import { getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
@@ -14,6 +13,7 @@ import FlashBanner from "@components/flash";
 import BannerCarousel from "@components/carousel";
 
 import { SMProductCard } from "@/modules/products/components/small-product-card";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
@@ -146,7 +146,7 @@ export default async function Home() {
                         <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner1.avif`)} />
                         <div className="grid grid-cols-2 md:flex flex-wrap mt-4 sm:mt-0 mx-auto sm:absolute bottom-16 right-4 gap-2 ml-auto z-10 px-4 md:px-0">
                             {["Boy", "Girl", "Toddler Boy", "Toddler Boy"].map((item: string, index: number) => (
-                                <Button key={index} className="min-w-36" size="lg" variant="flat">
+                                <Button key={index} className="min-w-36" size="md" variant="flat">
                                     {item}
                                 </Button>
                             ))}
@@ -171,7 +171,7 @@ export default async function Home() {
                         <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner2.avif`)} />
                         <div className="grid grid-cols-2 md:flex flex-wrap sm:absolute bottom-16 left-4 gap-2 ml-auto z-10 mt-4 sm:mt-0 px-4 md:px-0">
                             {["Shorts", "Tops", "Shoes", "Gowns"].map((item: string, index: number) => (
-                                <Button key={index} className="min-w-36" size="lg" variant="flat">
+                                <Button key={index} className="min-w-36" size="md" variant="flat">
                                     {item}
                                 </Button>
                             ))}

@@ -8,24 +8,12 @@ export const siteConfig = {
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     navItems: [
         {
-            label: "Home",
-            href: "/",
-        },
-        {
             label: "Collections",
             href: "/collections",
         },
         {
-            label: "Cart",
-            href: "/cart",
-        },
-        {
             label: "Checkout",
             href: "/checkout",
-        },
-        {
-            label: "Admin",
-            href: "/adminn",
         },
         {
             label: "Blog",

@@ -37,13 +37,13 @@ const LoginForm: React.FC<Props> = () => {
                     <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
                     <Input isRequired data-testid="password-input" label="Password" name="password" type="password" />
                 </div>
-                <FormButton className="w-full mt-6" data-testid="sign-in-button" size="lg">
+                <FormButton className="w-full mt-6" data-testid="sign-in-button" size="md">
                     Sign in
                 </FormButton>
             </form>
             <span className="text-center text-default-900 text-sm mt-6">
                 Not a member?{" "}
-                <LocalizedClientLink className="text-blue-500" href={"/sign-up"}>
+                <LocalizedClientLink className="text-warning-900" href={"/sign-up"}>
                     Join us.
                 </LocalizedClientLink>
             </span>

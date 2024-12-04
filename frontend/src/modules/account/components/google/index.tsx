@@ -40,7 +40,7 @@ const GoogleLogin: React.FC<Props> = () => {
         <React.Fragment>
             <Button
                 className="w-full"
-                size="lg"
+                size="md"
                 startContent={<img alt="Google" className="w-6" src="/google.svg" />}
                 variant="flat"
                 onPress={() => handleGoogleSignIn()}

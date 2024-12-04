@@ -22,8 +22,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
 
     return (
         <div className="bg-content2 flex flex-col p-4 rounded-lg" data-testid="order-card">
-            <div className="uppercase text-lg mb-1">
-                #<span data-testid="order-display-id">{order.order_id}</span>
+            <div data-testid="order-display-id" className="uppercase text-lg mb-1 text-ellipsis overflow-hidden">
+                {order.order_id}
             </div>
             <div className="flex items-center divide-x divide-gray-50 text-sm text-default-500">
                 <span className="pr-2" data-testid="order-created-at">
@@ -59,10 +59,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 )}
             </div>
             <div className="flex justify-end">
-                <LocalizedClientLink href={`/account/orders/details/${order.order_id}`}>
-                    <Button color="default" data-testid="order-details-link">
-                        See details
-                    </Button>
+                <LocalizedClientLink className="underline text-primary" data-testid="order-details-link" href={`/account/orders/details/${order.order_id}`}>
+                    See details
                 </LocalizedClientLink>
             </div>
         </div>

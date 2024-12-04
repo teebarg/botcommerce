@@ -24,10 +24,8 @@ export async function indexProducts() {
         }
 
         return await res.json();
-    } catch (error) {
-        console.error("Error creating product index:", error);
-
-        return null;
+    } catch (error: any) {
+        throw new Error(`Error creating product index: ${error.statusText}`);
     }
 }
 
@@ -321,10 +319,8 @@ export async function getCollections(page: number = 1, limit: number = 10) {
         }
 
         return await res.json();
-    } catch (error) {
-        console.error("Error fetching collections:", error);
-
-        return null;
+    } catch (error: any) {
+        throw new Error(`Error fetching collections: ${error.statusText}`);
     }
 }
 

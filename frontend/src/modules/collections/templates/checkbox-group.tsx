@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CheckboxGroupProps {
     groupName: string;
@@ -15,8 +16,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
     const searchParams = useSearchParams();
 
     // Handle parent checkbox change
-    const handleParentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const checked = e.target.checked;
+    const handleParentChange = (checked: boolean) => {
         const newSet = new Set(dataSet);
 
         if (checked) {
@@ -36,9 +36,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
     };
 
     // Handle individual child checkbox change
-    const handleChildChange = (e: React.ChangeEvent<HTMLInputElement>, slug: string) => {
-        const checked = e.target.checked;
-
+    const handleChildChange = (checked: boolean, slug: string) => {
         // if (!checked) {
         //     setParentChecked(false); // Uncheck parent if any child is unchecked
         // } else if (checkedIds.length === checkboxes.length) {
@@ -69,18 +67,16 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
         <React.Fragment>
             <div style={{ marginBottom: "20px" }}>
                 <div>
-                    <input checked={dataSet.has(item.slug)} id={groupName} type="checkbox" onChange={handleParentChange} />
-                    <label htmlFor={groupName} style={{ fontWeight: "bold", marginLeft: "8px" }}>
-                        {groupName}
-                    </label>
+                    <Checkbox isSelected={dataSet.has(item.slug)} onChange={handleParentChange} label={groupName} />
                 </div>
-                <div style={{ marginLeft: "20px" }}>
+                <div className="space-y-2 mt-1" style={{ marginLeft: "20px" }}>
                     {checkboxes.map((checkbox) => (
                         <div key={`sub-${checkbox.slug}`}>
-                            <input checked={dataSet.has(checkbox.slug)} type="checkbox" onChange={(e) => handleChildChange(e, checkbox.slug)} />
-                            <label htmlFor={checkbox.slug} style={{ marginLeft: "8px" }}>
-                                {checkbox.name}
-                            </label>
+                            <Checkbox
+                                isSelected={dataSet.has(checkbox.slug)}
+                                onChange={(e) => handleChildChange(e, checkbox.slug)}
+                                label={checkbox.name}
+                            />
                         </div>
                     ))}
                 </div>
