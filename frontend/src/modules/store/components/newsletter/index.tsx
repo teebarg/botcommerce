@@ -27,11 +27,11 @@ export default function NewsletterForm() {
                     name="email"
                     placeholder="email@gmail.com"
                     size="sm"
-                    startContent={<MailIcon className="text-2xl text-default-500 pointer-events-none flex-shrink-0" />}
+                    startContent={<MailIcon className="text-default-500 pointer-events-none flex-shrink-0" />}
                     type="email"
                 />
                 <div className="mt-4 sm:ml-4 sm:mt-0 sm:flex-shrink-0">
-                    <FormButton color="secondary" variant="shadow">
+                    <FormButton color="secondary" variant="shadow" size="sm">
                         Subscribe
                     </FormButton>
                 </div>

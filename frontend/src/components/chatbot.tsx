@@ -92,7 +92,7 @@ const ChatBot: React.FC<Props> = () => {
     return (
         <React.Fragment>
             <div
-                className="right-0 sm:right-4 bottom-20 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[90vw] sm:w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
+                className="right-0 sm:right-4 bottom-20 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[calc(100%-50px)] sm:w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
                 data-open={isOpen ? "true" : "false"}
             >
                 <header className="py-2 px-3 overflow-hidden rounded-top-corners max-h-full text-white" style={{ background: "rgb(255, 90, 45)" }}>
@@ -106,12 +106,10 @@ const ChatBot: React.FC<Props> = () => {
                             </div>
                             <svg
                                 aria-hidden="true"
-                                aria-labelledby="convo__1951869"
                                 className="rounded-md outline-0 align-middle h-2.5 w-2.5 absolute right-0 bottom-0 border-2 border-solid border-white"
                                 role="img"
                                 style={{ strokeWidth: 8 }}
                                 viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
                             >
                                 <circle cx="10" cy="10" r="9" />
                             </svg>
@@ -183,7 +181,7 @@ const ChatBot: React.FC<Props> = () => {
                     </div>
                 </div>
                 <div className="absolute bottom-0 w-full leading-4 bg-default" style={{ borderRadius: "0 0 5px 5px", padding: "0 16px 13px" }}>
-                    <div className="py-[3px] px-0 relative flex items-end w-full">
+                    <div className="py-[3px] px-0 relative flex items-center w-full">
                         <div className="flex max-h-20 overflow-hidden relative flex-1 chatinput-wrapper">
                             <pre> </pre>
                             <label className="visually-hidden" htmlFor="chat-input">
@@ -205,15 +203,12 @@ const ChatBot: React.FC<Props> = () => {
                                 <Smiley />
                             </button>
                         </div>
-                        <div className="flex items-end leading-4 p-0" style={{ margin: "7px 0 7px 7px" }}>
-                            <button className="mx-auto m-0 p-0 cursor-pointer border-none text-center align-top inline-block h-6 w-6">
+                        <div className="flex items-center gap-1 leading-4 p-0" style={{ margin: "7px 0 7px 7px" }}>
+                            <button className="h-8">
                                 <CogSixTooth className="text-default-500" />
                             </button>
-                            <button
-                                className="mx-auto m-0 p-0 cursor-pointer border-none text-center align-top inline-block h-6 w-6"
-                                onClick={handleSend}
-                            >
-                                <Send className="rounded-md outline-0 h-[14px]" viewBox="0 0 17 16" />
+                            <button className="h-8" onClick={handleSend}>
+                                <Send viewBox="0 0 17 16" />
                             </button>
                         </div>
                     </div>
@@ -222,7 +217,7 @@ const ChatBot: React.FC<Props> = () => {
             <div
                 aria-disabled="false"
                 aria-hidden="true"
-                aria-label="Open chat with Max in the Drift Widget messenger - Unread messages: 1"
+                aria-label="Open chat with Max - Unread messages: 1"
                 className="outline-none fixed h-14 w-14 cursor-pointer right-4 bottom-4 border-none rounded-[50%] group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
                 data-open={isOpen ? "true" : "false"}
                 onClick={toggleChat}

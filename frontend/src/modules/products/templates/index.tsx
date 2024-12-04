@@ -56,7 +56,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                             <img alt={product.name} className="h-[60vh]" src={product.image as string} />
                         </div>
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col px-2 md:px-0">
                         <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
                         <div className="my-2 flex items-center gap-2">
                             <p className="text-small text-default-500">669 reviews</p>
