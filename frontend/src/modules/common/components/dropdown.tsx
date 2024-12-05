@@ -4,15 +4,17 @@ import React, { useEffect, useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useOverlay, OverlayContainer } from "@react-aria/overlays";
 import { useButton } from "@react-aria/button";
+import { cn } from "@/lib/util/cn";
 
 interface Props {
     children: React.ReactNode;
     trigger: React.ReactNode;
     align?: "start" | "end" | "center";
     sideOffset?: number;
+    className?: string;
 }
 
-const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOffset = 4 }) => {
+const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOffset = 4, className }) => {
     const state = useOverlayTriggerState({});
     const buttonRef = React.useRef(null);
     const overlayRef = React.useRef(null);
@@ -66,7 +68,11 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
 
     return (
         <React.Fragment>
-            <button {...buttonProps} ref={buttonRef} className="inline-flex items-center text-default-500 cursor-pointer outline-none">
+            <button
+                {...buttonProps}
+                ref={buttonRef}
+                className={cn("inline-flex items-center text-default-500 cursor-pointer outline-none", className)}
+            >
                 {trigger}
             </button>
             {state.isOpen && (

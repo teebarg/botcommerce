@@ -12,7 +12,7 @@ interface Props {}
 
 const NotFound: React.FC<Props> = async () => {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-content1">
+        <div className="flex flex-col items-center justify-center h-full bg-content1 py-12 px-4">
             <div className="max-w-md mx-auto text-center">
                 <ExclamationIcon className="w-20 h-20 mx-auto text-danger" />
                 <h1 className="text-4xl font-bold mt-6">Oops! Page Not Found</h1>

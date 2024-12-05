@@ -31,7 +31,7 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
         <OverlayContainer>
             <div
                 {...underlayProps}
-                className="group fixed inset-0 flex items-center justify-center z-50 backdrop-blur bg-white/40 px-2 md:px-0"
+                className="group fixed inset-0 flex items-center justify-center z-50 backdrop-blur px-4 md:px-0"
                 data-has-x={hasX ? "true" : "false"}
             >
                 <div
@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
                     // {...dialogProps}
                     // {...modalProps}
                     ref={ref}
-                    className={cn("bg-default-100 rounded-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative", {
+                    className={cn("bg-default rounded-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative", {
                         "max-w-lg": size == "sm",
                         "max-w-2xl": size == "md",
                         "max-w-5xl": size == "lg",

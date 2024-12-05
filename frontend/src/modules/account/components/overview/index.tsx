@@ -26,8 +26,8 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 <div className="flex flex-col py-8 border-t border-gray-200">
                     <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
                         <div className="flex items-start gap-x-16 mb-6">
-                            <div className="flex flex-col gap-y-4">
-                                <h3 className="text-lg">Profile</h3>
+                            <div className="flex flex-col gap-y-2">
+                                <h3 className="text-lg font-semibold">Profile</h3>
                                 <div className="flex items-end gap-x-2">
                                     <span
                                         className="text-2xl leading-none"
@@ -40,8 +40,8 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-y-4">
-                                <h3 className="text-lg">Addresses</h3>
+                            <div className="flex flex-col gap-y-2">
+                                <h3 className="text-lg font-semibold">Addresses</h3>
                                 <div className="flex items-end gap-x-2">
                                     <span
                                         className="text-2xl leading-none"

@@ -50,7 +50,7 @@ const AddAddress = () => {
                     <div className="p-8">
                         <form action={formAction}>
                             <div className="flex flex-col gap-y-2 w-full py-4">
-                                <div className="grid grid-cols-2 gap-x-2">
+                                <div className="grid md:grid-cols-2 gap-2">
                                     <Input isRequired autoComplete="given-name" data-testid="first-name-input" label="First name" name="firstname" />
                                     <Input isRequired autoComplete="family-name" data-testid="last-name-input" label="Last name" name="lastname" />
                                 </div>

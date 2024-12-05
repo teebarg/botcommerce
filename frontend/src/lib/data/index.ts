@@ -294,8 +294,8 @@ export async function getCustomer() {
         }
 
         return await res.json();
-    } catch (error: any) {
-        throw new Error(`${error.statusText}`);
+    } catch (_e) {
+        return null;
     }
 }
 

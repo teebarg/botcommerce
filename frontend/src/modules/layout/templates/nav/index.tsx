@@ -116,6 +116,15 @@ const Navbar = async () => {
                         </LocalizedClientLink>
                     </NavbarItem>
                 </div>
+                <div className="mt-auto mb-2 md:hidden">
+                    {customer ? (
+                        <UserDropDown customer={customer} />
+                    ) : (
+                        <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href="/sign-in">
+                            Log In <span aria-hidden="true">&rarr;</span>
+                        </LocalizedClientLink>
+                    )}
+                </div>
             </NavbarMenu>
         </NavigationBar>
     );

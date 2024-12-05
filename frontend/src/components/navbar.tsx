@@ -120,7 +120,7 @@ export const NavbarMenuOverlay = ({ children, className }: { children: React.Rea
                         {...overlayProps}
                         ref={overlayRef}
                         className={cn(
-                            "z-50 px-6 fixed flex max-w-full top-0 inset-x-0 bottom-0 w-screen flex-col overflow-y-auto backdrop-blur-xl backdrop-saturate-150 bg-background/70 pt-12 h-screen",
+                            "z-50 px-4 pt-12 fixed flex max-w-full top-0 inset-x-0 bottom-0 w-screen flex-col overflow-y-auto backdrop-blur-xl backdrop-saturate-150 bg-background/70",
                             className
                         )}
                         data-open={context.expanded}
