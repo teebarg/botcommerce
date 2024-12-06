@@ -29,7 +29,7 @@ module.exports = {
                 medium: "var(--radius-medium)",
                 large: "var(--radius-large)",
                 50: "50%",
-                'top-corners': '5px 5px 0 0',
+                "top-corners": "5px 5px 0 0",
             },
             borderWidth: {
                 small: "var(--border-width-small)",

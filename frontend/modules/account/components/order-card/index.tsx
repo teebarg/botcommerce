@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import Button from "@modules/common/components/button";
 import { CartItem, Order } from "types/global";
 import { currency } from "@lib/util/util";
 import Image from "next/image";
@@ -59,7 +58,11 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 )}
             </div>
             <div className="flex justify-end">
-                <LocalizedClientLink className="underline text-primary" data-testid="order-details-link" href={`/account/orders/details/${order.order_id}`}>
+                <LocalizedClientLink
+                    className="underline text-primary"
+                    data-testid="order-details-link"
+                    href={`/account/orders/details/${order.order_id}`}
+                >
                     See details
                 </LocalizedClientLink>
             </div>

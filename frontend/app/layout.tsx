@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import "styles/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import clsx from "clsx";
@@ -19,8 +19,30 @@ const lexend = Lexend({
     variable: "--font-lexend",
 });
 
-export const metadata: Metadata = {
+export const metadata = {
     metadataBase: new URL(BASE_URL),
+    title: "Botcommerce",
+    description: "the worlds best flashcard learning system",
+    icons: {
+        icon: [{ url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }],
+        apple: [{ url: "/apple-touch-icon.png" }],
+    },
+    appleTouchIcon: "/apple-touch-icon.png",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "black-translucent",
+        startupImage: [
+            {
+                url: "/apple-splash-750-1334.jpg",
+                media: "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
+            },
+        ],
+    },
+};
+
+export const viewport: Viewport = {
+    maximumScale: 1,
+    userScalable: false,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,12 +52,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <html suppressHydrationWarning className={clsx("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">
             <head>
                 <ThemeScript />
-                <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-                <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-                <link rel="shortcut icon" href="/favicon.ico" />
-                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-                <meta name="apple-mobile-web-app-title" content="Botmerce" />
-                <link rel="manifest" href="/site.webmanifest" />
+                <link href="/favicon-96x96.png" rel="icon" sizes="96x96" type="image/png" />
+                <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+                <link href="/favicon.ico" rel="shortcut icon" />
+                <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+                <meta content="Botmerce" name="apple-mobile-web-app-title" />
+                <link href="/site.webmanifest" rel="manifest" />
             </head>
             <body className="min-h-screen bg-background">
                 <NotificationProviders>

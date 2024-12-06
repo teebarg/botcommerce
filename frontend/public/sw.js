@@ -3,6 +3,7 @@ self.addEventListener("push", function (event) {
     console.log("🚀 ~ event:", Boolean(event.data));
     if (event.data) {
         const data = event.data.json();
+
         console.log("🚀 ~ event:", data);
         const options = {
             body: data.body,
@@ -15,21 +16,20 @@ self.addEventListener("push", function (event) {
             },
         };
 
-        self.registration.showNotification(data.title, options)
         event.waitUntil(self.registration.showNotification(data.title, options));
     }
 });
 
-self.addEventListener('push', function (event) {
+self.addEventListener("push", function (event) {
+    console.log("🚀 ~ event:", event);
     event.waitUntil(
-        self.registration.showNotification('Test Notification', {
-            body: 'This is a simple test notification',
-            icon: '/avatar_ai.png',
-            badge: '/avatar_ai.png',
+        self.registration.showNotification("Test Notification", {
+            body: "This is a simple test notification",
+            icon: "/avatar_ai.png",
+            badge: "/avatar_ai.png",
         })
     );
 });
-
 
 self.addEventListener("notificationclick", function (event) {
     console.log("Notification click received.");

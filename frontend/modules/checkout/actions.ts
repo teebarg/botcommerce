@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { completeCart, deleteDiscount, updateCart } from "@lib/data";
+import { completeCart, updateCart } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { DeliveryOption, Order, PaymentSession } from "types/global";
@@ -53,7 +53,7 @@ export async function removeDiscount(code: string) {
     if (!cartId) return "No cartId cookie found";
 
     try {
-        await deleteDiscount(cartId, code);
+        // await deleteDiscount(cartId, code);
         revalidateTag("cart");
     } catch (error: any) {
         throw error;

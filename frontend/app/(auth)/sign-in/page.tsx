@@ -18,7 +18,7 @@ export default function Login() {
 
                     <LoginForm />
                     <p className="mt-6 text-xs text-default-500 text-center font-medium">
-                        Don't have an account?{" "}
+                        {`Don't have an account?`}{" "}
                         <LocalizedClientLink href="/sign-up" className="text-secondary">
                             Sign up
                         </LocalizedClientLink>

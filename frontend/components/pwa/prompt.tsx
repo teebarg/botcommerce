@@ -14,10 +14,8 @@ declare global {
 
 function InstallPrompt() {
     const [isIOS, setIsIOS] = useState<boolean>(false);
-    const [isStandalone, setIsStandalone] = useState<boolean>(false);
+    // const [isStandalone, setIsStandalone] = useState<boolean>(false);
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-
-    console.log(deferredPrompt)
 
     useEffect(() => {
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
@@ -27,12 +25,12 @@ function InstallPrompt() {
 
         // Capture the install prompt event
         const handleBeforeInstallPrompt = (e: Event) => {
-            console.log("e", e)
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
         };
 
         window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+
         return () => {
             window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
         };
