@@ -10,15 +10,15 @@
         "react"
     ],
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev --experimental-https",
         "build": "npm run prettier && next build",
         "start": "next start",
         "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",
         "analyze": "ANALYZE=true next build",
         "test-e2e": "playwright test e2e",
         "prepare": "husky",
-        "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-        "lint:check": "eslint --max-warnings=50 \"src/**/*.{js,jsx,ts,tsx,json}\" --fix"
+        "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+        "lint:check": "eslint --max-warnings=50 \"**/*.{js,jsx,ts,tsx,json}\" --fix"
     },
     "resolutions": {
         "@types/react": "17.0.40"
@@ -50,7 +50,8 @@
         "react-aria-components": "^1.2.1",
         "react-dom": "18.3.1",
         "react-instantsearch-hooks-web": "^6.29.0",
-        "tailwind-merge": "^2.5.4"
+        "tailwind-merge": "^2.5.4",
+        "web-push": "^3.6.7"
     },
     "devDependencies": {
         "@babel/core": "^7.17.5",
@@ -83,10 +84,10 @@
         "typescript": "^5.3.2"
     },
     "lint-staged": {
-        "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+        "/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
             "prettier --write"
         ],
-        "src/**/*.{js,jsx,ts,tsx,json}": [
+        "/**/*.{js,jsx,ts,tsx,json}": [
             "eslint --max-warnings=50 --fix"
         ]
     }

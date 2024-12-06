@@ -144,7 +144,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                                     {paymentInfoMap[cart.payment_session.id]?.title || cart.payment_session.provider_id}
                                 </p>
                                 {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, cart.payment_session.provider_id) && (
-                                    <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'src/modules/checkout/components/payment/index.tsx'" />
+                                    <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'modules/checkout/components/payment/index.tsx'" />
                                 )}
                             </div>
                             <div className="flex flex-col w-full md:w-1/3">

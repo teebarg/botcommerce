@@ -27,7 +27,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, sel
                     <RadioGroup.Radio checked={selectedPaymentOptionId === paymentSession.provider_id} />
                     <span className="text-base">{paymentInfoMap[paymentSession.provider_id]?.title || paymentSession.provider_id}</span>
                     {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, paymentSession.provider_id) && (
-                        <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'src/modules/checkout/components/payment/index.tsx'">
+                        <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'modules/checkout/components/payment/index.tsx'">
                             <span>
                                 <InformationCircleSolid />
                             </span>
