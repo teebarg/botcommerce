@@ -21,7 +21,6 @@ jsconfig.json
 *.code-workspace
 *.bkp
 frontend/node_modules
-frontend/src/node_modules
 frontend/build
 frontend/dist
 frontend/dev-dist

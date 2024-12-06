@@ -87,8 +87,7 @@ This is configured to support using the `meilisearch` plugin out of the box. To 
 
 ```
 .
-└── src
-    ├── app
+└── app
     ├── lib
     ├── modules
     ├── styles
