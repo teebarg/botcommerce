@@ -5,24 +5,62 @@ import { RightArrowIcon } from "nui-react-icons";
 
 import { Button } from "../ui/button";
 
+declare global {
+    interface BeforeInstallPromptEvent extends Event {
+        prompt: () => void;
+        userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+    }
+}
+
 function InstallPrompt() {
     const [isIOS, setIsIOS] = useState<boolean>(false);
     const [isStandalone, setIsStandalone] = useState<boolean>(false);
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+    console.log(deferredPrompt)
 
     useEffect(() => {
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
 
-        setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
-        console.log(window.matchMedia("(display-mode: standalone)").matches);
+        // setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
+        // console.log(window.matchMedia("(display-mode: standalone)").matches);
+
+        // Capture the install prompt event
+        const handleBeforeInstallPrompt = (e: Event) => {
+            console.log("e", e)
+            e.preventDefault();
+            setDeferredPrompt(e as BeforeInstallPromptEvent);
+        };
+
+        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+        return () => {
+            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+        };
     }, []);
 
-    if (isStandalone) {
+    const handleInstallClick = async () => {
+        console.log("deferredPrompt", deferredPrompt);
+        if (deferredPrompt) {
+            // Show the install prompt
+            await deferredPrompt.prompt();
+
+            // Wait for the user to respond to the prompt
+            const choiceResult = await deferredPrompt.userChoice;
+
+            if (choiceResult.outcome === "accepted") {
+                console.log("User accepted the install prompt");
+            } else {
+                console.log("User dismissed the install prompt");
+            }
+
+            // Clear the deferredPrompt
+            setDeferredPrompt(null);
+        }
+    };
+
+    if (!deferredPrompt) {
         return null; // Don't show install button if already installed
     }
-
-    const onClick = (e: any) => {
-        console.log("🚀 ~ ocClick ~ e:", e);
-    };
 
     return (
         <>
@@ -38,7 +76,7 @@ function InstallPrompt() {
                         Add to Home Screen
                     </span>
                 </div>
-                <Button className="min-w-[100px] gap-2 !rounded-full p-[1px]" onClick={onClick}>
+                <Button className="min-w-[100px] gap-2 !rounded-full p-[1px]" onClick={handleInstallClick}>
                     <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F54180_0%,#338EF7_50%,#F54180_100%)]" />
                     <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background group-hover:bg-background/70 transition-background px-3 py-1 text-sm font-medium text-foreground backdrop-blur-3xl">
                         Install
