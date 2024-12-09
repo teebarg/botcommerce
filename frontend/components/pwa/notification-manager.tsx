@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Bell, Send } from "nui-react-icons";
 
 import { subscribeUser, unsubscribeUser, sendNotification } from "./actions";
+import { useSnackbar } from "notistack";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     try {
@@ -29,6 +30,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 function PushNotificationManager() {
+    const { enqueueSnackbar } = useSnackbar();
     const [isSupported, setIsSupported] = useState<boolean>(false);
     const [newContent, setNewContent] = useState<boolean>(false);
     const [subscription, setSubscription] = useState<PushSubscription | null>(null);
@@ -85,10 +87,13 @@ function PushNotificationManager() {
         });
 
         // Send subscription to your backend
-        // await sendSubscriptionToBackend(subscription as PushSubscription);
+        const res = await subscribeUser(sub);
+        if (!res.success) {
+            enqueueSnackbar(res.message as string, { variant: "error" });
+            return;
+        }
 
         setSubscription(sub);
-        await subscribeUser(sub);
     }
 
     async function unsubscribeFromPush() {
@@ -99,27 +104,12 @@ function PushNotificationManager() {
 
     async function sendTestNotification() {
         if (subscription) {
-            await sendNotification(message);
-            setMessage("");
-        }
-    }
-
-    // Function to send subscription to backend
-    async function sendSubscriptionToBackend(subscription: PushSubscription) {
-        try {
-            const response = await fetch("/api/subscribe", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(subscription),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to send subscription to backend");
+            try {
+                await sendNotification(message);
+                setMessage("");
+            } catch (error: any) {
+                enqueueSnackbar("An error occurred sending to notifications" + error.message, { variant: "error" });
             }
-        } catch (error) {
-            console.error("Error sending subscription:", error);
         }
     }
 
@@ -179,13 +169,6 @@ function PushNotificationManager() {
                     >
                         {/* <BellOff size={16} className="mr-2" /> */}
                         Unsubscribe
-                    </button>
-                    <button
-                        className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all flex items-center justify-center"
-                        onClick={subscribeToPush}
-                    >
-                        <Bell className="mr-2" size={16} />
-                        Enable Notifications!!!!!!------
                     </button>
                 </div>
             ) : (

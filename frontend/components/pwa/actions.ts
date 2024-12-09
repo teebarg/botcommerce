@@ -6,13 +6,43 @@ webpush.setVapidDetails("mailto:<teebarg01@gmail.com>", process.env.NEXT_PUBLIC_
 
 let subscription: PushSubscription | null = null;
 
+interface PushSubscriptionData {
+    endpoint: string;
+    expirationTime: number | null;
+    keys: {
+        p256dh: string;
+        auth: string;
+    };
+}
+
+async function saveSubscription(subscriptionData: PushSubscriptionData) {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}/api/v1/notifications/subscribe`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ...subscriptionData, group: "bot" }),
+        });
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const responseData = await response.json();
+        console.log("Subscription saved successfully:", responseData);
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error saving subscription:", error);
+        return { success: false, message: error.message };
+    }
+}
+
 export async function subscribeUser(sub: PushSubscription) {
     console.log("sub", sub);
     subscription = sub;
 
-    // In a production environment, you would want to store the subscription in a database
-    // For example: await db.subscriptions.create({ data: sub })
-    return { success: true };
+    return saveSubscription(sub as unknown as PushSubscriptionData);
 }
 
 export async function unsubscribeUser() {
