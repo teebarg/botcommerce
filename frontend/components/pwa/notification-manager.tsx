@@ -30,10 +30,20 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 
 function PushNotificationManager() {
     const [isSupported, setIsSupported] = useState<boolean>(false);
+    const [newContent, setNewContent] = useState<boolean>(false);
     const [subscription, setSubscription] = useState<PushSubscription | null>(null);
     const [message, setMessage] = useState<string>("");
 
     useEffect(() => {
+        const broadcast = new BroadcastChannel("sw-messages");
+
+        broadcast.addEventListener("message", (event) => {
+            if (event.data.type === "NEW_CONTENT_AVAILABLE") {
+                console.log("Show new content banner");
+                setNewContent(true);
+            }
+        });
+
         if ("serviceWorker" in navigator && "PushManager" in window) {
             setIsSupported(true);
             registerServiceWorker();
@@ -113,6 +123,10 @@ function PushNotificationManager() {
         }
     }
 
+    function handleReload() {
+        window.location.reload();
+    }
+
     if (!isSupported) {
         return <p>Push notifications are not supported in this browser.</p>;
     }
@@ -123,6 +137,14 @@ function PushNotificationManager() {
                 {subscription ? <Bell className="text-blue-600 mr-3" size={24} /> : <Bell className="text-gray-400 mr-3" size={24} />}
                 <h3 className="text-xl font-semibold text-gray-800">Push Notifications</h3>
             </div>
+            {newContent && (
+                <button
+                    className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all flex items-center justify-center"
+                    onClick={handleReload}
+                >
+                    New content available
+                </button>
+            )}
 
             {subscription ? (
                 <div className="space-y-4">
@@ -163,7 +185,7 @@ function PushNotificationManager() {
                         onClick={subscribeToPush}
                     >
                         <Bell className="mr-2" size={16} />
-                        Enable Notifications
+                        Enable Notifications!!!!!!------
                     </button>
                 </div>
             ) : (

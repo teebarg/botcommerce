@@ -7,7 +7,7 @@ function base64UrlDecode(str: string) {
 
 // Function to verify JWT
 async function verifyJwt(token: string, secret: string) {
-    const [header, payload, signature] = token.split(".");
+    const [header, payload, signature] = token?.split(".");
 
     // Decode and parse the JWT header and payload
     const decodedHeader = JSON.parse(new TextDecoder().decode(base64UrlDecode(header)));

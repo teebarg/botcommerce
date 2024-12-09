@@ -37,7 +37,6 @@ function InstallPrompt() {
     }, []);
 
     const handleInstallClick = async () => {
-        console.log("deferredPrompt", deferredPrompt);
         if (deferredPrompt) {
             // Show the install prompt
             await deferredPrompt.prompt();
