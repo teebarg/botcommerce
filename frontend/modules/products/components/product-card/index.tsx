@@ -28,9 +28,6 @@ const ProductCard: React.FC<ComponentProps> = async ({ product, wishlist, showWi
                         {product.name}
                     </LocalizedClientLink>
                 </div>
-                {/* <div className="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">
-                    <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-default-500 opacity-50" />
-                </div> */}
             </div>
             <div className="h-full flex flex-col-reverse">
                 <Suspense fallback={<div />}>

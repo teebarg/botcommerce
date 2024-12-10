@@ -25,11 +25,6 @@ const CustomItem = ({ option, isSelected, onSelect }: ListboxItemProps) => (
         role="option"
         onClick={onSelect}
     >
-        {/* {option.icon && <option.icon aria-hidden="true" className={cn("h-5 w-5", option.color)} />} */}
-        {/* <div className="flex flex-col items-start">
-            <span className="font-medium">{option.firstname}</span>
-            {option.address_1 && <span className="text-xs text-muted-foreground">{option.address_1}</span>}
-        </div> */}
         <div className="flex flex-col">
             <span className="text-left text-base">
                 {option.first_name} {option.last_name}

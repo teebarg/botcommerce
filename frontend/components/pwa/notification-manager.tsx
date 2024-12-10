@@ -66,6 +66,10 @@ function PushNotificationManager() {
             updateViaCache: "none",
         });
         const sub = await registration.pushManager.getSubscription();
+        if (!sub) {
+            await subscribeToPush()
+            return
+        }
 
         setSubscription(sub);
     }
@@ -106,10 +110,6 @@ function PushNotificationManager() {
         window.location.reload();
     }
 
-    if (!isSupported) {
-        return <></>;
-    }
-
     return (
         <div>
             {newContent && (
@@ -120,18 +120,6 @@ function PushNotificationManager() {
                     New content available
                 </button>
             )}
-            <div className="fixed top-4 right-4 z-50">
-                {subscription ? (
-                    <button className="flex items-center justify-center" onClick={unsubscribeFromPush}>
-                        {/* <Bell size={16} className="mr-2" /> */}
-                        <Bell size={16} />
-                    </button>
-                ) : (
-                    <button className="flex items-center justify-center" onClick={subscribeToPush}>
-                        <Bell size={16} />
-                    </button>
-                )}
-            </div>
         </div>
     );
 }

@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
     return {
         name: "Botcommerce",
-        short_name: "BotPWA",
-        description: "A Progressive Web App built with Next.js",
+        short_name: "Botcommerce",
+        description: "Luxury at it finest",
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",

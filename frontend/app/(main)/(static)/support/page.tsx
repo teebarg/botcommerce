@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, Mail } from "nui-react-icons";
+import { ChevronDown, Clock, Headphones, Mail, PhoneCall } from "nui-react-icons";
 
 const SupportPage = () => {
     const [activeSection, setActiveSection] = useState<number | null>(null);
@@ -52,13 +52,13 @@ const SupportPage = () => {
                 </div>
 
                 <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    {/* <PhoneCall className="mx-auto mb-4 text-emerald-600" size={48} /> */}
+                    <PhoneCall className="mx-auto mb-4 text-emerald-600" size={48} />
                     <h3 className="text-xl font-semibold mb-2">Phone Concierge</h3>
                     <p className="text-default-500 mb-4">+1 (888) LUXURY-CARE</p>
                 </div>
 
                 <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    {/* <Clock className="mx-auto mb-4 text-amber-600" size={48} /> */}
+                    <Clock className="mx-auto mb-4 text-amber-600" size={48} />
                     <h3 className="text-xl font-semibold mb-2">Support Hours</h3>
                     <p className="text-default-500 mb-4">Mon-Sat: 9am - 7pm EST</p>
                 </div>
@@ -92,7 +92,7 @@ const SupportPage = () => {
             </div>
 
             <div className="bg-default mt-12 p-8 rounded-xl shadow-lg text-center">
-                {/* <Headphones className="mx-auto mb-4 text-indigo-700" size={60} /> */}
+                <Headphones className="mx-auto mb-4 text-indigo-700" size={60} />
                 <h3 className="text-2xl font-semibold mb-4">Personal Concierge Support</h3>
                 <p className="text-default-500 max-w-2xl mx-auto mb-6">
                     For personalized assistance beyond our standard support channels, our dedicated concierge team is available to provide white-glove

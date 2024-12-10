@@ -80,10 +80,16 @@ self.addEventListener("push", function (event) {
         const data = event.data.json();
         const options = {
             body: data.body,
-            icon: data.icon || "/avatar_ai.png",
-            badge: "/avatar_ai.png",
-            vibrate: [100, 50, 100],
+            icon: "/icon.png",
+            image: "/promo-banner.webp",
+            badge: "/icon.png",
+            actions: [
+                { action: "view", title: "View" },
+                { action: "dismiss", title: "Dismiss" },
+            ],
+            vibrate: [200, 100, 200],
             data: {
+                url: data.path || "/", // Navigate to this URL
                 dateOfArrival: Date.now(),
                 primaryKey: "2",
             },
@@ -94,15 +100,20 @@ self.addEventListener("push", function (event) {
 });
 
 self.addEventListener("notificationclick", function (event) {
-    console.log("Notification click received.");
-    event.notification.close();
-    event.waitUntil(clients.openWindow("<https://your-website.com>"));
+    if (event.action == "view") {
+        event.waitUntil(clients.openWindow(event.notification.data.url));
+        return;
+    }
+
+    if (event.action == "dismiss") {
+        event.notification.close();
+    }
 });
 
 self.addEventListener("message", (event) => {
-    console.log("event broadcast here....", event);
+    console.log("event broadcast here....!!!!!!", event);
     if (event.data === "SKIP_WAITING") {
-        console.log("skip waiting broadcast here....");
+        console.log("skip waiting broadcast here....eeeee");
         self.skipWaiting();
     }
 });

@@ -43,7 +43,6 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
             <div className="relative flex items-center gap-2">
                 <Tooltip content="Details">
                     <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
-                        {/* <EyeIcon onClick={() => navigate(`/admin/products/${item.id}`)} /> */}
                         <EyeIcon />
                     </span>
                 </Tooltip>
