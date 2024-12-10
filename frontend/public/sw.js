@@ -79,13 +79,29 @@ self.addEventListener("push", function (event) {
     if (event.data) {
         const data = event.data.json();
         const options = {
-            body: data.body,
-            icon: data.icon || "/avatar_ai.png",
-            badge: "/avatar_ai.png",
-            vibrate: [100, 50, 100],
+            // body: data.body,
+            // icon: data.icon || "/avatar_ai.png",
+            // badge: "/avatar_ai.png",
+            // vibrate: [100, 50, 100],
+            // data: {
+            //     dateOfArrival: Date.now(),
+            //     primaryKey: "2",
+            // },
+            body: "🌟 Special Offer! Click to grab it now.\nLimited time only!",
+            icon: "/icon.png",
+            image: "/promo-banner.webp",
+            badge: "/small-badge.webp",
+            // actions: [
+            //     { action: "view", title: "View Offer", icon: "/view.png" },
+            //     { action: "dismiss", title: "Dismiss", icon: "/dismiss.png" },
+            // ],
+            actions: [
+                { action: "view", title: "View Offer", icon: "/avatar_ai.png" },
+                { action: "dismiss", title: "Dismiss", icon: "/avatar_ai.png" },
+            ],
+            vibrate: [200, 100, 200],
             data: {
-                dateOfArrival: Date.now(),
-                primaryKey: "2",
+                url: "/special-offer", // Navigate to this URL
             },
         };
 
