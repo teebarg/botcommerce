@@ -10,15 +10,15 @@
         "react"
     ],
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev --experimental-https",
         "build": "npm run prettier && next build",
         "start": "next start",
         "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",
         "analyze": "ANALYZE=true next build",
         "test-e2e": "playwright test e2e",
         "prepare": "husky",
-        "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-        "lint:check": "eslint --max-warnings=50 \"src/**/*.{js,jsx,ts,tsx,json}\" --fix"
+        "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+        "lint:check": "eslint --max-warnings=50 \"**/*.{js,jsx,ts,tsx,json}\" --fix"
     },
     "resolutions": {
         "@types/react": "17.0.40"
@@ -44,7 +44,7 @@
         "meilisearch": "^0.42.0",
         "next": "14.2.4",
         "notistack": "^3.0.1",
-        "nui-react-icons": "^0.0.18",
+        "nui-react-icons": "^0.0.19",
         "pg": "^8.11.3",
         "react": "18.3.1",
         "react-aria-components": "^1.2.1",
@@ -83,10 +83,10 @@
         "typescript": "^5.3.2"
     },
     "lint-staged": {
-        "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+        "/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
             "prettier --write"
         ],
-        "src/**/*.{js,jsx,ts,tsx,json}": [
+        "/**/*.{js,jsx,ts,tsx,json}": [
             "eslint --max-warnings=50 --fix"
         ]
     }

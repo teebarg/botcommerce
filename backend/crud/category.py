@@ -7,7 +7,6 @@ from models.generic import Category
 
 
 class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
-
     # def create(self, db, obj_in: CategoryCreate) -> Category:
     #     db_obj = Category.model_validate(
     #         obj_in,
