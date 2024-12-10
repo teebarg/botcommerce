@@ -40,13 +40,16 @@ const FlashBanner: React.FC = () => {
             ? new Date(parseInt(storedEndTime, 10))
             : (() => {
                   const newEndTime = new Date();
+
                   newEndTime.setHours(newEndTime.getHours() + 24);
                   localStorage.setItem("flashSaleEndTime", newEndTime.getTime().toString());
+
                   return newEndTime;
               })();
 
         const timer = setInterval(() => {
             const newTimeLeft = calculateTimeLeft(endTime);
+
             setTimeLeft(newTimeLeft);
 
             // Stop the timer when countdown reaches zero
