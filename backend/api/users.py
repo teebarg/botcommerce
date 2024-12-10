@@ -1,5 +1,5 @@
 from typing import Any
-from models.user import UserUpdateMe
+
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
@@ -10,6 +10,7 @@ from core.deps import (
 )
 from models.generic import Address, UserPublic, Wishlist
 from models.message import Message
+from models.user import UserUpdateMe
 from models.wishlist import WishlistCreate
 
 # Create a router for users

@@ -3,6 +3,7 @@
 import React from "react";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Category, Collection } from "types/global";
+
 import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
 
 interface ComponentProps {

@@ -20,7 +20,7 @@ self.addEventListener("install", (event) => {
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
-    // self.skipWaiting(); // Skip waiting and activate the new service worker immediately
+    self.skipWaiting(); // Skip waiting and activate the new service worker immediately
     // broadcast.postMessage({ type: "NEW_CONTENT_AVAILABLE" });
 });
 
@@ -100,8 +100,9 @@ self.addEventListener("notificationclick", function (event) {
 });
 
 self.addEventListener("message", (event) => {
+    console.log("event broadcast here....", event);
     if (event.data === "SKIP_WAITING") {
-        console.log("broadcast here....")
+        console.log("skip waiting broadcast here....");
         self.skipWaiting();
     }
 });

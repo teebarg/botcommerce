@@ -10,7 +10,7 @@ import type {
 } from "../../types/listbox";
 
 import { forwardRef, ChangeEvent, useState, useCallback, useEffect, useRef, createContext, useContext } from "react";
-import { Check, ChevronUpDown, SearchIcon } from "nui-react-icons";
+import { Check, ChevronUpDown, Search } from "nui-react-icons";
 
 import { Button } from "./button";
 
@@ -79,7 +79,7 @@ export function ListboxSearch({ onSearch }: ListboxSearchProps) {
 
     return (
         <div className="relative">
-            <SearchIcon aria-hidden="true" className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search aria-hidden="true" className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <input
                 aria-label="Search options"
                 className="w-full border-0 border-b bg-transparent py-2 pl-8 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-0"

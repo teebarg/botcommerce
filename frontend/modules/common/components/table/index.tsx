@@ -2,7 +2,7 @@
 
 import React, { cloneElement, isValidElement, useState } from "react";
 import { Pagination as PaginationType } from "types/global";
-import { Plus, SearchIcon } from "nui-react-icons";
+import { Plus, Search } from "nui-react-icons";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
 import { exportProducts, indexProducts } from "@modules/admin/actions";
@@ -82,7 +82,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                             }}
                             defaultValue={searchQuery}
                             placeholder="Search by name..."
-                            startContent={<SearchIcon className="text-default-500" />}
+                            startContent={<Search className="text-default-500" />}
                             onChange={onSearchChange}
                             onClear={() => onClear()}
                         />

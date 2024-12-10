@@ -10,6 +10,7 @@ import SearchInput from "@modules/search/components/search-input";
 import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
 import { Kbd } from "@modules/common/components/kbd";
+
 import { Button } from "@/components/ui/button";
 
 interface Props {

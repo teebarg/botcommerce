@@ -74,6 +74,7 @@ export async function updateCustomerName(_currentState: Record<string, unknown>,
     try {
         await updateCustomer(customer);
         revalidateTag("customer");
+
         return { success: true, error: null };
     } catch (error: any) {
         return { success: false, error: error.toString() };

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Send } from "nui-react-icons";
-
-import { subscribeUser, unsubscribeUser, sendNotification } from "./actions";
+import { Bell } from "nui-react-icons";
 import { useSnackbar } from "notistack";
+
+import { subscribeUser, unsubscribeUser } from "./actions";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     try {
@@ -24,8 +24,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 
         return outputArray;
     } catch (error) {
-        console.error("Failed to decode Base64 string:", error);
-        throw new Error("Error decoding Base64 string");
+        throw new Error(`Error decoding Base64 string - ${error}`);
     }
 }
 
@@ -33,8 +32,7 @@ function PushNotificationManager() {
     const { enqueueSnackbar } = useSnackbar();
     const [isSupported, setIsSupported] = useState<boolean>(false);
     const [newContent, setNewContent] = useState<boolean>(false);
-    const [subscription, setSubscription] = useState<PushSubscription | null>(null);
-    const [message, setMessage] = useState<string>("");
+    const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
 
     useEffect(() => {
         const broadcast = new BroadcastChannel("sw-messages");
@@ -47,8 +45,8 @@ function PushNotificationManager() {
         });
 
         if ("serviceWorker" in navigator && "PushManager" in window) {
-            setIsSupported(true);
             registerServiceWorker();
+            setIsSupported(true);
         }
     }, []);
 
@@ -76,7 +74,7 @@ function PushNotificationManager() {
         const permissionGranted = await requestNotificationPermission();
 
         if (!permissionGranted) {
-            alert("Notification permission not granted");
+            enqueueSnackbar("Notification permission not granted", { variant: "error" });
 
             return;
         }
@@ -88,8 +86,10 @@ function PushNotificationManager() {
 
         // Send subscription to your backend
         const res = await subscribeUser(sub);
+
         if (!res.success) {
             enqueueSnackbar(res.message as string, { variant: "error" });
+
             return;
         }
 
@@ -102,31 +102,16 @@ function PushNotificationManager() {
         await unsubscribeUser();
     }
 
-    async function sendTestNotification() {
-        if (subscription) {
-            try {
-                await sendNotification(message);
-                setMessage("");
-            } catch (error: any) {
-                enqueueSnackbar("An error occurred sending to notifications" + error.message, { variant: "error" });
-            }
-        }
-    }
-
     function handleReload() {
         window.location.reload();
     }
 
     if (!isSupported) {
-        return <p>Push notifications are not supported in this browser.</p>;
+        return <></>;
     }
 
     return (
-        <div className="bg-white shadow-lg rounded-xl max-w-md mx-auto p-8">
-            <div className="flex items-center mb-4">
-                {subscription ? <Bell className="text-blue-600 mr-3" size={24} /> : <Bell className="text-gray-400 mr-3" size={24} />}
-                <h3 className="text-xl font-semibold text-gray-800">Push Notifications</h3>
-            </div>
+        <div>
             {newContent && (
                 <button
                     className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all flex items-center justify-center"
@@ -135,54 +120,18 @@ function PushNotificationManager() {
                     New content available
                 </button>
             )}
-
-            {subscription ? (
-                <div className="space-y-4">
-                    <div className="bg-green-50 p-3 rounded-lg">
-                        <p className="text-green-700 flex items-center">
-                            <span className="mr-2">✅</span>
-                            You are subscribed to push notifications
-                        </p>
-                    </div>
-
-                    <div className="flex space-x-2">
-                        <input
-                            className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter notification message"
-                            type="text"
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                        />
-                        <button
-                            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50"
-                            disabled={!message}
-                            onClick={sendTestNotification}
-                        >
-                            <Send className="mr-2" size={16} />
-                            Send
-                        </button>
-                    </div>
-
-                    <button
-                        className="w-full bg-red-50 text-red-600 px-4 py-2 rounded-md hover:bg-red-100 transition-colors flex items-center justify-center"
-                        onClick={unsubscribeFromPush}
-                    >
-                        {/* <BellOff size={16} className="mr-2" /> */}
-                        Unsubscribe
+            <div className="fixed top-4 right-4 z-50">
+                {subscription ? (
+                    <button className="flex items-center justify-center" onClick={unsubscribeFromPush}>
+                        {/* <Bell size={16} className="mr-2" /> */}
+                        <Bell size={16} />
                     </button>
-                </div>
-            ) : (
-                <div className="text-center space-y-4">
-                    <p className="text-gray-600">Get instant updates and stay informed</p>
-                    <button
-                        className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all flex items-center justify-center"
-                        onClick={subscribeToPush}
-                    >
-                        <Bell className="mr-2" size={16} />
-                        Enable Notifications
+                ) : (
+                    <button className="flex items-center justify-center" onClick={subscribeToPush}>
+                        <Bell size={16} />
                     </button>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

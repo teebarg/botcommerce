@@ -1,7 +1,7 @@
 "use client";
 
 import { Product } from "types/global";
-import { HeartFilledIcon, HeartIcon } from "nui-react-icons";
+import { HeartFilled, Heart } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 
@@ -50,7 +50,7 @@ const ProductWishList: React.FC<ComponentProps> = ({ product, inWishlist, classN
             disabled={isLoading}
             onClick={handleClick}
         >
-            {inWishlist ? <HeartFilledIcon className="h-8 w-8" /> : <HeartIcon className="h-8 w-8" />}
+            {inWishlist ? <HeartFilled className="h-8 w-8" /> : <Heart className="h-8 w-8" />}
         </Button>
     );
 };

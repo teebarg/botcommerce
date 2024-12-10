@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { cartUpdate } from "@modules/checkout/actions";
 import compareAddresses from "@lib/util/compare-addresses";
 import { omit } from "@lib/util/util";
-import { StarIcon } from "nui-react-icons";
+import { Star } from "nui-react-icons";
 
 import { Listbox } from "@/components/ui/listbox";
 import { cn } from "@/lib/util/cn";
@@ -46,7 +46,7 @@ const CustomItem = ({ option, isSelected, onSelect }: ListboxItemProps) => (
                 <span>{option.state && `${option.state}`}</span>
             </div>
         </div>
-        {isSelected && <StarIcon aria-hidden="true" className="ml-auto h-4 w-4 text-yellow-500" />}
+        {isSelected && <Star aria-hidden="true" className="ml-auto h-4 w-4 text-yellow-500" />}
     </button>
 );
 

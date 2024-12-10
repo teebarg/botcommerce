@@ -8,7 +8,7 @@ import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HeartFilledIcon, HeartIcon, HomeIcon, User, UserGroup } from "nui-react-icons";
+import { HeartFilled, Heart, HomeIcon, UserGroup } from "nui-react-icons";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -54,10 +54,10 @@ const Navbar = async () => {
                     <NavbarItem className="hidden md:flex items-center">
                         {customer ? (
                             <LocalizedClientLink className="" href={"/wishlist"}>
-                                <HeartFilledIcon className="h-8 w-8 text-primary-500" />
+                                <HeartFilled className="h-8 w-8 text-primary-500" />
                             </LocalizedClientLink>
                         ) : (
-                            <HeartIcon className="h-8 w-8" />
+                            <Heart className="h-8 w-8" />
                         )}
                     </NavbarItem>
                     <NavbarItem className="hidden sm:flex items-center">
@@ -82,7 +82,7 @@ const Navbar = async () => {
                         </LocalizedClientLink>
                     </NavbarItem>
                     <NavbarItem className="flex items-center gap-2">
-                        <HeartIcon className="h-8 w-8" />
+                        <Heart className="h-8 w-8" />
                         <LocalizedClientLink href={"/account/profile"}>Profile</LocalizedClientLink>
                     </NavbarItem>
                     {siteConfig.navItems.map((item: any, index: number) => (
@@ -91,7 +91,7 @@ const Navbar = async () => {
                         </NavbarItem>
                     ))}
                     <NavbarItem className="flex items-center gap-2">
-                        <HeartIcon className="h-8 w-8" />
+                        <Heart className="h-8 w-8" />
                         <LocalizedClientLink href={"/wishlist"}>Saved Items</LocalizedClientLink>
                     </NavbarItem>
                     {isAdmin && (

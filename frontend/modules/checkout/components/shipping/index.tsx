@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircleSolid, StarIcon } from "nui-react-icons";
+import { CheckCircleSolid, Star } from "nui-react-icons";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { setShippingMethod } from "@modules/checkout/actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -101,7 +101,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                                     </span>
                                     <div className="flex items-start gap-4">
                                         {
-                                            <StarIcon
+                                            <Star
                                                 className={cn(
                                                     "h-5 w-5 transition-colors",
                                                     option.id === cart.shipping_method?.id ? "text-primary" : "text-muted-foreground"

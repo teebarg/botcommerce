@@ -21,7 +21,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
 
     return (
         <div className="bg-content2 flex flex-col p-4 rounded-lg" data-testid="order-card">
-            <div data-testid="order-display-id" className="uppercase text-lg mb-1 text-ellipsis overflow-hidden">
+            <div className="uppercase text-lg mb-1 text-ellipsis overflow-hidden" data-testid="order-display-id">
                 {order.order_id}
             </div>
             <div className="flex items-center divide-x divide-gray-50 text-sm text-default-500">

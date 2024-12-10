@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, MailIcon } from "nui-react-icons";
+import { ChevronDown, Mail } from "nui-react-icons";
 
 const SupportPage = () => {
     const [activeSection, setActiveSection] = useState<number | null>(null);
@@ -46,7 +46,7 @@ const SupportPage = () => {
 
             <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    <MailIcon className="mx-auto mb-4 text-secondary-500" size={48} />
+                    <Mail className="mx-auto mb-4 text-secondary-500" size={48} />
                     <h3 className="text-xl font-semibold mb-2">Email Support</h3>
                     <p className="text-default-500 mb-4">clientcare@luxurystore.com</p>
                 </div>

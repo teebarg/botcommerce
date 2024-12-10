@@ -13,8 +13,8 @@ export default function UserDropDown({ customer }: any) {
     return (
         <React.Fragment>
             <Dropdown
-                className="w-full"
                 align="end"
+                className="w-full"
                 trigger={
                     <React.Fragment>
                         <div className="flex items-center gap-2 rounded-small outline-none transition-transform w-full">
@@ -31,10 +31,10 @@ export default function UserDropDown({ customer }: any) {
                                     <span className="text-tiny text-default-500">{customer?.email}</span>
                                 </div>
                                 <span
-                                    role="button"
-                                    data-testid="logout-button"
-                                    onClick={handleLogout}
                                     className="md:hidden bg-transparent border-2 border-secondary text-secondary py-0.5 px-4 rounded-full flex items-center mt-2"
+                                    data-testid="logout-button"
+                                    role="button"
+                                    onClick={handleLogout}
                                 >
                                     Log out
                                 </span>

@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { SignUpForm } from "@modules/auth/components/signup";
+
 import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function SignUp() {
                     <SignUpForm />
                     <p className="mt-6 text-xs text-default-500 text-center font-medium">
                         Already have an account?{" "}
-                        <LocalizedClientLink href="/sign-in" className="text-secondary">
+                        <LocalizedClientLink className="text-secondary" href="/sign-in">
                             Sign in
                         </LocalizedClientLink>
                     </p>

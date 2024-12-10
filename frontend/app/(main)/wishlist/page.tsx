@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { HeartIcon } from "nui-react-icons";
+import { Heart } from "nui-react-icons";
 
 import WishlistItem from "@/modules/common/components/wishlist";
 import { getWishlist } from "@/lib/data";
@@ -23,7 +23,7 @@ export default async function Wishlist() {
         return (
             <div className="text-center py-24 space-y-6">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-warning">
-                    <HeartIcon className="w-10 h-10 text-default-500" />
+                    <Heart className="w-10 h-10 text-default-500" />
                 </div>
 
                 <div className="space-y-2">

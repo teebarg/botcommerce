@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrrowRight } from "nui-react-icons";
+import { ArrowRight } from "nui-react-icons";
 
 interface Banner {
     image: string;
@@ -59,7 +59,7 @@ const BannerCarousel: React.FC = () => {
                                 href={banner.link}
                             >
                                 Shop Collection
-                                <ArrrowRight className="ml-2" />
+                                <ArrowRight className="ml-2" />
                             </a>
                         </div>
                     </div>

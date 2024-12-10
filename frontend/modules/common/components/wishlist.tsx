@@ -1,6 +1,6 @@
 "use client";
 
-import { Cart, HeartFilledIcon } from "nui-react-icons";
+import { Cart, HeartFilled } from "nui-react-icons";
 import React, { useState } from "react";
 import { useSnackbar } from "notistack";
 
@@ -81,7 +81,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
                     </Button>
 
                     <button className={cn("transition-colors text-secondary")} onClick={onRemove}>
-                        <HeartFilledIcon className="w-10 h-10" />
+                        <HeartFilled className="w-10 h-10" />
                     </button>
                 </div>
             </div>

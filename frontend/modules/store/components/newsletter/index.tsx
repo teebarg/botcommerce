@@ -4,7 +4,7 @@ import { useFormState } from "react-dom";
 import { newsletterForm } from "@modules/account/actions";
 import { FormButton } from "@modules/common/components/form-button";
 import { useEffect, useRef } from "react";
-import { MailIcon } from "nui-react-icons";
+import { Mail } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 import { Input } from "@components/ui/input";
 
@@ -27,11 +27,11 @@ export default function NewsletterForm() {
                     name="email"
                     placeholder="email@gmail.com"
                     size="sm"
-                    startContent={<MailIcon className="text-default-500 pointer-events-none flex-shrink-0" />}
+                    startContent={<Mail className="text-default-500 pointer-events-none flex-shrink-0" />}
                     type="email"
                 />
                 <div className="mt-4 sm:ml-4 sm:mt-0 sm:flex-shrink-0">
-                    <FormButton color="secondary" variant="shadow" size="sm">
+                    <FormButton color="secondary" size="sm" variant="shadow">
                         Subscribe
                     </FormButton>
                 </div>

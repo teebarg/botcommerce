@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
+
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface CheckboxGroupProps {
@@ -67,15 +68,15 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
         <React.Fragment>
             <div style={{ marginBottom: "20px" }}>
                 <div>
-                    <Checkbox isSelected={dataSet.has(item.slug)} onChange={handleParentChange} label={groupName} />
+                    <Checkbox isSelected={dataSet.has(item.slug)} label={groupName} onChange={handleParentChange} />
                 </div>
                 <div className="space-y-2 mt-1" style={{ marginLeft: "20px" }}>
                     {checkboxes.map((checkbox) => (
                         <div key={`sub-${checkbox.slug}`}>
                             <Checkbox
                                 isSelected={dataSet.has(checkbox.slug)}
-                                onChange={(e) => handleChildChange(e, checkbox.slug)}
                                 label={checkbox.name}
+                                onChange={(e) => handleChildChange(e, checkbox.slug)}
                             />
                         </div>
                     ))}

@@ -3,6 +3,7 @@ import { Cart } from "types/global";
 import { Input } from "@components/ui/input";
 
 import AddressSelect from "../address-select";
+
 import { Checkbox } from "@/components/ui/checkbox";
 
 const ShippingAddress = ({
@@ -112,9 +113,9 @@ const ShippingAddress = ({
             </div>
             <div className="my-8">
                 <Checkbox
-                    label="Billing address same as shipping address"
                     data-testid="billing-address-checkbox"
                     defaultSelected={checked}
+                    label="Billing address same as shipping address"
                     onChange={onChange}
                 />
             </div>

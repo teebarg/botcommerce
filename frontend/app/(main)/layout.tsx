@@ -6,9 +6,8 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Banner } from "@modules/common/components/banner";
 import { Cookie } from "@modules/store/components/cookie";
 import ChatBot from "@components/chatbot";
+
 import Search from "@/modules/search/templates/search";
-import { PushNotificationManager } from "@/components/pwa/notification-manager";
-import { InstallPrompt } from "@/components/pwa/prompt";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 
@@ -19,8 +18,6 @@ export const metadata: Metadata = {
 export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
         <React.Fragment>
-            <PushNotificationManager />
-            <InstallPrompt />
             <Banner />
             <div className="flex items-center justify-center">
                 <div className="flex w-full items-center gap-x-3 border-b-1 border-divider bg-gradient-to-r from-default-100 via-primary-100 to-secondary-100 px-2 md:px-6 py-2 sm:px-3.5 sm:before:flex-1">

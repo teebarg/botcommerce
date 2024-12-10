@@ -1,4 +1,4 @@
-import { Metadata, Viewport } from "next";
+import { Viewport } from "next";
 import "styles/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import clsx from "clsx";
@@ -8,6 +8,9 @@ import { getCustomer } from "@lib/data";
 import { NotificationProviders } from "./notistack-providers";
 import OverlayClientProvider from "./overlay-providers";
 import Google from "./google";
+
+import { PushNotificationManager } from "@/components/pwa/notification-manager";
+import { InstallPrompt } from "@/components/pwa/prompt";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -62,6 +65,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <body className="min-h-screen bg-background">
                 <NotificationProviders>
                     <OverlayClientProvider>
+                        <PushNotificationManager />
+                        <InstallPrompt />
                         <div className="relative flex flex-col min-h-screen">{children}</div>
                         {!customer && <Google />}
                     </OverlayClientProvider>

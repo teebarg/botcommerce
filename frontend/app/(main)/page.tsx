@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Customer, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
-import { LocationIcon, MailIcon } from "nui-react-icons";
+import { LocationIcon, Mail } from "nui-react-icons";
 import { openingHours } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
@@ -212,7 +212,7 @@ export default async function Home() {
                                 <div>
                                     <p className="font-semibold mt-4 text-xl">Our Contacts</p>
                                     <div className="flex gap-2">
-                                        <MailIcon />
+                                        <Mail />
                                         <p>obathrift@gmail.com</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Location</p>
