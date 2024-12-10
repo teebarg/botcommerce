@@ -90,18 +90,14 @@ self.addEventListener("push", function (event) {
             body: "🌟 Special Offer! Click to grab it now.\nLimited time only!",
             icon: "/icon.png",
             image: "/promo-banner.webp",
-            badge: "/small-badge.webp",
-            // actions: [
-            //     { action: "view", title: "View Offer", icon: "/view.png" },
-            //     { action: "dismiss", title: "Dismiss", icon: "/dismiss.png" },
-            // ],
+            badge: "/icon.png",
             actions: [
-                { action: "view", title: "View Offer", icon: "/avatar_ai.png" },
-                { action: "dismiss", title: "Dismiss", icon: "/avatar_ai.png" },
+                { action: "view", title: "View" },
+                { action: "dismiss", title: "Dismiss" },
             ],
             vibrate: [200, 100, 200],
             data: {
-                url: "/special-offer", // Navigate to this URL
+                url: data.path || "/", // Navigate to this URL
             },
         };
 
@@ -111,8 +107,17 @@ self.addEventListener("push", function (event) {
 
 self.addEventListener("notificationclick", function (event) {
     console.log("Notification click received.");
-    event.notification.close();
-    event.waitUntil(clients.openWindow("<https://your-website.com>"));
+    console.log(event);
+    console.log(event.notification);
+    // event.notification.close();
+    if (event.action == "view") {
+        event.waitUntil(clients.openWindow(event.notification.data.url));
+        return;
+    }
+
+    if (event.action == "dismiss") {
+        event.notification.close();
+    }
 });
 
 self.addEventListener("message", (event) => {
