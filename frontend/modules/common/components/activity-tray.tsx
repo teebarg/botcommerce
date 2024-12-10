@@ -90,7 +90,6 @@ const ActivityTray: React.FC<Props> = ({ customer }) => {
 
     return (
         <React.Fragment>
-            {/* <div className="relative"> */}
             <button {...buttonProps} ref={buttonRef} className="inline-flex items-center text-default-500 cursor-pointer outline-none">
                 <Bell size={22} />
             </button>
@@ -110,7 +109,6 @@ const ActivityTray: React.FC<Props> = ({ customer }) => {
                     </div>
                 </OverlayContainer>
             )}
-            {/* </div> */}
         </React.Fragment>
     );
 };

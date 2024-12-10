@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Cart, Tag } from "nui-react-icons";
+import { Cart, Clock, Tag } from "nui-react-icons";
 
 import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 
@@ -12,14 +12,8 @@ interface TimeLeft {
 }
 
 const FlashBanner: React.FC = () => {
-    const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => {
-        // Initialize with 24 hours from now
-        const endTime = new Date();
-
-        endTime.setHours(endTime.getHours() + 24);
-
-        return calculateTimeLeft(endTime);
-    });
+    const [timeLeft, setTimeLeft] = useState<TimeLeft>({ hours: 0, minutes: 0, seconds: 0 });
+    const [hydrated, setHydrated] = useState(false);
 
     function calculateTimeLeft(targetDate: Date): TimeLeft {
         const now = new Date();
@@ -37,22 +31,22 @@ const FlashBanner: React.FC = () => {
     }
 
     useEffect(() => {
+        // Indicate hydration
+        setHydrated(true);
+
         // Store the end time in localStorage to persist across page reloads
         const storedEndTime = localStorage.getItem("flashSaleEndTime");
         const endTime = storedEndTime
             ? new Date(parseInt(storedEndTime, 10))
             : (() => {
                   const newEndTime = new Date();
-
                   newEndTime.setHours(newEndTime.getHours() + 24);
                   localStorage.setItem("flashSaleEndTime", newEndTime.getTime().toString());
-
                   return newEndTime;
               })();
 
         const timer = setInterval(() => {
             const newTimeLeft = calculateTimeLeft(endTime);
-
             setTimeLeft(newTimeLeft);
 
             // Stop the timer when countdown reaches zero
@@ -65,6 +59,11 @@ const FlashBanner: React.FC = () => {
         return () => clearInterval(timer);
     }, []);
 
+    if (!hydrated) {
+        // Render an empty container or skeleton until hydrated
+        return <div className="h-24 bg-gray-800 rounded-2xl shadow-2xl max-w-7xl mx-auto" />;
+    }
+
     return (
         <div className="bg-gradient-to-r from-black/80 to-gray-800 text-white p-6 rounded-2xl shadow-2xl max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-4 mb-4 md:mb-0">
@@ -76,7 +75,7 @@ const FlashBanner: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-                {/* <Clock className="w-10 h-10 text-yellow-400" /> */}
+                <Clock className="w-10 h-10 text-yellow-400" />
                 <div className="flex space-x-2 text-center">
                     {(["hours", "minutes", "seconds"] as const).map((timeUnit) => (
                         <div key={timeUnit} className="bg-white/20 p-2 rounded-lg w-16">

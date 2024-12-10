@@ -79,15 +79,7 @@ self.addEventListener("push", function (event) {
     if (event.data) {
         const data = event.data.json();
         const options = {
-            // body: data.body,
-            // icon: data.icon || "/avatar_ai.png",
-            // badge: "/avatar_ai.png",
-            // vibrate: [100, 50, 100],
-            // data: {
-            //     dateOfArrival: Date.now(),
-            //     primaryKey: "2",
-            // },
-            body: "🌟 Special Offer! Click to grab it now.\nLimited time only!",
+            body: data.body,
             icon: "/icon.png",
             image: "/promo-banner.webp",
             badge: "/icon.png",
@@ -98,6 +90,8 @@ self.addEventListener("push", function (event) {
             vibrate: [200, 100, 200],
             data: {
                 url: data.path || "/", // Navigate to this URL
+                dateOfArrival: Date.now(),
+                primaryKey: "2",
             },
         };
 
@@ -106,10 +100,6 @@ self.addEventListener("push", function (event) {
 });
 
 self.addEventListener("notificationclick", function (event) {
-    console.log("Notification click received.");
-    console.log(event);
-    console.log(event.notification);
-    // event.notification.close();
     if (event.action == "view") {
         event.waitUntil(clients.openWindow(event.notification.data.url));
         return;
@@ -121,9 +111,9 @@ self.addEventListener("notificationclick", function (event) {
 });
 
 self.addEventListener("message", (event) => {
-    console.log("event broadcast here....", event);
+    console.log("event broadcast here....!!!!!!", event);
     if (event.data === "SKIP_WAITING") {
-        console.log("skip waiting broadcast here....");
+        console.log("skip waiting broadcast here....eeeee");
         self.skipWaiting();
     }
 });

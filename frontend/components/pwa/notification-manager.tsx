@@ -110,10 +110,6 @@ function PushNotificationManager() {
         window.location.reload();
     }
 
-    if (!isSupported) {
-        return <></>;
-    }
-
     return (
         <div>
             {newContent && (
