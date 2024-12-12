@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 
 import { subscribeUser, unsubscribeUser } from "./actions";
@@ -66,6 +65,7 @@ function PushNotificationManager() {
             updateViaCache: "none",
         });
         const sub = await registration.pushManager.getSubscription();
+
         if (!sub) {
             await subscribeToPush();
             return;
