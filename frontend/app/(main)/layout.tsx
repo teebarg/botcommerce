@@ -36,6 +36,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
             <main>{props.children}</main>
             <Cookie />
             <ChatBot />
+            <ButtonNav />
             <Footer />
         </React.Fragment>
     );
