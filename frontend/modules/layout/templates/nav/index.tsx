@@ -1,14 +1,13 @@
 import React, { Suspense } from "react";
 import { getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { siteConfig } from "@lib/config";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import Search from "@modules/search/templates/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HeartFilled, Heart, HomeIcon, UserGroup } from "nui-react-icons";
+import { HeartFilled, Heart, HomeIcon, UserGroup, User } from "nui-react-icons";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -82,21 +81,26 @@ const Navbar = async () => {
                         </LocalizedClientLink>
                     </NavbarItem>
                     <NavbarItem className="flex items-center gap-2">
-                        <Heart className="h-8 w-8" />
+                        <User className="h-8 w-8" viewBox="0 0 20 20" />
                         <LocalizedClientLink href={"/account/profile"}>Profile</LocalizedClientLink>
                     </NavbarItem>
-                    {siteConfig.navItems.map((item: any, index: number) => (
-                        <NavbarItem key={`${item}-${index}`}>
-                            <LocalizedClientLink href={item.href}>{item.label}</LocalizedClientLink>
-                        </NavbarItem>
-                    ))}
                     <NavbarItem className="flex items-center gap-2">
                         <Heart className="h-8 w-8" />
-                        <LocalizedClientLink href={"/wishlist"}>Saved Items</LocalizedClientLink>
+                        <LocalizedClientLink href={"/collections"}>Collections</LocalizedClientLink>
                     </NavbarItem>
+                    <NavbarItem className="flex items-center gap-2">
+                        <Heart className="h-8 w-8" />
+                        <LocalizedClientLink href={"/checkout"}>Checkout</LocalizedClientLink>
+                    </NavbarItem>
+                    {customer && (
+                        <NavbarItem className="flex items-center gap-2">
+                            <Heart className="h-8 w-8" />
+                            <LocalizedClientLink href={"/wishlist"}>Saved Items</LocalizedClientLink>
+                        </NavbarItem>
+                    )}
                     {isAdmin && (
                         <NavbarItem className="flex items-center gap-2">
-                            <UserGroup className="h-8 w-8" />
+                            <UserGroup className="h-8 w-8" viewBox="0 0 24 24" />
                             <LocalizedClientLink href={"/admin"}>Admin</LocalizedClientLink>
                         </NavbarItem>
                     )}

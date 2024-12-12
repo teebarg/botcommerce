@@ -65,9 +65,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <body className="min-h-screen bg-background">
                 <NotificationProviders>
                     <OverlayClientProvider>
-                        <PushNotificationManager />
-                        <InstallPrompt />
-                        <div className="relative flex flex-col min-h-screen">{children}</div>
+                        <div className="relative flex flex-col min-h-screen">
+                            <PushNotificationManager />
+                            <InstallPrompt />
+                            {children}
+                        </div>
                         {!customer && <Google />}
                     </OverlayClientProvider>
                 </NotificationProviders>

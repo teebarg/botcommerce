@@ -67,8 +67,8 @@ function PushNotificationManager() {
         });
         const sub = await registration.pushManager.getSubscription();
         if (!sub) {
-            await subscribeToPush()
-            return
+            await subscribeToPush();
+            return;
         }
 
         setSubscription(sub);

@@ -8,6 +8,7 @@ import { Cookie } from "@modules/store/components/cookie";
 import ChatBot from "@components/chatbot";
 
 import Search from "@/modules/search/templates/search";
+import { ButtonNav } from "@/components/bottom-navbar";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 
@@ -30,14 +31,14 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
                 </div>
             </div>
             <Navbar />
-            <div className="px-4 py-2 md:hidden sticky top-12 bg-content1 z-30">
+            <div className="px-4 py-2 md:hidden sticky top-12 z-30 bg-background">
                 <Search className="w-full justify-between" />
             </div>
             <main>{props.children}</main>
             <Cookie />
             <ChatBot />
-            <ButtonNav />
             <Footer />
+            <ButtonNav />
         </React.Fragment>
     );
 }

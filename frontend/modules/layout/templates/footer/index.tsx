@@ -50,7 +50,7 @@ export default async function Footer() {
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (
-        <footer className="flex w-full flex-col">
+        <footer className="flex w-full flex-col pb-12">
             <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
                 <div className="xl:grid xl:grid-cols-3 xl:gap-8">
                     <div className="space-y-4 md:pr-8">
