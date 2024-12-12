@@ -29,7 +29,7 @@ const Search: React.FC<Props> = ({ className }) => {
                 startContent={<MagnifyingGlassMini />}
                 onClick={modalState.open}
             >
-                Search products and categories...
+                I'm looking for...
             </Button>
             {modalState.isOpen && (
                 <Modal hasX={false} size="lg" onClose={modalState.close}>

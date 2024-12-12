@@ -32,7 +32,7 @@ export const ButtonNav = ({ className }: { className?: string }) => {
     ];
 
     return (
-        <nav className={cn("flex md:hidden1 z-40 w-full items-center justify-between fixed bottom-0 inset-x-0 py-2 px-8 bg-background", className)}>
+        <nav className={cn("flex md:hidden z-40 w-full items-center justify-between fixed bottom-0 inset-x-0 py-2 px-8 bg-background", className)}>
             {nav.map((item, index: number) => (
                 <LocalizedClientLink
                     key={index}

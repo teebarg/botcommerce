@@ -22,7 +22,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
     return (
         <React.Fragment>
             <div className="max-w-7xl mx-auto h-full w-full px-2 lg:px-12 my-8">
-                <nav data-slot="base">
+                <nav data-slot="base" className="hidden md:block">
                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                         <li className="flex items-center" data-slot="base">
                             <LocalizedClientLink href="/">Home</LocalizedClientLink>
@@ -91,6 +91,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     <RelatedProducts product={product} />
                 </Suspense>
             </div>
+            <div className="sticky bottom-32 bg-red-500 z-50">actio bbutton</div>
         </React.Fragment>
     );
 };

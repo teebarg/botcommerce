@@ -12,7 +12,7 @@ import { HeartFilled, Heart, HomeIcon, UserGroup, User } from "nui-react-icons";
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
     const isAdmin: boolean = Boolean(customer?.is_superuser);
-    const ThemeButton = getThemeToggler();
+    const  ThemeButton = getThemeToggler();
 
     return (
         <NavigationBar className="my-2">
@@ -35,11 +35,11 @@ const Navbar = async () => {
                         <Search className="w-full justify-between" />
                     </NavbarItem>
                 </div>
-                <div className="md:w-[25vw] flex gap-4 justify-end items-center">
+                <div className="md:w-[25vw] flex gap-3 justify-end items-center">
                     <NavbarItem className="flex items-center">
                         <Suspense
                             fallback={
-                                <LocalizedClientLink className="hover:text-default-900 flex gap-2" data-testid="nav-cart-link" href="/cart">
+                                <LocalizedClientLink className="hover:text-default-900" data-testid="nav-cart-link" href="/cart">
                                     Cart (0)
                                 </LocalizedClientLink>
                             }

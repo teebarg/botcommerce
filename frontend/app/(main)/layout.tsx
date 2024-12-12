@@ -9,6 +9,7 @@ import ChatBot from "@components/chatbot";
 
 import Search from "@/modules/search/templates/search";
 import { ButtonNav } from "@/components/bottom-navbar";
+import { Cart } from "nui-react-icons";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 
@@ -31,8 +32,11 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
                 </div>
             </div>
             <Navbar />
-            <div className="px-4 py-2 md:hidden sticky top-12 z-30 bg-background">
-                <Search className="w-full justify-between" />
+            <div className="px-4 py-2 md:hidden sticky top-10 z-30 bg-background flex items-center gap-2">
+                <Search className="w-full justify-between flex-1" />
+                <LocalizedClientLink className="text-default-500" href="/cart">
+                    <Cart className="h-8 w-8" />
+                </LocalizedClientLink>
             </div>
             <main>{props.children}</main>
             <Cookie />
