@@ -12,7 +12,7 @@ import { HeartFilled, Heart, HomeIcon, UserGroup, User } from "nui-react-icons";
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
     const isAdmin: boolean = Boolean(customer?.is_superuser);
-    const  ThemeButton = getThemeToggler();
+    const ThemeButton = getThemeToggler();
 
     return (
         <NavigationBar className="my-2">

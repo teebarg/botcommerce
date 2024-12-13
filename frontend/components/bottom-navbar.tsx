@@ -36,10 +36,10 @@ export const ButtonNav = ({ className }: { className?: string }) => {
             {nav.map((item, index: number) => (
                 <LocalizedClientLink
                     key={index}
-                    href={item.href}
                     className={cn("flex flex-col items-center", {
                         "text-warning": pathname === item.href,
                     })}
+                    href={item.href}
                 >
                     {item.icon}
                     <p className="text-sm font-semibold">{item.label}</p>

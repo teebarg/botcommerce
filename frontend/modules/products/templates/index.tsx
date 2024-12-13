@@ -22,7 +22,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
     return (
         <React.Fragment>
             <div className="max-w-7xl mx-auto h-full w-full px-2 lg:px-12 my-8">
-                <nav data-slot="base" className="hidden md:block">
+                <nav className="hidden md:block" data-slot="base">
                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                         <li className="flex items-center" data-slot="base">
                             <LocalizedClientLink href="/">Home</LocalizedClientLink>
@@ -53,7 +53,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                             ))}
                         </div>
                         <div className="flex-1">
-                            <img alt={product.name} className="h-[60vh]" src={product.image as string} />
+                            <div className="h-[60vh]">
+                                <Image fill alt={product.name} src={product.image as string} />
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-col px-2 md:px-0">
@@ -93,12 +95,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
             </div>
             <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg">
                 <LocalizedClientLink
-                    href="/"
                     className="relative inline-flex items-center justify-center outline-none px-3 h-10 rounded-small bg-transparent border border-default-500 text-default-500"
+                    href="/"
                 >
                     <HomeIcon />
                 </LocalizedClientLink>
-                <ProductActions product={product} showPrice={false} className="w-full" btnClassName="font-semibold" />
+                <ProductActions btnClassName="font-semibold" className="w-full" product={product} showPrice={false} />
             </div>
         </React.Fragment>
     );

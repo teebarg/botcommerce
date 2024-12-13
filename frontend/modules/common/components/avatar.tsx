@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import Image from "next/image";
 
 interface AvatarProps {
     src: string;
@@ -30,7 +31,7 @@ const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, col
                     }
                 )}
             >
-                <img alt="avatar" className="flex object-cover w-full h-full" src={src} />
+                <Image fill alt="avatar" className="flex object-cover w-full h-full" src={src} />
             </span>
         </React.Fragment>
     );

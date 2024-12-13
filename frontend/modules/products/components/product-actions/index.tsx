@@ -5,6 +5,7 @@ import { addToCart } from "@modules/cart/actions";
 import { currency } from "@lib/util/util";
 import Button from "@modules/common/components/button";
 import { Product } from "types/global";
+
 import { cn } from "@/lib/util/cn";
 
 type ProductActionsProps = {
@@ -47,7 +48,7 @@ export default function ProductActions({ product, disabled, wishlist, btnClassNa
     };
 
     return (
-        <div data-has-price={showPrice} className={cn("group", className)}>
+        <div className={cn("group", className)} data-has-price={showPrice}>
             <div className="hidden flex-col-reverse items-start mb-2 group-data-[has-price=true]:flex">
                 <div className="flex items-center w-full">
                     <span className="text-xl font-semibold text-danger">{currency(product.price)}</span>

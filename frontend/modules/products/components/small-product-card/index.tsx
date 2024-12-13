@@ -2,6 +2,7 @@ import { Product, WishlistItem } from "types/global";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Suspense } from "react";
 import React from "react";
+import Image from "next/image";
 
 import ProductActions from "../product-actions";
 import { ProductWishList } from "../product-card/product-wishlist";
@@ -18,8 +19,9 @@ const SMProductCard: React.FC<ComponentProps> = async ({ product, wishlist, show
     return (
         <>
             <React.Fragment>
-                <div
+                <LocalizedClientLink
                     className="relative flex max-w-full flex-none scroll-ml-6 flex-col gap-3 rounded-large bg-content1 p-2 shadow-medium w-full snap-start"
+                    href={`/products/${product.slug}`}
                     id={`${product.id}`}
                 >
                     {/* <div className="max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap px-1 h-5 text-tiny rounded-small bg-secondary-100 text-secondary-foreground absolute right-7 top-4 z-20">
@@ -27,18 +29,12 @@ const SMProductCard: React.FC<ComponentProps> = async ({ product, wishlist, show
                     </div> */}
                     <div className="relative flex max-h-full w-full flex-col items-center overflow-visible rounded-medium bg-content2 h-[22rem] justify-between">
                         <div className="flex flex-col gap-2 px-4 pt-6 w-full">
-                            <h3 className="text-base font-semibold tracking-tight leading-4 text-default-900 line-clamp-2">
-                                <LocalizedClientLink className="" href={`/products/${product.slug}`}>
-                                    {product.name}
-                                </LocalizedClientLink>
-                            </h3>
+                            <h3 className="text-base font-semibold tracking-tight leading-4 text-default-900 line-clamp-2">{product.name}</h3>
                             {/* <p className="text-small text-default-500 line-clamp-1">{product.description}</p> */}
                         </div>
-                        <img
-                            alt={product.name}
-                            className="relative rounded-large z-0 max-h-full max-w-[80%] overflow-visible object-contain object-center hover:scale-110 h-72 w-auto"
-                            src={product.image as string}
-                        />
+                        <div className="relative rounded-large z-0 max-h-full max-w-[80%] overflow-visible object-contain object-center hover:scale-110 h-72 w-auto">
+                            <Image fill alt={product.name} className="object-contain object-center hover:scale-110" src={product.image as string} />
+                        </div>
                     </div>
                     <div className="flex flex-col gap-3 px-1 flex-1">
                         <div className="h-full flex flex-col-reverse">
@@ -50,7 +46,7 @@ const SMProductCard: React.FC<ComponentProps> = async ({ product, wishlist, show
                             </Suspense>
                         </div>
                     </div>
-                </div>
+                </LocalizedClientLink>
             </React.Fragment>
         </>
     );

@@ -6,10 +6,10 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Banner } from "@modules/common/components/banner";
 import { Cookie } from "@modules/store/components/cookie";
 import ChatBot from "@components/chatbot";
+import { Cart } from "nui-react-icons";
 
 import Search from "@/modules/search/templates/search";
 import { ButtonNav } from "@/components/bottom-navbar";
-import { Cart } from "nui-react-icons";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 

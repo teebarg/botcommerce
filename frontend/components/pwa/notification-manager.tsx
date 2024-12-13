@@ -68,6 +68,7 @@ function PushNotificationManager() {
 
         if (!sub) {
             await subscribeToPush();
+
             return;
         }
 
