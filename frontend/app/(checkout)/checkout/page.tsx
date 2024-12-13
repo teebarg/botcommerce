@@ -4,9 +4,10 @@ import { cookies } from "next/headers";
 import Wrapper from "@modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
-import { getCart } from "@lib/data";
+import { getCart, getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
+import { ArrowRightOnRectangle, Cart, ChevronLeft, ChevronRight } from "nui-react-icons";
+import PaymentButton from "@/modules/checkout/components/payment-button";
 
 export const metadata: Metadata = {
     title: "Clothings | Botcommerce Store | Checkout",
@@ -51,14 +52,23 @@ export default async function Checkout() {
         return <EmptyCart />;
     }
 
+    const customer = await getCustomer();
+
     return (
         <>
             {" "}
-            <div className="relative flex min-h-dvh flex-col bg-background bg-radial pt-4 sm:pt-16" id="app-container">
+            <div className="relative flex min-h-dvh flex-col bg-background bg-radial pt-0 md:pt-4 sm:pt-16" id="app-container">
+                <div className="sticky top-0 md:hidden p-4 flex items-center gap-4 bg-background z-20">
+                    <ChevronLeft />
+                    <div>
+                        <p className="text-xl">Order confirmation</p>
+                        <p className="text-xs text-secondary-500">Free returns within 90days</p>
+                    </div>
+                </div>
                 <div className="flex items-center justify-center p-4">
                     <section className="flex w-full max-w-7xl flex-col lg:flex-row lg:gap-8">
                         <div className="w-full">
-                            <div className="flex flex-col gap-1 mb-6">
+                            <div className="hidden md:flex flex-col gap-1 mb-6">
                                 <h1 className="text-2xl font-medium">Shopping Cart</h1>
                                 <nav aria-label="Breadcrumbs" data-slot="base">
                                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
@@ -80,6 +90,11 @@ export default async function Checkout() {
                         </div>
                         <CheckoutSummary />
                     </section>
+                </div>
+                <div className={`fixed md:hidden bottom-0 z-50 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500`}>
+                    <div className="flex flex-row-reverse gap-2 px-2 py-2">
+                        <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
+                    </div>
                 </div>
             </div>
         </>

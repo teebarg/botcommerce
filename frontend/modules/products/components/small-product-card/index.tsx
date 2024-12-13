@@ -32,8 +32,8 @@ const SMProductCard: React.FC<ComponentProps> = async ({ product, wishlist, show
                             <h3 className="text-base font-semibold tracking-tight leading-4 text-default-900 line-clamp-2">{product.name}</h3>
                             {/* <p className="text-small text-default-500 line-clamp-1">{product.description}</p> */}
                         </div>
-                        <div className="relative rounded-large z-0 max-h-full max-w-[80%] overflow-visible object-contain object-center hover:scale-110 h-72 w-auto">
-                            <Image fill alt={product.name} className="object-contain object-center hover:scale-110" src={product.image as string} />
+                        <div className="relative rounded-large z-0 max-h-full w-[80%] overflow-visible h-72">
+                            <Image fill alt={product.name} className="hover:scale-95" src={product.image as string} />
                         </div>
                     </div>
                     <div className="flex flex-col gap-3 px-1 flex-1">

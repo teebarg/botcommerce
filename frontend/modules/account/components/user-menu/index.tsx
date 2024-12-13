@@ -5,6 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import React from "react";
 import Dropdown from "@modules/common/components/dropdown";
 import Image from "next/image";
+import ProfileAvatar from "@/public/profile.svg";
 
 export default function UserDropDown({ customer }: any) {
     const handleLogout = async () => {
@@ -19,8 +20,8 @@ export default function UserDropDown({ customer }: any) {
                 trigger={
                     <React.Fragment>
                         <div className="flex items-center gap-2 rounded-small outline-none transition-transform w-full">
-                            <span className="overflow-hidden z-0 outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-default">
-                                <Image fill alt="avatar" className="flex object-cover w-full h-full" src={customer?.image} />
+                            <span className="relative overflow-hidden z-0 outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-default">
+                                <Image fill alt="avatar" className="" src={customer?.image || ProfileAvatar} />
                             </span>
                             <div className="inline-flex flex-1 justify-between">
                                 <div className="inline-flex flex-col items-start justify-center">
