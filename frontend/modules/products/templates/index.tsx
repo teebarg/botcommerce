@@ -4,7 +4,7 @@ import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
 import { notFound } from "next/navigation";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
+import { ArrowUpRightMini, ChevronRight, Delivery, HomeIcon } from "nui-react-icons";
 import { Product } from "types/global";
 import Image from "next/image";
 
@@ -91,7 +91,15 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     <RelatedProducts product={product} />
                 </Suspense>
             </div>
-            <div className="sticky bottom-32 bg-red-500 z-50">actio bbutton</div>
+            <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg">
+                <LocalizedClientLink
+                    href="/"
+                    className="relative inline-flex items-center justify-center outline-none px-3 h-10 rounded-small bg-transparent border border-default-500 text-default-500"
+                >
+                    <HomeIcon />
+                </LocalizedClientLink>
+                <ProductActions product={product} showPrice={false} className="w-full" btnClassName="font-semibold" />
+            </div>
         </React.Fragment>
     );
 };

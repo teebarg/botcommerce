@@ -5,14 +5,18 @@ import { addToCart } from "@modules/cart/actions";
 import { currency } from "@lib/util/util";
 import Button from "@modules/common/components/button";
 import { Product } from "types/global";
+import { cn } from "@/lib/util/cn";
 
 type ProductActionsProps = {
     product: Product;
     disabled?: boolean;
+    showPrice?: boolean;
     wishlist?: React.ReactNode;
+    btnClassName?: string;
+    className?: string;
 };
 
-export default function ProductActions({ product, disabled, wishlist }: ProductActionsProps) {
+export default function ProductActions({ product, disabled, wishlist, btnClassName, className, showPrice = true }: ProductActionsProps) {
     const [isAdding, setIsAdding] = useState(false);
 
     // check if the selected variant is in stock
@@ -43,8 +47,8 @@ export default function ProductActions({ product, disabled, wishlist }: ProductA
     };
 
     return (
-        <div>
-            <div className="flex flex-col-reverse items-start mb-2">
+        <div data-has-price={showPrice} className={cn("group", className)}>
+            <div className="hidden flex-col-reverse items-start mb-2 group-data-[has-price=true]:flex">
                 <div className="flex items-center w-full">
                     <span className="text-xl font-semibold text-danger">{currency(product.price)}</span>
                     {product.old_price > product.price && (
@@ -62,7 +66,7 @@ export default function ProductActions({ product, disabled, wishlist }: ProductA
             </div>
 
             <Button
-                className="w-full"
+                className={cn("w-full", btnClassName)}
                 color="primary"
                 data-testid="add-product-button"
                 isDisabled={!inStock || !!disabled || isAdding}
