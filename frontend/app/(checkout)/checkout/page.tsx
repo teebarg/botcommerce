@@ -6,8 +6,9 @@ import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
 import { getCart, getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowRightOnRectangle, Cart, ChevronLeft, ChevronRight } from "nui-react-icons";
+import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 import PaymentButton from "@/modules/checkout/components/payment-button";
+import { BackButton } from "@/components/back";
 
 export const metadata: Metadata = {
     title: "Clothings | Botcommerce Store | Checkout",
@@ -58,8 +59,8 @@ export default async function Checkout() {
         <>
             {" "}
             <div className="relative flex min-h-dvh flex-col bg-background bg-radial pt-0 md:pt-4 sm:pt-16" id="app-container">
-                <div className="sticky top-0 md:hidden p-4 flex items-center gap-4 bg-background z-20">
-                    <ChevronLeft />
+                <div className="sticky top-0 md:hidden p-4 flex items-center gap-4 bg-background z-20 shadow-2xl">
+                    <BackButton />
                     <div>
                         <p className="text-xl">Order confirmation</p>
                         <p className="text-xs text-secondary-500">Free returns within 90days</p>
