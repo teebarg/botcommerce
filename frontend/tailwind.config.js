@@ -22,7 +22,11 @@ module.exports = {
                 divider: "hsl(var(--divider) / var(--divider-opacity, 1))",
             },
             borderColor: {
-                divider: "hsl(var(--divider) / var(--divider-opacity, 1))",
+                divider: "hsl(var(--divider))",
+                content1: "hsl(var(--content1))",
+                content2: "hsl(var(--content2))",
+                content3: "hsl(var(--content3))",
+                content4: "hsl(var(--content4))",
             },
             borderRadius: {
                 small: "var(--radius-small)",
@@ -137,6 +141,12 @@ module.exports = {
                     },
                     "100%": {
                         transform: "rotate(360deg)",
+                    },
+                },
+                shimmer: {
+                    "100%": {
+                        content: "var(--tw-content)",
+                        transform: "translateX(100%)",
                     },
                 },
             },
