@@ -65,7 +65,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                         </div>
                         <div className="max-w-40 mt-2">
                             <Suspense fallback={<ProductActions disabled={true} product={product} />}>
-                                <ProductActions product={product} />
+                                <ProductActions product={product} showDetails={false} />
                             </Suspense>
                         </div>
                         <div className="mt-4">

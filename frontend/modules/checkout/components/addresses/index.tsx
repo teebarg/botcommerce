@@ -75,7 +75,7 @@ const Addresses = ({
             ) : (
                 <div>
                     <div className="text-sm">
-                        {cart && cart.shipping_address ? (
+                        {cart?.shipping_address?.address_1 ? (
                             <div className="flex items-start gap-x-8">
                                 <div className="flex items-start flex-wrap gap-x-1 w-full text-base space-y-4 md:space-y-0">
                                     <div className="flex flex-col w-full md:w-1/3" data-testid="shipping-address-summary">
@@ -120,7 +120,7 @@ const Addresses = ({
                             </div>
                         ) : (
                             <div>
-                                <Spinner />
+                                <p className="text-warning-900">Add Address</p> 
                             </div>
                         )}
                     </div>

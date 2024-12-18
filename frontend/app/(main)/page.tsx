@@ -5,7 +5,6 @@ import { LocationIcon, Mail } from "nui-react-icons";
 import { openingHours } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
-import { ProductCard } from "@modules/products/components/product-card";
 import { getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
@@ -132,7 +131,7 @@ export default async function Home() {
                         </div>
                         <div className="col-span-3">
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                                 {featured?.map((product: Product, index: number) => (
                                     <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                 ))}
@@ -160,10 +159,10 @@ export default async function Home() {
                 </div>
                 <div className="bg-default-100">
                     <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
-                        <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
                             {trending?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
@@ -184,15 +183,15 @@ export default async function Home() {
                 </div>
                 <div className="bg-default-100 py-16">
                     <div className="max-w-7xl mx-auto px-4">
-                        <p className="text-primary font-medium">New Arrivals</p>
+                        <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
                         <p className="text-default-500">
                             {`We provide a curated selection of children's thrifts, ensuring top quality at unbeatable prices. Discover a variety of
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
-                        <div className="grid sm:grid-cols-4 gap-8 mt-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-8 mt-6">
                             {latest?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>

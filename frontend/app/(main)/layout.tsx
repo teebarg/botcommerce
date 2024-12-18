@@ -32,7 +32,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
                 </div>
             </div>
             <Navbar />
-            <div className="px-4 py-2 md:hidden sticky top-10 z-30 bg-background flex items-center gap-2">
+            <div className="px-4 py-2 md:hidden sticky top-0 z-30 bg-background flex items-center gap-2">
                 <Search className="w-full justify-between flex-1" />
                 <LocalizedClientLink className="text-default-500" href="/cart">
                     <Cart className="h-8 w-8" />
