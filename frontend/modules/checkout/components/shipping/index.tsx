@@ -64,7 +64,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
         <div>
             <div className="flex flex-row items-center justify-between mb-6">
                 <h2
-                    className={clsx("flex flex-row text-3xl gap-x-2 items-baseline", {
+                    className={clsx("flex flex-row text-xl gap-x-2 items-baseline", {
                         "opacity-50 pointer-events-none select-none": !isOpen && cart.shipping_method,
                     })}
                 >
@@ -80,7 +80,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             {isOpen ? (
                 <div data-testid="delivery-options-container">
                     <div className="pb-8">
-                        <RadioGroup name="shipping-method" value={cart.shipping_method?.id} onChange={(value: string) => handleChange(value)}>
+                        <RadioGroup className="grid grid-cols-2 gap-2 md:gap-6" name="shipping-method" value={cart.shipping_method?.id} onChange={(value: string) => handleChange(value)}>
                             {availableShippingMethods?.map((option) => (
                                 <RadioGroup.Option
                                     key={option.id}
@@ -91,7 +91,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                                     )}
                                     value={option.id}
                                 >
-                                    <span className="absolute right-8 top-4 flex h-5 w-5 items-center justify-center rounded-full border">
+                                    <span className="absolute right-2 md:right-8 top-4 flex h-5 w-5 items-center justify-center rounded-full border">
                                         <span
                                             className={cn(
                                                 "h-2.5 w-2.5 rounded-full bg-primary transition-all",
@@ -123,11 +123,11 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     <ErrorMessage data-testid="delivery-option-error-message" error={error} />
 
                     <Button
-                        className="mt-6"
+                        className="mt-2 font-semibold"
                         data-testid="submit-delivery-option-button"
                         isDisabled={!cart.shipping_method}
                         isLoading={isLoading}
-                        size="lg"
+                        size="sm"
                         onPress={handleSubmit}
                     >
                         Continue to payment

@@ -78,7 +78,7 @@ function Option({ value, children, className }: RadioOptionProps) {
     return (
         <label
             className={cn(
-                "flex items-center justify-between text-sm cursor-pointer py-4 border rounded-lg px-8 mb-2",
+                "flex items-center justify-between text-sm cursor-pointer py-4 border rounded-lg px-2 md:px-8 mb-2",
                 isSelected && "border-primary",
                 className
             )}
@@ -101,7 +101,7 @@ function Radio({ checked }: { checked: boolean }) {
 function RadioGroup({ value, onChange, name, children, className }: RadioGroupProps) {
     return (
         <RadioGroupContext.Provider value={{ value, onChange, name }}>
-            <div className={cn("space-y-2", className)} role="radiogroup">
+            <div className={cn("", className)} role="radiogroup">
                 {children}
             </div>
         </RadioGroupContext.Provider>

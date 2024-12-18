@@ -38,7 +38,7 @@ const SupportPage = () => {
     return (
         <div className="min-h-screen bg-content1 p-6 md:p-12 flex flex-col">
             <header className="text-center mb-12">
-                <h1 className="text-4xl font-serif font-bold text-default-900-900 mb-4">Luxury Client Support</h1>
+                <h1 className="text-4xl font-serif font-bold text-default-900 mb-4">Client Support</h1>
                 <p className="text-xl text-default-500 max-w-2xl mx-auto">
                     {`Personalized assistance for our discerning clients. We're here to ensure your exceptional experience.`}
                 </p>
@@ -46,21 +46,21 @@ const SupportPage = () => {
 
             <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    <Mail className="mx-auto mb-4 text-secondary-500" size={48} />
-                    <h3 className="text-xl font-semibold mb-2">Email Support</h3>
-                    <p className="text-default-500 mb-4">clientcare@luxurystore.com</p>
+                    <Mail className="mx-auto mb-2 text-primary h-12 w-12" />
+                    <h3 className="text-xl font-semibold mb-1">Email Support</h3>
+                    <p className="text-default-500 mb-4">drifthive4@gmail.com</p>
                 </div>
 
                 <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    <PhoneCall className="mx-auto mb-4 text-emerald-600" size={48} />
-                    <h3 className="text-xl font-semibold mb-2">Phone Concierge</h3>
-                    <p className="text-default-500 mb-4">+1 (888) LUXURY-CARE</p>
+                    <PhoneCall className="mx-auto mb-2 text-success h-12 w-12" />
+                    <h3 className="text-xl font-semibold mb-1">Phone Concierge</h3>
+                    <p className="text-default-500 mb-4">+234 (800) LUXURY-CARE</p>
                 </div>
 
                 <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    <Clock className="mx-auto mb-4 text-amber-600" size={48} />
-                    <h3 className="text-xl font-semibold mb-2">Support Hours</h3>
-                    <p className="text-default-500 mb-4">Mon-Sat: 9am - 7pm EST</p>
+                    <Clock className="mx-auto mb-2 text-primary h-12 w-12" />
+                    <h3 className="text-xl font-semibold mb-1">Support Hours</h3>
+                    <p className="text-default-500 mb-4">Mon-Sat: 9am - 7pm GMT</p>
                 </div>
             </div>
 
@@ -92,8 +92,8 @@ const SupportPage = () => {
             </div>
 
             <div className="bg-default mt-12 p-8 rounded-xl shadow-lg text-center">
-                <Headphones className="mx-auto mb-4 text-indigo-700" size={60} />
-                <h3 className="text-2xl font-semibold mb-4">Personal Concierge Support</h3>
+                <Headphones className="mx-auto mb-2 text-warning h-12 w-12" />
+                <h3 className="text-2xl font-semibold mb-2">Personal Concierge Support</h3>
                 <p className="text-default-500 max-w-2xl mx-auto mb-6">
                     For personalized assistance beyond our standard support channels, our dedicated concierge team is available to provide white-glove
                     service tailored to your unique needs.

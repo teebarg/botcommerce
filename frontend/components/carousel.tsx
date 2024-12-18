@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ArrowRight } from "nui-react-icons";
+import Image from "next/image";
 
 interface Banner {
     image: string;
@@ -49,7 +50,7 @@ const BannerCarousel: React.FC = () => {
                     key={index}
                     className={`absolute inset-0 transition-opacity duration-1000 ${index === currentBanner ? "opacity-100" : "opacity-0"}`}
                 >
-                    <img alt={banner.title} className="w-full h-full object-cover absolute" src={banner.image} />
+                    <Image fill alt={banner.title} className="w-full h-full object-cover absolute" src={banner.image} />
                     <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                         <div className="text-center text-white max-w-2xl px-4">
                             <h1 className="text-5xl font-bold mb-4">{banner.title}</h1>

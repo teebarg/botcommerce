@@ -80,9 +80,9 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     return (
         <div>
-            <div className="flex flex-row items-center justify-between mb-6">
+            <div className="flex flex-row items-center justify-between mb-4">
                 <h2
-                    className={clsx("flex flex-row text-3xl gap-x-2 items-baseline", {
+                    className={clsx("flex flex-row text-xl gap-x-2 items-baseline", {
                         "opacity-50 pointer-events-none select-none": !isOpen && !paymentReady,
                     })}
                 >
@@ -98,7 +98,11 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
             <div>
                 <div className={isOpen ? "block" : "hidden"}>
                     {!paidByGiftcard ? (
-                        <RadioGroup name="payment" value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
+                        <RadioGroup
+                            name="payment"
+                            value={cart?.payment_session?.provider_id || ""}
+                            onChange={(value: string) => handleChange(value)}
+                        >
                             {payMethods.map((item) => (
                                 <PaymentContainer
                                     key={item.id}
@@ -124,11 +128,11 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     <ErrorMessage data-testid="payment-method-error-message" error={error} />
 
                     <Button
-                        className="mt-6"
+                        className="mt-4 font-semibold"
                         data-testid="submit-payment-button"
                         isDisabled={!cart?.payment_session && !paidByGiftcard}
                         isLoading={isLoading}
-                        size="lg"
+                        size="sm"
                         onPress={handleSubmit}
                     >
                         Continue to review

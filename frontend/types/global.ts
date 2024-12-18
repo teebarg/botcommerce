@@ -112,6 +112,7 @@ export type Cart = {
     checkout_step?: "address" | "delivery" | "payment";
     subtotal: number;
     tax_total: number;
+    discount_total: number;
     delivery_fee: number;
     total: number;
     billing_address: Record<string, any>;

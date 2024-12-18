@@ -58,7 +58,7 @@ interface Props extends AriaButtonProps {
 const Button: React.FC<Props> = ({
     color = "default",
     variant = "solid",
-    size = "md",
+    size = "sm",
     className,
     style,
     isLoading = false,

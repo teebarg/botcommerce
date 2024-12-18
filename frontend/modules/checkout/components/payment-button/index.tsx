@@ -87,7 +87,7 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
 
     return (
         <>
-            <Button data-testid="submit-order-button" isDisabled={notReady} isLoading={submitting} size="lg" onPress={handlePayment}>
+            <Button data-testid="submit-order-button" color="danger" isDisabled={notReady} isLoading={submitting} size="md" onPress={handlePayment}>
                 Place order
             </Button>
             {modalState.isOpen && (

@@ -3,6 +3,7 @@
 import { Cart, HeartFilled } from "nui-react-icons";
 import React, { useState } from "react";
 import { useSnackbar } from "notistack";
+import Image from "next/image";
 
 import { cn } from "@/lib/util/cn";
 import { removeWish } from "@/modules/products/actions";
@@ -53,7 +54,8 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
     return (
         <div className="group relative bg-background rounded-xl overflow-hidden border border-default/50">
             <div className="aspect-square overflow-hidden">
-                <img
+                <Image
+                    fill
                     alt={name}
                     className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     src={image}
