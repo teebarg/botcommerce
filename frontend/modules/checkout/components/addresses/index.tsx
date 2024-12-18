@@ -58,14 +58,14 @@ const Addresses = ({
                             customer={customer}
                             onChange={() => setSameAsSBilling(!sameAsSBilling)}
                         />
-                        <input readOnly checked={sameAsSBilling} className="hidden" name="same_as_billing" type="checkbox" />
-                        {!sameAsSBilling && (
+                        <input readOnly checked={true} className="hidden" name="same_as_billing" type="checkbox" />
+                        {/* {!sameAsSBilling && (
                             <div>
                                 <h2 className="text-2xl gap-x-4 pb-6 pt-8">Billing address</h2>
 
                                 <BillingAddress cart={cart} />
                             </div>
-                        )}
+                        )} */}
                         <FormButton className="mt-6" data-testid="submit-address-button">
                             Continue to delivery
                         </FormButton>
@@ -97,7 +97,7 @@ const Addresses = ({
                                         <p className="font-normal text-default-500">{cart.email}</p>
                                     </div>
 
-                                    <div className="flex flex-col w-full md:w-1/3" data-testid="billing-address-summary">
+                                    {/* <div className="flex flex-col w-full md:w-1/3" data-testid="billing-address-summary">
                                         <p className="font-medium mb-1">Billing Address</p>
 
                                         {sameAsSBilling ? (
@@ -115,7 +115,7 @@ const Addresses = ({
                                                 </p>
                                             </>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         ) : (
@@ -126,7 +126,7 @@ const Addresses = ({
                     </div>
                 </div>
             )}
-            <hr className="tb-divider mt-8" />
+            <hr className="border-t-2 border-dashed border-[#C0A080] w-full mt-4" />
         </div>
     );
 };

@@ -9,6 +9,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 import PaymentButton from "@/modules/checkout/components/payment-button";
 import { BackButton } from "@/components/back";
+import { currency } from "@/lib/util/util";
 
 export const metadata: Metadata = {
     title: "Clothings | Botcommerce Store | Checkout",
@@ -41,9 +42,7 @@ const fetchCart = async () => {
         return null;
     }
 
-    const cart = await getCart(cartId).then((cart) => cart);
-
-    return cart;
+    return await getCart(cartId).then((cart) => cart);
 };
 
 export default async function Checkout() {
@@ -54,6 +53,12 @@ export default async function Checkout() {
     }
 
     const customer = await getCustomer();
+
+    const { total } = cart;
+
+    const getAmount = (amount: number | null | undefined) => {
+        return currency(Number(amount) || 0);
+    };
 
     return (
         <>
@@ -92,9 +97,10 @@ export default async function Checkout() {
                         <CheckoutSummary />
                     </section>
                 </div>
-                <div className={`fixed md:hidden bottom-0 z-50 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500`}>
-                    <div className="flex flex-row-reverse gap-2 px-2 py-2">
+                <div className="fixed md:hidden bottom-0 z-20 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500">
+                    <div className="flex flex-row-reverse justify-between items-center px-2 py-2">
                         <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
+                        <p className="font-semibold">Total: {getAmount(total)}</p>
                     </div>
                 </div>
             </div>
