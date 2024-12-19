@@ -16,8 +16,8 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
                     <div className="gap-2 w-full grid grid-cols-1 md:grid-cols-3">
                         <div className="flex flex-col">
                             <p className="text-base text-default-900">Payment method</p>
-                            <p className="text-base text-default-500" data-testid="payment-method">
-                                {paymentInfoMap[payment.id]?.title}
+                            <p className="text-xs md:text-base text-default-500" data-testid="payment-method">
+                                {paymentInfoMap[payment.id]?.title}nnnn
                             </p>
                         </div>
                         <div className="flex flex-col col-span-2">

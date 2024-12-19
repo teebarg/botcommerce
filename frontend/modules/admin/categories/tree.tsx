@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { Category } from "types/global";
 import { Chip } from "@modules/common/components/chip";
 import { ChevronRight, DotsSix, Folder, Tag } from "nui-react-icons";
-import clsx from "clsx";
 
 import CategoryAction from "./categories-control";
+import { cn } from "@/lib/util/cn";
 
 interface Props {
     categories: Category[];
@@ -38,7 +38,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                 <div className="flex items-center gap-4 flex-1">
                                     <button className="flex items-center" disabled={item?.children.length == 0} onClick={() => handleClick(item.id)}>
                                         <ChevronRight
-                                            className={clsx("transition-transform duration-300 text-default-900", {
+                                            className={cn("transition-transform duration-300 text-default-900", {
                                                 "rotate-90": open.includes(item.id),
                                                 "!text-default-500": item?.children.length == 0,
                                             })}

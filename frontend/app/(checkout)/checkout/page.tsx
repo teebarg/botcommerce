@@ -72,7 +72,7 @@ export default async function Checkout() {
                     </div>
                 </div>
                 <div className="flex items-center justify-center p-4">
-                    <section className="flex w-full max-w-7xl flex-col lg:flex-row lg:gap-8">
+                    <section className="flex w-full max-w-7xl flex-col lg:flex-row lg:gap-8 pb-20 md:pb-0">
                         <div className="w-full">
                             <div className="hidden md:flex flex-col gap-1 mb-6">
                                 <h1 className="text-2xl font-medium">Shopping Cart</h1>

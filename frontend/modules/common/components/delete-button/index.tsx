@@ -1,8 +1,8 @@
 import { Spinner, Trash } from "nui-react-icons";
 import { useState } from "react";
-import clsx from "clsx";
 import { deleteLineItem } from "@modules/cart/actions";
 import { useSnackbar } from "notistack";
+import { cn } from "@/lib/util/cn";
 
 const DeleteButton = ({ id, children, className }: { id: string; children?: React.ReactNode; className?: string }) => {
     const { enqueueSnackbar } = useSnackbar();
@@ -20,7 +20,7 @@ const DeleteButton = ({ id, children, className }: { id: string; children?: Reac
     };
 
     return (
-        <div className={clsx("flex items-center justify-between text-sm", className)}>
+        <div className={cn("flex items-center justify-between text-sm", className)}>
             <button className="flex gap-x-1 text-red-500 hover:text-default-900 cursor-pointer" onClick={() => handleDelete(id)}>
                 {isDeleting ? <Spinner className="animate-spin" /> : <Trash />}
                 <span>{children}</span>

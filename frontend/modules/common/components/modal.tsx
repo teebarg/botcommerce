@@ -2,6 +2,7 @@ import { XMark } from "nui-react-icons";
 import React, { useRef } from "react";
 import { useOverlay, usePreventScroll, OverlayContainer, OverlayProps } from "@react-aria/overlays";
 import { cn } from "@lib/util/cn";
+import { BackButton } from "@/components/back";
 
 interface ModalProps extends OverlayProps {
     title?: string;
@@ -31,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
         <OverlayContainer>
             <div
                 {...underlayProps}
-                className="group fixed inset-0 flex items-center justify-center z-50 backdrop-blur px-4 md:px-0"
+                className="group fixed inset-0 flex items-center justify-center z-50 backdrop-blur"
                 data-has-x={hasX ? "true" : "false"}
             >
                 <div
@@ -39,17 +40,21 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
                     // {...dialogProps}
                     // {...modalProps}
                     ref={ref}
-                    className={cn("bg-default rounded-lg w-full focus-visible:ring-offset-0 focus-visible:outline-none relative", {
+                    className={cn("bg-default rounded-lg w-full h-full md:h-auto focus-visible:ring-offset-0p focus-visible:outline-nonep relative", {
                         "max-w-lg": size == "sm",
                         "max-w-2xl": size == "md",
                         "max-w-5xl": size == "lg",
                     })}
                 >
-                    {title && <h2 className="text-lg font-semibold mb-4">{title}</h2>}
-                    <button className="absolute top-4 right-4 hidden group-data-[has-x=true]:block" onClick={onClose}>
+                    <div className="sticky top-0 md:hidden p-4 flex items-center gap-4 bg-background z-20 shadow-2xl">
+                        <BackButton onClick={onClose} />
+                        <div>{title && <h2 className="text-lg font-semibold">{title}</h2>}</div>
+                    </div>
+                    {/* {title && <h2 className="text-lg font-semibold mb-4">{title}</h2>} */}
+                    <button className="absolute top-6 right-6 hidden group-data-[has-x=true]:block" onClick={onClose}>
                         <XMark size={20} />
                     </button>
-                    <div>{children}</div>
+                    <div className="py-8 md:px-4">{children}</div>
                 </div>
             </div>
         </OverlayContainer>

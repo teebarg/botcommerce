@@ -1,9 +1,8 @@
 import React from "react";
 import { UseHitsProps, useHits, useSearchBox } from "react-instantsearch-hooks-web";
-import clsx from "clsx";
-
 import { ProductHit } from "../hit";
 import ShowAll from "../show-all";
+import { cn } from "@/lib/util/cn";
 
 type HitsProps<THit> = React.ComponentProps<"div"> &
     UseHitsProps & {
@@ -16,7 +15,7 @@ const Hits = ({ hitComponent: Hit, className, ...props }: HitsProps<ProductHit>)
 
     return (
         <div
-            className={clsx("transition-[height,max-height,opacity] duration-300 ease-in-out w-full h-full mb-1 p-4", className, {
+            className={cn("transition-[height,max-height,opacity] duration-300 ease-in-out w-full h-full mb-1 p-4", className, {
                 "max-h-full opacity-100": !!query,
                 "max-h-0 opacity-0": !query && !hits.length,
             })}
@@ -25,7 +24,7 @@ const Hits = ({ hitComponent: Hit, className, ...props }: HitsProps<ProductHit>)
                 {hits.slice(0, 6).map((hit, index) => (
                     <div
                         key={index}
-                        className={clsx("", {
+                        className={cn("", {
                             "hidden sm:block": index > 2,
                         })}
                     >
