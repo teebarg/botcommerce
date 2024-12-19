@@ -6,12 +6,6 @@
   A robust e-commerce storefront built with Next.js 14 and FastAPI.
 </p>
 
-<p align="center">
-  <a href="https://github.com/teebarg/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-</p>
-
 # Overview
 
 This is a custom e-commerce storefront built with:

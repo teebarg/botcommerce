@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/util/cn";
 
 interface Props {
     keys?: ("command" | "shift" | "option")[];
@@ -17,7 +17,7 @@ const Kbd: React.FC<Props> = ({ keys = [], className, children }) => {
     return (
         <React.Fragment>
             <kbd
-                className={clsx(
+                className={cn(
                     "px-1.5 py-0.5 inline-flex space-x-0.5 items-center font-sans font-normal text-center text-small shadow-small bg-default-100 text-foreground-500 rounded-small",
                     className
                 )}

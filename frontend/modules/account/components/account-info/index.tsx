@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import useToggleState from "@lib/hooks/use-toggle-state";
 import { useFormStatus } from "react-dom";
 import { useSnackbar } from "notistack";
-import clsx from "clsx";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/util/cn";
 
 type AccountInfoProps = {
     label: string;
@@ -79,7 +79,7 @@ const AccountInfo = ({
             </div>
 
             <div
-                className={clsx("static transition-[max-height,opacity] duration-300 ease-in-out overflow-visible", {
+                className={cn("static transition-[max-height,opacity] duration-300 ease-in-out overflow-visible", {
                     "max-h-[1000px] opacity-100": state,
                     "max-h-0 opacity-0": !state,
                 })}

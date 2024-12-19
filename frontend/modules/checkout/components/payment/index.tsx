@@ -7,12 +7,12 @@ import { CheckCircleSolid, CreditCard, Spinner } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
 import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
-import clsx from "clsx";
 import Button from "@modules/common/components/button";
 import { Cart, PaymentSession } from "types/global";
 import { Tooltip } from "@components/ui/tooltip";
 
 import { RadioGroup } from "@/components/ui/radio-group";
+import { cn } from "@/lib/util/cn";
 
 const payMethods = [
     { id: "stripe", provider_id: "Stripe" },
@@ -80,9 +80,9 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     return (
         <div>
-            <div className="flex flex-row items-center justify-between mb-6">
+            <div className="flex flex-row items-center justify-between mb-4">
                 <h2
-                    className={clsx("flex flex-row text-3xl gap-x-2 items-baseline", {
+                    className={cn("flex flex-row text-xl gap-x-2 items-baseline", {
                         "opacity-50 pointer-events-none select-none": !isOpen && !paymentReady,
                     })}
                 >
@@ -124,11 +124,11 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     <ErrorMessage data-testid="payment-method-error-message" error={error} />
 
                     <Button
-                        className="mt-6"
+                        className="mt-4 font-semibold"
                         data-testid="submit-payment-button"
                         isDisabled={!cart?.payment_session && !paidByGiftcard}
                         isLoading={isLoading}
-                        size="lg"
+                        size="sm"
                         onPress={handleSubmit}
                     >
                         Continue to review
@@ -140,7 +140,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                         <div className="flex items-start gap-x-1 w-full flex-wrap space-y-2 md:space-y-0">
                             <div className="flex flex-col w-full md:w-1/3">
                                 <p className="font-medium text-base mb-1">Payment method</p>
-                                <p className="font-normal text-base text-default-500" data-testid="payment-method-summary">
+                                <p className="font-normal text-xs md:text-base text-default-500" data-testid="payment-method-summary">
                                     {paymentInfoMap[cart.payment_session.id]?.title || cart.payment_session.provider_id}
                                 </p>
                                 {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, cart.payment_session.provider_id) && (
@@ -149,7 +149,10 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                             </div>
                             <div className="flex flex-col w-full md:w-1/3">
                                 <p className="font-medium text-base mb-1">Payment details</p>
-                                <div className="flex gap-2 font-normal text-base text-default-500 items-center" data-testid="payment-details-summary">
+                                <div
+                                    className="flex gap-2 font-normal text-xs md:text-base text-default-500 items-center"
+                                    data-testid="payment-details-summary"
+                                >
                                     <div className="shadow-lg rounded-lg flex items-center h-7 w-fit p-2 bg-default-100">
                                         {paymentInfoMap[cart.payment_session.id]?.icon || <CreditCard />}
                                     </div>

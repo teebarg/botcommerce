@@ -1,6 +1,6 @@
-import clsx from "clsx";
 import { getPercentageDiff } from "@lib/util/get-precentage-diff";
 import { currency } from "@lib/util/util";
+import { cn } from "@/lib/util/cn";
 
 type LineItemUnitPriceProps = {
     item: Omit<any, "beforeInsert">;
@@ -26,7 +26,7 @@ const LineItemUnitPrice = ({ item, style = "default" }: LineItemUnitPriceProps) 
                 </>
             )}
             <span
-                className={clsx("text-base", {
+                className={cn("text-base", {
                     "text-blue-400": hasReducedPrice,
                 })}
                 data-testid="product-unit-price"

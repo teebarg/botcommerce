@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/util/cn";
 
 interface BadgeProps {
     children: React.ReactNode;
@@ -15,7 +15,7 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
         <React.Fragment>
             <div className="relative inline-flex shrink-0">
                 <span
-                    className={clsx(
+                    className={cn(
                         "flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none rounded-medium",
                         `bg-${color} text-${color}-foreground`,
                         {
@@ -29,7 +29,7 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
                     {children}
                 </span>
                 <span
-                    className={clsx(
+                    className={cn(
                         "flex z-10 flex-wrap absolute box-border rounded-full whitespace-nowrap place-content-center origin-center items-center select-none font-regular px-0 border-2 border-background",
                         `bg-${color} text-${color}-foreground`,
                         {

@@ -1,0 +1,49 @@
+<svg
+  width="200"
+  height="200"
+  viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  fill="none"
+>
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="100" fill="url(#gradientBackground)" />
+
+  <!-- Head -->
+  <circle cx="100" cy="80" r="40" fill="url(#gradientSkin)" />
+
+  <!-- Body -->
+  <path
+    d="M60 170 C60 140, 140 140, 140 170 Z"
+    fill="url(#gradientClothes)"
+  />
+
+  <!-- Eyes -->
+  <circle cx="85" cy="75" r="5" fill="#FFFFFF" />
+  <circle cx="115" cy="75" r="5" fill="#FFFFFF" />
+
+  <!-- Smile -->
+  <path
+    d="M85 95 Q100 110, 115 95"
+    stroke="#FFFFFF"
+    stroke-width="3"
+    fill="none"
+    stroke-linecap="round"
+  />
+
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="gradientBackground" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9a9e" />
+      <stop offset="100%" stop-color="#fad0c4" />
+    </linearGradient>
+    <linearGradient id="gradientSkin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8C3A0" />
+      <stop offset="100%" stop-color="#F5AB7A" />
+    </linearGradient>
+    <linearGradient id="gradientClothes" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#85FFBD" />
+      <stop offset="100%" stop-color="#FFFB7D" />
+    </linearGradient>
+  </defs>
+</svg>

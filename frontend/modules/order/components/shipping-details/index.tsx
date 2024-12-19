@@ -11,7 +11,7 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
             <h2 className="flex flex-row text-xl font-semibold mt-6 mb-1">Delivery</h2>
             <div className="gap-6 grid grid-cols-1 md:grid-cols-3">
                 <div className="flex flex-col font-medium" data-testid="shipping-address-summary">
-                    <p className="text-base mb-1">Shipping Address</p>
+                    <p className="text-base mb-1">Shipping Address11</p>
                     <p className="text-default-500">
                         {order?.shipping_address?.first_name} {order?.shipping_address?.last_name}
                     </p>

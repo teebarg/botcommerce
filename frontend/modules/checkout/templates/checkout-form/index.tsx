@@ -42,7 +42,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
                     <Payment cart={cart} />
                 </div>
 
-                <div>
+                <div className="hidden md:block">
                     <Review cart={cart} customer={customer} />
                 </div>
             </div>

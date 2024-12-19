@@ -33,15 +33,11 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, cate
     return (
         <React.Fragment>
             <header className="relative z-20 flex flex-col sm:gap-2 rounded-medium bg-default-100 px-4 pb-3 pt-2 md:pt-3">
-                <div className="flex items-center gap-1 md:hidden md:gap-2">
-                    <h2 className="text-large font-medium capitalize">{slug}</h2>
-                    <span className="text-small text-default-500">({count})</span>
-                </div>
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
                         <Button className="md:hidden" onPress={state.open}>
                             <FunnelIcon className="text-default-500" focusable="false" role="img" size={16} />
-                            Filters
+                            Filters ({count})
                         </Button>
                         <div className="hidden items-center gap-1 md:flex">
                             <h2 className="text-medium font-medium capitalize">{slug ?? "Collections"}</h2>

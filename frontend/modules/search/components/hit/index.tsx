@@ -1,4 +1,5 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import Image from "next/image";
 
 export type ProductHit = {
     id: string;
@@ -21,7 +22,7 @@ const Hit = ({ hit }: HitProps) => {
             <div key={hit.id}>
                 <div className="relative">
                     <div className="relative h-72 w-full overflow-hidden rounded-lg">
-                        <img alt={hit.name} className="h-full w-full object-cover object-center" src={hit.image as string} />
+                        <Image fill alt={hit.name} className="h-full w-full object-cover object-center" src={hit.image as string} />
                     </div>
                     <div className="relative mt-4">
                         <span className="font-medium text-default-900 text-base line-clamp-2">{hit.name}</span>

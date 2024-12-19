@@ -5,6 +5,7 @@ import Button from "@modules/common/components/button";
 import { Table } from "@modules/common/components/table";
 import { Card, CardHeader, CardTitle, CardContent } from "components/ui/card";
 import { Activity, CreditCard, Users } from "nui-react-icons";
+import Image from "next/image";
 
 const users = [
     {
@@ -112,7 +113,12 @@ export default async function AdminPage() {
                     <div className="flex p-3 z-10 w-full items-center shrink-0 overflow-inherit color-inherit rounded-t-large justify-between">
                         <div className="flex gap-5">
                             <span className="flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none w-10 h-10 text-tiny bg-default text-default-foreground rounded-full">
-                                <img alt="avatar" className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0" src="" />
+                                <Image
+                                    fill
+                                    alt="avatar"
+                                    className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0"
+                                    src=""
+                                />
                             </span>
                             <div className="flex flex-col gap-1 items-start justify-center">
                                 <h4 className="text-small font-semibold leading-none text-default-900">Zoey Lang</h4>

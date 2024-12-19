@@ -1,7 +1,7 @@
 import { searchProducts } from "@lib/data";
 import { Product } from "types/global";
 
-import { ProductCard } from "../product-card";
+import { SMProductCard } from "../small-product-card";
 
 type RelatedProductsProps = {
     product: Product;
@@ -40,7 +40,7 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
             <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                 {productPreviews.slice(0, 4).map((product: Product) => (
                     <li key={product.id}>
-                        <ProductCard product={product} wishlist={[]} />
+                        <SMProductCard product={product} wishlist={[]} />
                     </li>
                 ))}
             </ul>

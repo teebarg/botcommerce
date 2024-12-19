@@ -6,21 +6,6 @@ export const siteConfig = {
     contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
     contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE,
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
-    navItems: [
-        {
-            label: "Collections",
-            href: "/collections",
-        },
-        {
-            label: "Checkout",
-            href: "/checkout",
-        },
-        {
-            label: "Blog",
-            href: "https://blog.niyi.com.ng",
-            external: true,
-        },
-    ],
     navMenuItems: [
         {
             label: "Profile",

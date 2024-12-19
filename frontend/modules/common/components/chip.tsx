@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/util/cn";
 
 interface Props {
     title: string;
@@ -12,7 +12,7 @@ const Chip: React.FC<Props> = ({ title, className = "", color = "primary", size 
     return (
         <React.Fragment>
             <div
-                className={clsx(
+                className={cn(
                     "relative max-w-fit min-w-min inline-flex items-center justify-between",
                     "box-border whitespace-nowrap px-1 rounded-full",
                     `bg-${color} text-${color}-foreground ${className}`,
