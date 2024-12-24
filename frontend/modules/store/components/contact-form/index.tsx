@@ -48,7 +48,7 @@ export default function ContactForm() {
                 <div className="text-gray-800">
                     <Checkbox defaultSelected label="I allow this website to store my submission." name="agreement" />
                 </div>
-                <FormButton color="primary" fullWidth={true} size="sm">
+                <FormButton color="primary" fullWidth={true} size="sm" className="min-w-32">
                     Submit
                 </FormButton>
             </div>

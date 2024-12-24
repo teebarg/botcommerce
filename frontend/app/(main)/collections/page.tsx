@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { CollectionTemplate } from "@modules/collections/templates";
 import { SortOptions } from "types/global";
+import { Suspense } from "react";
+import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 
 type Props = {
     searchParams: {
@@ -24,5 +26,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Collections({ searchParams }: Props) {
     const { sortBy, page } = searchParams;
 
-    return <CollectionTemplate page={page} searchParams={searchParams} sortBy={sortBy} />;
+    return (
+        <Suspense fallback={<CollectionTemplateSkeleton />}>
+            <CollectionTemplate page={page} searchParams={searchParams} sortBy={sortBy} />
+        </Suspense>
+    );
 }
