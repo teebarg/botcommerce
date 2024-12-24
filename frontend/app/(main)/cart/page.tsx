@@ -5,6 +5,7 @@ import SignInPrompt from "@modules/cart/components/sign-in-prompt";
 import ItemsTemplate from "@modules/cart/templates/items";
 import Summary from "@modules/cart/templates/summary";
 import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
+
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 
 export const metadata: Metadata = {

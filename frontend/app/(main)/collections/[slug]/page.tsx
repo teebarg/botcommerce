@@ -4,6 +4,7 @@ import { getCollectionBySlug, getCollectionsList } from "@lib/data";
 import { CollectionTemplate } from "@modules/collections/templates";
 import { Collection, SortOptions } from "types/global";
 import React, { Suspense } from "react";
+
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 
 type Props = {

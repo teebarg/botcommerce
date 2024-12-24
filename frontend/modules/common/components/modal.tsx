@@ -2,6 +2,7 @@ import { XMark } from "nui-react-icons";
 import React, { useRef } from "react";
 import { useOverlay, usePreventScroll, OverlayContainer, OverlayProps } from "@react-aria/overlays";
 import { cn } from "@lib/util/cn";
+
 import { BackButton } from "@/components/back";
 
 interface ModalProps extends OverlayProps {

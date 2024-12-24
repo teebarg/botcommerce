@@ -82,7 +82,7 @@ const FlashBanner: React.FC = () => {
                     <Clock className="w-10 h-10 text-yellow-400" />
                     <div className="flex space-x-2 text-center">
                         {(["hours", "minutes", "seconds"] as const).map((timeUnit) => (
-                            <div key={timeUnit} className="bg-white/20 p-2 rounded-lg w-16" suppressHydrationWarning>
+                            <div key={timeUnit} suppressHydrationWarning className="bg-white/20 p-2 rounded-lg w-16">
                                 <span className="text-2xl font-bold">{timeLeft[timeUnit].toString().padStart(2, "0")}</span>
                                 <p className="text-xs">{timeUnit.charAt(0).toUpperCase() + timeUnit.slice(1)}</p>
                             </div>

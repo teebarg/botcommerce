@@ -17,6 +17,7 @@ const BackButton: React.FC<Props> = ({ size = "sm", color = "default", onClick, 
     const handleGoBack = () => {
         if (onClick) {
             onClick();
+
             return;
         }
 

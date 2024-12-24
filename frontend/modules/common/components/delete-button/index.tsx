@@ -2,6 +2,7 @@ import { Spinner, Trash } from "nui-react-icons";
 import { useState } from "react";
 import { deleteLineItem } from "@modules/cart/actions";
 import { useSnackbar } from "notistack";
+
 import { cn } from "@/lib/util/cn";
 
 const DeleteButton = ({ id, children, className }: { id: string; children?: React.ReactNode; className?: string }) => {

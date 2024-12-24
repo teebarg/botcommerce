@@ -93,7 +93,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     <RelatedProducts product={product} />
                 </Suspense>
             </div>
-            <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg">
+            <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg md:hidden">
                 <LocalizedClientLink
                     className="relative inline-flex items-center justify-center outline-none px-3 h-10 rounded-small bg-transparent border border-default-500 text-default-500"
                     href="/"

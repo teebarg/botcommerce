@@ -6,6 +6,7 @@ import { getCategories, getCollectionsList, getCustomer, getWishlist, search } f
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 
 import { CollectionsTopBar } from "./topbar";
+
 import { SMProductCard } from "@/modules/products/components/small-product-card";
 
 interface ComponentProps {
@@ -52,7 +53,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     return (
         <React.Fragment>
             <div className="w-full">
-                <nav data-slot="base" className="hidden md:block">
+                <nav className="hidden md:block" data-slot="base">
                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                         <li className="flex items-center" data-slot="base">
                             <LocalizedClientLink href="/">Home</LocalizedClientLink>

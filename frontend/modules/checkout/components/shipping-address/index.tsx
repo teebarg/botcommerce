@@ -4,8 +4,6 @@ import { Input } from "@components/ui/input";
 
 import AddressSelect from "../address-select";
 
-import { Checkbox } from "@/components/ui/checkbox";
-
 const ShippingAddress = ({
     customer,
     cart,

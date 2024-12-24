@@ -1,14 +1,13 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { CheckCircleSolid, Spinner } from "nui-react-icons";
+import { CheckCircleSolid } from "nui-react-icons";
 import { useFormState } from "react-dom";
 import compareAddresses from "@lib/util/compare-addresses";
 import { FormButton } from "@modules/common/components/form-button";
 import { useState } from "react";
 import { Cart } from "types/global";
 
-import BillingAddress from "../billing_address";
 import ShippingAddress from "../shipping-address";
 import { setAddresses } from "../../actions";
 import ErrorMessage from "../error-message";

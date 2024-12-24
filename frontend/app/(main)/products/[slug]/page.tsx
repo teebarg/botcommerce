@@ -4,6 +4,9 @@ import { getProductBySlug } from "@lib/data";
 import ProductTemplate from "@modules/products/templates";
 import { getDocuments } from "@lib/util/meilisearch";
 import { Product } from "types/global";
+import { Suspense } from "react";
+
+import SkeletonProductTemplate from "@/modules/products/skeleton-product";
 
 export const revalidate = 2;
 
@@ -44,5 +47,9 @@ export default async function ProductPage({ params }: Props) {
         notFound();
     }
 
-    return <ProductTemplate product={product} />;
+    return (
+        <Suspense fallback={<SkeletonProductTemplate />}>
+            <ProductTemplate product={product} />
+        </Suspense>
+    );
 }

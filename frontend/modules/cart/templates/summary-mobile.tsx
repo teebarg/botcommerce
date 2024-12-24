@@ -4,6 +4,7 @@ import { Cart } from "types/global";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
@@ -13,9 +14,10 @@ type SummaryProps = {
 };
 
 const SummaryMobile = ({ cart }: SummaryProps) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
     if (!cart) return;
     const { subtotal, tax_total, delivery_fee, total, discount_total } = cart;
-    const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleSummary = () => {
         setIsExpanded(!isExpanded);
@@ -30,7 +32,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
             <div className={`overflow-hidden transition-all duration-500 px-2 ${isExpanded ? "max-h-48" : "max-h-0"}`}>
                 <div className="flex items-center justify-between py-2">
                     <p className="text-xl font-medium">Summary</p>
-                    <Button onClick={toggleSummary} className="bg-inherit min-w-0 w-auto px-0">
+                    <Button className="bg-inherit min-w-0 w-auto px-0" onClick={toggleSummary}>
                         <XMark />
                     </Button>
                 </div>
@@ -67,8 +69,8 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                     Checkout ({cart?.items?.length ?? 0})
                 </LocalizedClientLink>
                 <Button
-                    endContent={<ChevronDown className={cn("transition-all duration-500", isExpanded && "rotate-180")} />}
                     className="bg-inherit"
+                    endContent={<ChevronDown className={cn("transition-all duration-500", isExpanded && "rotate-180")} />}
                     onClick={toggleSummary}
                 >
                     <span className="text-2xl font-semibold">{getAmount(total ?? 0)}</span>

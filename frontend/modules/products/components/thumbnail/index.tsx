@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import PlaceholderImage from "@modules/common/icons/placeholder-image";
+
 import { cn } from "@/lib/util/cn";
 
 type ThumbnailProps = {

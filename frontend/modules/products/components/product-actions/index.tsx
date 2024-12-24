@@ -57,7 +57,7 @@ export default function ProductActions({
     };
 
     return (
-        <div className={cn("group flex-1 flex flex-col", className)} data-has-price={showPrice} data-has-details={showDetails}>
+        <div className={cn("group flex-1 flex flex-col", className)} data-has-details={showDetails} data-has-price={showPrice}>
             <div className="hidden flex-col-reverse items-start mb-2 group-data-[has-price=true]:flex flex-1 px-1 md:px-0">
                 <div className="flex items-center w-full">
                     <span className="text-lg font-semibold text-danger">{currency(product.price)}</span>

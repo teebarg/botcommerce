@@ -2,6 +2,7 @@ import React from "react";
 import { useToggleState } from "@react-stately/toggle";
 import { AriaSwitchProps, useSwitch } from "@react-aria/switch";
 import { useFocusRing } from "@react-aria/focus";
+
 import { cn } from "@/lib/util/cn";
 
 interface SwitchProps extends AriaSwitchProps {

@@ -7,6 +7,7 @@ import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
 import { getCart, getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
+
 import PaymentButton from "@/modules/checkout/components/payment-button";
 import { BackButton } from "@/components/back";
 import { currency } from "@/lib/util/util";

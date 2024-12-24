@@ -1,6 +1,7 @@
 import React from "react";
 import { getCategories, getCollectionsList } from "@lib/data";
 import { Category, SortOptions } from "types/global";
+
 import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 
 type Props = {

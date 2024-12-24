@@ -10,6 +10,7 @@ import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import FlashBanner from "@components/flash";
 import BannerCarousel from "@components/carousel";
+
 import { SMProductCard } from "@/modules/products/components/small-product-card";
 
 export const metadata: Metadata = {

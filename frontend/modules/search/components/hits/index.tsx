@@ -1,7 +1,9 @@
 import React from "react";
 import { UseHitsProps, useHits, useSearchBox } from "react-instantsearch-hooks-web";
+
 import { ProductHit } from "../hit";
 import ShowAll from "../show-all";
+
 import { cn } from "@/lib/util/cn";
 
 type HitsProps<THit> = React.ComponentProps<"div"> &

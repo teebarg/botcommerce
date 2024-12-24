@@ -1,5 +1,6 @@
-import { cn } from "@/lib/util/cn";
 import React from "react";
+
+import { cn } from "@/lib/util/cn";
 
 function Skeleton({ className }: React.HTMLAttributes<HTMLDivElement>) {
     return (
@@ -11,7 +12,7 @@ function Skeleton({ className }: React.HTMLAttributes<HTMLDivElement>) {
                 className
             )}
         >
-            <div className="opacity-0 transition-opacity motion-reduce:transition-none !duration-300"></div>
+            <div className="opacity-0 transition-opacity motion-reduce:transition-none !duration-300" />
         </div>
     );
 }

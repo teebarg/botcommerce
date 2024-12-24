@@ -5,6 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import React from "react";
 import Dropdown from "@modules/common/components/dropdown";
 import Image from "next/image";
+
 import ProfileAvatar from "@/public/profile.svg";
 
 export default function UserDropDown({ customer }: any) {
