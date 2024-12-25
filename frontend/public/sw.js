@@ -12,9 +12,13 @@ const ASSETS_TO_CACHE = [
     "/user-agreement",
     "/globals.css",
     "/avatar_ai.png",
+    "/bot.svg",
+    "/empty-cart.png",
+    "/frontend.webp",
+    "/promo-banner.webp",
+    "/side-banner.webp",
     "/offline", // A fallback page for offline users
     "/favicon.ico", // Favicon
-    // "/_next/image", // Next.js static files
     // "/_next/static/", // Next.js static files
 ];
 
@@ -49,24 +53,6 @@ self.addEventListener("activate", (event) => {
         )
     );
 });
-
-// Fetch event: Serve assets from cache or fallback to network
-// self.addEventListener("fetch", (event) => {
-//     event.respondWith(
-//         caches.match(event.request).then((response) => {
-//             return (
-//                 response ||
-//                 fetch(event.request).then((networkResponse) => {
-//                     return caches.open(CACHE_NAME).then((cache) => {
-//                         cache.put(event.request, networkResponse.clone());
-
-//                         return networkResponse;
-//                     });
-//                 })
-//             );
-//         })
-//     );
-// });
 
 // Fetch event: Cache dynamic URLs
 self.addEventListener("fetch", (event) => {

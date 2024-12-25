@@ -17,7 +17,7 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
                         <div className="flex flex-col">
                             <p className="text-base text-default-900">Payment method</p>
                             <p className="text-xs md:text-base text-default-500" data-testid="payment-method">
-                                {paymentInfoMap[payment.id]?.title}nnnn
+                                {paymentInfoMap[payment.id]?.title}
                             </p>
                         </div>
                         <div className="flex flex-col col-span-2">

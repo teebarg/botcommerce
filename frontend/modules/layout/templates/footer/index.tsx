@@ -77,7 +77,6 @@ export default async function Footer() {
                         </div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 col-span-2 mt-8 md:mt-0">
-                        {/* <div className="md:grid md:grid-cols-2 md:gap-8"> */}
                         {collections?.length > 0 && (
                             <div className="hidden md:block">
                                 <div>
@@ -139,8 +138,6 @@ export default async function Footer() {
                                 </ul>
                             </div>
                         )}
-                        {/* </div> */}
-                        {/* <div className="md:grid md:grid-cols-2 md:gap-8"> */}
                         <div>
                             <h3 className="text-base font-semibold text-default-500">About Us</h3>
                             <ul className="mt-2 space-y-1">
@@ -173,7 +170,6 @@ export default async function Footer() {
                                 </ul>
                             </div>
                         </div>
-                        {/* </div> */}
                     </div>
                 </div>
                 <div className="my-2 md:my-10 bg-default-100/20 py-4 md:flex md:items-center md:justify-between md:gap-2">
