@@ -1,5 +1,5 @@
 import { Viewport } from "next";
-import "styles/globals.css";
+import "public/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { getCustomer } from "@lib/data";

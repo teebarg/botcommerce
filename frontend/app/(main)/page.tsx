@@ -10,8 +10,7 @@ import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import FlashBanner from "@components/flash";
 import BannerCarousel from "@components/carousel";
-
-import { SMProductCard } from "@/modules/products/components/small-product-card";
+import { ProductCard } from "@/modules/products/components/product-card";
 
 export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
@@ -132,7 +131,7 @@ export default async function Home() {
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                                 {featured?.map((product: Product, index: number) => (
-                                    <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                    <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                 ))}
                             </div>
                         </div>
@@ -144,7 +143,7 @@ export default async function Home() {
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
                             {trending?.map((product: Product, index: number) => (
-                                <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
@@ -162,7 +161,7 @@ export default async function Home() {
                         </p>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-8 mt-6">
                             {latest?.map((product: Product, index: number) => (
-                                <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>

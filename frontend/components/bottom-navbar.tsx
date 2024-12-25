@@ -2,7 +2,7 @@
 
 import { cn } from "@lib/util/cn";
 import React from "react";
-import { HomeIcon, User } from "nui-react-icons";
+import { Cart, HeartFilled, HomeIcon, Search, User } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 export const ButtonNav = ({ className }: { className?: string }) => {
@@ -15,9 +15,14 @@ export const ButtonNav = ({ className }: { className?: string }) => {
             href: "/",
         },
         {
-            icon: <HomeIcon className="h-6 w-6" />,
-            label: "Categories",
+            icon: <Search className="h-6 w-6" />,
+            label: "Shop",
             href: "/collections",
+        },
+        {
+            icon: <Cart className="h-6 w-6" />,
+            label: "Cart",
+            href: "/cart",
         },
         {
             icon: <User className="h-6 w-6" viewBox="0 0 20 20" />,
@@ -25,7 +30,7 @@ export const ButtonNav = ({ className }: { className?: string }) => {
             href: "/account/profile",
         },
         {
-            icon: <HomeIcon className="h-6 w-6" />,
+            icon: <HeartFilled className="h-6 w-6" />,
             label: "Help",
             href: "/support",
         },

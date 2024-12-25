@@ -1,11 +1,11 @@
 import { Product, WishlistItem } from "types/global";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Suspense } from "react";
+import React from "react";
 import Image from "next/image";
 
 import ProductActions from "../product-actions";
-
-import { ProductWishList } from "./product-wishlist";
+import { ProductWishList } from "../product-card/product-wishlist";
 
 interface ComponentProps {
     product: Product;
@@ -17,25 +17,34 @@ const ProductCard: React.FC<ComponentProps> = async ({ product, wishlist, showWi
     const inWishlist = !!wishlist?.find((wishlist) => wishlist.product_id === product.id);
 
     return (
-        <div key={product.id} className="relative flex flex-col rounded-t-md">
-            <div className="relative">
-                {showWishlist && <ProductWishList className="absolute right-6 top-6" inWishlist={inWishlist} product={product} />}
-
-                <div className="relative h-72 w-full overflow-hidden rounded-lg p-2">
-                    <Image fill alt={product.name} className="h-full w-full object-cover object-center" src={product.image as string} />
-                </div>
-                <div className="relative mt-4">
-                    <LocalizedClientLink className="font-medium text-default-900 text-base line-clamp-2" href={`/products/${product.slug}`}>
-                        {product.name}
-                    </LocalizedClientLink>
-                </div>
-            </div>
-            <div className="h-full flex flex-col-reverse">
-                <Suspense fallback={<div />}>
-                    <ProductActions product={product} />
-                </Suspense>
-            </div>
-        </div>
+        <>
+            <React.Fragment>
+                <LocalizedClientLink
+                    className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 md:p-2 w-full snap-start"
+                    href={`/products/${product.slug}`}
+                    id={`${product.id}`}
+                >
+                    {/* <div className="max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap px-1 h-5 text-tiny rounded-small bg-secondary-100 text-secondary-foreground absolute right-7 top-4 z-20">
+                        <span className="flex-1 text-inherit px-1 pl-0.5 font-semibold">New</span>
+                    </div> */}
+                    <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-medium bg-content2 h-[12rem] md:h-[20rem] justify-between">
+                        <div className="relative md:rounded-large z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
+                            <Image fill alt={product.name} className="hover:scale-95" src={product.image as string} />
+                        </div>
+                    </div>
+                    <div className="flex flex-col md:px-1 flex-1">
+                        <div className="h-full flex flex-col-reverse">
+                            <Suspense fallback={<div />}>
+                                <ProductActions
+                                    product={product}
+                                    wishlist={showWishlist && <ProductWishList className="relative flex" inWishlist={inWishlist} product={product} />}
+                                />
+                            </Suspense>
+                        </div>
+                    </div>
+                </LocalizedClientLink>
+            </React.Fragment>
+        </>
     );
 };
 

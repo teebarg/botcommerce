@@ -6,8 +6,7 @@ import { getCategories, getCollectionsList, getCustomer, getWishlist, search } f
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 
 import { CollectionsTopBar } from "./topbar";
-
-import { SMProductCard } from "@/modules/products/components/small-product-card";
+import { ProductCard } from "@/modules/products/components/product-card";
 
 interface ComponentProps {
     query?: string;
@@ -105,7 +104,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                     <React.Fragment>
                                         <div className="grid w-full gap-2 md:gap-4 grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-4">
                                             {products.map((product: Product, index: number) => (
-                                                <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                             ))}
                                         </div>
                                         {pagination.total_pages > 1 && <Pagination pagination={pagination} />}

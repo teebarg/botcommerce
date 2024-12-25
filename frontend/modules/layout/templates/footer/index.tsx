@@ -51,11 +51,11 @@ export default async function Footer() {
 
     return (
         <footer className="flex w-full flex-col pb-12">
-            <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
+            <div className="mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                 <div className="xl:grid xl:grid-cols-3 xl:gap-8">
                     <div className="space-y-4 md:pr-8">
                         <div className="flex items-center justify-start">
-                            <span className="text-4xl font-semibold">Botcommerce</span>
+                            <span className="text-3xl font-semibold">Botcommerce</span>
                         </div>
                         <p className="text-small text-default-500">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring

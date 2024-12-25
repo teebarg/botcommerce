@@ -9,6 +9,7 @@ import { Product } from "types/global";
 import Image from "next/image";
 
 import ProductDetails from "./details";
+import { currency } from "@/lib/util/util";
 
 type ProductTemplateProps = {
     product: Product;
@@ -21,7 +22,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
 
     return (
         <React.Fragment>
-            <div className="max-w-7xl mx-auto h-full w-full px-2 lg:px-12 my-8">
+            <div className="max-w-7xl mx-auto h-full w-full md:px-12 my-8">
                 <nav className="hidden md:block" data-slot="base">
                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                         <li className="flex items-center" data-slot="base">
@@ -63,7 +64,22 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                         <div className="my-2 flex items-center gap-2">
                             <p className="text-small text-default-500">669 reviews</p>
                         </div>
-                        <div className="max-w-40 mt-2">
+                        <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2">
+                            <div className="flex items-center text-white">
+                                <span className="text-3xl font-semibold ">{currency(product.price)}</span>
+                                {product.old_price > product.price && (
+                                    <span className="ml-1 text-sm line-through">{currency(product.old_price)}</span>
+                                )}
+                            </div>
+                            {product.old_price > product.price && (
+                                <div className="mt-1 -mb-1.5">
+                                    <span className="text-xl font-medium text-orange-400">
+                                        Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                        <div className="max-w-40 mt-2 hidden md:block">
                             <Suspense fallback={<ProductActions disabled={true} product={product} />}>
                                 <ProductActions product={product} showDetails={false} />
                             </Suspense>
@@ -88,7 +104,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     </div>
                 </div>
             </div>
-            <div className="max-w-7xl mx-auto px-6 my-4" data-testid="related-products-container">
+            <div className="max-w-7xl mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
                 <Suspense fallback={<SkeletonRelatedProducts />}>
                     <RelatedProducts product={product} />
                 </Suspense>

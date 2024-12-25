@@ -1,7 +1,6 @@
 import { searchProducts } from "@lib/data";
 import { Product } from "types/global";
-
-import { SMProductCard } from "../small-product-card";
+import { ProductCard } from "../product-card";
 
 type RelatedProductsProps = {
     product: Product;
@@ -33,14 +32,14 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
     return (
         <div>
             <div className="flex flex-col items-center text-center mb-12">
-                <span className="text-base text-gray-600 mb-6">Related products</span>
-                <p className="text-2xl text-default-900 max-w-lg">You might also want to check out these products.</p>
+                <span className="text-base text-default-500 mb-4">Related products</span>
+                <p className="text-lg md:text-2xl text-default-900 max-w-lg">You might also want to check out these products.</p>
             </div>
 
-            <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-6 gap-y-8">
                 {productPreviews.slice(0, 4).map((product: Product) => (
                     <li key={product.id}>
-                        <SMProductCard product={product} wishlist={[]} />
+                        <ProductCard product={product} wishlist={[]} />
                     </li>
                 ))}
             </ul>
