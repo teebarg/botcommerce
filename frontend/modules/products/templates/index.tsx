@@ -9,6 +9,7 @@ import { Product } from "types/global";
 import Image from "next/image";
 
 import ProductDetails from "./details";
+
 import { currency } from "@/lib/util/util";
 
 type ProductTemplateProps = {

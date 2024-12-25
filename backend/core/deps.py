@@ -18,6 +18,7 @@ from crud.search import SearchService, get_search_service
 from db.engine import engine
 from models.generic import Address, Product, User
 from models.token import TokenPayload
+from services.cache import CacheService, get_cache_service
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -117,4 +118,5 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
 
 AdminUser = Annotated[User, Depends(get_current_active_superuser)]
 
+CacheService = Annotated[CacheService, Depends(get_cache_service)]
 SearchService = Annotated[SearchService, Depends(get_search_service)]

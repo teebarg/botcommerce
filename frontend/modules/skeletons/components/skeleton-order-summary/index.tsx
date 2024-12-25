@@ -1,13 +1,12 @@
-import SkeletonButton from "@modules/skeletons/components/skeleton-button";
 import SkeletonCartTotals from "@modules/skeletons/components/skeleton-cart-totals";
+
+import { Skeleton } from "@/components/skeleton";
 
 const SkeletonOrderSummary = () => {
     return (
         <div className="grid-cols-1">
             <SkeletonCartTotals header={false} />
-            <div className="mt-4">
-                <SkeletonButton />
-            </div>
+            <Skeleton className="w-full min-h-[50px] py-[10px] mt-4" />
         </div>
     );
 };

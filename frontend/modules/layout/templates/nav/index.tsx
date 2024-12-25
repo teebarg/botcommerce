@@ -56,7 +56,7 @@ const Navbar = async () => {
                                 <HeartFilled className="h-8 w-8 text-primary-500" />
                             </LocalizedClientLink>
                         ) : (
-                            <Heart className="h-8 w-8" />
+                            <Heart className="h-8 w-8 text-default-500" />
                         )}
                     </NavbarItem>
                     <NavbarItem className="hidden sm:flex items-center">

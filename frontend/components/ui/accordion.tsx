@@ -66,7 +66,7 @@ export function AccordionTrigger({ children, value, className }: { children: Rea
                 aria-expanded={isExpanded}
                 className={cn(
                     "flex py-4 w-full h-full gap-3 items-center outline-none transition-opacity",
-                    "justify-between px-4 text-left text-sm transition-all",
+                    "justify-between pr-4 text-left text-sm transition-all",
                     className
                 )}
                 data-open={isExpanded}

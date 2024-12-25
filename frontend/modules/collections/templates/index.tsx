@@ -6,6 +6,7 @@ import { getCategories, getCollectionsList, getCustomer, getWishlist, search } f
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 
 import { CollectionsTopBar } from "./topbar";
+
 import { ProductCard } from "@/modules/products/components/product-card";
 
 interface ComponentProps {

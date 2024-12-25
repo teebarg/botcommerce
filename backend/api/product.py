@@ -124,7 +124,7 @@ async def index(
 @router.post("/search")
 async def search_products(params: ProductSearch, service: deps.SearchService) -> Any:
     """
-    Search products using Meilisearch, sorted by relevance.
+    Search products using Meilisearch with Redis caching, sorted by relevance.
     """
     categories = params.categories
     collections = params.collections
@@ -154,10 +154,6 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
     search_results = await service.search_products(
         query=params.query, filters=search_params
     )
-
-    # search_results = search_documents(
-    #     index_name="products", query=params.query, **search_params
-    # )
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)

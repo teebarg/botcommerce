@@ -8,15 +8,15 @@ const Back: React.FC<IconProps> = ({ size = "16", color = "currentColor", ...att
     const router = useRouter();
 
     return (
-        <svg 
-            fill="none" 
-            height={size} 
-            viewBox="0 0 24 24" 
-            width={size} 
-            xmlns="http://www.w3.org/2000/svg" 
+        <svg
+            fill="none"
+            height={size}
+            viewBox="0 0 24 24"
+            width={size}
+            xmlns="http://www.w3.org/2000/svg"
             {...attributes}
+            style={{ cursor: "pointer" }}
             onClick={() => router.back()}
-            style={{ cursor: 'pointer' }}
         >
             <path d="M4 3.5V9.5H10" stroke={color} strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
             <path

@@ -1,15 +1,17 @@
-import InteractiveLink from "@modules/common/components/interactive-link";
+import Image from "next/image";
+
+import EmptyCart from "@/public/empty-cart.png";
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 
 const EmptyCartMessage = () => {
     return (
-        <div className="py-8 px-2 flex flex-col justify-center items-start" data-testid="empty-cart-message">
-            <h1 className="flex flex-row text-2xl gap-x-2 items-baseline">Cart</h1>
-            <p className="text-base mt-4 mb-6 max-w-[32rem]">
-                You don&apos;t have anything in your cart. Let&apos;s change that, use the link below to start browsing our products.
-            </p>
-            <div>
-                <InteractiveLink href="/collections">Explore products</InteractiveLink>
-            </div>
+        <div className="max-w-7xl mx-auto flex flex-col items-center py-6 space-y-4">
+            <Image alt={"Empty cart"} className="w-40" src={EmptyCart} />
+            <p className="text-xl font-semibold">Your cart is empty</p>
+            <p className="text-default-500 font-medium">Continue shopping to explore more.</p>
+            <LocalizedClientLink className="text-default py-2 px-4 bg-default-foreground rounded-md font-medium" href="/collections">
+                Explore items
+            </LocalizedClientLink>
         </div>
     );
 };

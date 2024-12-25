@@ -1,16 +1,13 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException
 from firebase_cart import CartHandler, CartItem, FirebaseConfig
 
+from core import deps
 from core.config import settings
-from core.deps import (
-    get_current_user,
-)
 from core.utils import generate_id
 from models.generic import CartDetails, CartItemIn
 from models.message import Message
-from services.meilisearch import get_document_by_id
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
@@ -35,8 +32,11 @@ def index(
 
 
 @router.post("/add")
-async def add_to_cart(cart_in: CartItemIn, cartId: str = Header(default=None)):
-    doc = get_document_by_id("products", cart_in.product_id)
+async def add_to_cart(
+    cart_in: CartItemIn, service: deps.SearchService, cartId: str = Header(default=None)
+):
+
+    doc = await service.get_product(product_id=cart_in.product_id)
     id = str(doc.get("id"))
     cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
     return cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
@@ -63,7 +63,7 @@ async def update_cart_details(
     return cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_user)])
+@router.delete("/{id}")
 def delete(id: str, cartId: str = Header(default=None)) -> Message:
     """
     Delete item from cart.

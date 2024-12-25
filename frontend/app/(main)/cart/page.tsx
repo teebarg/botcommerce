@@ -35,11 +35,9 @@ export default async function Cart() {
                             <div className="relative hidden md:block">
                                 <div className="flex flex-col gap-y-8 sticky top-12">
                                     {cart && (
-                                        <>
-                                            <div className="bg-content1 px-6 py-0 md:py-6 rounded-md">
-                                                <Summary cart={cart} />
-                                            </div>
-                                        </>
+                                        <div className="bg-content1 px-6 py-0 md:py-6 rounded-md">
+                                            <Summary cart={cart} />
+                                        </div>
                                     )}
                                 </div>
                             </div>

@@ -1,5 +1,6 @@
 import { searchProducts } from "@lib/data";
 import { Product } from "types/global";
+
 import { ProductCard } from "../product-card";
 
 type RelatedProductsProps = {

@@ -1,5 +1,6 @@
 import { ChevronRight } from "nui-react-icons";
 import React from "react";
+
 import SkeletonProductPreview from "../skeletons/components/skeleton-product-preview";
 
 const CollectionTemplateSkeleton = () => {
