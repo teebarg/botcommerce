@@ -29,7 +29,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
 
     return (
         <div className={`fixed md:hidden bottom-0 z-50 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500`}>
-            <div className={`overflow-hidden transition-all duration-500 px-2 ${isExpanded ? "max-h-48" : "max-h-0"}`}>
+            <div className={cn("overflow-hidden transition-all duration-500 px-2", isExpanded ? "max-h-48" : "max-h-0")}>
                 <div className="flex items-center justify-between py-2">
                     <p className="text-xl font-medium">Summary</p>
                     <Button className="bg-inherit min-w-0 w-auto px-0" onClick={toggleSummary}>

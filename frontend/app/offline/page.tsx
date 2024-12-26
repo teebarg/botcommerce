@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { RefreshCcw } from "nui-react-icons";
+import { cn } from "@/lib/util/cn";
 
 const OfflinePage = () => {
     const [isRetrying, setIsRetrying] = useState(false);
@@ -33,7 +34,7 @@ const OfflinePage = () => {
         <div className="bg-gradient-to-b from-default-50 to-default-100 flex items-center justify-center p-4 flex-1">
             <div className="max-w-md w-full bg-content1 rounded-2xl shadow-xl p-8 text-center">
                 {/* Animation Container */}
-                <div className={`mb-8 relative ${showAnimation ? "animate-bounce" : ""}`}>
+                <div className={cn("mb-8 relative", { "animate-bounce": showAnimation })}>
                     <div className="relative">
                         {/* <WifiOff className="w-24 h-24 mx-auto text-default-400" strokeWidth={1.5} /> */}
                         {/* <CloudOff className="w-12 h-12 absolute -bottom-2 -right-2 text-default-500" strokeWidth={1.5} /> */}
@@ -55,7 +56,7 @@ const OfflinePage = () => {
                     disabled={isRetrying}
                     onClick={handleRetry}
                 >
-                    <RefreshCcw className={`w-5 h-5 ${isRetrying ? "animate-spin" : ""}`} />
+                    <RefreshCcw className={cn("w-5 h-5", isRetrying && "animate-spin")} />
                     {isRetrying ? "Retrying..." : "Try Again"}
                 </button>
 

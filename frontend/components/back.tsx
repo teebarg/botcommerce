@@ -2,7 +2,7 @@
 
 import { cn } from "@lib/util/cn";
 import { useRouter } from "next/navigation";
-import { ChevronLeft } from "nui-react-icons";
+import { ArrowLongLeft } from "nui-react-icons";
 import React from "react";
 
 interface Props {
@@ -29,11 +29,9 @@ const BackButton: React.FC<Props> = ({ size = "sm", color = "default", onClick, 
     };
 
     return (
-        <React.Fragment>
-            <button className={cn(className)} onClick={handleGoBack}>
-                <ChevronLeft />
-            </button>
-        </React.Fragment>
+        <button className={cn(className)} onClick={handleGoBack}>
+            <ArrowLongLeft className="h-8 w-8" viewBox="0 0 15 15" />
+        </button>
     );
 };
 

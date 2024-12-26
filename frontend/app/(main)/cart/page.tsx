@@ -7,6 +7,9 @@ import Summary from "@modules/cart/templates/summary";
 import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
+import RecommendedProducts from "@/modules/products/components/recommended";
+import { Shield } from "nui-react-icons";
+import { CartItem } from "@/types/global";
 
 export const metadata: Metadata = {
     title: "Cart | Botcommerce Store",
@@ -17,13 +20,15 @@ export default async function Cart() {
     const cart = await retrieveCart();
     const customer = await getCustomer();
 
+    const product_ids = cart?.items?.map((x: CartItem) => x.product_id);
+
     return (
         <>
             <div className="py-0 md:py-12">
                 <div className="max-w-7xl mx-auto" data-testid="cart-container">
                     {cart?.items.length ? (
                         <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8">
-                            <div className="flex flex-col bg-content1 p-6 gap-y-6 rounded-md">
+                            <div className="flex flex-col bg-content1 px-4 py-6 gap-y-6 rounded-md">
                                 {!customer && (
                                     <>
                                         <SignInPrompt />
@@ -47,6 +52,20 @@ export default async function Cart() {
                             <EmptyCartMessage />
                         </div>
                     )}
+                    <div className="px-2 py-4 mt-4">
+                        <div className="flex gap-2 items-center">
+                            <Shield />
+                            <p>Security & Privacy</p>
+                        </div>
+                        <div className="flex gap-4 text-default-500 text-sm">
+                            <p>Safe payments</p>
+                            <p>Secure personal details</p>
+                        </div>
+                    </div>
+                    <div className="px-2 mt-4">
+                        <p className="text:sm md:text-lg font-semibold">More to love</p>
+                        <RecommendedProducts exclude={product_ids} />
+                    </div>
                 </div>
             </div>
             <SummaryMobile cart={cart} />

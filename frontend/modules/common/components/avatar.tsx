@@ -13,12 +13,21 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, color = "primary", size = "sm", radius = "full" }) => {
+    const cssClass = {
+        default: "ring-default",
+        primary: "ring-primary",
+        secondary: "ring-secondary",
+        danger: "ring-danger",
+        warning: "ring-warning",
+        success: "ring-success",
+    };
     return (
         <React.Fragment>
             <span
                 className={cn(
                     "flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none",
-                    `ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-${color}`,
+                    "ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark",
+                    cssClass[color],
                     className,
                     {
                         "w-8 h-8": size === "sm",

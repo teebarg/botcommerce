@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ChevronDown, Clock, Headphones, Mail, PhoneCall } from "nui-react-icons";
+import { cn } from "@/lib/util/cn";
 
 const SupportPage = () => {
     const [activeSection, setActiveSection] = useState<number | null>(null);
@@ -74,7 +75,7 @@ const SupportPage = () => {
                             onClick={() => setActiveSection(activeSection === index ? null : index)}
                         >
                             <span className="text-xl font-semibold">{section.title}</span>
-                            <ChevronDown className={`transform transition-transform ${activeSection === index ? "rotate-180" : ""}`} />
+                            <ChevronDown className={cn("transform transition-transform", { "rotate-180": activeSection === index })} />
                         </button>
 
                         {activeSection === index && (

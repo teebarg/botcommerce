@@ -14,13 +14,13 @@ const SkeletonProductTemplate = () => {
                             <Skeleton className="w-12 h-4" />
                         </li>
                         <li className="flex items-center">
-                            <span className="px-1 text-foreground/50">
+                            <span className="px-1">
                                 <ChevronRight />
                             </span>
                             <Skeleton className="w-20 h-4" />
                         </li>
                         <li className="flex items-center">
-                            <span className="px-1 text-foreground/50">
+                            <span className="px-1">
                                 <ChevronRight />
                             </span>
                             <Skeleton className="w-32 h-4" />
@@ -28,7 +28,7 @@ const SkeletonProductTemplate = () => {
                     </ol>
                 </nav>
 
-                <div className="relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8 mt-4">
+                <div className="relative grid grid-cols-1 md:grid-cols-2 md:gap-x-8 mt-4">
                     {/* Image gallery skeleton */}
                     <div className="relative h-full w-full flex-none flex gap-4">
                         <div className="flex flex-col gap-4">

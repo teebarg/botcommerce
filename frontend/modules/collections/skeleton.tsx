@@ -13,7 +13,7 @@ const CollectionTemplateSkeleton = () => {
                     <ol className="flex flex-wrap list-none rounded-small">
                         <li className="flex items-center">
                             <span>Home</span>
-                            <span className="px-1 text-foreground/50">
+                            <span className="px-1">
                                 <ChevronRight />
                             </span>
                         </li>
@@ -26,15 +26,10 @@ const CollectionTemplateSkeleton = () => {
                 <div className="flex gap-6 mt-0 md:mt-6">
                     <div className="w-full flex-1 flex-col">
                         {/* TopBar skeleton */}
-                        <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 rounded-lg">
-                            <div className="flex justify-between items-center p-4">
-                                <Skeleton className="h-8 w-32 rounded" />
-                                <Skeleton className="h-8 w-32 rounded" />
-                            </div>
-                        </div>
+                        <Skeleton className="h-14 w-full rounded" />
 
-                        <main className="mt-4 w-full overflow-visible px-1">
-                            <div className="block md:rounded-medium md:border-medium border-dashed border-divider md:px-2 py-4 min-h-[60vh]">
+                        <main className="mt-4 w-full px-1">
+                            <div className="block md:rounded-medium md:border-medium border-dashed border-divider md:px-2 py-4">
                                 <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-4">
                                     {/* Generate 8 skeleton product cards */}
                                     {[...Array(8)].map((_, index) => (
