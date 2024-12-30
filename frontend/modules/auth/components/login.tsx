@@ -7,15 +7,17 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@modules/account/components/google";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { useFormState } from "react-dom";
-import React from "react";
+import React, { useState } from "react";
 import { redirect } from "next/navigation";
 import { Input } from "@components/ui/input";
 
 import { signIn } from "../action";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "nui-react-icons";
 
 type Props = {};
 
 const LoginForm: React.FC<Props> = () => {
+    const [show, setShow] = useState<boolean>(false);
     const { enqueueSnackbar } = useSnackbar();
     const [state, formAction] = useFormState(signIn, null);
 
@@ -35,7 +37,23 @@ const LoginForm: React.FC<Props> = () => {
             <form action={formAction} className="w-full">
                 <div className="flex flex-col w-full gap-y-4">
                     <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
-                    <Input isRequired data-testid="password-input" label="Password" name="password" type="password" />
+                    <Input
+                        isRequired
+                        data-testid="password-input"
+                        label="Password"
+                        name="password"
+                        type={show ? "text" : "password"}
+                        endContent={
+                            <button
+                                type="button"
+                                className="text-default-500"
+                                onClick={() => setShow(!show)}
+                                aria-label={show ? "Hide password" : "Show password"}
+                            >
+                                {show ? <EyeSlashFilledIcon className="h-6 w-6" /> : <EyeFilledIcon className="h-6 w-6" />}
+                            </button>
+                        }
+                    />
                 </div>
                 <FormButton className="w-full mt-6" data-testid="sign-in-button" size="md">
                     Sign in

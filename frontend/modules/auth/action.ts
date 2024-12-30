@@ -27,7 +27,7 @@ export async function signIn(_prevState: unknown, formData: FormData) {
     const password = formData.get("password") as string;
 
     try {
-        await getToken({ email, password });
+        await getToken({ email, password }); 
         revalidateTag("customer");
 
         return { error: false, message: "Authentication successful" };

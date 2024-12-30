@@ -6,7 +6,7 @@ type RecommendedProductsProps = {
     exclude?: Array<string | number>;
 };
 
-export default async function RecommendedProducts({ exclude }: RecommendedProductsProps) {
+export default async function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
     // edit this function to define your related products logic
     const queryParams: SearchParams = {
         limit: 40,
@@ -23,7 +23,7 @@ export default async function RecommendedProducts({ exclude }: RecommendedProduc
 
     return (
         <div>
-            <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-6 gap-y-8">
+            <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-4 gap-y-8">
                 {filteredProducts.map((product: Product) => (
                     <li key={product.id}>
                         <ProductCard product={product} wishlist={[]} />

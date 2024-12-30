@@ -42,7 +42,7 @@ const GoogleLogin: React.FC<Props> = () => {
     return (
         <React.Fragment>
             <Button
-                className="w-full bg-white dark:bg-background"
+                className="w-full bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600"
                 size="md"
                 startContent={<Image alt="Google" className="w-6" src={Google} />}
                 variant="flat"
