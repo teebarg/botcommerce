@@ -10,9 +10,9 @@ import { useFormState } from "react-dom";
 import React, { useState } from "react";
 import { redirect } from "next/navigation";
 import { Input } from "@components/ui/input";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "nui-react-icons";
 
 import { signIn } from "../action";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "nui-react-icons";
 
 type Props = {};
 
@@ -40,19 +40,19 @@ const LoginForm: React.FC<Props> = () => {
                     <Input
                         isRequired
                         data-testid="password-input"
-                        label="Password"
-                        name="password"
-                        type={show ? "text" : "password"}
                         endContent={
                             <button
-                                type="button"
-                                className="text-default-500"
-                                onClick={() => setShow(!show)}
                                 aria-label={show ? "Hide password" : "Show password"}
+                                className="text-default-500"
+                                type="button"
+                                onClick={() => setShow(!show)}
                             >
                                 {show ? <EyeSlashFilledIcon className="h-6 w-6" /> : <EyeFilledIcon className="h-6 w-6" />}
                             </button>
                         }
+                        label="Password"
+                        name="password"
+                        type={show ? "text" : "password"}
                     />
                 </div>
                 <FormButton className="w-full mt-6" data-testid="sign-in-button" size="md">

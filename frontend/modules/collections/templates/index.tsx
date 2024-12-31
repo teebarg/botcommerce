@@ -103,7 +103,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                     </div>
                                 ) : (
                                     <React.Fragment>
-                                        <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-4">
+                                        <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
                                             {products.map((product: Product, index: number) => (
                                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                             ))}

@@ -1,6 +1,7 @@
-import { Skeleton } from "@/components/skeleton";
 import repeat from "@lib/util/repeat";
 import SkeletonProductPreview from "@modules/skeletons/components/skeleton-product-preview";
+
+import { Skeleton } from "@/components/skeleton";
 
 const SkeletonRelatedProducts = () => {
     return (

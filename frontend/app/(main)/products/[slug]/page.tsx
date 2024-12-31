@@ -1,9 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@lib/data";
+import { getProductBySlug, search } from "@lib/data";
 import ProductTemplate from "@modules/products/templates";
-import { getDocuments } from "@lib/util/meilisearch";
-import { Product } from "types/global";
+import { Product, SearchParams } from "types/global";
 import { Suspense } from "react";
 
 import SkeletonProductTemplate from "@/modules/products/skeleton-product";
@@ -15,7 +14,11 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-    const { results: products } = await getDocuments("products");
+    const queryParams: SearchParams = {
+        limit: 100,
+    };
+
+    const { products } = await search(queryParams);
 
     return products.map((product: Product) => ({
         slug: String(product.slug),

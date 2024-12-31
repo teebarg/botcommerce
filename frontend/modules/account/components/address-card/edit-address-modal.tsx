@@ -85,7 +85,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                 </div>
             </div>
             {modalState.isOpen && (
-                <Modal data-testid="edit-address-modal" onClose={modalState.close}>
+                <Modal data-testid="edit-address-modal" onClose={modalState.close} isOpen={modalState.isOpen}>
                     <div className="p-8">
                         <h3 className="mb-2">Edit address</h3>
                         <form action={formAction}>

@@ -107,7 +107,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                 </SlideOver>
             )}
             {deleteModalState.isOpen && (
-                <Modal onClose={deleteModalState.close}>
+                <Modal onClose={deleteModalState.close} isOpen={deleteModalState.isOpen}>
                     <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
                 </Modal>
             )}

@@ -99,7 +99,7 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
                 Place order
             </Button>
             {modalState.isOpen && (
-                <Modal data-testid="login-modal" size="sm" title="Login" onClose={modalState.close}>
+                <Modal data-testid="login-modal" size="sm" title="Login" onClose={modalState.close} isOpen={modalState.isOpen}>
                     <CheckoutLoginForm />
                 </Modal>
             )}

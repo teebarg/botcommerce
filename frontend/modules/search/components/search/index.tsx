@@ -1,32 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { MagnifyingGlassMini } from "nui-react-icons";
-import { SEARCH_INDEX_NAME, searchClient } from "@lib/search-client";
-import Hit from "@modules/search/components/hit";
-import Hits from "@modules/search/components/hits";
-import { InstantSearch } from "react-instantsearch-hooks-web";
 import SearchInput from "@modules/search/components/search-input";
 import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
 import { Kbd } from "@modules/common/components/kbd";
+import { useSnackbar } from "notistack";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Product, SearchParams } from "@/types/global";
 import { ProductCard } from "@/modules/products/components/product-card";
+import NoProductsFound from "@/modules/products/components/no-products";
+import { debounce } from "@/lib/util/util";
 
 interface Props {
     className?: string;
 }
 
 const Search: React.FC<Props> = ({ className }) => {
+    const { enqueueSnackbar } = useSnackbar();
+    const router = useRouter();
     const modalState = useOverlayTriggerState({});
     const [products, setProducts] = useState<Product[]>([]);
+    const [value, setValue] = useState("");
 
-    const handleChange = async () => {
+    const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
+        setValue(event?.target?.value);
         try {
             const queryParams: SearchParams = {
-                query: "",
+                query: event?.target?.value,
                 limit: 15,
                 page: 1,
                 sort: "created_at:desc",
@@ -41,14 +45,25 @@ const Search: React.FC<Props> = ({ className }) => {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to fetch search");
+                throw new Error(response.statusText);
             }
 
             const { products } = await response.json();
+
             setProducts(products);
         } catch (error) {
-            console.log(error);
+            enqueueSnackbar(`Error occurred fetching products - ${error}`, { variant: "error" });
         }
+    };
+
+    const onSubmit = () => {
+        if (value) {
+            router.push(`/search/${value}`);
+        }
+    };
+
+    const onReset = () => {
+        setValue("");
     };
 
     return (
@@ -63,17 +78,18 @@ const Search: React.FC<Props> = ({ className }) => {
                 {`I'm looking for...`}
             </Button>
             {modalState.isOpen && (
-                <Modal hasX={false} size="lg" onClose={modalState.close}>
+                <Modal hasX={false} size="lg" onClose={modalState.close} isOpen={modalState.isOpen}>
                     <div>
                         <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
                             <MagnifyingGlassMini />
-                            <SearchInput onChange={handleChange} />
+                            <SearchInput onChange={debounce(handleChange, 500)} onReset={onReset} onSubmit={onSubmit} />
                             <button onClick={modalState.close}>
                                 <Kbd className="md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
                             </button>
                         </div>
-                        <div className="max-h-[70vh] min-h-[70vh] overflow-y-auto">
-                            <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 pb-4">
+                        <div className="max-h-[70vh] min-h-[70vh] overflow-y-auto mt-2">
+                            {products.length == 0 && <NoProductsFound />}
+                            <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
                                 {products.map((product: Product, index: number) => (
                                     <ProductCard key={index} product={product} />
                                 ))}

@@ -217,6 +217,8 @@ def read(slug: str, db: SessionDep, redis: deps.CacheService) -> ProductPublic:
     # Cache the result
     redis.set(cache_key, product.model_dump_json())
 
+    return product
+
 
 @router.patch("/{id}")
 def update(

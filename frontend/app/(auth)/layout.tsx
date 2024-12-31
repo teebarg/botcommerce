@@ -1,5 +1,6 @@
-import { BackButton } from "@/components/back";
 import React from "react";
+
+import { BackButton } from "@/components/back";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
     return (

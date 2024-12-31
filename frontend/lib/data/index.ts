@@ -2,7 +2,6 @@ import { cache } from "react";
 import { Product, SearchParams } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
-import { searchDocuments, urlToList } from "@lib/util/meilisearch";
 import { revalidateTag } from "next/cache";
 
 /**
@@ -489,17 +488,24 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
 });
 
 export const getProductBySlug = async function (slug: string): Promise<any> {
+    const headers = getHeaders(["product"]);
+
     try {
-        const { hits } = await searchDocuments<Product>("products", "", {
-            filter: `slug = "${slug}"`,
-            limit: 1,
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`, {
+            method: "GET",
+            headers: {
+                accept: "application/json",
+                ...headers,
+            },
         });
 
-        if (hits.length == 0) return null;
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
 
-        return hits[0];
+        return await res.json();
     } catch (error) {
-        return null;
+        return { message: error, status: "error" };
     }
 };
 
@@ -643,54 +649,6 @@ export async function search(searchParams: SearchParams): Promise<SearchResult> 
             total_pages: 0,
         };
     }
-}
-
-export async function searchProducts(searchParams: SearchParams): Promise<SearchResult> {
-    const {
-        query = "",
-        categories = "",
-        collections = "",
-        min_price = 1,
-        max_price = 1000000,
-        page = 1,
-        limit = 20,
-        sort = "created_at:desc",
-    } = searchParams;
-
-    const filters: string[] = [];
-
-    if (categories) {
-        filters.push(`categories IN [${urlToList(categories)}]`);
-    }
-    if (collections) {
-        filters.push(`collections IN [${urlToList(collections)}]`);
-    }
-    if (min_price && max_price) {
-        filters.push(`price >= ${min_price} AND price <= ${max_price}`);
-    }
-
-    const meilisearchParams: Record<string, any> = {
-        limit: limit,
-        offset: (page - 1) * limit,
-        sort: [sort],
-    };
-
-    if (filters.length > 0) {
-        meilisearchParams.filter = filters.join(" AND ");
-    }
-
-    const searchResults = await searchDocuments<Product>("products", query, meilisearchParams);
-
-    const totalCount = searchResults.estimatedTotalHits || 0;
-    const totalPages = Math.ceil(totalCount / limit);
-
-    return {
-        products: searchResults.hits,
-        page: page,
-        limit: limit,
-        total_count: totalCount,
-        total_pages: totalPages,
-    };
 }
 
 export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {

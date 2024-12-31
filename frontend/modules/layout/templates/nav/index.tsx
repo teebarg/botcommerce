@@ -3,7 +3,7 @@ import { getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
-import Search from "@modules/search/templates/search";
+import Search from "@/modules/search/components/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";

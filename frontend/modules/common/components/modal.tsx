@@ -8,7 +8,7 @@ import { BackButton } from "@/components/back";
 interface ModalProps extends OverlayProps {
     title?: string;
     children: React.ReactNode;
-    isOpen?: boolean;
+    isOpen: boolean;
     hasX?: boolean;
     size?: "sm" | "md" | "lg";
     onClose?: () => void;
@@ -17,7 +17,6 @@ interface ModalProps extends OverlayProps {
 const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = "sm", hasX = true, ...props }) => {
     const ref = useRef<HTMLDivElement>(null);
 
-    // const { overlayProps, underlayProps } = useOverlay(props, ref);
     usePreventScroll();
     // Setup the modal with useOverlay for accessibility
     const { overlayProps, underlayProps } = useOverlay(
@@ -31,17 +30,12 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
 
     return (
         <OverlayContainer>
-            <div
-                {...underlayProps}
-                className="group fixed inset-0 flex items-center justify-center z-50 backdrop-blur"
-                data-has-x={hasX ? "true" : "false"}
-            >
+            <div className="group fixed inset-0 flex items-center justify-center z-40 backdrop-blur" data-has-x={hasX ? "true" : "false"}>
                 <div
+                    data-has-x={hasX ? "true" : "false"}
                     {...overlayProps}
-                    // {...dialogProps}
-                    // {...modalProps}
                     ref={ref}
-                    className={cn("bg-default rounded-lg w-full h-full md:h-auto focus-visible:ring-offset-0p focus-visible:outline-nonep relative", {
+                    className={cn("bg-default rounded-lg w-full h-full md:h-auto relative z-50", {
                         "max-w-lg": size == "sm",
                         "max-w-2xl": size == "md",
                         "max-w-5xl": size == "lg",

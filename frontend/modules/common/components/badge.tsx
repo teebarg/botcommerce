@@ -20,6 +20,7 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
         warning: "bg-warning text-warning-foreground",
         success: "bg-success text-success-foreground",
     };
+
     return (
         <React.Fragment>
             <div className="relative inline-flex shrink-0">
@@ -32,7 +33,7 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
                             "w-12 h-12": size == "md",
                             "w-14 h-14": size == "lg",
                         },
-                        cssClass[color],
+                        cssClass[color]
                     )}
                 >
                     {children}
@@ -49,7 +50,7 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
                             "top-[5%] left-[5%] -translate-x-1/2 -translate-y-1/2": placement == "top-left",
                             "bottom-[5%] left-[5%] -translate-x-1/2 translate-y-1/2": placement == "bottom-left",
                         },
-                        cssClass[color],
+                        cssClass[color]
                     )}
                 >
                     {content}

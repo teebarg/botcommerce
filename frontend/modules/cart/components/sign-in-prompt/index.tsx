@@ -1,4 +1,3 @@
-import Button from "@modules/common/components/button";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 const SignInPrompt = () => {
@@ -10,9 +9,9 @@ const SignInPrompt = () => {
             </div>
             <div>
                 <LocalizedClientLink
+                    className="relative inline-flex items-center justify-center outline-none py-2 rounded-small bg-transparent border border-secondary-500 text-secondary-900 min-w-28"
                     data-testid="sign-in-button"
                     href="/account"
-                    className="relative inline-flex items-center justify-center outline-none py-2 rounded-small bg-transparent border border-secondary-500 text-secondary-900 min-w-28"
                 >
                     Sign in
                 </LocalizedClientLink>

@@ -1,4 +1,4 @@
-import { searchProducts } from "@lib/data";
+import { search } from "@lib/data";
 import { Product } from "types/global";
 
 import { ProductCard } from "../product-card";
@@ -23,7 +23,7 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
     };
 
     const queryParams = setQueryParams();
-    const { products } = await searchProducts(queryParams);
+    const { products } = await search(queryParams);
     const productPreviews = products.filter((item: Product) => item.id !== product.id);
 
     if (!productPreviews.length) {

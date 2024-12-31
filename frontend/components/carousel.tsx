@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowRight } from "nui-react-icons";
 import Image from "next/image";
+
 import { cn } from "@/lib/util/cn";
 
 interface Banner {

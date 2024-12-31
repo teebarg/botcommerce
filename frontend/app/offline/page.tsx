@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { RefreshCcw } from "nui-react-icons";
+
 import { cn } from "@/lib/util/cn";
 
 const OfflinePage = () => {

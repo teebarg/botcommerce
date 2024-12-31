@@ -1,5 +1,6 @@
-import { searchProducts } from "@lib/data";
+import { search } from "@lib/data";
 import { Product, SearchParams } from "types/global";
+
 import { ProductCard } from "./product-card";
 
 type RecommendedProductsProps = {
@@ -13,7 +14,7 @@ export default async function RecommendedProducts({ exclude = [] }: RecommendedP
         sort: "created_at:desc",
     };
 
-    const { products } = await searchProducts(queryParams);
+    const { products } = await search(queryParams);
 
     if (!products.length) {
         return null;

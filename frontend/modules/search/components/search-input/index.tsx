@@ -1,15 +1,13 @@
 import { XMarkMini } from "nui-react-icons";
 import { ChangeEvent, FormEvent, useRef } from "react";
 
-// import SearchBoxWrapper, { ControlledSearchBoxProps } from "../search-box-wrapper";
-
 interface ControlledSearchBoxProps {
     onChange(event: ChangeEvent): void;
     onReset?(event: FormEvent): void;
     onSubmit?(event: FormEvent): void;
     placeholder?: string;
     value?: string;
-};
+}
 
 const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props }: ControlledSearchBoxProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -34,6 +32,7 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
 
         if (inputRef.current) {
             inputRef.current.focus();
+            inputRef.current.value = "";
         }
     };
 

@@ -2,6 +2,7 @@ import { ChevronRight } from "nui-react-icons";
 import React from "react";
 
 import SkeletonProductPreview from "../skeletons/components/skeleton-product-preview";
+
 import { Skeleton } from "@/components/skeleton";
 
 const CollectionTemplateSkeleton = () => {

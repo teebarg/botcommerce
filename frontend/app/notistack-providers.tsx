@@ -3,10 +3,16 @@
 import React from "react";
 import { SnackbarProvider } from "notistack";
 
-export function NotificationProviders({ children }: { children: React.ReactNode }) {
+interface Props {
+    children: React.ReactNode;
+}
+
+const NotificationProviders: React.FC<Props> = ({ children }) => {
     return (
         <SnackbarProvider anchorOrigin={{ horizontal: "right", vertical: "top" }} maxSnack={5}>
             {children}
         </SnackbarProvider>
     );
-}
+};
+
+export default NotificationProviders;

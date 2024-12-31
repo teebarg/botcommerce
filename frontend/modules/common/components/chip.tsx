@@ -18,6 +18,7 @@ const Chip: React.FC<Props> = ({ title, className = "", color = "primary", size 
         warning: "bg-warning text-warning-foreground",
         success: "bg-success text-success-foreground",
     };
+
     return (
         <React.Fragment>
             <div

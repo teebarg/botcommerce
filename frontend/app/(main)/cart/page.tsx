@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { getCustomer } from "@lib/data";
+import { Shield } from "nui-react-icons";
 import { retrieveCart } from "@modules/cart/actions";
 import SignInPrompt from "@modules/cart/components/sign-in-prompt";
 import ItemsTemplate from "@modules/cart/templates/items";
@@ -8,7 +9,6 @@ import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 import RecommendedProducts from "@/modules/products/components/recommended";
-import { Shield } from "nui-react-icons";
 import { CartItem } from "@/types/global";
 
 export const metadata: Metadata = {

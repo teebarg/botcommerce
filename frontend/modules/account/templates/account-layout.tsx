@@ -3,6 +3,7 @@ import UnderlineLink from "@modules/common/components/interactive-link";
 import { Customer } from "types/global";
 
 import AccountNav from "../components/account-nav";
+
 import RecommendedProducts from "@/modules/products/components/recommended";
 
 interface AccountLayoutProps {

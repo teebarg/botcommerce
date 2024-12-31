@@ -7,7 +7,7 @@ import { Banner } from "@modules/common/components/banner";
 import { Cookie } from "@modules/store/components/cookie";
 import ChatBot from "@components/chatbot";
 
-import Search from "@/modules/search/templates/search";
+import Search from "@/modules/search/components/search";
 import { ButtonNav } from "@/components/bottom-navbar";
 import { BackButton } from "@/components/back";
 

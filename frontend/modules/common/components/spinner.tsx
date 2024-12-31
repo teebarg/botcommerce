@@ -16,6 +16,7 @@ const Spinner: React.FC<Props> = ({ color = "default", size = "sm" }) => {
         warning: "border-b-warning",
         success: "border-b-success",
     };
+
     return (
         <React.Fragment>
             <div aria-label="Loading" className="relative inline-flex flex-col gap-2 items-center justify-center">

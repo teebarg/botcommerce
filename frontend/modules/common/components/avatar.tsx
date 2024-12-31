@@ -21,6 +21,7 @@ const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, col
         warning: "ring-warning",
         success: "ring-success",
     };
+
     return (
         <React.Fragment>
             <span
