@@ -153,9 +153,15 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
-    search_results = await service.search_products(
-        query=params.query, filters=search_params
-    )
+    try:
+        search_results = await service.search_products(
+            query=params.query, filters=search_params
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching products: {str(e)}"
+        )
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)

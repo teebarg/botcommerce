@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from typing import Annotated, Any
 
@@ -32,6 +33,22 @@ from services.export import export, process_file, validate_file
 # Create a router for categories
 router = APIRouter()
 
+# Custom JSON encoder for datetime
+def custom_serializer(obj: Any) -> str:
+    if isinstance(obj, datetime):
+        return obj.isoformat()  # Serialize datetime as ISO 8601 string
+    raise TypeError("Type not serializable")
+
+# Custom JSON decoder for datetime
+def custom_deserializer(obj: dict) -> dict:
+    for key, value in obj.items():
+        if isinstance(value, str) and "T" in value:  # ISO 8601 detection
+            try:
+                obj[key] = datetime.fromisoformat(value)
+            except ValueError:
+                pass
+    return obj
+
 
 class Categories(SQLModel):
     categories: list[CategoryPublic]
@@ -57,7 +74,7 @@ def index(
     # Try to get from cache first
     cached_data = redis.get(cache_key)
     if cached_data:
-        return Categories(**json.loads(cached_data))
+        return Categories(**json.loads(cached_data, object_hook=custom_deserializer))
 
     query = {"name": name}
     filters = crud.category.build_query(query)
@@ -85,7 +102,7 @@ def index(
     )
 
     # Cache the result
-    redis.set(cache_key, result.model_dump_json())
+    redis.set(cache_key, json.dumps(result.model_dump(), default=custom_serializer))
 
     return result
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { Product, WishlistItem } from "types/global";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Suspense } from "react";
@@ -9,11 +11,11 @@ import { ProductWishList } from "../product-card/product-wishlist";
 
 interface ComponentProps {
     product: Product;
-    wishlist: WishlistItem[];
+    wishlist?: WishlistItem[];
     showWishlist?: boolean;
 }
 
-const ProductCard: React.FC<ComponentProps> = async ({ product, wishlist, showWishlist = false }) => {
+const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWishlist = false }) => {
     const inWishlist = !!wishlist?.find((wishlist) => wishlist.product_id === product.id);
 
     return (
