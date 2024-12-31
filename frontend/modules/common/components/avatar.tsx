@@ -1,5 +1,7 @@
 import React from "react";
-import clsx from "clsx";
+import Image from "next/image";
+
+import { cn } from "@/lib/util/cn";
 
 interface AvatarProps {
     src: string;
@@ -11,12 +13,22 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, color = "primary", size = "sm", radius = "full" }) => {
+    const cssClass = {
+        default: "ring-default",
+        primary: "ring-primary",
+        secondary: "ring-secondary",
+        danger: "ring-danger",
+        warning: "ring-warning",
+        success: "ring-success",
+    };
+
     return (
         <React.Fragment>
             <span
-                className={clsx(
+                className={cn(
                     "flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none",
-                    `ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-${color}`,
+                    "ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark",
+                    cssClass[color],
                     className,
                     {
                         "w-8 h-8": size === "sm",
@@ -30,7 +42,7 @@ const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, col
                     }
                 )}
             >
-                <img alt="avatar" className="flex object-cover w-full h-full" src={src} />
+                <Image fill alt="avatar" className="flex object-cover w-full h-full" src={src} />
             </span>
         </React.Fragment>
     );

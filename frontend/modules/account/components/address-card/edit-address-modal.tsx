@@ -5,7 +5,6 @@ import { PencilSquare as Edit, Spinner, Trash } from "nui-react-icons";
 import { Modal } from "@modules/common/components/modal";
 import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@modules/account/actions";
 import { useFormState } from "react-dom";
-import clsx from "clsx";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import Button from "@modules/common/components/button";
@@ -14,6 +13,8 @@ import { useOverlayTriggerState } from "react-stately";
 import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
+
+import { cn } from "@/lib/util/cn";
 
 type EditAddressProps = {
     address: Address;
@@ -52,7 +53,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
     return (
         <React.Fragment>
             <div
-                className={clsx("border rounded-lg p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors", {
+                className={cn("border rounded-lg p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors", {
                     "border-gray-900": isActive,
                 })}
                 data-testid="address-container"
@@ -84,7 +85,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                 </div>
             </div>
             {modalState.isOpen && (
-                <Modal data-testid="edit-address-modal" onClose={modalState.close}>
+                <Modal data-testid="edit-address-modal" onClose={modalState.close} isOpen={modalState.isOpen}>
                     <div className="p-8">
                         <h3 className="mb-2">Edit address</h3>
                         <form action={formAction}>

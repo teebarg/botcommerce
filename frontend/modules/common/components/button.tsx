@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import clsx from "clsx";
 import { AriaButtonProps, useButton } from "@react-aria/button";
 import { useRef } from "react";
+
+import { cn } from "@/lib/util/cn";
 
 const buttonConfig: any = {
     primary: {
@@ -58,7 +59,7 @@ interface Props extends AriaButtonProps {
 const Button: React.FC<Props> = ({
     color = "default",
     variant = "solid",
-    size = "md",
+    size = "sm",
     className,
     style,
     isLoading = false,
@@ -75,7 +76,7 @@ const Button: React.FC<Props> = ({
             <button
                 {...buttonProps}
                 ref={ref}
-                className={clsx(
+                className={cn(
                     "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
                     "font-normal overflow-hidden outline-none transition-transform-colors-opacity motion-reduce:transition-none",
                     buttonConfig[size],

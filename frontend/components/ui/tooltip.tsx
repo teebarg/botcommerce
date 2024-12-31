@@ -17,6 +17,15 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children, color = "default",
     const targetRef = useRef<HTMLDivElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout>();
 
+    const cssClass = {
+        default: "bg-default",
+        primary: "bg-primary",
+        secondary: "bg-secondary",
+        danger: "bg-danger",
+        warning: "bg-warning",
+        success: "bg-success",
+    };
+
     const calculatePosition = () => {
         if (!targetRef.current || !tooltipRef.current) return;
 
@@ -84,7 +93,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children, color = "default",
                     className={cn(
                         "px-3 py-2 text-sm font-medium rounded-md shadow-md text-default-foreground max-w-sm",
                         "animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
-                        `bg-${color}`,
+                        cssClass[color],
                         className
                     )}
                     role="tooltip"

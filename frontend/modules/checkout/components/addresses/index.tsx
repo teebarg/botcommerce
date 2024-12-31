@@ -1,14 +1,13 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { CheckCircleSolid, Spinner } from "nui-react-icons";
+import { CheckCircleSolid } from "nui-react-icons";
 import { useFormState } from "react-dom";
 import compareAddresses from "@lib/util/compare-addresses";
 import { FormButton } from "@modules/common/components/form-button";
 import { useState } from "react";
 import { Cart } from "types/global";
 
-import BillingAddress from "../billing_address";
 import ShippingAddress from "../shipping-address";
 import { setAddresses } from "../../actions";
 import ErrorMessage from "../error-message";
@@ -58,14 +57,14 @@ const Addresses = ({
                             customer={customer}
                             onChange={() => setSameAsSBilling(!sameAsSBilling)}
                         />
-                        <input readOnly checked={sameAsSBilling} className="hidden" name="same_as_billing" type="checkbox" />
-                        {!sameAsSBilling && (
+                        <input readOnly checked={true} className="hidden" name="same_as_billing" type="checkbox" />
+                        {/* {!sameAsSBilling && (
                             <div>
                                 <h2 className="text-2xl gap-x-4 pb-6 pt-8">Billing address</h2>
 
                                 <BillingAddress cart={cart} />
                             </div>
-                        )}
+                        )} */}
                         <FormButton className="mt-6" data-testid="submit-address-button">
                             Continue to delivery
                         </FormButton>
@@ -75,11 +74,11 @@ const Addresses = ({
             ) : (
                 <div>
                     <div className="text-sm">
-                        {cart && cart.shipping_address ? (
+                        {cart?.shipping_address?.address_1 ? (
                             <div className="flex items-start gap-x-8">
                                 <div className="flex items-start flex-wrap gap-x-1 w-full text-base space-y-4 md:space-y-0">
-                                    <div className="flex flex-col w-full md:w-1/3" data-testid="shipping-address-summary">
-                                        <p className="font-medium mb-1">Shipping Address</p>
+                                    <div className="flex flex-col w-full md:w-1/3 text-xs md:text-base" data-testid="shipping-address-summary">
+                                        <p className="font-medium mb-1 text-base">Shipping Address</p>
                                         <p className="font-normal text-default-500">
                                             {cart.shipping_address.first_name} {cart.shipping_address.last_name}
                                         </p>
@@ -91,13 +90,13 @@ const Addresses = ({
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-col w-full md:w-1/3" data-testid="shipping-contact-summary">
-                                        <p className="font-medium mb-1">Contact</p>
+                                    <div className="flex flex-col w-full md:w-1/3 text-xs md:text-base" data-testid="shipping-contact-summary">
+                                        <p className="font-medium mb-1 text-base">Contact</p>
                                         <p className="font-normal text-default-500">{cart.shipping_address.phone}</p>
                                         <p className="font-normal text-default-500">{cart.email}</p>
                                     </div>
 
-                                    <div className="flex flex-col w-full md:w-1/3" data-testid="billing-address-summary">
+                                    {/* <div className="flex flex-col w-full md:w-1/3" data-testid="billing-address-summary">
                                         <p className="font-medium mb-1">Billing Address</p>
 
                                         {sameAsSBilling ? (
@@ -115,18 +114,18 @@ const Addresses = ({
                                                 </p>
                                             </>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         ) : (
                             <div>
-                                <Spinner />
+                                <p className="text-warning-900">Add Address</p>
                             </div>
                         )}
                     </div>
                 </div>
             )}
-            <hr className="tb-divider mt-8" />
+            <hr className="border-t-2 border-dashed border-[#C0A080] w-full mt-4" />
         </div>
     );
 };

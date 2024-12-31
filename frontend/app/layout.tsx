@@ -1,16 +1,18 @@
 import { Viewport } from "next";
-import "styles/globals.css";
+import "public/globals.css";
 import { Lexend, Outfit } from "next/font/google";
-import clsx from "clsx";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { getCustomer } from "@lib/data";
+import dynamic from "next/dynamic";
 
-import { NotificationProviders } from "./notistack-providers";
 import OverlayClientProvider from "./overlay-providers";
 import Google from "./google";
 
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
+import { cn } from "@/lib/util/cn";
+
+const NotificationProviders = dynamic(() => import("./notistack-providers"), { ssr: false });
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -52,7 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     const customer = await getCustomer().catch(() => null);
 
     return (
-        <html suppressHydrationWarning className={clsx("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">
+        <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">
             <head>
                 <ThemeScript />
                 <link href="/favicon-96x96.png" rel="icon" sizes="96x96" type="image/png" />
@@ -65,9 +67,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <body className="min-h-screen bg-background">
                 <NotificationProviders>
                     <OverlayClientProvider>
-                        <PushNotificationManager />
-                        <InstallPrompt />
-                        <div className="relative flex flex-col min-h-screen">{children}</div>
+                        <div className="relative flex flex-col min-h-screen">
+                            <PushNotificationManager />
+                            <InstallPrompt />
+                            {children}
+                        </div>
                         {!customer && <Google />}
                     </OverlayClientProvider>
                 </NotificationProviders>

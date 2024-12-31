@@ -1,10 +1,10 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
-import { siteConfig } from "@lib/config";
 import ActivityTray from "@modules/common/components/activity-tray";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
+import { HomeIcon } from "nui-react-icons";
 
 const AdminNavbar = async () => {
     const customer = await getCustomer().catch(() => null);
@@ -44,11 +44,12 @@ const AdminNavbar = async () => {
             </NavbarContent>
             <NavbarMenu>
                 <div className="mx-4 mt-2 flex flex-col gap-2">
-                    {siteConfig.navItems.map((item: any, index: number) => (
-                        <NavbarItem key={`${item}-${index}`}>
-                            <LocalizedClientLink href={item.href}>{item.label}</LocalizedClientLink>
-                        </NavbarItem>
-                    ))}
+                    <NavbarItem className="flex items-center gap-2">
+                        <HomeIcon className="h-8 w-8" />
+                        <LocalizedClientLink className="" href="/">
+                            Home
+                        </LocalizedClientLink>
+                    </NavbarItem>
                 </div>
             </NavbarMenu>
         </NavigationBar>

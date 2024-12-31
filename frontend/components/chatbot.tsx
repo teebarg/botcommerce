@@ -218,7 +218,7 @@ const ChatBot: React.FC<Props> = () => {
                 aria-disabled="false"
                 aria-hidden="true"
                 aria-label="Open chat with Max - Unread messages: 1"
-                className="outline-none fixed h-14 w-14 cursor-pointer right-4 bottom-4 border-none rounded-[50%] group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
+                className="outline-none fixed h-14 w-14 cursor-pointer right-8 bottom-20 md:bottom-12 border-none rounded-[50%] group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
                 data-open={isOpen ? "true" : "false"}
                 onClick={toggleChat}
             >

@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { getCollectionBySlug, getCollectionsList } from "@lib/data";
 import { CollectionTemplate } from "@modules/collections/templates";
 import { Collection, SortOptions } from "types/global";
+import React, { Suspense } from "react";
+
+import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 
 type Props = {
     params: { slug: string };
@@ -49,5 +52,9 @@ export default async function CollectionPage({ params, searchParams }: Props) {
         notFound();
     }
 
-    return <CollectionTemplate collection={collection} page={page} searchParams={searchParams} sortBy={sortBy} />;
+    return (
+        <Suspense fallback={<CollectionTemplateSkeleton />}>
+            <CollectionTemplate collection={collection} page={page} searchParams={searchParams} sortBy={sortBy} />
+        </Suspense>
+    );
 }

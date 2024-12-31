@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Category } from "types/global";
 import { deleteCategory } from "@modules/admin/actions";
 import { EllipsisHorizontal, PencilSquare, Plus, Trash } from "nui-react-icons";
-import clsx from "clsx";
 import Dropdown from "@modules/common/components/dropdown";
 import { useOverlayTriggerState } from "react-stately";
 import { SlideOver } from "@modules/common/components/slideover";
@@ -14,6 +13,8 @@ import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 
 import { CategoryForm } from "./category-form";
+
+import { cn } from "@/lib/util/cn";
 
 interface Props {
     canAdd?: boolean;
@@ -71,7 +72,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                             </div>
                             <div>
                                 <button
-                                    className={clsx("flex w-full items-center text-rose-500", {
+                                    className={cn("flex w-full items-center text-rose-500", {
                                         "pointer-events-none select-none opacity-50": category?.children.length > 0,
                                     })}
                                     disabled={category?.children.length > 0}
@@ -106,7 +107,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                 </SlideOver>
             )}
             {deleteModalState.isOpen && (
-                <Modal onClose={deleteModalState.close}>
+                <Modal onClose={deleteModalState.close} isOpen={deleteModalState.isOpen}>
                     <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
                 </Modal>
             )}

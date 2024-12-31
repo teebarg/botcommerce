@@ -1,7 +1,8 @@
 import Image from "next/image";
 import React from "react";
-import clsx from "clsx";
 import PlaceholderImage from "@modules/common/icons/placeholder-image";
+
+import { cn } from "@/lib/util/cn";
 
 type ThumbnailProps = {
     thumbnail?: string | null;
@@ -17,7 +18,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ thumbnail, images, size = "small"
 
     return (
         <div
-            className={clsx(
+            className={cn(
                 "relative w-full overflow-hidden p-4 bg-default-100 shadow-elevation-card-rest rounded-md transition-shadow ease-in-out duration-150",
                 className,
                 {

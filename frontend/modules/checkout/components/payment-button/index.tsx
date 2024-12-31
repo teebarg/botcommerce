@@ -75,8 +75,8 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
     };
 
     const handlePayment = () => {
-        setSubmitting(true);
         if (customer) {
+            setSubmitting(true);
             onPaymentCompleted();
 
             return;
@@ -87,14 +87,20 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
 
     return (
         <>
-            <Button data-testid="submit-order-button" isDisabled={notReady} isLoading={submitting} size="lg" onPress={handlePayment}>
+            <Button
+                className="min-w-32"
+                color="danger"
+                data-testid="submit-order-button"
+                isDisabled={notReady}
+                isLoading={submitting}
+                size="sm"
+                onPress={handlePayment}
+            >
                 Place order
             </Button>
             {modalState.isOpen && (
-                <Modal data-testid="login-modal" onClose={modalState.close}>
-                    <React.Fragment>
-                        <CheckoutLoginForm />
-                    </React.Fragment>
+                <Modal data-testid="login-modal" size="sm" title="Login" onClose={modalState.close} isOpen={modalState.isOpen}>
+                    <CheckoutLoginForm />
                 </Modal>
             )}
         </>

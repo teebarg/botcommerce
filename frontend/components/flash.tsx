@@ -68,34 +68,36 @@ const FlashBanner: React.FC = () => {
     }
 
     return (
-        <div className="bg-gradient-to-r from-black/80 to-gray-800 text-white p-6 rounded-2xl shadow-2xl max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                <Tag className="w-12 h-12 text-yellow-400 hidden md:block" />
-                <div>
-                    <h2 className="text-2xl font-bold text-yellow-300">Luxury Flash Sale</h2>
-                    <p className="text-sm text-gray-300">Exclusive 24-Hour Deals</p>
+        <div className="bg-gradient-to-r from-black/80 to-gray-800 ">
+            <div className="text-white px-6 py-4 rounded-2xl shadow-2xl max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between">
+                <div className="flex items-center space-x-2 mb-4 md:mb-0">
+                    <Tag className="w-12 h-12 text-yellow-400 hidden md:block" />
+                    <div>
+                        <h2 className="text-2xl font-bold text-yellow-300">Luxury Flash Sale</h2>
+                        <p className="text-sm text-gray-300">Exclusive 24-Hour Deals</p>
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex items-center space-x-4">
-                <Clock className="w-10 h-10 text-yellow-400" />
-                <div className="flex space-x-2 text-center">
-                    {(["hours", "minutes", "seconds"] as const).map((timeUnit) => (
-                        <div key={timeUnit} className="bg-white/20 p-2 rounded-lg w-16">
-                            <span className="text-2xl font-bold">{timeLeft[timeUnit].toString().padStart(2, "0")}</span>
-                            <p className="text-xs">{timeUnit.charAt(0).toUpperCase() + timeUnit.slice(1)}</p>
-                        </div>
-                    ))}
+                <div className="flex items-center space-x-4">
+                    <Clock className="w-10 h-10 text-yellow-400" />
+                    <div className="flex space-x-2 text-center">
+                        {(["hours", "minutes", "seconds"] as const).map((timeUnit) => (
+                            <div key={timeUnit} suppressHydrationWarning className="bg-white/20 p-2 rounded-lg w-16">
+                                <span className="text-2xl font-bold">{timeLeft[timeUnit].toString().padStart(2, "0")}</span>
+                                <p className="text-xs">{timeUnit.charAt(0).toUpperCase() + timeUnit.slice(1)}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            <LocalizedClientLink
-                className="mt-4 md:mt-0 bg-yellow-400 text-black px-6 py-1.5 rounded-full hover:bg-yellow-500 transition-colors flex items-center space-x-2"
-                href="/collections"
-            >
-                <Cart className="w-5 h-5" />
-                <span>Shop Now</span>
-            </LocalizedClientLink>
+                <LocalizedClientLink
+                    className="mt-4 md:mt-0 bg-yellow-400 text-black px-6 py-1.5 rounded-full hover:bg-yellow-500 transition-colors flex items-center space-x-2"
+                    href="/collections"
+                >
+                    <Cart className="w-5 h-5" />
+                    <span>Shop Now</span>
+                </LocalizedClientLink>
+            </div>
         </div>
     );
 };

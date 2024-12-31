@@ -1,62 +1,48 @@
 import repeat from "@lib/util/repeat";
-import SkeletonCodeForm from "@modules/skeletons/components/skeleton-code-form";
 import SkeletonOrderSummary from "@modules/skeletons/components/skeleton-order-summary";
+
+import { Skeleton } from "@/components/skeleton";
 
 export default function Loading() {
     return (
-        <div className="py-12">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-40">
-                    <div className="flex flex-col bg-content2 p-6 gap-y-6">
-                        <div className="bg-default-100 flex items-start justify-between">
+        <div className="py-6 md:py-12">
+            <div className="max-w-7xl mx-auto px-2 md:px-6">
+                <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-20">
+                    <div className="flex flex-col bg-content1 px-2 py-4 md:p-6 gap-y-6">
+                        <div className="flex items-start justify-between">
                             <div className="flex flex-col gap-y-2">
-                                <div className="w-60 h-8 bg-default-500 animate-pulse" />
-                                <div className="w-48 h-6 bg-default-500 animate-pulse" />
+                                <Skeleton className="w-60 h-8" />
+                                <Skeleton className="w-48 h-6" />
                             </div>
-                            <div>
-                                <div className="w-14 h-8 bg-default-500 animate-pulse" />
-                            </div>
+                            <Skeleton className="w-14 h-8" />
                         </div>
-                        <div>
-                            <div className="pb-3 flex items-center">
-                                <div className="w-20 h-12 bg-default-500 animate-pulse" />
-                            </div>
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-content3">
-                                <thead>
-                                    <tr>
-                                        {[" ", " ", " ", " ", " "].map((column: string, index: number) => (
-                                            <th key={index} className="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-default-500" scope="col">
-                                                {column}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
+                        <div className="hidden md:block">
+                            <Skeleton className="w-20 h-12 mb-8" />
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-content1">
                                 <tbody className="bg-content1">
-                                    {repeat(3).map((_, index: number) => (
+                                    {repeat(4).map((_, index: number) => (
                                         <tr key={index} className="even:bg-content2">
-                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-800 sm:pl-3">
-                                                <div className="flex w-24 h-24 p-4 bg-default-500 rounded-large animate-pulse" />
+                                            <td className="py-2 pl-4 pr-3">
+                                                <Skeleton className="flex w-24 h-24 p-4 rounded-large" />
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                            <td className="px-3">
                                                 <div className="flex flex-col gap-y-2">
-                                                    <div className="w-32 h-4 bg-default-500 animate-pulse" />
-                                                    <div className="w-24 h-4 bg-default-500 animate-pulse" />
+                                                    <Skeleton className="w-32 h-4" />
+                                                    <Skeleton className="w-24 h-4" />
                                                 </div>
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                            <td className="px-3">
                                                 <div className="flex flex-col gap-y-2">
-                                                    <div className="w-32 h-4 bg-default-500 animate-pulse" />
-                                                    <div className="w-24 h-4 bg-default-500 animate-pulse" />
+                                                    <Skeleton className="w-32 h-4" />
+                                                    <Skeleton className="w-24 h-4" />
                                                 </div>
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                                <div className="flex gap-2">
-                                                    <div className="w-12 h-6 bg-default-500 animate-pulse" />
-                                                </div>
+                                            <td className="px-3">
+                                                <Skeleton className="w-12 h-6" />
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                            <td className="px-3">
                                                 <div className="flex gap-2 justify-end">
-                                                    <div className="w-12 h-6 bg-default-500 animate-pulse" />
+                                                    <Skeleton className="w-12 h-6" />
                                                 </div>
                                             </td>
                                         </tr>
@@ -64,10 +50,35 @@ export default function Loading() {
                                 </tbody>
                             </table>
                         </div>
+                        <div className="md:hidden">
+                            <div className="py-0">
+                                <div className="space-y-4">
+                                    {repeat(3).map((_, index: number) => (
+                                        <div key={index} className="flex items-center space-x-4 py-4 border-b-slate-300">
+                                            <Skeleton className="aspect-square w-28 h-28 rounded-medium" />
+                                            <div className="flex-1 space-y-2">
+                                                <Skeleton className="w-3/4 h-4" />
+                                                <Skeleton className="w-1/4 h-4" />
+                                            </div>
+                                            <div className="flex flex-col space-y-2">
+                                                <Skeleton className="w-20 h-4" />
+                                                <Skeleton className="w-12 h-4" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-y-8">
+                    <div className="hidden md:flex flex-col gap-y-8">
                         <SkeletonOrderSummary />
-                        <SkeletonCodeForm />
+                        <div className="w-full flex flex-col">
+                            <Skeleton className="h-7 w-24 mb-4" />
+                            <div className="grid grid-cols-[1fr_80px] gap-x-2">
+                                <Skeleton className="h-12" />
+                                <Skeleton className="h-12" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

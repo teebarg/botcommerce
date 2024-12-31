@@ -4,10 +4,10 @@ import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
-import { ProductCard } from "@modules/products/components/product-card";
 
 import { CollectionsTopBar } from "./topbar";
-import { CollectionsSideBar } from "./sidebar";
+
+import { ProductCard } from "@/modules/products/components/product-card";
 
 interface ComponentProps {
     query?: string;
@@ -52,8 +52,8 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
 
     return (
         <React.Fragment>
-            <div className="w-full px-2 lg:px-24 py-4 mt-4">
-                <nav data-slot="base">
+            <div className="w-full">
+                <nav className="hidden md:block" data-slot="base">
                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                         <li className="flex items-center" data-slot="base">
                             <LocalizedClientLink href="/">Home</LocalizedClientLink>
@@ -74,20 +74,19 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                         )}
                     </ol>
                 </nav>
-                <div className="flex gap-6 mt-6">
-                    <div className="hidden md:block">
-                        <CollectionsSideBar categories={categories} collections={collections} />
-                    </div>
+                <div className="flex gap-6 mt-0 md:mt-6">
                     <div className="w-full flex-1 flex-col">
-                        <CollectionsTopBar
-                            categories={categories}
-                            collections={collections}
-                            count={pagination.total_count}
-                            slug={collection?.slug}
-                            sortBy={sortBy}
-                        />
+                        <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-background">
+                            <CollectionsTopBar
+                                categories={categories}
+                                collections={collections}
+                                count={pagination.total_count}
+                                slug={collection?.slug}
+                                sortBy={sortBy}
+                            />
+                        </div>
                         <main className="mt-4 w-full overflow-visible px-1">
-                            <div className="block rounded-medium border-medium border-dashed border-divider px-2 py-4 min-h-[50vh]">
+                            <div className="block md:rounded-medium md:border-medium border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
                                 {products.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1">
                                         <div className="max-w-md mx-auto text-center">
@@ -104,7 +103,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                     </div>
                                 ) : (
                                     <React.Fragment>
-                                        <div className="grid w-full gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-4">
+                                        <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
                                             {products.map((product: Product, index: number) => (
                                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                             ))}

@@ -1,15 +1,12 @@
 import hashlib
 import json
 from datetime import time, timedelta
-from typing import List
+from typing import List, Optional
 
-from fastapi import FastAPI
 from redis import Redis
 
 from core.config import settings
-from services.meilisearch import search_documents
-
-app = FastAPI()
+from services.meilisearch import get_document_by_id, search_documents
 
 # Initialize clients
 redis_client = Redis(
@@ -83,6 +80,26 @@ class SearchService:
         # Delete all related cache entries
         if search_keys:
             self.redis.delete(*search_keys)
+
+    async def get_product(self, product_id: str) -> Optional[dict]:
+        """Get product from cache, return None if not found"""
+        key = f"product:{product_id}"
+        cached_product = self.redis.get(key)
+
+        if cached_product:
+            return json.loads(cached_product)
+
+        doc = get_document_by_id("products", product_id)
+
+        # Cache the result
+        self.redis.setex(key, CACHE_EXPIRY, json.dumps(doc))
+
+        return doc
+
+    def cache_product(self, product_id: str, product_data: dict):
+        """Cache a product"""
+        key = f"product:{product_id}"
+        self.redis.setex(key, CACHE_EXPIRY, json.dumps(product_data))
 
 
 # Dependencies

@@ -1,3 +1,4 @@
+import json
 from typing import Annotated, Any
 
 from fastapi import (
@@ -40,13 +41,22 @@ router = APIRouter()
 )
 def index(
     db: SessionDep,
+    redis: deps.CacheService,
     name: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
 ) -> Collections:
     """
-    Retrieve collections.
+    Retrieve collections with Redis caching.
     """
+    cache_key = f"collections:list:{name}:{page}:{limit}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return Collections(**json.loads(cached_data))
+
+    # If not in cache, query database
     query = {"name": name}
     filters = crud.collection.build_query(query)
 
@@ -64,13 +74,18 @@ def index(
 
     total_pages = (total_count // limit) + (total_count % limit > 0)
 
-    return Collections(
+    result = Collections(
         collections=collections,
         page=page,
         limit=limit,
         total_pages=total_pages,
         total_count=total_count,
     )
+
+    # Cache the result for 5 minutes
+    redis.set(cache_key, result.model_dump_json())
+
+    return result
 
 
 @router.post("/", response_model=Collection)
@@ -90,13 +105,24 @@ def create(*, db: SessionDep, create_data: CollectionCreate) -> Collection:
 
 
 @router.get("/{id}", response_model=Collection)
-def read(id: int, db: SessionDep) -> Collection:
+def read(id: int, db: SessionDep, redis: deps.CacheService) -> Collection:
     """
-    Get a specific collection by id.
+    Get a specific collection by id with Redis caching.
     """
+    cache_key = f"collection:{id}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return Collection(**json.loads(cached_data))
+
     collection = crud.collection.get(db=db, id=id)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
+
+    # Cache the result for 5 minutes
+    redis.set(cache_key, collection.model_dump_json())
+
     return collection
 
 
@@ -119,11 +145,12 @@ def get_by_slug(slug: str, db: SessionDep) -> Collection:
 def update(
     *,
     db: SessionDep,
+    redis: deps.CacheService,
     id: int,
     update_data: CollectionUpdate,
 ) -> Collection:
     """
-    Update a collection.
+    Update a collection and invalidate cache.
     """
     db_collection = crud.collection.get(db=db, id=id)
     if not db_collection:
@@ -135,6 +162,8 @@ def update(
         db_collection = crud.collection.update(
             db=db, db_obj=db_collection, obj_in=update_data
         )
+        # Invalidate cache
+        redis.delete(f"collection:{id}")
         return db_collection
     except IntegrityError as e:
         logger.error(f"Error updating collection, {e.orig.pgerror}")

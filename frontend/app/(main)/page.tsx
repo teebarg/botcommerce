@@ -5,15 +5,13 @@ import { LocationIcon, Mail } from "nui-react-icons";
 import { openingHours } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
-import { ProductCard } from "@modules/products/components/product-card";
 import { getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import FlashBanner from "@components/flash";
 import BannerCarousel from "@components/carousel";
 
-import { SMProductCard } from "@/modules/products/components/small-product-card";
-import { Button } from "@/components/ui/button";
+import { ProductCard } from "@/modules/products/components/product-card";
 
 export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
@@ -132,9 +130,9 @@ export default async function Home() {
                         </div>
                         <div className="col-span-3">
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                                 {featured?.map((product: Product, index: number) => (
-                                    <SMProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                    <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                                 ))}
                             </div>
                         </div>
@@ -142,13 +140,11 @@ export default async function Home() {
                 </div>
                 <FlashBanner />
                 <div className="bg-default-100">
-                    <div className="max-w-7xl mx-auto relative py-8 min-h-48">
-                        <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner1.avif`)} />
-                        <div className="grid grid-cols-2 md:flex flex-wrap mt-4 sm:mt-0 mx-auto sm:absolute bottom-16 right-4 gap-2 ml-auto z-10 px-4 md:px-0">
-                            {["Boy", "Girl", "Toddler Boy", "Toddler Boy"].map((item: string, index: number) => (
-                                <Button key={index} className="min-w-36" size="md" variant="flat">
-                                    {item}
-                                </Button>
+                    <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
+                        <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
+                            {trending?.map((product: Product, index: number) => (
+                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
@@ -156,37 +152,15 @@ export default async function Home() {
                 <div className="relative h-28">
                     <Image fill alt="banner" src={"/frontend.webp"} />
                 </div>
-                <div className="bg-default-100">
-                    <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
-                        <p className="text-lg uppercase text-primary mb-2 font-semibold">Trending</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            {trending?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-default-100">
-                    <div className="max-w-7xl mx-auto relative py-8 min-h-48">
-                        <img alt="banner" className="h-auto w-full" src={imgSrc(`banners%2Fbanner2.avif`)} />
-                        <div className="grid grid-cols-2 md:flex flex-wrap sm:absolute bottom-16 left-4 gap-2 ml-auto z-10 mt-4 sm:mt-0 px-4 md:px-0">
-                            {["Shorts", "Tops", "Shoes", "Gowns"].map((item: string, index: number) => (
-                                <Button key={index} className="min-w-36" size="md" variant="flat">
-                                    {item}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
                 <div className="bg-default-100 py-16">
                     <div className="max-w-7xl mx-auto px-4">
-                        <p className="text-primary font-medium">New Arrivals</p>
+                        <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
                         <p className="text-default-500">
                             {`We provide a curated selection of children's thrifts, ensuring top quality at unbeatable prices. Discover a variety of
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
-                        <div className="grid sm:grid-cols-4 gap-8 mt-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-8 mt-6">
                             {latest?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}

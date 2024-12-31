@@ -77,10 +77,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                         {label}
                     </label>
                     <div
-                        className={cn(
-                            "inline-flex w-full items-center h-full box-border group-data-[has-label=true]:items-end pb-0.5",
-                            classNames?.["innerWrapper"]
-                        )}
+                        className={cn("inline-flex w-full items-center h-full box-border pb-0.5", classNames?.["innerWrapper"])}
                         data-slot="inner-wrapper"
                     >
                         {startContent}
@@ -88,9 +85,9 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             {...inputProps}
                             ref={ref}
                             className={cn(
-                                "w-full font-normal !outline-none placeholder:text-foreground-500 focus-visible:outline-none",
+                                "w-full font-normal !outline-none placeholder:text-foreground-500 focus-visible:outline-none mt-auto",
                                 "data-[has-start-content=true]:ps-1.5 data-[has-end-content=true]:pe-1.5 file:cursor-pointer file:bg-transparent file:border-0",
-                                "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground bg-background",
+                                "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground",
                                 classNames?.["input"]
                             )}
                             data-filled={Boolean(inputProps.value)}

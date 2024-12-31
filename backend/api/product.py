@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 from io import BytesIO
+import json
 from typing import Annotated, Any
 
 from fastapi import (
@@ -73,6 +74,7 @@ async def export_products(
 
 @router.get("/")
 async def index(
+    service: deps.SearchService,
     search: str = "",
     categories: str = Query(default=""),
     collections: str = Query(default=""),
@@ -105,8 +107,8 @@ async def index(
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
-    search_results = search_documents(
-        index_name="products", query=search, **search_params
+    search_results = await service.search_products(
+        query=search, filters=search_params
     )
 
     total_count = search_results["estimatedTotalHits"]
@@ -124,7 +126,7 @@ async def index(
 @router.post("/search")
 async def search_products(params: ProductSearch, service: deps.SearchService) -> Any:
     """
-    Search products using Meilisearch, sorted by relevance.
+    Search products using Meilisearch with Redis caching, sorted by relevance.
     """
     categories = params.categories
     collections = params.collections
@@ -151,13 +153,15 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
-    search_results = await service.search_products(
-        query=params.query, filters=search_params
-    )
-
-    # search_results = search_documents(
-    #     index_name="products", query=params.query, **search_params
-    # )
+    try:
+        search_results = await service.search_products(
+            query=params.query, filters=search_params
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching products: {str(e)}"
+        )
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
@@ -195,14 +199,25 @@ def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
 
 
 @router.get("/{slug}")
-def read(slug: str, db: SessionDep) -> ProductPublic:
+def read(slug: str, db: SessionDep, redis: deps.CacheService) -> ProductPublic:
     """
-    Get a specific product by slug.
+    Get a specific product by slug with Redis caching.
     """
-    if product := crud.product.get_by_key(db=db, key="slug", value=slug):
-        return product
-    else:
+    cache_key = f"product:{slug}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return Product(**json.loads(cached_data))
+
+    product = crud.product.get_by_key(db=db, key="slug", value=slug)
+    if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    # Cache the result
+    redis.set(cache_key, product.model_dump_json())
+
+    return product
 
 
 @router.patch("/{id}")
@@ -213,6 +228,7 @@ def update(
     product_in: ProductUpdate,
     background_tasks: BackgroundTasks,
     service: deps.SearchService,
+    redis: deps.CacheService,
 ) -> ProductPublic:
     """
     Update a product.
@@ -224,6 +240,8 @@ def update(
             detail="Product not found",
         )
     db_product = crud.product.update(db=db, db_obj=db_product, obj_in=product_in)
+    redis.delete(f"product:{db_product.slug}")
+    redis.delete(f"product:{id}")
 
     try:
         # Define the background task
@@ -242,7 +260,7 @@ def update(
 
 
 @router.delete("/{id}")
-def delete(db: SessionDep, id: int) -> Message:
+def delete(db: SessionDep, id: int, redis: deps.CacheService,) -> Message:
     """
     Delete a product.
     """
@@ -252,6 +270,8 @@ def delete(db: SessionDep, id: int) -> Message:
     crud.product.remove(db=db, id=id)
     try:
         delete_document(index_name="products", document_id=str(id))
+        redis.delete(f"product:{product.slug}")
+        redis.delete(f"product:{id}")
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")

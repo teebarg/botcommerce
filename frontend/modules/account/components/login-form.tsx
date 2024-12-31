@@ -24,7 +24,7 @@ const CheckoutLoginForm: React.FC<Props> = () => {
     });
 
     return (
-        <div>
+        <div className="p-6">
             <h1 className="text-center text-2xl uppercase font-medium mb-1">Sign In</h1>
             <p className="text-center text-base mb-8">Sign in to place your order.</p>
             <form action={formAction} className="w-full">
@@ -32,11 +32,11 @@ const CheckoutLoginForm: React.FC<Props> = () => {
                     <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
                     <Input isRequired data-testid="password-input" label="Password" name="password" type="password" />
                 </div>
-                <FormButton className="w-full mt-6" data-testid="sign-in-button" size="lg">
+                <FormButton className="w-full mt-6" color="primary" data-testid="sign-in-button" size="md">
                     Sign in
                 </FormButton>
             </form>
-            <span className="text-center text-default-900 text-sm mt-6">
+            <span className="text-default-900 text-sm mt-2 block">
                 Not a member?{" "}
                 <LocalizedClientLink className="text-blue-500 underline" data-testid="register-button" href={"/sign-in"}>
                     Join us

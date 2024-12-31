@@ -2,9 +2,21 @@ const broadcast = new BroadcastChannel("sw-messages");
 const CACHE_NAME = "botmerce-cache-v1"; // Increment this value for new versions
 const ASSETS_TO_CACHE = [
     "/", // Root URL
-    // "/index.html",
-    // "/globals.css",
+    "/career-opportunities",
+    "/claim",
+    "/latest-news",
+    "/our-story",
+    "/privacy",
+    "/support",
+    "/terms",
+    "/user-agreement",
+    "/globals.css",
     "/avatar_ai.png",
+    "/bot.svg",
+    "/empty-cart.png",
+    "/frontend.webp",
+    "/promo-banner.webp",
+    "/side-banner.webp",
     "/offline", // A fallback page for offline users
     "/favicon.ico", // Favicon
     // "/_next/static/", // Next.js static files
@@ -42,25 +54,29 @@ self.addEventListener("activate", (event) => {
     );
 });
 
-// Fetch event: Serve assets from cache or fallback to network
-// self.addEventListener("fetch", (event) => {
-//     event.respondWith(
-//         caches.match(event.request).then((response) => {
-//             return (
-//                 response ||
-//                 fetch(event.request).then((networkResponse) => {
-//                     return caches.open(CACHE_NAME).then((cache) => {
-//                         cache.put(event.request, networkResponse.clone());
-
-//                         return networkResponse;
-//                     });
-//                 })
-//             );
-//         })
-//     );
-// });
-
+// Fetch event: Cache dynamic URLs
 self.addEventListener("fetch", (event) => {
+    const url = new URL(event.request.url);
+
+    // Check if the request is for the `_next/image` endpoint
+    if (url.pathname === "/_next/image") {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                return (
+                    cachedResponse ||
+                    fetch(event.request).then((networkResponse) => {
+                        return caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, networkResponse.clone());
+                            return networkResponse;
+                        });
+                    })
+                );
+            })
+        );
+        return;
+    }
+
+    // Default caching strategy for other requests
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             return (
@@ -111,7 +127,6 @@ self.addEventListener("notificationclick", function (event) {
 });
 
 self.addEventListener("message", (event) => {
-    console.log("event broadcast here....!!!!!!", event);
     if (event.data === "SKIP_WAITING") {
         console.log("skip waiting broadcast here....eeeee");
         self.skipWaiting();

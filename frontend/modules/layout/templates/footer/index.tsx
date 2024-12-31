@@ -50,12 +50,12 @@ export default async function Footer() {
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (
-        <footer className="flex w-full flex-col">
-            <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
-                <div className="xl:grid xl:grid-cols-3 xl:gap-8">
+        <footer className="flex w-full flex-col pb-20 md:pb-12">
+            <div className="mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
+                <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="space-y-4 md:pr-8">
                         <div className="flex items-center justify-start">
-                            <span className="text-4xl font-semibold">Botcommerce</span>
+                            <span className="text-3xl font-semibold">Botcommerce</span>
                         </div>
                         <p className="text-small text-default-500">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
@@ -76,75 +76,88 @@ export default async function Footer() {
                             </Link>
                         </div>
                     </div>
-                    <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
-                        <div className="md:grid md:grid-cols-2 md:gap-8">
-                            {collections?.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 col-span-2 mt-8 md:mt-0">
+                        {collections?.length > 0 && (
+                            <div className="hidden md:block">
                                 <div>
-                                    <div>
-                                        <h3 className="text-base font-semibold text-default-500">Collections</h3>
-                                        <ul className="mt-2 space-y-0.5">
-                                            {collections?.slice(0, 6).map((c: any, index: any) => (
-                                                <li key={index}>
-                                                    <LocalizedClientLink
-                                                        className="text-small hover:opacity-80 transition-opacity text-default-500"
-                                                        href={`/collections/${c.slug}`}
-                                                    >
-                                                        {c.name}
-                                                    </LocalizedClientLink>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-                            {categories?.length > 0 && (
-                                <div className="mt-6 md:mt-0">
-                                    <h3 className="text-base font-semibold text-default-500">Categories</h3>
-                                    <ul className="mt-2 space-y-1" data-testid="footer-categories">
-                                        {categories?.map((c: Category) => {
-                                            const children =
-                                                c.children?.map((child: Category) => ({
-                                                    name: child.name,
-                                                    slug: child.slug,
-                                                    id: child.id,
-                                                })) || null;
-
-                                            return (
-                                                <li key={c.id}>
-                                                    <LocalizedClientLink
-                                                        className="text-small hover:opacity-80 transition-opacity text-default-500"
-                                                        data-testid="category-link"
-                                                        href={`/collections?cat_ids=${c.slug}`}
-                                                    >
-                                                        {c.name}
-                                                    </LocalizedClientLink>
-                                                    {children && (
-                                                        <ul className="ml-4">
-                                                            {children?.map((child: Category) => (
-                                                                <li key={child.id}>
-                                                                    <LocalizedClientLink
-                                                                        className="text-small hover:opacity-80 transition-opacity text-default-500"
-                                                                        data-testid="category-link"
-                                                                        href={`/collections?cat_ids=${child.slug}`}
-                                                                    >
-                                                                        {child.name}
-                                                                    </LocalizedClientLink>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    )}
-                                                </li>
-                                            );
-                                        })}
+                                    <h3 className="text-base font-semibold text-default-500">Collections</h3>
+                                    <ul className="mt-2 space-y-0.5">
+                                        {collections?.slice(0, 6).map((c: any, index: any) => (
+                                            <li key={index}>
+                                                <LocalizedClientLink
+                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                                    href={`/collections/${c.slug}`}
+                                                >
+                                                    {c.name}
+                                                </LocalizedClientLink>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
-                            )}
+                            </div>
+                        )}
+                        {categories?.length > 0 && (
+                            <div className="hidden md:block">
+                                <h3 className="text-base font-semibold text-default-500">Categories</h3>
+                                <ul className="mt-2 space-y-1" data-testid="footer-categories">
+                                    {categories?.map((c: Category) => {
+                                        const children =
+                                            c.children?.map((child: Category) => ({
+                                                name: child.name,
+                                                slug: child.slug,
+                                                id: child.id,
+                                            })) || null;
+
+                                        return (
+                                            <li key={c.id}>
+                                                <LocalizedClientLink
+                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                                    data-testid="category-link"
+                                                    href={`/collections?cat_ids=${c.slug}`}
+                                                >
+                                                    {c.name}
+                                                </LocalizedClientLink>
+                                                {children && (
+                                                    <ul className="ml-4">
+                                                        {children?.map((child: Category) => (
+                                                            <li key={child.id}>
+                                                                <LocalizedClientLink
+                                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                                                    data-testid="category-link"
+                                                                    href={`/collections?cat_ids=${child.slug}`}
+                                                                >
+                                                                    {child.name}
+                                                                </LocalizedClientLink>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        )}
+                        <div>
+                            <h3 className="text-base font-semibold text-default-500">About Us</h3>
+                            <ul className="mt-2 space-y-1">
+                                {about.map((item, index) => (
+                                    <li key={index}>
+                                        <LocalizedClientLink
+                                            className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                            href={item.to}
+                                        >
+                                            {item.label}
+                                        </LocalizedClientLink>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                        <div className="md:grid md:grid-cols-2 md:gap-8">
+                        <div className="">
                             <div>
-                                <h3 className="text-base font-semibold text-default-500">About Us</h3>
+                                <h3 className="text-base font-semibold text-default-500">Legal</h3>
                                 <ul className="mt-2 space-y-1">
-                                    {about.map((item, index) => (
+                                    {legal.map((item, index) => (
                                         <li key={index}>
                                             <LocalizedClientLink
                                                 className="text-small hover:opacity-80 transition-opacity text-default-500"
@@ -156,27 +169,10 @@ export default async function Footer() {
                                     ))}
                                 </ul>
                             </div>
-                            <div className="mt-10 md:mt-0">
-                                <div>
-                                    <h3 className="text-base font-semibold text-default-500">Legal</h3>
-                                    <ul className="mt-2 space-y-1">
-                                        {legal.map((item, index) => (
-                                            <li key={index}>
-                                                <LocalizedClientLink
-                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
-                                                    href={item.to}
-                                                >
-                                                    {item.label}
-                                                </LocalizedClientLink>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="my-10 rounded-medium bg-default-100/20 py-4 sm:my-14 sm:py-8 lg:my-16 lg:flex lg:items-center lg:justify-between lg:gap-2">
+                <div className="my-2 md:my-10 bg-default-100/20 py-4 md:flex md:items-center md:justify-between md:gap-2">
                     <div>
                         <h3 className="text-medium font-semibold text-default-500">Subscribe to our newsletter</h3>
                         <p className="mt-2 text-small text-default-500">
@@ -185,7 +181,7 @@ export default async function Footer() {
                     </div>
                     <NewsletterForm />
                 </div>
-                <div className="flex flex-wrap justify-between gap-2 pt-8">
+                <div className="flex flex-wrap justify-between gap-2 md:pt-8">
                     <p className="text-small text-default-500">&copy; {new Date().getFullYear()} Online Kiddies Store. All rights reserved.</p>
                 </div>
             </div>

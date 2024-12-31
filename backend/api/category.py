@@ -1,3 +1,5 @@
+from datetime import datetime
+import json
 from typing import Annotated, Any
 
 from fastapi import (
@@ -31,6 +33,22 @@ from services.export import export, process_file, validate_file
 # Create a router for categories
 router = APIRouter()
 
+# Custom JSON encoder for datetime
+def custom_serializer(obj: Any) -> str:
+    if isinstance(obj, datetime):
+        return obj.isoformat()  # Serialize datetime as ISO 8601 string
+    raise TypeError("Type not serializable")
+
+# Custom JSON decoder for datetime
+def custom_deserializer(obj: dict) -> dict:
+    for key, value in obj.items():
+        if isinstance(value, str) and "T" in value:  # ISO 8601 detection
+            try:
+                obj[key] = datetime.fromisoformat(value)
+            except ValueError:
+                pass
+    return obj
+
 
 class Categories(SQLModel):
     categories: list[CategoryPublic]
@@ -43,13 +61,21 @@ class Categories(SQLModel):
 @router.get("/", dependencies=[])
 def index(
     db: SessionDep,
+    redis: deps.CacheService,
     name: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
 ) -> Categories:
     """
-    Retrieve categories.
+    Retrieve categories with Redis caching.
     """
+    cache_key = f"categories:list:{name}:{page}:{limit}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return Categories(**json.loads(cached_data, object_hook=custom_deserializer))
+
     query = {"name": name}
     filters = crud.category.build_query(query)
 
@@ -67,13 +93,18 @@ def index(
 
     total_pages = (total_count // limit) + (total_count % limit > 0)
 
-    return Categories(
+    result = Categories(
         categories=categories,
         page=page,
         limit=limit,
         total_pages=total_pages,
         total_count=total_count,
     )
+
+    # Cache the result
+    redis.set(cache_key, json.dumps(result.model_dump(), default=custom_serializer))
+
+    return result
 
 
 @router.post("/")
@@ -93,13 +124,24 @@ def create(*, db: SessionDep, create_data: CategoryCreate) -> Category:
 
 
 @router.get("/{id}")
-def read(id: int, db: SessionDep) -> CategoryPublic:
+def read(id: int, db: SessionDep, redis: deps.CacheService) -> CategoryPublic:
     """
-    Get a specific category by id.
+    Get a specific category by id with Redis caching.
     """
+    cache_key = f"category:{id}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return CategoryPublic(**json.loads(cached_data))
+
     category = crud.category.get(db=db, id=id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
+
+    # Cache the result
+    redis.set(cache_key, category.model_dump_json())
+
     return category
 
 
@@ -118,11 +160,12 @@ def get_by_slug(slug: str, db: SessionDep) -> Category:
 def update(
     *,
     db: SessionDep,
+    redis: deps.CacheService,
     id: int,
     update_data: CategoryUpdate,
 ) -> Category:
     """
-    Update a category.
+    Update a category and invalidate cache.
     """
     db_collection = crud.category.get(db=db, id=id)
     if not db_collection:
@@ -134,6 +177,8 @@ def update(
         db_collection = crud.category.update(
             db=db, db_obj=db_collection, obj_in=update_data
         )
+        # Invalidate cache
+        redis.delete(f"category:{id}")
         return db_collection
     except IntegrityError as e:
         logger.error(f"Error updating category, {e.orig.pgerror}")

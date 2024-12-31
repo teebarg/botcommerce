@@ -6,7 +6,8 @@ import { useDialog } from "@react-aria/dialog";
 import { FocusScope } from "@react-aria/focus";
 import { CancelIcon } from "nui-react-icons";
 import { usePathname } from "next/navigation";
-import clsx from "clsx";
+
+import { cn } from "@/lib/util/cn";
 
 type Direction = "left" | "right";
 interface SlideoverProps {
@@ -48,7 +49,7 @@ const SlideOver: React.FC<SlideoverProps> = ({ isOpen, onClose, children, title,
                     {...dialogProps}
                     {...modalProps}
                     ref={ref}
-                    className={clsx(
+                    className={cn(
                         "fixed flex flex-col top-0 w-[90vw] sm:w-[27%] h-screen shadow-lg transform transition-transform duration-300 z-50 py-5 px-2 bg-default-100 focus-visible:outline-none",
                         className,
                         location[direction]

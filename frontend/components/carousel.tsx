@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { ArrowRight } from "nui-react-icons";
+import Image from "next/image";
+
+import { cn } from "@/lib/util/cn";
 
 interface Banner {
     image: string;
@@ -47,9 +50,9 @@ const BannerCarousel: React.FC = () => {
             {banners.map((banner, index) => (
                 <div
                     key={index}
-                    className={`absolute inset-0 transition-opacity duration-1000 ${index === currentBanner ? "opacity-100" : "opacity-0"}`}
+                    className={cn("absolute inset-0 transition-opacity duration-1000", index === currentBanner ? "opacity-100" : "opacity-0")}
                 >
-                    <img alt={banner.title} className="w-full h-full object-cover absolute" src={banner.image} />
+                    <Image fill alt={banner.title} className="w-full h-full object-cover absolute" src={banner.image} />
                     <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                         <div className="text-center text-white max-w-2xl px-4">
                             <h1 className="text-5xl font-bold mb-4">{banner.title}</h1>
@@ -71,8 +74,10 @@ const BannerCarousel: React.FC = () => {
                 {banners.map((_, index) => (
                     <button
                         key={index}
-                        className={`w-3 h-3 rounded-full transition-all
-                            ${index === currentBanner ? "bg-white scale-125" : "bg-white/50 hover:bg-white"}`}
+                        className={cn(
+                            "w-3 h-3 rounded-full transition-all",
+                            index === currentBanner ? "bg-white scale-125" : "bg-white/50 hover:bg-white"
+                        )}
                         onClick={() => setCurrentBanner(index)}
                     />
                 ))}

@@ -4,8 +4,6 @@ import { Input } from "@components/ui/input";
 
 import AddressSelect from "../address-select";
 
-import { Checkbox } from "@/components/ui/checkbox";
-
 const ShippingAddress = ({
     customer,
     cart,
@@ -111,22 +109,21 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.state")}
                 />
             </div>
-            <div className="my-8">
+            {/* <div className="my-8">
                 <Checkbox
                     data-testid="billing-address-checkbox"
                     defaultSelected={checked}
                     label="Billing address same as shipping address"
                     onChange={onChange}
                 />
-            </div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            </div> */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-4">
                 <Input
                     isRequired
                     autoComplete="email"
                     data-testid="shipping-email-input"
                     label="Email"
                     name="email"
-                    placeholder="Enter a valid email address."
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange(e, "email")}

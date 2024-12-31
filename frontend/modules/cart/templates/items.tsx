@@ -19,7 +19,7 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
     return (
         <div>
             <div className="pb-1 flex items-center">
-                <h3 className="text-[2rem] leading-[2.75rem]">Cart</h3>
+                <h3 className="text-2xl">Cart</h3>
             </div>
             <div className="hidden md:block">
                 <Table isDataOnly columns={["Item", "", "Quantity", "Price", "Total"]}>

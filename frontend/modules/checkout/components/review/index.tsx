@@ -1,11 +1,12 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import clsx from "clsx";
 import { siteConfig } from "@lib/config";
 import { Cart, Customer } from "types/global";
 
 import PaymentButton from "../payment-button";
+
+import { cn } from "@/lib/util/cn";
 
 const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">; customer: Customer }) => {
     const searchParams = useSearchParams();
@@ -21,7 +22,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
         <div>
             <div className="flex flex-row items-center justify-between mb-6">
                 <h2
-                    className={clsx("flex flex-row text-3xl-regular gap-x-2 items-baseline", {
+                    className={cn("flex flex-row text-3xl-regular gap-x-2 items-baseline", {
                         "opacity-50 pointer-events-none select-none": !isOpen,
                     })}
                 >

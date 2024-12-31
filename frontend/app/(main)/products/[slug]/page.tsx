@@ -1,9 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@lib/data";
+import { getProductBySlug, search } from "@lib/data";
 import ProductTemplate from "@modules/products/templates";
-import { getDocuments } from "@lib/util/meilisearch";
-import { Product } from "types/global";
+import { Product, SearchParams } from "types/global";
+import { Suspense } from "react";
+
+import SkeletonProductTemplate from "@/modules/products/skeleton-product";
 
 export const revalidate = 2;
 
@@ -12,7 +14,11 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-    const { results: products } = await getDocuments("products");
+    const queryParams: SearchParams = {
+        limit: 100,
+    };
+
+    const { products } = await search(queryParams);
 
     return products.map((product: Product) => ({
         slug: String(product.slug),
@@ -44,5 +50,9 @@ export default async function ProductPage({ params }: Props) {
         notFound();
     }
 
-    return <ProductTemplate product={product} />;
+    return (
+        <Suspense fallback={<SkeletonProductTemplate />}>
+            <ProductTemplate product={product} />
+        </Suspense>
+    );
 }

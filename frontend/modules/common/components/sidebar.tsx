@@ -64,13 +64,16 @@ const SubMenuComponent: React.FC<{
     return (
         <div className="w-full">
             <button
-                className={`
-                    w-full flex items-center justify-between p-4 text-default-500 hover:text-default-500
-                    transition-colors duration-200 group
-                    ${level === 0 ? "pl-4" : `pl-${level * 4 + 4}`}
-                    ${level === 1 ? "hover:bg-content2 bg-content1" : ""}
-                    ${level === 2 ? "hover:bg-content2 bg-content3" : ""}
-                `}
+                className={cn(
+                    "w-full flex items-center justify-between p-4 text-default-500 hover:text-default-500",
+                    "transition-colors duration-200 group",
+                    {
+                        "pl-4": level === 0,
+                        "pl-8 hover:bg-content2 bg-content1": level === 1,
+                        "pl-12 hover:bg-content2 bg-content3": level === 2,
+                        "pl-16 hover:bg-content3 bg-content4": level === 3,
+                    }
+                )}
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div className="flex items-center gap-2">
@@ -93,12 +96,7 @@ const SubMenuComponent: React.FC<{
                 </div>
             </button>
 
-            <div
-                className={`
-                    overflow-hidden transition-all duration-300 ease-in-out
-                    ${isOpen ? "max-h-96" : "max-h-0"}
-                `}
-            >
+            <div className={cn("overflow-hidden transition-all duration-300 ease-in-out", isOpen ? "max-h-96" : "max-h-0")}>
                 <div ref={contentRef}>
                     {item.menuItems.map((subItem, index) =>
                         "subMenu" in subItem ? (
@@ -126,13 +124,12 @@ const MenuItemComponent: React.FC<{
         <MenuLink
             className={cn(
                 "flex items-center justify-between p-4 transition-all duration-200 group",
-                `${item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-500"} ${
-                    level === 0 ? "pl-4" : `pl-${level * 4 + 4}`
-                }`,
+                item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-500",
                 {
-                    "hover:bg-content2 bg-content1": level === 1,
-                    "hover:bg-content2 bg-content3 pl-12": level === 2,
-                    "hover:bg-content3 bg-content4 pl-16": level === 3,
+                    "pl-4": level === 0,
+                    "pl-8 hover:bg-content2 bg-content1": level === 1,
+                    "pl-12 hover:bg-content2 bg-content3": level === 2,
+                    "pl-16 hover:bg-content3 bg-content4": level === 3,
                     "!bg-rose-200 text-rose-800 hover:!text-rose-700": active,
                 }
             )}
@@ -312,14 +309,14 @@ const SideBar: React.FC = () => {
                     Botcommerce
                 </h1>
                 <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200" onClick={() => setIsCollapsed(!isCollapsed)}>
-                    <ChevronRight className={`transform transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} size={20} />
+                    <ChevronRight className={cn("transform transition-transform duration-300", isCollapsed && "rotate-180")} size={20} />
                 </button>
             </div>
 
             <div className="flex-1 overflow-y-auto">
                 {navs.map((nav, index: number) => (
                     <React.Fragment key={index}>
-                        <div className={`px-4 mb-2 transition-opacity duration-200 mt-8 first:mt-0 ${isCollapsed ? "opacity-0" : "opacity-70"}`}>
+                        <div className={cn("px-4 mb-2 transition-opacity duration-200 mt-8 first:mt-0", isCollapsed ? "opacity-0" : "opacity-70")}>
                             <p className="text-xs font-bold text-default-500 uppercase tracking-wider">{nav.group}</p>
                         </div>
 
