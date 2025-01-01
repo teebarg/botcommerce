@@ -1,5 +1,5 @@
 fastapi==0.111.0
-pydantic==2.8.2
+pydantic==2.10.4
 firebase-admin==6.4.0
 passlib==1.7.4
 python-jose==3.3.0
