@@ -1,4 +1,4 @@
-fastapi==0.111.0
+fastapi==0.115.6
 pydantic==2.8.2
 firebase-admin==6.4.0
 passlib==1.7.4
