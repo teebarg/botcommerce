@@ -25,20 +25,13 @@ alembic.ini
 .flake8
 .pre-commit-config.yaml
 
-tox.ini
-mypy.ini
-pyproject.toml
 LICENSE
 .github/
 docker-compose.yml
-Makefile
 Dockerfile
 .docker
 app.log
 frontend/
 img
 scripts
-lb-ssl.yml
-lb.yml
-local-lb.yml
 requirements.dev.txt

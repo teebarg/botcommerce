@@ -5,7 +5,6 @@
 
 PROJECT_SLUG := "botcommerce"
 APP_NAME := $(PROJECT_SLUG)-backend
-PRECOMMIT_CONFIG_PATH = "./dev_config/python/.pre-commit-config.yaml"
 DOCKER_HUB := beafdocker
 
 # Help target
@@ -68,21 +67,23 @@ test: ## Run project tests
 
 prep: ## Prepare postges database
 	@echo "$(YELLOW)Preparing database...$(RESET)"
-	@cd backend && ./prestart.sh
+	@cd backend && scripts/prestart.sh
 
 prep-docker: ## Prepare postges database
 	@echo "$(YELLOW)Preparing docker database...$(RESET)"
-	docker exec botcommerce-backend ./prestart.sh
+	docker exec botcommerce-backend ./scripts/prestart.sh
 
 serve-backend: ## Serve the backend in terminal
-	@cd backend; python -m uvicorn main:app --host 0.0.0.0 --reload
+	@cd backend; fastapi dev app/main.py --host 0.0.0.0 --reload
 
 serve-frontend: ## Serve the frontend in terminal
 	@cd frontend; npm run dev
 
+sync: ## Sync dependencies
+	@cd backend; uv sync && source .venv/bin/activate
+
 dev: ## Serve the project in terminal
 	@echo "$(YELLOW)Running development in terminal...$(RESET)"
-	pip install -r backend/requirements.dev.txt --require-virtualenv
 	make -j 2 serve-backend serve-frontend
 
 
