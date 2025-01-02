@@ -21,7 +21,7 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
             href: "/account",
             icon: <User className="h-8 w-8" viewBox="0 0 20 20" />,
             label: "Overview",
-            dataTestid: "addresses-link",
+            dataTestid: "overview-link",
         },
         {
             href: "/account/profile",
@@ -54,17 +54,12 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
                         </>
                     </LocalizedClientLink>
                 ) : (
-                    <>
-                        <div className="text-xl mb-4 px-8">Hello {customer?.firstname}</div>
+                    <div className="bg-content2">
                         <div className="text-base">
                             <ul className="flex justify-between px-2">
                                 {navLinks.map((link, index: number) => (
                                     <li key={index}>
-                                        <LocalizedClientLink
-                                            className="py-4 px-8 text-xs font-semibold"
-                                            data-testid={link.dataTestid}
-                                            href={link.href}
-                                        >
+                                        <LocalizedClientLink className="px-8 text-xs font-semibold" data-testid={link.dataTestid} href={link.href}>
                                             <>
                                                 <div className="flex flex-col items-center">
                                                     {link.icon}
@@ -84,7 +79,7 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
                                 </li> */}
                             </ul>
                         </div>
-                    </>
+                    </div>
                 )}
             </div>
             <div className="hidden sm:block" data-testid="account-nav">
@@ -94,26 +89,13 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
                     </div>
                     <div className="text-base">
                         <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
-                            <li>
-                                <AccountNavLink data-testid="overview-link" href="/account" route={route!}>
-                                    Overview
-                                </AccountNavLink>
-                            </li>
-                            <li>
-                                <AccountNavLink data-testid="profile-link" href="/account/profile" route={route!}>
-                                    Profile
-                                </AccountNavLink>
-                            </li>
-                            <li>
-                                <AccountNavLink data-testid="addresses-link" href="/account/addresses" route={route!}>
-                                    Addresses
-                                </AccountNavLink>
-                            </li>
-                            <li>
-                                <AccountNavLink data-testid="orders-link" href="/account/orders" route={route!}>
-                                    Orders
-                                </AccountNavLink>
-                            </li>
+                            {navLinks.map((link, index: number) => (
+                                <li key={`account-${index}`}>
+                                    <AccountNavLink data-testid={link.dataTestid} href={link.href} route={route!}>
+                                        {link.label}
+                                    </AccountNavLink>
+                                </li>
+                            ))}
                             <li className="text-grey-700">
                                 <button data-testid="logout-button" type="button" onClick={handleLogout}>
                                     Log out

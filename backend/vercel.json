@@ -1,17 +1,17 @@
 {
   "version": 2,
   "buildCommand": "pip install -r requirements.txt",
-  "devCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+  "devCommand": "fastapi run app/main.py",
   "builds": [
     {
-      "src": "main.py",
+      "src": "app/main.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "main.py"
+      "dest": "app/main.py"
     }
   ]
 }

@@ -19,7 +19,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({ customer, children }) => 
                     <div className="md:min-w-[15rem]">{customer && <AccountNav customer={customer} />}</div>
                     <div className="md:flex-1">{children}</div>
                 </div>
-                <div className="flex flex-col sm:flex-row items-end justify-between sm:border-t border-gray-300 dark:border-gray-500 py-12 gap-8">
+                <div className="flex flex-col sm:flex-row items-end justify-between sm:border-t border-gray-300 dark:border-gray-500 py-4 md:py-12 gap-8">
                     <div>
                         <h3 className="text-lg font-semibold mb-2">Got questions?</h3>
                         <span className="font-medium">You can find frequently asked questions and answers on our customer service page.</span>

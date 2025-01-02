@@ -40,7 +40,7 @@ export default async function Home() {
     const [trending, latest, featured] = await Promise.all([
         getLandingProducts("trending"),
         getLandingProducts("latest"),
-        getLandingProducts("featured", 8),
+        getLandingProducts("featured", 6),
     ]);
 
     const customer: Customer = await getCustomer().catch(() => null);

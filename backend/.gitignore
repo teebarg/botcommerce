@@ -1,12 +1,17 @@
-*.pyc
 *.pyo
-__pycache__
-.dockerignore
 .docker
-.git
 .env
-cred.json
-app.log
 
 .idea/
+
+__pycache__
+app.egg-info
+*.pyc
+.mypy_cache
+.coverage
+htmlcov
+.cache
+.venv
 .vercel
+
+app.log
