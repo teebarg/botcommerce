@@ -695,7 +695,12 @@ export const getCollectionsList = cache(async function (search: string = "", pag
 
 export const getCollectionBySlug = async (slug: string): Promise<any> => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/slug/${slug}`, { next: { tags: ["collection"] } });
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/slug/${slug}`, {
+            headers: {
+                accept: "application/json",
+            },
+            next: { tags: ["collection"] },
+        });
 
         if (!response.ok) {
             console.log(response.statusText);
