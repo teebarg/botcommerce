@@ -693,11 +693,12 @@ export const getCollectionsList = cache(async function (search: string = "", pag
     }
 });
 
-export const getCollectionBySlug = cache(async function (slug: string): Promise<any> {
+export const getCollectionBySlug = async (slug: string): Promise<any> => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/slug/${slug}`, { next: { tags: ["collection"] } });
 
         if (!response.ok) {
+            console.log(response.statusText);
             throw new Error(response.statusText);
         }
 
@@ -705,7 +706,7 @@ export const getCollectionBySlug = cache(async function (slug: string): Promise<
     } catch (error: any) {
         throw new Error(`Error fetching collection by slug: ${error.statusText}`);
     }
-});
+};
 
 // Category actions
 export const listCategories = cache(async function () {
