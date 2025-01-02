@@ -13,3 +13,5 @@ htmlcov
 .cache
 .venv
 .vercel
+
+app.log

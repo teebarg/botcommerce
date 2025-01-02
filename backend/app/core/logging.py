@@ -1,5 +1,5 @@
 import logging
-import logging.config
+# import logging.config
 
 # Dictionary to configure logging
 LOGGING_CONFIG = {

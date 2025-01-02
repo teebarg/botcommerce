@@ -80,6 +80,7 @@ async def update_user_me(
 
     # Invalidate user cache
     redis.delete(f"user:{current_user.id}:profile")
+    redis.delete(f"user:email:{current_user.email}")
 
     return current_user
 

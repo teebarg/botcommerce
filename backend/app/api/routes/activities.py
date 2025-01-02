@@ -36,8 +36,6 @@ async def get_recent_activities(db: SessionDep, user: CurrentUser, limit: int = 
     activities = crud.activities.get_activity_logs_by_user(
         db=db, user_id=user.id, limit=limit
     )
-    if not activities:
-        raise HTTPException(status_code=404, detail="No activities found")
     return activities
 
 

@@ -88,7 +88,7 @@ function InstallPrompt() {
             </div>
             <div>
                 {isIOS && (
-                    <p>
+                    <p className="text-sm font-semibold text-center mt-1">
                         To install this app on your iOS device, tap the share button
                         <span aria-label="share icon" role="img">
                             {" "}

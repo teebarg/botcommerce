@@ -55,18 +55,19 @@ def get_storage() -> Generator:
 Storage = Annotated[Bucket, Depends(get_storage)]
 
 
-def get_current_user(session: SessionDep, access_token: TokenDep) -> User:
+async def get_current_user(session: SessionDep, access_token: TokenDep) -> User:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
+        logger.debug(token_data)
     except (InvalidTokenError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         ) from None
-    user = crud.user.get_by_email(db=session, email=token_data.sub)
+    user = await crud.user.get_by_email(db=session, email=token_data.sub)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if not user.is_active:
