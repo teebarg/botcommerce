@@ -153,86 +153,39 @@ async def process_products(file_content, content_type: str, user_id: int):
         )
 
 
-# async def create_or_update_products_in_db2(products: List):
-#     try:
-#         with Session(engine) as session:
-#             product_objects = []
-#             for product_data, categories, collections, images in products:
-#                 logger.info(f"Processing product {product_data['name']}")
-
-#                 # Check if product exists
-#                 product = session.exec(
-#                       select(Product).where(Product.id == product_data["id"])
-#                     ).first()
-
-#                 if product:
-#                     for key, value in product_data.items():
-#                         setattr(product, key, value)
-#                     product_objects.append(product)
-#                 else:
-#                     del product_data["id"]
-#                     product = Product(**product_data)
-#                     product_objects.append(product)
-
-#             # Use bulk operations for efficiency
-#             session.bulk_save_objects(product_objects)
-#             session.commit()
-
-#             for product_data, categories, collections, images in products:
-#                 product = session.exec(
-#                   select(Product).where(Product.slug == product_data["slug"])
-#                       ).first()
-#                 await update_categories(
-#                       product=product, categories=categories, session=session
-#                        )
-#                 await update_collections(
-#                       product=product, collections=collections, session=session
-#                        )
-#                 await update_images(product=product, images=images, session=session)
-#                 session.commit()
-#     except SQLAlchemyError as e:
-#         logger.error(f"Error updating product: {str(e)}")
-#         await manager.broadcast(
-#             id="sheet",
-#             data={"message": f"Error processing product: {str(e)}", "status": "error"},
-#             type="sheet-processor",
-#         )
-
-
 async def create_or_update_products_in_db(products: List):
     with Session(engine) as session:
         try:
+            # Collect all slugs first to minimize database queries
+            all_slugs = [p[0]['slug'] for p in products]
+            existing_products = {
+                p.slug: p for p in session.exec(
+                    select(Product).where(Product.slug.in_(all_slugs))
+                ).all()
+            }
+            print(existing_products)
+            
+            products_to_add = []
             for product_data, _categories, _collections, images in products:
-                logger.info(f"Processing product {product_data['name']}")
-                
-                # If ID is provided and exists, update the product
-                if product_data.get('id'):
-                    existing_product = session.get(Product, product_data['id'])
-                    if existing_product:
-                        for key, value in product_data.items():
-                            setattr(existing_product, key, value)
-                        continue
-
-                # If no ID or ID doesn't exist, try to find by slug
-                existing_product = session.exec(
-                    select(Product).where(Product.slug == product_data['slug'])
-                ).first()
-
-                if existing_product:
+                if product_data['slug'] in existing_products:
                     # Update existing product
+                    existing_product = existing_products[product_data['slug']]
                     for key, value in product_data.items():
-                        if key != 'id':  # Don't update the ID
+                        if key != 'id':
                             setattr(existing_product, key, value)
                 else:
-                    # Create new product
+                    # Prepare new product for bulk insert
                     if 'id' in product_data:
-                        del product_data['id']  # Remove ID for new products
-                    new_product = Product(**product_data)
-                    session.add(new_product)
-
+                        del product_data['id']
+                    products_to_add.append(Product(**product_data))
+            
+            # Bulk insert new products
+            if products_to_add:
+                session.add_all(products_to_add)
+                
             session.commit()
-
-            # Update related models
+            
+            # Update related models in bulk
             await update_related_models(products, session)
 
         except SQLAlchemyError as e:
@@ -250,64 +203,71 @@ async def create_or_update_products_in_db(products: List):
 
 
 async def update_related_models(products: List, session: Session):
+    # Collect all slugs
+    product_slugs = [p[0]["slug"] for p in products]
+    
+    # Fetch all products in one query
+    products_map = {
+        p.slug: p for p in session.exec(
+            select(Product).where(Product.slug.in_(product_slugs))
+        ).all()
+    }
+    
+    # Prepare bulk operations
+    categories_to_add = []
+    collections_to_add = []
+    images_to_add = []
+    
+    # Get all existing categories and collections upfront
+    all_categories = {
+        c.slug: c for c in session.exec(select(Category)).all()
+    }
+    all_collections = {
+        c.slug: c for c in session.exec(select(Collection)).all()
+    }
+    
     for product_data, categories, collections, images in products:
-        product = session.execute(
-            select(Product).where(Product.slug == product_data["slug"])
-        ).scalar_one_or_none()
-
-        if product:
-            await update_categories(product, categories, session)
-            await update_collections(product, collections, session)
-            await update_images(product, images, session)
-            session.commit()
-
-
-async def update_categories(product, categories, session: Session):
-    session.exec(
-        delete(ProductCategory).where(ProductCategory.product_id == product.id)
-    )
-
-    if not categories or categories is None or not isinstance(categories, str):
-        return
-
-    for item in categories.split(","):
-        category = session.exec(
-            select(Category).where(Category.slug == item.strip())
-        ).first()
-        if not category:
-            logger.debug(f"Category `{item.strip()}` doesn't exist, skipping...")
+        product = products_map.get(product_data["slug"])
+        if not product:
             continue
-        session.add(ProductCategory(product_id=product.id, category_id=category.id))
-
-
-async def update_collections(product, collections, session: Session):
-    session.exec(
-        delete(ProductCollection).where(ProductCollection.product_id == product.id)
-    )
-
-    if not collections or collections is None or not isinstance(collections, str):
-        return
-
-    for item in collections.split(","):
-        collection = session.exec(
-            select(Collection).where(Collection.slug == item.strip())
-        ).first()
-        if not collection:
-            logger.debug(f"Collection `{item.strip()}` doesn't exist, skipping...")
-            continue
-        session.add(
-            ProductCollection(product_id=product.id, collection_id=collection.id)
-        )
-
-
-async def update_images(product, images, session: Session):
-    session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
-
-    if not images or images is None or not isinstance(images, str):
-        return
-
-    for item in images.split("|"):
-        session.add(ProductImages(product_id=product.id, image=item.strip()))
+            
+        # Delete existing relationships in bulk
+        session.exec(delete(ProductCategory).where(ProductCategory.product_id == product.id))
+        session.exec(delete(ProductCollection).where(ProductCollection.product_id == product.id))
+        session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
+        
+        # Prepare new relationships for bulk insert
+        if categories and isinstance(categories, str):
+            for cat_slug in categories.split(","):
+                cat_slug = cat_slug.strip()
+                if category := all_categories.get(cat_slug):
+                    categories_to_add.append(
+                        ProductCategory(product_id=product.id, category_id=category.id)
+                    )
+                    
+        if collections and isinstance(collections, str):
+            for coll_slug in collections.split(","):
+                coll_slug = coll_slug.strip()
+                if collection := all_collections.get(coll_slug):
+                    collections_to_add.append(
+                        ProductCollection(product_id=product.id, collection_id=collection.id)
+                    )
+                    
+        if images and isinstance(images, str):
+            for image in images.split("|"):
+                images_to_add.append(
+                    ProductImages(product_id=product.id, image=image.strip())
+                )
+    
+    # Bulk insert all relationships
+    if categories_to_add:
+        session.add_all(categories_to_add)
+    if collections_to_add:
+        session.add_all(collections_to_add)
+    if images_to_add:
+        session.add_all(images_to_add)
+        
+    session.commit()
 
 
 async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int):

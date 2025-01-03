@@ -43,7 +43,7 @@ stopTest:
 # Utilities
 lint-backend: ## Format backend code
 	@echo "$(YELLOW)Running linters for backend...$(RESET)"
-	@cd backend && make format
+	@cd backend && ./scripts/lint.sh
 
 lint-frontend: ## Format frontend code
 	@echo "$(YELLOW)Running linters for frontend...$(RESET)"
@@ -59,7 +59,7 @@ test-frontend: ## Run frontend tests
 
 test-backend: ## Run backend tests
 	@echo "$(YELLOW)Running backend tests...$(RESET)"
-	docker exec botcommerce-backend ./test.sh
+	@cd backend && ./scripts/test.sh
 
 test: ## Run project tests
 	@$(MAKE) -s test-frontend
@@ -67,7 +67,7 @@ test: ## Run project tests
 
 prep: ## Prepare postges database
 	@echo "$(YELLOW)Preparing database...$(RESET)"
-	@cd backend && scripts/prestart.sh
+	@cd backend && ./scripts/prestart.sh
 
 prep-docker: ## Prepare postges database
 	@echo "$(YELLOW)Preparing docker database...$(RESET)"
@@ -102,8 +102,8 @@ pre-commit:
 	--prefix-colors "bgRed.bold.white,bgGreen.bold.white,bgBlue.bold.white,bgMagenta.bold.white" \
     "cd frontend && npm run lint:check" \
     "cd frontend && npm run build" \
-	"cd backend && make format" \
-	"cd backend && make test"
+	"cd backend && ./scripts/lint.sh" \
+	"cd backend && ./scripts/test.sh"
 
 pre-commit-docker:
 	npx concurrently --kill-others-on-fail --prefix "[{name}]" --names "frontend:lint,frontend:test,frontend:build,backend:lint,backend:test" \
@@ -111,5 +111,5 @@ pre-commit-docker:
     "docker exec botcommerce-frontend-1 npm run lint:check" \
     "docker exec botcommerce-frontend-1 npm run test:unit" \
     "docker exec botcommerce-frontend-1 npm run build" \
-	"docker exec botcommerce-backend-1 make format" \
-	"docker exec botcommerce-backend-1 make test"
+	"docker exec botcommerce-backend-1 ./scripts/lint.sh" \
+	"docker exec botcommerce-backend-1 ./scripts/test.sh"

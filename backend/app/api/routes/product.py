@@ -35,7 +35,6 @@ from app.services.meilisearch import (
     delete_document,
     delete_index,
     get_or_create_index,
-    search_documents,
     update_document,
 )
 from app.services.run_sheet import generate_excel_file, process_products
