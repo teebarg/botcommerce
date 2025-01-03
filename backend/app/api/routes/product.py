@@ -283,6 +283,7 @@ async def upload_products(
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
     background_tasks: BackgroundTasks,
+    redis: deps.CacheService,
 ):
     content_type = file.content_type
 
@@ -306,6 +307,13 @@ async def upload_products(
                 file_content=contents, content_type=content_type, user_id=user.id
             )
         )
+
+        # Clear all product-related cache
+        redis.delete_pattern("product:*")
+        redis.delete_pattern("search:*")
+
+        # Re-index
+        index_products(db=db)
 
         crud.activities.create_product_upload_activity(
             db=db, user_id=user.id, filename=file.filename
@@ -369,24 +377,8 @@ async def reindex_products(db: SessionDep, background_tasks: BackgroundTasks):
     This operation is performed asynchronously in the background.
     """
     try:
-        # Define the background task
-        def reindex_task():
-            products = crud.product.all(db=db)
-            logger.info("Starting re-indexing..........")
-
-            # Prepare the documents for Meilisearch
-            documents = []
-            for product in products:
-                product_dict = prepare_product_data_for_indexing(product)
-                documents.append(product_dict)
-
-            # Add all documents to the 'products' index
-            add_documents_to_index(index_name="products", documents=documents)
-
-            logger.info(f"Reindexed {len(documents)} products successfully.")
-
         # Add the task to background tasks
-        background_tasks.add_task(reindex_task)
+        background_tasks.add_task(index_products, db)
 
         return Message(message="Product reindexing started. This may take a while.")
     except Exception as e:
@@ -463,3 +455,24 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["categories"] = [category.name for category in product.categories]
     product_dict["images"] = [image.image for image in product.images]
     return product_dict
+
+def index_products(db: SessionDep):
+    """
+    Re-index all products in the database to Meilisearch.
+    """
+    try:
+        products = crud.product.all(db=db)
+        logger.info("Starting re-indexing..........")
+
+        # Prepare the documents for Meilisearch
+        documents = []
+        for product in products:
+            product_dict = prepare_product_data_for_indexing(product)
+            documents.append(product_dict)
+
+        # Add all documents to the 'products' index
+        add_documents_to_index(index_name="products", documents=documents)
+
+        logger.info(f"Reindexed {len(documents)} products successfully.")
+    except Exception as e:
+        logger.error(f"Error during product reindexing: {e}")

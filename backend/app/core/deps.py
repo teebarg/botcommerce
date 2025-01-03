@@ -61,7 +61,6 @@ async def get_current_user(session: SessionDep, access_token: TokenDep) -> User:
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
-        logger.debug(token_data)
     except (InvalidTokenError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

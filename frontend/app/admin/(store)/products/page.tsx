@@ -18,9 +18,7 @@ export const metadata: Metadata = {
 };
 
 const fetchProducts = async (search = "", page = 1, limit = 10) => {
-    const products = await getProducts(search, undefined, page, limit);
-
-    return products;
+    return await getProducts(search, undefined, page, limit);
 };
 
 export default async function ProductsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {

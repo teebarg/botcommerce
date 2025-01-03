@@ -202,28 +202,33 @@ async def process_products(file_content, content_type: str, user_id: int):
 async def create_or_update_products_in_db(products: List):
     with Session(engine) as session:
         try:
-            product_slugs = [product_data["slug"] for product_data, _, _, _ in products]
-            existing_products = (
-                session.execute(select(Product).where(Product.slug.in_(product_slugs)))
-                .scalars()
-                .all()
-            )
-
-            _existing_slugs = {prod.slug for prod in existing_products}
-
-            for product_data, _categories, _collections, _images in products:
+            for product_data, _categories, _collections, images in products:
                 logger.info(f"Processing product {product_data['name']}")
-                slug = product_data["slug"]
-                product = next(
-                    (prod for prod in existing_products if prod.slug == slug), None
-                )
+                
+                # If ID is provided and exists, update the product
+                if product_data.get('id'):
+                    existing_product = session.get(Product, product_data['id'])
+                    if existing_product:
+                        for key, value in product_data.items():
+                            setattr(existing_product, key, value)
+                        continue
 
-                if product:
+                # If no ID or ID doesn't exist, try to find by slug
+                existing_product = session.exec(
+                    select(Product).where(Product.slug == product_data['slug'])
+                ).first()
+
+                if existing_product:
+                    # Update existing product
                     for key, value in product_data.items():
-                        setattr(product, key, value)
+                        if key != 'id':  # Don't update the ID
+                            setattr(existing_product, key, value)
                 else:
-                    product = Product(**product_data)
-                    session.add(product)
+                    # Create new product
+                    if 'id' in product_data:
+                        del product_data['id']  # Remove ID for new products
+                    new_product = Product(**product_data)
+                    session.add(new_product)
 
             session.commit()
 
