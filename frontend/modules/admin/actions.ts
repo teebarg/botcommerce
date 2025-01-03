@@ -315,7 +315,7 @@ export async function getCollections(page: number = 1, limit: number = 10) {
         });
 
         if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            throw new Error(res.statusText);
         }
 
         return await res.json();

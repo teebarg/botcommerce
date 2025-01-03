@@ -26,7 +26,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r ./backend/requirements.dev.txt
+          pip install -r ./backend/requirements.txt
 
     - name: Run Tests
-      run: cd backend && make test
+      run: cd backend && ./scripts/test.sh

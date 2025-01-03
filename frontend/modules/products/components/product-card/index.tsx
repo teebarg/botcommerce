@@ -22,7 +22,7 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
         <>
             <React.Fragment>
                 <LocalizedClientLink
-                    className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 md:p-2 w-full snap-start"
+                    className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 w-full snap-start"
                     href={`/products/${product.slug}`}
                     id={`${product.id}`}
                 >
