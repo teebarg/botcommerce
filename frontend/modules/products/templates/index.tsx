@@ -23,7 +23,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
 
     return (
         <React.Fragment>
-            <div className="max-w-7xl mx-auto h-full w-full md:px-12 my-8">
+            <div className="max-w-7xl mx-auto h-full w-full my-8">
                 <nav className="hidden md:block" data-slot="base">
                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                         <li className="flex items-center" data-slot="base">

@@ -116,6 +116,35 @@ class CacheService:
             logger.error(f"Error deleting pattern from cache: {str(e)}")
             return False
 
+    def incr(self, key: str) -> int:
+        """
+        Increment the value of a key by 1
+        Args:
+            key: Cache key
+        Returns:
+            int: New value after increment
+        """
+        try:
+            return self.redis.incr(key)
+        except Exception as e:
+            logger.error(f"Error incrementing cache key: {str(e)}")
+            return 0
+
+    def expire(self, key: str, seconds: int) -> bool:
+        """
+        Set expiration time for a key
+        Args:
+            key: Cache key
+            seconds: Time in seconds until expiration
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            return self.redis.expire(key, seconds)
+        except Exception as e:
+            logger.error(f"Error setting expiration: {str(e)}")
+            return False
+
 
 # Dependencies
 async def get_cache_service():

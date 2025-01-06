@@ -41,7 +41,7 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
                                     product={product}
                                     wishlist={showWishlist && <ProductWishList className="relative flex" inWishlist={inWishlist} product={product} />}
                                 />
-                            </Suspense>
+                            </Suspense> 
                         </div>
                     </div>
                 </LocalizedClientLink>

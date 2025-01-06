@@ -83,9 +83,9 @@ class Settings(BaseSettings):
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
     SMTP_PORT: int = 587
-    SMTP_HOST: str | None = None
-    SMTP_USER: str | None = None
-    SMTP_PASSWORD: str | None = None
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_USER: str = "your-email@gmail.com"
+    SMTP_PASSWORD: str = "your-password"
 
     EMAILS_FROM_EMAIL: EmailStr | None = None
     EMAILS_FROM_NAME: str | None = None
@@ -111,6 +111,8 @@ class Settings(BaseSettings):
 
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
+
+    SLACK_WEBHOOK_URL: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

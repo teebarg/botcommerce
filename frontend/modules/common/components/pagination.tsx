@@ -32,8 +32,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
     );
 
     return (
-        <div className="py-2 px-2 flex justify-between items-center mt-4">
-            <div className="w-[30%]" />
+        <div className="p-2 flex justify-between items-center mt-4">
             <nav
                 aria-label="pagination navigation"
                 className="p-2.5 -m-2.5 overflow-x-scroll scrollbar-hide"

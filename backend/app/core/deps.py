@@ -19,6 +19,7 @@ from app.db.engine import engine
 from app.models.generic import Address, Product, User
 from app.models.token import TokenPayload
 from app.services.cache import CacheService, get_cache_service
+from app.services.notification import NotificationService, EmailChannel, SlackChannel
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -120,3 +121,23 @@ AdminUser = Annotated[User, Depends(get_current_active_superuser)]
 
 CacheService = Annotated[CacheService, Depends(get_cache_service)]
 SearchService = Annotated[SearchService, Depends(get_search_service)]
+
+def get_notification_service() -> NotificationService:
+    notification_service = NotificationService()
+    
+    # Configure email channel
+    email_channel = EmailChannel(
+        smtp_host=settings.SMTP_HOST,
+        smtp_port=settings.SMTP_PORT,
+        username=settings.SMTP_USER,
+        password=settings.SMTP_PASSWORD
+    )
+    notification_service.register_channel("email", email_channel)
+    
+    # Configure slack channel
+    slack_channel = SlackChannel(webhook_url=settings.SLACK_WEBHOOK_URL)
+    notification_service.register_channel("slack", slack_channel)
+    
+    return notification_service
+
+Notification = Annotated[NotificationService, Depends(get_notification_service)]
