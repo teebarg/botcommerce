@@ -1,10 +1,10 @@
 import json
 from datetime import datetime
 
-from app.core.deps import Notification
+from app.core.deps import Notification, SessionDep
 from app.core import deps
 from app.core.decorators import limit
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
@@ -17,6 +17,14 @@ from app.core.utils import (
 )
 from app.models.generic import ContactFormCreate, NewsletterCreate
 from app.services.cache import CacheService
+from xml.etree.ElementTree import Element, SubElement, tostring
+# from app.models.product import Product
+# from app.models.category import Category
+# from app.core.deps import (
+#     CurrentUser,
+#     SessionDep,
+# )
+from app.models.generic import Category, Collection, Product
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
 
@@ -73,23 +81,60 @@ async def newsletter(data: NewsletterCreate):
 
 
 @app.post("/api/log-error")
-@limit("2/minute")
+@limit("5/minute")
 async def log_error(error: dict, notification: Notification, redis: deps.CacheService, request: Request):
-    # Add a timestamp to the error
-    error["timestamp"] = datetime.utcnow().isoformat()
-    
     # Send the error to Slack
     slack_message = {
         "text": f"🚨 *Error Logged* 🚨\n"
                 f"*Message:* {error.get('message', 'N/A')}\n"
                 f"*Source:* {error.get('source', 'N/A')}\n"
-                f"*Timestamp:* {error['timestamp']}\n"
+                f"*Timestamp:* {datetime.utcnow().isoformat()}\n"
                 f"*Stack:* {error.get('stack', 'N/A')}"
     }
     notification.send_notification(
         channel_name="slack",
         slack_message=slack_message
     )
+
+
+@app.get("/sitemap.xml", response_class=Response)
+async def generate_sitemap(db: deps.SessionDep, redis: deps.CacheService ):
+    base_url = settings.DOMAIN
+    
+    # Try to get sitemap from cache first
+    cached_sitemap = redis.get("sitemap")
+    if cached_sitemap:
+        return Response(content=cached_sitemap, media_type="application/xml")
+
+    # If not in cache, fetch from database
+    products = db.query(Product).with_entities(Product.slug).all()
+    categories = db.query(Category).with_entities(Category.slug).all()
+
+    urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    
+    # Add the home page
+    home = SubElement(urlset, "url")
+    SubElement(home, "loc").text = f"{base_url}/"
+    SubElement(home, "priority").text = "1.0"
+
+    # Add category pages
+    for category in categories:
+        url = SubElement(urlset, "url")
+        SubElement(url, "loc").text = f"{base_url}/category/{category.slug}"
+        SubElement(url, "priority").text = "0.8"
+
+    # Add product pages
+    for product in products:
+        url = SubElement(urlset, "url")
+        SubElement(url, "loc").text = f"{base_url}/product/{product.slug}"
+        SubElement(url, "priority").text = "0.6"
+
+    sitemap = tostring(urlset, encoding="utf-8", method="xml")
+    
+    # Cache the sitemap for 1 hour (3600 seconds)
+    redis.set("sitemap", sitemap, expire=3600)
+    
+    return Response(content=sitemap, media_type="application/xml")
 
 
 # @app.post("/api/test-notification")
