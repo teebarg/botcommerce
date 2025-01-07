@@ -63,6 +63,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                     {currency(gc.balance)}
                                 </p>
                                 <button
+                                    aria-label="remove gift card"
                                     className="flex items-center gap-x-2 !background-transparent !border-none"
                                     data-testid="remove-gift-card-button"
                                     onClick={() => removeGiftCardCode(gc.code)}
@@ -88,7 +89,12 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                         ({appliedDiscount})
                                     </span>
                                 </p>
-                                <button className="flex items-center" data-testid="remove-discount-button" onClick={removeDiscountCode}>
+                                <button
+                                    aria-label="remove discount"
+                                    className="flex items-center"
+                                    data-testid="remove-discount-button"
+                                    onClick={removeDiscountCode}
+                                >
                                     <Trash size={14} />
                                     <span className="sr-only">Remove discount code from order</span>
                                 </button>
@@ -99,6 +105,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                     <form action={formAction} className="w-full">
                         <span className="flex gap-x-1 my-2 items-center">
                             <button
+                                aria-label="add gift card"
                                 className="text-sm font-medium text-blue-500"
                                 data-testid="add-discount-button"
                                 type="button"

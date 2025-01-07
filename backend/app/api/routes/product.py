@@ -198,7 +198,7 @@ def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
 
 
 @router.get("/{slug}")
-def read(slug: str, db: SessionDep, redis: deps.CacheService) -> ProductPublic:
+async def read(slug: str, db: SessionDep, redis: deps.CacheService) -> ProductPublic:
     """
     Get a specific product by slug with Redis caching.
     """
@@ -207,14 +207,15 @@ def read(slug: str, db: SessionDep, redis: deps.CacheService) -> ProductPublic:
     # Try to get from cache first
     cached_data = redis.get(cache_key)
     if cached_data:
-        return Product(**json.loads(cached_data))
+        return ProductPublic(**json.loads(cached_data))
 
     product = crud.product.get_by_key(db=db, key="slug", value=slug)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
     # Cache the result
-    redis.set(cache_key, product.model_dump_json())
+    product_public = ProductPublic.model_validate(product)
+    redis.set(cache_key, product_public.model_dump_json())
 
     return product
 

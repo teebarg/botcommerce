@@ -29,7 +29,7 @@ const BackButton: React.FC<Props> = ({ size = "sm", color = "default", onClick, 
     };
 
     return (
-        <button className={cn(className)} onClick={handleGoBack}>
+        <button aria-label="back button" className={cn(className)} onClick={handleGoBack}>
             <ArrowLongLeft className="h-6 w-6" viewBox="0 0 15 15" />
         </button>
     );

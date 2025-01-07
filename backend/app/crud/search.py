@@ -6,7 +6,7 @@ from typing import List, Optional
 from redis import Redis
 
 from app.core.config import settings
-from app.services.meilisearch import get_document_by_id, search_documents
+from app.services.meilisearch import get_document_by_attribute, get_document_by_id, search_documents
 
 # Initialize clients
 redis_client = Redis(
@@ -90,6 +90,21 @@ class SearchService:
             return json.loads(cached_product)
 
         doc = get_document_by_id("products", product_id)
+
+        # Cache the result
+        self.redis.setex(key, CACHE_EXPIRY, json.dumps(doc))
+
+        return doc
+
+    async def get_product_by_slug(self, slug: str) -> Optional[dict]:
+        """Get product from cache, return None if not found"""
+        key = f"product:{slug}"
+        cached_product = self.redis.get(key)
+
+        if cached_product:
+            return json.loads(cached_product)
+
+        doc = get_document_by_attribute("products", attribute="slug", value=slug)
 
         # Cache the result
         self.redis.setex(key, CACHE_EXPIRY, json.dumps(doc))

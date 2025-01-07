@@ -49,6 +49,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ type, name, labe
                 </label>
                 {type === "password" && (
                     <button
+                        aria-label="show"
                         className="text-default-500 px-4 focus:outline-none transition-all duration-150 outline-none focus:text-default-900 absolute right-0 top-3"
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}

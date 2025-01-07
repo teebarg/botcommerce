@@ -31,6 +31,7 @@ const NoProductsFound = ({
                 {/* Action Buttons */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
                     <button
+                        aria-label="clear search"
                         className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg
                      hover:bg-blue-700 transition-colors duration-200 gap-2"
                         onClick={onClearSearch}
@@ -40,6 +41,7 @@ const NoProductsFound = ({
                     </button>
 
                     <button
+                        aria-label="home"
                         className="inline-flex items-center px-4 py-2 border border-gray-300 text-default-500
                      rounded-lg hover:bg-gray-50 transition-colors duration-200 gap-2"
                         onClick={onGoHome}
@@ -56,6 +58,7 @@ const NoProductsFound = ({
                     <div className="flex flex-wrap justify-center gap-2">
                         {suggestedCategories.map((category) => (
                             <button
+                                aria-label="categories"
                                 key={category}
                                 className="px-4 py-2 bg-default-100 text-default-900 rounded-full text-sm
                          hover:bg-gray-200 transition-colors duration-200"

@@ -71,7 +71,12 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     {!isOpen && cart.shipping_method?.name && <CheckCircleSolid />}
                 </h2>
                 {!isOpen && cart?.shipping_address && cart?.billing_address && cart?.email && (
-                    <button className="text-default-900 hover:text-blue-600" data-testid="edit-delivery-button" onClick={handleEdit}>
+                    <button
+                        aria-label="edit"
+                        className="text-default-900 hover:text-blue-600"
+                        data-testid="edit-delivery-button"
+                        onClick={handleEdit}
+                    >
                         Edit
                     </button>
                 )}

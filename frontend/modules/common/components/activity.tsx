@@ -127,6 +127,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                     <div className="mt-6 flex">
                                         <div className="flex">
                                             <button
+                                                aria-label="remove activity"
                                                 className="text-rose-500"
                                                 data-testid="activity-delete-button"
                                                 onClick={() => removeActivity(item.id)}

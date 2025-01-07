@@ -56,6 +56,7 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
             <div ref={containerRef} className="group relative w-full" data-has-label={label ? "true" : "false"}>
                 <label className="hidden group-data-[has-label=true]:block text-xs font-medium text-gray-700 mb-1">{label}</label>
                 <button
+                    aria-label="select"
                     className="relative w-full bg-default-100 border border-gray-300 rounded-md py-2 pl-3 pr-10 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}

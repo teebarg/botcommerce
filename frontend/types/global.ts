@@ -14,7 +14,7 @@ export type Customer = {
 export type Product = {
     id: number;
     name: string;
-    slug?: string;
+    slug: string;
     description?: string;
     price: number;
     old_price: number;
@@ -30,7 +30,7 @@ export type Product = {
 export type Collection = {
     id: number;
     name: string;
-    slug?: string;
+    slug: string;
     created_at: string;
 };
 

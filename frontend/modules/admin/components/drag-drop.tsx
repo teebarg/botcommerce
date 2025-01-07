@@ -61,7 +61,7 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
             }}
         >
             {files[0] && (
-                <button className="absolute top-3 right-4" type="button" onClick={handleCancel}>
+                <button aria-label="cancel" className="absolute top-3 right-4" type="button" onClick={handleCancel}>
                     <CancelIcon aria-hidden="true" size={24} />
                 </button>
             )}
@@ -77,9 +77,12 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
                 <div className="text-center space-y-2">
                     <UploadIcon className="h-16 w-16 inline" fill="#007bff" />
                     <p>
-                        Drop your files here or <button className="link">browse.</button>
+                        Drop your files here or{" "}
+                        <button aria-label="browse" className="link">
+                            browse.
+                        </button>
                     </p>
-                    <button className="btn-custom group min-w-48 bg-primary text-primary-foreground" type="button">
+                    <button aria-label="select" className="btn-custom group min-w-48 bg-primary text-primary-foreground" type="button">
                         Select
                     </button>
                 </div>

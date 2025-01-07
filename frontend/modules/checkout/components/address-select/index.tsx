@@ -16,6 +16,7 @@ type AddressSelectProps = {
 // Custom item renderer example
 const CustomItem = ({ option, isSelected, onSelect }: ListboxItemProps) => (
     <button
+        aria-label="address"
         aria-selected={isSelected}
         className={cn(
             "relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",

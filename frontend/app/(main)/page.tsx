@@ -52,10 +52,10 @@ export default async function Home() {
         <React.Fragment>
             <div>
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative sm:grid grid-cols-4 gap-4 rounded-xl">
+                    <div className="max-w-8xl mx-auto relative sm:grid grid-cols-4 gap-4 rounded-xl py-6">
                         <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
-                            <ul className="bg-primary/10 text-primary-900">
+                            <ul className="bg-primary/10 text-primary">
                                 {cats.map((item: any, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink
@@ -109,7 +109,7 @@ export default async function Home() {
                     </div>
                 </div>
                 <div className="relative h-28">
-                    <Image fill alt="banner" src={"/frontend.webp"} />
+                    <Image fill alt="banner" src={"/frontend.webp"} priority sizes="100vw" />
                 </div>
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -137,7 +137,7 @@ export default async function Home() {
                     </div>
                 </div>
                 <FlashBanner />
-                <div>
+                <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
@@ -158,7 +158,7 @@ export default async function Home() {
                             {`We provide a curated selection of children's thrifts, ensuring top quality at unbeatable prices. Discover a variety of
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8 mt-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
                             {latest?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}

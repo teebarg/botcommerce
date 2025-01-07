@@ -62,6 +62,7 @@ export function AccordionTrigger({ children, value, className }: { children: Rea
     return (
         <h2 data-open={isExpanded}>
             <button
+                aria-label="open content"
                 aria-controls={`accordion-content-${value}`}
                 aria-expanded={isExpanded}
                 className={cn(

@@ -68,7 +68,7 @@ export default function UserDropDown({ customer }: any) {
                         className="flex group gap-2 items-center justify-between relative px-2 py-1.5 w-full h-full box-border rounded-small cursor-pointer outline-none"
                         data-key="logout"
                     >
-                        <button data-testid="logout-button" type="button" onClick={handleLogout}>
+                        <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
                             Log out
                         </button>
                     </div>

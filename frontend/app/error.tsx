@@ -41,7 +41,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                         >
                             Go back to homepage
                         </LocalizedClientLink>
-                        <Button className="block mt-6" color="danger" type="button" onClick={() => reset()}>
+                        <Button aria-label="try again" className="block mt-6" color="danger" type="button" onClick={() => reset()}>
                             Try again
                         </Button>
                     </div>

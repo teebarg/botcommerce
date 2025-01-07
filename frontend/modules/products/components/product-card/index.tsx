@@ -22,7 +22,7 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
         <>
             <React.Fragment>
                 <LocalizedClientLink
-                    className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 w-full snap-start"
+                    className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 w-full snap-start h-full"
                     href={`/products/${product.slug}`}
                     id={`${product.id}`}
                 >
@@ -41,7 +41,7 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
                                     product={product}
                                     wishlist={showWishlist && <ProductWishList className="relative flex" inWishlist={inWishlist} product={product} />}
                                 />
-                            </Suspense> 
+                            </Suspense>
                         </div>
                     </div>
                 </LocalizedClientLink>

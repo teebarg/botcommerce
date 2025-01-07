@@ -74,7 +74,6 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_LASTNAME: str = "admin"
     FIRST_SUPERUSER: EmailStr = "admin@email.com"
     FIRST_SUPERUSER_PASSWORD: str = "password"
-    USERS_OPEN_REGISTRATION: bool = False
 
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379

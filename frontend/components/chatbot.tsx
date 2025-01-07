@@ -4,6 +4,7 @@ import { cn } from "@lib/util/cn";
 import React, { useState, useEffect, useRef } from "react";
 import { CogSixTooth, Send, Smiley } from "nui-react-icons";
 import { useSnackbar } from "notistack";
+import { VisuallyHidden } from "@react-aria/visually-hidden";
 
 interface Props {}
 
@@ -124,7 +125,7 @@ const ChatBot: React.FC<Props> = () => {
                 </header>
                 <div className="h-[calc(100%-48px)] list-none m-0 p-0 overflow-hidden relative">
                     <div className="bottom-3 flex flex-col absolute inset-0 overflow-scroll mr-0 mb-0 pb-12 bg-default h-full w-full">
-                        <div aria-label="Messages from the conversation" className="flex flex-col gap-4" role="grid">
+                        <div aria-label="Messages from the conversation" className="flex flex-col gap-4">
                             {messages.map((message, index) => (
                                 <div key={index} className="relative py-0 px-4 flex flex-col">
                                     {index == 0 && (
@@ -184,9 +185,10 @@ const ChatBot: React.FC<Props> = () => {
                     <div className="py-[3px] px-0 relative flex items-center w-full">
                         <div className="flex max-h-20 overflow-hidden relative flex-1 chatinput-wrapper">
                             <pre> </pre>
-                            <label className="visually-hidden" htmlFor="chat-input">
-                                Write a reply...
-                            </label>
+                            <VisuallyHidden>
+                                <label htmlFor="chat-input">Write a reply...</label>
+                            </VisuallyHidden>
+
                             <textarea
                                 aria-label="Write a reply..."
                                 className="placeholder:text-ellipsis text-default-900 border-default-500 focus-visible:outline-none border-solid border"
@@ -204,10 +206,10 @@ const ChatBot: React.FC<Props> = () => {
                             </button>
                         </div>
                         <div className="flex items-center gap-1 leading-4 p-0" style={{ margin: "7px 0 7px 7px" }}>
-                            <button className="h-8">
+                            <button aria-label="settings" className="h-8">
                                 <CogSixTooth className="text-default-500" />
                             </button>
-                            <button className="h-8" onClick={handleSend}>
+                            <button aria-label="send message" className="h-8" onClick={handleSend}>
                                 <Send viewBox="0 0 17 16" />
                             </button>
                         </div>

@@ -74,11 +74,21 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                     </p>
                 </div>
                 <div className="flex items-center gap-x-4">
-                    <button className="text-sm flex items-center gap-x-2" data-testid="address-edit-button" onClick={modalState.open}>
+                    <button
+                        aria-label="edit address"
+                        className="text-sm flex items-center gap-x-2"
+                        data-testid="address-edit-button"
+                        onClick={modalState.open}
+                    >
                         <Edit />
                         Edit
                     </button>
-                    <button className="text-sm text-danger-500 flex items-center gap-x-2" data-testid="address-delete-button" onClick={removeAddress}>
+                    <button
+                        aria-label="delete address"
+                        className="text-sm text-danger-500 flex items-center gap-x-2"
+                        data-testid="address-delete-button"
+                        onClick={removeAddress}
+                    >
                         {removing ? <Spinner /> : <Trash />}
                         Remove
                     </button>

@@ -22,7 +22,11 @@ const DeleteButton = ({ id, children, className }: { id: string; children?: Reac
 
     return (
         <div className={cn("flex items-center justify-between text-sm", className)}>
-            <button className="flex gap-x-1 text-red-500 hover:text-default-900 cursor-pointer" onClick={() => handleDelete(id)}>
+            <button
+                aria-label="delete"
+                className="flex gap-x-1 text-red-500 hover:text-default-900 cursor-pointer"
+                onClick={() => handleDelete(id)}
+            >
                 {isDeleting ? <Spinner className="animate-spin" /> : <Trash />}
                 <span>{children}</span>
             </button>

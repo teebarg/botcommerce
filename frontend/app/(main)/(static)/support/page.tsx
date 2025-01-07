@@ -72,6 +72,7 @@ const SupportPage = () => {
                 {faqSections.map((section, index) => (
                     <div key={index} className="mb-4">
                         <button
+                            aria-label="open faq"
                             className="w-full bg-default p-4 rounded-lg shadow-sm flex justify-between items-center hover:bg-default-100 transition"
                             onClick={() => setActiveSection(activeSection === index ? null : index)}
                         >
