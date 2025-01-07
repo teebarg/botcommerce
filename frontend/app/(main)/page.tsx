@@ -165,13 +165,13 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-fixed bg-center" style={{ backgroundImage: `url(${imgSrc("banners%2Fhero-contact.jpeg")})` }}>
+                <div className="bg-fixed bg-center" style={{ backgroundImage: `url(${imgSrc("banners%2Fhero-contact.jpg")})` }}>
                     <div className="flex items-center h-full backdrop-blur-smp backdrop-saturate-150p bg-white/10p">
                         <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
                             <div className="sm:w-1/2 sm:pr-10 backdrop-blur bg-white/60 p-4 sm:p-8 rounded-lg shadow-lg shadow-gray-400">
-                                <p className="text-lg font-medium text-primary">GET IN TOUCH</p>
-                                <p className="text-2xl font-semibold text-gray-900">Reach out to us for more information</p>
-                                <p className="text-gray-500">
+                                <p className="text-lg font-medium text-rose-900">GET IN TOUCH</p>
+                                <p className="text-xl font-semibold text-gray-900">Reach out to us for more information</p>
+                                <p className="text-gray-700 font-medium">
                                     For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have
                                     about our products and services.
                                 </p>

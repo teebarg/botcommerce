@@ -1,10 +1,9 @@
 import json
 from datetime import datetime
 
-from app.core.deps import Notification, SessionDep
 from app.core import deps
 from app.core.decorators import limit
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, Request, Response
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
@@ -16,14 +15,7 @@ from app.core.utils import (
     send_email,
 )
 from app.models.generic import ContactFormCreate, NewsletterCreate
-from app.services.cache import CacheService
 from xml.etree.ElementTree import Element, SubElement, tostring
-# from app.models.product import Product
-# from app.models.category import Category
-# from app.core.deps import (
-#     CurrentUser,
-#     SessionDep,
-# )
 from app.models.generic import Category, Collection, Product
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
@@ -82,7 +74,7 @@ async def newsletter(data: NewsletterCreate):
 
 @app.post("/api/log-error")
 @limit("5/minute")
-async def log_error(error: dict, notification: Notification, redis: deps.CacheService, request: Request):
+async def log_error(error: dict, notification: deps.Notification, redis: deps.CacheService, request: Request):
     # Send the error to Slack
     slack_message = {
         "text": f"🚨 *Error Logged* 🚨\n"
@@ -99,8 +91,8 @@ async def log_error(error: dict, notification: Notification, redis: deps.CacheSe
 
 @app.get("/sitemap.xml", response_class=Response)
 async def generate_sitemap(db: deps.SessionDep, redis: deps.CacheService ):
-    base_url = settings.DOMAIN
-    
+    base_url = settings.FRONTEND_HOST
+
     # Try to get sitemap from cache first
     cached_sitemap = redis.get("sitemap")
     if cached_sitemap:
@@ -109,31 +101,42 @@ async def generate_sitemap(db: deps.SessionDep, redis: deps.CacheService ):
     # If not in cache, fetch from database
     products = db.query(Product).with_entities(Product.slug).all()
     categories = db.query(Category).with_entities(Category.slug).all()
+    collections = db.query(Collection).with_entities(Collection.slug).all()
 
     urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-    
+
     # Add the home page
     home = SubElement(urlset, "url")
     SubElement(home, "loc").text = f"{base_url}/"
     SubElement(home, "priority").text = "1.0"
+    SubElement(home, "changefreq").text = "daily"
+
+    # Add collections pages
+    for collection in collections:
+        url = SubElement(urlset, "url")
+        SubElement(url, "loc").text = f"{base_url}/collections/{collection.slug}"
+        SubElement(url, "priority").text = "0.9"
+        SubElement(url, "changefreq").text = "monthly"
 
     # Add category pages
     for category in categories:
         url = SubElement(urlset, "url")
-        SubElement(url, "loc").text = f"{base_url}/category/{category.slug}"
+        SubElement(url, "loc").text = f"{base_url}/collections?cat_ids={category.slug}"
         SubElement(url, "priority").text = "0.8"
+        SubElement(url, "changefreq").text = "monthly"
 
     # Add product pages
     for product in products:
         url = SubElement(urlset, "url")
         SubElement(url, "loc").text = f"{base_url}/product/{product.slug}"
         SubElement(url, "priority").text = "0.6"
+        SubElement(url, "changefreq").text = "weekly"
 
     sitemap = tostring(urlset, encoding="utf-8", method="xml")
-    
+
     # Cache the sitemap for 1 hour (3600 seconds)
     redis.set("sitemap", sitemap, expire=3600)
-    
+
     return Response(content=sitemap, media_type="application/xml")
 
 
