@@ -15,7 +15,6 @@ const ASSETS_TO_CACHE = [
     "/bot.svg",
     "/empty-cart.png",
     "/frontend.webp",
-    "/promo-banner.webp",
     "/side-banner.webp",
     "/offline", // A fallback page for offline users
     "/favicon.ico", // Favicon

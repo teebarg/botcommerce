@@ -205,7 +205,7 @@ const ChatBot: React.FC<Props> = () => {
                                 <Smiley />
                             </button>
                         </div>
-                        <div className="flex items-center gap-1 leading-4 p-0" style={{ margin: "7px 0 7px 7px" }}>
+                        <div className="flex items-center gap-2 leading-4 p-0" style={{ margin: "7px 0 5px 7px" }}>
                             <button aria-label="settings" className="h-8">
                                 <CogSixTooth className="text-default-500" />
                             </button>

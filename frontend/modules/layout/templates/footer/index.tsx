@@ -81,7 +81,7 @@ export default async function Footer() {
                             <div className="hidden md:block">
                                 <div>
                                     <h3 className="text-base font-semibold text-default-500">Collections</h3>
-                                    <ul className="mt-2 space-y-0.5">
+                                    <ul className="mt-2 space-y-1">
                                         {collections?.slice(0, 6).map((c: any, index: any) => (
                                             <li key={index}>
                                                 <LocalizedClientLink
@@ -99,7 +99,7 @@ export default async function Footer() {
                         {categories?.length > 0 && (
                             <div className="hidden md:block">
                                 <h3 className="text-base font-semibold text-default-500">Categories</h3>
-                                <ul className="mt-2 space-y-1" data-testid="footer-categories">
+                                <ul className="mt-2 space-y-2" data-testid="footer-categories">
                                     {categories?.map((c: Category) => {
                                         const children =
                                             c.children?.map((child: Category) => ({
@@ -111,18 +111,18 @@ export default async function Footer() {
                                         return (
                                             <li key={c.id}>
                                                 <LocalizedClientLink
-                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                                    className="text-sm hover:opacity-80 transition-opacity text-default-500"
                                                     data-testid="category-link"
                                                     href={`/collections?cat_ids=${c.slug}`}
                                                 >
                                                     {c.name}
                                                 </LocalizedClientLink>
                                                 {children && (
-                                                    <ul className="ml-4">
+                                                    <ul className="ml-4 space-y-1">
                                                         {children?.map((child: Category) => (
                                                             <li key={child.id}>
                                                                 <LocalizedClientLink
-                                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                                                    className="text-sm hover:opacity-80 transition-opacity text-default-500"
                                                                     data-testid="category-link"
                                                                     href={`/collections?cat_ids=${child.slug}`}
                                                                 >
@@ -140,11 +140,11 @@ export default async function Footer() {
                         )}
                         <div>
                             <h3 className="text-base font-semibold text-default-500">About Us</h3>
-                            <ul className="mt-2 space-y-1">
+                            <ul className="mt-2 space-y-2">
                                 {about.map((item, index) => (
                                     <li key={index}>
                                         <LocalizedClientLink
-                                            className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                            className="text-sm hover:opacity-80 transition-opacity text-default-500"
                                             href={item.to}
                                         >
                                             {item.label}
@@ -156,11 +156,11 @@ export default async function Footer() {
                         <div className="">
                             <div>
                                 <h3 className="text-base font-semibold text-default-500">Legal</h3>
-                                <ul className="mt-2 space-y-1">
+                                <ul className="mt-2 space-y-2">
                                     {legal.map((item, index) => (
                                         <li key={index}>
                                             <LocalizedClientLink
-                                                className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                                className="text-sm hover:opacity-80 transition-opacity text-default-500"
                                                 href={item.to}
                                             >
                                                 {item.label}
