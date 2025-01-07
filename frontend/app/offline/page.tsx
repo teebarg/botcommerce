@@ -51,6 +51,7 @@ const OfflinePage = () => {
 
                 {/* Retry Button */}
                 <button
+                    aria-label="retry"
                     className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700
                      text-white font-medium rounded-lg transition-colors duration-200
                      disabled:bg-blue-400 disabled:cursor-not-allowed gap-2"

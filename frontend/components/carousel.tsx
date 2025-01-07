@@ -73,6 +73,7 @@ const BannerCarousel: React.FC = () => {
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
                 {banners.map((_, index) => (
                     <button
+                        aria-label="indicator"
                         key={index}
                         className={cn(
                             "w-3 h-3 rounded-full transition-all",

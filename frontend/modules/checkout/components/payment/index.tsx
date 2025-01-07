@@ -90,7 +90,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     {!isOpen && paymentReady && <CheckCircleSolid />}
                 </h2>
                 {!isOpen && paymentReady && (
-                    <button className="hover:text-blue-400" data-testid="edit-payment-button" onClick={handleEdit}>
+                    <button aria-label="edit payment" className="hover:text-blue-400" data-testid="edit-payment-button" onClick={handleEdit}>
                         Edit
                     </button>
                 )}

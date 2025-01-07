@@ -64,6 +64,7 @@ const SubMenuComponent: React.FC<{
     return (
         <div className="w-full">
             <button
+                aria-label="open"
                 className={cn(
                     "w-full flex items-center justify-between p-4 text-default-500 hover:text-default-500",
                     "transition-colors duration-200 group",
@@ -308,7 +309,11 @@ const SideBar: React.FC = () => {
                 >
                     Botcommerce
                 </h1>
-                <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200" onClick={() => setIsCollapsed(!isCollapsed)}>
+                <button
+                    aria-label="open"
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                >
                     <ChevronRight className={cn("transform transition-transform duration-300", isCollapsed && "rotate-180")} size={20} />
                 </button>
             </div>

@@ -16,27 +16,27 @@ const Navbar = async () => {
 
     return (
         <NavigationBar className="my-2">
-            <NavbarContent className="flex flex-1 max-w-7xl mx-auto">
-                <NavbarBrand className="flex-1 md:w-[25vw]">
-                    <LocalizedClientLink className="flex justify-start items-center gap-1" href="/">
-                        <p className="font-bold text-inherit text-2xl">Botcommerce</p>
+            <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
+                <NavbarBrand className="flex items-center flex-1 md:w-[25vw] font-semibold">
+                    <LocalizedClientLink className="text-3xl block" href="/">
+                        Botcommerce
                     </LocalizedClientLink>
-                    <LocalizedClientLink className="text-base font-medium hidden md:block" href={"/collections"}>
+                    <LocalizedClientLink className="hidden md:block" href={"/collections"}>
                         Collections
                     </LocalizedClientLink>
                     {isAdmin && (
-                        <LocalizedClientLink className="text-base font-medium hidden md:block" href={"/admin"}>
+                        <LocalizedClientLink className="hidden md:block" href={"/admin"}>
                             Admin
                         </LocalizedClientLink>
                     )}
                 </NavbarBrand>
-                <div className="hidden sm:flex items-center flex-1">
-                    <NavbarItem className="hidden lg:flex flex-1">
-                        <Search className="w-full justify-between" />
-                    </NavbarItem>
-                </div>
-                <div className="md:w-[25vw] flex gap-3 justify-end items-center">
-                    <NavbarItem className="flex items-center">
+                {/* <div className="hidden sm:flex items-center flex-1"> */}
+                <NavbarItem className="hidden md:flex flex-1">
+                    <Search className="w-full justify-between" />
+                </NavbarItem>
+                {/* </div> */}
+                <NavbarItem className="md:w-[25vw] flex gap-3 justify-end items-center">
+                    <div className="flex items-center">
                         <Suspense
                             fallback={
                                 <LocalizedClientLink className="hover:text-default-900" data-testid="nav-cart-link" href="/cart">
@@ -46,20 +46,20 @@ const Navbar = async () => {
                         >
                             <Cart />
                         </Suspense>
-                    </NavbarItem>
-                    <NavbarItem className="flex items-center">
+                    </div>
+                    <div className="flex items-center">
                         <ThemeButton />
-                    </NavbarItem>
-                    <NavbarItem className="hidden md:flex items-center">
+                    </div>
+                    <div className="hidden md:flex items-center">
                         {customer ? (
-                            <LocalizedClientLink href={"/wishlist"}>
+                            <LocalizedClientLink href={"/wishlist"} aria-label="go to wishlist">
                                 <HeartFilled className="h-8 w-8 text-primary-500" />
                             </LocalizedClientLink>
                         ) : (
                             <Heart className="h-8 w-8 text-default-500" />
                         )}
-                    </NavbarItem>
-                    <NavbarItem className="hidden sm:flex items-center">
+                    </div>
+                    <div className="hidden sm:flex items-center">
                         {customer ? (
                             <UserDropDown customer={customer} />
                         ) : (
@@ -67,9 +67,9 @@ const Navbar = async () => {
                                 Log In <span aria-hidden="true">&rarr;</span>
                             </LocalizedClientLink>
                         )}
-                    </NavbarItem>
+                    </div>
                     <NavbarMenuToggle className="sm:hidden" />
-                </div>
+                </NavbarItem>
             </NavbarContent>
             <NavbarMenu>
                 <Search className="px-0" />
@@ -95,7 +95,9 @@ const Navbar = async () => {
                     {customer && (
                         <NavbarItem className="flex items-center gap-2">
                             <Heart className="h-8 w-8" />
-                            <LocalizedClientLink href={"/wishlist"}>Saved Items</LocalizedClientLink>
+                            <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
+                                Saved Items
+                            </LocalizedClientLink>
                         </NavbarItem>
                     )}
                     {isAdmin && (

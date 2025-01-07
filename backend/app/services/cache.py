@@ -95,6 +95,56 @@ class CacheService:
             logger.error(f"Error clearing cache: {str(e)}")
             return False
 
+    def delete_pattern(self, pattern: str) -> bool:
+        """
+        Delete all keys matching a pattern
+        Args:
+            pattern: Pattern to match keys against (e.g., "product:*")
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            cursor = 0
+            while True:
+                cursor, keys = self.redis.scan(cursor, pattern, 100)
+                if keys:
+                    self.redis.delete(*keys)
+                if cursor == 0:
+                    break
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting pattern from cache: {str(e)}")
+            return False
+
+    def incr(self, key: str) -> int:
+        """
+        Increment the value of a key by 1
+        Args:
+            key: Cache key
+        Returns:
+            int: New value after increment
+        """
+        try:
+            return self.redis.incr(key)
+        except Exception as e:
+            logger.error(f"Error incrementing cache key: {str(e)}")
+            return 0
+
+    def expire(self, key: str, seconds: int) -> bool:
+        """
+        Set expiration time for a key
+        Args:
+            key: Cache key
+            seconds: Time in seconds until expiration
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            return self.redis.expire(key, seconds)
+        except Exception as e:
+            logger.error(f"Error setting expiration: {str(e)}")
+            return False
+
 
 # Dependencies
 async def get_cache_service():

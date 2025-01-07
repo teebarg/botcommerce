@@ -58,6 +58,7 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
                     />
                     {value && (
                         <button
+                            aria-label="reset"
                             className="relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal subpixel-antialiased overflow-hidden outline-none text-tiny rounded-full px-0 gap-0 transition-transform-colors-opacity motion-reduce:transition-none bg-transparent text-foreground min-w-8 w-8 h-8 data-[hover=true]:opacity-hover border data-[hover=true]:bg-content2 border-default-500 dark:border-default-100"
                             type="button"
                             onClick={handleReset}

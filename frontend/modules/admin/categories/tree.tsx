@@ -37,7 +37,12 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                             </div>
                             <div className="flex items-center w-full">
                                 <div className="flex items-center gap-4 flex-1">
-                                    <button className="flex items-center" disabled={item?.children.length == 0} onClick={() => handleClick(item.id)}>
+                                    <button
+                                        aria-label="open"
+                                        className="flex items-center"
+                                        disabled={item?.children.length == 0}
+                                        onClick={() => handleClick(item.id)}
+                                    >
                                         <ChevronRight
                                             className={cn("transition-transform duration-300 text-default-900", {
                                                 "rotate-90": open.includes(item.id),

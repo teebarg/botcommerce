@@ -58,7 +58,7 @@ export default function ProductActions({
 
     return (
         <div className={cn("group flex-1 flex flex-col", className)} data-has-details={showDetails} data-has-price={showPrice}>
-            <div className="hidden flex-col-reverse items-start mb-2 group-data-[has-price=true]:flex flex-1 px-1 md:px-0">
+            <div className="hidden flex-col-reverse items-start mb-2 group-data-[has-price=true]:flex flex-1 px-1">
                 <div className="flex items-center w-full">
                     <span className="text-lg font-semibold text-danger">{currency(product.price)}</span>
                     {product.old_price > product.price && (
@@ -73,8 +73,8 @@ export default function ProductActions({
                         </span>
                     </div>
                 )}
-                <div className="flex-1 hidden group-data-[has-details=true]:block">
-                    <h3 className="text-xs md:text-base font-semibold tracking-tight leading-4 text-default-900 line-clamp-2 mb-auto">
+                <div className="flex-1 hidden group-data-[has-details=true]:block mb-4">
+                    <h3 className="text-xs md:text-base font-semibold tracking-tight leading-4 text-default-900 line-clamp-1 mb-auto">
                         {product.name}
                     </h3>
                 </div>

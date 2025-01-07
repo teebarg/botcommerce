@@ -1,4 +1,3 @@
-import { Viewport } from "next";
 import "public/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
@@ -43,11 +42,6 @@ export const metadata = {
             },
         ],
     },
-};
-
-export const viewport: Viewport = {
-    maximumScale: 1,
-    userScalable: false,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

@@ -23,7 +23,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
 
     return (
         <React.Fragment>
-            <div className="max-w-7xl mx-auto h-full w-full md:px-12 my-8">
+            <div className="max-w-7xl mx-auto h-full w-full my-8">
                 <nav className="hidden md:block" data-slot="base">
                     <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                         <li className="flex items-center" data-slot="base">
@@ -48,14 +48,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                 <div className="relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8 mt-4">
                     <div className="relative h-full w-full flex-none flex gap-4">
                         <div className="flex flex-col gap-4">
-                            {product?.images?.map((image: string, index: number) => (
+                            {product?.images?.map((image: any, index: number) => (
                                 <div key={index} className="w-[80px] h-[80px] relative rounded-lg overflow-hidden">
-                                    <Image fill alt={`Product ${index + 1}`} src={image} />
+                                    <Image fill alt={`Product ${index + 1}`} src={image.image} />
                                 </div>
                             ))}
                         </div>
                         <div className="flex-1">
-                            <div className="h-[60vh]">
+                            <div className="h-[60vh] relative rounded-lg overflow-hidden">
                                 <Image fill alt={product.name} src={product.image as string} />
                             </div>
                         </div>

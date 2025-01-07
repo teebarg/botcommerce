@@ -167,7 +167,8 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                             </div>
                             <button
-                                className="font-medium text-sm text-blue-600 hover:text-blue-700 
+                                aria-label="send"
+                                className="font-medium text-sm text-blue-600 hover:text-blue-700
                                      disabled:text-gray-400 disabled:cursor-not-allowed"
                                 disabled={resendDisabled}
                                 onClick={handleResend}
@@ -177,6 +178,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                         </div>
                         <div>
                             <button
+                                aria-label="submit"
                                 className="cl-internal-ttumny border-0 shadow-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300
                                      disabled:cursor-not-allowed transition-colors"
                                 data-localization-key="formButtonPrimary"
@@ -185,7 +187,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                             >
                                 {isLoading ? (
                                     <div
-                                        className="w-5 h-5 border-2 border-white border-t-transparent 
+                                        className="w-5 h-5 border-2 border-white border-t-transparent
                                               rounded-full animate-spin"
                                     />
                                 ) : (

@@ -55,7 +55,7 @@ const SlideOver: React.FC<SlideoverProps> = ({ isOpen, onClose, children, title,
                         location[direction]
                     )}
                 >
-                    <button className="absolute top-4 right-2 bg-transparent z-50" onClick={onClose}>
+                    <button aria-label="close" className="absolute top-4 right-2 bg-transparent z-50" onClick={onClose}>
                         <CancelIcon size={24} />
                     </button>
                     <div className="overflow-y-auto ppp[mask-image:linear-gradient(0deg,#000_calc(100%_-_50px),transparent)] flex flex-col flex-1">

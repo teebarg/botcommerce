@@ -48,6 +48,33 @@ def get_document_by_id(index_name: str, doc_id: str):
     except Exception as e:
         print(f"Error fetching document by ID: {e}")
 
+def get_document_by_attribute(index_name: str, attribute: str, value: Any) -> dict:
+    """
+    Get a document from a Meilisearch index by a specific attribute.
+
+    Args:
+        index_name: Name of the Meilisearch index
+        attribute: The attribute/field to search on
+        value: The value to match against the attribute
+
+    Returns:
+        dict: The matching document or None if not found
+    """
+    try:
+        index = get_or_create_index(index_name)
+        # Create filter string in Meilisearch format
+        filter_str = f"{attribute} = '{value}'"
+        # Search with the filter, limit 1 since we want a single doc
+        result = index.search("", {
+            "filter": filter_str,
+            "limit": 1
+        })
+        # Return first hit if found, otherwise None
+        return result["hits"][0] if result["hits"] else None
+    except Exception as e:
+        print(f"Error fetching document by attribute: {e}")
+        return None
+
 
 def search_documents(index_name: str, query: str, **kwargs) -> dict:
     """

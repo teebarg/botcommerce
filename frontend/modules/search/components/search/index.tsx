@@ -83,7 +83,7 @@ const Search: React.FC<Props> = ({ className }) => {
                         <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
                             <MagnifyingGlassMini />
                             <SearchInput onChange={debounce(handleChange, 500)} onReset={onReset} onSubmit={onSubmit} />
-                            <button onClick={modalState.close}>
+                            <button aria-label="close" onClick={modalState.close}>
                                 <Kbd className="md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
                             </button>
                         </div>

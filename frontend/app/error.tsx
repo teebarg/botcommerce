@@ -1,15 +1,30 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
     useEffect(() => {
-        // Log the error to an error reporting service
-        /* eslint-disable no-console */
-        console.error(error);
+        if (error) {
+            // Prepare the error data
+            const errorData = {
+                message: error.message || "An error occurred",
+                name: error.name || "Error",
+                stack: error.stack || "",
+                timestamp: new Date().toISOString(),
+            };
+
+            // Send the error to the server
+            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/log-error`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(errorData),
+            });
+        }
     }, [error]);
 
     return (
@@ -20,10 +35,13 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                         <h1 className="text-4xl font-bold mb-2">500</h1>
                         <p className="text-xl text-default-900 mb-4">Internal Server Error</p>
                         <p className="text-default-500 mb-6">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
-                        <Link className="inline-block bg-primary hover:bg-primary-focus text-white font-semibold py-2 px-4 rounded-md mr-4" href="/">
+                        <LocalizedClientLink
+                            className="inline-block bg-primary hover:bg-primary-focus text-white font-semibold py-2 px-4 rounded-md mr-4"
+                            href="/"
+                        >
                             Go back to homepage
-                        </Link>
-                        <Button className="block mt-6" color="danger" type="button" onClick={() => reset()}>
+                        </LocalizedClientLink>
+                        <Button aria-label="try again" className="block mt-6" color="danger" type="button" onClick={() => reset()}>
                             Try again
                         </Button>
                     </div>

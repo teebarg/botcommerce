@@ -125,7 +125,7 @@ export const NavbarMenuOverlay = ({ children, className }: { children: React.Rea
                         )}
                         data-open={context.expanded}
                     >
-                        <button className="absolute top-4 right-4 block" onClick={() => context.setExpanded(!context.expanded)}>
+                        <button aria-label="cancel" className="absolute top-4 right-4 block" onClick={() => context.setExpanded(!context.expanded)}>
                             <XMark size={32} />
                         </button>
                         {children}
@@ -149,6 +149,7 @@ export const NavbarMenuToggle = ({ className }: { children?: React.ReactNode; cl
 
     return (
         <button
+            aria-label="navbar"
             aria-pressed={isExpanded}
             className={cn(
                 "group flex items-center justify-center w-6 h-full rounded-small tap-highlight-transparent outline-none data-[focus-visible=true]:z-10",

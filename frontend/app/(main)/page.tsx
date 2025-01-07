@@ -20,8 +20,6 @@ export const metadata: Metadata = {
 
 const cats = ["Electronics", "Health & Beauty", "Men's Fashion", "Women's Fashion", "Sports & Hobby", "Tools", "Kids"];
 
-export const revalidate = 1;
-
 async function getLandingProducts(collection: string, limit: number = 4): Promise<any[]> {
     const queryParams: SearchParams = {
         query: "",
@@ -53,11 +51,11 @@ export default async function Home() {
     return (
         <React.Fragment>
             <div>
-                <div className="bg-default/10">
-                    <div className="max-w-7xl mx-auto relative sm:grid grid-cols-4 gap-4 rounded-xl my-4 sm:my-8">
+                <div className="bg-content1">
+                    <div className="max-w-8xl mx-auto relative sm:grid grid-cols-4 gap-4 rounded-xl py-6">
                         <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
-                            <ul className="bg-primary/10 text-primary-900">
+                            <ul className="bg-primary/10 text-primary">
                                 {cats.map((item: any, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink
@@ -111,10 +109,10 @@ export default async function Home() {
                     </div>
                 </div>
                 <div className="relative h-28">
-                    <Image fill alt="banner" src={"/frontend.webp"} />
+                    <Image fill alt="banner" src={"/frontend.webp"} priority sizes="100vw" />
                 </div>
-                <div className="bg-default-100">
-                    <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-content1">
+                    <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                                 <span className="text-secondary text-3xl font-semibold">Botcommerce</span>
@@ -139,10 +137,10 @@ export default async function Home() {
                     </div>
                 </div>
                 <FlashBanner />
-                <div className="bg-default-100">
-                    <div className="max-w-7xl mx-auto relative py-8 px-4 md:px-0">
+                <div className="bg-content1">
+                    <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
                             {trending?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
@@ -152,15 +150,15 @@ export default async function Home() {
                 <div className="relative h-28">
                     <Image fill alt="banner" src={"/frontend.webp"} />
                 </div>
-                <div className="bg-default-100 py-16">
-                    <div className="max-w-7xl mx-auto px-4">
+                <div className="bg-content1 py-16">
+                    <div className="max-w-8xl mx-auto px-4">
                         <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
                         <p className="text-default-500">
                             {`We provide a curated selection of children's thrifts, ensuring top quality at unbeatable prices. Discover a variety of
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-8 mt-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
                             {latest?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}

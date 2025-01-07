@@ -81,27 +81,26 @@ export const getCart = cache(async function (cartId: string) {
     return await response.json();
 });
 
-export const getProducts = cache(async function (search?: string, collections?: string, page?: number, limit?: number) {
+export const getProducts = async (search?: string, collections?: string, page?: number, limit?: number) => {
     const headers = getHeaders([]);
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { search, collections, page, limit });
-    const res = await fetch(url, {
-        next: {
-            tags: ["products"],
-        },
-        headers: {
-            "Content-Type": "application/json",
-            ...headers,
-        },
-    }).catch((error) => {
-        throw new Error(`Failed to create cart: ${error.statusText}`);
-    });
+    try {
+        const res = await fetch(url, {
+            headers: {
+                accept: "application/json",
+                ...headers,
+            },
+        });
 
-    if (!res.ok) {
-        throw new Error(`Failed to create cart: ${res.statusText}`);
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        return await res.json();
+    } catch (error: any) {
+        return { products: [], success: false, message: error.toString() };
     }
-
-    return await res.json();
-});
+};
 
 export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
     try {
@@ -684,7 +683,7 @@ export const getCollectionsList = cache(async function (search: string = "", pag
         });
 
         if (!response.ok) {
-            throw new Error("Failed to fetch collections");
+            throw new Error(response.statusText);
         }
 
         return await response.json();

@@ -68,7 +68,11 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                                                             </span>
                                                             <span data-testid="order-amount">{currency(order.total)}</span>
                                                         </div>
-                                                        <button className="flex items-center justify-between" data-testid="open-order-button">
+                                                        <button
+                                                            aria-label="open"
+                                                            className="flex items-center justify-between"
+                                                            data-testid="open-order-button"
+                                                        >
                                                             <ChevronDown className="-rotate-90" />
                                                         </button>
                                                     </div>

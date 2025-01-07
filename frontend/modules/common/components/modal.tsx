@@ -46,7 +46,7 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
                         <div>{title && <h2 className="text-lg font-semibold">{title}</h2>}</div>
                     </div>
                     {/* {title && <h2 className="text-lg font-semibold mb-4">{title}</h2>} */}
-                    <button className="absolute top-6 right-6 hidden group-data-[has-x=true]:block" onClick={onClose}>
+                    <button aria-label="cancel" className="absolute top-6 right-6 hidden group-data-[has-x=true]:block" onClick={onClose}>
                         <XMark size={20} />
                     </button>
                     <div className="py-8 md:px-4">{children}</div>

@@ -43,7 +43,7 @@ const Addresses = ({
                     {!isOpen && <CheckCircleSolid />}
                 </h2>
                 {!isOpen && cart?.shipping_address && (
-                    <button className="hover:text-blue-400" data-testid="edit-address-button" onClick={handleEdit}>
+                    <button aria-label="eidt" className="hover:text-blue-400" data-testid="edit-address-button" onClick={handleEdit}>
                         Edit
                     </button>
                 )}

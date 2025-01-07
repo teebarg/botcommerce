@@ -115,6 +115,7 @@ function PushNotificationManager() {
         <div>
             {newContent && (
                 <button
+                    aria-label="reload page"
                     className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all flex items-center justify-center"
                     onClick={handleReload}
                 >

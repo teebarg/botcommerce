@@ -22,7 +22,7 @@ export default async function CheckoutLayout({ children }: Props) {
 
     return (
         <React.Fragment>
-            <div className="w-full md:px-2 lg:px-24 py-0 md:py-4">
+            <div className="w-full md:px-2 py-0 md:py-4 mx-auto max-w-9xl">
                 <div className="flex gap-6 mt-0 md:mt-6">
                     <div className="hidden md:block">
                         <CollectionsSideBar categories={categories} collections={collections} />

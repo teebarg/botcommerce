@@ -1,7 +1,10 @@
 import json
 from datetime import datetime
 
-from fastapi import FastAPI
+from app.core.deps import Notification
+from app.core import deps
+from app.core.decorators import limit
+from fastapi import FastAPI, HTTPException, Request
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
@@ -13,6 +16,7 @@ from app.core.utils import (
     send_email,
 )
 from app.models.generic import ContactFormCreate, NewsletterCreate
+from app.services.cache import CacheService
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
 
@@ -66,6 +70,26 @@ async def newsletter(data: NewsletterCreate):
         html_content=email_data.html_content,
     )
     return {"message": "Email sent successfully"}
+
+
+@app.post("/api/log-error")
+@limit("2/minute")
+async def log_error(error: dict, notification: Notification, redis: deps.CacheService, request: Request):
+    # Add a timestamp to the error
+    error["timestamp"] = datetime.utcnow().isoformat()
+    
+    # Send the error to Slack
+    slack_message = {
+        "text": f"🚨 *Error Logged* 🚨\n"
+                f"*Message:* {error.get('message', 'N/A')}\n"
+                f"*Source:* {error.get('source', 'N/A')}\n"
+                f"*Timestamp:* {error['timestamp']}\n"
+                f"*Stack:* {error.get('stack', 'N/A')}"
+    }
+    notification.send_notification(
+        channel_name="slack",
+        slack_message=slack_message
+    )
 
 
 # @app.post("/api/test-notification")

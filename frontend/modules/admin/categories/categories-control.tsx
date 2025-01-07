@@ -55,7 +55,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
         <React.Fragment>
             <div className="flex items-center gap-2">
                 {canAdd && (
-                    <button onClick={openModal}>
+                    <button aria-label="add categories" onClick={openModal}>
                         <Plus />
                     </button>
                 )}
@@ -63,7 +63,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                     <div>
                         <div className="bg-default-100 rounded-lg shadow-md p-3 min-w-[100px] text-sm font-medium">
                             <div className="mb-2">
-                                <button className="flex w-full items-center" onClick={editModal}>
+                                <button aria-label="edit category" className="flex w-full items-center" onClick={editModal}>
                                     <span className="mr-2">
                                         <PencilSquare />
                                     </span>
@@ -72,6 +72,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                             </div>
                             <div>
                                 <button
+                                    aria-label="delete catrgory"
                                     className={cn("flex w-full items-center text-rose-500", {
                                         "pointer-events-none select-none opacity-50": category?.children.length > 0,
                                     })}
