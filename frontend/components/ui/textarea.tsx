@@ -57,9 +57,9 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-100 group-data-[focus=true]:bg-default-100",
+                        "relative w-full inline-flex shadow-sm px-3 bg-content1 data-[hover=true]:bg-content3 group-data-[focus=true]:bg-default-100",
                         "min-h-10 rounded-medium flex-col items-start justify-center gap-0 !h-auto transition-background motion-reduce:transition-none !duration-150 outline-none",
-                        "group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus group-data-[focus-visible=true]:ring-offset-2",
+                        "group-data-[focus-visible=true]:z-10",
                         "group-data-[focus-visible=true]:ring-offset-background py-2",
                         classNames?.["inputWrapper"]
                     )}

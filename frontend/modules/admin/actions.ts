@@ -90,6 +90,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         name: formData.get("name"),
         is_active: Boolean(formData.get("is_active")) ?? false,
         description: formData.get("description"),
+        brands: JSON.parse(formData.get("brands") as string) ?? [],
         categories: JSON.parse(formData.get("categories") as string) ?? [],
         collections: JSON.parse(formData.get("collections") as string) ?? [],
         price: formData.get("price") ?? 0,

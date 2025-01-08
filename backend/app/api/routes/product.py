@@ -250,6 +250,7 @@ def update(
     db_product = crud.product.update(db=db, db_obj=db_product, obj_in=product_in)
     redis.delete(f"product:{db_product.slug}")
     redis.delete(f"product:{id}")
+    redis.delete_pattern("search:*")
 
     try:
         # Define the background task
@@ -280,6 +281,7 @@ def delete(db: SessionDep, id: int, redis: deps.CacheService,) -> Message:
         delete_document(index_name="products", document_id=str(id))
         redis.delete(f"product:{product.slug}")
         redis.delete(f"product:{id}")
+        redis.delete_pattern("search:*")
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
@@ -339,6 +341,7 @@ async def upload_product_image(
     file: Annotated[UploadFile, File()],
     db: SessionDep,
     bucket: deps.Storage,
+    redis: deps.CacheService
 ):
     """
     Upload a product image.
@@ -366,6 +369,9 @@ async def upload_product_image(
             product_data = prepare_product_data_for_indexing(product)
 
             update_document(index_name="products", document=product_data)
+
+            # Remove cached data
+            redis.delete(f"product:{product.id}")
 
             # Return the updated product
             return product

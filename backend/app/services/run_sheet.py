@@ -17,9 +17,11 @@ from app.core.logging import logger
 from app.core.utils import generate_data_export_email, send_email
 from app.db.engine import engine
 from app.models.generic import (
+    Brand,
     Category,
     Collection,
     Product,
+    ProductBrand,
     ProductCategory,
     ProductCollection,
     ProductImages,
@@ -108,6 +110,7 @@ async def process_products(file_content, content_type: str, user_id: int):
                     "image": row_data.get("image", ""),
                 }
 
+                brands = row_data.get("brands", "")
                 categories = row_data.get("categories", "")
                 collections = row_data.get("collections", "")
                 images = row_data.get("images", "")
@@ -164,9 +167,9 @@ async def create_or_update_products_in_db(products: List):
                 ).all()
             }
             print(existing_products)
-            
+
             products_to_add = []
-            for product_data, _categories, _collections, images in products:
+            for product_data, _brands, _categories, _collections, images in products:
                 if product_data['slug'] in existing_products:
                     # Update existing product
                     existing_product = existing_products[product_data['slug']]
@@ -178,13 +181,13 @@ async def create_or_update_products_in_db(products: List):
                     if 'id' in product_data:
                         del product_data['id']
                     products_to_add.append(Product(**product_data))
-            
+
             # Bulk insert new products
             if products_to_add:
                 session.add_all(products_to_add)
-                
+
             session.commit()
-            
+
             # Update related models in bulk
             await update_related_models(products, session)
 
@@ -205,38 +208,51 @@ async def create_or_update_products_in_db(products: List):
 async def update_related_models(products: List, session: Session):
     # Collect all slugs
     product_slugs = [p[0]["slug"] for p in products]
-    
+
     # Fetch all products in one query
     products_map = {
         p.slug: p for p in session.exec(
             select(Product).where(Product.slug.in_(product_slugs))
         ).all()
     }
-    
+
     # Prepare bulk operations
+    brands_to_add = []
     categories_to_add = []
     collections_to_add = []
     images_to_add = []
-    
+
     # Get all existing categories and collections upfront
+    all_brands = {
+        c.slug: c for c in session.exec(select(Brand)).all()
+    }
     all_categories = {
         c.slug: c for c in session.exec(select(Category)).all()
     }
     all_collections = {
         c.slug: c for c in session.exec(select(Collection)).all()
     }
-    
-    for product_data, categories, collections, images in products:
+
+    for product_data, brands, categories, collections, images in products:
         product = products_map.get(product_data["slug"])
         if not product:
             continue
-            
+
         # Delete existing relationships in bulk
+        session.exec(delete(ProductBrand).where(ProductBrand.product_id == product.id))
         session.exec(delete(ProductCategory).where(ProductCategory.product_id == product.id))
         session.exec(delete(ProductCollection).where(ProductCollection.product_id == product.id))
         session.exec(delete(ProductImages).where(ProductImages.product_id == product.id))
-        
+
         # Prepare new relationships for bulk insert
+        if brands and isinstance(brands, str):
+            for brand_slug in brands.split(","):
+                brand_slug = brand_slug.strip()
+                if brand := all_brands.get(brand_slug):
+                    brands_to_add.append(
+                        ProductBrand(product_id=product.id, brand_id=brand.id)
+                    )
+
         if categories and isinstance(categories, str):
             for cat_slug in categories.split(","):
                 cat_slug = cat_slug.strip()
@@ -244,7 +260,7 @@ async def update_related_models(products: List, session: Session):
                     categories_to_add.append(
                         ProductCategory(product_id=product.id, category_id=category.id)
                     )
-                    
+
         if collections and isinstance(collections, str):
             for coll_slug in collections.split(","):
                 coll_slug = coll_slug.strip()
@@ -252,21 +268,23 @@ async def update_related_models(products: List, session: Session):
                     collections_to_add.append(
                         ProductCollection(product_id=product.id, collection_id=collection.id)
                     )
-                    
+
         if images and isinstance(images, str):
             for image in images.split("|"):
                 images_to_add.append(
                     ProductImages(product_id=product.id, image=image.strip())
                 )
-    
+
     # Bulk insert all relationships
+    if brands_to_add:
+        session.add_all(brands_to_add)
     if categories_to_add:
         session.add_all(categories_to_add)
     if collections_to_add:
         session.add_all(collections_to_add)
     if images_to_add:
         session.add_all(images_to_add)
-        
+
     session.commit()
 
 
@@ -285,6 +303,11 @@ async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int
                 ).all()
 
                 for product in products_to_remove:
+                    session.exec(
+                        delete(ProductBrand).where(
+                            ProductBrand.product_id == product.id
+                        )
+                    )
                     session.exec(
                         delete(ProductCollection).where(
                             ProductCollection.product_id == product.id
@@ -358,6 +381,7 @@ async def generate_excel_file(bucket: Any, email: str):
             "is_active",
             "categories",
             "collections",
+            "brands",
             "images",
         ]
         sheet.append(headers)
@@ -379,6 +403,15 @@ async def generate_excel_file(bucket: Any, email: str):
                 .where(ProductCollection.product_id == product.id)
             ).all()
 
+            # Fetch product brands as a comma-separated string
+            brands = session.exec(
+                select(Brand.slug)
+                .join(
+                    ProductBrand, Brand.id == ProductBrand.brand_id
+                )
+                .where(ProductBrand.product_id == product.id)
+            ).all()
+
             # Fetch product images as a |-separated string
             images = session.exec(
                 select(ProductImages.image).where(
@@ -387,6 +420,7 @@ async def generate_excel_file(bucket: Any, email: str):
             ).all()
 
             # Create a comma-separated string of collection names
+            brands_str = ",".join(brands)
             categories_str = ",".join(categories)
             collections_str = ",".join(collections)
             images_str = "|".join(images)
@@ -406,6 +440,7 @@ async def generate_excel_file(bucket: Any, email: str):
                     product.is_active,
                     categories_str,
                     collections_str,
+                    brands_str,
                     images_str,
                 ]
             )

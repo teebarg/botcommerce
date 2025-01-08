@@ -3,7 +3,7 @@ import { Product } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
-import { getCategories, getCustomer, getProducts } from "@lib/data";
+import { getBrands, getCategories, getCustomer, getProducts } from "@lib/data";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteProduct, getCollections } from "@modules/admin/actions";
@@ -17,15 +17,12 @@ export const metadata: Metadata = {
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 
-const fetchProducts = async (search = "", page = 1, limit = 10) => {
-    return await getProducts(search, undefined, page, limit);
-};
-
 export default async function ProductsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { products, ...pagination } = await fetchProducts(search, page, limit);
+    const { products, ...pagination } = await getProducts(search, undefined, page, limit);
+    const { brands } = (await getBrands()) as { brands: [] };
     const { collections } = (await getCollections(1, 100)) as { collections: [] };
     const { categories } = await getCategories();
 
@@ -43,7 +40,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                         canExport
                         canIndex
                         columns={["No", "Image", "Name", "Description", "Price", "Old Price", "Created At"]}
-                        form={<ProductForm categories={categories} collections={collections} type="create" />}
+                        form={<ProductForm brands={brands} categories={categories} collections={collections} type="create" />}
                         pagination={pagination}
                         searchQuery={search}
                     >
@@ -81,7 +78,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                         <Actions
                                             label="product"
                                             deleteAction={deleteProduct}
-                                            form={<ProductForm categories={categories} collections={collections} current={item} type="update" />}
+                                            form={
+                                                <ProductForm
+                                                    brands={brands}
+                                                    categories={categories}
+                                                    collections={collections}
+                                                    current={item}
+                                                    type="update"
+                                                />
+                                            }
                                             item={item}
                                         />
                                     </td>
