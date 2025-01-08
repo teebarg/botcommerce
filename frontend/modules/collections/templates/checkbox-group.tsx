@@ -70,7 +70,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
 
     return (
         <React.Fragment>
-            <div style={{ marginBottom: "20px" }}>
+            <div style={{ marginBottom: "16px" }}>
                 <Checkbox isSelected={dataSet.has(item.slug)} label={groupName} onChange={handleParentChange} />
                 <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
                     {checkboxes.map((checkbox) => (

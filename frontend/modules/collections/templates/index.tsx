@@ -19,6 +19,8 @@ interface ComponentProps {
         page?: number;
         sortBy?: SortOptions;
         cat_ids?: string;
+        maxPrice?: string;
+        minPrice?: string;
     };
 }
 
@@ -39,6 +41,8 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         limit: 12,
         page: page ?? 1,
         sort: sortBy ?? "created_at:desc",
+        max_price: searchParams?.maxPrice ?? 100000000,
+        min_price: searchParams?.minPrice ?? 0,
     };
 
     if (collection?.id) {
@@ -54,7 +58,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     return (
         <React.Fragment>
             <div className="hidden md:block">
-                <CollectionsSideBar categories={categories} collections={collections} facets={facets} />
+                <CollectionsSideBar categories={categories} collections={collections} facets={facets} searchParams={searchParams} />
             </div>
             <div className="w-full flex-1 flex-col">
                 <div className="w-full">
