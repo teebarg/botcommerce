@@ -37,7 +37,6 @@ router = APIRouter()
 @router.get(
     "/",
     dependencies=[],
-    response_model=Collections,
 )
 def index(
     db: SessionDep,
@@ -82,13 +81,13 @@ def index(
         total_count=total_count,
     )
 
-    # Cache the result for 5 minutes
+    # Cache the result
     redis.set(cache_key, result.model_dump_json())
 
     return result
 
 
-@router.post("/", response_model=Collection)
+@router.post("/")
 def create(*, db: SessionDep, create_data: CollectionCreate) -> Collection:
     """
     Create new collection.
@@ -104,7 +103,7 @@ def create(*, db: SessionDep, create_data: CollectionCreate) -> Collection:
     return collection
 
 
-@router.get("/{id}", response_model=Collection)
+@router.get("/{id}")
 def read(id: int, db: SessionDep, redis: deps.CacheService) -> Collection:
     """
     Get a specific collection by id with Redis caching.
@@ -120,13 +119,13 @@ def read(id: int, db: SessionDep, redis: deps.CacheService) -> Collection:
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
 
-    # Cache the result for 5 minutes
+    # Cache the result
     redis.set(cache_key, collection.model_dump_json())
 
     return collection
 
 
-@router.get("/slug/{slug}", response_model=Collection)
+@router.get("/slug/{slug}")
 def get_by_slug(slug: str, db: SessionDep) -> Collection:
     """
     Get a collection by its slug.
@@ -140,7 +139,6 @@ def get_by_slug(slug: str, db: SessionDep) -> Collection:
 @router.patch(
     "/{id}",
     dependencies=[Depends(get_current_user)],
-    response_model=Collection,
 )
 def update(
     *,

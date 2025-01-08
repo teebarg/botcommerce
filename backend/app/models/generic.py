@@ -61,9 +61,9 @@ class ProductImages(SQLModel, table=True):
     product: "Product" = Relationship(back_populates="images")
 
 
-# class ProductBrand(SQLModel, table=True):
-#     product_id: int = Field(foreign_key="product.id", primary_key=True)
-#     brand_id: int = Field(foreign_key="brand.id", primary_key=True)
+class ProductBrand(SQLModel, table=True):
+    product_id: int = Field(foreign_key="product.id", primary_key=True)
+    brand_id: int = Field(foreign_key="brand.id", primary_key=True)
 
 
 class ProductCategory(SQLModel, table=True):
@@ -147,9 +147,9 @@ class Product(ProductBase, table=True):
         back_populates="products", link_model=ProductCollection
     )
     # tags: list["Tag"] = Relationship(back_populates="products", link_model=ProductTag)
-    # brands: list["Brand"] = Relationship(
-    #     back_populates="products", link_model=ProductBrand
-    # )
+    brands: list["Brand"] = Relationship(
+        back_populates="products", link_model=ProductBrand
+    )
 
 
 class ProductPublic(ProductBase):
@@ -159,7 +159,7 @@ class ProductPublic(ProductBase):
     categories: list[Category] = []
     collections: list[Collection] = []
     # tags: list[Tag] = []
-    # brands: list[Brand] = []
+    brands: list[Brand] = []
 
 
 class Products(SQLModel):
