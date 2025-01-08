@@ -63,14 +63,11 @@ function PushNotificationManager() {
     }
 
     async function registerServiceWorker() {
-        console.log("register");
         const registration = await navigator.serviceWorker.register("/sw.js", {
             scope: "/",
             updateViaCache: "none",
         });
         const sub = await registration.pushManager.getSubscription();
-        console.log("sub");
-        console.log(sub);
 
         if (!sub) {
             // Don't auto-subscribe, let user initiate
@@ -83,7 +80,6 @@ function PushNotificationManager() {
 
     // Add a new function to handle user opt-in
     async function handleNotificationOptIn() {
-        console.log("yoooooooo");
         if (!isSupported) {
             enqueueSnackbar("Push notifications are not supported in your browser", { variant: "error" });
             return;
@@ -94,10 +90,7 @@ function PushNotificationManager() {
     }
 
     async function subscribeToPush() {
-        console.log("subscribd");
         const permissionGranted = await requestNotificationPermission();
-        console.log("permissionGranted");
-        console.log(permissionGranted);
 
         if (!permissionGranted) {
             enqueueSnackbar("Notification permission not granted", { variant: "error" });
@@ -105,12 +98,10 @@ function PushNotificationManager() {
             return;
         }
         const registration = await navigator.serviceWorker.ready;
-        console.log(registration);
         const sub = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
         });
-        console.log(sub);
 
         // Send subscription to your backend
         const res = await subscribeUser(sub);
