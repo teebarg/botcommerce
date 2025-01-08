@@ -1,5 +1,5 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "botmerce-cache-v1"; // Increment this value for new versions
+const CACHE_NAME = "botmerce-cache-v2"; // Increment this value for new versions
 const ASSETS_TO_CACHE = [
     "/", // Root URL
     "/career-opportunities",
@@ -15,7 +15,6 @@ const ASSETS_TO_CACHE = [
     "/bot.svg",
     "/empty-cart.png",
     "/frontend.webp",
-    "/promo-banner.webp",
     "/side-banner.webp",
     "/offline", // A fallback page for offline users
     "/favicon.ico", // Favicon
@@ -45,7 +44,6 @@ self.addEventListener("activate", (event) => {
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
                         console.log("[Service Worker] Deleting old cache:", cache);
-
                         return caches.delete(cache);
                     }
                 })

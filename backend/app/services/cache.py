@@ -24,19 +24,19 @@ class CacheService:
         self,
         key: str,
         value: Any,
-        expiration_seconds: Optional[int] = timedelta(hours=24),
+        expire: Optional[int] = timedelta(hours=24),
     ) -> bool:
         """
         Set a key-value pair in cache
         Args:
             key: Cache key
             value: Value to store
-            expiration_seconds: Time in seconds after which the key will expire
+            expire: Time in seconds after which the key will expire
         Returns:
             bool: True if successful, False otherwise
         """
         try:
-            return self.redis.set(key, value, ex=expiration_seconds)
+            return self.redis.set(key, value, ex=expire)
         except Exception as e:
             logger.error(f"Error setting cache: {str(e)}")
             return False

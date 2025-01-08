@@ -1,6 +1,0 @@
-# Allow all web crawlers to access the site
-User-agent: *
-Allow: /
-
-# Specify the location of your sitemap (if you have one)
-Sitemap: https://commerce.niyi.com.ng/sitemap.xml

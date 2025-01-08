@@ -4,14 +4,13 @@ import { ThemeScript } from "@lib/theme/theme-script";
 import { getCustomer } from "@lib/data";
 import dynamic from "next/dynamic";
 
-import OverlayClientProvider from "./overlay-providers";
-import Google from "./google";
-
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
 
+const Google = dynamic(() => import("./google"), { ssr: false });
 const NotificationProviders = dynamic(() => import("./notistack-providers"), { ssr: false });
+const OverlayClientProvider = dynamic(() => import("./overlay-providers"), { ssr: false });
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 

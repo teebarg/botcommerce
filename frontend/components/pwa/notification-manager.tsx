@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 
 import { subscribeUser, unsubscribeUser } from "./actions";
+import { Button } from "../ui/button";
+import { RightArrowIcon } from "nui-react-icons";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     try {
@@ -43,6 +45,7 @@ function PushNotificationManager() {
             }
         });
 
+        // Only check if push is supported, don't register yet
         if ("serviceWorker" in navigator && "PushManager" in window) {
             registerServiceWorker();
             setIsSupported(true);
@@ -67,12 +70,23 @@ function PushNotificationManager() {
         const sub = await registration.pushManager.getSubscription();
 
         if (!sub) {
-            await subscribeToPush();
-
+            // Don't auto-subscribe, let user initiate
+            setSubscription(null);
             return;
         }
 
         setSubscription(sub);
+    }
+
+    // Add a new function to handle user opt-in
+    async function handleNotificationOptIn() {
+        if (!isSupported) {
+            enqueueSnackbar("Push notifications are not supported in your browser", { variant: "error" });
+            return;
+        }
+
+        // await registerServiceWorker();
+        await subscribeToPush();
     }
 
     async function subscribeToPush() {
@@ -113,6 +127,34 @@ function PushNotificationManager() {
 
     return (
         <div>
+            {/* Add notification opt-in button */}
+            {isSupported && !subscription && (
+                <div className="flex w-full items-center justify-center gap-x-3 py-2 border-b">
+                    <div className="text-small flex items-end sm:text-[0.93rem] text-foreground hover:opacity-80 transition-opacity">
+                        <span aria-label="rocket" className="hidden md:block" role="img">
+                            🚀
+                        </span>
+                        <span
+                            className="inline-flex md:ml-1 animate-text-gradient font-medium bg-clip-text text-transparent bg-[linear-gradient(90deg,#D6009A_0%,#8a56cc_50%,#D6009A_100%)] dark:bg-[linear-gradient(90deg,#FFEBF9_0%,#8a56cc_50%,#FFEBF9_100%)]"
+                            style={{ fontSize: "inherit", backgroundSize: "200%", backgroundClip: "text" }}
+                        >
+                            Enable Push Notifications
+                        </span>
+                    </div>
+                    <Button className="min-w-[100px] gap-2 !rounded-full p-[1px]" onClick={handleNotificationOptIn}>
+                        <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F54180_0%,#338EF7_50%,#F54180_100%)]" />
+                        <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background group-hover:bg-background/70 transition-background px-3 py-1 text-sm font-medium text-foreground backdrop-blur-3xl">
+                            Enable
+                            <RightArrowIcon
+                                aria-hidden="true"
+                                className="outline-none transition-transform group-hover:translate-x-0.5 [&amp;>path]:stroke-[2px]"
+                                role="img"
+                                size={16}
+                            />
+                        </div>
+                    </Button>
+                </div>
+            )}
             {newContent && (
                 <button
                     aria-label="reload page"

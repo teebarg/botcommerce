@@ -17,6 +17,16 @@ const nextConfig = {
             },
         ],
     },
+    async rewrites() {
+        return {
+          beforeFiles: [
+            {
+              source: '/sitemap.xml',
+              destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/sitemap.xml`,
+            }
+          ]
+        }
+      }
 };
 
 module.exports = nextConfig;
