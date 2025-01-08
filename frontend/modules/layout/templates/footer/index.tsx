@@ -143,10 +143,7 @@ export default async function Footer() {
                             <ul className="mt-2 space-y-2">
                                 {about.map((item, index) => (
                                     <li key={index}>
-                                        <LocalizedClientLink
-                                            className="text-sm hover:opacity-80 transition-opacity text-default-500"
-                                            href={item.to}
-                                        >
+                                        <LocalizedClientLink className="text-sm hover:opacity-80 transition-opacity text-default-500" href={item.to}>
                                             {item.label}
                                         </LocalizedClientLink>
                                     </li>

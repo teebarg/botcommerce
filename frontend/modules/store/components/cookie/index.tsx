@@ -3,7 +3,7 @@
 import { FC, useEffect, useState } from "react";
 import { useCookie } from "@lib/hooks/use-cookie";
 import Link from "next/link";
-import Button from "@modules/common/components/button";
+import { Button } from "@/components/ui/button";
 
 export interface CookieProps {}
 
@@ -47,7 +47,7 @@ export const Cookie: FC<CookieProps> = () => {
                                 backgroundOrigin: "border-box",
                                 backgroundClip: "padding-box, border-box",
                             }}
-                            onPress={handleCookie}
+                            onClick={handleCookie}
                         >
                             Accept All
                         </Button>

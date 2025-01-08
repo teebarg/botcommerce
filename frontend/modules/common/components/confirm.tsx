@@ -1,6 +1,5 @@
+import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
-
-import Button from "./button";
 
 interface Props {
     title?: string;
@@ -36,16 +35,16 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", onConfirm, onClose }) =>
                         </p>
                     </div>
                     <div className="flex justify-end gap-2 mt-8">
-                        <Button className="min-w-36" color="default" variant="shadow" onPress={onClose}>
+                        <Button className="min-w-36" color="default" variant="shadow" onClick={onClose}>
                             Close
                         </Button>
                         <div>
                             {isPending ? (
-                                <Button isDisabled isLoading className="min-w-36" color="danger" variant="shadow">
+                                <Button disabled isLoading className="min-w-36" color="danger" variant="shadow">
                                     Deleting...
                                 </Button>
                             ) : (
-                                <Button className="min-w-36" color="danger" type="submit" variant="shadow" onPress={onSubmit}>
+                                <Button className="min-w-36" color="danger" type="submit" variant="shadow" onClick={onSubmit}>
                                     Delete
                                 </Button>
                             )}

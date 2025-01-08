@@ -4,7 +4,6 @@ import React, { forwardRef, useRef } from "react";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { ImageUpload } from "@modules/common/components/image-upload";
-import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Switch } from "@modules/common/components/switch";
@@ -15,6 +14,7 @@ import { Number } from "@components/ui/number";
 import { TextArea } from "@components/ui/textarea";
 
 import { createProduct, uploadProductImage } from "../actions";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     current?: any;
@@ -30,7 +30,7 @@ interface ChildRef {
 }
 
 const ProductForm = forwardRef<ChildRef, Props>(
-    ({ type = "create", onClose, current = { name: "", is_active: true }, brands = [],categories = [], collections = [] }, ref) => {
+    ({ type = "create", onClose, current = { name: "", is_active: true }, brands = [], categories = [], collections = [] }, ref) => {
         const router = useRouter();
         const [selectedBrands, setSelectedBrands] = React.useState<number[]>([]);
         const [selectedCategories, setSelectedCategories] = React.useState<number[]>([]);
@@ -150,7 +150,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                             </div>
                         </div>
                         <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
-                            <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
+                            <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
                                 Cancel
                             </Button>
                             <FormButton className="min-w-32" color="primary" variant="shadow">

@@ -2,12 +2,12 @@
 
 import { placeOrder } from "@modules/checkout/actions";
 import React, { useEffect, useState } from "react";
-import Button from "@modules/common/components/button";
 import { Cart, Customer, PaymentSession } from "types/global";
 import { Modal } from "@modules/common/components/modal";
 import { useSnackbar } from "notistack";
 import { useOverlayTriggerState } from "react-stately";
 import CheckoutLoginForm from "@modules/account/components/login-form";
+import { Button } from "@/components/ui/button";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -31,9 +31,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, customer, "data-tes
         case "manual":
             return <ManualTestPaymentButton customer={customer} data-testid={dataTestId} notReady={notReady} />;
         case "stripe":
-            return <Button isDisabled>Continue to payment</Button>;
+            return <Button disabled>Continue to payment</Button>;
         default:
-            return <Button isDisabled>Select a payment method</Button>;
+            return <Button disabled>Select a payment method</Button>;
     }
 };
 
@@ -46,7 +46,7 @@ const GiftCardPaymentButton = () => {
     };
 
     return (
-        <Button data-testid="submit-order-button" isLoading={submitting} onPress={handleOrder}>
+        <Button data-testid="submit-order-button" isLoading={submitting} onClick={handleOrder}>
             Place order
         </Button>
     );
@@ -91,10 +91,10 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
                 className="min-w-32"
                 color="danger"
                 data-testid="submit-order-button"
-                isDisabled={notReady}
+                disabled={notReady}
                 isLoading={submitting}
                 size="sm"
-                onPress={handlePayment}
+                onClick={handlePayment}
             >
                 Place order
             </Button>

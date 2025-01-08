@@ -4,7 +4,6 @@ import React from "react";
 import { FunnelIcon } from "nui-react-icons";
 import useWatch from "@lib/hooks/use-watch";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
-import Button from "@modules/common/components/button";
 import { ComboBox } from "@modules/common/components/combobox";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { SlideOver } from "@modules/common/components/slideover";
@@ -12,6 +11,7 @@ import { Category, Collection } from "types/global";
 
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
+import { Button } from "@/components/ui/button";
 
 interface ComponentProps {
     count: any;
@@ -35,7 +35,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, cate
             <header className="relative z-20 flex flex-col sm:gap-2 rounded-medium bg-default-100 px-4 pb-3 pt-2 md:pt-3">
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
-                        <Button className="md:hidden" onPress={state.open}>
+                        <Button className="md:hidden" onClick={state.open}>
                             <FunnelIcon className="text-default-500" focusable="false" role="img" size={16} />
                             Filters ({count})
                         </Button>

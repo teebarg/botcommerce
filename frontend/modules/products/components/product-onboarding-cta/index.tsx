@@ -1,4 +1,4 @@
-import Button from "@modules/common/components/button";
+import { Button } from "@/components/ui/button";
 
 const ProductOnboardingCta = () => {
     return (

@@ -1,15 +1,14 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import React from "react";
 import { useFormStatus } from "react-dom";
-
-import Button from "../button";
 
 export function FormButton({
     children,
     color = "default",
     variant = "solid",
-    size = "md",
+    size = "sm",
     className,
     "data-testid": dataTestId,
 }: {

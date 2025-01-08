@@ -1,10 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: [
-        "./modules/**/*.{js,ts,jsx,tsx}",
-        "./components/**/*.{js,ts,jsx,tsx,mdx}",
-        "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    ],
+    content: ["./modules/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
     theme: {
         extend: {
             backgroundColor: {
@@ -154,8 +150,8 @@ module.exports = {
                 "spinner-linear-spin": "spinner-spin 0.8s linear infinite",
             },
             maxWidth: {
-                '8xl': '88rem',  // 1408px
-                '9xl': '96rem',  // 1536px
+                "8xl": "88rem", // 1408px
+                "9xl": "96rem", // 1536px
             },
         },
     },

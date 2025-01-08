@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useWebSocket } from "@lib/hooks/use-websocket";
-import Button from "@modules/common/components/button";
 import { ProgressBar } from "@modules/common/components/progress-bar";
 
 import { DragNDrop } from "./drag-drop";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     onUpload: (formData: any) => void;
@@ -71,10 +71,10 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
                 <Button
                     className="min-w-48 rounded-md"
                     color="secondary"
-                    isDisabled={status || currentMessage?.status == "processing"}
+                    disabled={status || currentMessage?.status == "processing"}
                     isLoading={status || currentMessage?.status == "processing"}
                     variant="shadow"
-                    onPress={() => handleSubmit()}
+                    onClick={() => handleSubmit()}
                 >
                     {currentStatus()}
                 </Button>

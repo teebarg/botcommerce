@@ -9,9 +9,9 @@ import { exportProducts, indexProducts } from "@modules/admin/actions";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Input } from "@components/ui/input";
 
-import Button from "../button";
 import { Pagination } from "../pagination";
 import { SlideOver } from "../slideover";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     children: React.ReactNode;
@@ -87,22 +87,16 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                             onClear={() => onClear()}
                         />
                         <div className="flex items-center gap-3">
-                            <Button color="primary" endContent={<Plus />} onPress={() => state.open()}>
+                            <Button color="primary" endContent={<Plus />} onClick={() => state.open()}>
                                 Add New
                             </Button>
                             {canExport && (
-                                <Button
-                                    className="min-w-28"
-                                    color="secondary"
-                                    isDisabled={isExporting}
-                                    isLoading={isExporting}
-                                    onPress={handleExport}
-                                >
+                                <Button className="min-w-28" color="secondary" disabled={isExporting} isLoading={isExporting} onClick={handleExport}>
                                     Export
                                 </Button>
                             )}
                             {canIndex && (
-                                <Button className="min-w-28" color="secondary" isDisabled={isIndexing} isLoading={isIndexing} onPress={handleIndex}>
+                                <Button className="min-w-28" color="secondary" disabled={isIndexing} isLoading={isIndexing} onClick={handleIndex}>
                                     Index
                                 </Button>
                             )}

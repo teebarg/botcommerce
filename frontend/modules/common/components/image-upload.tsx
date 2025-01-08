@@ -6,8 +6,7 @@ import { DragNDrop } from "@modules/admin/components/drag-drop";
 import { FileTypes } from "types/global";
 import { useSnackbar } from "notistack";
 import Image from "next/image";
-
-import Button from "./button";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     onUpload: (formData: any) => void;
@@ -71,7 +70,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                             <div className="h-72 w-80 rounded-lg overflow-hidden relative">
                                 <Image fill alt="Product" src={preview} />
                             </div>
-                            <Button onPress={() => setPreview(undefined)}>
+                            <Button onClick={() => setPreview(undefined)}>
                                 <EditIcon size={24} />
                             </Button>
                         </div>
@@ -86,14 +85,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                     />
                 )}
                 {preview && isDirty && (
-                    <Button
-                        className="min-w-24 mt-2"
-                        color="secondary"
-                        isDisabled={status}
-                        isLoading={status}
-                        variant="shadow"
-                        onPress={handleSubmit}
-                    >
+                    <Button className="min-w-24 mt-2" color="secondary" disabled={status} isLoading={status} variant="shadow" onClick={handleSubmit}>
                         Upload{status ? "ing" : ""}
                     </Button>
                 )}

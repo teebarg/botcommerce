@@ -4,8 +4,7 @@ import React from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { Pagination as PaginationType } from "types/global";
 import { cn } from "@lib/util/cn";
-
-import Button from "./button";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     pagination: PaginationType;
@@ -120,10 +119,10 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                 </ul>
             </nav>
             <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                <Button isDisabled={pagination?.total_pages === 1 || page == 1} size="sm" variant="flat" onPress={onPreviousPage}>
+                <Button disabled={pagination?.total_pages === 1 || page == 1} size="sm" variant="flat" onClick={onPreviousPage}>
                     Previous
                 </Button>
-                <Button isDisabled={pagination?.total_pages === 1 || page == pagination?.total_pages} size="sm" variant="flat" onPress={onNextPage}>
+                <Button disabled={pagination?.total_pages === 1 || page == pagination?.total_pages} size="sm" variant="flat" onClick={onNextPage}>
                     Next
                 </Button>
             </div>
