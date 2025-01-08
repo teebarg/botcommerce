@@ -1,8 +1,5 @@
 import React from "react";
-import { getCategories, getCollectionsList } from "@lib/data";
-import { Category, SortOptions } from "types/global";
-
-import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
+import { SortOptions } from "types/global";
 
 type Props = {
     children: React.ReactNode;
@@ -15,19 +12,11 @@ type Props = {
 };
 
 export default async function CheckoutLayout({ children }: Props) {
-    const { collections } = await getCollectionsList();
-
-    const { categories: cat } = await getCategories();
-    const categories = cat?.filter((cat: Category) => !cat.parent_id);
-
     return (
         <React.Fragment>
             <div className="w-full md:px-2 py-0 md:py-4 mx-auto max-w-9xl">
                 <div className="flex gap-6 mt-0 md:mt-6">
-                    <div className="hidden md:block">
-                        <CollectionsSideBar categories={categories} collections={collections} />
-                    </div>
-                    <div className="w-full flex-1 flex-col">{children}</div>
+                    {children}
                 </div>
             </div>
         </React.Fragment>

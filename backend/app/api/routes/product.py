@@ -147,6 +147,7 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
         "limit": limit,
         "offset": (page - 1) * limit,
         "sort": [sort],  # Sort by specified field
+        "facets": ['categories', 'collections'],
     }
 
     if filters:
@@ -167,6 +168,7 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
 
     return {
         "products": search_results["hits"],
+        "facets": search_results.get("facetDistribution", {}),
         "page": page,
         "limit": limit,
         "total_count": total_count,

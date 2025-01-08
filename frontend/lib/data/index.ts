@@ -614,6 +614,10 @@ export async function removeWishlist(product_id: number) {
 
 interface SearchResult {
     products: Product[];
+    facets?: {
+        categories: Record<string, string>;
+        collections: Record<string, string>;
+    };
     page: number;
     limit: number;
     total_count: number;

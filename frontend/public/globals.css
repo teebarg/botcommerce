@@ -167,6 +167,22 @@ body {
         overflow: auto;
         -ms-overflow-style: none;
     }
+
+    /* range slider */    
+    /* track line */
+    .track:before {
+        content: attr(x);
+        display: block;
+        position: absolute;
+        background: gray;
+    }
+    
+    .slider.horizontal .track:before {
+        height: 3px;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 }
 
 @layer base {

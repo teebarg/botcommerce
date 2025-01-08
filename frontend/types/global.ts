@@ -198,8 +198,8 @@ export interface SearchParams {
     query?: string;
     categories?: string;
     collections?: string;
-    min_price?: number;
-    max_price?: number;
+    min_price?: number | string;
+    max_price?: number | string;
     page?: number;
     limit?: number;
     sort?: string;

@@ -5,13 +5,36 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Category, Collection } from "types/global";
 
 import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
+import RangeSlider from "@/components/ui/range-slider";
+import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 
 interface ComponentProps {
     collections: Collection[];
     categories: Category[];
+    facets?: {
+        categories: Record<string, string>;
+        collections: Record<string, string>;
+    };
+    searchParams?: {
+        maxPrice?: string;
+        minPrice?: string;
+    };
 }
 
-const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories }) => {
+const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories, facets, searchParams }) => {
+    const { updateQuery } = useUpdateQuery(500);
+
+    const onPriceChange = (values: number | number[]) => {
+        if (typeof values === "number") {
+            updateQuery([{ key: "maxPrice", value: values.toString() }]);
+            return;
+        }
+        const [minPrice, maxPrice] = values;
+        updateQuery([
+            { key: "minPrice", value: minPrice.toString() },
+            { key: "maxPrice", value: maxPrice.toString() },
+        ]);
+    };
     return (
         <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16">
             <div className="h-full w-full max-w-sm rounded-medium p-6 bg-default-100">
@@ -20,18 +43,26 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories 
                     <hr className="shrink-0 border-none w-full h-[1px] my-1 bg-default-100" />
                     <div className="block mb-6 space-y-1">
                         {collections?.map((item: Collection, index: number) => (
-                            <LocalizedClientLink key={index} className="block text-base" href={`/collections/${item.slug}`}>
-                                {item.name}
+                            <LocalizedClientLink key={index} className="text-base flex justify-between" href={`/collections/${item.slug}`}>
+                                {item.name} {facets?.collections && <span>({facets["collections"][item.name] ?? 0})</span>}
                             </LocalizedClientLink>
                         ))}
                     </div>
                 </div>
                 <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>
                 <hr className="shrink-0 border-none w-full h-[1px] my-3 bg-default-100" />
-                <div className="flex flex-col">
+                <RangeSlider
+                    label="Price"
+                    formatOptions={{ style: "currency", currency: "NGN" }}
+                    maxValue={100000}
+                    defaultValue={[Number(searchParams?.minPrice), Number(searchParams?.maxPrice)]}
+                    onChange={onPriceChange}
+                    step={500}
+                />
+                <div className="flex flex-col mt-2">
                     <span className="mb-2">Categories</span>
                     {categories?.map((item: Category, index: number) => (
-                        <CheckboxGroup key={index} checkboxes={item.children} groupName={item.name} item={item} />
+                        <CheckboxGroup key={index} checkboxes={item.children} groupName={item.name} item={item} facets={facets} />
                     ))}
                 </div>
             </div>
