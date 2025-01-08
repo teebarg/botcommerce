@@ -79,6 +79,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                     </td>
                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
                                         <Actions
+                                            label="product"
                                             deleteAction={deleteProduct}
                                             form={<ProductForm categories={categories} collections={collections} current={item} type="update" />}
                                             item={item}

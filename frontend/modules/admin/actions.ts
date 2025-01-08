@@ -213,6 +213,66 @@ export async function deleteCategory(id: number) {
     }
 }
 
+export async function createBrand(currentState: unknown, formData: FormData) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const brandUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand`;
+
+    const id = formData.get("id");
+    const type = formData.get("type") as string;
+
+    const url = type === "create" ? `${brandUrl}/` : `${brandUrl}/${id}`;
+
+    try {
+        const res = await fetch(url, {
+            method: type === "create" ? "POST" : "PATCH",
+            headers: {
+                "X-Auth": accessToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: formData.get("name"),
+                is_active: Boolean(formData.get("is_active")) ?? false,
+            }),
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("brands");
+
+        return { success: true, message: "Brand created successfully", data: await res.json() };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error creating brand" };
+    }
+}
+
+export async function deleteBrand(brandId: string) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/${brandId}`;
+
+    try {
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "X-Auth": accessToken,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("brands");
+
+        return { success: true, message: "Brand deleted successfully" };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error deleting brand" };
+    }
+}
+
 export async function createCollection(currentState: unknown, formData: FormData) {
     const accessToken = cookies().get("access_token")?.value as string;
     const collectionUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection`;

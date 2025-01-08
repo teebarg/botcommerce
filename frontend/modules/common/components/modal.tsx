@@ -35,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen, size = 
                     data-has-x={hasX ? "true" : "false"}
                     {...overlayProps}
                     ref={ref}
-                    className={cn("bg-default rounded-lg w-full h-full md:h-auto relative z-50", {
+                    className={cn("bg-content1 rounded-lg w-full h-full md:h-auto relative z-50", {
                         "max-w-lg": size == "sm",
                         "max-w-2xl": size == "md",
                         "max-w-5xl": size == "lg",

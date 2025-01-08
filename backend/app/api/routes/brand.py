@@ -1,5 +1,4 @@
 import json
-from typing import Any
 from fastapi import (
     APIRouter,
     Depends,
@@ -80,7 +79,7 @@ def index(
 
 
 @router.post("/")
-def create(*, db: SessionDep, create_data: BrandCreate) -> BrandPublic:
+def create(*, db: SessionDep, create_data: BrandCreate, redis: deps.CacheService) -> BrandPublic:
     """
     Create new brand.
     """
@@ -92,6 +91,7 @@ def create(*, db: SessionDep, create_data: BrandCreate) -> BrandPublic:
         )
 
     brand = crud.brand.create(db=db, obj_in=create_data)
+    redis.delete_pattern("brands:list:*")
     return brand
 
 
@@ -164,6 +164,7 @@ def update(
         db_brand = crud.brand.update(db=db, db_obj=db_brand, obj_in=update_data)
         # Invalidate cache
         redis.delete(f"brand:{id}")
+        redis.delete_pattern("brands:list:*")
         return db_brand
     except IntegrityError as e:
         logger.error(f"Error updating brand, {e.orig.pgerror}")
@@ -177,7 +178,7 @@ def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-def delete(db: SessionDep, id: int) -> Message:
+def delete(id: int, db: SessionDep, redis: deps.CacheService,) -> Message:
     """
     Delete a brand.
     """
@@ -185,4 +186,5 @@ def delete(db: SessionDep, id: int) -> Message:
     if not brand:
         raise HTTPException(status_code=404, detail="Brand not found")
     crud.brand.remove(db=db, id=id)
+    redis.delete_pattern("brands:list:*")
     return Message(message="Brand deleted successfully")

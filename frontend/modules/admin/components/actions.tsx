@@ -11,12 +11,13 @@ import { useRouter } from "next/navigation";
 import { Tooltip } from "@components/ui/tooltip";
 
 interface Props {
+    label?: string;
     item: any;
     form: React.ReactNode;
     deleteAction: (id: string) => void;
 }
 
-const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
+const Actions: React.FC<Props> = ({ label, item, form, deleteAction }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [current, setCurrent] = useState<any>({ is_active: true });
     const deleteModalState = useOverlayTriggerState({});
@@ -34,7 +35,7 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
             await deleteAction(current.id);
             router.refresh();
         } catch (error) {
-            enqueueSnackbar("Error deleting product", { variant: "error" });
+            enqueueSnackbar(`Error deleting ${label}`, { variant: "error" });
         }
     };
 
@@ -46,12 +47,12 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
                         <EyeIcon />
                     </span>
                 </Tooltip>
-                <Tooltip content="Edit products">
+                <Tooltip content={`Edit ${label}`}>
                     <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
                         <EditIcon onClick={() => slideOverState.open()} />
                     </span>
                 </Tooltip>
-                <Tooltip color="danger" content="Delete products">
+                <Tooltip color="danger" content={`Delete ${label}`}>
                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
                         <DeleteIcon onClick={() => onDelete(item)} />
                     </span>
@@ -64,7 +65,7 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
                 </Modal>
             )}
             {slideOverState.isOpen && (
-                <SlideOver className="bg-default-100" isOpen={slideOverState.isOpen} title="Edit Product" onClose={slideOverState.close}>
+                <SlideOver className="bg-default-100" isOpen={slideOverState.isOpen} title={`Edit ${label}`} onClose={slideOverState.close}>
                     {slideOverState.isOpen && formWithHandler}
                 </SlideOver>
             )}

@@ -85,9 +85,9 @@ class ProductTag(SQLModel, table=True):
 class Brand(BrandBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str
-    # products: list["Product"] = Relationship(
-    #     back_populates="brands", link_model=ProductBrand
-    # )
+    products: list["Product"] = Relationship(
+        back_populates="brands", link_model=ProductBrand
+    )
 
 
 class Category(CategoryBase, table=True):
