@@ -8,9 +8,13 @@ interface CheckboxGroupProps {
     groupName: string;
     checkboxes: Record<string, any>[];
     item?: any;
+    facets?: {
+        categories: Record<string, string>;
+        collections: Record<string, string>;
+    };
 }
 
-const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, item }) => {
+const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, facets, item }) => {
     const { updateQuery } = useUpdateQuery(200);
     const [dataSet, setDataSet] = useState(new Set());
 
@@ -67,17 +71,16 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, it
     return (
         <React.Fragment>
             <div style={{ marginBottom: "20px" }}>
-                <div>
-                    <Checkbox isSelected={dataSet.has(item.slug)} label={groupName} onChange={handleParentChange} />
-                </div>
+                <Checkbox isSelected={dataSet.has(item.slug)} label={groupName} onChange={handleParentChange} />
                 <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
                     {checkboxes.map((checkbox) => (
-                        <div key={`sub-${checkbox.slug}`}>
+                        <div key={`sub-${checkbox.slug}`} className="flex justify-between">
                             <Checkbox
                                 isSelected={dataSet.has(checkbox.slug)}
                                 label={checkbox.name}
                                 onChange={(e) => handleChildChange(e, checkbox.slug)}
                             />
+                            {facets?.categories && <span>({facets["categories"][checkbox.name] ?? 0})</span>}
                         </div>
                     ))}
                 </div>
