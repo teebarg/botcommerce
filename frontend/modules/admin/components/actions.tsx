@@ -2,7 +2,7 @@
 
 import { Confirm } from "@modules/common/components/confirm";
 import { Modal } from "@modules/common/components/modal";
-import { DeleteIcon, EditIcon, EyeIcon } from "nui-react-icons";
+import { Delete, EditIcon, Eye } from "nui-react-icons";
 import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { useSnackbar } from "notistack";
@@ -46,7 +46,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                 {showDetails && (
                     <Tooltip content="Details">
                         <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
-                            <EyeIcon />
+                            <Eye />
                         </span>
                     </Tooltip>
                 )}
@@ -57,7 +57,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                 </Tooltip>
                 <Tooltip color="danger" content={`Delete ${label}`}>
                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <DeleteIcon onClick={() => onDelete(item)} />
+                        <Delete onClick={() => onDelete(item)} />
                     </span>
                 </Tooltip>
             </div>

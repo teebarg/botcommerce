@@ -88,6 +88,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                         <div className="w-full flex-1 flex-col">
                             <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-background">
                                 <CollectionsTopBar
+                                    brands={brands}
                                     categories={categories}
                                     collections={collections}
                                     count={pagination.total_count}

@@ -615,6 +615,7 @@ export async function removeWishlist(product_id: number) {
 interface SearchResult {
     products: Product[];
     facets?: {
+        brands: Record<string, string>;
         categories: Record<string, string>;
         collections: Record<string, string>;
     };

@@ -1,4 +1,4 @@
-import { HomeIcon, RefreshCcw } from "nui-react-icons";
+import { Home, PackageSearch, RefreshCcw } from "nui-react-icons";
 import React from "react";
 
 const NoProductsFound = ({
@@ -12,7 +12,9 @@ const NoProductsFound = ({
             {/* Icon Animation Container */}
             <div className="relative mb-6">
                 <div className="absolute inset-0 bg-blue-100 rounded-full opacity-20 animate-ping" />
-                <div className="relative">{/* <PackageSearch className="w-20 h-20 text-blue-600" strokeWidth={1.5} /> */}</div>
+                <div className="relative">
+                    <PackageSearch className="w-20 h-20 text-blue-600" strokeWidth={1.5} />
+                </div>
             </div>
 
             {/* Main Content */}
@@ -46,7 +48,7 @@ const NoProductsFound = ({
                      rounded-lg hover:bg-gray-50 transition-colors duration-200 gap-2"
                         onClick={onGoHome}
                     >
-                        <HomeIcon className="w-4 h-4" />
+                        <Home className="w-4 h-4" />
                         Go to Homepage
                     </button>
                 </div>

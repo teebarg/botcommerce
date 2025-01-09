@@ -7,7 +7,7 @@ import Search from "@/modules/search/components/search";
 import { Customer } from "types/global";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HeartFilled, Heart, HomeIcon, UserGroup, User } from "nui-react-icons";
+import { HeartFilled, Heart, Home, UserGroup, User } from "nui-react-icons";
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -75,7 +75,7 @@ const Navbar = async () => {
                 <Search className="px-0" />
                 <div className="mt-6 flex flex-col gap-2">
                     <NavbarItem className="flex items-center gap-2">
-                        <HomeIcon className="h-8 w-8" />
+                        <Home className="h-8 w-8" />
                         <LocalizedClientLink className="" href="/">
                             Home
                         </LocalizedClientLink>

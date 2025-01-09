@@ -46,7 +46,7 @@ const BannerCarousel: React.FC = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-[500px] overflow-hidden">
+        <div className="relative w-full h-[500px] overflow-hidden rounded-md">
             {banners.map((banner, index) => (
                 <div
                     key={index}

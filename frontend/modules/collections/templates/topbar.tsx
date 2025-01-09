@@ -7,7 +7,7 @@ import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { ComboBox } from "@modules/common/components/combobox";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { SlideOver } from "@modules/common/components/slideover";
-import { Category, Collection } from "types/global";
+import { Brand, Category, Collection } from "types/global";
 
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
@@ -17,11 +17,12 @@ interface ComponentProps {
     count: any;
     slug?: string;
     sortBy?: string;
+    brands?: Brand[];
     categories?: Category[];
     collections?: Collection[];
 }
 
-const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, categories = [], collections = [] }) => {
+const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, brands = [], categories = [], collections = [] }) => {
     const { updateQuery } = useUpdateQuery(1000);
     const [value, setValue] = React.useState<string>(sortBy || "created_at:desc");
     const state = useOverlayTriggerState({});
@@ -58,7 +59,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, cate
             </header>
             {state.isOpen && (
                 <SlideOver className="bg-default-100" isOpen={state.isOpen} title="Filters" onClose={state.close}>
-                    <CollectionsSideBar categories={categories} collections={collections} />
+                    <CollectionsSideBar brands={brands} categories={categories} collections={collections} />
                 </SlideOver>
             )}
         </React.Fragment>
