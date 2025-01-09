@@ -146,13 +146,24 @@ def read(id: int, db: SessionDep, redis: deps.CacheService) -> CategoryPublic:
 
 
 @router.get("/slug/{slug}")
-def get_by_slug(slug: str, db: SessionDep) -> Category:
+def get_by_slug(slug: str, db: SessionDep, redis: deps.CacheService) -> Category:
     """
     Get a category by its slug.
     """
+    cache_key = f"category:slug:{slug}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return Category(**json.loads(cached_data))
+
     category = crud.category.get_by_key(db=db, key="slug", value=slug)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
+
+    # Cache the result
+    redis.set(cache_key, category.model_dump_json())
+
     return category
 
 
@@ -167,19 +178,21 @@ def update(
     """
     Update a category and invalidate cache.
     """
-    db_collection = crud.category.get(db=db, id=id)
-    if not db_collection:
+    db_category = crud.category.get(db=db, id=id)
+    if not db_category:
         raise HTTPException(
             status_code=404,
             detail="Category not found",
         )
     try:
-        db_collection = crud.category.update(
-            db=db, db_obj=db_collection, obj_in=update_data
+        db_category = crud.category.update(
+            db=db, db_obj=db_category, obj_in=update_data
         )
         # Invalidate cache
+        redis.delete(f"category:slug:{db_category.slug}")
         redis.delete(f"category:{id}")
-        return db_collection
+        redis.delete_pattern("category:list:*")
+        return db_category
     except IntegrityError as e:
         logger.error(f"Error updating category, {e.orig.pgerror}")
         raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
@@ -192,7 +205,7 @@ def update(
 
 
 @router.delete("/{id}")
-def delete(db: SessionDep, id: int) -> Message:
+def delete(id: int, db: SessionDep, redis: deps.CacheService) -> Message:
     """
     Delete a category.
     """
@@ -200,6 +213,9 @@ def delete(db: SessionDep, id: int) -> Message:
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     crud.category.remove(db=db, id=id)
+    redis.delete(f"category:slug:{category.slug}")
+    redis.delete(f"category:{id}")
+    redis.delete_pattern("categories:list:*")
     return Message(message="Category deleted successfully")
 
 

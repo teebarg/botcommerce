@@ -1,17 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { Category, Collection } from "types/global";
+import { Brand, Category, Collection } from "types/global";
 
 import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ComponentProps {
+    brands: Brand[];
     collections: Collection[];
     categories: Category[];
     facets?: {
+        brands: Record<string, string>;
         categories: Record<string, string>;
         collections: Record<string, string>;
     };
@@ -21,7 +24,8 @@ interface ComponentProps {
     };
 }
 
-const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories, facets, searchParams }) => {
+const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, categories, facets, searchParams }) => {
+    const [dataSet, setDataSet] = useState(new Set());
     const { updateQuery } = useUpdateQuery(500);
 
     const onPriceChange = (values: number | number[]) => {
@@ -35,6 +39,20 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories,
             { key: "maxPrice", value: maxPrice.toString() },
         ]);
     };
+
+    const onBrandChange = (checked: boolean, slug: string) => {
+        const newSet = new Set(dataSet);
+
+        if (checked) {
+            newSet.add(slug);
+        } else {
+            newSet.delete(slug);
+        }
+
+        setDataSet(newSet);
+        updateQuery([{ key: "cat_ids", value: Array.from(newSet).join(",") }]);
+    };
+
     return (
         <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16">
             <div className="h-full w-full max-w-sm rounded-medium p-6 bg-default-100">
@@ -55,7 +73,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories,
                     label="Price"
                     formatOptions={{ style: "currency", currency: "NGN" }}
                     maxValue={100000}
-                    defaultValue={[Number(searchParams?.minPrice), Number(searchParams?.maxPrice)]}
+                    defaultValue={[Number(searchParams?.minPrice ?? 500), Number(searchParams?.maxPrice ?? 50000)]}
                     onChange={onPriceChange}
                     step={500}
                 />
@@ -63,6 +81,15 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories,
                     <span className="mb-2">Categories</span>
                     {categories?.map((item: Category, index: number) => (
                         <CheckboxGroup key={index} checkboxes={item.children} groupName={item.name} item={item} facets={facets} />
+                    ))}
+                </div>
+                <div className="flex flex-col mt-2">
+                    <span className="mb-2">Brands</span>
+                    {brands?.map((item: Brand, index: number) => (
+                        <div key={`brand-${index}`} className="flex justify-between">
+                            <Checkbox label={item.name} onChange={(e) => onBrandChange(e, item.slug)} />
+                            {facets?.brands && <span>({facets["brands"][item.name] ?? 0})</span>}
+                        </div>
                     ))}
                 </div>
             </div>

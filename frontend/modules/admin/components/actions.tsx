@@ -14,10 +14,11 @@ interface Props {
     label?: string;
     item: any;
     form: React.ReactNode;
+    showDetails?: boolean;
     deleteAction: (id: string) => void;
 }
 
-const Actions: React.FC<Props> = ({ label, item, form, deleteAction }) => {
+const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, deleteAction }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [current, setCurrent] = useState<any>({ is_active: true });
     const deleteModalState = useOverlayTriggerState({});
@@ -42,11 +43,13 @@ const Actions: React.FC<Props> = ({ label, item, form, deleteAction }) => {
     return (
         <React.Fragment>
             <div className="relative flex items-center gap-2">
-                <Tooltip content="Details">
-                    <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
-                        <EyeIcon />
-                    </span>
-                </Tooltip>
+                {showDetails && (
+                    <Tooltip content="Details">
+                        <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
+                            <EyeIcon />
+                        </span>
+                    </Tooltip>
+                )}
                 <Tooltip content={`Edit ${label}`}>
                     <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
                         <EditIcon onClick={() => slideOverState.open()} />

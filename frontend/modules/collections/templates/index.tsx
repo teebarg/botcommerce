@@ -2,7 +2,7 @@ import React from "react";
 import { ChevronRight, ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
+import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 
 import { CollectionsTopBar } from "./topbar";
@@ -25,6 +25,7 @@ interface ComponentProps {
 }
 
 const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, sortBy, searchParams }) => {
+    const { brands } = await getBrands();
     const { collections } = await getCollectionsList();
     const customer: Customer = await getCustomer().catch(() => null);
     let wishlist: WishlistItem[] = [];
@@ -58,7 +59,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     return (
         <React.Fragment>
             <div className="hidden md:block">
-                <CollectionsSideBar categories={categories} collections={collections} facets={facets} searchParams={searchParams} />
+                <CollectionsSideBar brands={brands} categories={categories} collections={collections} facets={facets} searchParams={searchParams} />
             </div>
             <div className="w-full flex-1 flex-col">
                 <div className="w-full">

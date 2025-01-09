@@ -126,13 +126,24 @@ def read(id: int, db: SessionDep, redis: deps.CacheService) -> Collection:
 
 
 @router.get("/slug/{slug}")
-def get_by_slug(slug: str, db: SessionDep) -> Collection:
+def get_by_slug(slug: str, db: SessionDep, redis: deps.CacheService) -> Collection:
     """
     Get a collection by its slug.
     """
+    cache_key = f"collection:slug:{slug}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return Collection(**json.loads(cached_data))
+
     collection = crud.collection.get_by_key(db=db, key="slug", value=slug)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
+
+    # Cache the result
+    redis.set(cache_key, collection.model_dump_json())
+
     return collection
 
 
@@ -161,7 +172,9 @@ def update(
             db=db, db_obj=db_collection, obj_in=update_data
         )
         # Invalidate cache
+        redis.delete(f"collection:slug:{db_collection.slug}")
         redis.delete(f"collection:{id}")
+        redis.delete_pattern("collections:list:*")
         return db_collection
     except IntegrityError as e:
         logger.error(f"Error updating collection, {e.orig.pgerror}")
@@ -175,7 +188,7 @@ def update(
 
 
 @router.delete("/{id}")
-def delete(db: SessionDep, id: int) -> Message:
+def delete(id: int, db: SessionDep, redis: deps.CacheService) -> Message:
     """
     Delete a collection.
     """
@@ -183,6 +196,9 @@ def delete(db: SessionDep, id: int) -> Message:
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
     crud.collection.remove(db=db, id=id)
+    redis.delete(f"collection:slug:{collection.slug}")
+    redis.delete(f"collection:{id}")
+    redis.delete_pattern("collections:list:*")
     return Message(message="Collection deleted successfully")
 
 

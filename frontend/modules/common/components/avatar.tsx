@@ -29,7 +29,6 @@ const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, col
                     "flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none",
                     "ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark",
                     cssClass[color],
-                    className,
                     {
                         "w-8 h-8": size === "sm",
                         "w-10 h-10": size === "md",
@@ -39,7 +38,8 @@ const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, col
                         "rounded-large": radius === "md",
                         "rounded-medium": radius === "lg",
                         "rounded-small": radius === "sm",
-                    }
+                    },
+                    className
                 )}
             >
                 <Image fill alt="avatar" className="flex object-cover w-full h-full" src={src} />

@@ -74,8 +74,9 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
         <React.Fragment>
             {!isDataOnly && (
                 <div className="flex flex-col gap-4">
-                    <div className="flex justify-between gap-3 items-end">
+                    <div className="flex justify-between gap-3 items-center">
                         <Input
+                            size="sm"
                             classNames={{
                                 base: "w-full sm:max-w-[44%]",
                                 inputWrapper: "border-1",
@@ -103,7 +104,7 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
                         </div>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-default-500 text-small">Total {pagination?.total_count} entries</span>
+                        <span className="text-default-900 text-sm">Total {pagination?.total_count} entries</span>
                     </div>
                 </div>
             )}

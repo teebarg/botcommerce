@@ -31,7 +31,6 @@ export default async function CollectionsPage({ searchParams }: { searchParams: 
                     </div>
                     <Table
                         canExport
-                        canIndex
                         columns={["S/N", "Name", "Status", "Created At", "Actions"]}
                         form={<CollectionForm type="create" />}
                         pagination={pagination}

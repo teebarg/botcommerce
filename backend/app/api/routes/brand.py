@@ -106,11 +106,11 @@ def read(id: int, db: SessionDep, redis: deps.CacheService) -> BrandPublic:
     cached_data = redis.get(cache_key)
     if cached_data:
         return Brand(**json.loads(cached_data))
-    
+
     brand = crud.brand.get(db=db, id=id)
     if not brand:
         raise HTTPException(status_code=404, detail="Brand not found")
-    
+
     # Cache the result
     redis.set(cache_key, brand.model_dump_json())
 
@@ -128,11 +128,11 @@ def get_by_slug(slug: str, db: SessionDep, redis: deps.CacheService) -> Brand:
     cached_data = redis.get(cache_key)
     if cached_data:
         return Brand(**json.loads(cached_data))
-    
+
     brand = crud.collection.get_by_key(db=db, key="slug", value=slug)
     if not brand:
         raise HTTPException(status_code=404, detail="Brand not found")
-    
+
     # Cache the result
     redis.set(cache_key, brand.model_dump_json())
 
@@ -163,6 +163,7 @@ def update(
     try:
         db_brand = crud.brand.update(db=db, db_obj=db_brand, obj_in=update_data)
         # Invalidate cache
+        redis.delete(f"brand:slug:{db_brand.slug}")
         redis.delete(f"brand:{id}")
         redis.delete_pattern("brands:list:*")
         return db_brand
@@ -178,7 +179,7 @@ def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-def delete(id: int, db: SessionDep, redis: deps.CacheService,) -> Message:
+def delete(id: int, db: SessionDep, redis: deps.CacheService) -> Message:
     """
     Delete a brand.
     """
@@ -186,5 +187,7 @@ def delete(id: int, db: SessionDep, redis: deps.CacheService,) -> Message:
     if not brand:
         raise HTTPException(status_code=404, detail="Brand not found")
     crud.brand.remove(db=db, id=id)
+    redis.delete(f"brand:slug:{brand.slug}")
+    redis.delete(f"brand:{id}")
     redis.delete_pattern("brands:list:*")
     return Message(message="Brand deleted successfully")

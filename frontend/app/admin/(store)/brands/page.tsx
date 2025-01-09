@@ -2,15 +2,14 @@ import { Metadata } from "next";
 import { Brand } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
-import ProductUpload from "@modules/admin/products/product-upload";
-import { getBrands, getCustomer } from "@lib/data";
+import { getBrands } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
 import { Chip } from "@modules/common/components/chip";
 import { deleteBrand } from "@modules/admin/actions";
 import { BrandForm } from "@/modules/admin/brands/brand-form";
 
 export const metadata: Metadata = {
-    title: "Children clothing | Botcommerce Store",
+    title: "Brands Page | Children clothing | Botcommerce Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
 
@@ -19,19 +18,13 @@ export default async function BrandsPage({ searchParams }: { searchParams: { sea
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
     const { brands, ...pagination } = await getBrands(search, page, limit);
-    const customer = await getCustomer().catch(() => null);
 
     return (
         <React.Fragment>
             <div>
                 <div className="max-w-7xl mx-auto p-8">
-                    <h1 className="text-2xl font-semibold mb-2">Brands</h1>
-                    <div className="py-4">
-                        <ProductUpload customer={customer} />
-                    </div>
+                    <h1 className="text-2xl font-semibold mb-4">Brands</h1>
                     <Table
-                        canExport
-                        canIndex
                         columns={["S/N", "Name", "Status", "Created At", "Actions"]}
                         form={<BrandForm type="create" />}
                         pagination={pagination}
@@ -57,6 +50,7 @@ export default async function BrandsPage({ searchParams }: { searchParams: { sea
                                             deleteAction={deleteBrand}
                                             form={<BrandForm current={item} type="update" />}
                                             item={item}
+                                            showDetails={false}
                                         />
                                     </td>
                                 </tr>

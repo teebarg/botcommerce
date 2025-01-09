@@ -84,7 +84,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             {...inputProps}
                             ref={ref}
                             className={cn(
-                                "w-full font-normal !outline-none placeholder:text-foreground-500 focus-visible:outline-none mt-auto",
+                                "w-full font-normal !outline-none placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto",
                                 "data-[has-start-content=true]:ps-1.5 data-[has-end-content=true]:pe-1.5 file:cursor-pointer file:bg-transparent file:border-0",
                                 "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground",
                                 classNames?.["input"]
