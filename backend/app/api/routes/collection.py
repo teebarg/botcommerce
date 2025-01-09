@@ -88,7 +88,7 @@ def index(
 
 
 @router.post("/")
-def create(*, db: SessionDep, create_data: CollectionCreate) -> Collection:
+def create(*, db: SessionDep, create_data: CollectionCreate, redis: deps.CacheService) -> Collection:
     """
     Create new collection.
     """
@@ -100,6 +100,7 @@ def create(*, db: SessionDep, create_data: CollectionCreate) -> Collection:
         )
 
     collection = crud.collection.create(db=db, obj_in=create_data)
+    redis.delete_pattern("collections:list:*")
     return collection
 
 

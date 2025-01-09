@@ -15,7 +15,7 @@ upload_statuses: Dict[str, UploadStatus] = {}
 
 
 async def process_file(file, task_id: str, db: SessionDep, upload_func):
-    print("Processing file")
+    logger.debug("Processing file")
     # chunk_size = 100
     # try:
     #     df = pd.read_excel(BytesIO(file))

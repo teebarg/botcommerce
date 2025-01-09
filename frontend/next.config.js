@@ -15,6 +15,10 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "firebasestorage.googleapis.com",
             },
+            {
+                protocol: "https",
+                hostname: "bzjitsvxyblegrvtzvef.supabase.co",
+            },
         ],
     },
     async rewrites() {

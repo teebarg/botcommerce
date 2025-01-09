@@ -41,7 +41,7 @@ class EmailChannel(NotificationChannel):
 
             return True
         except Exception as e:
-            print(f"Email sending failed: {str(e)}")
+            logger.error(f"Email sending failed: {str(e)}")
             return False
 
 class SlackChannel(NotificationChannel):
@@ -69,7 +69,7 @@ class SMSChannel(NotificationChannel):
             # Make API call to SMS provider
             return True
         except Exception as e:
-            print(f"SMS sending failed: {str(e)}")
+            logger.error(f"SMS sending failed: {str(e)}")
             return False
 
 class NotificationService:

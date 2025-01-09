@@ -118,7 +118,7 @@ async def process_products(file_content, content_type: str, user_id: int):
 
                 # Add product data to be processed later
                 products_to_create_or_update.append(
-                    (product_data, categories, collections, images)
+                    (product_data, brands, categories, collections, images)
                 )
 
             # Process the batch
@@ -166,7 +166,6 @@ async def create_or_update_products_in_db(products: List):
                     select(Product).where(Product.slug.in_(all_slugs))
                 ).all()
             }
-            print(existing_products)
 
             products_to_add = []
             for product_data, _brands, _categories, _collections, images in products:

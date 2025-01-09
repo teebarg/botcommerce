@@ -108,7 +108,7 @@ def index(
 
 
 @router.post("/")
-def create(*, db: SessionDep, create_data: CategoryCreate) -> Category:
+def create(*, db: SessionDep, create_data: CategoryCreate, redis: deps.CacheService) -> Category:
     """
     Create new category.
     """
@@ -120,6 +120,7 @@ def create(*, db: SessionDep, create_data: CategoryCreate) -> Category:
         )
 
     category = crud.category.create(db=db, obj_in=create_data)
+    redis.delete_pattern("categories:list:*")
     return category
 
 
@@ -191,7 +192,7 @@ def update(
         # Invalidate cache
         redis.delete(f"category:slug:{db_category.slug}")
         redis.delete(f"category:{id}")
-        redis.delete_pattern("category:list:*")
+        redis.delete_pattern("categories:list:*")
         return db_category
     except IntegrityError as e:
         logger.error(f"Error updating category, {e.orig.pgerror}")

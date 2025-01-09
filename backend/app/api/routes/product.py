@@ -325,9 +325,9 @@ async def upload_products(
         # Re-index
         index_products(db=db)
 
-        crud.activities.create_product_upload_activity(
-            db=db, user_id=user.id, filename=file.filename
-        )
+        # crud.activities.create_product_upload_activity(
+        #     db=db, user_id=user.id, filename=file.filename
+        # )
 
     background_tasks.add_task(update_task)
 

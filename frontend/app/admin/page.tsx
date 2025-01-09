@@ -117,7 +117,7 @@ export default async function AdminPage() {
                                     fill
                                     alt="avatar"
                                     className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0"
-                                    src=""
+                                    src="/avatar_ai.png"
                                 />
                             </span>
                             <div className="flex flex-col gap-1 items-start justify-center">

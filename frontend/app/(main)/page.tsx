@@ -206,12 +206,12 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-gray-200">
-                    <div className="max-w-5xl mx-auto py-8">
-                        <p className="text-lg font-semibold text-primary mb-4 ml-2 sm:ml-0">OUR LOCATION</p>
+                <div className="bg-white/90">
+                    <div className="max-w-7xl mx-auto py-6">
+                        <p className="text-lg font-semibold text-gray-800 mb-2 ml-2 sm:ml-0">OUR LOCATION</p>
                         <iframe
                             allowFullScreen={true}
-                            height="450"
+                            height="500"
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d990.7044697975375!2d3.3243740696178534!3d6.66947613161211!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b96bc12c94145%3A0xce8a5a69dcdc4350!2s8%20Agbado%20Oke%20Aro%20Road%2C%20Ifako-Ijaiye%2C%20Lagos%20101232%2C%20Lagos!5e0!3m2!1sen!2sng!4v1718193637813!5m2!1sen!2sng"

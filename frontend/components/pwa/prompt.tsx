@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { RightArrowIcon } from "nui-react-icons";
 
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 declare global {
     interface BeforeInstallPromptEvent extends Event {

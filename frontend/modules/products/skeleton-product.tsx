@@ -30,10 +30,10 @@ const SkeletonProductTemplate = () => {
 
                 <div className="relative grid grid-cols-1 md:grid-cols-2 md:gap-x-8 mt-4">
                     {/* Image gallery skeleton */}
-                    <div className="relative h-full w-full flex-none flex gap-4">
+                    <div className="relative h-full w-full flex-none hidden md:flex gap-4">
                         <div className="flex flex-col gap-4">
                             {[1, 2, 3, 4].map((index) => (
-                                <Skeleton key={index} className="w-[80px] h-[80px] rounded-lg" />
+                                <Skeleton key={index} className="w-[80px] h-[120px] rounded-lg" />
                             ))}
                         </div>
                         <div className="flex-1">

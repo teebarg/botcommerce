@@ -33,7 +33,7 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
     return (
         <div>
             <div className="flex flex-col items-center text-center mb-12">
-                <span className="text-base text-default-500 mb-4">Related products</span>
+                <span className="text-base text-default-500 mb-2">Related products</span>
                 <p className="text-lg md:text-2xl text-default-900 max-w-lg">You might also want to check out these products.</p>
             </div>
 

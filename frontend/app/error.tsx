@@ -17,7 +17,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
             };
 
             // Send the error to the server
-            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/log-error`, {
+            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/log-error`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

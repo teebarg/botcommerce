@@ -50,9 +50,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                             })}
                                         />
                                     </button>
-                                    <div className="flex items-center">
-                                        <Folder />
-                                    </div>
+                                    <Folder />
                                     <span className="select-none text-sm font-medium capitalize flex-1">{item.name}</span>
                                     <Chip
                                         className="mr-2"
@@ -65,7 +63,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                         </div>
                         {item.children && open.includes(item.id) && (
                             <ol className="mt-4 mb-4 block">
-                                {item.children.map((item: Category, index: number) => (
+                                {item.children.map((sub: Category, index: number) => (
                                     <li key={index} className="ml-10 min-h-10">
                                         <div className="flex items-center">
                                             <div className="flex w-[32px] items-center">
@@ -75,14 +73,12 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                             </div>
                                             <div className="flex w-full items-center justify-between">
                                                 <div className="flex items-center">
-                                                    <div className="flex w-[32px] items-center justify-center">
-                                                        <Tag />
-                                                    </div>
+                                                    <Tag />
                                                     <span className="ml-2 select-none text-xs font-medium text-default-500 capitalize">
-                                                        {item.name}
+                                                        {sub.name}
                                                     </span>
                                                 </div>
-                                                <CategoryAction canAdd={false} category={item} />
+                                                <CategoryAction canAdd={false} category={sub} />
                                             </div>
                                         </div>
                                     </li>

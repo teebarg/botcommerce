@@ -86,7 +86,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                 <div className="flex flex-col mt-2">
                     <span className="mb-2">Brands</span>
                     {brands?.map((item: Brand, index: number) => (
-                        <div key={`brand-${index}`} className="flex justify-between">
+                        <div key={`brand-${index}`} className="flex justify-between mt-2">
                             <Checkbox label={item.name} onChange={(e) => onBrandChange(e, item.slug)} />
                             {facets?.brands && <span>({facets["brands"][item.name] ?? 0})</span>}
                         </div>
