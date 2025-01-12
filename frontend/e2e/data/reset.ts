@@ -33,14 +33,10 @@ async function testEnvChecks() {
 
     if (!env.testDatabase.startsWith("test_")) {
         const msg = "Please make sure your test environment database name starts with test_";
-
-        console.error(msg);
         throw new Error(msg);
     }
     if (env.testDatabase === env.productionDatabase) {
         const msg = "Please make sure your test environment database and production environment database names are not equal";
-
-        console.error(msg);
         throw new Error(msg);
     }
 }

@@ -1,11 +1,11 @@
 import React from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useSnackbar } from "notistack";
-import Button from "@modules/common/components/button";
 import { googleLogin } from "@modules/account/actions";
 import Image from "next/image";
 
 import Google from "@/public/google.svg";
+import { Button } from "@/components/ui/button";
 
 interface Props {}
 
@@ -46,7 +46,7 @@ const GoogleLogin: React.FC<Props> = () => {
                 size="md"
                 startContent={<Image alt="Google" className="w-6" src={Google} />}
                 variant="flat"
-                onPress={() => handleGoogleSignIn()}
+                onClick={() => handleGoogleSignIn()}
             >
                 Sign in with Google
             </Button>

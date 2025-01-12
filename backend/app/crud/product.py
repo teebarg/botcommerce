@@ -6,7 +6,7 @@ from app import crud
 from app.core.logging import logger
 from app.core.utils import generate_slug
 from app.crud.base import CRUDBase
-from app.models.generic import Category, Collection, Product, Tag
+from app.models.generic import Brand, Category, Collection, Product, Tag
 from app.models.product import (
     ProductCreate,
     ProductUpdate,
@@ -20,6 +20,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             update={
                 "slug": generate_slug(name=obj_in.name),
                 "tags": self.get_tag_update(db=db, update=obj_in),
+                "brands": self.get_brands_update(db=db, update=obj_in),
                 "categories": self.get_categories_update(db=db, update=obj_in),
                 "collections": self.get_collection_update(db=db, update=obj_in),
             },
@@ -46,6 +47,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             #     db_obj.slug = generate_slug(name=update_data.get("name", ""))
             if "tags" in update_data:
                 db_obj.tags = self.get_tag_update(db=db, update=obj_in)
+            if "brands" in update_data:
+                db_obj.brands = self.get_brands_update(db=db, update=obj_in)
             if "categories" in update_data:
                 db_obj.categories = self.get_categories_update(db=db, update=obj_in)
             if "collections" in update_data:
@@ -68,6 +71,15 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 db.commit()
             except Exception as e:
                 logger.error(e)
+
+    def get_brands_update(
+        self, db: Session, update: Product
+    ) -> Optional[list[Brand]]:
+        brands: list[Brand] = []
+        for i in update.brands:
+            if brand := crud.brand.get(db=db, id=i):
+                brands.append(brand)
+        return brands
 
     def get_categories_update(
         self, db: Session, update: Product

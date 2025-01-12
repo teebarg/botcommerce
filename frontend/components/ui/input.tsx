@@ -43,10 +43,9 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 data-[hover=true]:bg-default",
+                        "relative w-full inline-flex shadow-sm px-3 data-[hover=true]:bg-content2 bg-content1",
                         "min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-background",
-                        "!duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus",
-                        "group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background bg-default-100",
+                        "!duration-150 outline-none",
                         {
                             "h-10 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",
@@ -85,7 +84,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             {...inputProps}
                             ref={ref}
                             className={cn(
-                                "w-full font-normal !outline-none placeholder:text-foreground-500 focus-visible:outline-none mt-auto",
+                                "w-full font-normal !outline-none placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto",
                                 "data-[has-start-content=true]:ps-1.5 data-[has-end-content=true]:pe-1.5 file:cursor-pointer file:bg-transparent file:border-0",
                                 "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground",
                                 classNames?.["input"]

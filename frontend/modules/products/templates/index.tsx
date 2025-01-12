@@ -4,7 +4,7 @@ import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
 import { notFound } from "next/navigation";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowUpRightMini, ChevronRight, Delivery, HomeIcon } from "nui-react-icons";
+import { ArrowUpRightMini, ChevronRight, Delivery, Home } from "nui-react-icons";
 import { Product } from "types/global";
 import Image from "next/image";
 
@@ -46,10 +46,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     </ol>
                 </nav>
                 <div className="relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8 mt-4">
-                    <div className="relative h-full w-full flex-none flex gap-4">
-                        <div className="flex flex-col gap-4">
+                    <div className="relative h-full w-full flex-none flex flex-col-reverse md:flex-row md:gap-4">
+                        <div className="flex md:flex-col gap-4 px-2 md:px-0">
                             {product?.images?.map((image: any, index: number) => (
-                                <div key={index} className="w-[80px] h-[80px] relative rounded-lg overflow-hidden">
+                                <div key={index} className="w-[80px] h-[120px] relative rounded-lg overflow-hidden">
                                     <Image fill alt={`Product ${index + 1}`} src={image.image} />
                                 </div>
                             ))}
@@ -115,7 +115,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                     className="relative inline-flex items-center justify-center outline-none px-3 h-10 rounded-small bg-transparent border border-default-500 text-default-500"
                     href="/"
                 >
-                    <HomeIcon />
+                    <Home />
                 </LocalizedClientLink>
                 <ProductActions btnClassName="font-semibold" className="w-full" product={product} showPrice={false} />
             </div>

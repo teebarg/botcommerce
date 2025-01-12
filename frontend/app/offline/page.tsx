@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { RefreshCcw } from "nui-react-icons";
+import { CloudOff, RefreshCcw, WifiOff } from "nui-react-icons";
 
 import { cn } from "@/lib/util/cn";
 
@@ -37,8 +37,8 @@ const OfflinePage = () => {
                 {/* Animation Container */}
                 <div className={cn("mb-8 relative", { "animate-bounce": showAnimation })}>
                     <div className="relative">
-                        {/* <WifiOff className="w-24 h-24 mx-auto text-default-400" strokeWidth={1.5} /> */}
-                        {/* <CloudOff className="w-12 h-12 absolute -bottom-2 -right-2 text-default-500" strokeWidth={1.5} /> */}
+                        <WifiOff className="w-24 h-24 mx-auto text-default-400" strokeWidth={1.5} />
+                        <CloudOff className="w-12 h-12 absolute -bottom-2 -right-2 text-default-500" strokeWidth={1.5} />
                     </div>
                 </div>
 

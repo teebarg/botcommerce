@@ -3,10 +3,10 @@
 import { useMemo, useState } from "react";
 import { addToCart } from "@modules/cart/actions";
 import { currency } from "@lib/util/util";
-import Button from "@modules/common/components/button";
 import { Product } from "types/global";
 
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
 type ProductActionsProps = {
     product: Product;
@@ -84,9 +84,9 @@ export default function ProductActions({
                 className={cn("w-full", btnClassName)}
                 color="primary"
                 data-testid="add-product-button"
-                isDisabled={!inStock || !!disabled || isAdding}
+                disabled={!inStock || !!disabled || isAdding}
                 isLoading={isAdding}
-                onPress={handleAddToCart}
+                onClick={handleAddToCart}
             >
                 {!inStock ? "Out of stock" : "Add to cart"}
             </Button>

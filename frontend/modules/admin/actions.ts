@@ -90,6 +90,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
         name: formData.get("name"),
         is_active: Boolean(formData.get("is_active")) ?? false,
         description: formData.get("description"),
+        brands: JSON.parse(formData.get("brands") as string) ?? [],
         categories: JSON.parse(formData.get("categories") as string) ?? [],
         collections: JSON.parse(formData.get("collections") as string) ?? [],
         price: formData.get("price") ?? 0,
@@ -210,6 +211,66 @@ export async function deleteCategory(id: number) {
         return { success: true, message: "Category deleted successfully" };
     } catch (error) {
         return { success: false, message: "Error deleting category" };
+    }
+}
+
+export async function createBrand(currentState: unknown, formData: FormData) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const brandUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand`;
+
+    const id = formData.get("id");
+    const type = formData.get("type") as string;
+
+    const url = type === "create" ? `${brandUrl}/` : `${brandUrl}/${id}`;
+
+    try {
+        const res = await fetch(url, {
+            method: type === "create" ? "POST" : "PATCH",
+            headers: {
+                "X-Auth": accessToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: formData.get("name"),
+                is_active: Boolean(formData.get("is_active")) ?? false,
+            }),
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("brands");
+
+        return { success: true, message: "Brand created successfully", data: await res.json() };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error creating brand" };
+    }
+}
+
+export async function deleteBrand(brandId: string) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/${brandId}`;
+
+    try {
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "X-Auth": accessToken,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("brands");
+
+        return { success: true, message: "Brand deleted successfully" };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error deleting brand" };
     }
 }
 

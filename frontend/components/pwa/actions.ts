@@ -49,8 +49,6 @@ async function saveSubscription(subscriptionData: PushSubscriptionData) {
 
         return { success: true, message: "Success", data: responseData };
     } catch (error: any) {
-        console.error("Error saving subscription:", error);
-
         return { success: false, message: error.message, data: null };
     }
 }

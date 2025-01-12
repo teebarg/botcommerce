@@ -45,8 +45,8 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...p
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-100",
-                        "group-data-[focus=true]:bg-default-100 min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-background motion-reduce:transition-none",
+                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-content1 data-[hover=true]:bg-default-100",
+                        "group-data-[focus=true]:bg-content2 min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-background motion-reduce:transition-none",
                         "!duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus",
                         "group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background",
                         {
@@ -62,7 +62,7 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...p
                     <label
                         {...labelProps}
                         className={cn(
-                            "absolute z-10 pointer-events-none origin-top-left rtl:origin-top-right subpixel-antialiased block text-foreground-500 cursor-text",
+                            "absolute z-10 pointer-events-none origin-top-left rtl:origin-top-right subpixel-antialiased block text-default-900 cursor-text",
                             "will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity]",
                             "group-data-[filled-within=true]:text-default-500 group-data-[filled-within=true]:pointer-events-auto group-data-[filled-within=true]:scale-85",
                             "text-small group-data-[filled-within=true]:-translate-y-[calc(50%_+_theme(fontSize.small)/2_-_6px)] pe-2 max-w-full text-ellipsis overflow-hidden"

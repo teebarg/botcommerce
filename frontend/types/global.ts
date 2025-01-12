@@ -27,10 +27,19 @@ export type Product = {
     collections: string[];
 };
 
+export type Brand = {
+    id: number;
+    name: string;
+    slug: string;
+    is_active?: boolean;
+    created_at: string;
+};
+
 export type Collection = {
     id: number;
     name: string;
     slug: string;
+    is_active?: boolean;
     created_at: string;
 };
 

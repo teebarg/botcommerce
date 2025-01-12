@@ -93,7 +93,7 @@ const ChatBot: React.FC<Props> = () => {
     return (
         <React.Fragment>
             <div
-                className="right-0 sm:right-4 bottom-20 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[calc(100%-50px)] sm:w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
+                className="right-0 sm:right-4 bottom-28 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[calc(100%-50px)] sm:w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
                 data-open={isOpen ? "true" : "false"}
             >
                 <header className="py-2 px-3 overflow-hidden rounded-top-corners max-h-full text-white" style={{ background: "rgb(255, 90, 45)" }}>
@@ -220,15 +220,15 @@ const ChatBot: React.FC<Props> = () => {
                 aria-disabled="false"
                 aria-hidden="true"
                 aria-label="Open chat with Max - Unread messages: 1"
-                className="outline-none fixed h-14 w-14 cursor-pointer right-8 bottom-20 md:bottom-12 border-none rounded-[50%] group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
+                className="outline-none fixed h-14 w-14 cursor-pointer right-10 bottom-20 md:bottom-12 border-none rounded-50 group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
                 data-open={isOpen ? "true" : "false"}
                 onClick={toggleChat}
             >
-                <div className="cursor-pointer overflow-visible absolute h-full w-full rounded-[50%]" style={{ background: "none" }}>
+                <div className="cursor-pointer overflow-visible absolute h-full w-full rounded-50" style={{ background: "none" }}>
                     <div className="flex opacity-100 items-center justify-center h-full w-full group-data-[open=true]:opacity-0 group-data-[open=true]:hidden">
-                        <div className="rounded-[50%] h-full w-full bg-transparent overflow-hidden">
+                        <div className="rounded-50 h-full w-full bg-transparent overflow-hidden">
                             <div
-                                className="border-0 border-none rounded-[50%] overflow-hidden h-14 w-14"
+                                className="border-0 border-none rounded-50 overflow-hidden h-14 w-14"
                                 style={{ backgroundSize: "cover", backgroundPosition: "50%", backgroundImage: "url(/bot.svg)" }}
                             />
                         </div>
@@ -238,7 +238,7 @@ const ChatBot: React.FC<Props> = () => {
                         style={{ backgroundColor: "rgb(255, 255, 255)" }}
                     />
                 </div>
-                <div className="flex justify-center absolute -top-1 -right-1 w-[18px] h-[18px] rounded-[50%] bg-rose-800 leading-4 text-small text-white group-data-[open=true]:invisible">
+                <div className="flex justify-center absolute -top-1 -right-1 w-[18px] h-[18px] rounded-50 bg-rose-800 leading-4 text-sm text-white group-data-[open=true]:invisible">
                     1
                 </div>
             </div>

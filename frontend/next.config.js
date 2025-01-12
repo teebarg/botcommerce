@@ -15,18 +15,22 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "firebasestorage.googleapis.com",
             },
+            {
+                protocol: "https",
+                hostname: "bzjitsvxyblegrvtzvef.supabase.co",
+            },
         ],
     },
     async rewrites() {
         return {
-          beforeFiles: [
-            {
-              source: '/sitemap.xml',
-              destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/sitemap.xml`,
-            }
-          ]
-        }
-      }
+            beforeFiles: [
+                {
+                    source: "/sitemap.xml",
+                    destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/sitemap.xml`,
+                },
+            ],
+        };
+    },
 };
 
 module.exports = nextConfig;

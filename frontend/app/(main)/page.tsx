@@ -1,11 +1,11 @@
 import { Metadata } from "next";
-import { Customer, Product, SearchParams, WishlistItem } from "types/global";
+import { Category, Customer, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
-import { LocationIcon, Mail } from "nui-react-icons";
+import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
-import { getCustomer, getWishlist, search } from "@lib/data";
+import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import FlashBanner from "@components/flash";
@@ -17,8 +17,6 @@ export const metadata: Metadata = {
     title: "Children clothing | Botcommerce Store",
     description: "A performant frontend ecommerce starter template with Next.js.",
 };
-
-const cats = ["Electronics", "Health & Beauty", "Men's Fashion", "Women's Fashion", "Sports & Hobby", "Tools", "Kids"];
 
 async function getLandingProducts(collection: string, limit: number = 4): Promise<any[]> {
     const queryParams: SearchParams = {
@@ -41,7 +39,9 @@ export default async function Home() {
         getLandingProducts("featured", 6),
     ]);
 
-    const customer: Customer = await getCustomer().catch(() => null);
+    const { categories } = await getCategories();
+
+    const customer: Customer = await getCustomer();
     let wishlist: WishlistItem[] = [];
 
     if (customer) {
@@ -52,17 +52,17 @@ export default async function Home() {
         <React.Fragment>
             <div>
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative sm:grid grid-cols-4 gap-4 rounded-xl py-6">
+                    <div className="max-w-8xl mx-auto relative md:grid grid-cols-5 gap-4 rounded-xl py-6">
                         <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
-                            <ul className="bg-primary/10 text-primary">
-                                {cats.map((item: any, index: number) => (
+                            <ul className="bg-primary/10">
+                                {categories.map((item: Category, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink
-                                            className="text-md font-medium border border-primary/20 px-3 py-3 block hover:bg-primary/20"
-                                            href=""
+                                            className="font-medium border border-primary/20 p-3 block hover:bg-primary/20"
+                                            href={`/collections?cat_ids=${item.slug}`}
                                         >
-                                            {item}
+                                            {item.name}
                                         </LocalizedClientLink>
                                     </li>
                                 ))}
@@ -71,12 +71,32 @@ export default async function Home() {
                                 All Products
                             </LocalizedClientLink>
                         </div>
-                        <div className="col-span-2">
+                        <div className="col-span-3">
                             <BannerCarousel />
                         </div>
-                        <div className="w-full hidden md:block">
-                            <div className="bg-warning/15 p-4 rounded-lg hidden md:block">
-                                <span className="font-semibold text-lg text-default-900/80">👋 Hello!</span>
+                        <div className="w-full hidden md:flex flex-col">
+                            <div className="bg-warning/15 p-4 rounded-lg hidden md:block space-y-4 flex-1">
+                                <div className="flex items-center gap-4">
+                                    <div className="rounded-50 ring-1 ring-warning p-2">
+                                        <PhoneCall className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold">Call to Order</p>
+                                        <p className="text-xs font-medium">0700-000-0000</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="rounded-50 ring-1 ring-warning p-2">
+                                        <Commerce className="h-6 w-6" />
+                                    </div>
+                                    <p className="text-sm font-semibold">Sell on Botcommerce</p>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="rounded-50 ring-1 ring-warning p-2">
+                                        <Deal className="h-6 w-6" />
+                                    </div>
+                                    <p className="text-sm font-semibold">Best Deals</p>
+                                </div>
                             </div>
                             <div className="py-20 text-center block md:hidden">
                                 <span className="text-secondary text-4xl font-bold block">Botcommerce!</span>
@@ -85,8 +105,8 @@ export default async function Home() {
                             <div className="block md:hidden mt-0 md:mt-5">search component</div>
                             <div className="flex bg-secondary text-secondary-foreground p-4 rounded-lg mt-8 md:mt-4">
                                 <div>
-                                    <span className="block text-xl">Prime Store</span>
-                                    <span className="block text-3xl mt-2 font-bold">Looking Originals?</span>
+                                    <span className="block">Prime Store</span>
+                                    <span className="block text-2xl mt-2 font-bold">Looking Originals?</span>
                                     <span className="block mt-2">Explore the latest premium quality branded products.</span>
                                     <LocalizedClientLink
                                         className="inline-block font-semibold bg-transparent rounded-full border-2 border-secondary mt-5 hover:bg-secondary hover:text-white px-4 py-2"
@@ -169,8 +189,8 @@ export default async function Home() {
                     <div className="flex items-center h-full backdrop-blur-smp backdrop-saturate-150p bg-white/10p">
                         <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
                             <div className="sm:w-1/2 sm:pr-10 backdrop-blur bg-white/60 p-4 sm:p-8 rounded-lg shadow-lg shadow-gray-400">
-                                <p className="text-lg font-medium text-rose-900">GET IN TOUCH</p>
-                                <p className="text-xl font-semibold text-gray-900">Reach out to us for more information</p>
+                                <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
+                                <p className="text-xl font-semibold text-gray-700">Reach out to us for more information</p>
                                 <p className="text-gray-700 font-medium">
                                     For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have
                                     about our products and services.
@@ -206,12 +226,12 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-gray-200">
-                    <div className="max-w-5xl mx-auto py-8">
-                        <p className="text-lg font-semibold text-primary mb-4 ml-2 sm:ml-0">OUR LOCATION</p>
+                <div className="bg-white/90">
+                    <div className="max-w-7xl mx-auto py-6">
+                        <p className="text-lg font-semibold text-gray-800 mb-2 ml-2 sm:ml-0">OUR LOCATION</p>
                         <iframe
                             allowFullScreen={true}
-                            height="450"
+                            height="500"
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d990.7044697975375!2d3.3243740696178534!3d6.66947613161211!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b96bc12c94145%3A0xce8a5a69dcdc4350!2s8%20Agbado%20Oke%20Aro%20Road%2C%20Ifako-Ijaiye%2C%20Lagos%20101232%2C%20Lagos!5e0!3m2!1sen!2sng!4v1718193637813!5m2!1sen!2sng"

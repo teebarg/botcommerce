@@ -6,6 +6,7 @@ from uuid import UUID
 from meilisearch import Client
 
 from app.core.config import settings
+from app.core.logging import logger
 
 # Initialize Meilisearch client
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
@@ -46,7 +47,7 @@ def get_document_by_id(index_name: str, doc_id: str):
         doc = index.get_document(doc_id)
         return dict(doc)
     except Exception as e:
-        print(f"Error fetching document by ID: {e}")
+        logger.error(f"Error fetching document by ID: {e}")
 
 def get_document_by_attribute(index_name: str, attribute: str, value: Any) -> dict:
     """
@@ -72,7 +73,7 @@ def get_document_by_attribute(index_name: str, attribute: str, value: Any) -> di
         # Return first hit if found, otherwise None
         return result["hits"][0] if result["hits"] else None
     except Exception as e:
-        print(f"Error fetching document by attribute: {e}")
+        logger.error(f"Error fetching document by attribute: {e}")
         return None
 
 

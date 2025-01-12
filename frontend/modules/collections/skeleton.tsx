@@ -15,9 +15,7 @@ const CollectionTemplateSkeleton = () => {
                             <span className="text-sm">Collections</span>
                             <hr className="shrink-0 border-none w-full h-[1px] my-1 bg-default-100" />
                             <div className="block mb-6 space-y-1">
-                                {[1, 2, 3]?.map((_, index: number) => (
-                                    <Skeleton key={index} className="h-8 w-full rounded dark:bg-background" />
-                                ))}
+                                {[1, 2, 3]?.map((_, index: number) => <Skeleton key={index} className="h-8 w-full rounded dark:bg-background" />)}
                             </div>
                         </div>
                         <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>

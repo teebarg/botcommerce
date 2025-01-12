@@ -4,7 +4,7 @@ import UserDropDown from "@modules/account/components/user-menu";
 import ActivityTray from "@modules/common/components/activity-tray";
 import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HomeIcon } from "nui-react-icons";
+import { Home } from "nui-react-icons";
 
 const AdminNavbar = async () => {
     const customer = await getCustomer().catch(() => null);
@@ -45,7 +45,7 @@ const AdminNavbar = async () => {
             <NavbarMenu>
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     <NavbarItem className="flex items-center gap-2">
-                        <HomeIcon className="h-8 w-8" />
+                        <Home className="h-8 w-8" />
                         <LocalizedClientLink className="" href="/">
                             Home
                         </LocalizedClientLink>

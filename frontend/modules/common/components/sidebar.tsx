@@ -184,6 +184,10 @@ const SideBar: React.FC = () => {
                     href: "/admin/products",
                 },
                 {
+                    label: "Brands",
+                    href: "/admin/brands",
+                },
+                {
                     label: "Categories",
                     href: "/admin/categories",
                 },

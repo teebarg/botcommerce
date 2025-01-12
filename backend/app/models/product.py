@@ -18,6 +18,7 @@ class ProductBase(BaseModel):
 
 # Properties to receive via API on creation
 class ProductCreate(ProductBase):
+    brands: list[int] = []
     categories: list[int] = []
     collections: list[int] = []
     tags: list[int] = []
@@ -25,6 +26,7 @@ class ProductCreate(ProductBase):
 
 # Properties to receive via API on update, all are optional
 class ProductUpdate(ProductBase):
+    brands: list[int] = []
     categories: list[int] = []
     collections: list[int] = []
     tags: list[int] = []
@@ -32,6 +34,7 @@ class ProductUpdate(ProductBase):
 
 class ProductSearch(BM):
     query: Optional[str] = ""
+    brands: Optional[str] = ""
     categories: Optional[str] = ""
     collections: Optional[str] = ""
     min_price: Optional[int] = 0

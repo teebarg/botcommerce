@@ -4,21 +4,22 @@ import React, { forwardRef, useRef } from "react";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { ImageUpload } from "@modules/common/components/image-upload";
-import Button from "@modules/common/components/button";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Switch } from "@modules/common/components/switch";
 import { Multiselect } from "@modules/common/components/multiselect";
-import { Category, Collection } from "types/global";
+import { Brand, Category, Collection } from "types/global";
 import { Input } from "@components/ui/input";
 import { Number } from "@components/ui/number";
 import { TextArea } from "@components/ui/textarea";
 
 import { createProduct, uploadProductImage } from "../actions";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     current?: any;
     type?: "create" | "update";
+    brands?: Brand[];
     categories?: Category[];
     collections?: Collection[];
     onClose?: () => void;
@@ -29,16 +30,19 @@ interface ChildRef {
 }
 
 const ProductForm = forwardRef<ChildRef, Props>(
-    ({ type = "create", onClose, current = { name: "", is_active: true }, categories = [], collections = [] }, ref) => {
+    ({ type = "create", onClose, current = { name: "", is_active: true }, brands = [], categories = [], collections = [] }, ref) => {
         const router = useRouter();
+        const [selectedBrands, setSelectedBrands] = React.useState<number[]>([]);
         const [selectedCategories, setSelectedCategories] = React.useState<number[]>([]);
         const [selectedCollections, setSelectedCollections] = React.useState<number[]>([]);
         const isCreate = type === "create";
 
         React.useEffect(() => {
+            const selected_brands = brands.filter((item) => current?.brands?.includes(item.name)).map((item) => item.id);
             const selected_categories = categories.filter((item) => current?.categories?.includes(item.name)).map((item) => item.id);
             const selected_collections = collections.filter((item) => current?.collections?.includes(item.name)).map((item) => item.id);
 
+            setSelectedBrands(selected_brands);
             setSelectedCategories(selected_categories);
             setSelectedCollections(selected_collections);
         }, [current.collections]);
@@ -79,13 +83,13 @@ const ProductForm = forwardRef<ChildRef, Props>(
 
         return (
             <React.Fragment>
-                <div className="mx-auto w-full pb-8">
+                <div className="mx-auto w-full">
                     <form ref={formRef} action={formAction} className="h-full flex flex-col">
-                        <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll py-6">
+                        <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll py-6 pb-20">
                             <div className="relative flex-1">
                                 <div className="space-y-8 ">
                                     {/* Image uploader */}
-                                    <div>
+                                    <div className="bg-content1 p-2 rounded-md">
                                         <span className="block text-sm font-medium mb-1">Product Image</span>
                                         {!isCreate && <ImageUpload defaultImage={current.image} onUpload={handleUpload} />}
                                     </div>
@@ -94,6 +98,14 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     <Input isRequired defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
                                     <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
                                     <TextArea defaultValue={current.description} name="description" placeholder="Product description custom" />
+                                    <Multiselect
+                                        defaultValue={selectedBrands}
+                                        label="Brands"
+                                        name="brands"
+                                        options={brands}
+                                        placeholder="Select Brands"
+                                        variant="bordered"
+                                    />
                                     <Multiselect
                                         defaultValue={selectedCollections}
                                         label="Collections"
@@ -138,7 +150,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                             </div>
                         </div>
                         <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
-                            <Button className="min-w-32" color="danger" variant="shadow" onPress={onClose}>
+                            <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
                                 Cancel
                             </Button>
                             <FormButton className="min-w-32" color="primary" variant="shadow">

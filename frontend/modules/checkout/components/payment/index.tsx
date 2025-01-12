@@ -7,12 +7,12 @@ import { CheckCircleSolid, CreditCard, Spinner } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
 import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
-import Button from "@modules/common/components/button";
 import { Cart, PaymentSession } from "types/global";
 import { Tooltip } from "@components/ui/tooltip";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
 const payMethods = [
     { id: "stripe", provider_id: "Stripe" },
@@ -126,10 +126,10 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     <Button
                         className="mt-4 font-semibold"
                         data-testid="submit-payment-button"
-                        isDisabled={!cart?.payment_session && !paidByGiftcard}
+                        disabled={!cart?.payment_session && !paidByGiftcard}
                         isLoading={isLoading}
                         size="sm"
-                        onPress={handleSubmit}
+                        onClick={handleSubmit}
                     >
                         Continue to review
                     </Button>

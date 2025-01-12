@@ -10,7 +10,7 @@ import { useFormState } from "react-dom";
 import React, { useState } from "react";
 import { redirect } from "next/navigation";
 import { Input } from "@components/ui/input";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "nui-react-icons";
+import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 
 import { signIn } from "../action";
 
@@ -47,7 +47,7 @@ const LoginForm: React.FC<Props> = () => {
                                 type="button"
                                 onClick={() => setShow(!show)}
                             >
-                                {show ? <EyeSlashFilledIcon className="h-6 w-6" /> : <EyeFilledIcon className="h-6 w-6" />}
+                                {show ? <EyeSlashFilled className="h-6 w-6" /> : <EyeFilled className="h-6 w-6" />}
                             </button>
                         }
                         label="Password"

@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import { Pagination as PaginationType } from "types/global";
 import React from "react";
-import Button from "@modules/common/components/button";
 import { Table } from "@modules/common/components/table";
 import { Card, CardHeader, CardTitle, CardContent } from "components/ui/card";
 import { Activity, CreditCard, Users } from "nui-react-icons";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 const users = [
     {
@@ -117,7 +117,7 @@ export default async function AdminPage() {
                                     fill
                                     alt="avatar"
                                     className="flex object-cover w-full h-full transition-opacity !duration-500 opacity-0"
-                                    src=""
+                                    src="/avatar_ai.png"
                                 />
                             </span>
                             <div className="flex flex-col gap-1 items-start justify-center">

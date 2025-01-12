@@ -5,12 +5,12 @@ import ErrorMessage from "@modules/checkout/components/error-message";
 import { setShippingMethod } from "@modules/checkout/actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import Button from "@modules/common/components/button";
 import { Cart, DeliveryOption } from "types/global";
 import { currency } from "@lib/util/util";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -134,10 +134,10 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     <Button
                         className="mt-2 font-semibold"
                         data-testid="submit-delivery-option-button"
-                        isDisabled={!cart.shipping_method}
+                        disabled={!cart.shipping_method}
                         isLoading={isLoading}
                         size="sm"
-                        onPress={handleSubmit}
+                        onClick={handleSubmit}
                     >
                         Continue to payment
                     </Button>

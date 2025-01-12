@@ -615,6 +615,7 @@ export async function removeWishlist(product_id: number) {
 interface SearchResult {
     products: Product[];
     facets?: {
+        brands: Record<string, string>;
         categories: Record<string, string>;
         collections: Record<string, string>;
     };
@@ -653,6 +654,28 @@ export async function search(searchParams: SearchParams): Promise<SearchResult> 
         };
     }
 }
+
+export const getBrands = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/`, { search, page, limit });
+
+    revalidateTag("brands");
+
+    try {
+        const response = await fetch(url, {
+            next: {
+                tags: ["brands"],
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch brands");
+        }
+
+        return await response.json();
+    } catch (error) {
+        return { message: error instanceof Error ? error.message : "Error fetching brands" };
+    }
+};
 
 export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, { search, page, limit });

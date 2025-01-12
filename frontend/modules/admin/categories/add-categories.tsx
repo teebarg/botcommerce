@@ -3,9 +3,9 @@
 import React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { SlideOver } from "@modules/common/components/slideover";
-import Button from "@modules/common/components/button";
 
 import { CategoryForm } from "./category-form";
+import { Button } from "@/components/ui/button";
 
 interface Props {}
 
@@ -14,7 +14,7 @@ const AddCategory: React.FC<Props> = () => {
 
     return (
         <React.Fragment>
-            <Button variant="bordered" onPress={slideOverState.open}>
+            <Button variant="bordered" onClick={slideOverState.open}>
                 <span>Add category</span>
             </Button>
             {slideOverState.isOpen && (

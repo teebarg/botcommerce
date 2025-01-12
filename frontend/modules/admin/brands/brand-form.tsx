@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Switch } from "@modules/common/components/switch";
 import { Input } from "@components/ui/input";
 
-import { createCollection } from "../actions";
+import { createBrand } from "../actions";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -21,12 +21,12 @@ interface ChildRef {
     // submit: () => void;
 }
 
-const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current = { name: "", is_active: true } }, ref) => {
+const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current = { name: "", is_active: true } }, ref) => {
     const router = useRouter();
     const isCreate = type === "create";
 
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(createCollection, {
+    const [state, formAction] = useFormState(createBrand, {
         success: false,
         message: "",
         data: null,
@@ -36,7 +36,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
 
     React.useEffect(() => {
         if (state.success) {
-            enqueueSnackbar(state.message || "Collection created successfully", { variant: "success" });
+            enqueueSnackbar(state.message || "Brand created successfully", { variant: "success" });
             // Leave the slider open and clear form
             if (formRef.current) {
                 formRef.current.reset();
@@ -59,7 +59,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
+                    <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
                         <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
                             Cancel
                         </Button>
@@ -73,6 +73,6 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     );
 });
 
-CollectionForm.displayName = "CollectionForm";
+BrandForm.displayName = "BrandForm";
 
-export { CollectionForm };
+export { BrandForm };

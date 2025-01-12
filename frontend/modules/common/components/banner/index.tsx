@@ -5,9 +5,8 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import Button from "../button";
-
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
 interface ComponentProps {}
 
@@ -46,7 +45,7 @@ const Banner: React.FC<ComponentProps> = () => {
                         </span>
                     </div>
 
-                    <Button className="min-w-[100px] !rounded-full p-[1px]" size="sm" onPress={() => router.push("/collections")}>
+                    <Button className="min-w-[100px] !rounded-full p-[1px]" size="sm" onClick={() => router.push("/collections")}>
                         <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F54180_0%,#338EF7_50%,#F54180_100%)]" />
                         <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background group-hover:bg-background/70 transition-background px-3 py-1 text-sm font-medium text-foreground backdrop-blur-3xl">
                             Shop Now

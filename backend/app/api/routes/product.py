@@ -75,6 +75,7 @@ async def export_products(
 async def index(
     service: deps.SearchService,
     search: str = "",
+    brands: str = Query(default=""),
     categories: str = Query(default=""),
     collections: str = Query(default=""),
     maxPrice: int = Query(default=1000000, gt=0),
@@ -88,6 +89,8 @@ async def index(
     filters = []
     # if tag:
     #     filters.append(f"tag = '{tag}'")
+    if brands:
+        filters.append(f"brands IN {url_to_list(brands)}")
     if categories:
         filters.append(f"categories IN {url_to_list(categories)}")
     if collections:
@@ -127,6 +130,7 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
     """
     Search products using Meilisearch with Redis caching, sorted by relevance.
     """
+    brands = params.brands
     categories = params.categories
     collections = params.collections
     min_price = params.min_price
@@ -136,6 +140,8 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
     sort = params.sort
 
     filters = []
+    if brands:
+        filters.append(f"brands IN {url_to_list(brands)}")
     if categories:
         filters.append(f"categories IN {url_to_list(categories)}")
     if collections:
@@ -147,7 +153,7 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
         "limit": limit,
         "offset": (page - 1) * limit,
         "sort": [sort],  # Sort by specified field
-        "facets": ['categories', 'collections'],
+        "facets": ['brands', 'categories', 'collections'],
     }
 
     if filters:
@@ -244,6 +250,7 @@ def update(
     db_product = crud.product.update(db=db, db_obj=db_product, obj_in=product_in)
     redis.delete(f"product:{db_product.slug}")
     redis.delete(f"product:{id}")
+    redis.delete_pattern("search:*")
 
     try:
         # Define the background task
@@ -274,6 +281,7 @@ def delete(db: SessionDep, id: int, redis: deps.CacheService,) -> Message:
         delete_document(index_name="products", document_id=str(id))
         redis.delete(f"product:{product.slug}")
         redis.delete(f"product:{id}")
+        redis.delete_pattern("search:*")
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
@@ -317,9 +325,9 @@ async def upload_products(
         # Re-index
         index_products(db=db)
 
-        crud.activities.create_product_upload_activity(
-            db=db, user_id=user.id, filename=file.filename
-        )
+        # crud.activities.create_product_upload_activity(
+        #     db=db, user_id=user.id, filename=file.filename
+        # )
 
     background_tasks.add_task(update_task)
 
@@ -333,6 +341,7 @@ async def upload_product_image(
     file: Annotated[UploadFile, File()],
     db: SessionDep,
     bucket: deps.Storage,
+    redis: deps.CacheService
 ):
     """
     Upload a product image.
@@ -360,6 +369,9 @@ async def upload_product_image(
             product_data = prepare_product_data_for_indexing(product)
 
             update_document(index_name="products", document=product_data)
+
+            # Remove cached data
+            redis.delete(f"product:{product.id}")
 
             # Return the updated product
             return product
@@ -402,7 +414,7 @@ async def configure_filterable_attributes(
         index = get_or_create_index("products")
         # Update the filterable attributes
         index.update_filterable_attributes(
-            ["categories", "collections", "name", "price", "slug"]
+            ["brands", "categories", "collections", "name", "price", "slug"]
         )
         # Update the sortable attributes
         index.update_sortable_attributes(["created_at", "price"])
@@ -454,6 +466,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["collections"] = [
         collection.name for collection in product.collections
     ]
+    product_dict["brands"] = [brand.name for brand in product.brands]
     product_dict["categories"] = [category.name for category in product.categories]
     product_dict["images"] = [image.image for image in product.images]
     return product_dict

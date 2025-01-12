@@ -7,7 +7,6 @@ import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@m
 import { useFormState } from "react-dom";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
-import Button from "@modules/common/components/button";
 import { Address } from "types/global";
 import { useOverlayTriggerState } from "react-stately";
 import { ComboBox } from "@modules/common/components/combobox";
@@ -15,6 +14,7 @@ import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
 type EditAddressProps = {
     address: Address;
@@ -169,7 +169,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                             </div>
                             <div className="flex gap-3 mt-6">
-                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onPress={modalState.close}>
+                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
                                     Cancel
                                 </Button>
                                 <FormButton color="primary" data-testid="save-button">

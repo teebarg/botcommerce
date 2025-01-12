@@ -1,10 +1,10 @@
 "use client";
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import Button from "@modules/common/components/button";
 import { Order } from "types/global";
 
 import OrderCard from "../order-card";
+import { Button } from "@/components/ui/button";
 
 const OrderOverview = ({ orders }: { orders: any[] }) => {
     if (orders?.length) {

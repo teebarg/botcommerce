@@ -2,7 +2,7 @@
 
 import { Confirm } from "@modules/common/components/confirm";
 import { Modal } from "@modules/common/components/modal";
-import { DeleteIcon, EditIcon, EyeIcon } from "nui-react-icons";
+import { Delete, EditIcon, Eye } from "nui-react-icons";
 import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { useSnackbar } from "notistack";
@@ -11,12 +11,14 @@ import { useRouter } from "next/navigation";
 import { Tooltip } from "@components/ui/tooltip";
 
 interface Props {
+    label?: string;
     item: any;
     form: React.ReactNode;
+    showDetails?: boolean;
     deleteAction: (id: string) => void;
 }
 
-const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
+const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, deleteAction }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [current, setCurrent] = useState<any>({ is_active: true });
     const deleteModalState = useOverlayTriggerState({});
@@ -34,26 +36,28 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
             await deleteAction(current.id);
             router.refresh();
         } catch (error) {
-            enqueueSnackbar("Error deleting product", { variant: "error" });
+            enqueueSnackbar(`Error deleting ${label}`, { variant: "error" });
         }
     };
 
     return (
         <React.Fragment>
             <div className="relative flex items-center gap-2">
-                <Tooltip content="Details">
-                    <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
-                        <EyeIcon />
-                    </span>
-                </Tooltip>
-                <Tooltip content="Edit products">
+                {showDetails && (
+                    <Tooltip content="Details">
+                        <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
+                            <Eye />
+                        </span>
+                    </Tooltip>
+                )}
+                <Tooltip content={`Edit ${label}`}>
                     <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
                         <EditIcon onClick={() => slideOverState.open()} />
                     </span>
                 </Tooltip>
-                <Tooltip color="danger" content="Delete products">
+                <Tooltip color="danger" content={`Delete ${label}`}>
                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <DeleteIcon onClick={() => onDelete(item)} />
+                        <Delete onClick={() => onDelete(item)} />
                     </span>
                 </Tooltip>
             </div>
@@ -64,7 +68,7 @@ const Actions: React.FC<Props> = ({ item, form, deleteAction }) => {
                 </Modal>
             )}
             {slideOverState.isOpen && (
-                <SlideOver className="bg-default-100" isOpen={slideOverState.isOpen} title="Edit Product" onClose={slideOverState.close}>
+                <SlideOver className="bg-default-100" isOpen={slideOverState.isOpen} title={`Edit ${label}`} onClose={slideOverState.close}>
                     {slideOverState.isOpen && formWithHandler}
                 </SlideOver>
             )}

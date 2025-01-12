@@ -37,7 +37,6 @@ router = APIRouter()
 @router.get(
     "/",
     dependencies=[],
-    response_model=Collections,
 )
 def index(
     db: SessionDep,
@@ -82,14 +81,14 @@ def index(
         total_count=total_count,
     )
 
-    # Cache the result for 5 minutes
+    # Cache the result
     redis.set(cache_key, result.model_dump_json())
 
     return result
 
 
-@router.post("/", response_model=Collection)
-def create(*, db: SessionDep, create_data: CollectionCreate) -> Collection:
+@router.post("/")
+def create(*, db: SessionDep, create_data: CollectionCreate, redis: deps.CacheService) -> Collection:
     """
     Create new collection.
     """
@@ -101,10 +100,11 @@ def create(*, db: SessionDep, create_data: CollectionCreate) -> Collection:
         )
 
     collection = crud.collection.create(db=db, obj_in=create_data)
+    redis.delete_pattern("collections:list:*")
     return collection
 
 
-@router.get("/{id}", response_model=Collection)
+@router.get("/{id}")
 def read(id: int, db: SessionDep, redis: deps.CacheService) -> Collection:
     """
     Get a specific collection by id with Redis caching.
@@ -120,27 +120,37 @@ def read(id: int, db: SessionDep, redis: deps.CacheService) -> Collection:
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
 
-    # Cache the result for 5 minutes
+    # Cache the result
     redis.set(cache_key, collection.model_dump_json())
 
     return collection
 
 
-@router.get("/slug/{slug}", response_model=Collection)
-def get_by_slug(slug: str, db: SessionDep) -> Collection:
+@router.get("/slug/{slug}")
+def get_by_slug(slug: str, db: SessionDep, redis: deps.CacheService) -> Collection:
     """
     Get a collection by its slug.
     """
+    cache_key = f"collection:slug:{slug}"
+
+    # Try to get from cache first
+    cached_data = redis.get(cache_key)
+    if cached_data:
+        return Collection(**json.loads(cached_data))
+
     collection = crud.collection.get_by_key(db=db, key="slug", value=slug)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
+
+    # Cache the result
+    redis.set(cache_key, collection.model_dump_json())
+
     return collection
 
 
 @router.patch(
     "/{id}",
     dependencies=[Depends(get_current_user)],
-    response_model=Collection,
 )
 def update(
     *,
@@ -163,7 +173,9 @@ def update(
             db=db, db_obj=db_collection, obj_in=update_data
         )
         # Invalidate cache
+        redis.delete(f"collection:slug:{db_collection.slug}")
         redis.delete(f"collection:{id}")
+        redis.delete_pattern("collections:list:*")
         return db_collection
     except IntegrityError as e:
         logger.error(f"Error updating collection, {e.orig.pgerror}")
@@ -177,7 +189,7 @@ def update(
 
 
 @router.delete("/{id}")
-def delete(db: SessionDep, id: int) -> Message:
+def delete(id: int, db: SessionDep, redis: deps.CacheService) -> Message:
     """
     Delete a collection.
     """
@@ -185,6 +197,9 @@ def delete(db: SessionDep, id: int) -> Message:
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
     crud.collection.remove(db=db, id=id)
+    redis.delete(f"collection:slug:{collection.slug}")
+    redis.delete(f"collection:{id}")
+    redis.delete_pattern("collections:list:*")
     return Message(message="Collection deleted successfully")
 
 
