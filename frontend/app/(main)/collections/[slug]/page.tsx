@@ -6,6 +6,7 @@ import { Collection, SortOptions } from "types/global";
 import React, { Suspense } from "react";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
+import { siteConfig } from "@/lib/config";
 
 type Props = {
     params: { slug: string };
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: `${collection.name} | Botcommerce Store`,
+        title: `${collection.name} | ${siteConfig.name} Store`,
         description: `${collection.name} collection`,
     } as Metadata;
 }

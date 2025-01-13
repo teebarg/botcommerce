@@ -6,10 +6,11 @@ import { getSiteConfigs } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteSiteConfig } from "@modules/admin/actions";
 import { SiteConfigForm } from "@/modules/admin/siteconfigs/siteconfigs-form";
+import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
-    title: "SiteConfigs Page | Children clothing | Botcommerce Store",
-    description: "A performant frontend ecommerce starter template with Next.js.",
+    title: `SiteConfigs Page | Children clothing | ${siteConfig.name} Store`,
+    description: siteConfig.description,
 };
 
 export default async function SiteConfigsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {
@@ -33,7 +34,7 @@ export default async function SiteConfigsPage({ searchParams }: { searchParams: 
                             ?.sort((a: SiteConfig, b: SiteConfig) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                             .map((item: SiteConfig, index: number) => (
                                 <tr key={item.id} className="even:bg-content2">
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page) * limit + index + 1}</td>
+                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{page * limit + index + 1}</td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <div className="font-bold truncate max-w-32">{item?.key}</div>
                                     </td>

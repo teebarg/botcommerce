@@ -86,7 +86,7 @@ const Table: React.FC<Props> = ({
             {!isDataOnly && (
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between gap-3 items-center">
-                        <div>
+                        <div className="flex-1">
                             {canSearch && (
                                 <Input
                                     size="sm"

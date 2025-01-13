@@ -5,9 +5,17 @@ import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import Search from "@/modules/search/components/search";
 import { Customer } from "types/global";
-import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 import { HeartFilled, Heart, Home, UserGroup, User } from "nui-react-icons";
+import dynamic from "next/dynamic";
+import { siteConfig } from "@/lib/config";
+
+const getThemeToggler = () =>
+    dynamic(() => import("@lib/theme/theme-button"), {
+        ssr: false,
+        // Make sure to code a placeholder so the UI doesn't jump when the component loads
+        loading: () => <div className="w-6 h-6" />,
+    });
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -19,7 +27,7 @@ const Navbar = async () => {
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center flex-1 md:w-[25vw] font-semibold">
                     <LocalizedClientLink className="text-3xl block" href="/">
-                        Botcommerce
+                        {siteConfig.name}
                     </LocalizedClientLink>
                     <LocalizedClientLink className="hidden md:block" href={"/collections"}>
                         Collections

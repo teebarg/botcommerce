@@ -224,7 +224,6 @@ export type WishlistItem = {
     created_at?: string;
 };
 
-
 export type SiteConfig = {
     id: number;
     key: string;

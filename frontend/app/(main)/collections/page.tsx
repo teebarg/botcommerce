@@ -4,6 +4,7 @@ import { SortOptions } from "types/global";
 import { Suspense } from "react";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
+import { siteConfig } from "@/lib/config";
 
 type Props = {
     searchParams: {
@@ -17,8 +18,8 @@ export const revalidate = 3;
 
 export async function generateMetadata(): Promise<Metadata> {
     const metadata = {
-        title: `Collections | Botcommerce Store`,
-        description: "Collections",
+        title: `Collections | ${siteConfig.name} Store`,
+        description: siteConfig.description,
     } as Metadata;
 
     return metadata;

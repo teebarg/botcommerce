@@ -7,10 +7,11 @@ import { Actions } from "@modules/admin/components/actions";
 import { Chip } from "@modules/common/components/chip";
 import { deleteBrand } from "@modules/admin/actions";
 import { BrandForm } from "@/modules/admin/brands/brand-form";
+import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
-    title: "Brands Page | Children clothing | Botcommerce Store",
-    description: "A performant frontend ecommerce starter template with Next.js.",
+    title: `Brands Page | Children clothing | ${siteConfig.name} Store`,
+    description: siteConfig.description,
 };
 
 export default async function BrandsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {

@@ -11,6 +11,7 @@ import React from "react";
 import { Input } from "@components/ui/input";
 
 import { signUp } from "../action";
+import { siteConfig } from "@/lib/config";
 
 type Props = {};
 
@@ -41,7 +42,7 @@ const SignUpForm: React.FC<Props> = () => {
                     </div>
                 </div>
                 <span className="text-center text-default-500 text-xs mt-6">
-                    By creating an account, you agree to Botcommerce Store&apos;s{" "}
+                    By creating an account, you agree to {siteConfig.name} Store&apos;s{" "}
                     <LocalizedClientLink className="underline" href="/content/privacy-policy">
                         Privacy Policy
                     </LocalizedClientLink>{" "}

@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "components/ui/card";
 import { Activity, CreditCard, Users } from "nui-react-icons";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/lib/config";
 
 const users = [
     {
@@ -85,8 +86,9 @@ const pagination: PaginationType = {
 };
 
 export const metadata: Metadata = {
-    title: "Children clothing | Botcommerce Store",
-    description: "A performant frontend ecommerce starter template with Next.js.",
+    title: `Children clothing | ${siteConfig.name} Store`,
+    description:
+        "Explore our wide range of children's clothing at ${siteConfig.name} Store. From casual wear to formal attire, we have everything your little ones need.",
 };
 
 export default async function AdminPage() {

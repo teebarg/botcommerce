@@ -43,9 +43,8 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex shadow-sm px-3 data-[hover=true]:bg-content2 bg-content1",
-                        "min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-background",
-                        "!duration-150 outline-none",
+                        "relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-medium outline-none",
+                        "flex-col items-start justify-center gap-0 transition-background duration-150",
                         {
                             "h-10 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",

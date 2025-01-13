@@ -5,6 +5,7 @@ import { Calendar, Check, ChevronRight, CogSixTooth, Component, DocumentText, Ec
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@lib/util/cn";
+import { siteConfig } from "@/lib/config";
 
 interface MenuItem {
     label: string;
@@ -316,7 +317,7 @@ const SideBar: React.FC = () => {
                         "!opacity-0 w-0": isCollapsed,
                     })}
                 >
-                    Botcommerce
+                    {siteConfig.name}
                 </h1>
                 <button
                     aria-label="open"

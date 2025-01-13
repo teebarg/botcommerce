@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
+import { siteConfig } from "@/lib/config";
 
 const Google = dynamic(() => import("./google"), { ssr: false });
 const NotificationProviders = dynamic(() => import("./notistack-providers"), { ssr: false });
@@ -24,7 +25,7 @@ const lexend = Lexend({
 
 export const metadata = {
     metadataBase: new URL(BASE_URL),
-    title: "Botcommerce",
+    title: siteConfig.name,
     description: "the worlds best flashcard learning system",
     icons: {
         icon: [{ url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }],
