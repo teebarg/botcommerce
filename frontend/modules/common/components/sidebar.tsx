@@ -164,14 +164,19 @@ const SideBar: React.FC = () => {
                     icon: <Window size={18} />,
                 },
                 {
-                    label: "Settings",
-                    href: "/admin/settings",
+                    label: "Configs",
+                    href: "/admin/configs",
                     icon: <CogSixTooth size={18} />,
                 },
                 {
                     label: "Users",
                     href: "/admin/users",
                     icon: <Users size={18} />,
+                },
+                {
+                    label: "Settings",
+                    href: "/admin/settings",
+                    icon: <CogSixTooth size={18} />,
                 },
             ],
         },

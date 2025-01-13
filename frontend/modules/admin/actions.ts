@@ -408,3 +408,63 @@ export async function bulkUploadProducts({ formData }: { formData: FormData }) {
         return e instanceof Error ? e.message : "Unknown error occurred";
     }
 }
+
+export async function createSiteConfig(currentState: unknown, formData: FormData) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const configUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config`;
+
+    const id = formData.get("id");
+    const type = formData.get("type") as string;
+
+    const url = type === "create" ? `${configUrl}/` : `${configUrl}/${id}`;
+
+    try {
+        const res = await fetch(url, {
+            method: type === "create" ? "POST" : "PATCH",
+            headers: {
+                "X-Auth": accessToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                key: formData.get("key"),
+                value: formData.get("value"),
+            }),
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("configs");
+
+        return { success: true, message: "Config created successfully", data: await res.json() };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error creating config" };
+    }
+}
+
+export async function deleteSiteConfig(configId: string) {
+    const accessToken = cookies().get("access_token")?.value as string;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config/${configId}`;
+
+    try {
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "X-Auth": accessToken,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("configs");
+
+        return { success: true, message: "Config deleted successfully" };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error deleting config" };
+    }
+}

@@ -1,7 +1,9 @@
+from app.services.cache import get_cache_service
 from fastapi import  HTTPException
 from functools import wraps
-from typing import Optional
 import re
+import json
+from typing import Callable, Optional
 
 def limit(rate_string: str):
     """
@@ -59,4 +61,61 @@ def limit(rate_string: str):
             
             return await func(*args, **kwargs)
         return wrapper
+    return decorator
+
+
+def cache(expire: int = 86400, key: Optional[str] = None):
+    """
+    Decorator to cache the result of a function.
+    Args:
+        expire: Expiration time in seconds for the cache.
+        key: Optional custom key for caching. If not provided, a key is generated.
+    """
+    def generate_cache_key(key: str, func_name: str, args: tuple, kwargs: dict) -> str:
+        """
+        Generate a consistent cache key based on the function name and normalized arguments.
+        Args:
+            func_name: The name of the function.
+            args: Positional arguments.
+            kwargs: Keyword arguments.
+        Returns:
+            str: A hash representing the cache key.
+        """
+        temp_kwargs = ":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache"]])
+        return f"{key or func_name}:{temp_kwargs}"
+
+        # # Normalize arguments and keyword arguments
+        # key_data = {
+        #     "func_name": func_name,
+        #     "args": args,
+        #     "kwargs": sorted(temp_kwargs.items()),  # Sort kwargs to ensure consistency
+        # }
+        # # Generate a hash key
+        # return f"{key or func_name}:{hashlib.md5(json.dumps(key_data, sort_keys=True, default=str).encode()).hexdigest()}"
+    
+    def decorator(func: Callable):
+        @wraps(func)
+        async def wrapped(*args, **kwargs):
+            # Initialize cache service
+            cache_service = await get_cache_service()
+
+            # Use the provided key or generate one
+            cache_key = generate_cache_key(key=key, func_name=func.__name__, args=args, kwargs=kwargs)
+
+            # Try to get the result from the cache
+            cached_result = cache_service.get(cache_key)
+            if cached_result is not None:
+                return json.loads(cached_result)
+
+            # Compute the result, cache it, and return it
+            result = await func(*args, **kwargs)
+            # cache_service.set(cache_key, json.dumps(result), expire)
+            if isinstance(result, dict):
+                cache_service.set(cache_key, json.dumps(result), expire)
+            else:
+                cache_service.set(cache_key, result.model_dump_json(), expire)
+            return result
+
+        return wrapped
+
     return decorator
