@@ -128,8 +128,15 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative h-28">
-                    <Image fill alt="banner" src={"/frontend.webp"} priority sizes="100vw" />
+                <div className="relative h-8 md:h-28">
+                    <Image
+                        fill
+                        alt="banner"
+                        src="/frontend.webp"
+                        priority
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        className="object-contain"
+                    />
                 </div>
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -167,8 +174,15 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative h-28">
-                    <Image fill alt="banner" src={"/frontend.webp"} />
+                <div className="relative h-8 md:h-28">
+                    <Image
+                        fill
+                        alt="banner"
+                        src="/frontend.webp"
+                        priority
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        className="object-contain"
+                    />
                 </div>
                 <div className="bg-content1 py-16">
                     <div className="max-w-8xl mx-auto px-4">
