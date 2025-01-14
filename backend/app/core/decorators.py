@@ -83,15 +83,6 @@ def cache(expire: int = 86400, key: Optional[str] = None):
         """
         temp_kwargs = ":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache"]])
         return f"{key or func_name}:{temp_kwargs}"
-
-        # # Normalize arguments and keyword arguments
-        # key_data = {
-        #     "func_name": func_name,
-        #     "args": args,
-        #     "kwargs": sorted(temp_kwargs.items()),  # Sort kwargs to ensure consistency
-        # }
-        # # Generate a hash key
-        # return f"{key or func_name}:{hashlib.md5(json.dumps(key_data, sort_keys=True, default=str).encode()).hexdigest()}"
     
     def decorator(func: Callable):
         @wraps(func)
@@ -109,7 +100,7 @@ def cache(expire: int = 86400, key: Optional[str] = None):
 
             # Compute the result, cache it, and return it
             result = await func(*args, **kwargs)
-            # cache_service.set(cache_key, json.dumps(result), expire)
+
             if isinstance(result, dict):
                 cache_service.set(cache_key, json.dumps(result), expire)
             else:

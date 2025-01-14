@@ -87,8 +87,7 @@ const pagination: PaginationType = {
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
-    description:
-        "Explore our wide range of children's clothing at ${siteConfig.name} Store. From casual wear to formal attire, we have everything your little ones need.",
+    description: siteConfig.description,
 };
 
 export default async function AdminPage() {

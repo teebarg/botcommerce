@@ -179,7 +179,7 @@ export default async function Footer() {
                     <NewsletterForm />
                 </div>
                 <div className="flex flex-wrap justify-between gap-2 md:pt-8">
-                    <p className="text-small text-default-500">&copy; {new Date().getFullYear()} Online Kiddies Store. All rights reserved.</p>
+                    <p className="text-small text-default-500">&copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
                 </div>
             </div>
         </footer>

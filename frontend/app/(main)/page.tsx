@@ -202,7 +202,7 @@ export default async function Home() {
                 <div className="bg-fixed bg-center" style={{ backgroundImage: `url(${imgSrc("banners%2Fhero-contact.jpg")})` }}>
                     <div className="flex items-center h-full">
                         <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
-                            <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/40 text-gray-100 p-4 sm:p-8 rounded-lg">
+                            <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/50 text-gray-100 p-4 sm:p-8 rounded-lg">
                                 <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
                                 <p className="text-xl font-semibold">Reach out to us for more information</p>
                                 <p className="font-medium">
@@ -211,7 +211,7 @@ export default async function Home() {
                                 </p>
                                 <ContactForm />
                             </div>
-                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/40 p-4 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
+                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 p-4 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
                                 <div>
                                     <p className="font-semibold mt-4 text-xl">Our Contacts</p>
                                     <div className="flex gap-2">

@@ -14,12 +14,6 @@ class SiteConfigUpdate(BaseModel):
     key: Optional[str] = None
     value: Optional[str] = None
 
-class SiteConfigInDB(SiteConfigBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
 
 class SiteConfig(SiteConfigBase, table=True):
     __tablename__ = "site_config"

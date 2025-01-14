@@ -27,9 +27,8 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
     return (
         <React.Fragment>
             <div
-                className={cn("group flex flex-col data-[hidden=true]:hidden w-full", classNames?.["base"])}
+                className={cn("group focus-visible:outline-none data-[hidden=true]:hidden w-full", classNames?.["base"])}
                 data-filled={isFocused || Boolean(inputProps.value) || Boolean(props.placeholder)}
-                data-filled-within={isFocused || Boolean(inputProps.value) || Boolean(props.placeholder)}
                 data-focus={isFocused}
                 data-focus-within={isFocused}
                 data-has-elements="true"
@@ -43,8 +42,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-medium outline-none",
-                        "flex-col items-start justify-center gap-0 transition-background duration-150",
+                        "relative w-full flex-col items-start justify-center inline-flex shadow-sm px-3 bg-content1 rounded-medium outline-none",
                         {
                             "h-10 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",
@@ -60,11 +58,9 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                     <label
                         {...labelProps}
                         className={cn(
-                            "absolute z-10 pointer-events-none origin-top-left rtl:origin-top-right subpixel-antialiased block text-foreground-500 cursor-text",
-                            "after:text-danger after:ml-0.5 rtl:after:ml-[unset] rtl:after:mr-0.5 will-change-auto !duration-200 !ease-out motion-reduce:transition-none",
-                            "transition-[transform,color,left,opacity] group-data-[filled-within=true]:text-default-500 group-data-[filled-within=true]:pointer-events-auto",
-                            "group-data-[filled-within=true]:scale-85 md:text-small text-xs group-data-[filled-within=true]:-translate-y-[calc(50%_+_theme(fontSize.small)/2_-_6px)] pe-2",
-                            "max-w-full text-ellipsis overflow-hidden",
+                            "absolute z-10 block text-foreground-500 cursor-text after:text-danger after:ml-0.5 duration-200 ease-out transition-all",
+                            "group-data-[filled=true]:text-default-500 group-data-[filled=true]:pointer-events-auto max-w-full text-ellipsis overflow-hidden",
+                            "group-data-[filled=true]:scale-85 text-xs group-data-[filled=true]:-translate-y-[calc(50%_+_theme(fontSize.small)/2_-_2px)]",
                             {
                                 "after:content-['*']": props.isRequired,
                             },
@@ -83,13 +79,11 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             {...inputProps}
                             ref={ref}
                             className={cn(
-                                "w-full font-normal !outline-none placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto",
-                                "data-[has-start-content=true]:ps-1.5 data-[has-end-content=true]:pe-1.5 file:cursor-pointer file:bg-transparent file:border-0",
-                                "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground",
+                                "w-full font-normal placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto autofill:bg-transparent",
+                                "file:cursor-pointer file:bg-transparent file:border-0 text-small group-data-[has-value=true]:text-default-foreground",
                                 classNames?.["input"]
                             )}
                             data-filled={Boolean(inputProps.value)}
-                            data-filled-within="true"
                             data-has-end-content={endContent ? "true" : "false"}
                             data-has-start-content={startContent ? "true" : "false"}
                             data-slot="input"

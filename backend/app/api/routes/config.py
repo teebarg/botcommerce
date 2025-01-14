@@ -1,5 +1,5 @@
 from typing import Any
-from app.models.config import SiteConfig, SiteConfigCreate, SiteConfigInDB, SiteConfigUpdate, SiteConfigs
+from app.models.config import SiteConfig, SiteConfigCreate, SiteConfigUpdate, SiteConfigs
 from app.core.deps import CacheService, SessionDep
 from app.core.decorators import cache
 from fastapi import APIRouter, HTTPException
@@ -65,7 +65,7 @@ async def read(id: int, db: SessionDep) -> SiteConfig:
 
     return config
 
-@router.post("/", response_model=SiteConfigInDB)
+@router.post("/", response_model=SiteConfig)
 async def create(
     *,
     db: SessionDep,
@@ -86,7 +86,7 @@ async def create(
     return siteconfig.create(db=db, obj_in=config_in)
 
 
-@router.patch("/{id}", response_model=SiteConfigInDB)
+@router.patch("/{id}", response_model=SiteConfig)
 async def update(
     *,
     db: SessionDep,

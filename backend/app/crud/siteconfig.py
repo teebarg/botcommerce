@@ -29,11 +29,6 @@ def create(db: Session, obj_in: SiteConfigCreate) -> SiteConfig:
 
 
 def update(db: Session, db_obj: SiteConfig, obj_in: SiteConfigUpdate) -> SiteConfig:
-    # update_data = obj_in.dict(exclude_unset=True)
-    
-    # for field, value in update_data.items():
-    #     if value is not None:
-    #         setattr(db_obj, field, value)
     update_data = obj_in.model_dump(exclude_unset=True)
     db_obj.sqlmodel_update(update_data)
     db.add(db_obj)

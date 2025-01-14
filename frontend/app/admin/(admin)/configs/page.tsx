@@ -9,7 +9,7 @@ import { SiteConfigForm } from "@/modules/admin/siteconfigs/siteconfigs-form";
 import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
-    title: `SiteConfigs Page | Children clothing | ${siteConfig.name} Store`,
+    title: `SiteConfigs | ${siteConfig.name} Store`,
     description: siteConfig.description,
 };
 

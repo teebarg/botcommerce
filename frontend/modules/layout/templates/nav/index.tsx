@@ -13,7 +13,6 @@ import { siteConfig } from "@/lib/config";
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
         ssr: false,
-        // Make sure to code a placeholder so the UI doesn't jump when the component loads
         loading: () => <div className="w-6 h-6" />,
     });
 

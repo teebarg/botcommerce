@@ -59,7 +59,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-medium flex-col gap-0 !duration-150 outline-none py-2",
+                        "relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-medium flex-col py-2",
                         classNames?.["inputWrapper"]
                     )}
                     data-hover={isHovered ? "true" : "false"}
@@ -69,9 +69,8 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                     <label
                         {...labelProps}
                         className={cn(
-                            "z-10 pointer-events-none block text-foreground-500 cursor-text relative",
-                            "!duration-200 !ease-out transition-all group-data-[filled-within=true]:text-default-500",
-                            "group-data-[filled-within=true]:scale-85 text-small pb-0.5 max-w-full text-ellipsis overflow-hidden",
+                            "z-10 pointer-events-none block text-foreground-500 cursor-text relative text-small pb-0.5 max-w-full",
+                            "duration-200 transition-all group-data-[filled-within=true]:text-default-500 text-ellipsis overflow-hidden",
                             classNames?.["label"]
                         )}
                         data-slot="label"
@@ -86,8 +85,8 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                             {...inputProps}
                             ref={textareaRef}
                             className={cn(
-                                "w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small resize-none",
-                                "data-[hide-scroll=true]:scrollbar-hide group-data-[has-value=true]:text-default-foreground pt-0 transition-height !duration-100",
+                                "w-full font-normal bg-transparent outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small",
+                                "group-data-[has-value=true]:text-default-foreground pt-0 transition-height duration-100 resize-none autofill:bg-transparent",
                                 classNames?.["input"]
                             )}
                             data-hide-scroll="true"
