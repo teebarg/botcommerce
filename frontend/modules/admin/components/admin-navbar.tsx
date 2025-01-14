@@ -2,9 +2,16 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import ActivityTray from "@modules/common/components/activity-tray";
-import { getThemeToggler } from "@lib/theme/get-theme-button";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 import { Home } from "nui-react-icons";
+import dynamic from "next/dynamic";
+import { siteConfig } from "@/lib/config";
+
+const getThemeToggler = () =>
+    dynamic(() => import("@lib/theme/theme-button"), {
+        ssr: false,
+        loading: () => <div className="w-6 h-6" />,
+    });
 
 const AdminNavbar = async () => {
     const customer = await getCustomer().catch(() => null);
@@ -15,7 +22,7 @@ const AdminNavbar = async () => {
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">
                     <LocalizedClientLink className="flex justify-start items-center gap-1" href="/admin">
-                        <p className="font-bold text-inherit">Botcommerce</p>
+                        <p className="font-bold text-inherit">{siteConfig.name}</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
             </NavbarContent>

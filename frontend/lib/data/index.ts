@@ -798,3 +798,26 @@ export async function deleteActivities(id: string | number) {
         throw new Error(`Error: ${error}`);
     }
 }
+
+export const getSiteConfigs = async (skip: number = 0, limit: number = 20): Promise<any> => {
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config/`, { skip, limit });
+    const headers = getHeaders(["configs"]);
+    revalidateTag("configs");
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                accept: "application/json",
+                ...headers,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch configs");
+        }
+
+        return await response.json();
+    } catch (error) {
+        return { message: error instanceof Error ? error.message : "Error fetching configs" };
+    }
+};

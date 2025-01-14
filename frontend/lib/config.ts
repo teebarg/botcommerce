@@ -2,32 +2,11 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
     name: process.env.NEXT_PUBLIC_NAME,
-    description: "Make beautiful websites regardless of your coding experience.",
+    description:
+        "Discover a wide range of high-quality products at unbeatable prices. Shop now for exclusive deals and fast shipping, ensuring a seamless shopping experience tailored just for you.",
     contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
     contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE,
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
-    navMenuItems: [
-        {
-            label: "Profile",
-            href: "/account/profile",
-        },
-        {
-            label: "Dashboard",
-            href: "/account",
-        },
-        {
-            label: "Orders",
-            href: "/account/orders",
-        },
-        {
-            label: "Addresses",
-            href: "/account/addresses",
-        },
-        {
-            label: "Logout",
-            href: "/logout",
-        },
-    ],
     links: {
         github: "https://github.com/teebarg",
         twitter: "https://twitter.com",

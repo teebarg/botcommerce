@@ -3,11 +3,12 @@ import React, { useState } from "react";
 
 interface Props {
     title?: string;
+    content?: string;
     onConfirm?: () => void;
     onClose?: () => void;
 }
 
-const Confirm: React.FC<Props> = ({ title = "Confirm?", onConfirm, onClose }) => {
+const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onClose }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
 
     const onSubmit = async () => {
@@ -30,8 +31,8 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", onConfirm, onClose }) =>
                     </div>
                     <div>
                         <p className="text-sm text-default-500 mt-6 font-medium">
-                            Are you sure you want to delete this user? All of your data will be permanently removed from our servers forever. This
-                            action cannot be undone.
+                            {content ??
+                                "Are you sure you want to delete this item? All of your data will be permanently removed from our servers forever. This action cannot be undone."}
                         </p>
                     </div>
                     <div className="flex justify-end gap-2 mt-8">

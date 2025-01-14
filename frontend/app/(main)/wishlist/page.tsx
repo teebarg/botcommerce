@@ -4,13 +4,14 @@ import { Heart } from "nui-react-icons";
 import WishlistItem from "@/modules/common/components/wishlist";
 import { getWishlist } from "@/lib/data";
 import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import { siteConfig } from "@/lib/config";
 
 export const revalidate = 3;
 
 export async function generateMetadata(): Promise<Metadata> {
     const metadata = {
-        title: `Wishlist | Botcommerce Store`,
-        description: "Wishlist",
+        title: `Wishlist | ${siteConfig.name} Store`,
+        description: siteConfig.description,
     } as Metadata;
 
     return metadata;

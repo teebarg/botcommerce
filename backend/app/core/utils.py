@@ -116,6 +116,7 @@ def generate_invoice_email(order: Order, user: User) -> EmailData:
             "project_name": settings.PROJECT_NAME,
             "order": order,
             "user": user,
+            "current_year": datetime.now().year,
         },
     )
     return EmailData(html_content=html_content, subject=subject)
@@ -165,6 +166,7 @@ def generate_contact_form_email(
             "email": email,
             "phone": phone,
             "message": message,
+            "current_year": datetime.now().year,
         },
     )
     return EmailData(html_content=html_content, subject=subject)

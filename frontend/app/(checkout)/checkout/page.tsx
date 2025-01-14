@@ -11,9 +11,11 @@ import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 import PaymentButton from "@/modules/checkout/components/payment-button";
 import { BackButton } from "@/components/back";
 import { currency } from "@/lib/util/util";
+import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
-    title: "Clothings | Botcommerce Store | Checkout",
+    title: `Clothings | ${siteConfig.name} Store | Checkout`,
+    description: siteConfig.description,
 };
 
 interface EmptyCartProps {}

@@ -69,16 +69,27 @@ const FlashBanner: React.FC = () => {
 
     return (
         <div className="bg-gradient-to-r from-black/80 to-gray-800 ">
-            <div className="text-white px-6 py-4 rounded-2xl shadow-2xl max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between">
-                <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                    <Tag className="w-12 h-12 text-yellow-400 hidden md:block" />
+            <div className="text-white px-2 py-4 rounded-2xl shadow-2xl max-w-5xl mx-auto flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                    <Tag className="w-8 h-8 text-yellow-400" viewBox="0 0 20 20" />
                     <div>
-                        <h2 className="text-2xl font-bold text-yellow-300">Luxury Flash Sale</h2>
-                        <p className="text-sm text-gray-300">Exclusive 24-Hour Deals</p>
+                        <h2 className="text-sm md:text-2xl font-bold text-yellow-300">Flash Sale</h2>
+                        <p className="text-sm text-gray-300 hidden md:inline-block">Exclusive 24-Hour Deals</p>
+                        <div className="flex md:hidden space-x-1 text-center">
+                            {(["hours", "minutes", "seconds"] as const).map((timeUnit, index: number) => (
+                                <div key={timeUnit} suppressHydrationWarning>
+                                    <span className="text-xs font-semibold">
+                                        {timeLeft[timeUnit].toString().padStart(2, "0")}
+                                        {timeUnit.charAt(0)}
+                                    </span>
+                                    {index < 2 && <span>:</span>}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="hidden md:flex items-center space-x-4">
                     <Clock className="w-10 h-10 text-yellow-400" />
                     <div className="flex space-x-2 text-center">
                         {(["hours", "minutes", "seconds"] as const).map((timeUnit) => (
@@ -91,7 +102,7 @@ const FlashBanner: React.FC = () => {
                 </div>
 
                 <LocalizedClientLink
-                    className="mt-4 md:mt-0 bg-yellow-400 text-black px-6 py-1.5 rounded-full hover:bg-yellow-500 transition-colors flex items-center space-x-2"
+                    className="bg-yellow-400 text-black px-4 py-1.5 rounded-full hover:bg-yellow-500 transition-colors flex items-center space-x-2"
                     href="/collections"
                 >
                     <Cart className="w-5 h-5" />

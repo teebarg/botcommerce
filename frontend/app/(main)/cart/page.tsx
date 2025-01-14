@@ -10,10 +10,11 @@ import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 import RecommendedProducts from "@/modules/products/components/recommended";
 import { CartItem } from "@/types/global";
+import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
-    title: "Cart | Botcommerce Store",
-    description: "View your cart",
+    title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
+    description: siteConfig.description,
 };
 
 export default async function Cart() {

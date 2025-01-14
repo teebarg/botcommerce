@@ -10,12 +10,10 @@ import { TextArea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
 
 const inputClass = {
-    inputWrapper: "!bg-white/70 hover:!bg-white/50 focus:!bg-white/50 !text-blue-700",
-    label: "!text-black/50 font-medium text-lg",
-    description: "text-black/30 font-medium",
-    input: "focus:!bg-transparent !text-gray-600 !bg-transparent",
-    innerWrapper: "focus:!bg-white/50",
-    base: "focus:!bg-red-500",
+    inputWrapper: "bg-white/70",
+    label: "!text-gray-700",
+    input: "!text-gray-800 bg-transparent placeholder:text-gray-500",
+    description: "text-gray-100 text-tiny",
 };
 
 export default function ContactForm() {
@@ -45,7 +43,7 @@ export default function ContactForm() {
                     placeholder="Ex. I want to make an enquiry about..."
                     validationBehavior="native"
                 />
-                <div className="text-gray-800">
+                <div className="text-gray-100">
                     <Checkbox color="danger" defaultSelected label="I allow this website to store my submission." name="agreement" />
                 </div>
                 <FormButton color="danger" className="min-w-32" fullWidth={true}>

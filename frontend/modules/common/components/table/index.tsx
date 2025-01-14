@@ -19,12 +19,23 @@ interface Props {
     pagination?: PaginationType;
     canExport?: boolean;
     canIndex?: boolean;
+    canSearch?: boolean;
     searchQuery?: string;
     form?: React.ReactNode;
     isDataOnly?: boolean;
 }
 
-const Table: React.FC<Props> = ({ columns, children, pagination, canExport = false, canIndex = false, searchQuery, form, isDataOnly = false }) => {
+const Table: React.FC<Props> = ({
+    columns,
+    children,
+    pagination,
+    canExport = false,
+    canIndex = false,
+    canSearch = true,
+    searchQuery,
+    form,
+    isDataOnly = false,
+}) => {
     const { updateQuery } = useUpdateQuery(1000);
     const { enqueueSnackbar } = useSnackbar();
     const [isExporting, setIsExporting] = useState(false);
@@ -75,18 +86,22 @@ const Table: React.FC<Props> = ({ columns, children, pagination, canExport = fal
             {!isDataOnly && (
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between gap-3 items-center">
-                        <Input
-                            size="sm"
-                            classNames={{
-                                base: "w-full sm:max-w-[44%]",
-                                inputWrapper: "border-1",
-                            }}
-                            defaultValue={searchQuery}
-                            placeholder="Search by name..."
-                            startContent={<Search className="text-default-500" />}
-                            onChange={onSearchChange}
-                            onClear={() => onClear()}
-                        />
+                        <div className="flex-1">
+                            {canSearch && (
+                                <Input
+                                    size="sm"
+                                    classNames={{
+                                        base: "w-full sm:max-w-[44%]",
+                                        inputWrapper: "border-1",
+                                    }}
+                                    defaultValue={searchQuery}
+                                    placeholder="Search by name..."
+                                    startContent={<Search className="text-default-500" />}
+                                    onChange={onSearchChange}
+                                    onClear={() => onClear()}
+                                />
+                            )}
+                        </div>
                         <div className="flex items-center gap-3">
                             <Button color="primary" endContent={<Plus />} onClick={() => state.open()}>
                                 Add New

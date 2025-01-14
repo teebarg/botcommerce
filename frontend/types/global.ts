@@ -223,3 +223,11 @@ export type WishlistItem = {
     image: string;
     created_at?: string;
 };
+
+export type SiteConfig = {
+    id: number;
+    key: string;
+    value: string;
+    created_at: string;
+    updated_at: string;
+};

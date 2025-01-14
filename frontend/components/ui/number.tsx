@@ -7,15 +7,18 @@ import { useNumberFieldState } from "react-stately";
 import { useNumberField } from "@react-aria/numberfield";
 import { useLocale } from "@react-aria/i18n";
 
+type InputClassNames = Partial<Record<"base" | "inputWrapper" | "label" | "innerWrapper" | "description" | "input", string>>;
+
 interface Props extends AriaNumberFieldProps {
     name?: string;
     size?: "sm" | "md" | "lg";
     hidden?: boolean;
     className?: string;
+    classNames?: InputClassNames;
     errorMessage?: string;
 }
 
-const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...props }) => {
+const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", classNames, ...props }) => {
     const [isHovered, setIsHovered] = useState(false);
     let { label } = props;
 
@@ -31,9 +34,8 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...p
     return (
         <React.Fragment>
             <div
-                className="group flex flex-col data-[hidden=true]:hidden w-full"
+                className="group focus-visible:outline-none data-[hidden=true]:hidden w-full"
                 data-filled="true"
-                data-filled-within="true"
                 data-has-elements="true"
                 data-has-helper={isInvalid || props.description}
                 data-has-label={Boolean(label)}
@@ -45,10 +47,7 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...p
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-content1 data-[hover=true]:bg-default-100",
-                        "group-data-[focus=true]:bg-content2 min-h-10 rounded-medium flex-col items-start justify-center gap-0 transition-background motion-reduce:transition-none",
-                        "!duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus",
-                        "group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background",
+                        "relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-medium flex-col items-start justify-center outline-none",
                         {
                             "h-12 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",
@@ -62,10 +61,9 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...p
                     <label
                         {...labelProps}
                         className={cn(
-                            "absolute z-10 pointer-events-none origin-top-left rtl:origin-top-right subpixel-antialiased block text-default-900 cursor-text",
-                            "will-change-auto !duration-200 !ease-out motion-reduce:transition-none transition-[transform,color,left,opacity]",
-                            "group-data-[filled-within=true]:text-default-500 group-data-[filled-within=true]:pointer-events-auto group-data-[filled-within=true]:scale-85",
-                            "text-small group-data-[filled-within=true]:-translate-y-[calc(50%_+_theme(fontSize.small)/2_-_6px)] pe-2 max-w-full text-ellipsis overflow-hidden"
+                            "absolute z-10 block text-default-900 duration-200 ease-out transition-all max-w-full text-ellipsis overflow-hidden",
+                            "group-data-[filled=true]:text-default-500 group-data-[filled=true]:pointer-events-auto group-data-[filled=true]:scale-85",
+                            "text-xs group-data-[filled=true]:-translate-y-[calc(50%_+_theme(fontSize.small)/2_-_2px)] "
                         )}
                         data-slot="label"
                     >
@@ -80,12 +78,11 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...p
                             {...inputProps}
                             ref={inputRef}
                             className={cn(
-                                "w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none",
-                                "data-[has-start-content=true]:ps-1.5 data-[has-end-content=true]:pe-1.5 file:cursor-pointer file:bg-transparent file:border-0",
-                                "autofill:bg-transparent bg-clip-text text-small group-data-[has-value=true]:text-default-foreground"
+                                "w-full font-normal bg-transparent placeholder:text-foreground-500 focus-visible:outline-none",
+                                "text-small group-data-[has-value=true]:text-default-foreground autofill:bg-transparent",
+                                classNames?.["input"]
                             )}
                             data-filled={Boolean(inputProps.value)}
-                            data-filled-within="true"
                             data-slot="input"
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
@@ -94,7 +91,11 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", ...p
                 </div>
                 <div className="hidden group-data-[has-helper=true]:flex p-1 relative flex-col gap-1.5" data-slot="helper-wrapper">
                     {props.description && (
-                        <div {...descriptionProps} className="text-tiny text-foreground-500" data-slot="description">
+                        <div
+                            {...descriptionProps}
+                            className={cn("text-tiny text-foreground-500", classNames?.["description"])}
+                            data-slot="description"
+                        >
                             {props.description}
                         </div>
                     )}

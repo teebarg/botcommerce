@@ -3,12 +3,12 @@
 import { InformationCircleSolid, Trash } from "nui-react-icons";
 import React, { useMemo } from "react";
 import { useFormState } from "react-dom";
-import Input from "@modules/common/components/input";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { removeDiscount, removeGiftCard, submitDiscountForm } from "@modules/checkout/actions";
 import { FormButton } from "@modules/common/components/form-button";
 import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
+import { Input } from "@/components/ui/input";
 
 type DiscountCodeProps = {
     cart: Omit<any, "refundable_amount" | "refunded_total">;

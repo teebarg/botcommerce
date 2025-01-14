@@ -6,6 +6,7 @@ import { Product, SearchParams } from "types/global";
 import { Suspense } from "react";
 
 import SkeletonProductTemplate from "@/modules/products/skeleton-product";
+import { siteConfig } from "@/lib/config";
 
 export const revalidate = 2;
 
@@ -33,10 +34,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: `${product.name} | Botcommerce Store`,
+        title: `${product.name} | ${siteConfig.name} Store`,
         description: `${product.description}`,
         openGraph: {
-            title: `${product.name} | Botcommerce Store`,
+            title: `${product.name} | ${siteConfig.name} Store`,
             description: `${product.description}`,
             images: product.image ? [product.image] : [],
         },

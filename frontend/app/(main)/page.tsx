@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Category, Customer, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
-import { openingHours } from "@lib/config";
+import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import ContactForm from "@modules/store/components/contact-form";
 import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
@@ -14,8 +14,8 @@ import BannerCarousel from "@components/carousel";
 import { ProductCard } from "@/modules/products/components/product-card";
 
 export const metadata: Metadata = {
-    title: "Children clothing | Botcommerce Store",
-    description: "A performant frontend ecommerce starter template with Next.js.",
+    title: `Children clothings | ${siteConfig.name}`,
+    description: siteConfig.description,
 };
 
 async function getLandingProducts(collection: string, limit: number = 4): Promise<any[]> {
@@ -89,7 +89,7 @@ export default async function Home() {
                                     <div className="rounded-50 ring-1 ring-warning p-2">
                                         <Commerce className="h-6 w-6" />
                                     </div>
-                                    <p className="text-sm font-semibold">Sell on Botcommerce</p>
+                                    <p className="text-sm font-semibold">Sell on {siteConfig.name}</p>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="rounded-50 ring-1 ring-warning p-2">
@@ -99,7 +99,7 @@ export default async function Home() {
                                 </div>
                             </div>
                             <div className="py-20 text-center block md:hidden">
-                                <span className="text-secondary text-4xl font-bold block">Botcommerce!</span>
+                                <span className="text-secondary text-4xl font-bold block">{siteConfig.name}!</span>
                                 <span className="text-secondary text-xl block mt-2">Luxury online shopping.</span>
                             </div>
                             <div className="block md:hidden mt-0 md:mt-5">search component</div>
@@ -128,14 +128,21 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative h-28">
-                    <Image fill alt="banner" src={"/frontend.webp"} priority sizes="100vw" />
+                <div className="relative h-8 md:h-28">
+                    <Image
+                        fill
+                        alt="banner"
+                        src="/frontend.webp"
+                        priority
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        className="object-contain"
+                    />
                 </div>
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
-                                <span className="text-secondary text-3xl font-semibold">Botcommerce</span>
+                                <span className="text-secondary text-3xl font-semibold">{siteConfig.name}</span>
                                 <span className="text-secondary text-lg block mt-4 mb-4">Explore the exclusive beauty and cosmetics collection.</span>
                                 <LocalizedClientLink
                                     className="bg-transparent text-secondary border-2 border-secondary rounded-full px-8 py-2 hover:bg-secondary/10"
@@ -167,8 +174,15 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative h-28">
-                    <Image fill alt="banner" src={"/frontend.webp"} />
+                <div className="relative h-8 md:h-28">
+                    <Image
+                        fill
+                        alt="banner"
+                        src="/frontend.webp"
+                        priority
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        className="object-contain"
+                    />
                 </div>
                 <div className="bg-content1 py-16">
                     <div className="max-w-8xl mx-auto px-4">
@@ -186,26 +200,23 @@ export default async function Home() {
                     </div>
                 </div>
                 <div className="bg-fixed bg-center" style={{ backgroundImage: `url(${imgSrc("banners%2Fhero-contact.jpg")})` }}>
-                    <div className="flex items-center h-full backdrop-blur-smp backdrop-saturate-150p bg-white/10p">
+                    <div className="flex items-center h-full">
                         <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
-                            <div className="sm:w-1/2 sm:pr-10 backdrop-blur bg-white/60 p-4 sm:p-8 rounded-lg shadow-lg shadow-gray-400">
+                            <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/50 text-gray-100 p-4 sm:p-8 rounded-lg">
                                 <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
-                                <p className="text-xl font-semibold text-gray-700">Reach out to us for more information</p>
-                                <p className="text-gray-700 font-medium">
+                                <p className="text-xl font-semibold">Reach out to us for more information</p>
+                                <p className="font-medium">
                                     For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have
                                     about our products and services.
                                 </p>
-
-                                <div>
-                                    <ContactForm />
-                                </div>
+                                <ContactForm />
                             </div>
-                            <div className="sm:w-1/2 backdrop-blur bg-white/60 p-4 sm:p-8 rounded-lg text-gray-800 mt-6 sm:mt-0">
+                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 p-4 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
                                 <div>
                                     <p className="font-semibold mt-4 text-xl">Our Contacts</p>
                                     <div className="flex gap-2">
                                         <Mail />
-                                        <p>obathrift@gmail.com</p>
+                                        <p>{siteConfig.contactEmail}</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Location</p>
                                     <div className="flex gap-2">

@@ -4,10 +4,11 @@ import { Category } from "types/global";
 import { getCategories } from "@lib/data";
 import CategoryTree from "@modules/admin/categories/tree";
 import AddCategory from "@modules/admin/categories/add-categories";
+import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
-    title: "Children clothing | Botcommerce Store",
-    description: "A performant frontend ecommerce starter template with Next.js.",
+    title: `Children clothing | ${siteConfig.name} Store`,
+    description: siteConfig.description,
 };
 
 export default async function CategoriesPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {

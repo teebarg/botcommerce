@@ -1,10 +1,11 @@
+import { siteConfig } from "@/lib/config";
 import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: "Botcommerce",
-        short_name: "Botcommerce",
-        description: "Luxury at it finest",
+        name: siteConfig.name,
+        short_name: siteConfig.name,
+        description: siteConfig.description,
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",

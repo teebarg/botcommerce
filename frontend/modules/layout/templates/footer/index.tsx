@@ -55,7 +55,7 @@ export default async function Footer() {
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="space-y-4 md:pr-8">
                         <div className="flex items-center justify-start">
-                            <span className="text-3xl font-semibold">Botcommerce</span>
+                            <span className="text-3xl font-semibold">{siteConfig.name}</span>
                         </div>
                         <p className="text-small text-default-500">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
@@ -179,7 +179,7 @@ export default async function Footer() {
                     <NewsletterForm />
                 </div>
                 <div className="flex flex-wrap justify-between gap-2 md:pt-8">
-                    <p className="text-small text-default-500">&copy; {new Date().getFullYear()} Online Kiddies Store. All rights reserved.</p>
+                    <p className="text-small text-default-500">&copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
                 </div>
             </div>
         </footer>
