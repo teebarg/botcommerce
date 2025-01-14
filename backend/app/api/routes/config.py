@@ -1,12 +1,19 @@
 from typing import Any
-from app.models.config import SiteConfig, SiteConfigCreate, SiteConfigUpdate, SiteConfigs
-from app.core.deps import CacheService, SessionDep
-from app.core.decorators import cache
+
 from fastapi import APIRouter, HTTPException
-from app.crud import siteconfig
-from sqlmodel import func, select
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import func, select
+
+from app.core.decorators import cache
+from app.core.deps import CacheService, SessionDep
 from app.core.logging import logger
+from app.crud import siteconfig
+from app.models.config import (
+    SiteConfig,
+    SiteConfigCreate,
+    SiteConfigs,
+    SiteConfigUpdate,
+)
 from app.models.message import Message
 
 router = APIRouter()
@@ -41,13 +48,13 @@ async def index(
     items = db.exec(statement).all()
 
 
-    total_pages = (count // limit) + (count % limit > 0)
+    pages = (count // limit) + (count % limit > 0)
 
     result = SiteConfigs(
         configs=items,
         page=skip,
         limit=limit,
-        total_pages=total_pages,
+        total_pages=pages,
         total_count=count,
     )
 
@@ -81,7 +88,7 @@ async def create(
             status_code=400,
             detail="The config already exists in the system.",
         )
-    
+
     cache.delete_pattern("configs:*")
     return siteconfig.create(db=db, obj_in=config_in)
 
@@ -100,7 +107,7 @@ async def update(
     config = siteconfig.get(db=db, id=id)
     if not config:
         raise HTTPException(status_code=404, detail="Site configuration not found")
-    
+
     try:
         config = siteconfig.update(db=db, db_obj=config, obj_in=config_in)
         # Invalidate cache
@@ -116,7 +123,7 @@ async def update(
             status_code=400,
             detail=f"{e}",
         ) from e
-    
+
 @router.delete("/{id}")
 async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
@@ -130,4 +137,3 @@ async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     cache.delete(f"config:{id}")
     cache.delete_pattern("configs:*")
     return Message(message="Config deleted successfully")
-    

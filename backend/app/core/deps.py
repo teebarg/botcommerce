@@ -1,4 +1,5 @@
-from typing import Annotated, Generator, Union
+from collections.abc import Generator
+from typing import Annotated
 
 import firebase_admin
 import jwt
@@ -19,7 +20,7 @@ from app.db.engine import engine
 from app.models.generic import Address, Product, User
 from app.models.token import TokenPayload
 from app.services.cache import CacheService, get_cache_service
-from app.services.notification import NotificationService, EmailChannel, SlackChannel
+from app.services.notification import EmailChannel, NotificationService, SlackChannel
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -36,7 +37,7 @@ def get_db() -> Generator:
 
 SessionDep = Annotated[Session, Depends(get_db)]
 # TokenDep = Annotated[str, Depends(reusable_oauth2)]
-TokenDep = Annotated[Union[str, None], Depends(APIKeyHeader(name="X-Auth"))]
+TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 
 
 def get_storage() -> Generator:
@@ -127,7 +128,7 @@ SearchService = Annotated[SearchService, Depends(get_search_service)]
 
 def get_notification_service() -> NotificationService:
     notification_service = NotificationService()
-    
+
     # Configure email channel
     email_channel = EmailChannel(
         smtp_host=settings.SMTP_HOST,
@@ -136,11 +137,11 @@ def get_notification_service() -> NotificationService:
         password=settings.SMTP_PASSWORD
     )
     notification_service.register_channel("email", email_channel)
-    
+
     # Configure slack channel
     slack_channel = SlackChannel(webhook_url=settings.SLACK_WEBHOOK_URL)
     notification_service.register_channel("slack", slack_channel)
-    
+
     return notification_service
 
 Notification = Annotated[NotificationService, Depends(get_notification_service)]

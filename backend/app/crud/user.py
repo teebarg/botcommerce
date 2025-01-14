@@ -1,6 +1,5 @@
-from typing import  List
+import json
 
-from app.services.cache import get_cache_service
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
@@ -10,7 +9,7 @@ from app.crud.base import CRUDBase
 from app.models.generic import User, Wishlist
 from app.models.user import UserCreate, UserUpdate
 from app.models.wishlist import WishlistCreate
-import json
+from app.services.cache import get_cache_service
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -29,25 +28,25 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         cache_service = await get_cache_service()
         cache_key = f"user:email:{email}"
         cached_user = cache_service.get(cache_key)
-        
+
         if cached_user:
             user_data = json.loads(cached_user)
             return User(**user_data)
-        
+
         # If not in cache, query the database
         statement = select(User).where(User.email == email)
         user = db.exec(statement).first()
-        
+
         # Cache the result if user exists
         if user:
             cache_service.set(
                 cache_key,
                 user.model_dump_json()
             )
-        
+
         return user
 
-    def get_user_wishlist(self, db: Session, user_id: int) -> List[Wishlist]:
+    def get_user_wishlist(self, db: Session, user_id: int) -> list[Wishlist]:
         statement = select(Wishlist).where(Wishlist.user_id == user_id)
         return db.exec(statement).all()
 

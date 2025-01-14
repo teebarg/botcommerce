@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from sqlmodel import Session, select
 
@@ -52,7 +52,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         db_obj.sqlmodel_update(update_data)
         return self.sync(db=db, update=db_obj, type="update")
 
-    async def bulk_upload(self, db: Session, *, records: list[Dict[str, Any]]) -> None:
+    async def bulk_upload(self, db: Session, *, records: list[dict[str, Any]]) -> None:
         for address in records:
             try:
                 if model := db.exec(

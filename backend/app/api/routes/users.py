@@ -1,15 +1,16 @@
-from typing import Any
 import json
-from app.core import deps
-from app.core.utils import custom_deserializer, custom_serializer
+from typing import Any
+
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
 from app import crud
+from app.core import deps
 from app.core.deps import (
     CurrentUser,
     SessionDep,
 )
+from app.core.utils import custom_deserializer, custom_serializer
 from app.models.generic import Address, UserPublic, Wishlist
 from app.models.message import Message
 from app.models.user import UserUpdateMe

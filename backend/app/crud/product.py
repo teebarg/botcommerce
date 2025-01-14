@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 from sqlmodel import Session, select
 
@@ -58,7 +58,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         except Exception as e:
             raise e
 
-    async def bulk_upload(self, db: Session, *, records: list[Dict[str, Any]]) -> None:
+    async def bulk_upload(self, db: Session, *, records: list[dict[str, Any]]) -> None:
         for product in records:
             try:
                 if model := db.exec(
@@ -74,7 +74,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
     def get_brands_update(
         self, db: Session, update: Product
-    ) -> Optional[list[Brand]]:
+    ) -> list[Brand] | None:
         brands: list[Brand] = []
         for i in update.brands:
             if brand := crud.brand.get(db=db, id=i):
@@ -83,7 +83,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
     def get_categories_update(
         self, db: Session, update: Product
-    ) -> Optional[list[Category]]:
+    ) -> list[Category] | None:
         categories: list[Category] = []
         for i in update.categories:
             if category := crud.category.get(db=db, id=i):
@@ -92,14 +92,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
     def get_collection_update(
         self, db: Session, update: Product
-    ) -> Optional[list[Collection]]:
+    ) -> list[Collection] | None:
         collections: list[Collection] = []
         for i in update.collections:
             if collection := crud.collection.get(db=db, id=i):
                 collections.append(collection)
         return collections
 
-    def get_tag_update(self, db: Session, update: Product) -> Optional[list[Tag]]:
+    def get_tag_update(self, db: Session, update: Product) -> list[Tag] | None:
         tags: list[Tag] = []
         for i in update.tags:
             if tag := crud.tag.get(db=db, id=i):

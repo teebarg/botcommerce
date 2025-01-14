@@ -1,4 +1,5 @@
 import json
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -9,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
 from app import crud
+from app.core import deps
 from app.core.deps import (
     SessionDep,
     get_current_user,
@@ -22,7 +24,6 @@ from app.models.brand import (
 )
 from app.models.generic import Brand
 from app.models.message import Message
-from app.core import deps
 
 # Create a router for brands
 router = APIRouter()

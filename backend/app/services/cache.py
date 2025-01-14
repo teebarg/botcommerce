@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any, Optional
+from typing import Any
 
 from redis import Redis
 
@@ -24,7 +24,7 @@ class CacheService:
         self,
         key: str,
         value: Any,
-        expire: Optional[int] = timedelta(hours=24),
+        expire: int | None = timedelta(hours=24),
     ) -> bool:
         """
         Set a key-value pair in cache
@@ -41,7 +41,7 @@ class CacheService:
             logger.error(f"Error setting cache: {str(e)}")
             return False
 
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str) -> str | None:
         """
         Get value from cache by key
         Args:

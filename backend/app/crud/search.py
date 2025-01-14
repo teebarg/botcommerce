@@ -1,12 +1,15 @@
 import hashlib
 import json
 from datetime import time, timedelta
-from typing import List, Optional
 
 from redis import Redis
 
 from app.core.config import settings
-from app.services.meilisearch import get_document_by_attribute, get_document_by_id, search_documents
+from app.services.meilisearch import (
+    get_document_by_attribute,
+    get_document_by_id,
+    search_documents,
+)
 
 # Initialize clients
 redis_client = Redis(
@@ -67,7 +70,7 @@ class SearchService:
         # Set expiry on the key
         self.redis.expire(key, CACHE_EXPIRY)
 
-    def get_recently_viewed(self, user_id: str) -> List[str]:
+    def get_recently_viewed(self, user_id: str) -> list[str]:
         """Get user's recently viewed products"""
         key = f"recent_products:{user_id}"
         return self.redis.zrevrange(key, 0, -1)
@@ -81,7 +84,7 @@ class SearchService:
         if search_keys:
             self.redis.delete(*search_keys)
 
-    async def get_product(self, product_id: str) -> Optional[dict]:
+    async def get_product(self, product_id: str) -> dict | None:
         """Get product from cache, return None if not found"""
         key = f"product:{product_id}"
         cached_product = self.redis.get(key)
@@ -96,7 +99,7 @@ class SearchService:
 
         return doc
 
-    async def get_product_by_slug(self, slug: str) -> Optional[dict]:
+    async def get_product_by_slug(self, slug: str) -> dict | None:
         """Get product from cache, return None if not found"""
         key = f"product:{slug}"
         cached_product = self.redis.get(key)

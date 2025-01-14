@@ -1,7 +1,7 @@
 import asyncio
 import datetime
-from io import BytesIO
 import json
+from io import BytesIO
 from typing import Annotated, Any
 
 from fastapi import (
@@ -153,7 +153,7 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
         "limit": limit,
         "offset": (page - 1) * limit,
         "sort": [sort],  # Sort by specified field
-        "facets": ['brands', 'categories', 'collections'],
+        "facets": ["brands", "categories", "collections"],
     }
 
     if filters:

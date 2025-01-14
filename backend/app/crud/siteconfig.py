@@ -1,22 +1,24 @@
-from typing import Optional
+
 from sqlalchemy.orm import Session
-from sqlmodel import  select
+from sqlmodel import select
+
 from app.models.config import SiteConfig, SiteConfigCreate, SiteConfigUpdate
 
-def configs(db: Session) -> Optional[SiteConfig]:
+
+def configs(db: Session) -> SiteConfig | None:
     configs = db.query(SiteConfig).all()
     return {config.key: config.value for config in configs}
 
 
-def all(db: Session) -> Optional[SiteConfig]:
+def all(db: Session) -> SiteConfig | None:
     return db.query(SiteConfig).all()
 
-def get(db: Session, id: str) -> Optional[SiteConfig]:
+def get(db: Session, id: str) -> SiteConfig | None:
     return db.get(SiteConfig, id)
 
 def get_by_key(
     db: Session, value: str | int, key: str = "key"
-) -> Optional[SiteConfig]:
+) -> SiteConfig | None:
     statement = select(SiteConfig).where(getattr(SiteConfig, key) == value)
     return db.exec(statement).first()
 
@@ -42,4 +44,3 @@ def remove(db: Session, *, id: int) -> SiteConfig:
     db.delete(db_obj)
     db.commit()
     return db_obj
-    

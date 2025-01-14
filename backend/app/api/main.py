@@ -1,6 +1,19 @@
 from fastapi import APIRouter
 
-from app.api.routes import activities, address, brand, cart, category, collection, config, order, product, tag, users, websocket
+from app.api.routes import (
+    activities,
+    address,
+    brand,
+    cart,
+    category,
+    collection,
+    config,
+    order,
+    product,
+    tag,
+    users,
+    websocket,
+)
 
 api_router = APIRouter()
 api_router.include_router(activities.router, prefix="/activities", tags=["activities"])

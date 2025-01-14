@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from sqlmodel import Session, select
 
@@ -20,7 +20,7 @@ class CRUDTag(CRUDBase[Tag, TagCreate, TagUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    async def bulk_upload(self, db: Session, *, records: list[Dict[str, Any]]) -> None:
+    async def bulk_upload(self, db: Session, *, records: list[dict[str, Any]]) -> None:
         for tag in records:
             try:
                 if model := db.exec(

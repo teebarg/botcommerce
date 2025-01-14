@@ -1,4 +1,3 @@
-import json
 from typing import Annotated, Any
 
 from fastapi import (
@@ -14,17 +13,16 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
-from app import crud
 from app.core import deps
-from app.core.deps import (
-    SessionDep,
-    get_current_user,
-)
+from app.core.decorators import cache
+from app.core.deps import CacheService, SessionDep, Storage, get_current_user
 from app.core.logging import logger
+from app.crud import collection as col
 from app.models.collection import (
     CollectionCreate,
     Collections,
     CollectionUpdate,
+    Search,
 )
 from app.models.generic import Collection
 from app.models.message import Message
@@ -38,9 +36,9 @@ router = APIRouter()
     "/",
     dependencies=[],
 )
-def index(
+@cache(key="collections")
+async def index(
     db: SessionDep,
-    redis: deps.CacheService,
     name: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -48,102 +46,74 @@ def index(
     """
     Retrieve collections with Redis caching.
     """
-    cache_key = f"collections:list:{name}:{page}:{limit}"
-
-    # Try to get from cache first
-    cached_data = redis.get(cache_key)
-    if cached_data:
-        return Collections(**json.loads(cached_data))
-
-    # If not in cache, query database
     query = {"name": name}
-    filters = crud.collection.build_query(query)
+    filters = col.build_query(query)
 
     count_statement = select(func.count()).select_from(Collection)
     if filters:
         count_statement = count_statement.where(or_(*filters))
-    total_count = db.exec(count_statement).one()
+    count = db.exec(count_statement).one()
 
-    collections = crud.collection.get_multi(
+    collections = col.get_multi(
         db=db,
         filters=filters,
         limit=limit,
         offset=(page - 1) * limit,
     )
 
-    total_pages = (total_count // limit) + (total_count % limit > 0)
+    pages = (count // limit) + (count % limit > 0)
 
     result = Collections(
         collections=collections,
         page=page,
         limit=limit,
-        total_pages=total_pages,
-        total_count=total_count,
+        total_pages=pages,
+        total_count=count,
     )
-
-    # Cache the result
-    redis.set(cache_key, result.model_dump_json())
 
     return result
 
 
 @router.post("/")
-def create(*, db: SessionDep, create_data: CollectionCreate, redis: deps.CacheService) -> Collection:
+async def create(*, db: SessionDep, create_data: CollectionCreate, cache: CacheService) -> Collection:
     """
     Create new collection.
     """
-    collection = crud.collection.get_by_key(db=db, value=create_data.name)
+    collection = col.get_by_key(db=db, value=create_data.name)
     if collection:
         raise HTTPException(
             status_code=400,
             detail="The collection already exists in the system.",
         )
 
-    collection = crud.collection.create(db=db, obj_in=create_data)
-    redis.delete_pattern("collections:list:*")
+    collection = col.create(db=db, obj_in=create_data)
+    cache.delete_pattern("collections:*")
     return collection
 
 
 @router.get("/{id}")
-def read(id: int, db: SessionDep, redis: deps.CacheService) -> Collection:
+@cache(key="collection")
+async def read(id: int, db: SessionDep) -> Collection:
     """
     Get a specific collection by id with Redis caching.
     """
-    cache_key = f"collection:{id}"
-
-    # Try to get from cache first
-    cached_data = redis.get(cache_key)
-    if cached_data:
-        return Collection(**json.loads(cached_data))
-
-    collection = crud.collection.get(db=db, id=id)
+    collection = col.get(db=db, id=id)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
-
-    # Cache the result
-    redis.set(cache_key, collection.model_dump_json())
 
     return collection
 
 
 @router.get("/slug/{slug}")
-def get_by_slug(slug: str, db: SessionDep, redis: deps.CacheService) -> Collection:
+@cache(key="collection")
+async def get_by_slug(slug: str, db: SessionDep) -> Collection:
     """
     Get a collection by its slug.
     """
-    cache_key = f"collection:slug:{slug}"
 
-    # Try to get from cache first
-    cached_data = redis.get(cache_key)
-    if cached_data:
-        return Collection(**json.loads(cached_data))
-
-    collection = crud.collection.get_by_key(db=db, key="slug", value=slug)
+    collection = col.get_by_key(db=db, key="slug", value=slug)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
-
-    # Cache the result
-    redis.set(cache_key, collection.model_dump_json())
 
     return collection
 
@@ -152,31 +122,31 @@ def get_by_slug(slug: str, db: SessionDep, redis: deps.CacheService) -> Collecti
     "/{id}",
     dependencies=[Depends(get_current_user)],
 )
-def update(
+async def update(
     *,
     db: SessionDep,
-    redis: deps.CacheService,
+    cache: CacheService,
     id: int,
     update_data: CollectionUpdate,
 ) -> Collection:
     """
     Update a collection and invalidate cache.
     """
-    db_collection = crud.collection.get(db=db, id=id)
-    if not db_collection:
+    collection = col.get(db=db, id=id)
+    if not collection:
         raise HTTPException(
             status_code=404,
             detail="Collection not found",
         )
     try:
-        db_collection = crud.collection.update(
-            db=db, db_obj=db_collection, obj_in=update_data
+        collection = col.update(
+            db=db, db_obj=collection, obj_in=update_data
         )
         # Invalidate cache
-        redis.delete(f"collection:slug:{db_collection.slug}")
-        redis.delete(f"collection:{id}")
-        redis.delete_pattern("collections:list:*")
-        return db_collection
+        cache.delete(f"collection:{collection.slug}")
+        cache.delete(f"collection:{id}")
+        cache.delete_pattern("collections:list:*")
+        return collection
     except IntegrityError as e:
         logger.error(f"Error updating collection, {e.orig.pgerror}")
         raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
@@ -189,17 +159,18 @@ def update(
 
 
 @router.delete("/{id}")
-def delete(id: int, db: SessionDep, redis: deps.CacheService) -> Message:
+async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
     Delete a collection.
     """
-    collection = crud.collection.get(db=db, id=id)
+    collection = col.get(db=db, id=id)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
-    crud.collection.remove(db=db, id=id)
-    redis.delete(f"collection:slug:{collection.slug}")
-    redis.delete(f"collection:{id}")
-    redis.delete_pattern("collections:list:*")
+    col.remove(db=db, id=id)
+    # Invalidate cache
+    cache.delete(f"collection:slug:{collection.slug}")
+    cache.delete(f"collection:{id}")
+    cache.delete_pattern("collections:list:*")
     return Message(message="Collection deleted successfully")
 
 
@@ -215,14 +186,14 @@ async def upload_collections(
 
     contents = await file.read()
     background_tasks.add_task(
-        process_file, contents, task_id, db, crud.collection.bulk_upload
+        process_file, contents, task_id, db, col.bulk_upload
     )
     return {"batch": batch, "message": "File upload started"}
 
 
 @router.post("/export")
 async def export_collections(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
+    current_user: deps.CurrentUser, db: SessionDep, bucket: Storage
 ):
     try:
         collections = db.exec(select(Collection))
@@ -236,13 +207,11 @@ async def export_collections(
 
         return {"message": "Data Export successful", "file_url": file_url}
     except Exception as e:
-        logger.error(f"Export collections error: {e}")
+        logger.error(f"Collections exports failed: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
 
-
-@router.get(
-    "/autocomplete/",
-)
+@router.get("/autocomplete/")
+@cache(key="collections")
 async def autocomplete(
     db: SessionDep,
     search: str = "",
@@ -258,6 +227,6 @@ async def autocomplete(
             )
         )
 
-    data = db.exec(statement)
+    data = db.exec(statement).all()
 
-    return {"results": data}
+    return Search(results=data)

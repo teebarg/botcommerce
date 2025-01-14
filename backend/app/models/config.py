@@ -1,5 +1,6 @@
-from typing import Optional
+
 from sqlmodel import Field, SQLModel
+
 from app.models.base import BaseModel
 
 
@@ -11,8 +12,8 @@ class SiteConfigCreate(SiteConfigBase):
     pass
 
 class SiteConfigUpdate(BaseModel):
-    key: Optional[str] = None
-    value: Optional[str] = None
+    key: str | None = None
+    value: str | None = None
 
 
 class SiteConfig(SiteConfigBase, table=True):

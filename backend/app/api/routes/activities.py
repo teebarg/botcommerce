@@ -1,4 +1,3 @@
-from typing import List
 
 from fastapi import APIRouter, HTTPException, status
 
@@ -31,7 +30,7 @@ async def log_activity(db: SessionDep, user: CurrentUser, activity: ActivityCrea
 
 
 # Get recent activities for a user
-@router.get("/", response_model=List[ActivityLog])
+@router.get("/", response_model=list[ActivityLog])
 async def get_recent_activities(db: SessionDep, user: CurrentUser, limit: int = 10):
     activities = crud.activities.get_activity_logs_by_user(
         db=db, user_id=user.id, limit=limit
