@@ -1,5 +1,3 @@
-import json
-from datetime import datetime
 from typing import Annotated, Any
 
 from fastapi import (
@@ -15,10 +13,12 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, func, or_, select
 
-from app import crud
-from app.core import deps
+from app.core import crud
 from app.core.deps import (
+    CacheService,
+    CurrentUser,
     SessionDep,
+    Storage,
     get_current_user,
 )
 from app.core.logging import logger
@@ -26,29 +26,13 @@ from app.models.category import (
     CategoryCreate,
     CategoryUpdate,
 )
+from app.core.decorators import cache
 from app.models.generic import Category, CategoryPublic
 from app.models.message import Message
 from app.services.export import export, process_file, validate_file
 
 # Create a router for categories
 router = APIRouter()
-
-# Custom JSON encoder for datetime
-def custom_serializer(obj: Any) -> str:
-    if isinstance(obj, datetime):
-        return obj.isoformat()  # Serialize datetime as ISO 8601 string
-    raise TypeError("Type not serializable")
-
-# Custom JSON decoder for datetime
-def custom_deserializer(obj: dict) -> dict:
-    for key, value in obj.items():
-        if isinstance(value, str) and "T" in value:  # ISO 8601 detection
-            try:
-                obj[key] = datetime.fromisoformat(value)
-            except ValueError:
-                pass
-    return obj
-
 
 class Categories(SQLModel):
     categories: list[CategoryPublic]
@@ -58,10 +42,14 @@ class Categories(SQLModel):
     total_pages: int
 
 
+class Search(SQLModel):
+    results: list[CategoryPublic]
+
+
 @router.get("/", dependencies=[])
-def index(
+@cache(key="categories")
+async def index(
     db: SessionDep,
-    redis: deps.CacheService,
     name: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -69,13 +57,6 @@ def index(
     """
     Retrieve categories with Redis caching.
     """
-    cache_key = f"categories:list:{name}:{page}:{limit}"
-
-    # Try to get from cache first
-    cached_data = redis.get(cache_key)
-    if cached_data:
-        return Categories(**json.loads(cached_data, object_hook=custom_deserializer))
-
     query = {"name": name}
     filters = crud.category.build_query(query)
 
@@ -93,7 +74,7 @@ def index(
 
     total_pages = (total_count // limit) + (total_count % limit > 0)
 
-    result = Categories(
+    return Categories(
         categories=categories,
         page=page,
         limit=limit,
@@ -101,14 +82,9 @@ def index(
         total_count=total_count,
     )
 
-    # Cache the result
-    redis.set(cache_key, json.dumps(result.model_dump(), default=custom_serializer))
-
-    return result
-
 
 @router.post("/")
-def create(*, db: SessionDep, create_data: CategoryCreate, redis: deps.CacheService) -> Category:
+async def create(*, db: SessionDep, create_data: CategoryCreate, cache: CacheService) -> Category:
     """
     Create new category.
     """
@@ -120,80 +96,62 @@ def create(*, db: SessionDep, create_data: CategoryCreate, redis: deps.CacheServ
         )
 
     category = crud.category.create(db=db, obj_in=create_data)
-    redis.delete_pattern("categories:list:*")
+    cache.delete_pattern("categories:*")
     return category
 
 
 @router.get("/{id}")
-def read(id: int, db: SessionDep, redis: deps.CacheService) -> CategoryPublic:
+@cache(key="category")
+async def read(id: int, db: SessionDep) -> CategoryPublic:
     """
     Get a specific category by id with Redis caching.
     """
-    cache_key = f"category:{id}"
-
-    # Try to get from cache first
-    cached_data = redis.get(cache_key)
-    if cached_data:
-        return CategoryPublic(**json.loads(cached_data))
-
     category = crud.category.get(db=db, id=id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-
-    # Cache the result
-    redis.set(cache_key, category.model_dump_json())
 
     return category
 
 
 @router.get("/slug/{slug}")
-def get_by_slug(slug: str, db: SessionDep, redis: deps.CacheService) -> Category:
+@cache(key="category")
+async def get_by_slug(slug: str, db: SessionDep) -> Category:
     """
     Get a category by its slug.
     """
-    cache_key = f"category:slug:{slug}"
-
-    # Try to get from cache first
-    cached_data = redis.get(cache_key)
-    if cached_data:
-        return Category(**json.loads(cached_data))
-
     category = crud.category.get_by_key(db=db, key="slug", value=slug)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-
-    # Cache the result
-    redis.set(cache_key, category.model_dump_json())
 
     return category
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])
-def update(
+async def update(
     *,
     db: SessionDep,
-    redis: deps.CacheService,
+    cache: CacheService,
     id: int,
     update_data: CategoryUpdate,
 ) -> Category:
     """
     Update a category and invalidate cache.
     """
-    db_category = crud.category.get(db=db, id=id)
-    if not db_category:
+    category = crud.category.get(db=db, id=id)
+    if not category:
         raise HTTPException(
             status_code=404,
             detail="Category not found",
         )
     try:
-        db_category = crud.category.update(
-            db=db, db_obj=db_category, obj_in=update_data
+        category = crud.category.update(
+            db=db, db_obj=category, obj_in=update_data
         )
         # Invalidate cache
-        redis.delete(f"category:slug:{db_category.slug}")
-        redis.delete(f"category:{id}")
-        redis.delete_pattern("categories:list:*")
-        return db_category
+        cache.delete(f"category:{category.slug}")
+        cache.delete(f"category:{id}")
+        cache.delete_pattern("categories:*")
+        return category
     except IntegrityError as e:
         logger.error(f"Error updating category, {e.orig.pgerror}")
         raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
@@ -206,7 +164,7 @@ def update(
 
 
 @router.delete("/{id}")
-def delete(id: int, db: SessionDep, redis: deps.CacheService) -> Message:
+async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
     Delete a category.
     """
@@ -214,9 +172,9 @@ def delete(id: int, db: SessionDep, redis: deps.CacheService) -> Message:
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     crud.category.remove(db=db, id=id)
-    redis.delete(f"category:slug:{category.slug}")
-    redis.delete(f"category:{id}")
-    redis.delete_pattern("categories:list:*")
+    cache.delete(f"category:{category.slug}")
+    cache.delete(f"category:{id}")
+    cache.delete_pattern("categories:*")
     return Message(message="Category deleted successfully")
 
 
@@ -239,7 +197,7 @@ async def upload_collections(
 
 @router.post("/export")
 async def export_collections(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
+    current_user: CurrentUser, db: SessionDep, bucket: Storage
 ):
     try:
         categories = db.exec(select(Category))
@@ -256,10 +214,8 @@ async def export_collections(
         logger.error(f"Export categories error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
 
-
-@router.get(
-    "/autocomplete/",
-)
+@router.get("/autocomplete/")
+@cache(key="categories")
 async def autocomplete(
     db: SessionDep,
     search: str = "",
@@ -274,5 +230,4 @@ async def autocomplete(
         )
 
     data = db.exec(statement)
-
-    return {"results": data}
+    return Search(results=data)

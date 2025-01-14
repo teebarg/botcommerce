@@ -13,11 +13,9 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
-from app.core import deps
 from app.core.decorators import cache
-from app.core.deps import CacheService, SessionDep, Storage, get_current_user
+from app.core.deps import CacheService, CurrentUser, SessionDep, Storage, get_current_user
 from app.core.logging import logger
-from app.crud import collection as col
 from app.models.collection import (
     CollectionCreate,
     Collections,
@@ -27,6 +25,7 @@ from app.models.collection import (
 from app.models.generic import Collection
 from app.models.message import Message
 from app.services.export import export, process_file, validate_file
+from app.core import crud
 
 # Create a router for collections
 router = APIRouter()
@@ -47,14 +46,14 @@ async def index(
     Retrieve collections with Redis caching.
     """
     query = {"name": name}
-    filters = col.build_query(query)
+    filters = crud.collection.build_query(query)
 
     count_statement = select(func.count()).select_from(Collection)
     if filters:
         count_statement = count_statement.where(or_(*filters))
     count = db.exec(count_statement).one()
 
-    collections = col.get_multi(
+    collections = crud.collection.get_multi(
         db=db,
         filters=filters,
         limit=limit,
@@ -63,7 +62,7 @@ async def index(
 
     pages = (count // limit) + (count % limit > 0)
 
-    result = Collections(
+    return Collections(
         collections=collections,
         page=page,
         limit=limit,
@@ -71,22 +70,20 @@ async def index(
         total_count=count,
     )
 
-    return result
-
 
 @router.post("/")
 async def create(*, db: SessionDep, create_data: CollectionCreate, cache: CacheService) -> Collection:
     """
     Create new collection.
     """
-    collection = col.get_by_key(db=db, value=create_data.name)
+    collection = crud.collection.get_by_key(db=db, value=create_data.name)
     if collection:
         raise HTTPException(
             status_code=400,
             detail="The collection already exists in the system.",
         )
 
-    collection = col.create(db=db, obj_in=create_data)
+    collection = crud.collection.create(db=db, obj_in=create_data)
     cache.delete_pattern("collections:*")
     return collection
 
@@ -97,7 +94,7 @@ async def read(id: int, db: SessionDep) -> Collection:
     """
     Get a specific collection by id with Redis caching.
     """
-    collection = col.get(db=db, id=id)
+    collection = crud.collection.get(db=db, id=id)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
 
@@ -111,7 +108,7 @@ async def get_by_slug(slug: str, db: SessionDep) -> Collection:
     Get a collection by its slug.
     """
 
-    collection = col.get_by_key(db=db, key="slug", value=slug)
+    collection = crud.collection.get_by_key(db=db, key="slug", value=slug)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
 
@@ -132,20 +129,20 @@ async def update(
     """
     Update a collection and invalidate cache.
     """
-    collection = col.get(db=db, id=id)
+    collection = crud.collection.get(db=db, id=id)
     if not collection:
         raise HTTPException(
             status_code=404,
             detail="Collection not found",
         )
     try:
-        collection = col.update(
+        collection = crud.collection.update(
             db=db, db_obj=collection, obj_in=update_data
         )
         # Invalidate cache
         cache.delete(f"collection:{collection.slug}")
         cache.delete(f"collection:{id}")
-        cache.delete_pattern("collections:list:*")
+        cache.delete_pattern("collections:*")
         return collection
     except IntegrityError as e:
         logger.error(f"Error updating collection, {e.orig.pgerror}")
@@ -163,14 +160,14 @@ async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
     Delete a collection.
     """
-    collection = col.get(db=db, id=id)
+    collection = crud.collection.get(db=db, id=id)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
-    col.remove(db=db, id=id)
+    crud.collection.remove(db=db, id=id)
     # Invalidate cache
-    cache.delete(f"collection:slug:{collection.slug}")
+    cache.delete(f"collection:{collection.slug}")
     cache.delete(f"collection:{id}")
-    cache.delete_pattern("collections:list:*")
+    cache.delete_pattern("collections:*")
     return Message(message="Collection deleted successfully")
 
 
@@ -186,14 +183,14 @@ async def upload_collections(
 
     contents = await file.read()
     background_tasks.add_task(
-        process_file, contents, task_id, db, col.bulk_upload
+        process_file, contents, task_id, db, crud.collection.bulk_upload
     )
     return {"batch": batch, "message": "File upload started"}
 
 
 @router.post("/export")
 async def export_collections(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: Storage
+    current_user: CurrentUser, db: SessionDep, bucket: Storage
 ):
     try:
         collections = db.exec(select(Collection))
@@ -228,5 +225,4 @@ async def autocomplete(
         )
 
     data = db.exec(statement).all()
-
     return Search(results=data)

@@ -24,9 +24,9 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
                 <span className="hidden sm:block min-w-[20rem] h-screen overflow-y-auto">
                     <SideBar />
                 </span>
-                <div className="flex-1 h-screen overflow-y-auto">
+                <div className="flex-1 h-screen overflow-y-auto flex flex-col">
                     <AdminNavbar />
-                    <main>{props.children}</main>
+                    <main className="flex-1">{props.children}</main>
                 </div>
             </div>
         </React.Fragment>

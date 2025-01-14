@@ -79,8 +79,8 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             {...inputProps}
                             ref={ref}
                             className={cn(
-                                "w-full font-normal placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto autofill:bg-transparent",
-                                "file:cursor-pointer file:bg-transparent file:border-0 text-small group-data-[has-value=true]:text-default-foreground",
+                                "w-full font-normal placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto autofill:bg-transparent data-[has-end-content=true]:pe",
+                                "file:cursor-pointer file:bg-transparent file:border-0 text-small group-data-[has-value=true]:text-default-foreground data-[has-start-content=true]:ps-1.5",
                                 classNames?.["input"]
                             )}
                             data-filled={Boolean(inputProps.value)}
