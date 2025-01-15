@@ -27,3 +27,7 @@ class Tags(SQLModel):
     limit: int
     total_count: int
     total_pages: int
+
+
+class Search(SQLModel):
+    results: list[TagPublic]

@@ -13,16 +13,20 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
+from app.core.decorators import cache
 from app import crud
-from app.core import deps
 from app.core.deps import (
+    CacheService,
+    CurrentUser,
     SessionDep,
+    Storage,
     get_current_user,
 )
 from app.core.logging import logger
 from app.models.generic import Tag
 from app.models.message import Message
 from app.models.tag import (
+    Search,
     TagCreate,
     TagPublic,
     Tags,
@@ -39,6 +43,7 @@ router = APIRouter()
     dependencies=[Depends(get_current_user)],
     response_model=Tags,
 )
+@cache(key="tags")
 async def index(
     db: SessionDep,
     name: str = "",
@@ -75,7 +80,7 @@ async def index(
 
 
 @router.post("/", response_model=TagPublic)
-def create(*, db: SessionDep, create_data: TagCreate) -> TagPublic:
+def create(*, db: SessionDep, create_data: TagCreate, cache: CacheService) -> TagPublic:
     """
     Create new tag.
     """
@@ -87,10 +92,12 @@ def create(*, db: SessionDep, create_data: TagCreate) -> TagPublic:
         )
 
     tag = crud.tag.create(db=db, obj_in=create_data)
+    cache.delete_pattern("tags:*")
     return tag
 
 
 @router.get("/{id}", response_model=TagPublic)
+@cache(key="tag")
 def read(id: int, db: SessionDep) -> TagPublic:
     """
     Get a specific tag by id.
@@ -103,28 +110,31 @@ def read(id: int, db: SessionDep) -> TagPublic:
 
 @router.patch(
     "/{id}",
-    # dependencies=[Depends(get_current_user)],
-    response_model=TagPublic,
+    dependencies=[Depends(get_current_user)]
 )
 def update(
     *,
     db: SessionDep,
+    cache: CacheService,
     id: int,
     update_data: TagUpdate,
 ) -> TagPublic:
     """
     Update a tag.
     """
-    db_tag = crud.tag.get(db=db, id=id)
-    if not db_tag:
+    tag = crud.tag.get(db=db, id=id)
+    if not tag:
         raise HTTPException(
             status_code=404,
             detail="Tag not found",
         )
 
     try:
-        db_tag = crud.tag.update(db=db, db_obj=db_tag, obj_in=update_data)
-        return db_tag
+        tag = crud.tag.update(db=db, db_obj=tag, obj_in=update_data)
+        # Invalidate cache
+        cache.delete(f"tag:{id}")
+        cache.delete_pattern("tags:*")
+        return tag
     except IntegrityError as e:
         logger.error(f"Error updating tag, {e.orig.pgerror}")
         raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
@@ -137,7 +147,7 @@ def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-def delete(db: SessionDep, id: int) -> Message:
+def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
     Delete a tag.
     """
@@ -146,6 +156,9 @@ def delete(db: SessionDep, id: int) -> Message:
         if not tag:
             raise HTTPException(status_code=404, detail="Tag not found")
         crud.tag.remove(db=db, id=id)
+        # Invalidate cache
+        cache.delete(f"tag:{id}")
+        cache.delete_pattern("tags:*")
         return Message(message="Tag deleted successfully")
     except Exception as e:
         raise HTTPException(
@@ -171,7 +184,7 @@ async def upload_tags(
 
 @router.post("/export")
 async def export_tags(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
+    current_user: CurrentUser, db: SessionDep, bucket: Storage
 ):
     try:
         tags = db.exec(select(Tag))
@@ -189,9 +202,8 @@ async def export_tags(
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get(
-    "/autocomplete/",
-)
+@router.get("/autocomplete/")
+@cache(key="tags")
 async def autocomplete(
     db: SessionDep,
     search: str = "",
@@ -205,6 +217,5 @@ async def autocomplete(
             or_(Tag.name.like(f"%{search}%"), Tag.slug.like(f"%{search}%"))
         )
 
-    data = db.exec(statement)
-
-    return {"results": data}
+    data = db.exec(statement).all()
+    return Search(results=data)
