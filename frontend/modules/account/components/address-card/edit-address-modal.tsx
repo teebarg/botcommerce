@@ -96,7 +96,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
             </div>
             {modalState.isOpen && (
                 <Modal data-testid="edit-address-modal" onClose={modalState.close} isOpen={modalState.isOpen}>
-                    <div className="p-8">
+                    <div className="p-5">
                         <h3 className="mb-2">Edit address</h3>
                         <form action={formAction}>
                             <div className="grid grid-cols-1 gap-y-2 w-full py-2">
@@ -169,10 +169,10 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                             </div>
                             <div className="flex gap-3 mt-6">
-                                <Button className="h-10" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
+                                <Button className="min-w-32" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
                                     Cancel
                                 </Button>
-                                <FormButton color="primary" data-testid="save-button">
+                                <FormButton className="min-w-32" color="primary" data-testid="save-button">
                                     Update
                                 </FormButton>
                             </div>

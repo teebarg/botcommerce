@@ -86,7 +86,7 @@ async def create(
             detail="The config already exists in the system.",
         )
 
-    cache.delete_pattern("configs:*")
+    cache.invalidate("configs")
     return crud.siteconfig.create(db=db, obj_in=config_in)
 
 
@@ -109,7 +109,7 @@ async def update(
         config = crud.siteconfig.update(db=db, db_obj=config, obj_in=config_in)
         # Invalidate cache
         cache.delete(f"config:{id}")
-        cache.delete_pattern("configs:*")
+        cache.invalidate("configs")
         return config
     except IntegrityError as e:
         logger.error(f"Error updating config, {e.orig.pgerror}")
@@ -132,5 +132,5 @@ async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     crud.siteconfig.remove(db=db, id=id)
     # Invalidate cache
     cache.delete(f"config:{id}")
-    cache.delete_pattern("configs:*")
+    cache.invalidate("configs")
     return Message(message="Config deleted successfully")

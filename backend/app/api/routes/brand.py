@@ -78,7 +78,7 @@ async def create(*, db: SessionDep, create_data: BrandCreate, cache: CacheServic
         )
 
     brand = crud.brand.create(db=db, obj_in=create_data)
-    cache.delete_pattern("brands:*")
+    cache.invalidate("brands")
     return brand
 
 
@@ -134,7 +134,7 @@ async def update(
         # Invalidate cache
         cache.delete(f"brand:{db_brand.slug}")
         cache.delete(f"brand:{id}")
-        cache.delete_pattern("brands:*")
+        cache.invalidate("brands")
         return db_brand
     except IntegrityError as e:
         logger.error(f"Error updating brand, {e.orig.pgerror}")
@@ -158,5 +158,5 @@ async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     crud.brand.remove(db=db, id=id)
     cache.delete(f"brand:{brand.slug}")
     cache.delete(f"brand:{id}")
-    cache.delete_pattern("brands:*")
+    cache.invalidate("brands")
     return Message(message="Brand deleted successfully")

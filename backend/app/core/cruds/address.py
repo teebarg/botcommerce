@@ -1,8 +1,8 @@
 from app.core.cruds.base import BaseCRUD
-from sqlmodel import Session
+from sqlalchemy.orm import Session
+from sqlmodel import or_, select, SQLModel
 
-from app.core.utils import generate_slug
-from app.models.brand import AddressCreate, AddressUpdate
+from app.models.address import AddressCreate, AddressUpdate
 from app.models.generic import Address
 
 
@@ -34,42 +34,4 @@ class AddressCRUD(BaseCRUD[Address, AddressCreate, AddressUpdate]):
             obj_in,
             update={"user_id": user_id},
         )
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
-
-    def update(
-        self,
-        db: Session,
-        *,
-        db_obj: Address,
-        obj_in: AddressUpdate,
-    ) -> Address:
-        update_data = obj_in.model_dump(exclude_unset=True)
-        db_obj.sqlmodel_update(update_data)
-        return self.sync(db=db, update=db_obj, type="update")
-
-    async def bulk_upload(self, db: Session, *, records: list[dict[str, Any]]) -> None:
-        for address in records:
-            try:
-                if model := db.exec(
-                    select(Address).where(Address.name == address.get("slug"))
-                ).first():
-                    model.sqlmodel_update(address)
-                else:
-                    model = Address(**address)
-                    db.add(model)
-                db.commit()
-            except Exception as e:
-                logger.error(e)
-
-    def create(self, db: Session, obj_in: AddressCreate) -> Address:
-        db_obj = Address.model_validate(
-            obj_in,
-            update={"slug": generate_slug(name=obj_in.name)},
-        )
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+        return self.sync(db=db, update=db_obj)

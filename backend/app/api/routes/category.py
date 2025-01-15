@@ -96,7 +96,7 @@ async def create(*, db: SessionDep, create_data: CategoryCreate, cache: CacheSer
         )
 
     category = crud.category.create(db=db, obj_in=create_data)
-    cache.delete_pattern("categories:*")
+    cache.invalidate("categories")
     return category
 
 
@@ -150,7 +150,7 @@ async def update(
         # Invalidate cache
         cache.delete(f"category:{category.slug}")
         cache.delete(f"category:{id}")
-        cache.delete_pattern("categories:*")
+        cache.invalidate("categories")
         return category
     except IntegrityError as e:
         logger.error(f"Error updating category, {e.orig.pgerror}")
@@ -174,7 +174,7 @@ async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     crud.category.remove(db=db, id=id)
     cache.delete(f"category:{category.slug}")
     cache.delete(f"category:{id}")
-    cache.delete_pattern("categories:*")
+    cache.invalidate("categories")
     return Message(message="Category deleted successfully")
 
 

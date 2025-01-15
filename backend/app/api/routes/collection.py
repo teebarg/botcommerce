@@ -84,7 +84,7 @@ async def create(*, db: SessionDep, create_data: CollectionCreate, cache: CacheS
         )
 
     collection = crud.collection.create(db=db, obj_in=create_data)
-    cache.delete_pattern("collections:*")
+    cache.invalidate("collections")
     return collection
 
 
@@ -107,7 +107,6 @@ async def get_by_slug(slug: str, db: SessionDep) -> Collection:
     """
     Get a collection by its slug.
     """
-
     collection = crud.collection.get_by_key(db=db, key="slug", value=slug)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
@@ -115,10 +114,7 @@ async def get_by_slug(slug: str, db: SessionDep) -> Collection:
     return collection
 
 
-@router.patch(
-    "/{id}",
-    dependencies=[Depends(get_current_user)],
-)
+@router.patch("/{id}", dependencies=[Depends(get_current_user)])
 async def update(
     *,
     db: SessionDep,
@@ -142,7 +138,7 @@ async def update(
         # Invalidate cache
         cache.delete(f"collection:{collection.slug}")
         cache.delete(f"collection:{id}")
-        cache.delete_pattern("collections:*")
+        cache.invalidate("collections")
         return collection
     except IntegrityError as e:
         logger.error(f"Error updating collection, {e.orig.pgerror}")
@@ -167,7 +163,7 @@ async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     # Invalidate cache
     cache.delete(f"collection:{collection.slug}")
     cache.delete(f"collection:{id}")
-    cache.delete_pattern("collections:*")
+    cache.invalidate("collections")
     return Message(message="Collection deleted successfully")
 
 

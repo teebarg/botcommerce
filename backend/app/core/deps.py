@@ -1,5 +1,4 @@
-from collections.abc import Generator
-from typing import Annotated
+from typing import Annotated, Generator
 
 import firebase_admin
 import jwt
@@ -11,11 +10,9 @@ from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlmodel import Session
 
-from app import crud
-from app.core import security
+from app.core import crud, security
 from app.core.config import settings
 from app.core.logging import logger
-from app.crud.search import SearchService, get_search_service
 from app.db.engine import engine
 from app.models.generic import Address, Product, User
 from app.models.token import TokenPayload
@@ -124,7 +121,6 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
 AdminUser = Annotated[User, Depends(get_current_active_superuser)]
 
 CacheService = Annotated[CacheService, Depends(get_cache_service)]
-SearchService = Annotated[SearchService, Depends(get_search_service)]
 
 def get_notification_service() -> NotificationService:
     notification_service = NotificationService()

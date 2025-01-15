@@ -94,6 +94,27 @@ class CacheService:
         except Exception as e:
             logger.error(f"Error clearing cache: {str(e)}")
             return False
+        
+    def invalidate(self, key: str)-> bool:
+        """
+        Delete all keys matching a pattern
+        Args:
+            pattern: Pattern to match keys against (e.g., "product:*")
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Get all keys that might contain this product
+            search_keys = self.redis.keys(f"{key}:*")
+
+            # Delete all related cache entries
+            if search_keys:
+                self.redis.delete(*search_keys)
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting pattern from cache: {str(e)}")
+            return False
+        
 
     def delete_pattern(self, pattern: str) -> bool:
         """

@@ -31,7 +31,8 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     let wishlist: WishlistItem[] = [];
 
     if (customer) {
-        wishlist = await getWishlist();
+        const { wishlists } = await getWishlist();
+        wishlist = wishlists
     }
 
     const { categories: cat } = await getCategories();
@@ -86,7 +87,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                     </nav>
                     <div className="flex gap-6 mt-0 md:mt-6">
                         <div className="w-full flex-1 flex-col">
-                            <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-background">
+                            <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10">
                                 <CollectionsTopBar
                                     brands={brands}
                                     categories={categories}

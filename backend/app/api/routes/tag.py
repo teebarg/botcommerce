@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
 from app.core.decorators import cache
-from app import crud
+from app.core import crud
 from app.core.deps import (
     CacheService,
     CurrentUser,
@@ -38,11 +38,7 @@ from app.services.export import export, process_file, validate_file
 router = APIRouter()
 
 
-@router.get(
-    "/",
-    dependencies=[Depends(get_current_user)],
-    response_model=Tags,
-)
+@router.get("/", dependencies=[Depends(get_current_user)])
 @cache(key="tags")
 async def index(
     db: SessionDep,
@@ -79,8 +75,8 @@ async def index(
     )
 
 
-@router.post("/", response_model=TagPublic)
-def create(*, db: SessionDep, create_data: TagCreate, cache: CacheService) -> TagPublic:
+@router.post("/")
+async def create(*, db: SessionDep, create_data: TagCreate, cache: CacheService) -> TagPublic:
     """
     Create new tag.
     """
@@ -92,13 +88,13 @@ def create(*, db: SessionDep, create_data: TagCreate, cache: CacheService) -> Ta
         )
 
     tag = crud.tag.create(db=db, obj_in=create_data)
-    cache.delete_pattern("tags:*")
+    cache.invalidate("tags")
     return tag
 
 
-@router.get("/{id}", response_model=TagPublic)
+@router.get("/{id}")
 @cache(key="tag")
-def read(id: int, db: SessionDep) -> TagPublic:
+async def read(id: int, db: SessionDep) -> TagPublic:
     """
     Get a specific tag by id.
     """
@@ -108,11 +104,8 @@ def read(id: int, db: SessionDep) -> TagPublic:
     return tag
 
 
-@router.patch(
-    "/{id}",
-    dependencies=[Depends(get_current_user)]
-)
-def update(
+@router.patch("/{id}", dependencies=[Depends(get_current_user)])
+async def update(
     *,
     db: SessionDep,
     cache: CacheService,
@@ -133,7 +126,7 @@ def update(
         tag = crud.tag.update(db=db, db_obj=tag, obj_in=update_data)
         # Invalidate cache
         cache.delete(f"tag:{id}")
-        cache.delete_pattern("tags:*")
+        cache.invalidate("tags")
         return tag
     except IntegrityError as e:
         logger.error(f"Error updating tag, {e.orig.pgerror}")
@@ -147,7 +140,7 @@ def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
+async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
     Delete a tag.
     """
@@ -158,7 +151,7 @@ def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
         crud.tag.remove(db=db, id=id)
         # Invalidate cache
         cache.delete(f"tag:{id}")
-        cache.delete_pattern("tags:*")
+        cache.invalidate("tags")
         return Message(message="Tag deleted successfully")
     except Exception as e:
         raise HTTPException(

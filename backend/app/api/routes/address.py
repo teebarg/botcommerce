@@ -7,8 +7,10 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, select
 
-from app import crud
+from app.core.decorators import cache
+from app.core import crud
 from app.core.deps import (
+    CacheService,
     CurrentAddress,
     CurrentUser,
     SessionDep,
@@ -27,12 +29,9 @@ from app.models.message import Message
 router = APIRouter()
 
 
-@router.get(
-    "/",
-    dependencies=[Depends(get_current_user)],
-    response_model=Addresses,
-)
-def index(
+@router.get("/", dependencies=[Depends(get_current_user)])
+@cache(key="addresses")
+async def index(
     db: SessionDep,
     current_user: CurrentUser,
     page: int = Query(default=1, gt=0),
@@ -68,33 +67,29 @@ def index(
     )
 
 
-@router.post(
-    "/", dependencies=[Depends(get_current_user)], response_model=AddressPublic
-)
-def create(
-    *, db: SessionDep, current_user: CurrentUser, create_data: AddressCreate
+@router.post("/", dependencies=[Depends(get_current_user)])
+async def create(
+    *, db: SessionDep, current_user: CurrentUser, create_data: AddressCreate, cache: CacheService
 ) -> AddressPublic:
     """
     Create new address.
     """
     address = crud.address.create(db=db, obj_in=create_data, user_id=current_user.id)
+    cache.invalidate("addresses")
     return address
 
 
-@router.get("/{id}", response_model=AddressPublic)
-def read(address: CurrentAddress) -> AddressPublic:
+@router.get("/{id}")
+@cache(key="address")
+async def read(address: CurrentAddress) -> AddressPublic:
     """
     Get a specific address by id.
     """
     return address
 
 
-@router.post(
-    "/billing_address",
-    dependencies=[Depends(get_current_user)],
-    response_model=AddressPublic,
-)
-def set_billing_address(db: SessionDep, user: CurrentUser, address: AddressCreate):
+@router.post("/billing_address", dependencies=[Depends(get_current_user)])
+async def set_billing_address(db: SessionDep, user: CurrentUser, address: AddressCreate) -> AddressPublic:
     # Check if the user already has a billing address
     existing_address = db.exec(
         select(Address).where(Address.user_id == user.id, Address.is_billing)
@@ -111,25 +106,25 @@ def set_billing_address(db: SessionDep, user: CurrentUser, address: AddressCreat
     return address
 
 
-@router.patch(
-    "/{id}",
-    dependencies=[Depends(get_address_param)],
-    response_model=AddressPublic,
-)
-def update(
+@router.patch("/{id}", dependencies=[Depends(get_address_param)])
+async def update(
     *,
     db: SessionDep,
-    db_address: CurrentAddress,
+    cache: CacheService,
+    address: CurrentAddress,
     update_data: AddressUpdate,
 ) -> AddressPublic:
     """
     Update a address.
     """
     try:
-        db_address = crud.address.update(db=db, db_obj=db_address, obj_in=update_data)
-        return db_address
+        address = crud.address.update(db=db, db_obj=address, obj_in=update_data)
+        # Invalidate cache
+        cache.delete(f"address:{id}")
+        cache.invalidate("addresses")
+        return address
     except IntegrityError as e:
-        logger.error(f"Error updating tag, ${e.orig.pgerror}")
+        logger.error(f"Error updating address, ${e.orig.pgerror}")
         raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
     except Exception as e:
         logger.error(e)
@@ -140,12 +135,15 @@ def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(get_address_param)])
-def delete(db: SessionDep, id: int) -> Message:
+async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
     Delete a address.
     """
     try:
         crud.address.remove(db=db, id=id)
+        # Invalidate cache
+        cache.delete(f"address:{id}")
+        cache.invalidate("addresses:*")
         return Message(message="Address deleted successfully")
     except Exception as e:
         raise HTTPException(

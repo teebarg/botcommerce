@@ -1,14 +1,15 @@
 
 from fastapi import APIRouter, HTTPException, status
 
-from app import crud
+from app.core import crud
 from app.api.routes.websocket import manager
 from app.core.deps import (
     CurrentUser,
     SessionDep,
 )
+from app.core.decorators import cache
 from app.core.logging import logger
-from app.models.activities import ActivityCreate
+from app.models.activities import Activities, ActivityCreate
 from app.models.generic import ActivityLog
 from app.models.message import Message
 
@@ -30,12 +31,13 @@ async def log_activity(db: SessionDep, user: CurrentUser, activity: ActivityCrea
 
 
 # Get recent activities for a user
-@router.get("/", response_model=list[ActivityLog])
+@router.get("/", response_model=Activities)
+@cache(key="activities")
 async def get_recent_activities(db: SessionDep, user: CurrentUser, limit: int = 10):
     activities = crud.activities.get_activity_logs_by_user(
         db=db, user_id=user.id, limit=limit
     )
-    return activities
+    return Activities(activities=activities)
 
 
 @router.delete("/{activity_id}", response_model=Message)

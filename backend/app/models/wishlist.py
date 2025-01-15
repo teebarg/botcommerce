@@ -21,7 +21,3 @@ class WishlistPublic(WishlistBase):
 
 class Wishlists(SQLModel):
     wishlists: list[WishlistPublic]
-    page: int
-    limit: int
-    total_count: int
-    total_pages: int

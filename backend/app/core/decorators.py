@@ -1,3 +1,4 @@
+import hashlib
 import json
 import re
 from collections.abc import Callable
@@ -84,7 +85,7 @@ def cache(expire: int = 86400, key: str | None = None):
         Returns:
             str: A hash representing the cache key.
         """
-        temp_kwargs = ":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache"]])
+        temp_kwargs = hashlib.sha256(":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache"]]).encode()).hexdigest()
         return f"{key or func_name}:{temp_kwargs}"
 
     def decorator(func: Callable):

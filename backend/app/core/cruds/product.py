@@ -1,11 +1,11 @@
 from typing import Any
 
+from app.core.cruds.base import BaseCRUD
 from sqlmodel import Session, select
 
-from app import crud
+from app.core import crud
 from app.core.logging import logger
 from app.core.utils import generate_slug
-from app.crud.base import CRUDBase
 from app.models.generic import Brand, Category, Collection, Product, Tag
 from app.models.product import (
     ProductCreate,
@@ -13,7 +13,7 @@ from app.models.product import (
 )
 
 
-class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
+class ProductCRUD(BaseCRUD[Product, ProductCreate, ProductUpdate]):
     def create(self, db: Session, obj_in: ProductCreate) -> Product:
         db_obj = Product.model_validate(
             obj_in,
@@ -25,10 +25,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 "collections": self.get_collection_update(db=db, update=obj_in),
             },
         )
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+        return self.sync(db=db, update=db_obj)
 
     def update(
         self,
@@ -105,6 +102,3 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             if tag := crud.tag.get(db=db, id=i):
                 tags.append(tag)
         return tags
-
-
-product = CRUDProduct(Product)
