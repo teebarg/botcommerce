@@ -1,12 +1,12 @@
+from app.core.cruds.base import BaseCRUD
 from sqlmodel import Session
 
 from app.core.utils import generate_slug
-from app.crud.base import CRUDBase
 from app.models.brand import BrandCreate, BrandUpdate
 from app.models.generic import Brand
 
 
-class CRUDBrand(CRUDBase[Brand, BrandCreate, BrandUpdate]):
+class BrandCRUD(BaseCRUD[Brand, BrandCreate, BrandUpdate]):
     def create(self, db: Session, obj_in: BrandCreate) -> Brand:
         db_obj = Brand.model_validate(
             obj_in,
@@ -16,6 +16,3 @@ class CRUDBrand(CRUDBase[Brand, BrandCreate, BrandUpdate]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
-
-
-brand = CRUDBrand(Brand)

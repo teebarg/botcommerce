@@ -42,7 +42,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
             >
                 <div
                     className={cn(
-                        "relative w-full flex-col items-start justify-center inline-flex shadow-sm px-3 bg-content1 rounded-medium outline-none",
+                        "relative w-full flex-col items-start justify-center inline-flex shadow-sm px-3 bg-default-100 rounded-medium outline-none",
                         {
                             "h-10 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",
@@ -79,8 +79,8 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             {...inputProps}
                             ref={ref}
                             className={cn(
-                                "w-full font-normal placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto autofill:bg-transparent",
-                                "file:cursor-pointer file:bg-transparent file:border-0 text-small group-data-[has-value=true]:text-default-foreground",
+                                "w-full bg-transparent font-normal placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto autofill:bg-transparent data-[has-end-content=true]:pe",
+                                "file:cursor-pointer file:bg-transparent file:border-0 text-small group-data-[has-value=true]:text-default-foreground data-[has-start-content=true]:ps-1.5",
                                 classNames?.["input"]
                             )}
                             data-filled={Boolean(inputProps.value)}

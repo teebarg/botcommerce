@@ -1,14 +1,14 @@
 import asyncio
 
+from app.core.cruds.base import BaseCRUD
 from sqlmodel import Session
 
 from app.api.routes.websocket import manager
-from app.crud.base import CRUDBase
 from app.models.activities import ActivityCreate, ActivityUpdate
 from app.models.generic import ActivityLog
 
 
-class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
+class ActivityCRUD(BaseCRUD[ActivityLog, ActivityCreate, ActivityUpdate]):
     def create(
         self, db: Session, activity_log: ActivityCreate, user_id: int
     ) -> ActivityLog:
@@ -64,6 +64,3 @@ class CRUDActivity(CRUDBase[ActivityLog, ActivityCreate, ActivityUpdate]):
                 is_success=True,
             ),
         )
-
-
-activities = CRUDActivity(ActivityLog)

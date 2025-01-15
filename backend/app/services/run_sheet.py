@@ -2,7 +2,7 @@ import csv
 import time
 from datetime import datetime
 from io import BytesIO
-from typing import Any, List
+from typing import Any
 
 from fastapi import (
     HTTPException,
@@ -89,7 +89,7 @@ async def process_products(file_content, content_type: str, user_id: int):
             # Extract and process the products
             products_to_create_or_update = []
             for row in batch:
-                row_data = dict(zip(headers, row))
+                row_data = dict(zip(headers, row, strict=False))
                 name = row_data.get("name", "")
                 active = row_data.get("is_active", True)
                 is_active = row_data.get("is_active", True)
@@ -156,11 +156,11 @@ async def process_products(file_content, content_type: str, user_id: int):
         )
 
 
-async def create_or_update_products_in_db(products: List):
+async def create_or_update_products_in_db(products: list):
     with Session(engine) as session:
         try:
             # Collect all slugs first to minimize database queries
-            all_slugs = [p[0]['slug'] for p in products]
+            all_slugs = [p[0]["slug"] for p in products]
             existing_products = {
                 p.slug: p for p in session.exec(
                     select(Product).where(Product.slug.in_(all_slugs))
@@ -169,16 +169,16 @@ async def create_or_update_products_in_db(products: List):
 
             products_to_add = []
             for product_data, _brands, _categories, _collections, images in products:
-                if product_data['slug'] in existing_products:
+                if product_data["slug"] in existing_products:
                     # Update existing product
-                    existing_product = existing_products[product_data['slug']]
+                    existing_product = existing_products[product_data["slug"]]
                     for key, value in product_data.items():
-                        if key != 'id':
+                        if key != "id":
                             setattr(existing_product, key, value)
                 else:
                     # Prepare new product for bulk insert
-                    if 'id' in product_data:
-                        del product_data['id']
+                    if "id" in product_data:
+                        del product_data["id"]
                     products_to_add.append(Product(**product_data))
 
             # Bulk insert new products
@@ -204,7 +204,7 @@ async def create_or_update_products_in_db(products: List):
             raise
 
 
-async def update_related_models(products: List, session: Session):
+async def update_related_models(products: list, session: Session):
     # Collect all slugs
     product_slugs = [p[0]["slug"] for p in products]
 

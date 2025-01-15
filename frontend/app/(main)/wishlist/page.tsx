@@ -18,9 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Wishlist() {
-    const wishlist = await getWishlist();
+    const { wishlists } = await getWishlist();
 
-    if (!wishlist) {
+    if (!wishlists) {
         return (
             <div className="text-center py-24 space-y-6">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-warning">
@@ -47,11 +47,11 @@ export default async function Wishlist() {
             <h1 className="text-3xl font-bold text-center text-default-900">Your Wishlist</h1>
             <p className="text-center text-default-500 mt-1">Curate your luxury collection.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
-                {wishlist.map((item: any) => (
+                {wishlists.map((item: any) => (
                     <WishlistItem key={item.id} {...item} />
                 ))}
             </div>
-            {wishlist.length === 0 && (
+            {wishlists.length === 0 && (
                 <p className="text-center text-default-500 mt-10">Your wishlist is empty. Explore our luxury collection to add items.</p>
             )}
         </div>

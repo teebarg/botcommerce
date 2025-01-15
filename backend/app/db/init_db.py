@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 
-from app import crud
+from app.core import crud
 from app.core.config import settings
 from app.core.logging import logger
 from app.models.generic import User

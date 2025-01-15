@@ -1,11 +1,10 @@
-from typing import Dict
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 
 class ConnectionManager:
     def __init__(self):
-        self.connections: Dict[str, WebSocket] = {}
+        self.connections: dict[str, WebSocket] = {}
 
     async def connect(self, id: str, websocket: WebSocket) -> None:
         """

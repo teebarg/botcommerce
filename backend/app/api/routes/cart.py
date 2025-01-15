@@ -1,9 +1,9 @@
 from typing import Any
 
+from app.services.product import get_product
 from fastapi import APIRouter, Header, HTTPException
 from firebase_cart import CartHandler, CartItem, FirebaseConfig
 
-from app.core import deps
 from app.core.config import settings
 from app.core.utils import generate_id
 from app.models.generic import CartDetails, CartItemIn
@@ -33,10 +33,11 @@ def index(
 
 @router.post("/add")
 async def add_to_cart(
-    cart_in: CartItemIn, service: deps.SearchService, cartId: str = Header(default=None)
+    cart_in: CartItemIn,
+    cartId: str = Header(default=None)
 ):
 
-    doc = await service.get_product(product_id=cart_in.product_id)
+    doc = await get_product(product_id=cart_in.product_id)
     id = str(doc.get("id"))
     cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
     return cart_handler.add_to_cart(cart_id=cartId, item=cart_item)

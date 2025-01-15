@@ -1,22 +1,26 @@
 import json
 from datetime import datetime
+from xml.etree.ElementTree import Element, SubElement, tostring
 
-from app.core import deps
-from app.core.decorators import limit
 from fastapi import FastAPI, Request, Response
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
+from app.core import deps
 from app.core.config import settings
-
+from app.core.decorators import limit
 from app.core.utils import (
     generate_contact_form_email,
     generate_newsletter_email,
     send_email,
 )
-from app.models.generic import ContactFormCreate, NewsletterCreate
-from xml.etree.ElementTree import Element, SubElement, tostring
-from app.models.generic import Category, Collection, Product
+from app.models.generic import (
+    Category,
+    Collection,
+    ContactFormCreate,
+    NewsletterCreate,
+    Product,
+)
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
 

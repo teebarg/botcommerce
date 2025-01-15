@@ -1,12 +1,19 @@
 from typing import Any
-from app.models.config import SiteConfig, SiteConfigCreate, SiteConfigUpdate, SiteConfigs
-from app.core.deps import CacheService, SessionDep
-from app.core.decorators import cache
+
 from fastapi import APIRouter, HTTPException
-from app.crud import siteconfig
-from sqlmodel import func, select
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import func, select
+
+from app.core.decorators import cache
+from app.core.deps import CacheService, SessionDep
 from app.core.logging import logger
+from app.core import crud
+from app.models.config import (
+    SiteConfig,
+    SiteConfigCreate,
+    SiteConfigs,
+    SiteConfigUpdate,
+)
 from app.models.message import Message
 
 router = APIRouter()
@@ -19,8 +26,7 @@ async def site_config(
     """
     Retrieve site configuration.
     """
-    config = siteconfig.configs(db=db)
-    return config
+    return crud.siteconfig.configs(db=db)
 
 
 @router.get(
@@ -41,17 +47,15 @@ async def index(
     items = db.exec(statement).all()
 
 
-    total_pages = (count // limit) + (count % limit > 0)
+    pages = (count // limit) + (count % limit > 0)
 
-    result = SiteConfigs(
+    return SiteConfigs(
         configs=items,
         page=skip,
         limit=limit,
-        total_pages=total_pages,
+        total_pages=pages,
         total_count=count,
     )
-
-    return result
 
 @router.get("/{id}")
 @cache(key="config")  # Cache for 24hrs
@@ -59,7 +63,7 @@ async def read(id: int, db: SessionDep) -> SiteConfig:
     """
     Get a specific config by id with Redis caching.
     """
-    config = siteconfig.get(db=db, id=id)
+    config = crud.siteconfig.get(db=db, id=id)
     if not config:
         raise HTTPException(status_code=404, detail="Config not found")
 
@@ -75,15 +79,15 @@ async def create(
     """
     Create new site configuration.
     """
-    config = siteconfig.get_by_key(db=db, value=config_in.key)
+    config = crud.siteconfig.get_by_key(db=db, key="key",value=config_in.key)
     if config:
         raise HTTPException(
             status_code=400,
             detail="The config already exists in the system.",
         )
-    
-    cache.delete_pattern("configs:*")
-    return siteconfig.create(db=db, obj_in=config_in)
+
+    cache.invalidate("configs")
+    return crud.siteconfig.create(db=db, obj_in=config_in)
 
 
 @router.patch("/{id}", response_model=SiteConfig)
@@ -97,15 +101,15 @@ async def update(
     """
     Update site configuration.
     """
-    config = siteconfig.get(db=db, id=id)
+    config = crud.siteconfig.get(db=db, id=id)
     if not config:
         raise HTTPException(status_code=404, detail="Site configuration not found")
-    
+
     try:
-        config = siteconfig.update(db=db, db_obj=config, obj_in=config_in)
+        config = crud.siteconfig.update(db=db, db_obj=config, obj_in=config_in)
         # Invalidate cache
         cache.delete(f"config:{id}")
-        cache.delete_pattern("configs:*")
+        cache.invalidate("configs")
         return config
     except IntegrityError as e:
         logger.error(f"Error updating config, {e.orig.pgerror}")
@@ -116,18 +120,17 @@ async def update(
             status_code=400,
             detail=f"{e}",
         ) from e
-    
+
 @router.delete("/{id}")
 async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
     """
     Delete a config.
     """
-    config = siteconfig.get(db=db, id=id)
+    config = crud.siteconfig.get(db=db, id=id)
     if not config:
         raise HTTPException(status_code=404, detail="Config not found")
-    siteconfig.remove(db=db, id=id)
+    crud.siteconfig.remove(db=db, id=id)
     # Invalidate cache
     cache.delete(f"config:{id}")
-    cache.delete_pattern("configs:*")
+    cache.invalidate("configs")
     return Message(message="Config deleted successfully")
-    

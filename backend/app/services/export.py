@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import (
     HTTPException,
@@ -11,7 +11,7 @@ from app.core.deps import (
 from app.core.logging import logger
 from app.models.generic import UploadStatus
 
-upload_statuses: Dict[str, UploadStatus] = {}
+upload_statuses: dict[str, UploadStatus] = {}
 
 
 async def process_file(file, task_id: str, db: SessionDep, upload_func):

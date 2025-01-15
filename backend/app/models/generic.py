@@ -1,5 +1,5 @@
 import secrets
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
@@ -38,18 +38,18 @@ class CartItemIn(BaseModel):
 
 
 class CartDetails(BaseModel):
-    shipping_address: Optional[dict] = None
-    billing_address: Optional[dict] = None
-    email: Optional[str] = None
-    shipping_method: Optional[dict] = None
-    payment_session: Optional[dict] = None
+    shipping_address: dict | None = None
+    billing_address: dict | None = None
+    email: str | None = None
+    shipping_method: dict | None = None
+    payment_session: dict | None = None
 
 
 class OrderDetails(BaseModel):
-    fulfillments: Optional[list[dict]] = None
-    fulfillment_status: Optional[str] = None
-    payment_status: Optional[str] = None
-    status: Optional[str] = None
+    fulfillments: list[dict] | None = None
+    fulfillment_status: str | None = None
+    payment_status: str | None = None
+    status: str | None = None
 
 
 # Shared properties
@@ -94,7 +94,7 @@ class Category(CategoryBase, table=True):
     __tablename__ = "categories"
     id: int | None = Field(default=None, primary_key=True)
     slug: str
-    parent_id: Optional[int] = Field(foreign_key="categories.id")
+    parent_id: int | None = Field(foreign_key="categories.id")
     products: list["Product"] = Relationship(
         back_populates="categories", link_model=ProductCategory
     )
@@ -105,7 +105,7 @@ class Category(CategoryBase, table=True):
     )
 
     # Relationship to subcategories (self-referential)
-    children: List["Category"] = Relationship(
+    children: list["Category"] = Relationship(
         back_populates="parent",  # Linking parent to children
         sa_relationship_kwargs={"cascade": "all, delete-orphan"},
     )
@@ -114,10 +114,10 @@ class Category(CategoryBase, table=True):
 class CategoryPublic(CategoryBase):
     id: int
     slug: str
-    parent_id: Optional[int]
+    parent_id: int | None
     parent: Optional["Category"] = None
     # Include subcategories (optional)
-    children: List["CategoryPublic"] = []
+    children: list["CategoryPublic"] = []
 
 
 class Collection(CollectionBase, table=True):
@@ -173,9 +173,9 @@ class Products(SQLModel):
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str = secrets.token_urlsafe(6)
-    addresses: List["Address"] = Relationship(back_populates="user")
-    activity_logs: List["ActivityLog"] = Relationship(back_populates="user")
-    wishlists: List["Wishlist"] = Relationship(back_populates="user")
+    addresses: list["Address"] = Relationship(back_populates="user")
+    activity_logs: list["ActivityLog"] = Relationship(back_populates="user")
+    wishlists: list["Wishlist"] = Relationship(back_populates="user")
 
 
 class UserPublic(UserBase):
@@ -187,7 +187,7 @@ class UserPublic(UserBase):
 class ActivityLog(ActivityBase, table=True):
     __tablename__ = "activity_logs"
 
-    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    id: int | None = Field(default=None, primary_key=True, index=True)
     user_id: int = Field(foreign_key="user.id")
     activity_type: str | None = Field(
         index=True, max_length=255
@@ -199,7 +199,7 @@ class ActivityLog(ActivityBase, table=True):
 
 class Address(AddressBase, table=True):
     __tablename__ = "addresses"
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(default=None, foreign_key="user.id")
     user: User = Relationship(back_populates="addresses")
 

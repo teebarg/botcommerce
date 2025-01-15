@@ -33,7 +33,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
 
     return (
         <React.Fragment>
-            <header className="relative z-20 flex flex-col sm:gap-2 rounded-medium bg-default-100 px-4 pb-3 pt-2 md:pt-3">
+            <header className="relative z-20 flex flex-col sm:gap-2 rounded-medium bg-content1 px-4 pb-3 pt-2 md:pt-3">
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
                         <Button className="md:hidden" onClick={state.open}>
@@ -47,7 +47,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                     </div>
                     <div className="flex items-center gap-1 flex-1 sm:flex-initial">
                         <ComboBox
-                            className="min-w-[15rem] max-w-xs flex-1"
+                            className="w-[18rem] flex-1"
                             items={filters}
                             name="filter"
                             placeholder="Filter products"
