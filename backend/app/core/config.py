@@ -1,10 +1,9 @@
 import secrets
-from typing import Annotated, Any, List, Literal, Optional
+from typing import Annotated, Any, Literal
 
 from pydantic import (
     AnyUrl,
     BeforeValidator,
-    AnyHttpUrl,
     EmailStr,
     PostgresDsn,
     ValidationInfo,
@@ -12,6 +11,7 @@ from pydantic import (
     field_validator,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
@@ -55,7 +55,7 @@ class Settings(BaseSettings):
         return f"https://{self.DOMAIN}"
 
     @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
-    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
+    def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v
         return str(

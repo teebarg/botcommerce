@@ -1,23 +1,27 @@
 import asyncio
 import datetime
 from io import BytesIO
-import json
 from typing import Annotated, Any
 
 from fastapi import (
     APIRouter,
     BackgroundTasks,
+    Depends,
     File,
     HTTPException,
     Query,
     UploadFile,
 )
 
-from app import crud
-from app.core import deps
+from app.core.decorators import cache
+from sqlalchemy.exc import IntegrityError
+from app.core import crud
 from app.core.deps import (
+    CacheService,
     CurrentUser,
     SessionDep,
+    Storage,
+    get_current_user,
 )
 from app.core.logging import logger
 from app.core.utils import url_to_list
@@ -35,6 +39,7 @@ from app.services.meilisearch import (
     delete_document,
     delete_index,
     get_or_create_index,
+    search_documents,
     update_document,
 )
 from app.services.run_sheet import generate_excel_file, process_products
@@ -45,9 +50,9 @@ router = APIRouter()
 
 @router.get("/export")
 async def export_products(
-    current_user: deps.CurrentUser,
+    current_user: CurrentUser,
     db: SessionDep,
-    bucket: deps.Storage,
+    bucket: Storage,
     background_tasks: BackgroundTasks,
 ) -> Any:
     try:
@@ -64,7 +69,7 @@ async def export_products(
         background_tasks.add_task(run_task)
 
         return {
-            "message": "Data Export successful. An email with the file URL has been sent."
+            "message": "Data Export successful. Please check your email"
         }
     except Exception as e:
         logger.error(f"Export products error: {e}")
@@ -72,8 +77,8 @@ async def export_products(
 
 
 @router.get("/")
+@cache(key="products")
 async def index(
-    service: deps.SearchService,
     search: str = "",
     brands: str = Query(default=""),
     categories: str = Query(default=""),
@@ -109,9 +114,7 @@ async def index(
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
-    search_results = await service.search_products(
-        query=search, filters=search_params
-    )
+    search_results = search_documents(index_name="products", query=search, **search_params)
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
@@ -126,7 +129,8 @@ async def index(
 
 
 @router.post("/search")
-async def search_products(params: ProductSearch, service: deps.SearchService) -> Any:
+@cache(key="products")
+async def search_products(params: ProductSearch) -> Any:
     """
     Search products using Meilisearch with Redis caching, sorted by relevance.
     """
@@ -153,16 +157,14 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
         "limit": limit,
         "offset": (page - 1) * limit,
         "sort": [sort],  # Sort by specified field
-        "facets": ['brands', 'categories', 'collections'],
+        "facets": ["brands", "categories", "collections"],
     }
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
     try:
-        search_results = await service.search_products(
-            query=params.query, filters=search_params
-        )
+        search_results = search_documents(index_name="products", query=params.query, **search_params)
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -183,7 +185,7 @@ async def search_products(params: ProductSearch, service: deps.SearchService) ->
 
 
 @router.post("/")
-def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
+async def create(*, db: SessionDep, product_in: ProductCreate, cache: CacheService) -> ProductPublic:
     """
     Create new product.
     """
@@ -194,82 +196,79 @@ def create(*, db: SessionDep, product_in: ProductCreate) -> ProductPublic:
             detail="The product already exists in the system.",
         )
 
-    product = crud.product.create(db=db, obj_in=product_in)
     try:
+        product = crud.product.create(db=db, obj_in=product_in)
         # Create a dictionary with product data and collection names
         product_data = prepare_product_data_for_indexing(product)
 
         add_documents_to_index(index_name="products", documents=[product_data])
+        cache.invalidate("search")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
     return product
 
 
 @router.get("/{slug}")
-async def read(slug: str, db: SessionDep, redis: deps.CacheService) -> ProductPublic:
+@cache(key="product")
+async def read(slug: str, db: SessionDep) -> ProductPublic:
     """
     Get a specific product by slug with Redis caching.
     """
-    cache_key = f"product:{slug}"
-
-    # Try to get from cache first
-    cached_data = redis.get(cache_key)
-    if cached_data:
-        return ProductPublic(**json.loads(cached_data))
-
     product = crud.product.get_by_key(db=db, key="slug", value=slug)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Cache the result
-    product_public = ProductPublic.model_validate(product)
-    redis.set(cache_key, product_public.model_dump_json())
-
     return product
 
 
-@router.patch("/{id}")
-def update(
+@router.patch("/{id}", dependencies=[Depends(get_current_user)])
+async def update(
     *,
     db: SessionDep,
     id: int,
     product_in: ProductUpdate,
     background_tasks: BackgroundTasks,
-    service: deps.SearchService,
-    redis: deps.CacheService,
+    cache: CacheService,
 ) -> ProductPublic:
     """
     Update a product.
     """
-    db_product = crud.product.get(db=db, id=id)
-    if not db_product:
+    product = crud.product.get(db=db, id=id)
+    if not product:
         raise HTTPException(
             status_code=404,
             detail="Product not found",
         )
-    db_product = crud.product.update(db=db, db_obj=db_product, obj_in=product_in)
-    redis.delete(f"product:{db_product.slug}")
-    redis.delete(f"product:{id}")
-    redis.delete_pattern("search:*")
 
     try:
+        product = crud.product.update(db=db, db_obj=product, obj_in=product_in)
+        # Invalidate cache
+        cache.delete(f"product:{product.slug}")
+        cache.delete(f"product:{id}")
+        cache.invalidate("search")
+    
         # Define the background task
-        def update_task(db_product: Product):
+        def update_task(product: Product):
             # Prepare product data for Meilisearch indexing
-            product_data = prepare_product_data_for_indexing(db_product)
+            product_data = prepare_product_data_for_indexing(product)
 
             update_document(index_name="products", document=product_data)
-            service.invalidate_product_cache(product_id=db_product.id)
 
-        background_tasks.add_task(update_task, db_product=db_product)
-        return db_product
+        background_tasks.add_task(update_task, product=product)
+        return product
+    except IntegrityError as e:
+        logger.error(f"Error updating collection, {e.orig.pgerror}")
+        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
     except Exception as e:
-        logger.error(f"Error updating document in Meilisearch: {e}")
-    return db_product
+        logger.error(e)
+        raise HTTPException(
+            status_code=400,
+            detail=f"{e}",
+        ) from e
 
 
 @router.delete("/{id}")
-def delete(db: SessionDep, id: int, redis: deps.CacheService,) -> Message:
+async def delete(id: int, db: SessionDep, cache: CacheService,) -> Message:
     """
     Delete a product.
     """
@@ -279,9 +278,10 @@ def delete(db: SessionDep, id: int, redis: deps.CacheService,) -> Message:
     crud.product.remove(db=db, id=id)
     try:
         delete_document(index_name="products", document_id=str(id))
-        redis.delete(f"product:{product.slug}")
-        redis.delete(f"product:{id}")
-        redis.delete_pattern("search:*")
+        # Invalidate cache
+        cache.delete(f"product:{product.slug}")
+        cache.delete(f"product:{id}")
+        cache.invalidate("search")
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
@@ -293,7 +293,7 @@ async def upload_products(
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
     background_tasks: BackgroundTasks,
-    redis: deps.CacheService,
+    cache: CacheService,
 ):
     content_type = file.content_type
 
@@ -319,8 +319,8 @@ async def upload_products(
         )
 
         # Clear all product-related cache
-        redis.delete_pattern("product:*")
-        redis.delete_pattern("search:*")
+        cache.invalidate("product")
+        cache.invalidate("search")
 
         # Re-index
         index_products(db=db)
@@ -340,8 +340,8 @@ async def upload_product_image(
     id: str,
     file: Annotated[UploadFile, File()],
     db: SessionDep,
-    bucket: deps.Storage,
-    redis: deps.CacheService
+    bucket: Storage,
+    cache: CacheService
 ):
     """
     Upload a product image.
@@ -371,7 +371,7 @@ async def upload_product_image(
             update_document(index_name="products", document=product_data)
 
             # Remove cached data
-            redis.delete(f"product:{product.id}")
+            cache.delete(f"product:{product.id}")
 
             # Return the updated product
             return product
@@ -461,7 +461,7 @@ async def config_delete_index() -> dict:
         ) from e
 
 
-def prepare_product_data_for_indexing(product: Product) -> dict:
+async def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
     product_dict["collections"] = [
         collection.name for collection in product.collections
@@ -471,7 +471,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["images"] = [image.image for image in product.images]
     return product_dict
 
-def index_products(db: SessionDep):
+async def index_products(db: SessionDep):
     """
     Re-index all products in the database to Meilisearch.
     """

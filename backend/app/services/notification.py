@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+
+import emails  # type: ignore
 import requests
+
 from app.core.config import settings
 from app.core.logging import logger
-import emails  # type: ignore
+
 
 class NotificationChannel(ABC):
     @abstractmethod
@@ -74,7 +76,7 @@ class SMSChannel(NotificationChannel):
 
 class NotificationService:
     def __init__(self):
-        self.channels: Dict[str, NotificationChannel] = {}
+        self.channels: dict[str, NotificationChannel] = {}
 
     def register_channel(self, channel_name: str, channel: NotificationChannel):
         """Register a new notification channel."""

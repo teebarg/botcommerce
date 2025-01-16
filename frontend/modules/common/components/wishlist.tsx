@@ -52,24 +52,17 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
     };
 
     return (
-        <div className="group relative bg-background rounded-xl overflow-hidden border border-default/50">
-            <div className="aspect-square overflow-hidden">
-                <Image
-                    fill
-                    alt={name}
-                    className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                    src={image}
-                />
-            </div>
-
-            <div className="p-6 space-y-4">
-                <div className="space-y-1">
-                    {/* <p className="text-sm font-medium text-muted-foreground">{brand}</p> */}
-                    <h3 className="font-medium line-clamp-1">{name}</h3>
-                    <p className="text-default-500 line-clamp-1">{description}</p>
-                    {/* <p className="text-lg font-semibold">${price.toLocaleString()}</p> */}
+        <>
+            <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 w-full snap-start h-full" id={`${id}`}>
+                <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-medium bg-content2 h-[12rem] md:h-[20rem] justify-between">
+                    <div className="relative md:rounded-large z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
+                        <Image fill alt={name} className="hover:scale-95" src={image as string} />
+                    </div>
                 </div>
-
+                <div className="space-y-1">
+                    <h3 className="font-medium line-clamp-1">{name}</h3>
+                    {/* <p className="text-default-500 line-clamp-1">{description}</p> */}
+                </div>
                 <div className="flex gap-3">
                     <Button
                         className={"flex-1"}
@@ -87,7 +80,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
                     </button>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

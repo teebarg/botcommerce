@@ -54,8 +54,8 @@ def admin_index(
 
 @router.post("/", dependencies=[Depends(get_current_user)])
 def create(
-    *, 
-    user: CurrentUser, 
+    *,
+    user: CurrentUser,
     cartId: str = Header(default=None),
     notification: Notification
 ) -> Order:
@@ -77,12 +77,12 @@ def create(
     slack_message = {
         "text": f"🛍️ *New Order Created* 🛍️\n"
                 f"*Order ID:* {order_details.get('order', {}).get('order_id')}\n"
-                f"*Customer:* {user.firstname} {user.lastname}\n" 
+                f"*Customer:* {user.firstname} {user.lastname}\n"
                 f"*Email:* {user.email}\n"
                 f"*Amount:* ${order_details.get('order', {}).get('total', 0)}\n"
                 f"*Payment Status:* ${order_details.get('order', {}).get('payment_status', 0)}"
     }
-    
+
     notification.send_notification(
         channel_name="slack",
         slack_message=slack_message
