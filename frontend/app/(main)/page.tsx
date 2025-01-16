@@ -46,7 +46,7 @@ export default async function Home() {
 
     if (customer) {
         const { wishlists } = await getWishlist();
-        wishlist = wishlists
+        wishlist = wishlists;
     }
 
     return (

@@ -32,7 +32,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
 
     if (customer) {
         const { wishlists } = await getWishlist();
-        wishlist = wishlists
+        wishlist = wishlists;
     }
 
     const { categories: cat } = await getCategories();
