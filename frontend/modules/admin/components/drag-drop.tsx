@@ -8,6 +8,7 @@ import { CancelIcon, UploadIcon } from "nui-react-icons";
 import { FileTrigger } from "@modules/common/components/file-trigger";
 import useWatch from "@lib/hooks/use-watch";
 import { FileTypes } from "types/global";
+import { Button } from "@/components/ui/button";
 
 interface DragNDropProps {
     onSelect: (files: File[]) => void;
@@ -82,9 +83,9 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
                             browse.
                         </button>
                     </p>
-                    <button aria-label="select" className="btn-custom group min-w-48 bg-primary text-primary-foreground" type="button">
+                    <Button color="primary" aria-label="select" className="min-w-48">
                         Select
-                    </button>
+                    </Button>
                 </div>
             </FileTrigger>
             <div className="mt-4" slot="label">

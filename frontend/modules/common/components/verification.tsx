@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Pencil, TriangleRightMini } from "nui-react-icons";
 import React, { useState, useRef, useEffect } from "react";
 
@@ -150,7 +151,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                                             aria-label={`Digit-${index + 1}`}
                                             aria-required="false"
                                             autoComplete="one-time-code"
-                                            className="v-input bg-background focus:border-rose-400 focus:ring-1 focus:ring-rose-400"
+                                            className="text-lg font-bold rounded-md h-10 w-10 text-center bg-background transition-all ease-linear duration-200"
                                             disabled={isLoading}
                                             id={`digit-${index}-field`}
                                             inputMode="numeric"
@@ -177,10 +178,10 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                             </button>
                         </div>
                         <div>
-                            <button
+                            <Button
+                                color="primary"
                                 aria-label="submit"
-                                className="cl-internal-ttumny border-0 shadow-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300
-                                     disabled:cursor-not-allowed transition-colors"
+                                className="w-full"
                                 data-localization-key="formButtonPrimary"
                                 disabled={isLoading || code.join("").length !== 6}
                                 onClick={handleSubmit}
@@ -196,7 +197,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                                         <TriangleRightMini className="w-4 h-4" />
                                     </span>
                                 )}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
