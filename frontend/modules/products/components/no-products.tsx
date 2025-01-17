@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Home, PackageSearch, RefreshCcw } from "nui-react-icons";
 import React from "react";
 
@@ -32,25 +33,14 @@ const NoProductsFound = ({
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
-                    <button
-                        aria-label="clear search"
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg
-                     hover:bg-blue-700 transition-colors duration-200 gap-2"
-                        onClick={onClearSearch}
-                    >
-                        <RefreshCcw className="w-4 h-4" />
+                    <Button aria-label="clear search" color="primary" onClick={onClearSearch} startContent={<RefreshCcw className="w-4 h-4" />}>
                         Clear Search
-                    </button>
+                    </Button>
 
-                    <button
-                        aria-label="home"
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 text-default-500
-                     rounded-lg hover:bg-gray-50 transition-colors duration-200 gap-2"
-                        onClick={onGoHome}
-                    >
+                    <Button variant="bordered" aria-label="home" onClick={onGoHome}>
                         <Home className="w-4 h-4" />
                         Go to Homepage
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Suggested Categories */}
@@ -59,14 +49,9 @@ const NoProductsFound = ({
 
                     <div className="flex flex-wrap justify-center gap-2">
                         {suggestedCategories.map((category) => (
-                            <button
-                                key={category}
-                                aria-label="categories"
-                                className="px-4 py-2 bg-default-100 text-default-900 rounded-full text-sm
-                         hover:bg-gray-200 transition-colors duration-200"
-                            >
+                            <Button key={category} aria-label="categories">
                                 {category}
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 </div>

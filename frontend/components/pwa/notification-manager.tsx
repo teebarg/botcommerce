@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { RightArrowIcon } from "nui-react-icons";
 
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 import { subscribeUser, unsubscribeUser } from "./actions";
 
@@ -159,13 +159,9 @@ function PushNotificationManager() {
                 </div>
             )}
             {newContent && (
-                <button
-                    aria-label="reload page"
-                    className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all flex items-center justify-center"
-                    onClick={handleReload}
-                >
+                <Button color="primary" aria-label="reload page" className="w-full" onClick={handleReload}>
                     New content available
-                </button>
+                </Button>
             )}
         </div>
     );

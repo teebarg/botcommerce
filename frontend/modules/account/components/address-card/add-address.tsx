@@ -39,7 +39,7 @@ const AddAddress = () => {
         <>
             <button
                 aria-label="add address"
-                className="border border-default-100 rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between"
+                className="border border-default-100 rounded-lg p-5 min-h-[200px] flex flex-col justify-between"
                 data-testid="add-address-button"
                 onClick={modalState.open}
             >

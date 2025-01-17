@@ -74,7 +74,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 ref={ref}
                 className={cn(
                     "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
-                    "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity motion-reduce:transition-none hover:opacity-80",
+                    "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
                     buttonConfig[size],
                     variant === "shadow" && buttonConfig[color].shadow,
                     disabled ? "pointer-events-none opacity-50" : "",

@@ -34,7 +34,7 @@ export default function UserDropDown({ customer }: any) {
             dataKey: "account",
             child: (
                 <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
-                    Log out11111
+                    Log out
                 </button>
             ),
         },
@@ -62,7 +62,7 @@ export default function UserDropDown({ customer }: any) {
                                     role="button"
                                     onClick={handleLogout}
                                 >
-                                    Log out2222
+                                    Log out
                                 </span>
                             </div>
                         </div>

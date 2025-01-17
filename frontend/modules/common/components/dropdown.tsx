@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useOverlay, OverlayContainer } from "@react-aria/overlays";
+import { useOverlay } from "@react-aria/overlays";
 import { useButton } from "@react-aria/button";
 
 import { cn } from "@/lib/util/cn";
@@ -15,7 +15,7 @@ interface Props {
     className?: string;
 }
 
-const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOffset = 4, className }) => {
+const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOffset = 6, className }) => {
     const state = useOverlayTriggerState({});
     const buttonRef = React.useRef(null);
     const overlayRef = React.useRef(null);
@@ -55,7 +55,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
                 left = Math.max(4, Math.min(left, viewportWidth - contentRect.width - 4));
 
                 setPopoverPosition({
-                    top: rect.bottom + sideOffset,
+                    top: rect.height + sideOffset,
                     left,
                 });
             };
@@ -77,19 +77,18 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
                 {trigger}
             </button>
             {state.isOpen && (
-                <OverlayContainer>
-                    <div
-                        {...overlayProps}
-                        ref={overlayRef}
-                        className="absolute overflow-auto rounded-md bg-inherit z-40 shadow-lg min-w-[150px]"
-                        style={{
-                            top: popoverPosition.top,
-                            left: popoverPosition.left,
-                        }}
-                    >
-                        {children}
-                    </div>
-                </OverlayContainer>
+                <div
+                    {...overlayProps}
+                    ref={overlayRef}
+                    className="absolute overflow-auto rounded-md bg-inherit z-40 shadow-lg min-w-[150px]"
+                    style={{
+                        top: popoverPosition.top,
+                        left: popoverPosition.left,
+                        opacity: 1,
+                    }}
+                >
+                    {children}
+                </div>
             )}
         </React.Fragment>
     );

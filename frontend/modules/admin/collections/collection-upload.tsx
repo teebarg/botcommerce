@@ -17,11 +17,7 @@ const CollectionUpload: React.FC<CollectionProps> = ({ customer }) => {
         await bulkUploadProducts({ formData });
     };
 
-    return (
-        <div className="">
-            <Excel wsUrl={wsUrl} onUpload={handleUpload} />
-        </div>
-    );
+    return <Excel wsUrl={wsUrl} onUpload={handleUpload} />;
 };
 
 export default CollectionUpload;

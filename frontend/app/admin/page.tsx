@@ -127,7 +127,7 @@ export default async function AdminPage() {
                                 <h5 className="text-small tracking-tight text-default-500">@zoeylang</h5>
                             </div>
                         </div>
-                        <Button className="">Follow</Button>
+                        <Button>Follow</Button>
                     </div>
                     <div className="relative flex w-full p-3 flex-auto flex-col place-content-inherit align-items-inherit h-auto break-words text-left overflow-y-auto px-3 py-0 text-small text-default-500">
                         <p>Frontend developer and UI/UX enthusiast. Join me on this coding adventure!</p>

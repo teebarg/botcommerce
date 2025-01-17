@@ -84,9 +84,7 @@ const Navbar = async () => {
                 <div className="mt-6 flex flex-col gap-2">
                     <NavbarItem className="flex items-center gap-2">
                         <Home className="h-8 w-8" />
-                        <LocalizedClientLink className="" href="/">
-                            Home
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href="/">Home</LocalizedClientLink>
                     </NavbarItem>
                     <NavbarItem className="flex items-center gap-2">
                         <User className="h-8 w-8" viewBox="0 0 20 20" />
@@ -120,14 +118,10 @@ const Navbar = async () => {
 
                 <div className="flex flex-col gap-2">
                     <NavbarItem>
-                        <LocalizedClientLink className="" href="/our-story">
-                            Our Story
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href="/our-story">Our Story</LocalizedClientLink>
                     </NavbarItem>
                     <NavbarItem>
-                        <LocalizedClientLink className="" href={"/support"}>
-                            Contact Us
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href={"/support"}>Contact Us</LocalizedClientLink>
                     </NavbarItem>
                 </div>
                 <div className="mt-auto mb-2 md:hidden">

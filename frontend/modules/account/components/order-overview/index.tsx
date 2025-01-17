@@ -23,7 +23,7 @@ const OrderOverview = ({ orders }: { orders: any[] }) => {
     return (
         <div className="w-full flex flex-col items-center gap-y-4" data-testid="no-orders-container">
             <h2 className="text-lg">Nothing to see here</h2>
-            <p className="">You don&apos;t have any orders yet, let us change that {":)"}</p>
+            <p>You don&apos;t have any orders yet, let us change that {":)"}</p>
             <div className="mt-4">
                 <LocalizedClientLink passHref href="/">
                     <Button color="default" data-testid="continue-shopping-button">

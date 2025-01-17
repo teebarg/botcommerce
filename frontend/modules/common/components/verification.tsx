@@ -131,7 +131,7 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                             </p>
                             <div className="flex gap-2 items-center justify-center">
                                 <p className="font-medium text-sm text-default-500">{email}</p>
-                                <button aria-label="Edit" className="" onClick={onEditEmail}>
+                                <button aria-label="Edit" onClick={onEditEmail}>
                                     <Pencil />
                                 </button>
                             </div>
