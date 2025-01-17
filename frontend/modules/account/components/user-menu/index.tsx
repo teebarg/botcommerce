@@ -13,6 +13,33 @@ export default function UserDropDown({ customer }: any) {
         await signOut();
     };
 
+    const links = [
+        {
+            dataKey: "admin",
+            child: (
+                <span className="flex-1 text-small font-normal truncate">
+                    <LocalizedClientLink href="/account/profile">Profile</LocalizedClientLink>
+                </span>
+            ),
+        },
+        {
+            dataKey: "account",
+            child: (
+                <span className="flex-1 text-small font-normal truncate">
+                    <LocalizedClientLink href="/account">Dashboard</LocalizedClientLink>
+                </span>
+            ),
+        },
+        {
+            dataKey: "account",
+            child: (
+                <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
+                    Log out11111
+                </button>
+            ),
+        },
+    ];
+
     return (
         <React.Fragment>
             <Dropdown
@@ -20,9 +47,9 @@ export default function UserDropDown({ customer }: any) {
                 className="w-full"
                 trigger={
                     <React.Fragment>
-                        <div className="flex items-center gap-2 rounded-small outline-none transition-transform w-full">
-                            <span className="relative overflow-hidden z-0 outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-default">
-                                <Image fill alt="avatar" className="" src={customer?.image || ProfileAvatar} />
+                        <div className="flex gap-2 w-full">
+                            <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-default">
+                                <Image fill alt="avatar" src={customer?.image || ProfileAvatar} />
                             </span>
                             <div className="inline-flex flex-1 justify-between">
                                 <div className="inline-flex flex-col items-start justify-center">
@@ -30,12 +57,12 @@ export default function UserDropDown({ customer }: any) {
                                     <span className="text-tiny text-default-500">{customer?.email}</span>
                                 </div>
                                 <span
-                                    className="md:hidden bg-transparent border-2 border-secondary text-secondary py-0.5 px-4 rounded-full flex items-center mt-2"
+                                    className="md:hidden border-2 border-secondary text-secondary px-4 rounded-full flex items-center"
                                     data-testid="logout-button"
                                     role="button"
                                     onClick={handleLogout}
                                 >
-                                    Log out
+                                    Log out2222
                                 </span>
                             </div>
                         </div>
@@ -47,31 +74,11 @@ export default function UserDropDown({ customer }: any) {
                         <p className="font-bold">Signed in as</p>
                         <p className="font-bold">@{customer?.firstname}</p>
                     </div>
-
-                    <div
-                        className="flex group gap-2 items-center justify-between relative px-2 py-1.5 w-full h-full box-border rounded-small cursor-pointer outline-none"
-                        data-key="admin"
-                    >
-                        <span className="flex-1 text-small font-normal truncate">
-                            <LocalizedClientLink href="/account/profile">Profile</LocalizedClientLink>
-                        </span>
-                    </div>
-                    <div
-                        className="flex group gap-2 items-center justify-between relative px-2 py-1.5 w-full h-full box-border rounded-small cursor-pointer outline-none"
-                        data-key="account"
-                    >
-                        <span className="flex-1 text-small font-normal truncate">
-                            <LocalizedClientLink href="/account">Dashboard</LocalizedClientLink>
-                        </span>
-                    </div>
-                    <div
-                        className="flex group gap-2 items-center justify-between relative px-2 py-1.5 w-full h-full box-border rounded-small cursor-pointer outline-none"
-                        data-key="logout"
-                    >
-                        <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
-                            Log out
-                        </button>
-                    </div>
+                    {links.map((item, index: number) => (
+                        <div key={index} className="px-2 py-1.5 cursor-pointer" data-key={item.dataKey}>
+                            {item.child}
+                        </div>
+                    ))}
                 </div>
             </Dropdown>
         </React.Fragment>
