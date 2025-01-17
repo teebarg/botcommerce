@@ -3,6 +3,7 @@
 import { FC, useEffect, useState } from "react";
 import { useCookie } from "@lib/hooks/use-cookie";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 
 export interface CookieProps {}

@@ -45,7 +45,8 @@ export default async function Home() {
     let wishlist: WishlistItem[] = [];
 
     if (customer) {
-        const { wishlists } = await getWishlist();
+        const { wishlists } = (await getWishlist()) || {};
+
         wishlist = wishlists;
     }
 
@@ -132,11 +133,11 @@ export default async function Home() {
                 <div className="relative h-8 md:h-28">
                     <Image
                         fill
-                        alt="banner"
-                        src="/frontend.webp"
                         priority
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        alt="banner"
                         className="object-contain"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        src="/frontend.webp"
                     />
                 </div>
                 <div className="bg-content1">
@@ -178,11 +179,11 @@ export default async function Home() {
                 <div className="relative h-8 md:h-28">
                     <Image
                         fill
-                        alt="banner"
-                        src="/frontend.webp"
                         priority
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        alt="banner"
                         className="object-contain"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        src="/frontend.webp"
                     />
                 </div>
                 <div className="bg-content1 py-16">

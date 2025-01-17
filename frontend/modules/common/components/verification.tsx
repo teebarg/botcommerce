@@ -1,8 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Pencil, TriangleRightMini } from "nui-react-icons";
 import React, { useState, useRef, useEffect } from "react";
+
+import { Button } from "@/components/ui/button";
 
 interface Props {
     email: string;
@@ -179,9 +180,9 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
                         </div>
                         <div>
                             <Button
-                                color="primary"
                                 aria-label="submit"
                                 className="w-full"
+                                color="primary"
                                 data-localization-key="formButtonPrimary"
                                 disabled={isLoading || code.join("").length !== 6}
                                 onClick={handleSubmit}

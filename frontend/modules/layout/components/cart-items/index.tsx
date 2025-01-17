@@ -1,5 +1,6 @@
 import { Cart } from "nui-react-icons";
 import ItemsPreviewTemplate from "@modules/cart/templates/preview";
+
 import { Button } from "@/components/ui/button";
 
 interface ComponentProps {

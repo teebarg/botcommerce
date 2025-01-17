@@ -11,6 +11,7 @@ import { Brand, Category, Collection } from "types/global";
 
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
+
 import { Button } from "@/components/ui/button";
 
 interface ComponentProps {

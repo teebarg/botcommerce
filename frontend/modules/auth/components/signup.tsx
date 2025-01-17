@@ -11,6 +11,7 @@ import React from "react";
 import { Input } from "@components/ui/input";
 
 import { signUp } from "../action";
+
 import { siteConfig } from "@/lib/config";
 
 type Props = {};

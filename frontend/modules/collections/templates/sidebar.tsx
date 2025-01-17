@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Brand, Category, Collection } from "types/global";
+import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 
 import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
-import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface ComponentProps {
@@ -31,9 +31,11 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
     const onPriceChange = (values: number | number[]) => {
         if (typeof values === "number") {
             updateQuery([{ key: "maxPrice", value: values.toString() }]);
+
             return;
         }
         const [minPrice, maxPrice] = values;
+
         updateQuery([
             { key: "minPrice", value: minPrice.toString() },
             { key: "maxPrice", value: maxPrice.toString() },
@@ -70,17 +72,17 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                 <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>
                 <hr className="shrink-0 border-none w-full h-[1px] my-3 bg-default-100" />
                 <RangeSlider
-                    label="Price"
-                    formatOptions={{ style: "currency", currency: "NGN" }}
-                    maxValue={100000}
                     defaultValue={[Number(searchParams?.minPrice ?? 500), Number(searchParams?.maxPrice ?? 50000)]}
-                    onChange={onPriceChange}
+                    formatOptions={{ style: "currency", currency: "NGN" }}
+                    label="Price"
+                    maxValue={100000}
                     step={500}
+                    onChange={onPriceChange}
                 />
                 <div className="flex flex-col mt-2">
                     <span className="mb-2">Categories</span>
                     {categories?.map((item: Category, index: number) => (
-                        <CheckboxGroup key={index} checkboxes={item.children} groupName={item.name} item={item} facets={facets} />
+                        <CheckboxGroup key={index} checkboxes={item.children} facets={facets} groupName={item.name} item={item} />
                     ))}
                 </div>
                 <div className="flex flex-col mt-2">

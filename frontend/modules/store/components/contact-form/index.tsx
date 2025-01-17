@@ -44,9 +44,9 @@ export default function ContactForm() {
                     validationBehavior="native"
                 />
                 <div className="text-gray-100">
-                    <Checkbox color="danger" defaultSelected label="I allow this website to store my submission." name="agreement" />
+                    <Checkbox defaultSelected color="danger" label="I allow this website to store my submission." name="agreement" />
                 </div>
-                <FormButton color="danger" className="min-w-32" fullWidth={true}>
+                <FormButton className="min-w-32" color="danger" fullWidth={true}>
                     Submit
                 </FormButton>
             </div>

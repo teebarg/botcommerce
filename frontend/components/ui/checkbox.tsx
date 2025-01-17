@@ -34,7 +34,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, color = "default", ...props 
 
     return (
         <React.Fragment>
-            <label data-selected={isSelected} className="flex items-center cursor-pointer group">
+            <label className="flex items-center cursor-pointer group" data-selected={isSelected}>
                 <VisuallyHidden>
                     <input {...mergeProps(inputProps, focusProps)} ref={ref} />
                 </VisuallyHidden>

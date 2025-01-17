@@ -6,9 +6,9 @@ import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist,
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 
 import { CollectionsTopBar } from "./topbar";
+import { CollectionsSideBar } from "./sidebar";
 
 import { ProductCard } from "@/modules/products/components/product-card";
-import { CollectionsSideBar } from "./sidebar";
 
 interface ComponentProps {
     query?: string;
@@ -31,7 +31,8 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     let wishlist: WishlistItem[] = [];
 
     if (customer) {
-        const { wishlists } = await getWishlist();
+        const { wishlists } = (await getWishlist()) || {};
+
         wishlist = wishlists;
     }
 

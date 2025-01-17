@@ -8,6 +8,7 @@ import { removeDiscount, removeGiftCard, submitDiscountForm } from "@modules/che
 import { FormButton } from "@modules/common/components/form-button";
 import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
+
 import { Input } from "@/components/ui/input";
 
 type DiscountCodeProps = {

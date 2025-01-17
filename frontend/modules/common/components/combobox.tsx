@@ -84,10 +84,10 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
                         }}
                     />
                     <ChevronDown
-                        viewBox="0 0 24 24"
                         className={cn("absolute right-3 w-5 h-5 transition-transform duration-500 ease-out", {
                             "rotate-180": state.isOpen,
                         })}
+                        viewBox="0 0 24 24"
                     />
                 </button>
                 {state.isOpen && (

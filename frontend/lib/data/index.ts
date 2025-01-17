@@ -84,6 +84,7 @@ export const getCart = cache(async function (cartId: string) {
 export const getProducts = async (search?: string, collections?: string, page?: number, limit?: number) => {
     const headers = getHeaders([]);
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { search, collections, page, limit });
+
     try {
         const res = await fetch(url, {
             headers: {
@@ -802,6 +803,7 @@ export async function deleteActivities(id: string | number) {
 export const getSiteConfigs = async (skip: number = 0, limit: number = 20): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config/`, { skip, limit });
     const headers = getHeaders(["configs"]);
+
     revalidateTag("configs");
 
     try {

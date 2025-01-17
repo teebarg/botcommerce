@@ -78,7 +78,7 @@ const Search: React.FC<Props> = ({ className }) => {
                 {`I'm looking for...`}
             </Button>
             {modalState.isOpen && (
-                <Modal hasX={false} size="lg" onClose={modalState.close} isOpen={modalState.isOpen}>
+                <Modal hasX={false} isOpen={modalState.isOpen} size="lg" onClose={modalState.close}>
                     <div>
                         <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
                             <MagnifyingGlassMini />

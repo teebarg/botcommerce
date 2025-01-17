@@ -11,6 +11,7 @@ import { Input } from "@components/ui/input";
 
 import { Pagination } from "../pagination";
 import { SlideOver } from "../slideover";
+
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -89,13 +90,13 @@ const Table: React.FC<Props> = ({
                         <div className="flex-1">
                             {canSearch && (
                                 <Input
-                                    size="sm"
                                     classNames={{
                                         base: "w-full sm:max-w-[44%]",
                                         inputWrapper: "border-1",
                                     }}
                                     defaultValue={searchQuery}
                                     placeholder="Search by name..."
+                                    size="sm"
                                     startContent={<Search className="text-default-500" />}
                                     onChange={onSearchChange}
                                     onClear={() => onClear()}

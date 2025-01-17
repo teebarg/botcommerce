@@ -14,6 +14,7 @@ import { Number } from "@components/ui/number";
 import { TextArea } from "@components/ui/textarea";
 
 import { createProduct, uploadProductImage } from "../actions";
+
 import { Button } from "@/components/ui/button";
 
 interface Props {

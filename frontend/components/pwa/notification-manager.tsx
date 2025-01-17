@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
+import { RightArrowIcon } from "nui-react-icons";
+
+import { Button } from "../ui/button";
 
 import { subscribeUser, unsubscribeUser } from "./actions";
-import { Button } from "../ui/button";
-import { RightArrowIcon } from "nui-react-icons";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     try {
@@ -72,6 +73,7 @@ function PushNotificationManager() {
         if (!sub) {
             // Don't auto-subscribe, let user initiate
             setSubscription(null);
+
             return;
         }
 
@@ -82,6 +84,7 @@ function PushNotificationManager() {
     async function handleNotificationOptIn() {
         if (!isSupported) {
             enqueueSnackbar("Push notifications are not supported in your browser", { variant: "error" });
+
             return;
         }
 

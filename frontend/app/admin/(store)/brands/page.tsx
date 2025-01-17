@@ -6,6 +6,7 @@ import { getBrands } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
 import { Chip } from "@modules/common/components/chip";
 import { deleteBrand } from "@modules/admin/actions";
+
 import { BrandForm } from "@/modules/admin/brands/brand-form";
 import { siteConfig } from "@/lib/config";
 
@@ -47,10 +48,10 @@ export default async function BrandsPage({ searchParams }: { searchParams: { sea
                                     </td>
                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
                                         <Actions
-                                            label="brand"
                                             deleteAction={deleteBrand}
                                             form={<BrandForm current={item} type="update" />}
                                             item={item}
+                                            label="brand"
                                             showDetails={false}
                                         />
                                     </td>

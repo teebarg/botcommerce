@@ -1,6 +1,7 @@
-import { siteConfig } from "@/lib/config";
 import { Metadata } from "next";
 import React from "react";
+
+import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
     title: `Settings Page | Children clothing | ${siteConfig.name} Store`,

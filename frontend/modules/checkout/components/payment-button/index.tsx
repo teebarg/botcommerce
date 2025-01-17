@@ -7,6 +7,7 @@ import { Modal } from "@modules/common/components/modal";
 import { useSnackbar } from "notistack";
 import { useOverlayTriggerState } from "react-stately";
 import CheckoutLoginForm from "@modules/account/components/login-form";
+
 import { Button } from "@/components/ui/button";
 
 type PaymentButtonProps = {
@@ -99,7 +100,7 @@ const ManualTestPaymentButton = ({ notReady, customer }: { notReady: boolean; cu
                 Place order
             </Button>
             {modalState.isOpen && (
-                <Modal data-testid="login-modal" size="sm" title="Login" onClose={modalState.close} isOpen={modalState.isOpen}>
+                <Modal data-testid="login-modal" isOpen={modalState.isOpen} size="sm" title="Login" onClose={modalState.close}>
                     <CheckoutLoginForm />
                 </Modal>
             )}

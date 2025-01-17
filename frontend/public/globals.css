@@ -35,40 +35,9 @@ body {
         content: "";
         position: absolute;
         width: 100%;
-        top: 50%;
-        left: 0;
         background-color: inherit;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 3px;
     }
 
-    .chatbot-icon:after {
-        -webkit-transform: rotate(45deg);
-        -moz-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        -o-transform: rotate(45deg);
-        transform: rotate(45deg);
-    }
-
-    .chatbot-icon:before {
-        -webkit-transform: rotate(-45deg);
-        -moz-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        -o-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-    }
-
-    .chatinput-wrapper textarea {
-        resize: none;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        position: absolute;
-        top: 0;
-        left: 0;
-        touch-action: manipulation;
-    }
 
     .chatinput-wrapper pre,
     .chatinput-wrapper textarea {
@@ -76,26 +45,16 @@ body {
         height: 114.3%;
         border-radius: 6px;
         padding: 10px 36px 10px 12px;
-        margin: 0;
-        white-space: pre-wrap;
-        font-size: 16px;
         transform: scale(0.875);
         transform-origin: top left;
         line-height: 20px;
-        overflow: auto;
-        -ms-overflow-style: none;
     }
 
-    /* range slider */    
     /* track line */
     .track:before {
         content: attr(x);
-        display: block;
         position: absolute;
         background: gray;
-    }
-    
-    .slider.horizontal .track:before {
         height: 3px;
         width: 100%;
         top: 50%;

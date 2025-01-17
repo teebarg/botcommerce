@@ -11,6 +11,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
+
 import { Button } from "@/components/ui/button";
 
 const AddAddress = () => {
@@ -47,7 +48,7 @@ const AddAddress = () => {
             </button>
 
             {modalState.isOpen && (
-                <Modal data-testid="add-address-modal" onClose={modalState.close} isOpen={modalState.isOpen}>
+                <Modal data-testid="add-address-modal" isOpen={modalState.isOpen} onClose={modalState.close}>
                     <div className="p-8">
                         <form action={formAction}>
                             <div className="flex flex-col gap-y-2 w-full py-4">

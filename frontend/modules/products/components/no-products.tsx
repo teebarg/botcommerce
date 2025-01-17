@@ -60,8 +60,8 @@ const NoProductsFound = ({
                     <div className="flex flex-wrap justify-center gap-2">
                         {suggestedCategories.map((category) => (
                             <button
-                                aria-label="categories"
                                 key={category}
+                                aria-label="categories"
                                 className="px-4 py-2 bg-default-100 text-default-900 rounded-full text-sm
                          hover:bg-gray-200 transition-colors duration-200"
                             >

@@ -93,7 +93,7 @@ const ChatBot: React.FC<Props> = () => {
     return (
         <React.Fragment>
             <div
-                className="right-0 sm:right-4 bottom-28 fixed z-40 overflow-hidden h-full max-h-[600px] min-h-36 rounded-md translate-y-0 w-[calc(100%-50px)] sm:w-[400px] mt-8 mx-6 mb-0 shadow-lg hidden data-[open=true]:block"
+                className="right-0 sm:right-4 bottom-28 fixed z-40 overflow-hidden h-full max-h-[600px] w-[calc(100%-30px)] sm:w-[400px] mx-4 hidden data-[open=true]:block rounded-md"
                 data-open={isOpen ? "true" : "false"}
             >
                 <header className="py-2 px-3 overflow-hidden rounded-top-corners max-h-full text-white" style={{ background: "rgb(255, 90, 45)" }}>
@@ -191,7 +191,7 @@ const ChatBot: React.FC<Props> = () => {
 
                             <textarea
                                 aria-label="Write a reply..."
-                                className="placeholder:text-ellipsis text-default-900 border-default-500 focus-visible:outline-none border-solid border"
+                                className="placeholder:text-ellipsis text-default-900 border-default-500 focus-visible:outline-none border-solid border resize-none absolute"
                                 id="chat-input"
                                 placeholder="Write a reply..."
                                 value={input}
@@ -220,7 +220,7 @@ const ChatBot: React.FC<Props> = () => {
                 aria-disabled="false"
                 aria-hidden="true"
                 aria-label="Open chat with Max - Unread messages: 1"
-                className="outline-none fixed h-14 w-14 cursor-pointer right-10 bottom-20 md:bottom-12 border-none rounded-50 group block z-40 bg-none data-[open=true]:bg-orange-600 shadow-lg"
+                className="outline-none fixed h-14 w-14 cursor-pointer right-4 md:right-10 bottom-12 border-none rounded-50 group block bg-none data-[open=true]:bg-orange-600 shadow-lg z-50"
                 data-open={isOpen ? "true" : "false"}
                 onClick={toggleChat}
             >
@@ -234,11 +234,11 @@ const ChatBot: React.FC<Props> = () => {
                         </div>
                     </div>
                     <div
-                        className="chatbot-icon hidden relative top-7 left-3 w-8 h-0 opacity-0 group-data-[open=true]:opacity-100 group-data-[open=true]:block leading-4"
+                        className="chatbot-icon hidden relative top-7 left-3 w-8 h-0 opacity-0 group-data-[open=true]:opacity-100 group-data-[open=true]:block leading-4 after:transform after:rotate-45 before:-rotate-45"
                         style={{ backgroundColor: "rgb(255, 255, 255)" }}
                     />
                 </div>
-                <div className="flex justify-center absolute -top-1 -right-1 w-[18px] h-[18px] rounded-50 bg-rose-800 leading-4 text-sm text-white group-data-[open=true]:invisible">
+                <div className="flex justify-center absolute -top-1 -right-1 w-[18px] h-[18px] rounded-50 bg-rose-800 leading-4 text-white group-data-[open=true]:invisible">
                     1
                 </div>
             </div>

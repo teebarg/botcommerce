@@ -9,6 +9,7 @@ import { Switch } from "@modules/common/components/switch";
 import { Input } from "@components/ui/input";
 
 import { createCollection } from "../actions";
+
 import { Button } from "@/components/ui/button";
 
 interface Props {

@@ -4,6 +4,7 @@ import { Category } from "types/global";
 import { getCategories } from "@lib/data";
 import CategoryTree from "@modules/admin/categories/tree";
 import AddCategory from "@modules/admin/categories/add-categories";
+
 import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {

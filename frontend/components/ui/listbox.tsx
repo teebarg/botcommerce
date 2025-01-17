@@ -99,9 +99,9 @@ export const ListboxTrigger = forwardRef<HTMLButtonElement, ListboxTriggerProps>
 
     return (
         <Button
-            aria-label="trigger"
             ref={ref}
             aria-expanded={isOpen}
+            aria-label="trigger"
             className={cn("w-full justify-between hover:bg-warning/50 transition-colors py-6", className)}
             role="combobox"
             type="button"

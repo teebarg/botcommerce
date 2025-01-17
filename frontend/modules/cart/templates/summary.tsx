@@ -4,6 +4,7 @@ import CartTotals from "@modules/common/components/cart-totals";
 import { Cart } from "types/global";
 import DiscountCode from "@modules/checkout/components/discount-code";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
+
 import { Button } from "@/components/ui/button";
 
 type SummaryProps = {

@@ -3,11 +3,12 @@ import { getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
-import Search from "@/modules/search/components/search";
 import { Customer } from "types/global";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 import { HeartFilled, Heart, Home, UserGroup, User } from "nui-react-icons";
 import dynamic from "next/dynamic";
+
+import Search from "@/modules/search/components/search";
 import { siteConfig } from "@/lib/config";
 
 const getThemeToggler = () =>
@@ -59,7 +60,7 @@ const Navbar = async () => {
                     </div>
                     <div className="hidden md:flex items-center">
                         {customer ? (
-                            <LocalizedClientLink href={"/wishlist"} aria-label="go to wishlist">
+                            <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
                                 <HeartFilled className="h-8 w-8 text-primary-500" />
                             </LocalizedClientLink>
                         ) : (

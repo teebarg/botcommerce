@@ -54,11 +54,11 @@ const BannerCarousel: React.FC = () => {
                 >
                     <Image
                         fill
+                        priority
                         alt={banner.title}
                         className="w-full h-full object-cover absolute"
-                        src={banner.image}
-                        priority
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        src={banner.image}
                     />
                     <div className="absolute inset-0 bg-gray-800 bg-opacity-40 flex items-center justify-center">
                         <div className="text-center text-white max-w-2xl px-4">
@@ -80,8 +80,8 @@ const BannerCarousel: React.FC = () => {
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
                 {banners.map((_, index) => (
                     <button
-                        aria-label="indicator"
                         key={index}
+                        aria-label="indicator"
                         className={cn(
                             "w-3 h-3 rounded-full transition-all",
                             index === currentBanner ? "bg-white scale-125" : "bg-white/50 hover:bg-white"

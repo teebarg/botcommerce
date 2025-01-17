@@ -6,6 +6,7 @@ import { DragNDrop } from "@modules/admin/components/drag-drop";
 import { FileTypes } from "types/global";
 import { useSnackbar } from "notistack";
 import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
 
 interface Props {

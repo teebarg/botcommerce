@@ -63,7 +63,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
             </div>
             {/* Delete Modal */}
             {deleteModalState.isOpen && (
-                <Modal onClose={deleteModalState.close} isOpen={deleteModalState.isOpen}>
+                <Modal isOpen={deleteModalState.isOpen} onClose={deleteModalState.close}>
                     <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
                 </Modal>
             )}

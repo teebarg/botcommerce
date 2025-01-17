@@ -1,8 +1,9 @@
-import React from "react";
-import { useSliderState } from "react-stately";
 import type { AriaSliderProps, AriaSliderThumbProps } from "@react-types/slider";
 
+import React from "react";
+import { useSliderState } from "react-stately";
 import { mergeProps, useFocusRing, useNumberFormatter, useSlider, useSliderThumb, VisuallyHidden } from "react-aria";
+
 import { cn } from "@/lib/util/cn";
 
 interface SliderProps extends AriaSliderProps {
@@ -36,7 +37,7 @@ const RangeSlider: React.FC<SliderProps> = ({ color = "primary", ...props }) => 
     };
 
     return (
-        <div {...groupProps} className={`slider ${state.orientation} flex flex-col`}>
+        <div {...groupProps} className="flex flex-col">
             {props.label && (
                 <div className="flex justify-between text-sm">
                     <label {...labelProps}>{props.label}</label>
@@ -65,6 +66,7 @@ const Thumb: React.FC<ThumbProps> = ({ cssClass, ...props }) => {
     );
 
     let { focusProps, isFocusVisible } = useFocusRing();
+
     return (
         <div {...thumbProps} className={cn("thumb top-1/2 rounded-50 w-5 h-5", cssClass, isFocusVisible && "focus", isDragging && "dragging")}>
             <VisuallyHidden>

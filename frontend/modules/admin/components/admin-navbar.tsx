@@ -5,6 +5,7 @@ import ActivityTray from "@modules/common/components/activity-tray";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 import { Home } from "nui-react-icons";
 import dynamic from "next/dynamic";
+
 import { siteConfig } from "@/lib/config";
 
 const getThemeToggler = () =>
