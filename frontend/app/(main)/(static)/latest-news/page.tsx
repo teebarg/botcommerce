@@ -51,7 +51,7 @@ export default function LatestNews() {
                     <div key={item.id} className="bg-content1 rounded-lg shadow-md overflow-hidden">
                         <div className="p-6">
                             <h2 className="text-xl font-semibold mb-2 text-foreground">{item.title}</h2>
-                            <p className="text-gray-600 text-sm mb-4">{item.date}</p>
+                            <p className="text-default-500 text-sm mb-4">{item.date}</p>
                             <p className="mb-4 text-foreground">{item.excerpt}</p>
                             <Link className="text-blue-600 hover:underline" href={`/news/${item.id}`}>
                                 Read more

@@ -6,12 +6,12 @@ import { useSnackbar } from "notistack";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Category } from "types/global";
-import { Switch } from "@modules/common/components/switch";
 import { Input } from "@components/ui/input";
 
 import { createCategory } from "../actions";
 
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
     current?: Category;

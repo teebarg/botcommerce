@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/util/cn";
-import { Spinner } from "../spinner";
+import Link from "next/link";
 
 const buttonConfig: any = {
     primary: {
@@ -41,61 +41,34 @@ const buttonConfig: any = {
     lg: "px-6 min-w-24 h-14 text-medium gap-3 rounded-large",
 };
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    isLoading?: boolean;
+interface BtnLinkProps {
     children: React.ReactNode;
-    endContent?: React.ReactNode;
-    startContent?: React.ReactNode;
     color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
     variant?: "solid" | "bordered" | "flat" | "shadow";
     size?: "sm" | "md" | "lg";
     className?: string;
-    style?: React.CSSProperties;
+    href: string;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    (
-        {
-            className,
-            color = "default",
-            variant = "solid",
-            size = "sm",
-            endContent,
-            startContent,
-            type = "button", // Default to "button"
-            isLoading = false,
-            disabled,
-            children,
-            ...props
-        },
-        ref
-    ) => {
-        return (
-            <button
-                ref={ref}
-                className={cn(
-                    "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
-                    "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
-                    buttonConfig[size],
-                    variant === "shadow" && buttonConfig[color].shadow,
-                    disabled ? "pointer-events-none opacity-50" : "",
-                    buttonConfig[color].color,
-                    variant === "bordered" && buttonConfig[color].bordered,
-                    className
-                )}
-                disabled={isLoading || disabled} // Combine isLoading and disabled logic
-                type={type} // Explicitly forward the type prop
-                {...props}
-            >
-                {isLoading && <Spinner color="current" />}
-                {startContent}
-                {children}
-                {endContent}
-            </button>
-        );
-    }
-);
+const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", variant = "solid", href, className, children, ...props }) => {
+    return (
+        <Link
+            href={href}
+            className={cn(
+                "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
+                "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
+                variant === "shadow" && buttonConfig[color].shadow,
+                buttonConfig[size],
+                buttonConfig[color].color,
+                className
+            )}
+            {...props}
+        >
+            {children}
+        </Link>
+    );
+};
 
-Button.displayName = "Button";
+BtnLink.displayName = "BtnLink";
 
-export { Button };
+export { BtnLink };

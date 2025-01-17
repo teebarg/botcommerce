@@ -8,11 +8,11 @@ import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteProduct, getCollections } from "@modules/admin/actions";
 import { ProductForm } from "@modules/admin/products/product-form";
-import { Badge } from "@modules/common/components/badge";
 import { CheckMini } from "nui-react-icons";
 import { Avatar } from "@modules/common/components/avatar";
 
 import { siteConfig } from "@/lib/config";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,

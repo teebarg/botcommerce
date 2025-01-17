@@ -1,17 +1,20 @@
 import { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Category, Customer, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
-import ContactForm from "@modules/store/components/contact-form";
 import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import FlashBanner from "@components/flash";
-import BannerCarousel from "@components/carousel";
+
+const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
+const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
+const FlashBanner = dynamic(() => import("@components/flash"), { ssr: false });
 
 import { ProductCard } from "@/modules/products/components/product-card";
+
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,

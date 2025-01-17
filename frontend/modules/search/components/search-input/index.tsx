@@ -47,7 +47,7 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
                         aria-expanded="true"
                         autoComplete="off"
                         autoCorrect="off"
-                        className="w-full px-2 h-14 font-sans text-lg outline-none rounded-none bg-transparent text-default-900 placeholder-default-500"
+                        className="w-full px-2 h-14 text-lg focus-visible:outline-none rounded-none bg-transparent text-default-900 placeholder-default-500"
                         data-testid="search-input"
                         placeholder={placeholder}
                         role="combobox"
@@ -56,7 +56,7 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
                         value={value}
                         onChange={onChange}
                     />
-                    {!value && (
+                    {value && (
                         <button
                             aria-label="reset"
                             className="inline-flex justify-center rounded-full w-8 border data-[hover=true]:bg-content2 border-default-500 dark:border-default-100"

@@ -3,12 +3,13 @@ import React from "react";
 
 interface Props {
     className?: string;
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
+    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success" | "current";
     size?: "sm" | "md" | "lg";
 }
 
 const Spinner: React.FC<Props> = ({ size = "sm", color = "primary", className }) => {
     const colorClass = {
+        current: "border-b-current",
         default: "border-b-default",
         primary: "border-b-primary",
         secondary: "border-b-secondary",

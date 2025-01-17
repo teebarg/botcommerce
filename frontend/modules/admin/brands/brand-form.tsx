@@ -5,12 +5,12 @@ import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
-import { Switch } from "@modules/common/components/switch";
 import { Input } from "@components/ui/input";
 
 import { createBrand } from "../actions";
 
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
     current?: any;
