@@ -1,5 +1,6 @@
 import React from "react";
 import { siteConfig } from "@lib/config";
+
 import { BtnLink } from "@/components/ui/btnLink";
 
 const Claim = () => {

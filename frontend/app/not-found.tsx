@@ -1,7 +1,8 @@
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Metadata } from "next";
 import { ExclamationIcon } from "nui-react-icons";
 import React from "react";
+
+import { BtnLink } from "@/components/ui/btnLink";
 
 export const metadata: Metadata = {
     title: "404",
@@ -16,10 +17,10 @@ const NotFound: React.FC<Props> = async () => {
             <div className="max-w-md mx-auto text-center">
                 <ExclamationIcon className="w-20 h-20 mx-auto text-danger" />
                 <h1 className="text-3xl font-bold mt-6">Oops! Page Not Found</h1>
-                <p className="text-default-500 mt-4">{`The page you're looking for doesn't exist or has been moved.`}</p>
-                <LocalizedClientLink className="bg-primary text-white font-semibold py-2 px-4 rounded mt-6 inline-block" href="/">
+                <p className="text-default-500 my-4">{`The page you're looking for doesn't exist or has been moved.`}</p>
+                <BtnLink color="primary" href="/">
                     Go to Home
-                </LocalizedClientLink>
+                </BtnLink>
             </div>
         </div>
     );

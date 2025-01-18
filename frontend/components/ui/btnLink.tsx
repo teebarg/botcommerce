@@ -1,7 +1,7 @@
 import * as React from "react";
+import Link from "next/link";
 
 import { cn } from "@/lib/util/cn";
-import Link from "next/link";
 
 const buttonConfig: any = {
     primary: {
@@ -36,9 +36,9 @@ const buttonConfig: any = {
     },
 
     // Sizes
-    sm: "px-3 min-w-20 h-10 text-tiny gap-2 rounded-small",
-    md: "px-4 min-w-20 h-12 text-small gap-2 rounded-medium",
-    lg: "px-6 min-w-24 h-14 text-medium gap-3 rounded-large",
+    sm: "px-4 min-w-20 h-10 text-tiny gap-2 rounded-small",
+    md: "px-6 min-w-20 h-12 text-small gap-2 rounded-medium",
+    lg: "px-8 min-w-24 h-14 text-medium gap-3 rounded-large",
 };
 
 interface BtnLinkProps {
@@ -53,7 +53,6 @@ interface BtnLinkProps {
 const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", variant = "solid", href, className, children, ...props }) => {
     return (
         <Link
-            href={href}
             className={cn(
                 "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
                 "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
@@ -62,6 +61,7 @@ const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", varia
                 buttonConfig[color].color,
                 className
             )}
+            href={href}
             {...props}
         >
             {children}

@@ -12,6 +12,8 @@ import { Chip } from "@modules/common/components/chip";
 
 import { CartItems } from "../cart-items";
 
+import { BtnLink } from "@/components/ui/btnLink";
+
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;
 }
@@ -91,12 +93,9 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                                 </dl>
                                 {cart?.items?.length && (
                                     <div className="mt-4">
-                                        <LocalizedClientLink
-                                            className="inline-flex items-center justify-center whitespace-nowrap font-normal overflow-hidden px-4 min-w-20 h-10 text-small gap-2 rounded-medium bg-primary text-primary-foreground w-full"
-                                            href={"/checkout"}
-                                        >
+                                        <BtnLink className="w-full" color="primary" href={"/checkout"}>
                                             Checkout
-                                        </LocalizedClientLink>
+                                        </BtnLink>
                                     </div>
                                 )}
                                 <div className="mt-6 flex items-center justify-center text-center text-sm">

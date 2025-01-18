@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { Home, PackageSearch, RefreshCcw } from "nui-react-icons";
 import React from "react";
+
+import { Button } from "@/components/ui/button";
 
 const NoProductsFound = ({
     searchQuery = "",
@@ -33,11 +34,11 @@ const NoProductsFound = ({
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
-                    <Button aria-label="clear search" color="primary" onClick={onClearSearch} startContent={<RefreshCcw className="w-4 h-4" />}>
+                    <Button aria-label="clear search" color="primary" startContent={<RefreshCcw className="w-4 h-4" />} onClick={onClearSearch}>
                         Clear Search
                     </Button>
 
-                    <Button variant="bordered" aria-label="home" onClick={onGoHome}>
+                    <Button aria-label="home" variant="bordered" onClick={onGoHome}>
                         <Home className="w-4 h-4" />
                         Go to Homepage
                     </Button>

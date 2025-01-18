@@ -1,11 +1,10 @@
 "use client";
 
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Order } from "types/global";
 
 import OrderCard from "../order-card";
 
-import { Button } from "@/components/ui/button";
+import { BtnLink } from "@/components/ui/btnLink";
 
 const OrderOverview = ({ orders }: { orders: any[] }) => {
     if (orders?.length) {
@@ -25,11 +24,9 @@ const OrderOverview = ({ orders }: { orders: any[] }) => {
             <h2 className="text-lg">Nothing to see here</h2>
             <p>You don&apos;t have any orders yet, let us change that {":)"}</p>
             <div className="mt-4">
-                <LocalizedClientLink passHref href="/">
-                    <Button color="default" data-testid="continue-shopping-button">
-                        Continue shopping
-                    </Button>
-                </LocalizedClientLink>
+                <BtnLink data-testid="continue-shopping-button" href="/">
+                    Continue shopping
+                </BtnLink>
             </div>
         </div>
     );

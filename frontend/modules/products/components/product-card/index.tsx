@@ -50,4 +50,4 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
     );
 };
 
-export { ProductCard };
+export default ProductCard;

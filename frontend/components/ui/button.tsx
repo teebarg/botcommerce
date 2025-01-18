@@ -1,7 +1,8 @@
 import * as React from "react";
 
-import { cn } from "@/lib/util/cn";
 import { Spinner } from "../spinner";
+
+import { cn } from "@/lib/util/cn";
 
 const buttonConfig: any = {
     primary: {

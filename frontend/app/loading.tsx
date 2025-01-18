@@ -1,5 +1,6 @@
-import { Spinner } from "@/components/spinner";
 import React from "react";
+
+import { Spinner } from "@/components/spinner";
 
 const Loader = () => {
     return (

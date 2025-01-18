@@ -51,7 +51,7 @@ const OfflinePage = () => {
                 </p>
 
                 {/* Retry Button */}
-                <Button aria-label="retry" color="warning" className="px-8  text-white" disabled={isRetrying} onClick={handleRetry}>
+                <Button aria-label="retry" className="px-8  text-white" color="warning" disabled={isRetrying} onClick={handleRetry}>
                     <RefreshCcw className={cn("w-5 h-5", isRetrying && "animate-spin")} />
                     {isRetrying ? "Retrying..." : "Try Again"}
                 </Button>

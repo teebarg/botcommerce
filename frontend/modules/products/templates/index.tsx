@@ -11,6 +11,7 @@ import Image from "next/image";
 import ProductDetails from "./details";
 
 import { currency } from "@/lib/util/util";
+import { BtnLink } from "@/components/ui/btnLink";
 
 type ProductTemplateProps = {
     product: Product;
@@ -111,12 +112,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({ product }) => {
                 </Suspense>
             </div>
             <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg md:hidden">
-                <LocalizedClientLink
-                    className="relative inline-flex items-center justify-center outline-none px-3 h-10 rounded-small bg-transparent border border-default-500 text-default-500"
-                    href="/"
-                >
+                <BtnLink href="/" variant="bordered">
                     <Home />
-                </LocalizedClientLink>
+                </BtnLink>
                 <ProductActions btnClassName="font-semibold" className="w-full" product={product} showPrice={false} />
             </div>
         </React.Fragment>

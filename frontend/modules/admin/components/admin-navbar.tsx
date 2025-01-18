@@ -54,9 +54,7 @@ const AdminNavbar = async () => {
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     <NavbarItem className="flex items-center gap-2">
                         <Home className="h-8 w-8" />
-                        <LocalizedClientLink href="/">
-                            Home
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href="/">Home</LocalizedClientLink>
                     </NavbarItem>
                 </div>
             </NavbarMenu>

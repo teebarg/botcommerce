@@ -8,12 +8,13 @@ import { Modal } from "@modules/common/components/modal";
 import { Kbd } from "@modules/common/components/kbd";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 import { Button } from "@/components/ui/button";
 import { Product, SearchParams } from "@/types/global";
-import { ProductCard } from "@/modules/products/components/product-card";
 import NoProductsFound from "@/modules/products/components/no-products";
 import { debounce } from "@/lib/util/util";
+const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
 
 interface Props {
     className?: string;

@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { RightArrowIcon } from "nui-react-icons";
 
-import { Button } from "@/components/ui/button";
-
 import { subscribeUser, unsubscribeUser } from "./actions";
+
+import { Button } from "@/components/ui/button";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     try {
@@ -159,7 +159,7 @@ function PushNotificationManager() {
                 </div>
             )}
             {newContent && (
-                <Button color="primary" aria-label="reload page" className="w-full" onClick={handleReload}>
+                <Button aria-label="reload page" className="w-full" color="primary" onClick={handleReload}>
                     New content available
                 </Button>
             )}

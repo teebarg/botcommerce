@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import EmptyCart from "@/public/empty-cart.png";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import { BtnLink } from "@/components/ui/btnLink";
 
 const EmptyCartMessage = () => {
     return (
@@ -9,9 +9,7 @@ const EmptyCartMessage = () => {
             <Image alt={"Empty cart"} className="w-40" src={EmptyCart} />
             <p className="text-xl font-semibold">Your cart is empty</p>
             <p className="text-default-500 font-medium">Continue shopping to explore more.</p>
-            <LocalizedClientLink className="text-default py-2 px-4 bg-default-foreground rounded-md font-medium" href="/collections">
-                Explore items
-            </LocalizedClientLink>
+            <BtnLink href="/collections">Explore items</BtnLink>
         </div>
     );
 };

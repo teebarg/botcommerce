@@ -1,13 +1,13 @@
 "use client";
 
 import { Cart } from "types/global";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
+import { BtnLink } from "@/components/ui/btnLink";
 
 type SummaryProps = {
     cart: Cart;
@@ -61,13 +61,10 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                     <p>{getAmount(total)}</p>
                 </div>
             </div>
-            <div className="flex flex-row-reverse gap-2 px-2 py-2">
-                <LocalizedClientLink
-                    className="relative inline-flex items-center justify-center outline-none px-3 h-10 rounded-small bg-transparent border border-rose-500 text-rose-500"
-                    href="/checkout"
-                >
+            <div className="flex flex-row-reverse gap-2 p-2">
+                <BtnLink color="danger" href="/checkout" variant="bordered">
                     Checkout ({cart?.items?.length ?? 0})
-                </LocalizedClientLink>
+                </BtnLink>
                 <Button
                     className="bg-inherit"
                     endContent={<ChevronDown className={cn("transition-all duration-500", isExpanded && "rotate-180")} />}
