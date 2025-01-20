@@ -1,15 +1,15 @@
 import { Metadata } from "next";
 import Footer from "@modules/layout/templates/footer";
-import Navbar from "@modules/layout/templates/nav";
 import React from "react";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { Banner } from "@modules/common/components/banner";
-import { Cookie } from "@modules/store/components/cookie";
-import ChatBot from "@components/chatbot";
-
-import Search from "@/modules/search/components/search";
-import { ButtonNav } from "@/components/bottom-navbar";
 import { BackButton } from "@/components/back";
+import dynamic from "next/dynamic";
+
+const Banner = dynamic(() => import("@modules/common/components/banner"), { ssr: false });
+const ButtonNav = dynamic(() => import("@/components/bottom-navbar"), { ssr: false });
+const Cookie = dynamic(() => import("@modules/store/components/cookie"), { ssr: false });
+const ChatBot = dynamic(() => import("@components/chatbot"), { ssr: false });
+const Navbar = dynamic(() => import("@modules/layout/templates/nav"), { ssr: false });
+const Search = dynamic(() => import("@/modules/search/components/search"), { ssr: false });
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 
@@ -21,13 +21,6 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
         <React.Fragment>
             <Banner />
-            <div className="flex items-center justify-center">
-                <div className="hidden md:flex w-full items-center justify-center gap-x-3 border-b-1 border-divider bg-gradient-to-r from-default-100 via-primary-100 to-secondary-100 px-6 py-2 text-center">
-                    <LocalizedClientLink className="text-medium no-underline text-inherit font-semibold" href={"/collections"} role="link">
-                        GET FREE SHIPPING ON ₦20,000+ View Details
-                    </LocalizedClientLink>
-                </div>
-            </div>
             <Navbar />
             <div className="px-4 py-2 md:hidden sticky top-0 z-40 bg-background flex items-center gap-4 select-none">
                 <BackButton />

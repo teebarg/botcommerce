@@ -68,7 +68,7 @@ const SubMenuComponent: React.FC<{
             <button
                 aria-label="open"
                 className={cn(
-                    "w-full flex items-center justify-between p-4 text-default-500 hover:text-default-500",
+                    "w-full flex items-center justify-between p-4 text-pink-900 dark:text-default-900 hover:text-default-500",
                     "transition-colors duration-200 group",
                     {
                         "pl-4": level === 0,
@@ -127,7 +127,7 @@ const MenuItemComponent: React.FC<{
         <MenuLink
             className={cn(
                 "flex items-center justify-between p-4 transition-all duration-200 group",
-                item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-500 hover:text-default-500",
+                item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-default-900 hover:text-default-500",
                 {
                     "pl-4": level === 0,
                     "pl-8 hover:bg-content2 bg-content1": level === 1,
@@ -333,7 +333,7 @@ const SideBar: React.FC = () => {
                 {navs.map((nav, index: number) => (
                     <React.Fragment key={index}>
                         <div className={cn("px-4 mb-2 transition-opacity duration-200 mt-8 first:mt-0", isCollapsed ? "opacity-0" : "opacity-70")}>
-                            <p className="text-xs font-bold text-default-500 uppercase tracking-wider">{nav.group}</p>
+                            <p className="text-xs font-bold text-default-900 uppercase tracking-wider">{nav.group}</p>
                         </div>
 
                         <nav>

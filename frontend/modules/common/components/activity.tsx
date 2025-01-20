@@ -40,7 +40,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
         }
     };
 
-    if (activities.length == 0) {
+    if (activities?.length == 0) {
         return (
             <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-white to-gray-50 border border-gray-100 rounded-lg shadow-sm h-full">
                 <div className="relative mb-6">
@@ -88,7 +88,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
         <React.Fragment>
             <div className="text-lg font-semibold pt-7 pl-8 pb-1">Activity</div>
             <div>
-                {activities.map((item: Activity, index: number) => (
+                {activities?.map((item: Activity, index: number) => (
                     <div key={index} className="border-default-100 mx-8 border-b last:border-b-0">
                         <div className="hover:bg-default-100 -mx-8 flex px-8 py-6">
                             <div className="relative h-full w-full">

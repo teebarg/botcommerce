@@ -8,6 +8,8 @@ from app.core.config import settings
 from app.core.utils import generate_id
 from app.models.generic import CartDetails, CartItemIn
 from app.models.message import Message
+from app.core.decorators import cache
+from app.core.deps import ( CacheService )
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
@@ -22,9 +24,8 @@ router = APIRouter()
 
 
 @router.get("/")
-def index(
-    cartId: str = Header(default=None),
-) -> Any:
+@cache(key="cart")
+async def index(cartId: str = Header(default=None)) -> Any:
     """
     Retrieve cart.
     """
@@ -34,43 +35,84 @@ def index(
 @router.post("/add")
 async def add_to_cart(
     cart_in: CartItemIn,
-    cartId: str = Header(default=None)
+    cache: CacheService,
+    cartId: str = Header(default=None),
 ):
 
     doc = await get_product(product_id=cart_in.product_id)
     id = str(doc.get("id"))
     cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
-    return cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
+    try:
+        cart = cart_handler.add_to_cart(cart_id=cartId, item=cart_item)    
+        # Invalidate cache
+        cache.invalidate("cart")
+        return cart
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{e}",
+        ) from e
 
 
 @router.post("/create")
-async def create_cart():
+async def create_cart(cache: CacheService):
     id = generate_id()
-    return cart_handler.create_cart(cart_id=id, customer_id="", email="")
+    try:
+        cart = cart_handler.create_cart(cart_id=id, customer_id="", email="")    
+        # Invalidate cache
+        cache.invalidate("cart")
+        return cart
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{e}",
+        ) from e
 
 
 @router.post("/update")
-async def update_cart(cart_in: CartItemIn, cartId: str = Header(default=None)):
-    return cart_handler.update_cart_quantity(
-        cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity
-    )
+async def update_cart(cart_in: CartItemIn, cache: CacheService, cartId: str = Header(default=None)):
+    try:
+        cart = cart_handler.update_cart_quantity(
+            cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity
+        )    
+        # Invalidate cache
+        cache.delete(f"cart:{cartId}")
+        return cart
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{e}",
+        ) from e
 
 
 @router.patch("/update-cart-details")
 async def update_cart_details(
-    cart_update: CartDetails, cartId: str = Header(default=None)
+    cart_update: CartDetails, cache: CacheService, cartId: str = Header(default=None)
 ):
-    update_data = cart_update.dict(exclude_unset=True)
-    return cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
+    try:
+        update_data = cart_update.dict(exclude_unset=True)
+        cart = cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
+   
+        # Invalidate cache
+        cache.delete(f"cart:{cartId}")
+        return cart
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{e}",
+        ) from e
 
 
 @router.delete("/{id}")
-def delete(id: str, cartId: str = Header(default=None)) -> Message:
+async def delete(id: str, cache: CacheService, cartId: str = Header(default=None)) -> Message:
     """
     Delete item from cart.
     """
     try:
-        return cart_handler.remove_from_cart(cart_id=cartId, item_id=id)
+        cart = cart_handler.remove_from_cart(cart_id=cartId, item_id=id)
+        # Invalidate cache
+        cache.delete(f"cart:{cartId}")
+        return cart
     except Exception as e:
         raise HTTPException(
             status_code=500,

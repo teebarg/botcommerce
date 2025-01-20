@@ -15,7 +15,7 @@ interface Banner {
 
 const banners: Banner[] = [
     {
-        image: "https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-1.avif",
+        image: "https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fbanner2.jpg?alt=media",
         title: "Luxury Collection",
         subtitle: "Timeless Elegance Awaits",
         link: "/collections",
@@ -27,7 +27,7 @@ const banners: Banner[] = [
         link: "/collections",
     },
     {
-        image: "https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-3.avif",
+        image: "https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fbanner1.jpg?alt=media",
         title: "Limited Edition",
         subtitle: "Rare Pieces, Unmatched Quality",
         link: "/collections",
@@ -46,7 +46,7 @@ const BannerCarousel: React.FC = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-[500px] overflow-hidden rounded-md">
+        <div className="relative w-full min-h-[500px] h-full overflow-hidden rounded-md">
             {banners.map((banner, index) => (
                 <div
                     key={index}

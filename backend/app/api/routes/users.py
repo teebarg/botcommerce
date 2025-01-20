@@ -76,17 +76,6 @@ async def update_user_me(
             status_code=400,
             detail=f"{e}",
         ) from e
-    # user_data = user_in.model_dump(exclude_unset=True)
-    # current_user.sqlmodel_update(user_data)
-    # session.add(current_user)
-    # session.commit()
-    # session.refresh(current_user)
-
-    # # Invalidate user cache
-    # cache.delete(f"user:{current_user.id}")
-    # cache.delete(f"user:{current_user.email}")
-
-    # return current_user
 
 
 @router.get("/wishlist")

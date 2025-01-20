@@ -3,7 +3,7 @@
 import { signOut } from "@modules/account/actions";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import React from "react";
-import Dropdown from "@modules/common/components/dropdown";
+import Dropdown from "@/components/ui/dropdown";
 import Image from "next/image";
 
 import ProfileAvatar from "@/public/profile.svg";

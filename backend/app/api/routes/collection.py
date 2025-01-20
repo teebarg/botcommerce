@@ -31,10 +31,7 @@ from app.core import crud
 router = APIRouter()
 
 
-@router.get(
-    "/",
-    dependencies=[],
-)
+@router.get("/")
 @cache(key="collections")
 async def index(
     db: SessionDep,

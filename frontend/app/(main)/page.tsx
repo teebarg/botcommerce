@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Category, Customer, Product, SearchParams, WishlistItem } from "types/global";
+import { Category, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
@@ -8,7 +8,6 @@ import { imgSrc } from "@lib/util/util";
 import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-
 import { BtnLink } from "@/components/ui/btnLink";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
@@ -36,15 +35,14 @@ async function getLandingProducts(collection: string, limit: number = 4): Promis
 }
 
 export default async function Home() {
-    const [trending, latest, featured] = await Promise.all([
+    const [trending, latest, featured, { categories }, customer] = await Promise.all([
         getLandingProducts("trending"),
         getLandingProducts("latest"),
         getLandingProducts("featured", 6),
+        getCategories(),
+        getCustomer(),
     ]);
 
-    const { categories } = await getCategories();
-
-    const customer: Customer = await getCustomer();
     let wishlist: WishlistItem[] = [];
 
     if (customer) {

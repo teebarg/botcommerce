@@ -25,7 +25,7 @@ export default async function CategoriesPage({ searchParams }: { searchParams: {
                 <div className="max-w-7xl mx-auto p-8">
                     <div className="flex h-full grow flex-col">
                         <div className="flex w-full grow flex-col">
-                            <div className="rounded-md border-default-100 flex h-full w-full flex-col overflow-hidden border min-h-[350px]">
+                            <div className="rounded-md border-default/20 flex h-full w-full flex-col overflow-hidden border min-h-[350px]">
                                 <div>
                                     <div className="p-8 border-default-100 border-b border-solid">
                                         <div className="flex items-start justify-between">

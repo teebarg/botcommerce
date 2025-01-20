@@ -63,4 +63,4 @@ const Banner: React.FC<ComponentProps> = () => {
     );
 };
 
-export { Banner };
+export default Banner;
