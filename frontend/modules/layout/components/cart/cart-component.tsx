@@ -108,7 +108,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                         </React.Fragment>
                     }
                     isOpen={state.isOpen}
-                    title="Carts"
+                    title="Cart"
                     onClose={closeSlideOver}
                 >
                     <CartItems cartItems={cart?.items} />

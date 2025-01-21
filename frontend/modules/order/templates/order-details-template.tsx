@@ -3,12 +3,12 @@
 import { XMark } from "nui-react-icons";
 import React from "react";
 import Help from "@modules/order/components/help";
-import Items from "@modules/order/components/items";
 import OrderDetails from "@modules/order/components/order-details";
 import OrderSummary from "@modules/order/components/order-summary";
 import ShippingDetails from "@modules/order/components/shipping-details";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Order } from "types/global";
+import Items from "@/components/order/cart-details";
 
 type OrderDetailsTemplateProps = {
     order: Order;

@@ -59,7 +59,7 @@ export default async function Home() {
                         <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
                             <ul className="bg-primary/10">
-                                {categories.map((item: Category, index: number) => (
+                                {categories?.map((item: Category, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink
                                             className="font-medium border border-primary/20 p-3 block hover:bg-primary/20"

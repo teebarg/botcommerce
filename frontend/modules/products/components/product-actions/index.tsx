@@ -7,6 +7,7 @@ import { Product } from "types/global";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 
 type ProductActionsProps = {
     product: Product;
@@ -43,7 +44,6 @@ export default function ProductActions({
     if (!product) {
         return null;
     }
-
     // add the selected variant to the cart
     const handleAddToCart = async () => {
         setIsAdding(true);
@@ -75,7 +75,9 @@ export default function ProductActions({
                 )}
                 <div className="flex-1 hidden group-data-[has-details=true]:block mb-4">
                     <h3 className="text-xs md:text-base font-semibold tracking-tight leading-4 text-default-900 line-clamp-1 mb-auto">
-                        {product.name}
+                        <LocalizedClientLink href={`/products/${product.slug}`} id={`${product.id}`}>
+                            {product.name}
+                        </LocalizedClientLink>
                     </h3>
                 </div>
             </div>

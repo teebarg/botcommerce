@@ -86,7 +86,7 @@ async def create(*, db: SessionDep, create_data: CollectionCreate, cache: CacheS
 
 
 @router.get("/{id}")
-@cache(key="collection")
+@cache(key="collection", hash=False)
 async def read(id: int, db: SessionDep) -> Collection:
     """
     Get a specific collection by id with Redis caching.
@@ -99,7 +99,7 @@ async def read(id: int, db: SessionDep) -> Collection:
 
 
 @router.get("/slug/{slug}")
-@cache(key="collection")
+@cache(key="collection", hash=False)
 async def get_by_slug(slug: str, db: SessionDep) -> Collection:
     """
     Get a collection by its slug.

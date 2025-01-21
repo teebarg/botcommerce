@@ -40,12 +40,17 @@ async def add_to_cart(
 ):
 
     doc = await get_product(cache=cache, product_id=cart_in.product_id)
+    if not doc:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not find product",
+        )
     id = str(doc.get("id"))
     cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
     try:
-        cart = cart_handler.add_to_cart(cart_id=cartId, item=cart_item)    
+        cart = cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
         # Invalidate cache
-        cache.delete("cart")
+        cache.delete(f"cart:{cartId}")
         return cart
     except Exception as e:
         raise HTTPException(
@@ -58,7 +63,7 @@ async def add_to_cart(
 async def create_cart():
     id = generate_id()
     try:
-        return cart_handler.create_cart(cart_id=id, customer_id="", email="")    
+        return cart_handler.create_cart(cart_id=id, customer_id="", email="")
     except Exception as e:
         raise HTTPException(
             status_code=400,
@@ -71,7 +76,7 @@ async def update_cart(cart_in: CartItemIn, cache: CacheService, cartId: str = He
     try:
         cart = cart_handler.update_cart_quantity(
             cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity
-        )    
+        )
         # Invalidate cache
         cache.delete(f"cart:{cartId}")
         return cart
@@ -89,7 +94,7 @@ async def update_cart_details(
     try:
         update_data = cart_in.dict(exclude_unset=True)
         cart = cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
-   
+
         # Invalidate cache
         cache.delete(f"cart:{cartId}")
         return cart

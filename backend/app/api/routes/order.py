@@ -47,6 +47,7 @@ async def index(user: CurrentUser) -> Orders:
 
 
 @router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
+@cache(key="orders")
 async def admin_index(
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -54,8 +55,7 @@ async def admin_index(
     """
     Retrieve orders.
     """
-    orders = order_handler.get_paginated_orders(page=page, limit=limit)
-    return orders
+    return order_handler.get_paginated_orders(page=page, limit=limit)
 
 
 @router.post("/", dependencies=[Depends(get_current_user)])
@@ -102,7 +102,7 @@ async def create(
 
 
 @router.get("/{id}", dependencies=[Depends(get_current_user)])
-@cache(key="order")
+@cache(key="order", hash=False)
 async def read(id: str, user: CurrentUser) -> Any:
     """
     Get a specific order by order_number.
@@ -111,11 +111,9 @@ async def read(id: str, user: CurrentUser) -> Any:
     if not user:
         return {"message": "User details not found"}
 
-    order_details = order_handler.get_order(
+    return order_handler.get_order(
         order_id=id, user_id=user.id, is_admin=user.is_superuser
     )
-
-    return order_details
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_active_superuser)])
