@@ -29,7 +29,6 @@ LOGGING_CONFIG = {
 
 # Apply the logging configuration
 # logging.config.dictConfig(LOGGING_CONFIG)
-logging.basicConfig(level=logging.INFO)
 
-# Use the logger in your application
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

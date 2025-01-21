@@ -105,10 +105,18 @@ def cache(expire: int = 86400, key: str | None = None):
             # Compute the result, cache it, and return it
             result = await func(*args, **kwargs)
 
-            if isinstance(result, dict):
-                cache_service.set(cache_key, json.dumps(result), expire)
-            else:
-                cache_service.set(cache_key, result.model_dump_json(), expire)
+            try:
+                if isinstance(result, dict):
+                    serialized_result = json.dumps(result)
+                elif hasattr(result, "model_dump_json"):
+                    serialized_result = result.model_dump_json()  # For Pydantic v2.x
+                elif hasattr(result, "json"):
+                    serialized_result = result.json()  # For Pydantic v1.x
+                else:
+                    raise Exception("Cannot serialize result")
+                cache_service.set(cache_key, serialized_result, expire)
+            except Exception as e:
+                raise ValueError(f"Failed to serialize result: {e}")
             return result
 
         return wrapped

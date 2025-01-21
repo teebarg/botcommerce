@@ -59,8 +59,6 @@ select = [
     "UP",  # pyupgrade
     "ARG001", # unused arguments in functions
     "C90",    # mccabe
-    "Q",      # flake8-quotes
-    "RUF100", # Unused noqa directive
 ]
 ignore = [
     "E501",  # line too long, handled by black
