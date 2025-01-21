@@ -68,7 +68,7 @@ def limit(rate_string: str):
     return decorator
 
 
-def cache(expire: int = 86400, key: str | None = None):
+def cache(expire: int = 86400, key: str | None = None, hash: bool = True):
     """
     Decorator to cache the result of a function.
     Args:
@@ -85,7 +85,10 @@ def cache(expire: int = 86400, key: str | None = None):
         Returns:
             str: A hash representing the cache key.
         """
-        temp_kwargs = hashlib.sha256(":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache"]]).encode()).hexdigest()
+        temp_kwargs = ":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache", "cart_in"]])
+        if hash:
+            temp_kwargs = hashlib.sha256(temp_kwargs.encode()).hexdigest()
+            
         return f"{key or func_name}:{temp_kwargs}"
 
     def decorator(func: Callable):

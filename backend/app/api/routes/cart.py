@@ -24,7 +24,7 @@ router = APIRouter()
 
 
 @router.get("/")
-@cache(key="cart")
+@cache(key="cart", hash=False)
 async def index(cartId: str = Header(default=None)) -> Any:
     """
     Retrieve cart.
@@ -39,13 +39,13 @@ async def add_to_cart(
     cartId: str = Header(default=None),
 ):
 
-    doc = await get_product(product_id=cart_in.product_id)
+    doc = await get_product(cache=cache, product_id=cart_in.product_id)
     id = str(doc.get("id"))
     cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
     try:
         cart = cart_handler.add_to_cart(cart_id=cartId, item=cart_item)    
         # Invalidate cache
-        cache.invalidate("cart")
+        cache.delete("cart")
         return cart
     except Exception as e:
         raise HTTPException(
@@ -55,13 +55,10 @@ async def add_to_cart(
 
 
 @router.post("/create")
-async def create_cart(cache: CacheService):
+async def create_cart():
     id = generate_id()
     try:
-        cart = cart_handler.create_cart(cart_id=id, customer_id="", email="")    
-        # Invalidate cache
-        cache.invalidate("cart")
-        return cart
+        return cart_handler.create_cart(cart_id=id, customer_id="", email="")    
     except Exception as e:
         raise HTTPException(
             status_code=400,
@@ -87,10 +84,10 @@ async def update_cart(cart_in: CartItemIn, cache: CacheService, cartId: str = He
 
 @router.patch("/update-cart-details")
 async def update_cart_details(
-    cart_update: CartDetails, cache: CacheService, cartId: str = Header(default=None)
+    cart_in: CartDetails, cache: CacheService, cartId: str = Header(default=None)
 ):
     try:
-        update_data = cart_update.dict(exclude_unset=True)
+        update_data = cart_in.dict(exclude_unset=True)
         cart = cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
    
         # Invalidate cache

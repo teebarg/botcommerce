@@ -40,6 +40,6 @@ async def get_product(cache, product_id: str) -> dict | None:
     doc = get_document_by_id("products", product_id)
 
     # Cache the result
-    cache.setex(key, CACHE_EXPIRY, json.dumps(doc))
+    cache.set(key, CACHE_EXPIRY, json.dumps(doc))
 
     return doc
