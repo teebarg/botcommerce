@@ -24,7 +24,7 @@ interface ComponentProps {
 }
 
 const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, brands = [], categories = [], collections = [] }) => {
-    const { updateQuery } = useUpdateQuery(1000);
+    const { updateQuery } = useUpdateQuery();
     const [value, setValue] = React.useState<string>(sortBy || "created_at:desc");
     const state = useOverlayTriggerState({});
 

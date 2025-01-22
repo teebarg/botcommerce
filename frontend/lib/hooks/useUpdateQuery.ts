@@ -1,6 +1,7 @@
-import { useCallback } from "react";
+import { startTransition, useCallback } from "react";
 import { debounce } from "@lib/util/util";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useProgressBar } from "@/components/ui/progress-bar";
 
 interface QueryParam {
     key: string;
@@ -11,6 +12,7 @@ const useUpdateQuery = (delay = 500) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    let progress = useProgressBar();
 
     const updateQuery = useCallback(
         debounce((data: QueryParam[]) => {
@@ -24,7 +26,12 @@ const useUpdateQuery = (delay = 500) => {
                 }
                 params.set(key, value);
             });
-            router.push(`${pathname}?${params.toString()}`);
+            progress.start();
+
+            startTransition(() => {
+                router.push(`${pathname}?${params.toString()}`);
+                progress.done();
+            });
         }, delay),
         [searchParams]
     );

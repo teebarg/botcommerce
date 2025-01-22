@@ -30,7 +30,7 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
                             </div>
                             <div className="flex flex-1 flex-col">
                                 <div className="text-sm">
-                                    <LocalizedClientLink href={`/products/${item.slug}`} role="link">
+                                    <LocalizedClientLink href={`/products/${item.slug}`}>
                                         <p className="font-semibold text-default-900 truncate max-w-40">{item.name}</p>
                                     </LocalizedClientLink>
                                 </div>
