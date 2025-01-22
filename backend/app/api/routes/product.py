@@ -208,19 +208,6 @@ async def create(*, db: SessionDep, product_in: ProductCreate, cache: CacheServi
     return product
 
 
-@router.get("/{id}")
-@cache(key="product", hash=False)
-async def read(id: int, db: SessionDep) -> ProductPublic:
-    """
-    Get a specific product by id with Redis caching.
-    """
-    product = crud.product.get(db=db, id=id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-
-    return product
-
-
 @router.get("/{slug}")
 @cache(key="product", hash=False)
 async def read(slug: str, db: SessionDep) -> ProductPublic:
