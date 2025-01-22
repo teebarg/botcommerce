@@ -13,8 +13,8 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
-from app.core.decorators import cache
 from app.core import crud
+from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     CurrentUser,

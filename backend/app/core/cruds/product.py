@@ -1,9 +1,9 @@
 from typing import Any
 
-from app.core.cruds.base import BaseCRUD
 from sqlmodel import Session, select
 
 from app.core import crud
+from app.core.cruds.base import BaseCRUD
 from app.core.logging import logger
 from app.core.utils import generate_slug
 from app.models.generic import Brand, Category, Collection, Product, Tag

@@ -1,8 +1,8 @@
-from app.core.cruds.base import BaseCRUD
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from app.core import crud
+from app.core.cruds.base import BaseCRUD
 from app.core.security import get_password_hash
 from app.models.generic import User, Wishlist
 from app.models.user import UserCreate, UserUpdate

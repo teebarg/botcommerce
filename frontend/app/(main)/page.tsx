@@ -8,6 +8,7 @@ import { imgSrc } from "@lib/util/util";
 import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
+
 import { BtnLink } from "@/components/ui/btnLink";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });

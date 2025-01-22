@@ -13,8 +13,15 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
+from app.core import crud
 from app.core.decorators import cache
-from app.core.deps import CacheService, CurrentUser, SessionDep, Storage, get_current_user
+from app.core.deps import (
+    CacheService,
+    CurrentUser,
+    SessionDep,
+    Storage,
+    get_current_user,
+)
 from app.core.logging import logger
 from app.models.collection import (
     CollectionCreate,
@@ -25,7 +32,6 @@ from app.models.collection import (
 from app.models.generic import Collection
 from app.models.message import Message
 from app.services.export import export, process_file, validate_file
-from app.core import crud
 
 # Create a router for collections
 router = APIRouter()

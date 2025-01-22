@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ErrorMessage from "@modules/checkout/components/error-message";
-import { CheckCircleSolid, CreditCard, Spinner } from "nui-react-icons";
+import { CheckCircleSolid, CreditCard } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
 import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
@@ -13,6 +13,7 @@ import { Tooltip } from "@components/ui/tooltip";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/spinner";
 
 const payMethods = [
     { id: "stripe", provider_id: "Stripe" },
@@ -116,7 +117,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                             </p>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center px-4 py-16 text-default-900">
+                        <div className="flex flex-col items-center justify-center px-4 py-16">
                             <Spinner />
                         </div>
                     )}

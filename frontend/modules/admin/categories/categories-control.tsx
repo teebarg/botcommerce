@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Category } from "types/global";
 import { deleteCategory } from "@modules/admin/actions";
 import { EllipsisHorizontal, PencilSquare, Plus, Trash } from "nui-react-icons";
-import Dropdown from "@/components/ui/dropdown";
 import { useOverlayTriggerState } from "react-stately";
 import { SlideOver } from "@modules/common/components/slideover";
 import { Modal } from "@modules/common/components/modal";
@@ -14,6 +13,7 @@ import { useSnackbar } from "notistack";
 
 import { CategoryForm } from "./category-form";
 
+import Dropdown from "@/components/ui/dropdown";
 import { cn } from "@/lib/util/cn";
 
 interface Props {

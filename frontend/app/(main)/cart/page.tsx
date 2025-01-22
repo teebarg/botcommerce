@@ -39,7 +39,7 @@ export default async function Cart() {
                                 <div className="pb-1 flex items-center">
                                     <h3 className="text-2xl">Cart</h3>
                                 </div>
-                                <Items items={cart?.items} isOrder={false} />
+                                <Items isOrder={false} items={cart?.items} />
                             </div>
                             <div className="relative hidden md:block">
                                 <div className="flex flex-col gap-y-8 sticky top-12">

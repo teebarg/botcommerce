@@ -85,10 +85,10 @@ def cache(expire: int = 86400, key: str | None = None, hash: bool = True):
         Returns:
             str: A hash representing the cache key.
         """
-        temp_kwargs = ":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache", "cart_in"]])
+        temp_kwargs = ":".join([str(v.id) if k == "user" else str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache", "cart_in"]])
         if hash:
             temp_kwargs = hashlib.sha256(temp_kwargs.encode()).hexdigest()
-            
+
         return f"{key or func_name}:{temp_kwargs}"
 
     def decorator(func: Callable):

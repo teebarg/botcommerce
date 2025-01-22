@@ -1,12 +1,11 @@
-from typing import Any, Generic, TypeVar
 from datetime import datetime, timezone
+from typing import Any, Generic, TypeVar
+
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from sqlmodel import or_, select, SQLModel
+from sqlmodel import SQLModel, or_, select
 
 from app.core.logging import logger
-from fastapi.encoders import jsonable_encoder
-
-from app.core.utils import generate_slug
 
 # Type variables for model and input schemas
 ModelType = TypeVar("ModelType", bound=SQLModel)

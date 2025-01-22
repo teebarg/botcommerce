@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
-import { RightArrowIcon } from "nui-react-icons";
+import { Bell, CancelIcon } from "nui-react-icons";
 
 import { subscribeUser, unsubscribeUser } from "./actions";
 
@@ -132,30 +132,32 @@ function PushNotificationManager() {
         <div>
             {/* Add notification opt-in button */}
             {isSupported && !subscription && (
-                <div className="flex w-full items-center justify-center gap-x-3 py-2 border-b">
-                    <div className="text-small flex items-end sm:text-[0.93rem] text-foreground hover:opacity-80 transition-opacity">
-                        <span aria-label="rocket" className="hidden md:block" role="img">
-                            🚀
-                        </span>
-                        <span
-                            className="inline-flex md:ml-1 animate-text-gradient font-medium bg-clip-text text-transparent bg-[linear-gradient(90deg,#D6009A_0%,#8a56cc_50%,#D6009A_100%)] dark:bg-[linear-gradient(90deg,#FFEBF9_0%,#8a56cc_50%,#FFEBF9_100%)]"
-                            style={{ fontSize: "inherit", backgroundSize: "200%", backgroundClip: "text" }}
-                        >
-                            Enable Push Notifications
-                        </span>
-                    </div>
-                    <Button className="min-w-[100px] gap-2 !rounded-full p-[1px]" onClick={handleNotificationOptIn}>
-                        <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F54180_0%,#338EF7_50%,#F54180_100%)]" />
-                        <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background group-hover:bg-background/70 transition-background px-3 py-1 text-sm font-medium text-foreground backdrop-blur-3xl">
-                            Enable
-                            <RightArrowIcon
-                                aria-hidden="true"
-                                className="outline-none transition-transform group-hover:translate-x-0.5 [&amp;>path]:stroke-[2px]"
-                                role="img"
-                                size={16}
-                            />
+                <div className="fixed top-4 left-4 right-4 md:right-auto md:max-w-[25rem] z-50">
+                    <div className="bg-content2 rounded-lg shadow-xl p-8">
+                        {/* Close button */}
+                        <button className="absolute top-2 right-2 text-default-500 hover:text-default-500/5" onClick={() => setIsSupported(false)}>
+                            <CancelIcon className="h-6 w-6" />
+                        </button>
+
+                        {/* Icon and content container */}
+                        <div className="flex items-start space-x-4">
+                            <div className="bg-secondary p-3 rounded-full">
+                                <Bell className="w-6 h-6 text-white" />
+                            </div>
+
+                            <div className="flex-1">
+                                <h3 className="font-semibold text-default-900 mb-1">Stay Updated</h3>
+                                <p className="text-sm text-default-500 mb-3">
+                                    Get instant updates about your orders, exclusive deals, and special offers
+                                </p>
+
+                                {/* Enable button */}
+                                <Button color="secondary" startContent={<Bell size={20} />} onClick={handleNotificationOptIn}>
+                                    <span>Enable Notifications</span>
+                                </Button>
+                            </div>
                         </div>
-                    </Button>
+                    </div>
                 </div>
             )}
             {newContent && (

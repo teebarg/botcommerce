@@ -8,6 +8,7 @@ import { Table } from "@modules/common/components/table";
 import { CartItem } from "types/global";
 import Image from "next/image";
 import { currency } from "@lib/util/util";
+
 import Control from "@/modules/cart/templates/control";
 import { cn } from "@/lib/util/cn";
 

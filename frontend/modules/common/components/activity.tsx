@@ -1,10 +1,12 @@
-import { Bell, CancelIcon, Excel, Spinner, Trash } from "nui-react-icons";
+import { Bell, CancelIcon, Excel, Trash } from "nui-react-icons";
 import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useSnackbar } from "notistack";
 import { deleteActivity } from "@modules/account/actions";
 
 import Logo from "../icons/logo";
+
+import { Spinner } from "@/components/spinner";
 
 interface Props {
     activities: Activity[];

@@ -5,6 +5,7 @@ import ShippingDetails from "@modules/order/components/shipping-details";
 import PaymentDetails from "@modules/order/components/payment-details";
 import { Order } from "types/global";
 import { notFound } from "next/navigation";
+
 import Items from "@/components/order/cart-details";
 
 type OrderCompletedTemplateProps = {

@@ -3,9 +3,9 @@
 import { signOut } from "@modules/account/actions";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import React from "react";
-import Dropdown from "@/components/ui/dropdown";
 import Image from "next/image";
 
+import Dropdown from "@/components/ui/dropdown";
 import ProfileAvatar from "@/public/profile.svg";
 
 export default function UserDropDown({ customer }: any) {

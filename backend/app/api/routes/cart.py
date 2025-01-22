@@ -1,15 +1,15 @@
 from typing import Any
 
-from app.services.product import get_product
 from fastapi import APIRouter, Header, HTTPException
 from firebase_cart import CartHandler, CartItem, FirebaseConfig
 
 from app.core.config import settings
+from app.core.decorators import cache
+from app.core.deps import CacheService
 from app.core.utils import generate_id
 from app.models.generic import CartDetails, CartItemIn
 from app.models.message import Message
-from app.core.decorators import cache
-from app.core.deps import ( CacheService )
+from app.services.product import get_product
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,

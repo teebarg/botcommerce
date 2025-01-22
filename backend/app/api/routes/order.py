@@ -2,9 +2,10 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from firebase_cart import FirebaseConfig, Order, OrderHandler
-from sqlmodel import select, SQLModel
+from sqlmodel import SQLModel, select
 
 from app.core.config import settings
+from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     CurrentUser,
@@ -14,7 +15,6 @@ from app.core.deps import (
     get_current_active_superuser,
     get_current_user,
 )
-from app.core.decorators import cache
 from app.core.logging import logger
 from app.core.utils import generate_invoice_email
 from app.models.generic import OrderDetails

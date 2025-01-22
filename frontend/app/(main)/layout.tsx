@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import Footer from "@modules/layout/templates/footer";
 import React from "react";
-import { BackButton } from "@/components/back";
 import dynamic from "next/dynamic";
+
+import { BackButton } from "@/components/back";
 
 const Banner = dynamic(() => import("@modules/common/components/banner"), { ssr: false });
 const ButtonNav = dynamic(() => import("@/components/bottom-navbar"), { ssr: false });

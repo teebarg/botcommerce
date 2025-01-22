@@ -1,6 +1,6 @@
-from app.core.cruds.base import BaseCRUD
 from sqlmodel import Session
 
+from app.core.cruds.base import BaseCRUD
 from app.models.config import SiteConfig, SiteConfigCreate, SiteConfigUpdate
 
 

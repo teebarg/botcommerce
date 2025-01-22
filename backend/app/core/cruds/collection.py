@@ -1,7 +1,7 @@
+
+from app.core.cruds.base import BaseCRUD
 from app.models.collection import CollectionCreate, CollectionUpdate
 from app.models.generic import Collection
-from app.core.cruds.base import BaseCRUD
-from sqlalchemy.orm import Session
 
 
 class CollectionCRUD(BaseCRUD[Collection, CollectionCreate, CollectionUpdate]):

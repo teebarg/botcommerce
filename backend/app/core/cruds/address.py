@@ -1,7 +1,7 @@
-from app.core.cruds.base import BaseCRUD
 from sqlalchemy.orm import Session
-from sqlmodel import or_, select, SQLModel
+from sqlmodel import select
 
+from app.core.cruds.base import BaseCRUD
 from app.models.address import AddressCreate, AddressUpdate
 from app.models.generic import Address
 
