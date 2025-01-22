@@ -8,6 +8,7 @@ import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
 import { Chip } from "@modules/common/components/chip";
 import { deleteCollection } from "@modules/admin/actions";
+
 import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -53,10 +54,10 @@ export default async function CollectionsPage({ searchParams }: { searchParams: 
                                     </td>
                                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
                                         <Actions
-                                            label="collection"
                                             deleteAction={deleteCollection}
                                             form={<CollectionForm current={item} type="update" />}
                                             item={item}
+                                            label="collection"
                                         />
                                     </td>
                                 </tr>

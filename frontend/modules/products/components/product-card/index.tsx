@@ -1,7 +1,6 @@
 "use client";
 
 import { Product, WishlistItem } from "types/global";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Suspense } from "react";
 import React from "react";
 import Image from "next/image";
@@ -21,11 +20,7 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
     return (
         <>
             <React.Fragment>
-                <LocalizedClientLink
-                    className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 w-full snap-start h-full"
-                    href={`/products/${product.slug}`}
-                    id={`${product.id}`}
-                >
+                <span className="flex flex-col gap-3 h-full" id={`${product.id}`}>
                     {/* <div className="max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap px-1 h-5 text-tiny rounded-small bg-secondary-100 text-secondary-foreground absolute right-7 top-4 z-20">
                         <span className="flex-1 text-inherit px-1 pl-0.5 font-semibold">New</span>
                     </div> */}
@@ -44,10 +39,10 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
                             </Suspense>
                         </div>
                     </div>
-                </LocalizedClientLink>
+                </span>
             </React.Fragment>
         </>
     );
 };
 
-export { ProductCard };
+export default ProductCard;

@@ -1,6 +1,7 @@
 import React from "react";
-import Link from "next/link";
 import { siteConfig } from "@lib/config";
+
+import { BtnLink } from "@/components/ui/btnLink";
 
 const Terms = () => {
     return (
@@ -49,12 +50,9 @@ const Terms = () => {
             </div>
 
             <div className="mt-8 text-center">
-                <Link
-                    className="inline-block bg-primary text-white px-6 py-2 rounded-lg text-lg font-semibold hover:bg-primary/90 transition duration-300"
-                    href="/"
-                >
+                <BtnLink color="primary" href="/">
                     Back to Home
-                </Link>
+                </BtnLink>
             </div>
         </div>
     );

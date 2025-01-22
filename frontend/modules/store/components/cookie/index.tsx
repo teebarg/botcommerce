@@ -3,11 +3,12 @@
 import { FC, useEffect, useState } from "react";
 import { useCookie } from "@lib/hooks/use-cookie";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 
 export interface CookieProps {}
 
-export const Cookie: FC<CookieProps> = () => {
+const Cookie: FC<CookieProps> = () => {
     const { getCookie, setCookie } = useCookie();
     const [showCookie, setShowCookie] = useState<boolean>(false);
 
@@ -58,3 +59,5 @@ export const Cookie: FC<CookieProps> = () => {
         </div>
     );
 };
+
+export default Cookie;

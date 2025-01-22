@@ -3,11 +3,12 @@ import { getCustomer } from "@lib/data";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
-import Search from "@/modules/search/components/search";
 import { Customer } from "types/global";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 import { HeartFilled, Heart, Home, UserGroup, User } from "nui-react-icons";
 import dynamic from "next/dynamic";
+
+import Search from "@/modules/search/components/search";
 import { siteConfig } from "@/lib/config";
 
 const getThemeToggler = () =>
@@ -59,7 +60,7 @@ const Navbar = async () => {
                     </div>
                     <div className="hidden md:flex items-center">
                         {customer ? (
-                            <LocalizedClientLink href={"/wishlist"} aria-label="go to wishlist">
+                            <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
                                 <HeartFilled className="h-8 w-8 text-primary-500" />
                             </LocalizedClientLink>
                         ) : (
@@ -83,9 +84,7 @@ const Navbar = async () => {
                 <div className="mt-6 flex flex-col gap-2">
                     <NavbarItem className="flex items-center gap-2">
                         <Home className="h-8 w-8" />
-                        <LocalizedClientLink className="" href="/">
-                            Home
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href="/">Home</LocalizedClientLink>
                     </NavbarItem>
                     <NavbarItem className="flex items-center gap-2">
                         <User className="h-8 w-8" viewBox="0 0 20 20" />
@@ -119,14 +118,10 @@ const Navbar = async () => {
 
                 <div className="flex flex-col gap-2">
                     <NavbarItem>
-                        <LocalizedClientLink className="" href="/our-story">
-                            Our Story
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href="/our-story">Our Story</LocalizedClientLink>
                     </NavbarItem>
                     <NavbarItem>
-                        <LocalizedClientLink className="" href={"/support"}>
-                            Contact Us
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href={"/support"}>Contact Us</LocalizedClientLink>
                     </NavbarItem>
                 </div>
                 <div className="mt-auto mb-2 md:hidden">

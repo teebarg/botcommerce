@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import { BtnLink } from "@/components/ui/btnLink";
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
     useEffect(() => {
@@ -35,13 +35,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                         <h1 className="text-4xl font-bold mb-2">500</h1>
                         <p className="text-xl text-default-900 mb-4">Internal Server Error</p>
                         <p className="text-default-500 mb-6">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
-                        <LocalizedClientLink
-                            className="inline-block bg-primary hover:bg-primary-focus text-white font-semibold py-2 px-4 rounded-md mr-4"
-                            href="/"
-                        >
+                        <BtnLink color="primary" href="/">
                             Go back to homepage
-                        </LocalizedClientLink>
-                        <Button aria-label="try again" className="block mt-6" color="danger" type="button" onClick={() => reset()}>
+                        </BtnLink>
+                        <Button aria-label="try again" className="block mt-6 ml-4" color="danger" type="button" onClick={() => reset()}>
                             Try again
                         </Button>
                     </div>

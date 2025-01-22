@@ -148,19 +148,8 @@ export const NavbarMenuToggle = ({ className }: { children?: React.ReactNode; cl
     };
 
     return (
-        <button
-            aria-label="navbar"
-            aria-pressed={isExpanded}
-            className={cn(
-                "group flex items-center justify-center w-6 h-full rounded-small tap-highlight-transparent outline-none data-[focus-visible=true]:z-10",
-                "data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2",
-                className
-            )}
-            data-open={isExpanded}
-            type="button"
-            onClick={handleClick}
-        >
-            <span className="w-full h-full pointer-events-none flex flex-col items-center justify-center text-inherit group-data-[pressed=true]:opacity-70 transition-opacity before:content-[''] before:block before:h-px before:w-6 before:bg-current before:transition-transform before:duration-150 before:-translate-y-1 before:rotate-0 group-data-[open=true]:before:translate-y-px group-data-[open=true]:before:rotate-45 after:content-[''] after:block after:h-px after:w-6 after:bg-current after:transition-transform after:duration-150 after:translate-y-1 after:rotate-0 group-data-[open=true]:after:translate-y-0 group-data-[open=true]:after:-rotate-45" />
+        <button aria-label="navbar" aria-pressed={isExpanded} className={cn(className)} data-open={isExpanded} type="button" onClick={handleClick}>
+            <span className="pointer-events-none flex flex-col transition-opacity before:h-px before:w-6 before:bg-current before:transition-transform before:duration-150 before:-translate-y-1 after:h-px after:w-6 after:bg-current after:transition-transform after:duration-150 after:translate-y-1" />
         </button>
     );
 };

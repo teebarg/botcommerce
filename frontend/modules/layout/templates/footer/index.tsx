@@ -150,22 +150,17 @@ export default async function Footer() {
                                 ))}
                             </ul>
                         </div>
-                        <div className="">
-                            <div>
-                                <h3 className="text-base font-semibold text-default-500">Legal</h3>
-                                <ul className="mt-2 space-y-2">
-                                    {legal.map((item, index) => (
-                                        <li key={index}>
-                                            <LocalizedClientLink
-                                                className="text-sm hover:opacity-80 transition-opacity text-default-500"
-                                                href={item.to}
-                                            >
-                                                {item.label}
-                                            </LocalizedClientLink>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <div>
+                            <h3 className="text-base font-semibold text-default-500">Legal</h3>
+                            <ul className="mt-2 space-y-2">
+                                {legal.map((item, index) => (
+                                    <li key={index}>
+                                        <LocalizedClientLink className="text-sm hover:opacity-80 transition-opacity text-default-500" href={item.to}>
+                                            {item.label}
+                                        </LocalizedClientLink>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                 </div>

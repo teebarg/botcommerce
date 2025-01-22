@@ -1,6 +1,7 @@
 import React from "react";
-import Link from "next/link";
 import { siteConfig } from "@lib/config";
+
+import { BtnLink } from "@/components/ui/btnLink";
 
 const Claim = () => {
     return (
@@ -34,12 +35,7 @@ const Claim = () => {
             </div>
 
             <div className="text-center">
-                <Link
-                    className="inline-block bg-primary text-white px-6 py-2 rounded-lg text-lg font-semibold hover:bg-primary/90 transition duration-300"
-                    href="/claim-form"
-                >
-                    File a Claim Now
-                </Link>
+                <BtnLink href="/claim-form">File a Claim Now</BtnLink>
             </div>
 
             <div className="mt-12 bg-content1 rounded-lg shadow-lg p-8">

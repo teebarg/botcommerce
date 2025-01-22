@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Cart, Clock, Tag } from "nui-react-icons";
 
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import { BtnLink } from "@/components/ui/btnLink";
 
 interface TimeLeft {
     hours: number;
@@ -101,13 +101,10 @@ const FlashBanner: React.FC = () => {
                     </div>
                 </div>
 
-                <LocalizedClientLink
-                    className="bg-yellow-400 text-black px-4 py-1.5 rounded-full hover:bg-yellow-500 transition-colors flex items-center space-x-2"
-                    href="/collections"
-                >
+                <BtnLink className="text-black" color="warning" href="/collections">
                     <Cart className="w-5 h-5" />
                     <span>Shop Now</span>
-                </LocalizedClientLink>
+                </BtnLink>
             </div>
         </div>
     );

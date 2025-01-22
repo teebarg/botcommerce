@@ -9,18 +9,17 @@ import { CartItem } from "types/global";
 import Image from "next/image";
 import { currency } from "@lib/util/util";
 
-import Control from "./control";
+import Control from "@/modules/cart/templates/control";
+import { cn } from "@/lib/util/cn";
 
 type ItemsTemplateProps = {
     items: CartItem[];
+    isOrder?: boolean;
 };
 
-const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
+const Items = ({ items, isOrder = true }: ItemsTemplateProps) => {
     return (
         <div>
-            <div className="pb-1 flex items-center">
-                <h3 className="text-2xl">Cart</h3>
-            </div>
             <div className="hidden md:block">
                 <Table isDataOnly columns={["Item", "", "Quantity", "Price", "Total"]}>
                     {items
@@ -33,13 +32,11 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
                                     </LocalizedClientLink>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <p className="font-medium text-default-900 truncate max-w-72" data-testid="product-title">
+                                    <p className={cn("font-medium text-default-900", !isOrder && "truncate max-w-72")} data-testid="product-title">
                                         {item.name}
                                     </p>
                                 </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <Control item={item} />
-                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">{isOrder ? <p>{item.quantity}</p> : <Control item={item} />}</td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
                                     <LineItemUnitPrice item={item} style="tight" />
                                 </td>
@@ -64,12 +61,20 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-sm font-medium line-clamp-1">{item.name}</h3>
-                                        <Control item={item} />
+                                        {isOrder ? (
+                                            <span className="text-sm font-medium text-default-900 flex items-center">
+                                                {item.quantity} @ {currency(item.price)}
+                                            </span>
+                                        ) : (
+                                            <Control item={item} />
+                                        )}
                                     </div>
                                     <div className="flex flex-col items-end">
-                                        <span className="text-sm font-medium text-default-900 flex items-center">
-                                            {item.quantity} @ {currency(item.price)}
-                                        </span>
+                                        {!isOrder && (
+                                            <span className="text-sm font-medium text-default-900 flex items-center">
+                                                {item.quantity} @ {currency(item.price)}
+                                            </span>
+                                        )}
                                         <span className="text-xl font-medium">{currency(item.price * item.quantity)}</span>
                                     </div>
                                 </div>
@@ -81,4 +86,4 @@ const ItemsTemplate = ({ items }: ItemsTemplateProps) => {
     );
 };
 
-export default ItemsTemplate;
+export default Items;

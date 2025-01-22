@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import SQLModel, func, or_, select
 
 from app.core import crud
+from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     CurrentUser,
@@ -26,7 +27,6 @@ from app.models.category import (
     CategoryCreate,
     CategoryUpdate,
 )
-from app.core.decorators import cache
 from app.models.generic import Category, CategoryPublic
 from app.models.message import Message
 from app.services.export import export, process_file, validate_file
@@ -101,7 +101,7 @@ async def create(*, db: SessionDep, create_data: CategoryCreate, cache: CacheSer
 
 
 @router.get("/{id}")
-@cache(key="category")
+@cache(key="category", hash=False)
 async def read(id: int, db: SessionDep) -> CategoryPublic:
     """
     Get a specific category by id with Redis caching.
@@ -114,7 +114,7 @@ async def read(id: int, db: SessionDep) -> CategoryPublic:
 
 
 @router.get("/slug/{slug}")
-@cache(key="category")
+@cache(key="category", hash=False)
 async def get_by_slug(slug: str, db: SessionDep) -> Category:
     """
     Get a category by its slug.

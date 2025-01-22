@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { PencilSquare as Edit, Spinner, Trash } from "nui-react-icons";
+import { PencilSquare as Edit, Trash } from "nui-react-icons";
 import { Modal } from "@modules/common/components/modal";
 import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@modules/account/actions";
 import { useFormState } from "react-dom";
@@ -15,6 +15,7 @@ import { Input } from "@components/ui/input";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/spinner";
 
 type EditAddressProps = {
     address: Address;
@@ -95,7 +96,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                 </div>
             </div>
             {modalState.isOpen && (
-                <Modal data-testid="edit-address-modal" onClose={modalState.close} isOpen={modalState.isOpen}>
+                <Modal data-testid="edit-address-modal" isOpen={modalState.isOpen} onClose={modalState.close}>
                     <div className="p-5">
                         <h3 className="mb-2">Edit address</h3>
                         <form action={formAction}>

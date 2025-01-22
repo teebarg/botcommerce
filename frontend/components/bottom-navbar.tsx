@@ -5,7 +5,7 @@ import React from "react";
 import { Cart, HeartFilled, Home, Search, User } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-export const ButtonNav = ({ className }: { className?: string }) => {
+const ButtonNav = ({ className }: { className?: string }) => {
     const pathname = usePathname();
 
     const nav = [
@@ -53,3 +53,5 @@ export const ButtonNav = ({ className }: { className?: string }) => {
         </nav>
     );
 };
+
+export default ButtonNav;

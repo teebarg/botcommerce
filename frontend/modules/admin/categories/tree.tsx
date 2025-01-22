@@ -67,7 +67,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                     <li key={index} className="ml-10 min-h-10">
                                         <div className="flex items-center">
                                             <div className="flex w-[32px] items-center">
-                                                <span className="" draggable="true">
+                                                <span draggable="true">
                                                     <DotsSix className="cursor-grab" />
                                                 </span>
                                             </div>

@@ -1,29 +1,28 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select, SQLModel
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
 
-from app.core.decorators import cache
 from app.core import crud
+from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     CurrentUser,
     SessionDep,
 )
-
+from app.core.logging import logger
 from app.models.generic import Address, UserPublic, Wishlist
 from app.models.message import Message
 from app.models.user import UserUpdateMe
 from app.models.wishlist import WishlistCreate, Wishlists
-from app.core.logging import logger
 
 # Create a router for users
 router = APIRouter()
 
 
 @router.get("/me")
-@cache(key="user")
+@cache(key="user", hash=False)
 async def read_user_me(
     db: SessionDep,
     user: CurrentUser
@@ -58,14 +57,13 @@ async def update_user_me(
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"
             )
-        
+
     try:
         user = crud.user.update(
             db=db, db_obj=current_user, obj_in=user_in
         )
         # Invalidate cache
         cache.delete(f"user:{user.id}")
-        cache.delete(f"user:{user.email}")
         return user
     except IntegrityError as e:
         logger.error(f"Error updating user, {e.orig.pgerror}")
@@ -76,21 +74,10 @@ async def update_user_me(
             status_code=400,
             detail=f"{e}",
         ) from e
-    # user_data = user_in.model_dump(exclude_unset=True)
-    # current_user.sqlmodel_update(user_data)
-    # session.add(current_user)
-    # session.commit()
-    # session.refresh(current_user)
-
-    # # Invalidate user cache
-    # cache.delete(f"user:{current_user.id}")
-    # cache.delete(f"user:{current_user.email}")
-
-    # return current_user
 
 
 @router.get("/wishlist")
-@cache(key="wishlist")
+@cache(key="wishlist", hash=False)
 async def read_wishlist(
     db: SessionDep,
     user: CurrentUser
@@ -100,8 +87,11 @@ async def read_wishlist(
 
 
 @router.post("/wishlist", response_model=Wishlist)
-def create_user_wishlist_item(item: WishlistCreate, db: SessionDep, user: CurrentUser):
-    return crud.user.create_wishlist_item(db=db, item=item, user_id=user.id)
+def create_user_wishlist_item(item: WishlistCreate, db: SessionDep, user: CurrentUser, cache: CacheService):
+    result = crud.user.create_wishlist_item(db=db, item=item, user_id=user.id)
+    # Invalidate cache
+    cache.delete(f"wishlist:{user.id}")
+    return result
 
 
 @router.delete("/wishlist/{product_id}", response_model=Message)
@@ -123,7 +113,7 @@ async def remove_wishlist_item(
     db.delete(wishlist_item)
     db.commit()
 
-    # Invalidate wishlist cache
-    cache.delete("wishlist")
+    # Invalidate cache
+    cache.delete(f"wishlist:{user.id}")
 
     return Message(message="Item deleted successfully")

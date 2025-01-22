@@ -79,10 +79,10 @@ const AccountInfo = ({
             </div>
 
             <div
-                className={cn("static transition-[max-height,opacity] duration-300 ease-in-out overflow-visible", {
-                    "max-h-[1000px] opacity-100": state,
-                    "max-h-0 opacity-0": !state,
-                })}
+                className={cn(
+                    "static transition-[max-height,opacity] duration-300 ease-in-out overflow-visible",
+                    state ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+                )}
             >
                 <div className="flex flex-col gap-y-2 py-4">
                     <div>{children}</div>

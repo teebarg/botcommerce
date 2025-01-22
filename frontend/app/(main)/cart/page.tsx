@@ -3,7 +3,6 @@ import { getCustomer } from "@lib/data";
 import { Shield } from "nui-react-icons";
 import { retrieveCart } from "@modules/cart/actions";
 import SignInPrompt from "@modules/cart/components/sign-in-prompt";
-import ItemsTemplate from "@modules/cart/templates/items";
 import Summary from "@modules/cart/templates/summary";
 import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
@@ -11,6 +10,7 @@ import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 import RecommendedProducts from "@/modules/products/components/recommended";
 import { CartItem } from "@/types/global";
 import { siteConfig } from "@/lib/config";
+import Items from "@/components/order/cart-details";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -36,7 +36,10 @@ export default async function Cart() {
                                         <hr className="tb-divider" />
                                     </>
                                 )}
-                                <ItemsTemplate items={cart?.items} />
+                                <div className="pb-1 flex items-center">
+                                    <h3 className="text-2xl">Cart</h3>
+                                </div>
+                                <Items isOrder={false} items={cart?.items} />
                             </div>
                             <div className="relative hidden md:block">
                                 <div className="flex flex-col gap-y-8 sticky top-12">

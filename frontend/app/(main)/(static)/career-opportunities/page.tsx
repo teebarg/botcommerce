@@ -1,6 +1,7 @@
 import React from "react";
-import Link from "next/link";
 import { siteConfig } from "@lib/config";
+
+import { BtnLink } from "@/components/ui/btnLink";
 
 const CareerOpportunities = () => {
     const jobOpenings: { title: string; location: string }[] = [
@@ -29,12 +30,9 @@ const CareerOpportunities = () => {
                                 <div key={index} className="bg-content1 rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
                                     <h3 className="text-xl font-semibold mb-2 text-foreground">{job.title}</h3>
                                     <p className="mb-4 text-foreground">{job.location}</p>
-                                    <Link
-                                        className="inline-block bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition duration-300"
-                                        href="#"
-                                    >
+                                    <BtnLink color="primary" href="">
                                         Learn More
-                                    </Link>
+                                    </BtnLink>
                                 </div>
                             ))}
                         </div>
@@ -45,12 +43,9 @@ const CareerOpportunities = () => {
                                 {`We don't have any open positions at the moment, but we're always on the lookout for talent. Please check back later or
                                 submit your resume for future opportunities.`}
                             </p>
-                            <Link
-                                className="inline-block bg-primary text-white px-6 py-2 rounded-lg text-lg font-semibold hover:bg-primary/90 transition duration-300"
-                                href="#"
-                            >
+                            <BtnLink color="primary" href="">
                                 Submit Your Resume
-                            </Link>
+                            </BtnLink>
                         </div>
                     )}
                 </div>
@@ -61,12 +56,9 @@ const CareerOpportunities = () => {
                         {`We're always interested in hearing from talented individuals. Send us your resume, and we'll keep you in mind for future
                         opportunities.`}
                     </p>
-                    <Link
-                        className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300"
-                        href="#"
-                    >
+                    <BtnLink color="success" href="">
                         Submit Your Resume
-                    </Link>
+                    </BtnLink>
                 </div>
             </div>
         </div>

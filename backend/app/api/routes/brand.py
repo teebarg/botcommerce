@@ -7,8 +7,8 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
-from app.core.decorators import cache
 from app.core import crud
+from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     SessionDep,
@@ -83,7 +83,7 @@ async def create(*, db: SessionDep, create_data: BrandCreate, cache: CacheServic
 
 
 @router.get("/{id}")
-@cache(key="brand")
+@cache(key="brand", hash=False)
 async def read(id: int, db: SessionDep) -> BrandPublic:
     """
     Get a specific brand by id with Redis caching.
@@ -96,7 +96,7 @@ async def read(id: int, db: SessionDep) -> BrandPublic:
 
 
 @router.get("/slug/{slug}")
-@cache(key="brand")
+@cache(key="brand", hash=False)
 async def get_by_slug(slug: str, db: SessionDep) -> Brand:
     """
     Get a collection by its slug.
@@ -122,20 +122,20 @@ async def update(
     """
     Update a brand and invalidate cache.
     """
-    db_brand = crud.brand.get(db=db, id=id)
-    if not db_brand:
+    brand = crud.brand.get(db=db, id=id)
+    if not brand:
         raise HTTPException(
             status_code=404,
             detail="Brand not found",
         )
 
     try:
-        db_brand = crud.brand.update(db=db, db_obj=db_brand, obj_in=update_data)
+        brand = crud.brand.update(db=db, db_obj=brand, obj_in=update_data)
         # Invalidate cache
-        cache.delete(f"brand:{db_brand.slug}")
+        cache.delete(f"brand:{brand.slug}")
         cache.delete(f"brand:{id}")
         cache.invalidate("brands")
-        return db_brand
+        return brand
     except IntegrityError as e:
         logger.error(f"Error updating brand, {e.orig.pgerror}")
         raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e

@@ -12,10 +12,10 @@ from fastapi import (
     Query,
     UploadFile,
 )
-
-from app.core.decorators import cache
 from sqlalchemy.exc import IntegrityError
+
 from app.core import crud
+from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     CurrentUser,
@@ -208,8 +208,21 @@ async def create(*, db: SessionDep, product_in: ProductCreate, cache: CacheServi
     return product
 
 
+@router.get("/{id}")
+@cache(key="product", hash=False)
+async def read(id: int, db: SessionDep) -> ProductPublic:
+    """
+    Get a specific product by id with Redis caching.
+    """
+    product = crud.product.get(db=db, id=id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    return product
+
+
 @router.get("/{slug}")
-@cache(key="product")
+@cache(key="product", hash=False)
 async def read(slug: str, db: SessionDep) -> ProductPublic:
     """
     Get a specific product by slug with Redis caching.
@@ -246,7 +259,7 @@ async def update(
         cache.delete(f"product:{product.slug}")
         cache.delete(f"product:{id}")
         cache.invalidate("search")
-    
+
         # Define the background task
         def update_task(product: Product):
             # Prepare product data for Meilisearch indexing

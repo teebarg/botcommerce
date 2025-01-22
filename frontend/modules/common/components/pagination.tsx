@@ -4,6 +4,7 @@ import React from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { Pagination as PaginationType } from "types/global";
 import { cn } from "@lib/util/cn";
+
 import { Button } from "@/components/ui/button";
 
 interface Props {

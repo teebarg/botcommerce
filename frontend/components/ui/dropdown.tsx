@@ -15,7 +15,7 @@ interface Props {
     className?: string;
 }
 
-const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOffset = 4, className }) => {
+const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOffset = 6, className }) => {
     const state = useOverlayTriggerState({});
     const buttonRef = React.useRef(null);
     const overlayRef = React.useRef(null);
@@ -72,7 +72,7 @@ const Dropdown: React.FC<Props> = ({ children, trigger, align = "start", sideOff
             <button
                 {...buttonProps}
                 ref={buttonRef}
-                className={cn("inline-flex items-center text-default-500 cursor-pointer outline-none", className)}
+                className={cn("inline-flex items-center text-default-500 cursor-pointer focus-visible:outline-none", className)}
             >
                 {trigger}
             </button>

@@ -15,7 +15,7 @@ interface Banner {
 
 const banners: Banner[] = [
     {
-        image: "https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-1.avif",
+        image: "https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fbanner2.jpg?alt=media",
         title: "Luxury Collection",
         subtitle: "Timeless Elegance Awaits",
         link: "/collections",
@@ -27,7 +27,7 @@ const banners: Banner[] = [
         link: "/collections",
     },
     {
-        image: "https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-3.avif",
+        image: "https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fbanner1.jpg?alt=media",
         title: "Limited Edition",
         subtitle: "Rare Pieces, Unmatched Quality",
         link: "/collections",
@@ -46,7 +46,7 @@ const BannerCarousel: React.FC = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-[500px] overflow-hidden rounded-md">
+        <div className="relative w-full min-h-[500px] h-full overflow-hidden rounded-md">
             {banners.map((banner, index) => (
                 <div
                     key={index}
@@ -54,11 +54,11 @@ const BannerCarousel: React.FC = () => {
                 >
                     <Image
                         fill
+                        priority
                         alt={banner.title}
                         className="w-full h-full object-cover absolute"
-                        src={banner.image}
-                        priority
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        src={banner.image}
                     />
                     <div className="absolute inset-0 bg-gray-800 bg-opacity-40 flex items-center justify-center">
                         <div className="text-center text-white max-w-2xl px-4">
@@ -80,8 +80,8 @@ const BannerCarousel: React.FC = () => {
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
                 {banners.map((_, index) => (
                     <button
-                        aria-label="indicator"
                         key={index}
+                        aria-label="indicator"
                         className={cn(
                             "w-3 h-3 rounded-full transition-all",
                             index === currentBanner ? "bg-white scale-125" : "bg-white/50 hover:bg-white"

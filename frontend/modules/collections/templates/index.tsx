@@ -4,11 +4,14 @@ import { Pagination } from "@modules/common/components/pagination";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
+import dynamic from "next/dynamic";
 
 import { CollectionsTopBar } from "./topbar";
-
-import { ProductCard } from "@/modules/products/components/product-card";
 import { CollectionsSideBar } from "./sidebar";
+
+import { BtnLink } from "@/components/ui/btnLink";
+
+const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
 
 interface ComponentProps {
     query?: string;
@@ -31,7 +34,8 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     let wishlist: WishlistItem[] = [];
 
     if (customer) {
-        const { wishlists } = await getWishlist();
+        const { wishlists } = (await getWishlist()) || {};
+
         wishlist = wishlists;
     }
 
@@ -104,13 +108,10 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                             <div className="max-w-md mx-auto text-center">
                                                 <ExclamationIcon className="w-20 h-20 mx-auto text-danger" />
                                                 <h1 className="text-4xl font-bold mt-6">Oops! No Products Found</h1>
-                                                <p className="text-default-500 mt-4">{`There are no products in this category`}</p>
-                                                <LocalizedClientLink
-                                                    className="bg-primary text-white font-semibold py-2 px-4 rounded mt-6 inline-block"
-                                                    href="/"
-                                                >
+                                                <p className="text-default-500 my-4">{`There are no products in this category`}</p>
+                                                <BtnLink color="primary" href="/">
                                                     Go to Home
-                                                </LocalizedClientLink>
+                                                </BtnLink>
                                             </div>
                                         </div>
                                     ) : (

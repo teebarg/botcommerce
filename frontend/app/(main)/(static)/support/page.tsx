@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { ChevronDown, Clock, Headphones, Mail, PhoneCall } from "nui-react-icons";
 
 import { cn } from "@/lib/util/cn";
+import { siteConfig } from "@/lib/config";
+import { Button } from "@/components/ui/button";
 
 const SupportPage = () => {
     const [activeSection, setActiveSection] = useState<number | null>(null);
@@ -37,6 +39,24 @@ const SupportPage = () => {
         },
     ];
 
+    const details = [
+        {
+            label: "Email Support",
+            text: siteConfig.contactEmail,
+            icon: <Mail className="mx-auto mb-2 text-primary h-12 w-12" />,
+        },
+        {
+            label: "Phone",
+            text: siteConfig.contactPhone,
+            icon: <PhoneCall className="mx-auto mb-2 text-success h-12 w-12" />,
+        },
+        {
+            label: "Support Hours",
+            text: "Mon-Sat: 9am - 7pm GMT",
+            icon: <Clock className="mx-auto mb-2 text-primary h-12 w-12" />,
+        },
+    ];
+
     return (
         <div className="min-h-screen bg-content1 p-6 md:p-12 flex flex-col">
             <header className="text-center mb-12">
@@ -47,29 +67,19 @@ const SupportPage = () => {
             </header>
 
             <div className="grid md:grid-cols-3 gap-6 mb-12">
-                <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    <Mail className="mx-auto mb-2 text-primary h-12 w-12" />
-                    <h3 className="text-xl font-semibold mb-1">Email Support</h3>
-                    <p className="text-default-500 mb-4">drifthive4@gmail.com</p>
-                </div>
-
-                <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    <PhoneCall className="mx-auto mb-2 text-success h-12 w-12" />
-                    <h3 className="text-xl font-semibold mb-1">Phone</h3>
-                    <p className="text-default-500 mb-4">+234 (800) LUXURY-CARE</p>
-                </div>
-
-                <div className="bg-default p-6 rounded-xl shadow-md text-center">
-                    <Clock className="mx-auto mb-2 text-primary h-12 w-12" />
-                    <h3 className="text-xl font-semibold mb-1">Support Hours</h3>
-                    <p className="text-default-500 mb-4">Mon-Sat: 9am - 7pm GMT</p>
-                </div>
+                {details.map((i, index: number) => (
+                    <div key={index} className="bg-default p-6 rounded-xl shadow-md text-center">
+                        {i.icon}
+                        <h3 className="text-xl font-semibold mb-1">{i.label}</h3>
+                        <p className="text-default-500 mb-4">{i.text}</p>
+                    </div>
+                ))}
             </div>
 
             <div className="max-w-4xl mx-auto w-full">
                 <h2 className="text-3xl font-serif font-bold text-center mb-8">Frequently Asked Questions</h2>
 
-                {faqSections.map((section, index) => (
+                {faqSections.map((section, index: number) => (
                     <div key={index} className="mb-4">
                         <button
                             aria-label="open faq"
@@ -82,7 +92,7 @@ const SupportPage = () => {
 
                         {activeSection === index && (
                             <div className="bg-default p-6 rounded-b-lg shadow-md">
-                                {section.questions.map((item, qIndex) => (
+                                {section.questions.map((item, qIndex: number) => (
                                     <div key={qIndex} className="mb-4 last:mb-0">
                                         <h4 className="font-semibold text-lg mb-2">{item.q}</h4>
                                         <p className="text-default-500">{item.a}</p>
@@ -94,16 +104,14 @@ const SupportPage = () => {
                 ))}
             </div>
 
-            <div className="bg-default mt-12 p-8 rounded-xl shadow-lg text-center">
+            <div className="bg-default mt-12 py-16 rounded-xl shadow-lg text-center">
                 <Headphones className="mx-auto mb-2 text-warning h-12 w-12" />
                 <h3 className="text-2xl font-semibold mb-2">Personal Support</h3>
                 <p className="text-default-500 max-w-2xl mx-auto mb-6">
                     For personalized assistance beyond our standard support channels, our dedicated concierge team is available to provide white-glove
                     service tailored to your unique needs.
                 </p>
-                <button className="bg-secondary-500 text-secondary-foreground px-8 py-3 rounded-full hover:bg-secondary-100 transition font-semibold">
-                    Request Personal Assistance
-                </button>
+                <Button color="secondary">Request Personal Assistance</Button>
             </div>
         </div>
     );

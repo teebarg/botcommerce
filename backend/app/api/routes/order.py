@@ -2,14 +2,16 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from firebase_cart import FirebaseConfig, Order, OrderHandler
-from sqlmodel import select
+from sqlmodel import SQLModel, select
 
-from app.core import deps
 from app.core.config import settings
+from app.core.decorators import cache
 from app.core.deps import (
+    CacheService,
     CurrentUser,
     Notification,
     SessionDep,
+    Storage,
     get_current_active_superuser,
     get_current_user,
 )
@@ -30,39 +32,47 @@ order_handler = OrderHandler(firebase_config)
 # Create a router for orders
 router = APIRouter()
 
+class Orders(SQLModel):
+    orders: list[Any]
+
 
 @router.get("/", dependencies=[Depends(get_current_user)])
-def index(user: CurrentUser) -> list[Order]:
+@cache(key="orders")
+async def index(user: CurrentUser) -> Orders:
     """
     Retrieve orders.
     """
     orders = order_handler.get_orders(user_id=user.id)
-    return orders
+    return Orders(orders=orders)
 
 
 @router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
-def admin_index(
+@cache(key="orders")
+async def admin_index(
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
 ) -> Any:
     """
     Retrieve orders.
     """
-    orders = order_handler.get_paginated_orders(page=page, limit=limit)
-    return orders
+    return order_handler.get_paginated_orders(page=page, limit=limit)
 
 
 @router.post("/", dependencies=[Depends(get_current_user)])
-def create(
+async def create(
     *,
     user: CurrentUser,
     cartId: str = Header(default=None),
-    notification: Notification
+    notification: Notification,
+    cache: CacheService
 ) -> Order:
     """
     Create new order.
     """
     order_details = order_handler.create_order(cart_id=cartId, user_id=user.id)
+
+    # Invalidate cache
+    cache.invalidate("orders")
 
     # Send invoice email
     email_data = generate_invoice_email(order=order_details.get("order", {}), user=user)
@@ -91,8 +101,9 @@ def create(
     return order_details.get("order", {})
 
 
-@router.get("/{order_id}", dependencies=[])
-def read(order_id: str, user: CurrentUser) -> Any:
+@router.get("/{id}", dependencies=[Depends(get_current_user)])
+@cache(key="order", hash=False)
+async def read(id: str, user: CurrentUser) -> Any:
     """
     Get a specific order by order_number.
     """
@@ -100,18 +111,16 @@ def read(order_id: str, user: CurrentUser) -> Any:
     if not user:
         return {"message": "User details not found"}
 
-    order_details = order_handler.get_order(
-        order_id=order_id, user_id=user.id, is_admin=user.is_superuser
+    return order_handler.get_order(
+        order_id=id, user_id=user.id, is_admin=user.is_superuser
     )
-
-    return order_details
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_active_superuser)])
-def update(
-    *,
+async def update(
     id: str,
     update_data: OrderDetails,
+    cache: CacheService
 ) -> Message:
     """
     Update a order.
@@ -119,12 +128,15 @@ def update(
     res = order_handler.update_order(
         order_id=id, update_data=update_data, is_admin=True
     )
+    # Invalidate cache
+    cache.delete(f"order:{id}")
+    cache.invalidate("orders")
     return res
 
 
 @router.post("/export")
 async def export_orders(
-    current_user: deps.CurrentUser, db: SessionDep, bucket: deps.Storage
+    current_user: CurrentUser, db: SessionDep, bucket: Storage
 ):
     try:
         orders = db.exec(select(Order))

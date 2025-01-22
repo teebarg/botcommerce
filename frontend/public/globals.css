@@ -27,60 +27,6 @@ body {
     .tb-divider {
         @apply shrink-0 bg-divider border-none w-full h-[1px];
     }
-    .btn-custom {
-        @apply relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal overflow-hidden outline-none px-4 h-10 text-small gap-2 rounded-medium;
-    }
-
-    .v-input {
-        max-height: 2.25rem;
-        transition-timing-function: ease;
-        transition-duration: 200ms;
-        text-align: center;
-        font-family: inherit;
-        letter-spacing: normal;
-        font-weight: 700;
-        font-size: 1.0625rem;
-        line-height: 1.41176;
-        padding: 0.125rem 0px;
-        box-sizing: border-box;
-        height: 2.5rem;
-        width: 2.5rem;
-        border-radius: 0.375rem;
-        border-color: rgba(0, 0, 0, 0.11);
-        border-width: 0px;
-        box-shadow:
-            rgba(0, 0, 0, 0.11) 0px 0px 0px 1px,
-            rgba(0, 0, 0, 0.07) 0px 0px 1px 0px;
-    }
-
-    .cl-internal-ttumny {
-        padding: 0.375rem 0.75rem;
-        background-color: var(--accent);
-        color: var(--accentContrast);
-        border-radius: 0.375rem;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        transition-property: background-color, background, border-color, color, fill, stroke, opacity, box-shadow, transform;
-        transition-duration: 100ms;
-        font-family: inherit;
-        letter-spacing: normal;
-        font-weight: 500;
-        font-size: 0.8125rem;
-        line-height: 1.38462;
-        box-shadow:
-            rgba(255, 255, 255, 0.07) 0px 1px 1px 0px inset,
-            rgba(34, 42, 53, 0.2) 0px 2px 3px 0px,
-            rgba(0, 0, 0, 0.24) 0px 1px 1px 0px;
-        border-style: solid;
-        border-color: var(--accent);
-        width: 100%;
-        --accent: #2f3037;
-        --accentHover: #3b3c45;
-        --border: #2f3037;
-        --accentContrast: white;
-        --alpha: hsla(0, 0%, 0%, 0.03);
-    }
 
     .chatbot-icon:after,
     .chatbot-icon:before {
@@ -89,40 +35,9 @@ body {
         content: "";
         position: absolute;
         width: 100%;
-        top: 50%;
-        left: 0;
         background-color: inherit;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        border-radius: 3px;
     }
 
-    .chatbot-icon:after {
-        -webkit-transform: rotate(45deg);
-        -moz-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        -o-transform: rotate(45deg);
-        transform: rotate(45deg);
-    }
-
-    .chatbot-icon:before {
-        -webkit-transform: rotate(-45deg);
-        -moz-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        -o-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-    }
-
-    .chatinput-wrapper textarea {
-        resize: none;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        position: absolute;
-        top: 0;
-        left: 0;
-        touch-action: manipulation;
-    }
 
     .chatinput-wrapper pre,
     .chatinput-wrapper textarea {
@@ -130,26 +45,16 @@ body {
         height: 114.3%;
         border-radius: 6px;
         padding: 10px 36px 10px 12px;
-        margin: 0;
-        white-space: pre-wrap;
-        font-size: 16px;
         transform: scale(0.875);
         transform-origin: top left;
         line-height: 20px;
-        overflow: auto;
-        -ms-overflow-style: none;
     }
 
-    /* range slider */    
     /* track line */
     .track:before {
         content: attr(x);
-        display: block;
         position: absolute;
         background: gray;
-    }
-    
-    .slider.horizontal .track:before {
         height: 3px;
         width: 100%;
         top: 50%;

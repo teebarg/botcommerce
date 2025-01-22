@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { LoginForm } from "@modules/auth/components/login";
+
 import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {

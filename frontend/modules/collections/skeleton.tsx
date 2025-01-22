@@ -9,23 +9,23 @@ const CollectionTemplateSkeleton = () => {
     return (
         <React.Fragment>
             <div className="hidden md:block">
-                <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16">
-                    <div className="h-full w-full max-w-sm rounded-medium p-6 bg-default-100">
+                <div className="h-full w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16">
+                    <div className="h-full w-full max-w-sm rounded-medium p-6 bg-default-100 text-sm space-y-4">
                         <div>
-                            <span className="text-sm">Collections</span>
-                            <hr className="shrink-0 border-none w-full h-[1px] my-1 bg-default-100" />
-                            <div className="block mb-6 space-y-1">
+                            <span>Collections</span>
+                            <div className="space-y-2">
                                 {[1, 2, 3]?.map((_, index: number) => <Skeleton key={index} className="h-8 w-full rounded dark:bg-background" />)}
                             </div>
                         </div>
-                        <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>
-                        <hr className="shrink-0 border-none w-full h-[1px] my-3 bg-default-100" />
-                        <div className="flex flex-col">
-                            <span>Categories</span>
-                            {[1, 2, 3, 4, 5]?.map((_, index: number) => (
-                                <Skeleton key={index} className="h-12 w-full rounded dark:bg-background mt-2" />
-                            ))}
-                        </div>
+                        <hr className="shrink-0 border-none w-full h-[1px] bg-default-100" />
+                        {["Categories", "Brands"].map((item: string, index: number) => (
+                            <div key={index} className="flex flex-col gap-2">
+                                <span>{item}</span>
+                                {[1, 2, 3, 4, 5]?.map((_, index: number) => (
+                                    <Skeleton key={index} className="h-10 w-full rounded dark:bg-background" />
+                                ))}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@ const CollectionTemplateSkeleton = () => {
                                     <ChevronRight />
                                 </span>
                             </li>
-                            <li className="flex items-center">
+                            <li>
                                 <Skeleton className="h-4 w-24 rounded" />
                             </li>
                         </ol>

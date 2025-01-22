@@ -1,17 +1,20 @@
 import { Metadata } from "next";
-import { Category, Customer, Product, SearchParams, WishlistItem } from "types/global";
+import dynamic from "next/dynamic";
+import { Category, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
-import ContactForm from "@modules/store/components/contact-form";
 import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import FlashBanner from "@components/flash";
-import BannerCarousel from "@components/carousel";
 
-import { ProductCard } from "@/modules/products/components/product-card";
+import { BtnLink } from "@/components/ui/btnLink";
+
+const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
+const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
+const FlashBanner = dynamic(() => import("@components/flash"), { ssr: false });
+const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -33,19 +36,19 @@ async function getLandingProducts(collection: string, limit: number = 4): Promis
 }
 
 export default async function Home() {
-    const [trending, latest, featured] = await Promise.all([
+    const [trending, latest, featured, { categories }, customer] = await Promise.all([
         getLandingProducts("trending"),
         getLandingProducts("latest"),
         getLandingProducts("featured", 6),
+        getCategories(),
+        getCustomer(),
     ]);
 
-    const { categories } = await getCategories();
-
-    const customer: Customer = await getCustomer();
     let wishlist: WishlistItem[] = [];
 
     if (customer) {
-        const { wishlists } = await getWishlist();
+        const { wishlists } = (await getWishlist()) || {};
+
         wishlist = wishlists;
     }
 
@@ -57,7 +60,7 @@ export default async function Home() {
                         <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
                             <ul className="bg-primary/10">
-                                {categories.map((item: Category, index: number) => (
+                                {categories?.map((item: Category, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink
                                             className="font-medium border border-primary/20 p-3 block hover:bg-primary/20"
@@ -76,7 +79,7 @@ export default async function Home() {
                             <BannerCarousel />
                         </div>
                         <div className="w-full hidden md:flex flex-col">
-                            <div className="bg-warning/15 p-4 rounded-lg hidden md:block space-y-4 flex-1">
+                            <div className="bg-warning/15 p-4 rounded-lg hidden md:block space-y-4">
                                 <div className="flex items-center gap-4">
                                     <div className="rounded-50 ring-1 ring-warning p-2">
                                         <PhoneCall className="h-6 w-6" />
@@ -104,17 +107,14 @@ export default async function Home() {
                                 <span className="text-secondary text-xl block mt-2">Luxury online shopping.</span>
                             </div>
                             <div className="block md:hidden mt-0 md:mt-5">search component</div>
-                            <div className="flex bg-secondary text-secondary-foreground p-4 rounded-lg mt-8 md:mt-4">
+                            <div className="flex items-center bg-secondary text-secondary-foreground p-4 rounded-lg mt-8 md:mt-4 flex-1">
                                 <div>
                                     <span className="block">Prime Store</span>
                                     <span className="block text-2xl mt-2 font-bold">Looking Originals?</span>
-                                    <span className="block mt-2">Explore the latest premium quality branded products.</span>
-                                    <LocalizedClientLink
-                                        className="inline-block font-semibold bg-transparent rounded-full border-2 border-secondary mt-5 hover:bg-secondary hover:text-white px-4 py-2"
-                                        href="/collections"
-                                    >
+                                    <span className="block my-2">Explore the latest premium quality branded products.</span>
+                                    <BtnLink color="secondary" href="/collections">
                                         Visit Shop!
-                                    </LocalizedClientLink>
+                                    </BtnLink>
                                 </div>
                             </div>
                             <div className="bg-warning/15 p-4 rounded-lg mt-8 md:mt-4 text-default-900/80">
@@ -132,11 +132,11 @@ export default async function Home() {
                 <div className="relative h-8 md:h-28">
                     <Image
                         fill
-                        alt="banner"
-                        src="/frontend.webp"
                         priority
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        alt="banner"
                         className="object-contain"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        src="/frontend.webp"
                     />
                 </div>
                 <div className="bg-content1">
@@ -178,11 +178,11 @@ export default async function Home() {
                 <div className="relative h-8 md:h-28">
                     <Image
                         fill
-                        alt="banner"
-                        src="/frontend.webp"
                         priority
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        alt="banner"
                         className="object-contain"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
+                        src="/frontend.webp"
                     />
                 </div>
                 <div className="bg-content1 py-16">

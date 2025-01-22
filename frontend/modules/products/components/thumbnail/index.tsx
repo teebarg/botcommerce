@@ -18,19 +18,15 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ thumbnail, images, size = "small"
 
     return (
         <div
-            className={cn(
-                "relative w-full overflow-hidden p-4 bg-default-100 shadow-elevation-card-rest rounded-md transition-shadow ease-in-out duration-150",
-                className,
-                {
-                    "aspect-[11/14]": isFeatured,
-                    "aspect-[9/16]": !isFeatured && size !== "square",
-                    "aspect-[1/1]": size === "square",
-                    "w-[180px]": size === "small",
-                    "w-[290px]": size === "medium",
-                    "w-[440px]": size === "large",
-                    "w-full": size === "full",
-                }
-            )}
+            className={cn("relative w-full overflow-hidden p-4 rounded-md transition-shadow ease-in-out duration-150", className, {
+                "aspect-[11/14]": isFeatured,
+                "aspect-[9/16]": !isFeatured && size !== "square",
+                "aspect-[1/1]": size === "square",
+                "w-[180px]": size === "small",
+                "w-[290px]": size === "medium",
+                "w-[440px]": size === "large",
+                "w-full": size === "full",
+            })}
             data-testid={dataTestid}
         >
             <ImageOrPlaceholder image={initialImage} size={size} />

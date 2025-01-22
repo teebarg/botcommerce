@@ -13,8 +13,15 @@ from fastapi import (
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, or_, select
 
+from app.core import crud
 from app.core.decorators import cache
-from app.core.deps import CacheService, CurrentUser, SessionDep, Storage, get_current_user
+from app.core.deps import (
+    CacheService,
+    CurrentUser,
+    SessionDep,
+    Storage,
+    get_current_user,
+)
 from app.core.logging import logger
 from app.models.collection import (
     CollectionCreate,
@@ -25,16 +32,12 @@ from app.models.collection import (
 from app.models.generic import Collection
 from app.models.message import Message
 from app.services.export import export, process_file, validate_file
-from app.core import crud
 
 # Create a router for collections
 router = APIRouter()
 
 
-@router.get(
-    "/",
-    dependencies=[],
-)
+@router.get("/")
 @cache(key="collections")
 async def index(
     db: SessionDep,
@@ -89,7 +92,7 @@ async def create(*, db: SessionDep, create_data: CollectionCreate, cache: CacheS
 
 
 @router.get("/{id}")
-@cache(key="collection")
+@cache(key="collection", hash=False)
 async def read(id: int, db: SessionDep) -> Collection:
     """
     Get a specific collection by id with Redis caching.
@@ -102,7 +105,7 @@ async def read(id: int, db: SessionDep) -> Collection:
 
 
 @router.get("/slug/{slug}")
-@cache(key="collection")
+@cache(key="collection", hash=False)
 async def get_by_slug(slug: str, db: SessionDep) -> Collection:
     """
     Get a collection by its slug.

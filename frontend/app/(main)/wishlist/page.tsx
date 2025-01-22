@@ -3,8 +3,8 @@ import { Heart } from "nui-react-icons";
 
 import WishlistItem from "@/modules/common/components/wishlist";
 import { getWishlist } from "@/lib/data";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 import { siteConfig } from "@/lib/config";
+import { BtnLink } from "@/components/ui/btnLink";
 
 export const revalidate = 3;
 
@@ -32,12 +32,9 @@ export default async function Wishlist() {
                     <p className="text-default-500 max-w-md mx-auto">Explore our collection and save your favorite luxury items for later</p>
                 </div>
 
-                <LocalizedClientLink
-                    className="inline-flex items-center justify-center px-8 py-3 font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity"
-                    href="/collections"
-                >
+                <BtnLink color="primary" href="/collections" size="md">
                     Explore Collection
-                </LocalizedClientLink>
+                </BtnLink>
             </div>
         );
     }

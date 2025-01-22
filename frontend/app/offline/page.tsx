@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { CloudOff, RefreshCcw, WifiOff } from "nui-react-icons";
 
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
 const OfflinePage = () => {
     const [isRetrying, setIsRetrying] = useState(false);
@@ -50,17 +51,10 @@ const OfflinePage = () => {
                 </p>
 
                 {/* Retry Button */}
-                <button
-                    aria-label="retry"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700
-                     text-white font-medium rounded-lg transition-colors duration-200
-                     disabled:bg-blue-400 disabled:cursor-not-allowed gap-2"
-                    disabled={isRetrying}
-                    onClick={handleRetry}
-                >
+                <Button aria-label="retry" className="px-8  text-white" color="warning" disabled={isRetrying} onClick={handleRetry}>
                     <RefreshCcw className={cn("w-5 h-5", isRetrying && "animate-spin")} />
                     {isRetrying ? "Retrying..." : "Try Again"}
-                </button>
+                </Button>
 
                 {/* Tips Section */}
                 <div className="mt-8 pt-8 border-t border-default-200">

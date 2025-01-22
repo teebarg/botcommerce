@@ -94,7 +94,7 @@ class CacheService:
         except Exception as e:
             logger.error(f"Error clearing cache: {str(e)}")
             return False
-        
+
     def invalidate(self, key: str)-> bool:
         """
         Delete all keys matching a pattern
@@ -114,7 +114,7 @@ class CacheService:
         except Exception as e:
             logger.error(f"Error deleting pattern from cache: {str(e)}")
             return False
-        
+
 
     def delete_pattern(self, pattern: str) -> bool:
         """

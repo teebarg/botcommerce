@@ -1,8 +1,7 @@
-import json
 from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Response
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
@@ -40,11 +39,6 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 # Root path
 @app.get("/")
 async def root():
-    return {"message": "Hello World from UV"}
-
-
-@app.get("/api/health-check")
-async def health_check():
     return {"message": "Server is running"}
 
 
@@ -78,7 +72,7 @@ async def newsletter(data: NewsletterCreate):
 
 @app.post("/api/log-error")
 @limit("5/minute")
-async def log_error(error: dict, notification: deps.Notification, redis: deps.CacheService, request: Request):
+async def log_error(error: dict, notification: deps.Notification):
     # Send the error to Slack
     slack_message = {
         "text": f"🚨 *Error Logged* 🚨\n"
@@ -94,11 +88,11 @@ async def log_error(error: dict, notification: deps.Notification, redis: deps.Ca
 
 
 @app.get("/sitemap.xml", response_class=Response)
-async def generate_sitemap(db: deps.SessionDep, redis: deps.CacheService ):
+async def generate_sitemap(db: deps.SessionDep, cache: deps.CacheService ):
     base_url = settings.FRONTEND_HOST
 
     # Try to get sitemap from cache first
-    cached_sitemap = redis.get("sitemap")
+    cached_sitemap = cache.get("sitemap")
     if cached_sitemap:
         return Response(content=cached_sitemap, media_type="application/xml")
 
@@ -139,7 +133,7 @@ async def generate_sitemap(db: deps.SessionDep, redis: deps.CacheService ):
     sitemap = tostring(urlset, encoding="utf-8", method="xml")
 
     # Cache the sitemap for 1 hour (3600 seconds)
-    redis.set("sitemap", sitemap, expire=3600)
+    cache.set("sitemap", sitemap, expire=3600)
 
     return Response(content=sitemap, media_type="application/xml")
 
@@ -177,11 +171,3 @@ async def generate_sitemap(db: deps.SessionDep, redis: deps.CacheService ):
 #                 aio_pika.Message(body=order_data.encode()),
 #                 routing_key=product_queue.name,
 #             )
-
-
-class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        return obj.isoformat() if isinstance(obj, datetime) else super().default(obj)
-
-
-app.json_encoder = CustomJSONEncoder

@@ -68,7 +68,7 @@ def limit(rate_string: str):
     return decorator
 
 
-def cache(expire: int = 86400, key: str | None = None):
+def cache(expire: int = 86400, key: str | None = None, hash: bool = True):
     """
     Decorator to cache the result of a function.
     Args:
@@ -85,7 +85,10 @@ def cache(expire: int = 86400, key: str | None = None):
         Returns:
             str: A hash representing the cache key.
         """
-        temp_kwargs = hashlib.sha256(":".join([str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache"]]).encode()).hexdigest()
+        temp_kwargs = ":".join([str(v.id) if k == "user" else str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache", "cart_in"]])
+        if hash:
+            temp_kwargs = hashlib.sha256(temp_kwargs.encode()).hexdigest()
+
         return f"{key or func_name}:{temp_kwargs}"
 
     def decorator(func: Callable):
@@ -105,10 +108,18 @@ def cache(expire: int = 86400, key: str | None = None):
             # Compute the result, cache it, and return it
             result = await func(*args, **kwargs)
 
-            if isinstance(result, dict):
-                cache_service.set(cache_key, json.dumps(result), expire)
-            else:
-                cache_service.set(cache_key, result.model_dump_json(), expire)
+            try:
+                if isinstance(result, dict):
+                    serialized_result = json.dumps(result)
+                elif hasattr(result, "model_dump_json"):
+                    serialized_result = result.model_dump_json()  # For Pydantic v2.x
+                elif hasattr(result, "json"):
+                    serialized_result = result.json()  # For Pydantic v1.x
+                else:
+                    raise Exception("Cannot serialize result")
+                cache_service.set(cache_key, serialized_result, expire)
+            except Exception as e:
+                raise ValueError(f"Failed to serialize result: {e}")
             return result
 
         return wrapped

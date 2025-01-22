@@ -1,4 +1,4 @@
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import { BtnLink } from "@/components/ui/btnLink";
 
 const SignInPrompt = () => {
     return (
@@ -8,13 +8,9 @@ const SignInPrompt = () => {
                 <p className="text-sm md:text-base text-default-500">Sign in for a better experience.</p>
             </div>
             <div>
-                <LocalizedClientLink
-                    className="relative inline-flex items-center justify-center outline-none py-2 rounded-small bg-transparent border border-secondary-500 text-secondary-900 min-w-28"
-                    data-testid="sign-in-button"
-                    href="/account"
-                >
+                <BtnLink color="secondary" data-testid="sign-in-button" href="/account" variant="bordered">
                     Sign in
-                </LocalizedClientLink>
+                </BtnLink>
             </div>
         </div>
     );

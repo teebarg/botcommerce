@@ -8,12 +8,13 @@ import { Modal } from "@modules/common/components/modal";
 import { Kbd } from "@modules/common/components/kbd";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 import { Button } from "@/components/ui/button";
 import { Product, SearchParams } from "@/types/global";
-import { ProductCard } from "@/modules/products/components/product-card";
 import NoProductsFound from "@/modules/products/components/no-products";
 import { debounce } from "@/lib/util/util";
+const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
 
 interface Props {
     className?: string;
@@ -78,7 +79,7 @@ const Search: React.FC<Props> = ({ className }) => {
                 {`I'm looking for...`}
             </Button>
             {modalState.isOpen && (
-                <Modal hasX={false} size="lg" onClose={modalState.close} isOpen={modalState.isOpen}>
+                <Modal hasX={false} isOpen={modalState.isOpen} size="lg" onClose={modalState.close}>
                     <div>
                         <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
                             <MagnifyingGlassMini />

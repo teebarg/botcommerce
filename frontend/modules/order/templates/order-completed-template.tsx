@@ -1,11 +1,12 @@
 import CartTotals from "@modules/common/components/cart-totals";
 import Help from "@modules/order/components/help";
-import Items from "@modules/order/components/items";
 import OrderDetails from "@modules/order/components/order-details";
 import ShippingDetails from "@modules/order/components/shipping-details";
 import PaymentDetails from "@modules/order/components/payment-details";
 import { Order } from "types/global";
 import { notFound } from "next/navigation";
+
+import Items from "@/components/order/cart-details";
 
 type OrderCompletedTemplateProps = {
     order: Order;

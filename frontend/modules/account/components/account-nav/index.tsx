@@ -97,7 +97,7 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
                                 </li>
                             ))}
                             <li className="text-grey-700">
-                                <button data-testid="logout-button" aria-label="log out" type="button" onClick={handleLogout}>
+                                <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
                                     Log out
                                 </button>
                             </li>
