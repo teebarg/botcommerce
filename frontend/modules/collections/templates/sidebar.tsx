@@ -26,7 +26,7 @@ interface ComponentProps {
 
 const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, categories, facets, searchParams }) => {
     const [dataSet, setDataSet] = useState(new Set());
-    const { updateQuery } = useUpdateQuery(500);
+    const { updateQuery } = useUpdateQuery();
 
     const onPriceChange = (values: number | number[]) => {
         if (typeof values === "number") {

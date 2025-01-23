@@ -142,12 +142,17 @@ module.exports = {
                         transform: "translateX(100%)",
                     },
                 },
+                "indeterminate-bar": {
+                    "0%": { transform: "translateX(-50%) scaleX(.2)" },
+                    "100%": { transform: "translateX(100%) scaleX(1)" },
+                },
             },
             animation: {
                 blob: "blob 15s infinite",
                 "blob-delayed": "blob 15s infinite 2s",
                 "spinner-ease-spin": "spinner-spin 0.8s ease infinite",
                 "spinner-linear-spin": "spinner-spin 0.8s linear infinite",
+                "indeterminate-bar": "indeterminate-bar 1.5s cubic-bezier(.65,.815,.735,.395) infinite",
             },
             maxWidth: {
                 "8xl": "88rem", // 1408px

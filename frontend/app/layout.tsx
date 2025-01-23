@@ -8,6 +8,7 @@ import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
 import { siteConfig } from "@/lib/config";
+import ProgressBar from "@/components/ui/progress-bar";
 
 const Google = dynamic(() => import("./google"), { ssr: false });
 const NotificationProviders = dynamic(() => import("./notistack-providers"), { ssr: false });
@@ -60,14 +61,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </head>
             <body className="min-h-screen bg-background">
                 <NotificationProviders>
-                    <OverlayClientProvider>
-                        <div className="relative flex flex-col min-h-screen">
-                            <PushNotificationManager />
-                            <InstallPrompt />
-                            {children}
-                        </div>
-                        {!customer && <Google />}
-                    </OverlayClientProvider>
+                    <ProgressBar className="h-1 bg-primary">
+                        <OverlayClientProvider>
+                            <div className="relative flex flex-col min-h-screen">
+                                <PushNotificationManager />
+                                <InstallPrompt />
+                                {children}
+                            </div>
+                            {!customer && <Google />}
+                        </OverlayClientProvider>
+                    </ProgressBar>
                 </NotificationProviders>
             </body>
         </html>

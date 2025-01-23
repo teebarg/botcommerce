@@ -37,7 +37,7 @@ const Table: React.FC<Props> = ({
     form,
     isDataOnly = false,
 }) => {
-    const { updateQuery } = useUpdateQuery(1000);
+    const { updateQuery } = useUpdateQuery();
     const { enqueueSnackbar } = useSnackbar();
     const [isExporting, setIsExporting] = useState(false);
     const [isIndexing, setIsIndexing] = useState(false);

@@ -22,7 +22,7 @@ const AdminNavbar = async () => {
         <NavigationBar>
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">
-                    <LocalizedClientLink className="flex justify-start items-center gap-1" href="/admin">
+                    <LocalizedClientLink href="/admin">
                         <p className="font-bold text-inherit">{siteConfig.name}</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
@@ -30,9 +30,7 @@ const AdminNavbar = async () => {
 
             <NavbarContent className="flex basis-1/5 sm:basis-full" justify="end">
                 <NavbarItem className="flex">
-                    <LocalizedClientLink className="text-sm font-semibold leading-6" href="/">
-                        Store
-                    </LocalizedClientLink>
+                    <LocalizedClientLink href="/">Store</LocalizedClientLink>
                 </NavbarItem>
                 <NavbarItem className="flex items-center gap-2.5">
                     {/* <Notification /> */}
@@ -43,7 +41,7 @@ const AdminNavbar = async () => {
                     {customer ? (
                         <UserDropDown customer={customer} />
                     ) : (
-                        <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
+                        <LocalizedClientLink href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>
                         </LocalizedClientLink>
                     )}

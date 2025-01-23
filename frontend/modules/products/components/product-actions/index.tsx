@@ -75,9 +75,7 @@ export default function ProductActions({
                 )}
                 <div className="flex-1 hidden group-data-[has-details=true]:block mb-4">
                     <h3 className="text-xs md:text-base font-semibold tracking-tight leading-4 text-default-900 line-clamp-1 mb-auto">
-                        <LocalizedClientLink href={`/products/${product.slug}`} id={`${product.id}`}>
-                            {product.name}
-                        </LocalizedClientLink>
+                        <LocalizedClientLink href={`/products/${product.slug}`}>{product.name}</LocalizedClientLink>
                     </h3>
                 </div>
             </div>

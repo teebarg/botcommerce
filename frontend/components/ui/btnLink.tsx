@@ -1,7 +1,7 @@
 import * as React from "react";
-import Link from "next/link";
 
 import { cn } from "@/lib/util/cn";
+import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 
 const buttonConfig: any = {
     primary: {
@@ -52,7 +52,7 @@ interface BtnLinkProps {
 
 const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", variant = "solid", href, className, children, ...props }) => {
     return (
-        <Link
+        <LocalizedClientLink
             className={cn(
                 "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
                 "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
@@ -65,7 +65,7 @@ const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", varia
             {...props}
         >
             {children}
-        </Link>
+        </LocalizedClientLink>
     );
 };
 

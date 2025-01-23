@@ -1,26 +1,34 @@
 "use client";
 
-import Link from "next/link";
-import React from "react";
+import Link, { LinkProps } from "next/link";
+import React, { startTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useProgressBar } from "@/components/ui/progress-bar";
 
-/**
- * Use this component to create a Next.js `<Link />`,
- * without having to explicitly pass it as a prop.
- */
-const LocalizedClientLink = ({
-    children,
-    href,
-    ...props
-}: {
-    children?: React.ReactNode;
+interface TransitionLinkProps extends LinkProps {
+    children: React.ReactNode;
     href: string;
     className?: string;
-    onClick?: () => void;
-    passHref?: true;
-    [x: string]: any;
-}) => {
+}
+
+const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, ...props }) => {
+    const router = useRouter();
+    let progress = useProgressBar();
+
     return (
-        <Link href={`${href}`} {...props}>
+        <Link
+            {...props}
+            href={href}
+            onClick={(e) => {
+                e.preventDefault();
+                progress.start();
+
+                startTransition(() => {
+                    router.push(href.toString());
+                    progress.done();
+                });
+            }}
+        >
             {children}
         </Link>
     );

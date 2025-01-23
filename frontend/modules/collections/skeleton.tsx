@@ -11,7 +11,7 @@ const CollectionTemplateSkeleton = () => {
             <div className="hidden md:block">
                 <div className="h-full w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16">
                     <div className="h-full w-full max-w-sm rounded-medium p-6 bg-default-100 text-sm space-y-4">
-                        <div>
+                        <div className="space-y-2">
                             <span>Collections</span>
                             <div className="space-y-2">
                                 {[1, 2, 3]?.map((_, index: number) => <Skeleton key={index} className="h-8 w-full rounded dark:bg-background" />)}
