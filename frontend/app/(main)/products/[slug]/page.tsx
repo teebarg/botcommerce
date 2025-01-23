@@ -1,12 +1,21 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductBySlug, search } from "@lib/data";
-import ProductTemplate from "@modules/products/templates";
 import { Product, SearchParams } from "types/global";
-import { Suspense } from "react";
 
 import SkeletonProductTemplate from "@/modules/products/skeleton-product";
 import { siteConfig } from "@/lib/config";
+import React, { Suspense } from "react";
+import ProductActions from "@modules/products/components/product-actions";
+import RelatedProducts from "@modules/products/components/related-products";
+import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
+import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import { ArrowUpRightMini, ChevronRight, Delivery, Home } from "nui-react-icons";
+import Image from "next/image";
+
+import { currency } from "@/lib/util/util";
+import { BtnLink } from "@/components/ui/btnLink";
+import ProductDetails from "@/modules/products/templates/details";
 
 export const revalidate = 2;
 
@@ -53,7 +62,101 @@ export default async function ProductPage({ params }: Props) {
 
     return (
         <Suspense fallback={<SkeletonProductTemplate />}>
-            <ProductTemplate product={product} />
+            <React.Fragment>
+                <div className="max-w-7xl mx-auto h-full w-full md:my-8">
+                    <nav className="hidden md:block mb-4" data-slot="base">
+                        <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
+                            <li className="flex items-center" data-slot="base">
+                                <LocalizedClientLink href="/">Home</LocalizedClientLink>
+                            </li>
+                            <li className="flex items-center" data-slot="base">
+                                <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
+                                    <ChevronRight />
+                                </span>
+                                <LocalizedClientLink href="/collections">Collection</LocalizedClientLink>
+                            </li>
+                            {product?.name && (
+                                <li className="flex items-center" data-slot="base">
+                                    <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
+                                        <ChevronRight />
+                                    </span>
+                                    <span>{product.name}</span>
+                                </li>
+                            )}
+                        </ol>
+                    </nav>
+                    <div className="relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
+                        <div className="relative h-full w-full flex-none flex flex-col-reverse md:flex-row gap-2 md:gap-4">
+                            <div className="flex md:flex-col gap-4 px-2 md:px-0">
+                                {product?.images?.map((image: any, index: number) => (
+                                    <div key={index} className="w-[80px] h-[120px] relative rounded-lg overflow-hidden">
+                                        <Image fill alt={`Product ${index + 1}`} src={image.image} />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex-1 bg-red-50 rounded-md">
+                                <div className="h-[60vh] relative rounded-lg overflow-hidden">
+                                    <Image fill alt={product.name} src={product.image as string} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col px-2 md:px-0 mt-6 md:mt-0">
+                            <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
+                            <div className="my-2 flex items-center gap-2">
+                                <p className="text-small text-default-500">669 reviews</p>
+                            </div>
+                            <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2">
+                                <div className="flex items-center text-white">
+                                    <span className="text-3xl font-semibold ">{currency(product.price)}</span>
+                                    {product.old_price > product.price && (
+                                        <span className="ml-1 text-sm line-through">{currency(product.old_price)}</span>
+                                    )}
+                                </div>
+                                {product.old_price > product.price && (
+                                    <div className="mt-1 -mb-1.5">
+                                        <span className="text-xl font-medium text-orange-400">
+                                            Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="max-w-40 mt-2 hidden md:block">
+                                <Suspense fallback={<ProductActions disabled={true} product={product} />}>
+                                    <ProductActions product={product} showDetails={false} />
+                                </Suspense>
+                            </div>
+                            <div className="mt-4">
+                                <p className="line-clamp-3 text-medium text-default-500">{product.description}</p>
+                            </div>
+                            <div className="mt-6 flex flex-col gap-1">
+                                <div className="mb-4 flex items-center gap-2 text-default-900">
+                                    <Delivery />
+                                    <p className="text-small font-medium">Free shipping and 30 days return</p>
+                                </div>
+                                <LocalizedClientLink
+                                    className="inline-flex items-center text-small hover:opacity-80 transition-opacity my-2 text-default-500"
+                                    href={"/"}
+                                >
+                                    See guide
+                                    <ArrowUpRightMini />
+                                </LocalizedClientLink>
+                            </div>
+                            <ProductDetails product={product} />
+                        </div>
+                    </div>
+                </div>
+                <div className="max-w-7xl mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
+                    <Suspense fallback={<SkeletonRelatedProducts />}>
+                        <RelatedProducts product={product} />
+                    </Suspense>
+                </div>
+                <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg md:hidden">
+                    <BtnLink href="/" variant="bordered">
+                        <Home />
+                    </BtnLink>
+                    <ProductActions btnClassName="font-semibold" className="w-full" product={product} showPrice={false} />
+                </div>
+            </React.Fragment>
         </Suspense>
     );
 }
