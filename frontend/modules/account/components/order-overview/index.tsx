@@ -10,7 +10,7 @@ const OrderOverview = ({ orders }: { orders: any[] }) => {
     if (orders?.length) {
         return (
             <div className="flex flex-col gap-y-8 w-full">
-                {orders.map((o: Order, i: number) => (
+                {orders?.map((o: Order, i: number) => (
                     <div key={`order-${i}`} className="border-b border-gray-200 pb-6 last:pb-0 last:border-none">
                         <OrderCard order={o} />
                     </div>

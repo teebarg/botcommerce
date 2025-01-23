@@ -40,7 +40,7 @@ const Navbar = async () => {
     const ThemeButton = getThemeToggler();
 
     return (
-        <NavigationBar className="my-2">
+        <NavigationBar className="my-2 hidden md:flex">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center flex-1 md:w-[25vw] font-semibold">
                     <LocalizedClientLink className="text-3xl block" href="/">

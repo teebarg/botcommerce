@@ -26,7 +26,7 @@ const CareerOpportunities = () => {
 
                     {jobOpenings.length > 0 ? (
                         <div className="grid md:grid-cols-2 gap-6">
-                            {jobOpenings.map((job, index) => (
+                            {jobOpenings?.map((job, index) => (
                                 <div key={index} className="bg-content1 rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
                                     <h3 className="text-xl font-semibold mb-2 text-foreground">{job.title}</h3>
                                     <p className="mb-4 text-foreground">{job.location}</p>

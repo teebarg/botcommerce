@@ -181,7 +181,7 @@ export function Listbox({ options, value, onChange, placeholder = "Select an opt
                         {filteredOptions.length === 0 ? (
                             <p className="p-2 text-sm text-muted-foreground text-center">No options found</p>
                         ) : (
-                            filteredOptions.map((option: ListboxOption, index: number) => {
+                            filteredOptions?.map((option: ListboxOption) => {
                                 const itemProps = {
                                     option,
                                     isSelected: option.id === value,

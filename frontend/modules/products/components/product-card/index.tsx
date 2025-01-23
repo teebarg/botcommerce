@@ -24,9 +24,15 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
                     {/* <div className="max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap px-1 h-5 text-tiny rounded-small bg-secondary-100 text-secondary-foreground absolute right-7 top-4 z-20">
                         <span className="flex-1 text-inherit px-1 pl-0.5 font-semibold">New</span>
                     </div> */}
-                    <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-medium bg-content2 h-[12rem] md:h-[20rem] justify-between">
+                    <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-medium bg-content2 h-[15rem] md:h-[20rem] justify-between">
                         <div className="relative md:rounded-large z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
-                            <Image fill alt={product.name} className="hover:scale-95" src={product.image as string} />
+                            <Image
+                                fill
+                                alt={product.name}
+                                className="hover:scale-95"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                src={product.image as string}
+                            />
                         </div>
                     </div>
                     <div className="flex flex-col md:px-1 flex-1">

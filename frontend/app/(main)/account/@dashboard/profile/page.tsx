@@ -20,7 +20,7 @@ export default async function Profile() {
     }
 
     return (
-        <div className="w-full" data-testid="profile-page-wrapper">
+        <div className="w-full px-2 md:px-0" data-testid="profile-page-wrapper">
             <div className="mb-8">
                 <h1 className="text-xl font-semibold">Profile</h1>
                 <p className="text-base">

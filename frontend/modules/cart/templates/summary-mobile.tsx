@@ -1,6 +1,6 @@
 "use client";
 
-import { Cart } from "types/global";
+import { Cart, CartItem } from "types/global";
 import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
 
@@ -14,6 +14,7 @@ type SummaryProps = {
 };
 
 const SummaryMobile = ({ cart }: SummaryProps) => {
+    console.log(cart);
     const [isExpanded, setIsExpanded] = useState(false);
 
     if (!cart) return;
@@ -26,6 +27,11 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
     const getAmount = (amount: number | null | undefined) => {
         return currency(Number(amount) || 0);
     };
+
+    const totalItems =
+        cart?.items?.reduce((acc: number, item: CartItem) => {
+            return acc + item.quantity;
+        }, 0) || 0;
 
     return (
         <div className={`fixed md:hidden bottom-0 z-50 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500`}>
@@ -63,7 +69,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
             </div>
             <div className="flex flex-row-reverse gap-2 p-2">
                 <BtnLink color="danger" href="/checkout" variant="bordered">
-                    Checkout ({cart?.items?.length ?? 0})
+                    Checkout ({totalItems ?? 0})
                 </BtnLink>
                 <Button
                     className="bg-inherit"

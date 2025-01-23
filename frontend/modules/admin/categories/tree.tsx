@@ -63,7 +63,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                         </div>
                         {item.children && open.includes(item.id) && (
                             <ol className="mt-4 mb-4 block">
-                                {item.children.map((sub: Category, index: number) => (
+                                {item.children?.map((sub: Category, index: number) => (
                                     <li key={index} className="ml-10 min-h-10">
                                         <div className="flex items-center">
                                             <div className="flex w-[32px] items-center">

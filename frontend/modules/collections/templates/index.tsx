@@ -10,6 +10,7 @@ import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
 
 import { BtnLink } from "@/components/ui/btnLink";
+import { Badge } from "@/components/ui/badge";
 
 const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
 
@@ -67,12 +68,23 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                 <CollectionsSideBar brands={brands} categories={categories} collections={collections} facets={facets} searchParams={searchParams} />
             </div>
             <div className="w-full flex-1 flex-col">
+                {/* Categories */}
+                <div className="px-4 my-6 md:hidden">
+                    <h2 className="text-lg font-semibold mb-2">Categories</h2>
+                    <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
+                        {cat.map((category: Collection, index: number) => (
+                            <BtnLink href={`/collections?cat_ids=${category.slug}`} key={index} color="secondary" className="flex-none">
+                                {category.name}
+                            </BtnLink>
+                        ))}
+                    </div>
+                </div>
                 <div className="w-full">
                     <nav className="hidden md:block" data-slot="base">
                         <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
                             <li className="flex items-center" data-slot="base">
                                 <LocalizedClientLink href="/">Home</LocalizedClientLink>
-                                <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
+                                <span className="px-1 text-foreground/50" data-slot="separator">
                                     <ChevronRight />
                                 </span>
                             </li>

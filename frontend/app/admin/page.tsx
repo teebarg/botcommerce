@@ -97,7 +97,7 @@ export default async function AdminPage() {
             <div className="px-8 py-4">
                 <div className="grid gap-6 mb-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                        {stats.map((item, index: any) => (
+                        {stats?.map((item, index: any) => (
                             <Card key={index}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">{item.title}</CardTitle>

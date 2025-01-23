@@ -126,7 +126,7 @@ const ChatBot: React.FC<Props> = () => {
                 <div className="h-[calc(100%-48px)] list-none m-0 p-0 overflow-hidden relative">
                     <div className="bottom-3 flex flex-col absolute inset-0 overflow-scroll mr-0 mb-0 pb-12 bg-default h-full w-full">
                         <div aria-label="Messages from the conversation" className="flex flex-col gap-4">
-                            {messages.map((message, index) => (
+                            {messages?.map((message, index) => (
                                 <div key={index} className="relative py-0 px-4 flex flex-col">
                                     {index == 0 && (
                                         <p className={cn("text-small my-3 mx-0 text-center uppercase min-h-4 leading-6 font-medium")}>

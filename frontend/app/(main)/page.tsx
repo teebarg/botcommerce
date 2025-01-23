@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Category, Product, SearchParams, WishlistItem } from "types/global";
+import { Category, Collection, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
@@ -56,7 +56,7 @@ export default async function Home() {
         <React.Fragment>
             <div>
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative md:grid grid-cols-5 gap-4 rounded-xl py-6">
+                    <div className="max-w-8xl mx-auto relative hidden md:grid grid-cols-5 gap-4 rounded-xl py-6">
                         <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
                             <ul className="bg-primary/10">
@@ -125,6 +125,23 @@ export default async function Home() {
                                         Support Center
                                     </LocalizedClientLink>
                                 </span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Mobile Hero Section */}
+                    <div
+                        className="relative h-[50vh] md:hidden bg-cover"
+                        style={{
+                            backgroundImage: `url("https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-2.avif")`,
+                        }}
+                    >
+                        <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
+                            <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
+                                {categories?.map((category: Collection, index: number) => (
+                                    <BtnLink href={`/collections?cat_ids=${category.slug}`} key={index} color="secondary" className="flex-none">
+                                        {category.name}
+                                    </BtnLink>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -226,7 +243,7 @@ export default async function Home() {
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Opening Hours</p>
                                     <div>
-                                        {openingHours.map((hour, index) => (
+                                        {openingHours?.map((hour, index) => (
                                             <div key={index} className="grid grid-cols-3">
                                                 <p>{hour.day}</p>
                                                 <p className="col-span-2">{hour.time}</p>

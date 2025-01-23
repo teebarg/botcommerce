@@ -21,7 +21,7 @@ export async function generateStaticParams() {
 
     const { products } = await search(queryParams);
 
-    return products.map((product: Product) => ({
+    return products?.map((product: Product) => ({
         slug: String(product.slug),
     }));
 }
