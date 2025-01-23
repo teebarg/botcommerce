@@ -5,17 +5,34 @@ import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import { Customer } from "types/global";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HeartFilled, Heart, Home, UserGroup, User } from "nui-react-icons";
+import { HeartFilled, Heart, Home, UserGroup, User, Checkout, Collection } from "nui-react-icons";
 import dynamic from "next/dynamic";
 
 import Search from "@/modules/search/components/search";
 import { siteConfig } from "@/lib/config";
+import { cn } from "@/lib/util/cn";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
         ssr: false,
         loading: () => <div className="w-6 h-6" />,
     });
+
+interface NavLinkProp {
+    href: string;
+    title: string;
+    icon?: React.ReactNode;
+    className?: string;
+}
+
+const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) => {
+    return (
+        <NavbarItem className={cn("flex items-center gap-2", className)}>
+            {icon}
+            <LocalizedClientLink href={href}>{title}</LocalizedClientLink>
+        </NavbarItem>
+    );
+};
 
 const Navbar = async () => {
     const customer: Customer = await getCustomer().catch(() => null);
@@ -38,27 +55,21 @@ const Navbar = async () => {
                         </LocalizedClientLink>
                     )}
                 </NavbarBrand>
-                {/* <div className="hidden sm:flex items-center flex-1"> */}
                 <NavbarItem className="hidden md:flex flex-1">
                     <Search className="w-full justify-between" />
                 </NavbarItem>
-                {/* </div> */}
                 <NavbarItem className="md:w-[25vw] flex gap-3 justify-end items-center">
-                    <div className="flex items-center">
-                        <Suspense
-                            fallback={
-                                <LocalizedClientLink className="hover:text-default-900" data-testid="nav-cart-link" href="/cart">
-                                    Cart (0)
-                                </LocalizedClientLink>
-                            }
-                        >
-                            <Cart />
-                        </Suspense>
-                    </div>
-                    <div className="flex items-center">
-                        <ThemeButton />
-                    </div>
-                    <div className="hidden md:flex items-center">
+                    <Suspense
+                        fallback={
+                            <LocalizedClientLink className="hover:text-default-900" data-testid="nav-cart-link" href="/cart">
+                                Cart (0)
+                            </LocalizedClientLink>
+                        }
+                    >
+                        <Cart />
+                    </Suspense>
+                    <ThemeButton />
+                    <div className="hidden md:flex">
                         {customer ? (
                             <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
                                 <HeartFilled className="h-8 w-8 text-primary-500" />
@@ -67,7 +78,7 @@ const Navbar = async () => {
                             <Heart className="h-8 w-8 text-default-500" />
                         )}
                     </div>
-                    <div className="hidden sm:flex items-center">
+                    <div className="hidden sm:flex">
                         {customer ? (
                             <UserDropDown customer={customer} />
                         ) : (
@@ -81,48 +92,20 @@ const Navbar = async () => {
             </NavbarContent>
             <NavbarMenu>
                 <Search className="px-0" />
-                <div className="mt-6 flex flex-col gap-2">
-                    <NavbarItem className="flex items-center gap-2">
-                        <Home className="h-8 w-8" />
-                        <LocalizedClientLink href="/">Home</LocalizedClientLink>
-                    </NavbarItem>
-                    <NavbarItem className="flex items-center gap-2">
-                        <User className="h-8 w-8" viewBox="0 0 20 20" />
-                        <LocalizedClientLink href={"/account/profile"}>Profile</LocalizedClientLink>
-                    </NavbarItem>
-                    <NavbarItem className="flex items-center gap-2">
-                        <Heart className="h-8 w-8" />
-                        <LocalizedClientLink href={"/collections"}>Collections</LocalizedClientLink>
-                    </NavbarItem>
-                    <NavbarItem className="flex items-center gap-2">
-                        <Heart className="h-8 w-8" />
-                        <LocalizedClientLink href={"/checkout"}>Checkout</LocalizedClientLink>
-                    </NavbarItem>
-                    {customer && (
-                        <NavbarItem className="flex items-center gap-2">
-                            <Heart className="h-8 w-8" />
-                            <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
-                                Saved Items
-                            </LocalizedClientLink>
-                        </NavbarItem>
-                    )}
-                    {isAdmin && (
-                        <NavbarItem className="flex items-center gap-2">
-                            <UserGroup className="h-8 w-8" viewBox="0 0 24 24" />
-                            <LocalizedClientLink href={"/admin"}>Admin</LocalizedClientLink>
-                        </NavbarItem>
-                    )}
+                <div className="mt-6 space-y-2">
+                    <NavLink icon={<Home className="h-8 w-8" />} title="Home" href="/" />
+                    <NavLink icon={<User className="h-8 w-8" viewBox="0 0 20 20" />} title="Profile" href="/account/profile" />
+                    <NavLink icon={<Collection className="h-8 w-8" />} title="Collections" href="/collections" />
+                    <NavLink icon={<Checkout className="h-8 w-8" />} title="Checkout" href="/checkout" />
+                    {customer && <NavLink icon={<Heart className="h-8 w-8" />} title="Saved Items" href="/wishlist" />}
+                    {isAdmin && <NavLink icon={<UserGroup className="h-8 w-8" viewBox="0 0 24 24" />} title="Admin" href="/admin" />}
                 </div>
 
                 <hr className="tb-divider my-4" />
 
-                <div className="flex flex-col gap-2">
-                    <NavbarItem>
-                        <LocalizedClientLink href="/our-story">Our Story</LocalizedClientLink>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <LocalizedClientLink href={"/support"}>Contact Us</LocalizedClientLink>
-                    </NavbarItem>
+                <div className="space-y-2">
+                    <NavLink title="Our Story" href="/our-story" />
+                    <NavLink title="Contact Us" href="/support" />
                 </div>
                 <div className="mt-auto mb-2 md:hidden">
                     {customer ? (
