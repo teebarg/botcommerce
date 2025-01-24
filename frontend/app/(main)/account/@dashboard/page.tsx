@@ -5,6 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Customer, Order } from "types/global";
 import { currency } from "@lib/util/util";
 import { ChevronDown } from "nui-react-icons";
+import PromotionalBanner from "@/components/promotion";
 
 export const metadata: Metadata = {
     title: "Account",
@@ -48,7 +49,8 @@ export default async function OverviewTemplate() {
     return (
         <div data-testid="overview-page-wrapper">
             <div>
-                <div className="text-xl hidden md:flex justify-between items-center mb-4">
+                <PromotionalBanner />
+                <div className="text-xl hidden md:flex justify-between items-center mt-4">
                     <span data-testid="welcome-message" data-value={customer?.firstname}>
                         Hello {customer?.firstname}
                     </span>
@@ -59,7 +61,7 @@ export default async function OverviewTemplate() {
                         </span>
                     </span>
                 </div>
-                <div className="flex flex-col py-2 border-t border-gray-200">
+                <div className="flex flex-col py-2 border-t border-gray-200 mt-2">
                     <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
                         <div className="grid grid-cols-2 gap-x-2 max-w-xl">
                             <div className="flex flex-col bg-pink-100 rounded-lg py-2 px-4 text-gray-800 ">

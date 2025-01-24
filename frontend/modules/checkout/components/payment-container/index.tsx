@@ -1,42 +1,56 @@
-import { InformationCircleSolid } from "nui-react-icons";
 import React from "react";
-import { Tooltip } from "@components/ui/tooltip";
-
-import PaymentTest from "../payment-test";
 
 import { RadioGroup } from "@/components/ui/radio-group";
+import { cn } from "@/lib/util/cn";
 
 type PaymentContainerProps = {
     paymentSession: any;
     selectedPaymentOptionId: string | null;
     disabled?: boolean;
-    paymentInfoMap: Record<string, { title: string; icon: JSX.Element }>;
+    paymentInfoMap: Record<string, { title: string; description: string; icon: React.JSX.Element | any }>;
 };
 
 const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, selectedPaymentOptionId, paymentInfoMap, disabled = false }) => {
-    const isDevelopment = process.env.NODE_ENV === "development";
-
     return (
         <>
             <RadioGroup.Option
                 key={paymentSession.id}
-                className={selectedPaymentOptionId === paymentSession.provider_id ? "border-primary" : ""}
+                className={cn(
+                    "flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all max-w-md",
+                    selectedPaymentOptionId === paymentSession.provider_id ? "border-green-500 bg-green-50" : "border-gray-300 hover:border-gray-400"
+                )}
                 value={paymentSession.provider_id}
             >
-                <div className="flex items-center gap-x-4">
-                    <RadioGroup.Radio checked={selectedPaymentOptionId === paymentSession.provider_id} />
-                    <span className="text-base">{paymentInfoMap[paymentSession.provider_id]?.title || paymentSession.provider_id}</span>
-                    {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, paymentSession.provider_id) && (
-                        <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'modules/checkout/components/payment/index.tsx'">
-                            <span>
-                                <InformationCircleSolid />
-                            </span>
-                        </Tooltip>
+                {/* Icon */}
+                <div
+                    className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-full text-lg",
+                        selectedPaymentOptionId === paymentSession.provider_id ? "bg-green-500 text-white" : "bg-gray-200 text-gray-600"
                     )}
-                    {paymentSession.provider_id === "manual" && isDevelopment && <PaymentTest className="hidden sm:block" />}
+                >
+                    {paymentInfoMap[paymentSession.provider_id]?.icon}
                 </div>
-                <span className="justify-self-end text-default-900">{paymentInfoMap[paymentSession.provider_id]?.icon}</span>
-                {paymentSession.provider_id === "manual" && isDevelopment && <PaymentTest className="sm:hidden text-[10px]" />}
+
+                {/* Text Content */}
+                <div className="flex-1">
+                    <h3
+                        className={cn(
+                            "text-sm font-medium",
+                            selectedPaymentOptionId === paymentSession.provider_id ? "text-green-600" : "text-gray-800"
+                        )}
+                    >
+                        {paymentInfoMap[paymentSession.provider_id]?.title || paymentSession.provider_id}
+                    </h3>
+                    <p className="text-sm text-gray-600">{paymentInfoMap[paymentSession.provider_id]?.description}</p>
+                </div>
+
+                {/* Radio Indicator */}
+                <div
+                    className={cn(
+                        "h-5 w-5 rounded-full border-2",
+                        selectedPaymentOptionId === paymentSession.provider_id ? "border-green-500 bg-green-500" : "border-gray-300"
+                    )}
+                ></div>
             </RadioGroup.Option>
         </>
     );

@@ -41,7 +41,7 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
                 <span
                     className={cn(
                         "flex z-10 flex-wrap absolute box-border rounded-full whitespace-nowrap place-content-center origin-center",
-                        "items-center select-none font-regular px-0 border-2 border-background",
+                        "items-center select-none px-0 border-2 border-background",
                         {
                             "text-tiny w-4 h-4 min-w-4 min-h-4": size == "sm",
                             "text-small w-5 h-5 min-w-5 min-h-5": size == "md",

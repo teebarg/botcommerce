@@ -10,6 +10,7 @@ import Image from "next/image";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 import { BtnLink } from "@/components/ui/btnLink";
+import PromotionalBanner from "@/components/promotion";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
@@ -146,18 +147,11 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative h-8 md:h-28">
-                    <Image
-                        fill
-                        priority
-                        alt="banner"
-                        className="object-contain"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
-                        src="/frontend.webp"
-                    />
+                <div className="relative py-2">
+                    <PromotionalBanner />
                 </div>
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="max-w-8xl mx-auto relative py-2 md:py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                                 <span className="text-secondary text-3xl font-semibold">{siteConfig.name}</span>

@@ -38,9 +38,9 @@ const Addresses = ({
     return (
         <div>
             <div className="flex flex-row items-center justify-between mb-6">
-                <h2 className="flex flex-row text-2xl gap-x-2 items-baseline">
+                <h2 className="flex flex-row text-lg font-bold gap-x-2 items-baseline">
                     Shipping Address
-                    {!isOpen && <CheckCircleSolid />}
+                    {!isOpen && <CheckCircleSolid className="text-success" />}
                 </h2>
                 {!isOpen && cart?.shipping_address && (
                     <button aria-label="eidt" className="hover:text-blue-400" data-testid="edit-address-button" onClick={handleEdit}>
@@ -118,9 +118,9 @@ const Addresses = ({
                                 </div>
                             </div>
                         ) : (
-                            <div>
-                                <p className="text-warning-900">Add Address</p>
-                            </div>
+                            <button aria-label="add address" className="text-warning-900" data-testid="add-address-button" onClick={handleEdit}>
+                                Add Address
+                            </button>
                         )}
                     </div>
                 </div>

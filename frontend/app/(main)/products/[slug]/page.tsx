@@ -10,14 +10,11 @@ import ProductActions from "@modules/products/components/product-actions";
 import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
 import LocalizedClientLink from "@modules/common/components/localized-client-link";
-import { ArrowUpRightMini, ChevronRight, Delivery, Home } from "nui-react-icons";
+import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import Image from "next/image";
 
 import { currency } from "@/lib/util/util";
-import { BtnLink } from "@/components/ui/btnLink";
 import ProductDetails from "@/modules/products/templates/details";
-
-export const revalidate = 2;
 
 type Props = {
     params: { slug: string };
@@ -63,6 +60,9 @@ export default async function ProductPage({ params }: Props) {
     return (
         <Suspense fallback={<SkeletonProductTemplate />}>
             <React.Fragment>
+                <div className="sticky top-14 z-50 w-full px-8 py-4 bg-background shadow-xl md:hidden">
+                    <ProductActions btnClassName="font-semibold bg-rose-500 text-white" className="w-full" product={product} showPrice={false} />
+                </div>
                 <div className="max-w-7xl mx-auto h-full w-full md:my-8">
                     <nav className="hidden md:block mb-4" data-slot="base">
                         <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
@@ -94,7 +94,7 @@ export default async function ProductPage({ params }: Props) {
                                     </div>
                                 ))}
                             </div>
-                            <div className="flex-1 bg-red-50 rounded-md">
+                            <div className="flex-1">
                                 <div className="h-[60vh] relative rounded-lg overflow-hidden">
                                     <Image fill alt={product.name} src={product.image as string} />
                                 </div>
@@ -149,12 +149,6 @@ export default async function ProductPage({ params }: Props) {
                     <Suspense fallback={<SkeletonRelatedProducts />}>
                         <RelatedProducts product={product} />
                     </Suspense>
-                </div>
-                <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg md:hidden">
-                    <BtnLink href="/" variant="bordered">
-                        <Home />
-                    </BtnLink>
-                    <ProductActions btnClassName="font-semibold" className="w-full" product={product} showPrice={false} />
                 </div>
             </React.Fragment>
         </Suspense>

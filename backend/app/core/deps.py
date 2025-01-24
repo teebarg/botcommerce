@@ -28,8 +28,8 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 
 def get_db() -> Generator:
-    retries = 5  # Number of retries
-    wait_time = 1  # Initial wait time (seconds)
+    retries = 10  # Number of retries
+    wait_time = 2  # Initial wait time (seconds)
     session = None
 
     for attempt in range(retries):

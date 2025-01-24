@@ -40,22 +40,25 @@ def limit(rate_string: str):
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            # Extract request and redis from kwargs
-            request = kwargs.get("request")
-            redis = kwargs.get("redis")
+            cache = await get_cache_service()
+            # Extract request
+            # request = kwargs.get("request")
 
-            if not request or not redis:
-                raise ValueError("Rate limiting requires 'request' and 'redis' parameters")
+            # if not request:
+            #     raise ValueError("Rate limiting requires 'request' parameter")
+            
+            # client_ip = request.state.client_host
 
-            client_ip = request.client.host
-            key = f"rate_limit:{client_ip}:{func.__name__}"
+            # client_ip = request.client.host
+            # key = f"rate_limit:{client_ip}:{func.__name__}"
+            key = f"rate_limit:{func.__name__}"
 
             # Increment the request count
-            current_count = redis.incr(key)
+            current_count = cache.redis.incr(key)
 
             if current_count == 1:
                 # Set the expiration for the first request
-                redis.expire(key, period_seconds)
+                cache.redis.expire(key, period_seconds)
 
             if current_count > max_requests:
                 raise HTTPException(

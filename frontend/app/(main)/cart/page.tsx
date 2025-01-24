@@ -25,6 +25,7 @@ export default async function Cart() {
 
     return (
         <>
+            <SummaryMobile cart={cart} />
             <div className="py-0 md:py-12">
                 <div className="max-w-7xl mx-auto" data-testid="cart-container">
                     {cart?.items.length ? (
@@ -72,7 +73,6 @@ export default async function Cart() {
                     </div>
                 </div>
             </div>
-            <SummaryMobile cart={cart} />
         </>
     );
 }

@@ -55,10 +55,11 @@ const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", varia
         <LocalizedClientLink
             className={cn(
                 "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
-                "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
+                "font-medium overflow-hidden outline-none transition-all hover:opacity-80",
                 variant === "shadow" && buttonConfig[color].shadow,
                 buttonConfig[size],
                 buttonConfig[color].color,
+                variant === "bordered" && buttonConfig[color].bordered,
                 className
             )}
             href={href}

@@ -16,8 +16,9 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
 
 const payMethods = [
-    { id: "stripe", provider_id: "Stripe" },
-    { id: "manual", provider_id: "Bank Transfer" },
+    { id: "stripe", provider_id: "stripe" },
+    { id: "manual", provider_id: "manual" },
+    { id: "paystack", provider_id: "paystack" },
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
@@ -83,12 +84,12 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
         <div>
             <div className="flex flex-row items-center justify-between mb-4">
                 <h2
-                    className={cn("flex flex-row text-xl gap-x-2 items-baseline", {
+                    className={cn("flex flex-row text-lg font-bold gap-x-2 items-baseline", {
                         "opacity-50 pointer-events-none select-none": !isOpen && !paymentReady,
                     })}
                 >
                     Payment
-                    {!isOpen && paymentReady && <CheckCircleSolid />}
+                    {!isOpen && paymentReady && <CheckCircleSolid className="text-success" />}
                 </h2>
                 {!isOpen && paymentReady && (
                     <button aria-label="edit payment" className="hover:text-blue-400" data-testid="edit-payment-button" onClick={handleEdit}>

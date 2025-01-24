@@ -98,10 +98,10 @@ export default async function Checkout() {
                         <CheckoutSummary />
                     </section>
                 </div>
-                <div className="fixed md:hidden bottom-0 z-20 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500">
-                    <div className="flex flex-row-reverse justify-between items-center px-2 py-2">
+                <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
+                    <div className="flex flex-row-reverse justify-between items-center">
                         <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
-                        <p className="font-semibold">Total: {getAmount(total)}</p>
+                        <p className="font-semibold text-xl">Total: {getAmount(total)}</p>
                     </div>
                 </div>
             </div>

@@ -22,7 +22,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
         <div>
             <div className="flex flex-row items-center justify-between mb-6">
                 <h2
-                    className={cn("flex flex-row text-3xl-regular gap-x-2 items-baseline", {
+                    className={cn("flex flex-row text-3xl gap-x-2 items-baseline", {
                         "opacity-50 pointer-events-none select-none": !isOpen,
                     })}
                 >

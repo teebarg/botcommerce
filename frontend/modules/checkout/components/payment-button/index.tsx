@@ -30,6 +30,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, customer, "data-tes
 
     switch (paymentSession.id) {
         case "manual":
+        case "paystack":
             return <ManualTestPaymentButton customer={customer} data-testid={dataTestId} notReady={notReady} />;
         case "stripe":
             return <Button disabled>Continue to payment</Button>;

@@ -102,7 +102,7 @@ export const ListboxTrigger = forwardRef<HTMLButtonElement, ListboxTriggerProps>
             ref={ref}
             aria-expanded={isOpen}
             aria-label="trigger"
-            className={cn("w-full justify-between hover:bg-warning/50 transition-colors py-6", className)}
+            className={cn("w-full justify-between transition-colors py-6", className)}
             role="combobox"
             type="button"
             onClick={() => setIsOpen(!isOpen)}
@@ -117,7 +117,7 @@ export const DefaultListboxItem = forwardRef<HTMLButtonElement, ListboxItemProps
         ref={ref}
         aria-selected={isSelected}
         className={cn(
-            "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-warning hover:text-warning-foreground focus:bg-warning focus:text-warning-foreground",
+            "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:text-warning-foreground focus:text-warning-foreground",
             isSelected && "bg-warning/50"
         )}
         role="option"
