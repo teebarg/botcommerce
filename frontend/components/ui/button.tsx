@@ -88,7 +88,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 type={type} // Explicitly forward the type prop
                 {...props}
             >
-                {isLoading && <Spinner color="current" />}
+                {isLoading && <Spinner color="current" className="mr-2" />}
                 {startContent}
                 {children}
                 {endContent}
