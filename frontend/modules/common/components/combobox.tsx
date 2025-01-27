@@ -70,14 +70,14 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
                     ref={triggerRef}
                     className={cn(
                         "relative px-3 w-full inline-flex shadow-sm outline-none bg-default-100",
-                        "rounded-medium flex-col items-start justify-center h-12 py-2"
+                        "rounded-xl flex-col items-start justify-center h-12 py-2"
                     )}
                 >
                     <input readOnly className="hidden" name={name} value={state.inputValue} />
                     <input
                         {...inputProps}
                         ref={inputRef}
-                        className="bg-transparent outline-none flex-grow text-default-foreground font-normal text-small w-full cursor-pointer"
+                        className="bg-transparent outline-none flex-grow text-default-foreground font-normal text-sm w-full cursor-pointer"
                         placeholder={placeholder}
                         style={{
                             boxSizing: "border-box",
@@ -100,7 +100,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className
                             {[...state.collection].map((item) => (
                                 <li
                                     key={item.key}
-                                    className={cn("px-2 py-4 cursor-pointer rounded-lg text-small font-semibold hover:bg-default/20", {
+                                    className={cn("px-2 py-4 cursor-pointer rounded-lg text-sm font-semibold hover:bg-default/20", {
                                         "bg-default/70": state.selectionManager.isSelected(item.key),
                                     })}
                                     onMouseDown={() => state.selectionManager.select(item.key)}

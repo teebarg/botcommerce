@@ -33,7 +33,7 @@ const Banner: React.FC<ComponentProps> = () => {
                         index === currentSlide ? "opacity-100 flex items-center justify-between md:justify-center gap-2 w-full" : "opacity-0 hidden"
                     )}
                 >
-                    <div className="text-small flex items-end sm:text-[0.93rem] text-foreground hover:opacity-80 transition-opacity">
+                    <div className="text-sm flex items-end sm:text-[0.93rem] text-foreground hover:opacity-80 transition-opacity">
                         <span aria-label="rocket" className="hidden md:block" role="img">
                             🚀
                         </span>

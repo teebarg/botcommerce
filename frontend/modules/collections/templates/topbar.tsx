@@ -34,7 +34,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
 
     return (
         <React.Fragment>
-            <header className="relative z-20 flex flex-col sm:gap-2 rounded-medium bg-content1 px-4 pb-3 pt-2 md:pt-3">
+            <header className="relative z-20 flex flex-col sm:gap-2 rounded-xl bg-content1 px-4 pb-3 pt-2 md:pt-3">
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
                         <Button className="md:hidden h-12" onClick={state.open}>
@@ -42,8 +42,8 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                             Filters ({count})
                         </Button>
                         <div className="hidden items-center gap-1 md:flex">
-                            <h2 className="text-medium font-medium capitalize">{slug ?? "Collections"}</h2>
-                            <span className="text-small text-default-500">({count})</span>
+                            <h2 className="text-base font-medium capitalize">{slug ?? "Collections"}</h2>
+                            <span className="text-sm text-default-500">({count})</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-1 flex-1 sm:flex-initial">

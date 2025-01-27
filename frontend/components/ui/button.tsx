@@ -37,9 +37,9 @@ const buttonConfig: any = {
     },
 
     // Sizes
-    sm: "px-4 min-w-20 h-10 text-tiny gap-2 rounded-small",
-    md: "px-6 min-w-20 h-12 text-small gap-2 rounded-medium",
-    lg: "px-8 min-w-24 h-14 text-medium gap-3 rounded-large",
+    sm: "px-4 min-w-20 h-10 text-xs gap-2 rounded-lg",
+    md: "px-6 min-w-20 h-12 text-sm gap-2 rounded-xl",
+    lg: "px-8 min-w-24 h-14 text-base gap-3 rounded-1xl",
 };
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -75,7 +75,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <button
                 ref={ref}
                 className={cn(
-                    "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
+                    "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap text",
                     "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
                     buttonConfig[size],
                     variant === "shadow" && buttonConfig[color].shadow,

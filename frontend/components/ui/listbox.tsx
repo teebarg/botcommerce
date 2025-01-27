@@ -79,10 +79,10 @@ export function ListboxSearch({ onSearch }: ListboxSearchProps) {
 
     return (
         <div className="relative">
-            <Search aria-hidden="true" className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search aria-hidden="true" className="absolute left-2 top-2.5 h-4 w-4 text-default-500" />
             <input
                 aria-label="Search options"
-                className="w-full border-0 border-b bg-transparent py-2 pl-8 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-0"
+                className="w-full border-0 border-b bg-transparent py-2 pl-8 pr-4 text-sm outline-none placeholder:text-default-500 focus:ring-0"
                 placeholder="Search..."
                 role="searchbox"
                 type="text"
@@ -123,11 +123,11 @@ export const DefaultListboxItem = forwardRef<HTMLButtonElement, ListboxItemProps
         role="option"
         onClick={onSelect}
     >
-        {option.icon && <option.icon aria-hidden="true" className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />}
+        {option.icon && <option.icon aria-hidden="true" className="mr-2 h-4 w-4 shrink-0 text-default-500" />}
         <div className="flex flex-col">
             <span>{option.label}</span>
             {option.description && (
-                <span aria-description={option.description} className="text-xs text-muted-foreground">
+                <span aria-description={option.description} className="text-xs text-default-500">
                     {option.description}
                 </span>
             )}
@@ -170,7 +170,7 @@ export function Listbox({ options, value, onChange, placeholder = "Select an opt
                             <span>{selectedOption.address_1}</span>
                         </div>
                     ) : (
-                        <span className="text-muted-foreground">{placeholder}</span>
+                        <span className="text-default-500">{placeholder}</span>
                     )}
                     <ChevronUpDown className="ml-2 shrink-0" />
                 </ListboxTrigger>
@@ -179,7 +179,7 @@ export function Listbox({ options, value, onChange, placeholder = "Select an opt
                     <ListboxSearch onSearch={setSearchQuery} />
                     <div aria-label="Options" className="max-h-[300px] overflow-auto p-1" id="listbox-options" role="listbox">
                         {filteredOptions.length === 0 ? (
-                            <p className="p-2 text-sm text-muted-foreground text-center">No options found</p>
+                            <p className="p-2 text-sm text-default-500 text-center">No options found</p>
                         ) : (
                             filteredOptions?.map((option: ListboxOption) => {
                                 const itemProps = {

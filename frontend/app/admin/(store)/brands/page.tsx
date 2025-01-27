@@ -4,11 +4,11 @@ import React from "react";
 import { Table } from "@modules/common/components/table";
 import { getBrands } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
-import { Chip } from "@modules/common/components/chip";
 import { deleteBrand } from "@modules/admin/actions";
 
 import { BrandForm } from "@/modules/admin/brands/brand-form";
 import { siteConfig } from "@/lib/config";
+import Chip from "@/components/ui/chip";
 
 export const metadata: Metadata = {
     title: `Brands Page | Children clothing | ${siteConfig.name} Store`,

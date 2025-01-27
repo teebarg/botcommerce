@@ -53,9 +53,9 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
 
     return (
         <>
-            <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-large md:bg-content1 w-full snap-start h-full" id={`${id}`}>
-                <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-medium bg-content2 h-[12rem] md:h-[20rem] justify-between">
-                    <div className="relative md:rounded-large z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
+            <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-content1 w-full snap-start h-full" id={`${id}`}>
+                <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl bg-content2 h-[12rem] md:h-[20rem] justify-between">
+                    <div className="relative md:rounded-1xl z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
                         <Image fill alt={name} className="hover:scale-95" src={image as string} />
                     </div>
                 </div>

@@ -70,9 +70,8 @@ const ReviewsSection: React.FC = () => {
                     color={selectedFilter === filter ? "default" : "secondary"}
                     onClick={() => setSelectedFilter(filter)}
                     className="py-1 px-3 cursor-pointer capitalize"
-                >
-                    {filter}
-                </Chip>
+                    title={filter}
+                />
             ))}
             <Button size="sm" className="ml-2 h-8">
                 filter
@@ -113,7 +112,7 @@ const ReviewsSection: React.FC = () => {
                 <div>
                     <div className="flex items-center">
                         <span className="font-medium mr-2">{review.name}</span>
-                        {review.verified && <Chip color="success">Verified</Chip>}
+                        {review.verified && <Chip color="success" title="Verified" />}
                     </div>
                     <div className="flex">
                         {[...Array(5)].map((_, i) => (

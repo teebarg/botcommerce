@@ -23,7 +23,7 @@ export default function Loading() {
                                     {repeat(4).map((_, index: number) => (
                                         <tr key={index} className="even:bg-content2">
                                             <td className="py-2 pl-4 pr-3">
-                                                <Skeleton className="flex w-24 h-24 p-4 rounded-large" />
+                                                <Skeleton className="flex w-24 h-24 p-4 rounded-1xl" />
                                             </td>
                                             <td className="px-3">
                                                 <div className="flex flex-col gap-y-2">
@@ -55,7 +55,7 @@ export default function Loading() {
                                 <div className="space-y-4">
                                     {repeat(3).map((_, index: number) => (
                                         <div key={index} className="flex items-center space-x-4 py-4 border-b-slate-300">
-                                            <Skeleton className="aspect-square w-28 h-28 rounded-medium" />
+                                            <Skeleton className="aspect-square w-28 h-28 rounded-xl" />
                                             <div className="flex-1 space-y-2">
                                                 <Skeleton className="w-3/4 h-4" />
                                                 <Skeleton className="w-1/4 h-4" />

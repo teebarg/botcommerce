@@ -41,8 +41,6 @@ def get_db() -> Generator:
             print(f"Database is waking up, retrying in {wait_time} seconds... (Attempt {attempt + 1}/{retries})")
             time.sleep(wait_time)
             wait_time *= 2  # Exponential backoff
-        except Exception as e:
-            print(e)
         finally:
             if session:
                 session.close()  # Ensure the session is closed after every attempt

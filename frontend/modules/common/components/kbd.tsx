@@ -19,7 +19,7 @@ const Kbd: React.FC<Props> = ({ keys = [], className, children }) => {
         <React.Fragment>
             <kbd
                 className={cn(
-                    "px-1.5 py-0.5 inline-flex space-x-0.5 items-center font-sans font-normal text-center text-small shadow-small bg-default-100 text-foreground-500 rounded-small",
+                    "px-1.5 py-0.5 inline-flex space-x-0.5 items-center font-sans font-normal text-center text-sm shadow-small bg-default-100 text-foreground-500 rounded-lg",
                     className
                 )}
             >

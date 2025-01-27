@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { Category } from "types/global";
-import { Chip } from "@modules/common/components/chip";
 import { ChevronRight, DotsSix, Folder, Tag } from "nui-react-icons";
 
 import CategoryAction from "./categories-control";
 
 import { cn } from "@/lib/util/cn";
+import Chip from "@/components/ui/chip";
 
 interface Props {
     categories: Category[];

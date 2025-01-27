@@ -10,7 +10,7 @@ const CollectionTemplateSkeleton = () => {
         <React.Fragment>
             <div className="hidden md:block">
                 <div className="h-full w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16">
-                    <div className="h-full w-full max-w-sm rounded-medium p-6 bg-default-100 text-sm space-y-4">
+                    <div className="h-full w-full max-w-sm rounded-xl p-6 bg-default-100 text-sm space-y-4">
                         <div className="space-y-2">
                             <span>Collections</span>
                             <div className="space-y-2">
@@ -33,7 +33,7 @@ const CollectionTemplateSkeleton = () => {
                 <div className="w-full">
                     {/* Breadcrumb skeleton */}
                     <nav className="hidden md:block">
-                        <ol className="flex flex-wrap list-none rounded-small">
+                        <ol className="flex flex-wrap list-none rounded-lg">
                             <li className="flex items-center">
                                 <span>Home</span>
                                 <span className="px-1">
@@ -52,7 +52,7 @@ const CollectionTemplateSkeleton = () => {
                             <Skeleton className="h-14 w-full rounded" />
 
                             <main className="mt-4 w-full px-1">
-                                <div className="block md:rounded-medium md:border-2 border-dashed border-divider md:px-2 py-4">
+                                <div className="block md:rounded-xl md:border-2 border-dashed border-divider md:px-2 py-4">
                                     <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-4">
                                         {/* Generate 8 skeleton product cards */}
                                         {[...Array(8)].map((_, index) => (

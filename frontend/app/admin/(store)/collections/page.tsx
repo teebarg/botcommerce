@@ -6,10 +6,10 @@ import ProductUpload from "@modules/admin/products/product-upload";
 import { getCollectionsList, getCustomer } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
-import { Chip } from "@modules/common/components/chip";
 import { deleteCollection } from "@modules/admin/actions";
 
 import { siteConfig } from "@/lib/config";
+import Chip from "@/components/ui/chip";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,

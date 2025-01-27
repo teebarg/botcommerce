@@ -43,10 +43,10 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                 data-total={pagination?.total_pages}
                 role="navigation"
             >
-                <ul className="flex flex-nowrap h-fit max-w-fit relative gap-1 items-center overflow-visible rounded-medium" data-slot="wrapper">
+                <ul className="flex flex-nowrap h-fit max-w-fit relative gap-1 items-center overflow-visible rounded-xl" data-slot="wrapper">
                     <span
                         aria-hidden="true"
-                        className="absolute flex overflow-visible items-center justify-center origin-center select-none touch-none pointer-events-none z-20 data-[moving=true]:transition-transform !data-[moving=true]:duration-300 opacity-0 data-[moving]:opacity-100 min-w-9 w-9 h-9 text-small rounded-medium bg-secondary-900 text-background"
+                        className="absolute flex overflow-visible items-center justify-center origin-center select-none touch-none pointer-events-none z-20 data-[moving=true]:transition-transform !data-[moving=true]:duration-300 opacity-0 data-[moving]:opacity-100 min-w-9 w-9 h-9 text-sm rounded-xl bg-secondary-900 text-background"
                         data-moving={page !== pagination?.page || false}
                         data-slot="cursor"
                         style={{ transform: `translateX(${40 * page}px) scale(1)` }}
@@ -59,7 +59,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                         className={cn(
                             "flex flex-wrap truncate box-border items-center justify-center outline-none data-[disabled=true]:opacity-50",
                             "data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100",
-                            "min-w-9 w-9 h-9 text-small rounded-medium"
+                            "min-w-9 w-9 h-9 text-sm rounded-xl"
                         )}
                         data-disabled={pagination?.total_pages === 1 || page == 1 ? "true" : "false"}
                         data-slot="prev"
@@ -77,7 +77,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                             key={index}
                             aria-current={page == index + 1 ? "true" : undefined}
                             aria-label={`pagination item ${index + 1} ${page == index + 1 ? "active" : ""}`}
-                            className="select-none touch-none bg-default transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-small rounded-medium"
+                            className="select-none touch-none bg-default transition-transform-background flex flex-wrap truncate box-border items-center justify-center text-default-foreground outline-none data-[disabled=true]:text-default-100 data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100 active:bg-default-500 min-w-9 w-9 h-9 text-sm rounded-xl"
                             data-active={page === index + 1 ? "true" : undefined}
                             data-slot="item"
                             role="button"
@@ -95,7 +95,7 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                         className={cn(
                             "flex flex-wrap truncate box-border items-center justify-center outline-none data-[disabled=true]:opacity-50",
                             "data-[disabled=true]:pointer-events-none [&[data-hover=true]:not([data-active=true])]:bg-default-100",
-                            "min-w-9 w-9 h-9 text-small rounded-medium"
+                            "min-w-9 w-9 h-9 text-sm rounded-xl"
                         )}
                         data-disabled={pagination?.total_pages === 1 || page == pagination?.total_pages ? "true" : "false"}
                         data-slot="next"

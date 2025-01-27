@@ -2,7 +2,7 @@ import React from "react";
 import { CreditCard } from "nui-react-icons";
 
 /* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
-export const paymentInfoMap: Record<string, { title: string, description: string, icon: React.JSX.Element | any }> = {
+export const paymentInfoMap: Record<string, { title: string; description: string; icon: React.JSX.Element | any }> = {
     manual: {
         title: "Bank Transfer",
         description: "Pay directly into our bank account.",
@@ -18,6 +18,6 @@ export const paymentInfoMap: Record<string, { title: string, description: string
         title: "Paystack",
         description: "Secure payments through Paystack.",
         icon: "💳", // Placeholder for an icon
-    }
+    },
     // Add more payment providers here
 };

@@ -56,7 +56,12 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
                     <ul className="flex justify-between px-6">
                         {navLinks.map((link, index: number) => (
                             <li key={index}>
-                                <LocalizedClientLink className="px-8 text-xs font-semibold" data-testid={link.dataTestid} href={link.href} active="text-rose-500">
+                                <LocalizedClientLink
+                                    className="px-8 text-xs font-semibold"
+                                    data-testid={link.dataTestid}
+                                    href={link.href}
+                                    active="text-rose-500"
+                                >
                                     <div className="flex flex-col items-center">
                                         {link.icon}
                                         <span>{link.label}</span>

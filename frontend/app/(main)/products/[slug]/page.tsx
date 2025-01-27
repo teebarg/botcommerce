@@ -66,7 +66,7 @@ export default async function ProductPage({ params }: Props) {
                 </div>
                 <div className="max-w-7xl mx-auto h-full w-full md:my-8">
                     <nav className="hidden md:block mb-4" data-slot="base">
-                        <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
+                        <ol className="flex flex-wrap list-none rounded-lg" data-slot="list">
                             <li className="flex items-center" data-slot="base">
                                 <LocalizedClientLink href="/">Home</LocalizedClientLink>
                             </li>
@@ -104,7 +104,7 @@ export default async function ProductPage({ params }: Props) {
                         <div className="flex flex-col px-2 md:px-0 mt-6 md:mt-0">
                             <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
                             <div className="my-2 flex items-center gap-2">
-                                <p className="text-small text-default-500">669 reviews</p>
+                                <p className="text-sm text-default-500">669 reviews</p>
                             </div>
                             <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2">
                                 <div className="flex items-center text-white">
@@ -127,15 +127,15 @@ export default async function ProductPage({ params }: Props) {
                                 </Suspense>
                             </div>
                             <div className="mt-4">
-                                <p className="line-clamp-3 text-medium text-default-500">{product.description}</p>
+                                <p className="line-clamp-3 text-base text-default-500">{product.description}</p>
                             </div>
                             <div className="mt-6 flex flex-col gap-1">
                                 <div className="mb-4 flex items-center gap-2 text-default-900">
                                     <Delivery />
-                                    <p className="text-small font-medium">Free shipping and 30 days return</p>
+                                    <p className="text-sm font-medium">Free shipping and 30 days return</p>
                                 </div>
                                 <LocalizedClientLink
-                                    className="inline-flex items-center text-small hover:opacity-80 transition-opacity my-2 text-default-500"
+                                    className="inline-flex items-center text-sm hover:opacity-80 transition-opacity my-2 text-default-500"
                                     href={"/"}
                                 >
                                     See guide

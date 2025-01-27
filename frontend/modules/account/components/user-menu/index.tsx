@@ -17,7 +17,7 @@ export default function UserDropDown({ customer }: any) {
         {
             dataKey: "admin",
             child: (
-                <span className="flex-1 text-small font-normal truncate">
+                <span className="flex-1 text-sm font-normal truncate">
                     <LocalizedClientLink href="/account/profile">Profile</LocalizedClientLink>
                 </span>
             ),
@@ -25,7 +25,7 @@ export default function UserDropDown({ customer }: any) {
         {
             dataKey: "account",
             child: (
-                <span className="flex-1 text-small font-normal truncate">
+                <span className="flex-1 text-sm font-normal truncate">
                     <LocalizedClientLink href="/account">Dashboard</LocalizedClientLink>
                 </span>
             ),
@@ -53,8 +53,8 @@ export default function UserDropDown({ customer }: any) {
                             </span>
                             <div className="inline-flex flex-1 justify-between">
                                 <div className="inline-flex flex-col items-start justify-center">
-                                    <span className="text-small text-default-900">{customer?.lastname}</span>
-                                    <span className="text-tiny text-default-500">{customer?.email}</span>
+                                    <span className="text-sm text-default-900">{customer?.lastname}</span>
+                                    <span className="text-xs text-default-500">{customer?.email}</span>
                                 </div>
                                 <span
                                     className="md:hidden border-2 border-secondary text-secondary px-4 rounded-full flex items-center"

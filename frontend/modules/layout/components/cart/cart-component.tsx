@@ -8,11 +8,11 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Cart, CartItem } from "types/global";
 import { usePathname } from "next/navigation";
 import { currency } from "@lib/util/util";
-import { Chip } from "@modules/common/components/chip";
 
 import { CartItems } from "../cart-items";
 
 import { BtnLink } from "@/components/ui/btnLink";
+import Chip from "@/components/ui/chip";
 
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;
@@ -93,8 +93,8 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                             <div className="p-2">
                                 <dl className="flex flex-col gap-4 py-4">
                                     <div className="flex justify-between">
-                                        <dt className="text-small text-default-500">Subtotal</dt>
-                                        <dd className="text-small font-semibold text-default-900">{currency(total)}</dd>
+                                        <dt className="text-sm text-default-500">Subtotal</dt>
+                                        <dd className="text-sm font-semibold text-default-900">{currency(total)}</dd>
                                     </div>
                                 </dl>
                                 {cart?.items?.length && (

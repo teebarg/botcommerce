@@ -28,7 +28,7 @@ module.exports = {
                 "content2-foreground": "hsl(var( --content2-foreground))",
                 "content3-foreground": "hsl(var( --content3-foreground))",
                 "content4-foreground": "hsl(var( --content4-foreground))",
-                divider: "hsl(var(--divider) / var(--divider-opacity, 1))",
+                divider: "hsl(var(--divider) / 0.15)",
             },
             borderColor: {
                 divider: "hsl(var(--divider))",
@@ -38,10 +38,8 @@ module.exports = {
                 content4: "hsl(var(--content4))",
             },
             borderRadius: {
-                small: "var(--radius-small)",
-                medium: "var(--radius-medium)",
-                large: "var(--radius-large)",
                 50: "50%",
+                "1xl": "0.875rem",
                 "top-corners": "5px 5px 0 0",
             },
             borderWidth: {
@@ -54,10 +52,7 @@ module.exports = {
                 large: "var(--box-shadow-large)",
             },
             fontSize: {
-                tiny: ["var(--font-size-tiny)", { lineHeight: "var(--line-height-tiny)" }],
-                small: ["var(--font-size-small)", { lineHeight: "var(--line-height-small)" }],
-                medium: ["var(--font-size-medium)", { lineHeight: "var(--line-height-medium)" }],
-                large: ["var(--font-size-large)", { lineHeight: "var(--line-height-large)" }],
+                xxs: ["0.625rem", { lineHeight: "0.875" }],
             },
             fontFamily: {
                 sans: "var(--font-inter)",
@@ -97,11 +92,6 @@ module.exports = {
                 danger: generateColorScale("danger"),
                 success: generateColorScale("success"), // Add other color names as needed
                 warning: generateColorScale("warning"),
-                muted: {
-                    DEFAULT: "hsl(var(--muted))",
-                    foreground: "hsl(var(--muted-foreground))",
-                },
-                border: "hsl(var(--border))",
                 divider: "hsl(var(--divider))",
             },
             keyframes: {

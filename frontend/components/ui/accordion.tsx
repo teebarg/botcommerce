@@ -75,7 +75,7 @@ export function AccordionTrigger({ children, value, className }: { children: Rea
                 onClick={handleClick}
             >
                 <div className="flex-1 flex flex-col text-start">
-                    <span className="text-foreground text-large" data-open={isExpanded}>
+                    <span className="text-foreground text-lg" data-open={isExpanded}>
                         {children}
                     </span>
                 </div>

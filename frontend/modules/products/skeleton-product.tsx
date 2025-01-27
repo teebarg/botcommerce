@@ -9,7 +9,7 @@ const SkeletonProductTemplate = () => {
             <div className="max-w-7xl mx-auto h-full w-full px-2 lg:px-12 my-8">
                 {/* Breadcrumb skeleton */}
                 <nav className="hidden md:block">
-                    <ol className="flex flex-wrap list-none rounded-small">
+                    <ol className="flex flex-wrap list-none rounded-lg">
                         <li className="flex items-center">
                             <Skeleton className="w-12 h-4" />
                         </li>
@@ -67,8 +67,8 @@ const SkeletonProductTemplate = () => {
 
             {/* Bottom fixed bar skeleton */}
             <div className="fixed bottom-0 z-50 w-full px-6 py-3 flex gap-2 bg-background shadow-lg">
-                <Skeleton className="w-10 h-10 rounded-small" />
-                <Skeleton className="flex-1 h-10 rounded-small" />
+                <Skeleton className="w-10 h-10 rounded-lg" />
+                <Skeleton className="flex-1 h-10 rounded-lg" />
             </div>
         </React.Fragment>
     );

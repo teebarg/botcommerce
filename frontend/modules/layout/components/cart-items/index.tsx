@@ -26,7 +26,7 @@ const CartItems: React.FC<ComponentProps> = ({ cartItems }) => {
     }
 
     return (
-        <div className="w-full rounded-medium bg-content2 px-2 py-4 dark:bg-content1 lg:flex-none max-h-full overflow-auto">
+        <div className="w-full rounded-xl bg-content2 px-2 py-4 dark:bg-content1 lg:flex-none max-h-full overflow-auto">
             <div>
                 <h2 className="font-medium text-default-500">Your Cart</h2>
                 <hr className="tb-divider mt-4" />

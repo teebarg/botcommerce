@@ -39,7 +39,7 @@ export const NavbarBrand = ({ children, className }: { children: React.ReactNode
     return (
         <li
             className={cn(
-                "flex flex-row flex-nowrap justify-start bg-transparent items-center no-underline text-medium whitespace-nowrap box-border gap-3",
+                "flex flex-row flex-nowrap justify-start bg-transparent items-center no-underline text-base whitespace-nowrap box-border gap-3",
                 className
             )}
         >
@@ -65,7 +65,7 @@ export const NavbarContent = ({ children, className, justify }: { children: Reac
 
 export const NavbarItem = ({ children, className, active }: { children: React.ReactNode; className?: string; active?: boolean }) => {
     return (
-        <li className={cn("text-large data-[active=true]:font-semibold", className)} data-active={active}>
+        <li className={cn("text-lg data-[active=true]:font-semibold", className)} data-active={active}>
             {children}
         </li>
     );

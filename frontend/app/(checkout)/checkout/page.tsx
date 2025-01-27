@@ -78,7 +78,7 @@ export default async function Checkout() {
                             <div className="hidden md:flex flex-col gap-1 mb-6">
                                 <h1 className="text-2xl font-medium">Shopping Cart</h1>
                                 <nav aria-label="Breadcrumbs" data-slot="base">
-                                    <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
+                                    <ol className="flex flex-wrap list-none rounded-lg" data-slot="list">
                                         <li className="flex items-center" data-slot="base">
                                             <LocalizedClientLink href={"/"}>Home</LocalizedClientLink>
                                             <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">

@@ -105,16 +105,16 @@ export default async function AdminPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold">{item.content}</div>
-                                    <p className="text-xs text-muted-foreground">{item.subContent}</p>
+                                    <p className="text-xs text-default-500">{item.subContent}</p>
                                 </CardContent>
                             </Card>
                         ))}
                     </div>
                 </div>
-                <div className="flex flex-col relative overflow-hidden h-auto text-foreground box-border bg-content1 outline-none shadow-medium rounded-large transition-transform-background max-w-[340px] mb-12 p-6">
+                <div className="flex flex-col relative overflow-hidden h-auto text-foreground box-border bg-content1 outline-none shadow-medium rounded-1xl transition-transform-background max-w-[340px] mb-12 p-6">
                     <div className="flex p-3 z-10 w-full items-center shrink-0 overflow-inherit color-inherit rounded-t-large justify-between">
                         <div className="flex gap-5">
-                            <span className="flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none w-10 h-10 text-tiny bg-default text-default-foreground rounded-full">
+                            <span className="flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none w-10 h-10 text-xs bg-default text-default-foreground rounded-full">
                                 <Image
                                     fill
                                     alt="avatar"
@@ -123,13 +123,13 @@ export default async function AdminPage() {
                                 />
                             </span>
                             <div className="flex flex-col gap-1 items-start justify-center">
-                                <h4 className="text-small font-semibold leading-none text-default-900">Zoey Lang</h4>
-                                <h5 className="text-small tracking-tight text-default-500">@zoeylang</h5>
+                                <h4 className="text-sm font-semibold leading-none text-default-900">Zoey Lang</h4>
+                                <h5 className="text-sm tracking-tight text-default-500">@zoeylang</h5>
                             </div>
                         </div>
                         <Button>Follow</Button>
                     </div>
-                    <div className="relative flex w-full p-3 flex-auto flex-col place-content-inherit align-items-inherit h-auto break-words text-left overflow-y-auto px-3 py-0 text-small text-default-500">
+                    <div className="relative flex w-full p-3 flex-auto flex-col place-content-inherit align-items-inherit h-auto break-words text-left overflow-y-auto px-3 py-0 text-sm text-default-500">
                         <p>Frontend developer and UI/UX enthusiast. Join me on this coding adventure!</p>
                         <span className="pt-2">
                             #FrontendWithZoey
@@ -141,12 +141,12 @@ export default async function AdminPage() {
 
                     <div className="p-3 h-auto flex w-full items-center overflow-hidden color-inherit rounded-b-large gap-3 text-default-500">
                         <div className="flex gap-1">
-                            <p className="font-semibold text-small">4</p>
-                            <p className="text-default-500 text-small">Following</p>
+                            <p className="font-semibold text-sm">4</p>
+                            <p className="text-default-500 text-sm">Following</p>
                         </div>
                         <div className="flex gap-1">
-                            <p className="font-semibold text-small">97.1K</p>
-                            <p className="text-default-500 text-small">Followers</p>
+                            <p className="font-semibold text-sm">97.1K</p>
+                            <p className="text-default-500 text-sm">Followers</p>
                         </div>
                     </div>
                 </div>
