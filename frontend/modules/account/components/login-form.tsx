@@ -3,11 +3,12 @@ import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { FormButton } from "@modules/common/components/form-button";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { signIn } from "@modules/auth/action";
 import { Input } from "@components/ui/input";
 
 import { GoogleLogin } from "./google";
+
+import LocalizedClientLink from "@/components/ui/link";
 
 type Props = {};
 

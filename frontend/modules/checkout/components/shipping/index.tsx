@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircleSolid, Star } from "nui-react-icons";
+import { CheckCircleSolid } from "nui-react-icons";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { setShippingMethod } from "@modules/checkout/actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -61,14 +61,14 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
 
     return (
         <div>
-            <div className="flex flex-row items-center justify-between mb-6">
+            <div className="flex flex-row items-center justify-between mb-2">
                 <h2
-                    className={cn("flex flex-row text-xl gap-x-2 items-baseline", {
-                        "opacity-50 pointer-events-none select-none": !isOpen && cart.shipping_method,
+                    className={cn("flex flex-row text-lg font-bold gap-x-2 items-baseline", {
+                        "opacity-50 pointer-events-none select-none": !isOpen && !cart.shipping_method,
                     })}
                 >
-                    Delivery
-                    {!isOpen && cart.shipping_method?.name && <CheckCircleSolid />}
+                    Choose a Delivery Option
+                    {!isOpen && cart.shipping_method?.name && <CheckCircleSolid className="text-success" />}
                 </h2>
                 {!isOpen && cart?.shipping_address && cart?.billing_address && cart?.email && (
                     <button
@@ -83,56 +83,48 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             </div>
             {isOpen ? (
                 <div data-testid="delivery-options-container">
-                    <div className="pb-8">
-                        <RadioGroup
-                            className="grid grid-cols-2 gap-2 md:gap-6"
-                            name="shipping-method"
-                            value={cart.shipping_method?.id}
-                            onChange={(value: string) => handleChange(value)}
-                        >
-                            {availableShippingMethods?.map((option) => (
-                                <RadioGroup.Option
-                                    key={option.id}
-                                    className={cn(
-                                        "group relative transition-all",
-                                        option.id === cart.shipping_method?.id && "border-primary bg-primary/10",
-                                        option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
-                                    )}
-                                    value={option.id}
+                    <RadioGroup
+                        className="grid grid-cols-1 md:grid-cols-3 gap-2"
+                        name="shipping-method"
+                        value={cart.shipping_method?.id}
+                        onChange={(value: string) => handleChange(value)}
+                    >
+                        {availableShippingMethods?.map((option) => (
+                            <RadioGroup.Option
+                                key={option.id}
+                                className={cn(
+                                    `flex items-center justify-between px-4 py-4 md:px-3 rounded-lg border-2 cursor-pointer transition-all ${
+                                        option.id === cart.shipping_method?.id
+                                            ? "border-blue-500 bg-blue-50"
+                                            : "border-gray-300 hover:border-gray-400"
+                                    }`,
+                                    option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
+                                )}
+                                value={option.id}
+                            >
+                                <div>
+                                    <h3
+                                        className={`text-sm font-medium ${
+                                            option.id === cart.shipping_method?.id ? "text-blue-600" : "text-gray-800"
+                                        }`}
+                                    >
+                                        {option.name}
+                                    </h3>
+                                    <p className="text-sm text-gray-600">{option.description}</p>
+                                </div>
+                                <span
+                                    className={`text-sm font-semibold ${option.id === cart.shipping_method?.id ? "text-blue-600" : "text-gray-800"}`}
                                 >
-                                    <span className="absolute right-2 md:right-8 top-4 flex h-5 w-5 items-center justify-center rounded-full border">
-                                        <span
-                                            className={cn(
-                                                "h-2.5 w-2.5 rounded-full bg-primary transition-all",
-                                                option.id === cart.shipping_method?.id ? "scale-100 opacity-100" : "scale-0 opacity-0"
-                                            )}
-                                        />
-                                    </span>
-                                    <div className="flex items-start gap-4">
-                                        {
-                                            <Star
-                                                className={cn(
-                                                    "h-5 w-5 transition-colors",
-                                                    option.id === cart.shipping_method?.id ? "text-primary" : "text-muted-foreground"
-                                                )}
-                                            />
-                                        }
-                                        <div className="space-y-1">
-                                            <p className={cn("font-medium leading-none", option.id === cart.shipping_method?.id && "text-primary")}>
-                                                {option.name}
-                                            </p>
-                                            {option.amount && <p className="text-sm text-muted-foreground">{currency(option.amount)}</p>}
-                                        </div>
-                                    </div>
-                                </RadioGroup.Option>
-                            ))}
-                        </RadioGroup>
-                    </div>
+                                    {option.amount}
+                                </span>
+                            </RadioGroup.Option>
+                        ))}
+                    </RadioGroup>
 
                     <ErrorMessage data-testid="delivery-option-error-message" error={error} />
 
                     <Button
-                        className="mt-2 font-semibold"
+                        className="font-semibold mt-2"
                         data-testid="submit-delivery-option-button"
                         disabled={!cart.shipping_method}
                         isLoading={isLoading}
@@ -144,7 +136,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 </div>
             ) : (
                 <div>
-                    <div className="text-small-regular">
+                    <div className="text-sm">
                         {cart && cart.shipping_method?.name && (
                             <div className="flex flex-col w-1/3">
                                 <p className="font-medium mb-1 text-base">Method</p>

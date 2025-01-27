@@ -1,3 +1,4 @@
+import json
 from typing import Annotated, Generator
 
 import firebase_admin
@@ -18,6 +19,8 @@ from app.models.generic import Address, Product, User
 from app.models.token import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
+from sqlalchemy.exc import OperationalError
+import time
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -25,11 +28,24 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 
 def get_db() -> Generator:
-    with Session(engine) as session:
+    retries = 10  # Number of retries
+    wait_time = 2  # Initial wait time (seconds)
+    session = None
+
+    for attempt in range(retries):
         try:
-            yield session
+            session = Session(engine)
+            yield session  # Provide the session to the caller
+            break  # Exit retry loop if successful
+        except OperationalError:
+            print(f"Database is waking up, retrying in {wait_time} seconds... (Attempt {attempt + 1}/{retries})")
+            time.sleep(wait_time)
+            wait_time *= 2  # Exponential backoff
         finally:
-            session.close()
+            if session:
+                session.close()  # Ensure the session is closed after every attempt
+    else:
+        raise Exception("Database connection failed after multiple retries.")
 
 
 SessionDep = Annotated[Session, Depends(get_db)]
@@ -55,9 +71,10 @@ def get_storage() -> Generator:
 
 
 Storage = Annotated[Bucket, Depends(get_storage)]
+CacheService = Annotated[CacheService, Depends(get_cache_service)]
 
 
-async def get_current_user(session: SessionDep, access_token: TokenDep) -> User:
+async def get_current_user(session: SessionDep, access_token: TokenDep, cache: CacheService) -> User:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -68,7 +85,16 @@ async def get_current_user(session: SessionDep, access_token: TokenDep) -> User:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         ) from None
-    user = await crud.user.get_by_email(db=session, email=token_data.sub)
+
+    # Check if user is in cache
+    user = cache.get(f"user:{token_data.sub}")
+    if user is None:
+        user = await crud.user.get_by_email(db=session, email=token_data.sub)
+        if user:
+            cache.set(f"user:{token_data.sub}", user.model_dump_json(), expire=3600)  # Store user in cache
+    else:
+        user = User(**json.loads(user))
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if not user.is_active:
@@ -119,8 +145,6 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
 
 
 AdminUser = Annotated[User, Depends(get_current_active_superuser)]
-
-CacheService = Annotated[CacheService, Depends(get_cache_service)]
 
 def get_notification_service() -> NotificationService:
     notification_service = NotificationService()

@@ -45,10 +45,10 @@ export function RadioItem({ option, isSelected, name, onSelect }: RadioItemProps
                 />
             </span>
             <div className="flex items-start gap-4">
-                {option.icon && <option.icon className={cn("h-5 w-5 transition-colors", isSelected ? "text-primary" : "text-muted-foreground")} />}
+                {option.icon && <option.icon className={cn("h-5 w-5 transition-colors", isSelected ? "text-primary" : "text-default-500")} />}
                 <div className="space-y-1">
                     <p className={cn("font-medium leading-none", isSelected && "text-primary")}>{option.label}</p>
-                    {option.description && <p className="text-sm text-muted-foreground">{option.description}</p>}
+                    {option.description && <p className="text-sm text-default-500">{option.description}</p>}
                 </div>
             </div>
         </label>

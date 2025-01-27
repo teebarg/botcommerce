@@ -8,10 +8,10 @@ import { addCustomerShippingAddress } from "@modules/account/actions";
 import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { useOverlayTriggerState } from "react-stately";
-import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 
+import { ComboBox } from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
 
 const AddAddress = () => {

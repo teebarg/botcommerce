@@ -42,7 +42,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
             >
                 <div
                     className={cn(
-                        "relative w-full flex-col items-start justify-center inline-flex shadow-sm px-3 bg-default-100 rounded-medium outline-none",
+                        "relative w-full flex-col items-start justify-center inline-flex shadow-sm px-3 bg-default-100 rounded-xl outline-none",
                         {
                             "h-10 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",
@@ -60,7 +60,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                         className={cn(
                             "absolute z-10 block text-foreground-500 cursor-text after:text-danger after:ml-0.5 duration-200 ease-out transition-all",
                             "group-data-[filled=true]:text-default-500 group-data-[filled=true]:pointer-events-auto max-w-full text-ellipsis overflow-hidden",
-                            "group-data-[filled=true]:scale-85 text-xs group-data-[filled=true]:-translate-y-[calc(50%_+_theme(fontSize.small)/2_-_2px)]",
+                            "group-data-[filled=true]:scale-85 text-xs group-data-[filled=true]:-translate-y-[calc(50%_+_theme(fontSize.sm)/2_-_2px)]",
                             {
                                 "after:content-['*']": props.isRequired,
                             },
@@ -80,7 +80,7 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                             ref={ref}
                             className={cn(
                                 "w-full bg-transparent font-normal placeholder:text-foreground-500 focus-visible:outline-none group-data-[has-label=true]:mt-auto autofill:bg-transparent data-[has-end-content=true]:pe",
-                                "file:cursor-pointer file:bg-transparent file:border-0 text-small group-data-[has-value=true]:text-default-foreground data-[has-start-content=true]:ps-1.5",
+                                "file:cursor-pointer file:bg-transparent file:border-0 text-sm group-data-[has-value=true]:text-default-foreground data-[has-start-content=true]:ps-1.5",
                                 classNames?.["input"]
                             )}
                             data-filled={Boolean(inputProps.value)}
@@ -97,16 +97,12 @@ const Input: React.FC<Props> = ({ errorMessage, hidden, size = "md", endContent,
                 </div>
                 <div className="hidden group-data-[has-helper=true]:flex p-1 relative flex-col gap-1.5" data-slot="helper-wrapper">
                     {props.description && (
-                        <div
-                            {...descriptionProps}
-                            className={cn("text-tiny text-foreground-500", classNames?.["description"])}
-                            data-slot="description"
-                        >
+                        <div {...descriptionProps} className={cn("text-xs text-foreground-500", classNames?.["description"])} data-slot="description">
                             {props.description}
                         </div>
                     )}
                     {isInvalid && (
-                        <div {...errorMessageProps} className="text-tiny text-danger" data-slot="error-message">
+                        <div {...errorMessageProps} className="text-xs text-danger" data-slot="error-message">
                             {validationErrors.join(" ")}
                         </div>
                     )}

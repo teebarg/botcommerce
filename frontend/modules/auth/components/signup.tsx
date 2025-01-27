@@ -5,7 +5,6 @@ import useWatch from "@lib/hooks/use-watch";
 import { FormButton } from "@modules/common/components/form-button";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@modules/account/components/google";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { useFormState } from "react-dom";
 import React from "react";
 import { Input } from "@components/ui/input";
@@ -13,6 +12,7 @@ import { Input } from "@components/ui/input";
 import { signUp } from "../action";
 
 import { siteConfig } from "@/lib/config";
+import LocalizedClientLink from "@/components/ui/link";
 
 type Props = {};
 

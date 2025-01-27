@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/util/cn";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import LocalizedClientLink from "@/components/ui/link";
 
 const buttonConfig: any = {
     primary: {
@@ -36,9 +36,9 @@ const buttonConfig: any = {
     },
 
     // Sizes
-    sm: "px-4 min-w-20 h-10 text-tiny gap-2 rounded-small",
-    md: "px-6 min-w-20 h-12 text-small gap-2 rounded-medium",
-    lg: "px-8 min-w-24 h-14 text-medium gap-3 rounded-large",
+    sm: "px-4 min-w-20 h-10 text-xs gap-2 rounded-lg",
+    md: "px-6 min-w-20 h-12 text-sm gap-2 rounded-xl",
+    lg: "px-8 min-w-24 h-14 text-base gap-3 rounded-1xl",
 };
 
 interface BtnLinkProps {
@@ -54,11 +54,12 @@ const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", varia
     return (
         <LocalizedClientLink
             className={cn(
-                "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
-                "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
+                "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap roun",
+                "font-medium overflow-hidden outline-none transition-all hover:opacity-80",
                 variant === "shadow" && buttonConfig[color].shadow,
                 buttonConfig[size],
                 buttonConfig[color].color,
+                variant === "bordered" && buttonConfig[color].bordered,
                 className
             )}
             href={href}

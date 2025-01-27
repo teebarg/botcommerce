@@ -1,10 +1,11 @@
 import { getCategories, getCollectionsList } from "@lib/data";
 import { siteConfig } from "@lib/config";
 import { GithubIcon, YoutubeIcon, TwitterIcon, WhatsAppIcon } from "nui-react-icons";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import Link from "next/link";
 import NewsletterForm from "@modules/store/components/newsletter";
 import { Category } from "types/global";
+
+import LocalizedClientLink from "@/components/ui/link";
 
 const about = [
     {
@@ -57,7 +58,7 @@ export default async function Footer() {
                         <div className="flex items-center justify-start">
                             <span className="text-3xl font-semibold">{siteConfig.name}</span>
                         </div>
-                        <p className="text-small text-default-500">
+                        <p className="text-sm text-default-500">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
                         </p>
@@ -85,7 +86,7 @@ export default async function Footer() {
                                         {collections?.slice(0, 6).map((c: any, index: any) => (
                                             <li key={index}>
                                                 <LocalizedClientLink
-                                                    className="text-small hover:opacity-80 transition-opacity text-default-500"
+                                                    className="text-sm hover:opacity-80 transition-opacity text-default-500"
                                                     href={`/collections/${c.slug}`}
                                                 >
                                                     {c.name}
@@ -166,15 +167,15 @@ export default async function Footer() {
                 </div>
                 <div className="my-2 md:my-10 bg-default-100/20 py-4 md:flex md:items-center md:justify-between md:gap-2">
                     <div>
-                        <h3 className="text-medium font-semibold text-default-500">Subscribe to our newsletter</h3>
-                        <p className="mt-2 text-small text-default-500">
+                        <h3 className="text-base font-semibold text-default-500">Subscribe to our newsletter</h3>
+                        <p className="mt-2 text-sm text-default-500">
                             Receive weekly updates with the newest insights, trends, and tools, straight to your email.
                         </p>
                     </div>
                     <NewsletterForm />
                 </div>
                 <div className="flex flex-wrap justify-between gap-2 md:pt-8">
-                    <p className="text-small text-default-500">
+                    <p className="text-sm text-default-500">
                         &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
                     </p>
                 </div>

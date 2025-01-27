@@ -26,7 +26,7 @@ export async function generateStaticParams() {
         return [];
     }
 
-    return collections.map((collection: Collection) => ({
+    return collections?.map((collection: Collection) => ({
         slug: String(collection.slug),
     }));
 }

@@ -126,10 +126,10 @@ const ChatBot: React.FC<Props> = () => {
                 <div className="h-[calc(100%-48px)] list-none m-0 p-0 overflow-hidden relative">
                     <div className="bottom-3 flex flex-col absolute inset-0 overflow-scroll mr-0 mb-0 pb-12 bg-default h-full w-full">
                         <div aria-label="Messages from the conversation" className="flex flex-col gap-4">
-                            {messages.map((message, index) => (
+                            {messages?.map((message, index) => (
                                 <div key={index} className="relative py-0 px-4 flex flex-col">
                                     {index == 0 && (
-                                        <p className={cn("text-small my-3 mx-0 text-center uppercase min-h-4 leading-6 font-medium")}>
+                                        <p className={cn("text-sm my-3 mx-0 text-center uppercase min-h-4 leading-6 font-medium")}>
                                             {formatDate(new Date())}
                                         </p>
                                     )}
@@ -141,7 +141,7 @@ const ChatBot: React.FC<Props> = () => {
                                         {!message.isUser && (
                                             <React.Fragment>
                                                 <li className="mt-0">
-                                                    <span className="text-small ml-1 align-top" style={{ color: "rgb(53, 63, 69)" }}>
+                                                    <span className="text-sm ml-1 align-top" style={{ color: "rgb(53, 63, 69)" }}>
                                                         Max
                                                     </span>
                                                 </li>

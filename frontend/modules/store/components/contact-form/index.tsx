@@ -13,7 +13,7 @@ const inputClass = {
     inputWrapper: "bg-white/70",
     label: "!text-gray-700",
     input: "!text-gray-800 bg-transparent placeholder:text-gray-500",
-    description: "text-gray-100 text-tiny",
+    description: "text-gray-100 text-xs",
 };
 
 export default function ContactForm() {

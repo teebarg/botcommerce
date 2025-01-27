@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import { CollectionTemplate } from "@modules/collections/templates";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { SortOptions } from "types/global";
 import { Suspense } from "react";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
+import LocalizedClientLink from "@/components/ui/link";
 
 export const metadata: Metadata = {
     title: "Search",

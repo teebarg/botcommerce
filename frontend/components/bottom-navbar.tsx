@@ -1,14 +1,18 @@
-"use client";
-
 import { cn } from "@lib/util/cn";
 import React from "react";
-import { Cart, HeartFilled, Home, Search, User } from "nui-react-icons";
-import { usePathname } from "next/navigation";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
-const ButtonNav = ({ className }: { className?: string }) => {
-    const pathname = usePathname();
+import { HeartFilled, Home, Search, User } from "nui-react-icons";
 
-    const nav = [
+import { Cart } from "@/modules/layout/components/cart";
+import LocalizedClientLink from "@/components/ui/link";
+
+const ButtonNav = async ({ className }: { className?: string }) => {
+    interface NavLink {
+        icon: React.ReactNode;
+        label: string;
+        href: string;
+    }
+
+    const nav: NavLink[] = [
         {
             icon: <Home className="h-6 w-6" />,
             label: "Home",
@@ -20,32 +24,31 @@ const ButtonNav = ({ className }: { className?: string }) => {
             href: "/collections",
         },
         {
-            icon: <Cart className="h-6 w-6" />,
+            icon: <Cart />,
             label: "Cart",
             href: "/cart",
         },
         {
             icon: <User className="h-6 w-6" viewBox="0 0 20 20" />,
             label: "Account",
-            href: "/account/profile",
+            href: "/account",
         },
         {
             icon: <HeartFilled className="h-6 w-6" />,
-            label: "Help",
-            href: "/support",
+            label: "Menu",
+            href: "/menu",
         },
     ];
 
     return (
-        <nav className={cn("flex md:hidden z-40 w-full items-center justify-between fixed bottom-0 inset-x-0 py-2 px-8 bg-background", className)}>
-            {nav.map((item, index: number) => (
-                <LocalizedClientLink
-                    key={index}
-                    className={cn("flex flex-col items-center", {
-                        "text-warning": pathname === item.href,
-                    })}
-                    href={item.href}
-                >
+        <nav
+            className={cn(
+                "flex md:hidden z-40 w-full items-center justify-between fixed bottom-0 inset-x-0 py-4 px-8 bg-background shadow-xl",
+                className
+            )}
+        >
+            {nav.map((item: NavLink, index: number) => (
+                <LocalizedClientLink key={index} active="text-rose-600" className={cn("flex flex-col items-center")} href={item.href}>
                     {item.icon}
                     <p className="text-sm font-semibold">{item.label}</p>
                 </LocalizedClientLink>

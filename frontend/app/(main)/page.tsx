@@ -1,20 +1,21 @@
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Category, Product, SearchParams, WishlistItem } from "types/global";
+import { Category, Collection, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 import { BtnLink } from "@/components/ui/btnLink";
+import PromotionalBanner from "@/components/promotion";
+import LocalizedClientLink from "@/components/ui/link";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
 const FlashBanner = dynamic(() => import("@components/flash"), { ssr: false });
-const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -56,7 +57,7 @@ export default async function Home() {
         <React.Fragment>
             <div>
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative md:grid grid-cols-5 gap-4 rounded-xl py-6">
+                    <div className="max-w-8xl mx-auto relative hidden md:grid grid-cols-5 gap-4 rounded-xl py-6">
                         <div className="hidden md:block">
                             <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
                             <ul className="bg-primary/10">
@@ -128,19 +129,29 @@ export default async function Home() {
                             </div>
                         </div>
                     </div>
+                    {/* Mobile Hero Section */}
+                    <div
+                        className="relative h-[50vh] md:hidden bg-cover"
+                        style={{
+                            backgroundImage: `url("https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-2.avif")`,
+                        }}
+                    >
+                        <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
+                            <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
+                                {categories?.map((category: Collection, index: number) => (
+                                    <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
+                                        {category.name}
+                                    </BtnLink>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="relative h-8 md:h-28">
-                    <Image
-                        fill
-                        priority
-                        alt="banner"
-                        className="object-contain"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
-                        src="/frontend.webp"
-                    />
+                <div className="relative py-2">
+                    <PromotionalBanner />
                 </div>
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="max-w-8xl mx-auto relative py-2 md:py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                                 <span className="text-secondary text-3xl font-semibold">{siteConfig.name}</span>
@@ -226,7 +237,7 @@ export default async function Home() {
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Opening Hours</p>
                                     <div>
-                                        {openingHours.map((hour, index) => (
+                                        {openingHours?.map((hour, index) => (
                                             <div key={index} className="grid grid-cols-3">
                                                 <p>{hour.day}</p>
                                                 <p className="col-span-2">{hour.time}</p>

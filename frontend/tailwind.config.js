@@ -1,3 +1,19 @@
+const generateColorScale = (baseName) => {
+    const scale = {};
+    const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+    // Dynamically generate color scales
+    steps.forEach((step) => {
+        scale[step] = `hsl(var(--${baseName}-${step}))`;
+    });
+
+    // Add the default and foreground variants
+    scale["DEFAULT"] = `hsl(var(--${baseName}))`;
+    scale["foreground"] = `hsl(var(--${baseName}-foreground))`;
+
+    return scale;
+};
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: ["./modules/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
@@ -12,7 +28,7 @@ module.exports = {
                 "content2-foreground": "hsl(var( --content2-foreground))",
                 "content3-foreground": "hsl(var( --content3-foreground))",
                 "content4-foreground": "hsl(var( --content4-foreground))",
-                divider: "hsl(var(--divider) / var(--divider-opacity, 1))",
+                divider: "hsl(var(--divider) / 0.15)",
             },
             borderColor: {
                 divider: "hsl(var(--divider))",
@@ -22,16 +38,13 @@ module.exports = {
                 content4: "hsl(var(--content4))",
             },
             borderRadius: {
-                small: "var(--radius-small)",
-                medium: "var(--radius-medium)",
-                large: "var(--radius-large)",
                 50: "50%",
+                "1xl": "0.875rem",
                 "top-corners": "5px 5px 0 0",
             },
             borderWidth: {
-                small: "var(--border-width-small)",
-                medium: "var(--border-width-medium)",
-                large: "var(--border-width-large)",
+                1: "1px",
+                3: "3px",
             },
             boxShadow: {
                 small: "var(--box-shadow-small)",
@@ -39,10 +52,7 @@ module.exports = {
                 large: "var(--box-shadow-large)",
             },
             fontSize: {
-                tiny: ["var(--font-size-tiny)", { lineHeight: "var(--line-height-tiny)" }],
-                small: ["var(--font-size-small)", { lineHeight: "var(--line-height-small)" }],
-                medium: ["var(--font-size-medium)", { lineHeight: "var(--line-height-medium)" }],
-                large: ["var(--font-size-large)", { lineHeight: "var(--line-height-large)" }],
+                xxs: ["0.625rem", { lineHeight: "0.875" }],
             },
             fontFamily: {
                 sans: "var(--font-inter)",
@@ -64,13 +74,6 @@ module.exports = {
                     500: "hsl(var(--foreground-500))",
                     900: "hsl(var(--foreground-900))",
                 },
-                default: {
-                    DEFAULT: "hsl(var(--default))",
-                    100: "hsl(var(--default-100))",
-                    500: "hsl(var(--default-500))",
-                    900: "hsl(var(--default-900))",
-                    foreground: "hsl(var(--default-foreground))",
-                },
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     100: "hsl(var(--primary-100))",
@@ -85,32 +88,10 @@ module.exports = {
                     900: "hsl(var(--secondary-900))",
                     foreground: "hsl(var(--secondary-foreground))",
                 },
-                success: {
-                    DEFAULT: "hsl(var(--success))",
-                    100: "hsl(var(--success-100))",
-                    500: "hsl(var(--success-500))",
-                    900: "hsl(var(--success-900))",
-                    foreground: "hsl(var(--success-foreground))",
-                },
-                danger: {
-                    DEFAULT: "hsl(var(--danger))",
-                    100: "hsl(var(--danger-100))",
-                    500: "hsl(var(--danger-500))",
-                    900: "hsl(var(--danger-900))",
-                    foreground: "hsl(var(--danger-foreground))",
-                },
-                warning: {
-                    DEFAULT: "hsl(var(--warning))",
-                    100: "hsl(var(--warning-100))",
-                    500: "hsl(var(--warning-500))",
-                    900: "hsl(var(--warning-900))",
-                    foreground: "hsl(var(--warning-foreground))",
-                },
-                muted: {
-                    DEFAULT: "hsl(var(--muted))",
-                    foreground: "hsl(var(--muted-foreground))",
-                },
-                border: "hsl(var(--border))",
+                default: generateColorScale("default"),
+                danger: generateColorScale("danger"),
+                success: generateColorScale("success"), // Add other color names as needed
+                warning: generateColorScale("warning"),
                 divider: "hsl(var(--divider))",
             },
             keyframes: {
@@ -146,6 +127,10 @@ module.exports = {
                     "0%": { transform: "translateX(-50%) scaleX(.2)" },
                     "100%": { transform: "translateX(100%) scaleX(1)" },
                 },
+                "gradient-move": {
+                    "0%": { backgroundPosition: "0% 50%" },
+                    "100%": { backgroundPosition: "100% 50%" },
+                },
             },
             animation: {
                 blob: "blob 15s infinite",
@@ -153,6 +138,7 @@ module.exports = {
                 "spinner-ease-spin": "spinner-spin 0.8s ease infinite",
                 "spinner-linear-spin": "spinner-spin 0.8s linear infinite",
                 "indeterminate-bar": "indeterminate-bar 1.5s cubic-bezier(.65,.815,.735,.395) infinite",
+                "gradient-move": "gradient-move 4s infinite alternate",
             },
             maxWidth: {
                 "8xl": "88rem", // 1408px

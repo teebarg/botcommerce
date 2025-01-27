@@ -26,7 +26,7 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
             <div className="relative inline-flex shrink-0">
                 <span
                     className={cn(
-                        "flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none rounded-medium",
+                        "flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none rounded-xl",
                         {
                             "ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-success": isBordered,
                             "w-10 h-10": size == "sm",
@@ -41,11 +41,11 @@ const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, co
                 <span
                     className={cn(
                         "flex z-10 flex-wrap absolute box-border rounded-full whitespace-nowrap place-content-center origin-center",
-                        "items-center select-none font-regular px-0 border-2 border-background",
+                        "items-center select-none px-0 border-2 border-background",
                         {
-                            "text-tiny w-4 h-4 min-w-4 min-h-4": size == "sm",
-                            "text-small w-5 h-5 min-w-5 min-h-5": size == "md",
-                            "text-small w-6 h-6 min-w-6 min-h-6": size == "lg",
+                            "text-xs w-4 h-4 min-w-4 min-h-4": size == "sm",
+                            "text-sm w-5 h-5 min-w-5 min-h-5": size == "md",
+                            "text-sm w-6 h-6 min-w-6 min-h-6": size == "lg",
                             "top-[5%] right-[5%] translate-x-1/2 -translate-y-1/2": placement == "top-right",
                             "bottom-[5%] right-[5%] translate-x-1/2 translate-y-1/2": placement == "bottom-right",
                             "top-[5%] left-[5%] -translate-x-1/2 -translate-y-1/2": placement == "top-left",

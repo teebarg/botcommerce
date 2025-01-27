@@ -5,7 +5,6 @@ import Wrapper from "@modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
 import { getCart, getCustomer } from "@lib/data";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 
 import PaymentButton from "@/modules/checkout/components/payment-button";
@@ -13,6 +12,7 @@ import { BackButton } from "@/components/back";
 import { currency } from "@/lib/util/util";
 import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
+import LocalizedClientLink from "@/components/ui/link";
 
 export const metadata: Metadata = {
     title: `Clothings | ${siteConfig.name} Store | Checkout`,
@@ -78,7 +78,7 @@ export default async function Checkout() {
                             <div className="hidden md:flex flex-col gap-1 mb-6">
                                 <h1 className="text-2xl font-medium">Shopping Cart</h1>
                                 <nav aria-label="Breadcrumbs" data-slot="base">
-                                    <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
+                                    <ol className="flex flex-wrap list-none rounded-lg" data-slot="list">
                                         <li className="flex items-center" data-slot="base">
                                             <LocalizedClientLink href={"/"}>Home</LocalizedClientLink>
                                             <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
@@ -98,10 +98,10 @@ export default async function Checkout() {
                         <CheckoutSummary />
                     </section>
                 </div>
-                <div className="fixed md:hidden bottom-0 z-20 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500">
-                    <div className="flex flex-row-reverse justify-between items-center px-2 py-2">
+                <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
+                    <div className="flex flex-row-reverse justify-between items-center">
                         <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
-                        <p className="font-semibold">Total: {getAmount(total)}</p>
+                        <p className="font-semibold text-xl">Total: {getAmount(total)}</p>
                     </div>
                 </div>
             </div>

@@ -1,19 +1,18 @@
 "use client";
 
 import { cn } from "@lib/util/cn";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ArrowLongLeft } from "nui-react-icons";
 import React from "react";
 
 interface Props {
     className?: string;
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
-    size?: "sm" | "md" | "lg";
     onClick?: () => void;
 }
 
-const BackButton: React.FC<Props> = ({ size = "sm", color = "default", onClick, className }) => {
+const BackButton: React.FC<Props> = ({ onClick, className }) => {
     const router = useRouter();
+    const pathname = usePathname();
     const handleGoBack = () => {
         if (onClick) {
             onClick();
@@ -29,7 +28,7 @@ const BackButton: React.FC<Props> = ({ size = "sm", color = "default", onClick, 
     };
 
     return (
-        <button aria-label="back button" className={cn(className)} onClick={handleGoBack}>
+        <button aria-label="back button" className={cn(className, pathname == "/" && "hidden")} onClick={handleGoBack}>
             <ArrowLongLeft className="h-6 w-6" viewBox="0 0 15 15" />
         </button>
     );

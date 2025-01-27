@@ -1,7 +1,6 @@
 import React from "react";
-import { ChevronRight, ExclamationIcon } from "nui-react-icons";
+import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 import dynamic from "next/dynamic";
@@ -10,8 +9,9 @@ import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
 
 import { BtnLink } from "@/components/ui/btnLink";
+import LocalizedClientLink from "@/components/ui/link";
 
-const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 interface ComponentProps {
     query?: string;
@@ -67,12 +67,36 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                 <CollectionsSideBar brands={brands} categories={categories} collections={collections} facets={facets} searchParams={searchParams} />
             </div>
             <div className="w-full flex-1 flex-col">
+                {/* Mobile banner */}
+                <div className="bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 my-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden">
+                    <div className="flex items-center space-x-3">
+                        <Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />
+                        <div>
+                            <h3 className="text-white font-bold text-base animate-fade-in-up">Exclusive Offer!</h3>
+                            <p className="text-white/80 text-xs animate-fade-in-up delay-100">Get 20% Off Today</p>
+                        </div>
+                    </div>
+                    <BtnLink className="bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold" href="/">
+                        <span>Shop Now</span>
+                    </BtnLink>
+                </div>
+                {/* Categories */}
+                <div className="px-4 my-6 md:hidden">
+                    <h2 className="text-lg font-semibold mb-2">Categories</h2>
+                    <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
+                        {cat.map((category: Collection, index: number) => (
+                            <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
+                                {category.name}
+                            </BtnLink>
+                        ))}
+                    </div>
+                </div>
                 <div className="w-full">
                     <nav className="hidden md:block" data-slot="base">
-                        <ol className="flex flex-wrap list-none rounded-small" data-slot="list">
+                        <ol className="flex flex-wrap list-none rounded-lg" data-slot="list">
                             <li className="flex items-center" data-slot="base">
                                 <LocalizedClientLink href="/">Home</LocalizedClientLink>
-                                <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
+                                <span className="px-1 text-foreground/50" data-slot="separator">
                                     <ChevronRight />
                                 </span>
                             </li>
@@ -102,7 +126,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                 />
                             </div>
                             <main className="mt-4 w-full overflow-visible px-1">
-                                <div className="block md:rounded-medium md:border-medium border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
+                                <div className="block md:rounded-xl md:border-2 border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
                                     {products.length === 0 ? (
                                         <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1">
                                             <div className="max-w-md mx-auto text-center">

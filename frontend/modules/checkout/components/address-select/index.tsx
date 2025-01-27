@@ -19,7 +19,7 @@ const CustomItem = ({ option, isSelected, onSelect }: ListboxItemProps) => (
         aria-label="address"
         aria-selected={isSelected}
         className={cn(
-            "relative flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+            "relative flex w-full items-center gap-4 justify-between rounded-md px-3 py-2 text-sm transition-colors",
             "hover:bg-content2 hover:text-default-900",
             isSelected ? "bg-content1" : "bg-default"
         )}
@@ -27,11 +27,11 @@ const CustomItem = ({ option, isSelected, onSelect }: ListboxItemProps) => (
         onClick={onSelect}
     >
         <div className="flex flex-col">
-            <span className="text-left text-base">
-                {option.first_name} {option.last_name}
+            <span className="text-left font-semibold">
+                {option.firstname} {option.lastname}
             </span>
-            {option.company && <span className="text-sm text-default-900">{option.company}</span>}
-            <div className="flex flex-col text-left text-base mt-2">
+            {option.company && <span className="text-xs text-default-500">{option.company}</span>}
+            <div className="flex flex-col text-left text-xs text-default-500">
                 <span>
                     {option.address_1}
                     {option.address_2 && <span>, {option.address_2}</span>}
@@ -39,10 +39,10 @@ const CustomItem = ({ option, isSelected, onSelect }: ListboxItemProps) => (
                 <span>
                     {option.postal_code}, {option.city}
                 </span>
-                <span>{option.state && `${option.state}`}</span>
+                <span>{option.state}</span>
             </div>
         </div>
-        {isSelected && <Star aria-hidden="true" className="ml-auto h-4 w-4 text-yellow-500" />}
+        {isSelected && <Star aria-hidden="true" className="h-6 w-6 text-yellow-500" />}
     </button>
 );
 
@@ -62,15 +62,7 @@ const AddressSelect = ({ addresses, cart }: AddressSelectProps) => {
     }, [addresses, cart?.shipping_address]);
 
     return (
-        <>
-            <Listbox
-                options={addresses}
-                placeholder="Select an address..."
-                renderItem={CustomItem}
-                value={selectedAddress?.id}
-                onChange={handleSelect}
-            />
-        </>
+        <Listbox options={addresses} placeholder="Select an address..." renderItem={CustomItem} value={selectedAddress?.id} onChange={handleSelect} />
     );
 };
 

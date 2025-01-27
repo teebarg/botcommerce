@@ -35,9 +35,9 @@ const Avatar: React.FC<AvatarProps> = ({ className, src, isDisabled = false, col
                         "w-14 h-14": size === "lg",
                         "opacity-disabled": isDisabled,
                         "rounded-full": radius === "full",
-                        "rounded-large": radius === "md",
-                        "rounded-medium": radius === "lg",
-                        "rounded-small": radius === "sm",
+                        "rounded-xl": radius === "md",
+                        "rounded-1xl": radius === "lg",
+                        "rounded-lg": radius === "sm",
                     },
                     className
                 )}

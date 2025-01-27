@@ -58,10 +58,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                 data-slot="base"
             >
                 <div
-                    className={cn(
-                        "relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-medium flex-col py-2",
-                        classNames?.["inputWrapper"]
-                    )}
+                    className={cn("relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-xl flex-col py-2", classNames?.["inputWrapper"])}
                     data-hover={isHovered ? "true" : "false"}
                     data-slot="input-wrapper"
                     style={{ cursor: "text" }}
@@ -69,7 +66,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                     <label
                         {...labelProps}
                         className={cn(
-                            "z-10 pointer-events-none block text-foreground-500 cursor-text relative text-small pb-0.5 max-w-full",
+                            "z-10 pointer-events-none block text-foreground-500 cursor-text relative text-sm pb-0.5 max-w-full",
                             "duration-200 transition-all group-data-[filled-within=true]:text-default-500 text-ellipsis overflow-hidden",
                             classNames?.["label"]
                         )}
@@ -85,7 +82,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                             {...inputProps}
                             ref={textareaRef}
                             className={cn(
-                                "w-full font-normal bg-transparent outline-none placeholder:text-foreground-500 focus-visible:outline-none text-small",
+                                "w-full font-normal bg-transparent outline-none placeholder:text-foreground-500 focus-visible:outline-none text-sm",
                                 "group-data-[has-value=true]:text-default-foreground pt-0 transition-height duration-100 resize-none autofill:bg-transparent",
                                 classNames?.["input"]
                             )}
@@ -100,16 +97,12 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                 </div>
                 <div className="hidden group-data-[has-helper=true]:flex p-1 relative flex-col gap-1.5" data-slot="helper-wrapper">
                     {props.description && (
-                        <div
-                            {...descriptionProps}
-                            className={cn("text-tiny text-foreground-500", classNames?.["description"])}
-                            data-slot="description"
-                        >
+                        <div {...descriptionProps} className={cn("text-xs text-foreground-500", classNames?.["description"])} data-slot="description">
                             {props.description}
                         </div>
                     )}
                     {isInvalid && (
-                        <div {...errorMessageProps} className="text-tiny text-danger" data-slot="error-message">
+                        <div {...errorMessageProps} className="text-xs text-danger" data-slot="error-message">
                             {validationErrors.join(" ")}
                         </div>
                     )}

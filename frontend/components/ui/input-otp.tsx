@@ -12,7 +12,7 @@ interface Props {
     onEditEmail?: () => void;
 }
 
-const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail }) => {
+const InputOtp: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail }) => {
     const [code, setCode] = useState<string[]>(Array(6).fill(""));
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -207,4 +207,4 @@ const Verification: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail 
     );
 };
 
-export { Verification };
+export default InputOtp;

@@ -5,9 +5,9 @@ import { Suspense } from "react";
 import React from "react";
 import Image from "next/image";
 
-import ProductActions from "../product-actions";
+import { ProductWishList } from "./product-wishlist";
 
-import { ProductWishList } from "@/components/product/product-wishlist";
+import ProductActions from "@/modules/products/components/product-actions";
 
 interface ComponentProps {
     product: Product;

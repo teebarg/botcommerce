@@ -1,6 +1,6 @@
 "use client";
 
-import { Cart } from "types/global";
+import { Cart, CartItem } from "types/global";
 import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
 
@@ -27,8 +27,13 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
         return currency(Number(amount) || 0);
     };
 
+    const totalItems =
+        cart?.items?.reduce((acc: number, item: CartItem) => {
+            return acc + item.quantity;
+        }, 0) || 0;
+
     return (
-        <div className={`fixed md:hidden bottom-0 z-50 w-full py-3 flex flex-col gap-2 bg-background shadow-2xl transition-all duration-500`}>
+        <div className={`sticky md:hidden top-14 z-50 w-full flex flex-col bg-background shadow-2xl transition-all duration-500`}>
             <div className={cn("overflow-hidden transition-all duration-500 px-2", isExpanded ? "max-h-48" : "max-h-0")}>
                 <div className="flex items-center justify-between py-2">
                     <p className="text-xl font-medium">Summary</p>
@@ -63,11 +68,11 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
             </div>
             <div className="flex flex-row-reverse gap-2 p-2">
                 <BtnLink color="danger" href="/checkout" variant="bordered">
-                    Checkout ({cart?.items?.length ?? 0})
+                    Checkout ({totalItems ?? 0})
                 </BtnLink>
                 <Button
                     className="bg-inherit"
-                    endContent={<ChevronDown className={cn("transition-all duration-500", isExpanded && "rotate-180")} />}
+                    endContent={<ChevronDown className={cn("transition-all duration-500 rotate-180", isExpanded && "rotate-0")} />}
                     onClick={toggleSummary}
                 >
                     <span className="text-2xl font-semibold">{getAmount(total ?? 0)}</span>

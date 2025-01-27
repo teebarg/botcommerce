@@ -1,13 +1,14 @@
 "use client";
 
-import { ChevronDown, User } from "nui-react-icons";
+import { User } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import { signOut } from "@modules/account/actions";
 import MapPin from "@modules/common/icons/map-pin";
 import Package from "@modules/common/icons/package";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Customer } from "types/global";
 import { cn } from "@lib/util/cn";
+
+import LocalizedClientLink from "@/components/ui/link";
 
 const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | null }) => {
     const route = usePathname();
@@ -45,43 +46,6 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
 
     return (
         <div>
-            <div className="sm:hidden" data-testid="mobile-account-nav">
-                {route !== `/account` ? (
-                    <LocalizedClientLink className="flex items-center gap-x-2 text-sm py-2" data-testid="account-main-link" href="/account">
-                        <>
-                            <ChevronDown className="transform rotate-90" />
-                            <span>Account</span>
-                        </>
-                    </LocalizedClientLink>
-                ) : (
-                    <div className="bg-content2">
-                        <div className="text-base">
-                            <ul className="flex justify-between px-2">
-                                {navLinks.map((link, index: number) => (
-                                    <li key={index}>
-                                        <LocalizedClientLink className="px-8 text-xs font-semibold" data-testid={link.dataTestid} href={link.href}>
-                                            <>
-                                                <div className="flex flex-col items-center">
-                                                    {link.icon}
-                                                    <span>{link.label}</span>
-                                                </div>
-                                            </>
-                                        </LocalizedClientLink>
-                                    </li>
-                                ))}
-                                {/* <li>
-                                    <button className="py-4 px-8" data-testid="logout-button" type="button" onClick={handleLogout}>
-                                        <div className="flex flex-col items-center">
-                                            <ArrowRightOnRectangle />
-                                            <span>Log out</span>
-                                        </div>
-                                    </button>
-                                </li> */}
-                            </ul>
-                        </div>
-                    </div>
-                )}
-            </div>
             <div className="hidden sm:block" data-testid="account-nav">
                 <div>
                     <div className="pb-4">

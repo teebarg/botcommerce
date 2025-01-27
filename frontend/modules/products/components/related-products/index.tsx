@@ -2,7 +2,7 @@ import { search } from "@lib/data";
 import dynamic from "next/dynamic";
 import { Product } from "types/global";
 
-const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 type RelatedProductsProps = {
     product: Product;

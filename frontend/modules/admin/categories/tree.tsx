@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { Category } from "types/global";
-import { Chip } from "@modules/common/components/chip";
 import { ChevronRight, DotsSix, Folder, Tag } from "nui-react-icons";
 
 import CategoryAction from "./categories-control";
 
 import { cn } from "@/lib/util/cn";
+import Chip from "@/components/ui/chip";
 
 interface Props {
     categories: Category[];
@@ -63,7 +63,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                         </div>
                         {item.children && open.includes(item.id) && (
                             <ol className="mt-4 mb-4 block">
-                                {item.children.map((sub: Category, index: number) => (
+                                {item.children?.map((sub: Category, index: number) => (
                                     <li key={index} className="ml-10 min-h-10">
                                         <div className="flex items-center">
                                             <div className="flex w-[32px] items-center">

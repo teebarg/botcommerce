@@ -3,6 +3,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 
 from fastapi import FastAPI, Response
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api.main import api_router
 from app.core import deps
@@ -22,6 +23,18 @@ from app.models.generic import (
 )
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
+
+# # Custom middleware to capture the client host
+# class ClientHostMiddleware(BaseHTTPMiddleware):
+#     async def dispatch(self, request, call_next):
+#         client_host = request.client.host
+#         # Attach the client host to the request state
+#         request.state.client_host = client_host
+#         print(f"Client host: {client_host}")  # Log the client IP
+#         return await call_next(request)
+
+# # Add middleware to the app
+# app.add_middleware(ClientHostMiddleware)
 
 # Set all CORS enabled origins
 if settings.all_cors_origins:
@@ -71,7 +84,7 @@ async def newsletter(data: NewsletterCreate):
 
 
 @app.post("/api/log-error")
-@limit("5/minute")
+@limit("10/minute")
 async def log_error(error: dict, notification: deps.Notification):
     # Send the error to Slack
     slack_message = {

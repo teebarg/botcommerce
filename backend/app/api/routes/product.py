@@ -218,7 +218,7 @@ async def read(slug: str, db: SessionDep) -> ProductPublic:
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    return product
+    return ProductPublic.model_validate(product)
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])

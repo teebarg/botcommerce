@@ -1,8 +1,9 @@
 import { useMemo } from "react";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { CartItem, Order } from "types/global";
 import { currency } from "@lib/util/util";
 import Image from "next/image";
+
+import LocalizedClientLink from "@/components/ui/link";
 
 type OrderCardProps = {
     order: Omit<Order, "beforeInsert">;
