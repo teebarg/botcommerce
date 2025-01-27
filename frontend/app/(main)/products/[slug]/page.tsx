@@ -11,7 +11,7 @@ import Image from "next/image";
 
 import { siteConfig } from "@/lib/config";
 import SkeletonProductTemplate from "@/modules/products/skeleton-product";
-import { currency } from "@/lib/util/util";
+import { currency, imgSrc } from "@/lib/util/util";
 import ProductDetails from "@/modules/products/templates/details";
 import ReviewsSection from "@/components/review";
 import LocalizedClientLink from "@/components/ui/link";
@@ -95,7 +95,11 @@ export default async function ProductPage({ params }: Props) {
                                 ))}
                             </div>
                             <div className="flex-1">
-                                <div className="h-[60vh] relative rounded-lg overflow-hidden">
+                                <div
+                                    className="bg-fixed bg-auto bg-top h-[60vh] block md:hidden"
+                                    style={{ backgroundImage: `url(${product.image as string})` }}
+                                ></div>
+                                <div className="hidden md:block h-[60vh] relative rounded-lg overflow-hidden">
                                     <Image fill alt={product.name} src={product.image as string} />
                                 </div>
                             </div>

@@ -138,7 +138,9 @@ const ReviewsSection: React.FC = () => {
 
     return (
         <div className="p-4 max-w-7xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                Customer Reviews <Chip color="success" title="All from verified purchases" />
+            </h2>
 
             <RatingBreakdown />
 

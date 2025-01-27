@@ -148,7 +148,12 @@ export default async function Home() {
                     </div>
                 </div>
                 <div className="relative py-2">
-                    <PromotionalBanner />
+                    <PromotionalBanner
+                        title="Big Sale on Top Brands!"
+                        subtitle="Get up to 50% OFF on select products."
+                        outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                        btnClass="text-purple-600"
+                    />
                 </div>
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-2 md:py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">

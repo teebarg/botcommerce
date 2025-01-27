@@ -1,26 +1,35 @@
 import React from "react";
 
-import { BtnLink } from "./ui/btnLink";
+import { BtnLink } from "@/components/ui/btnLink";
+import { cn } from "@/lib/util/cn";
 
-const PromotionalBanner: React.FC = () => {
+interface Props {
+    title: string;
+    subtitle?: string;
+    icon?: React.ReactNode;
+    outerClass?: string;
+    btnClass?: string;
+}
+
+const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass, btnClass }) => {
     return (
-        <div className="relative mx-2 md:mx-auto max-w-8xl overflow-hidden rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 p-4 shadow-lg">
-            {/* Animated Background Glow */}
-            <div className="absolute inset-0 animate-gradient-move opacity-50" />
-
-            {/* Banner Content */}
-            <div className="relative z-10 flex items-center justify-between gap-4">
+        <div
+            className={cn(
+                "bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden",
+                outerClass
+            )}
+        >
+            <div className="flex items-center space-x-3">
+                {icon}
                 <div>
-                    <h2 className="text-xl font-bold text-white sm:text-2xl">Big Sale on Top Brands!</h2>
-                    <p className="text-sm text-white/90">
-                        Get up to <span className="font-bold">50% OFF</span> on select products.
-                    </p>
+                    <h3 className="text-white font-bold text-base animate-fade-in-up">{title}</h3>
+                    <p className="text-white/80 text-xs animate-fade-in-up delay-100">{subtitle}</p>
                 </div>
-                {/* CTA Button */}
-                <BtnLink className="!rounded-full bg-white text-sm font-medium text-purple-600 shadow-md !py-2" href="/collections">
-                    Shop Now
-                </BtnLink>
             </div>
+            {/* CTA Button */}
+            <BtnLink className={cn("bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold", btnClass)} href="/">
+                <span>Shop Now</span>
+            </BtnLink>
         </div>
     );
 };

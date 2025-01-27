@@ -10,6 +10,7 @@ import { CollectionsSideBar } from "./sidebar";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
+import PromotionalBanner from "@/components/promotion";
 
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
@@ -68,24 +69,19 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
             </div>
             <div className="w-full flex-1 flex-col">
                 {/* Mobile banner */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden">
-                    <div className="flex items-center space-x-3">
-                        <Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />
-                        <div>
-                            <h3 className="text-white font-bold text-base animate-fade-in-up">Exclusive Offer!</h3>
-                            <p className="text-white/80 text-xs animate-fade-in-up delay-100">Get 20% Off Today</p>
-                        </div>
-                    </div>
-                    <BtnLink className="bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold" href="/">
-                        <span>Shop Now</span>
-                    </BtnLink>
-                </div>
+                <PromotionalBanner
+                    title="Exclusive Offer!"
+                    subtitle="Get 20% Off Today"
+                    icon={<Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />}
+                    outerClass="from-blue-600 to-purple-700"
+                    btnClass="text-blue-600"
+                />
                 {/* Categories */}
                 <div className="px-4 my-6 md:hidden">
                     <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
                         {cat.map((category: Collection, index: number) => (
-                            <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
+                            <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                 {category.name}
                             </BtnLink>
                         ))}
