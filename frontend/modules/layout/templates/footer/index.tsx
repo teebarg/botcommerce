@@ -1,10 +1,11 @@
 import { getCategories, getCollectionsList } from "@lib/data";
 import { siteConfig } from "@lib/config";
 import { GithubIcon, YoutubeIcon, TwitterIcon, WhatsAppIcon } from "nui-react-icons";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import Link from "next/link";
 import NewsletterForm from "@modules/store/components/newsletter";
 import { Category } from "types/global";
+
+import LocalizedClientLink from "@/components/ui/link";
 
 const about = [
     {

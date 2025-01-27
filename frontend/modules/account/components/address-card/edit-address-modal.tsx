@@ -9,10 +9,10 @@ import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { Address } from "types/global";
 import { useOverlayTriggerState } from "react-stately";
-import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 
+import { ComboBox } from "@/components/ui/combobox";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";

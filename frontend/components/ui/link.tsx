@@ -3,6 +3,7 @@
 import Link, { LinkProps } from "next/link";
 import React, { startTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
+
 import { useProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/util/cn";
 
@@ -21,8 +22,8 @@ const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, cl
     return (
         <Link
             {...props}
-            href={href}
             className={cn(className, pathname == href && active)}
+            href={href}
             onClick={(e) => {
                 e.preventDefault();
                 progress.start();

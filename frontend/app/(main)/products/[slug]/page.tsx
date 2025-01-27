@@ -2,20 +2,19 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductBySlug, search } from "@lib/data";
 import { Product, SearchParams } from "types/global";
-
-import SkeletonProductTemplate from "@/modules/products/skeleton-product";
-import { siteConfig } from "@/lib/config";
 import React, { Suspense } from "react";
 import ProductActions from "@modules/products/components/product-actions";
 import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import Image from "next/image";
 
+import { siteConfig } from "@/lib/config";
+import SkeletonProductTemplate from "@/modules/products/skeleton-product";
 import { currency } from "@/lib/util/util";
 import ProductDetails from "@/modules/products/templates/details";
 import ReviewsSection from "@/components/review";
+import LocalizedClientLink from "@/components/ui/link";
 
 type Props = {
     params: { slug: string };

@@ -3,11 +3,12 @@
 import React, { useEffect, useMemo } from "react";
 import { useFormState } from "react-dom";
 import { updateCustomerBillingAddress } from "@modules/account/actions";
-import { ComboBox } from "@modules/common/components/combobox";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 
 import AccountInfo from "../account-info";
+
+import { ComboBox } from "@/components/ui/combobox";
 
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;

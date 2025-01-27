@@ -1,7 +1,6 @@
 import React from "react";
 import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 import dynamic from "next/dynamic";
@@ -10,8 +9,9 @@ import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
 
 import { BtnLink } from "@/components/ui/btnLink";
+import LocalizedClientLink from "@/components/ui/link";
 
-const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 interface ComponentProps {
     query?: string;
@@ -76,7 +76,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                             <p className="text-white/80 text-xs animate-fade-in-up delay-100">Get 20% Off Today</p>
                         </div>
                     </div>
-                    <BtnLink href="/" className="bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold">
+                    <BtnLink className="bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold" href="/">
                         <span>Shop Now</span>
                     </BtnLink>
                 </div>
@@ -85,7 +85,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                     <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
                         {cat.map((category: Collection, index: number) => (
-                            <BtnLink href={`/collections?cat_ids=${category.slug}`} key={index} color="secondary" className="flex-none">
+                            <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                 {category.name}
                             </BtnLink>
                         ))}

@@ -4,7 +4,6 @@ import { Cart as CartIcon } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 import { SlideOver } from "@modules/common/components/slideover";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Cart, CartItem } from "types/global";
 import { usePathname } from "next/navigation";
 import { currency } from "@lib/util/util";
@@ -13,6 +12,7 @@ import { CartItems } from "../cart-items";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import Chip from "@/components/ui/chip";
+import LocalizedClientLink from "@/components/ui/link";
 
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;

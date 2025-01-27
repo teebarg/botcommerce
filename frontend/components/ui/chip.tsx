@@ -1,5 +1,6 @@
-import { cn } from "@/lib/util/cn";
 import React from "react";
+
+import { cn } from "@/lib/util/cn";
 
 // Define types for the props
 type Color = "primary" | "secondary" | "default" | "danger" | "warning" | "success";
@@ -55,8 +56,10 @@ const Chip: React.FC<Props> = ({ title, onClick, className, color = "primary", v
         if (variant === "bordered" || variant === "shadow") {
             return variantCss[variant](color);
         }
+
         return variantCss[variant];
     };
+
     return (
         <React.Fragment>
             <div

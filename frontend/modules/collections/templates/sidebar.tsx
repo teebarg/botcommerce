@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Brand, Category, Collection } from "types/global";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 
 import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import LocalizedClientLink from "@/components/ui/link";
 
 interface ComponentProps {
     brands: Brand[];

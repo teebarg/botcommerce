@@ -1,13 +1,14 @@
 "use client";
 
-import { ChevronDown, User } from "nui-react-icons";
+import { User } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import { signOut } from "@modules/account/actions";
 import MapPin from "@modules/common/icons/map-pin";
 import Package from "@modules/common/icons/package";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Customer } from "types/global";
 import { cn } from "@lib/util/cn";
+
+import LocalizedClientLink from "@/components/ui/link";
 
 const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | null }) => {
     const route = usePathname();

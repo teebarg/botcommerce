@@ -1,11 +1,12 @@
 import { Metadata } from "next";
 import { getCustomer, listCustomerOrders } from "@lib/data";
 import { notFound } from "next/navigation";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { Customer, Order } from "types/global";
 import { currency } from "@lib/util/util";
 import { ChevronDown } from "nui-react-icons";
+
 import PromotionalBanner from "@/components/promotion";
+import LocalizedClientLink from "@/components/ui/link";
 
 export const metadata: Metadata = {
     title: "Account",

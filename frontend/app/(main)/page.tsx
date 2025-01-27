@@ -7,15 +7,15 @@ import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
 import Image from "next/image";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
+import LocalizedClientLink from "@/components/ui/link";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
 const FlashBanner = dynamic(() => import("@components/flash"), { ssr: false });
-const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -139,7 +139,7 @@ export default async function Home() {
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
                             <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
                                 {categories?.map((category: Collection, index: number) => (
-                                    <BtnLink href={`/collections?cat_ids=${category.slug}`} key={index} color="secondary" className="flex-none">
+                                    <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                         {category.name}
                                     </BtnLink>
                                 ))}

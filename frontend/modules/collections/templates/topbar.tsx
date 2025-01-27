@@ -4,7 +4,6 @@ import React from "react";
 import { FunnelIcon } from "nui-react-icons";
 import useWatch from "@lib/hooks/use-watch";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
-import { ComboBox } from "@modules/common/components/combobox";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { SlideOver } from "@modules/common/components/slideover";
 import { Brand, Category, Collection } from "types/global";
@@ -12,6 +11,7 @@ import { Brand, Category, Collection } from "types/global";
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
 
+import { ComboBox } from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
 
 interface ComponentProps {

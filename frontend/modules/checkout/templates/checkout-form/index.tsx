@@ -1,4 +1,3 @@
-import { currency } from "@/lib/util/util";
 import { getCustomer } from "@lib/data";
 import Addresses from "@modules/checkout/components/addresses";
 import Payment from "@modules/checkout/components/payment";
@@ -6,6 +5,8 @@ import Review from "@modules/checkout/components/review";
 import Shipping from "@modules/checkout/components/shipping";
 import { cookies } from "next/headers";
 import { Cart } from "types/global";
+
+import { currency } from "@/lib/util/util";
 
 type CheckoutFormProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;

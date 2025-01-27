@@ -1,4 +1,3 @@
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
 import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import ActivityTray from "@modules/common/components/activity-tray";
@@ -7,6 +6,7 @@ import { Home } from "nui-react-icons";
 import dynamic from "next/dynamic";
 
 import { siteConfig } from "@/lib/config";
+import LocalizedClientLink from "@/components/ui/link";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {

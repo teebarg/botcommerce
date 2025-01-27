@@ -1,11 +1,11 @@
 import { getCustomer } from "@lib/data";
 import { Customer } from "types/global";
-import UnderlineLink from "@modules/common/components/interactive-link";
 import { Package, User } from "nui-react-icons";
+
 import RecommendedProducts from "@/modules/products/components/recommended";
 import AccountNav from "@/modules/account/components/account-nav";
 import MapPin from "@/modules/common/icons/map-pin";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import LocalizedClientLink from "@/components/ui/link";
 
 const navLinks = [
     {
@@ -36,6 +36,7 @@ const navLinks = [
 
 export default async function AccountPageLayout({ dashboard }: { dashboard?: React.ReactNode }) {
     const customer = (await getCustomer()) as Customer;
+
     return (
         <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">
             <div className="bg-blue-600 text-white p-6 md:hidden">
@@ -57,10 +58,10 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
                         {navLinks.map((link, index: number) => (
                             <li key={index}>
                                 <LocalizedClientLink
+                                    active="text-rose-500"
                                     className="px-8 text-xs font-semibold"
                                     data-testid={link.dataTestid}
                                     href={link.href}
-                                    active="text-rose-500"
                                 >
                                     <div className="flex flex-col items-center">
                                         {link.icon}
@@ -83,7 +84,7 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
                         <span className="font-medium">You can find frequently asked questions and answers on our customer service page.</span>
                     </div>
                     <div>
-                        <UnderlineLink href="/customer-service">Customer Service</UnderlineLink>
+                        <LocalizedClientLink href="/customer-service">Customer Service</LocalizedClientLink>
                     </div>
                 </div>
                 <div className="mt-4">

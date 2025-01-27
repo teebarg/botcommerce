@@ -1,6 +1,7 @@
-import { cn } from "@/lib/util/cn";
 import { CheckCircleSolid, ExclamationIcon, InformationCircleSolid, Shield } from "nui-react-icons";
 import React from "react";
+
+import { cn } from "@/lib/util/cn";
 
 interface Props {
     title: string;
@@ -31,7 +32,7 @@ const Alert: React.FC<Props> = ({ title, color = "primary", variant = "solid" })
         secondary: {
             outer: "",
             inner: "bg-secondary-100/50 dark:bg-secondary-100 border-secondary-100",
-            icon: <InformationCircleSolid viewBox="0 0 20 20" className="fill-current" />,
+            icon: <InformationCircleSolid className="fill-current" viewBox="0 0 20 20" />,
             variant: {
                 bordered: "border-1 bg-transparent border-secondary text-secondary",
                 solid: "bg-secondary-100/50 dark:bg-secondary-100/50 text-secondary-500",
@@ -65,17 +66,18 @@ const Alert: React.FC<Props> = ({ title, color = "primary", variant = "solid" })
             },
         },
     };
+
     return (
         <React.Fragment>
             <div className="w-full flex items-center my-3">
                 <div
-                    role="alert"
-                    title={title}
                     className={cn(
                         "flex flex-grow flex-row w-full py-3 px-4 gap-x-1 rounded-xl items-start",
                         colorCss[color].outer,
                         colorCss[color].variant[variant]
                     )}
+                    role="alert"
+                    title={title}
                 >
                     <div
                         className={cn("flex-none relative w-9 h-9 rounded-full grid place-items-center shadow-small border-1", colorCss[color].inner)}

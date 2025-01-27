@@ -1,5 +1,6 @@
-import { cn } from "@/lib/util/cn";
 import React from "react";
+
+import { cn } from "@/lib/util/cn";
 
 interface Props {
     value: number;
@@ -10,12 +11,12 @@ const Progress: React.FC<Props> = ({ value, className }) => {
     return (
         <React.Fragment>
             <div
-                className={cn("flex flex-col gap-2 w-full", className)}
                 aria-label="Loading..."
-                aria-valuenow={value}
-                aria-valuemin={0}
                 aria-valuemax={100}
+                aria-valuemin={0}
+                aria-valuenow={value}
                 aria-valuetext={`${value}%`}
+                className={cn("flex flex-col gap-2 w-full", className)}
                 role="progressbar"
             >
                 <div className="z-0 relative bg-default-500/50 overflow-hidden h-2 rounded-full">

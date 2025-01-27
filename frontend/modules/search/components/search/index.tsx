@@ -5,16 +5,16 @@ import { MagnifyingGlassMini } from "nui-react-icons";
 import SearchInput from "@modules/search/components/search-input";
 import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
-import { Kbd } from "@modules/common/components/kbd";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
+import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import { Product, SearchParams } from "@/types/global";
 import NoProductsFound from "@/modules/products/components/no-products";
 import { debounce } from "@/lib/util/util";
-const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 interface Props {
     className?: string;

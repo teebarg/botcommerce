@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { SignUpForm } from "@modules/auth/components/signup";
 
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
 import { siteConfig } from "@/lib/config";
+import LocalizedClientLink from "@/components/ui/link";
 
 export const metadata: Metadata = {
     title: `Sign Up | ${siteConfig.name}`,

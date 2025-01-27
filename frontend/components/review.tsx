@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { ChevronDown, Star, ThumbsDownIcon, ThumbsUpIcon } from "nui-react-icons";
+
+import { Button } from "@/components/ui/button";
 import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 
@@ -65,15 +66,15 @@ const ReviewsSection: React.FC = () => {
         <div className="flex overflow-x-auto gap-2 mb-4 pb-2">
             {["recent", "top", "verified"].map((filter: string, index: number) => (
                 <Chip
-                    size="lg"
                     key={index}
-                    color={selectedFilter === filter ? "default" : "secondary"}
-                    onClick={() => setSelectedFilter(filter)}
                     className="py-1 px-3 cursor-pointer capitalize"
+                    color={selectedFilter === filter ? "default" : "secondary"}
+                    size="lg"
                     title={filter}
+                    onClick={() => setSelectedFilter(filter)}
                 />
             ))}
-            <Button size="sm" className="ml-2 h-8">
+            <Button className="ml-2 h-8" size="sm">
                 filter
                 {/* <Filter className="h-4 w-4" /> */}
             </Button>
@@ -98,7 +99,7 @@ const ReviewsSection: React.FC = () => {
                 {ratingDistribution.map((rating: { stars: number; percentage: number }, index: number) => (
                     <div key={index} className="flex items-center">
                         <span className="mr-2 text-sm w-6">{rating.stars}★</span>
-                        <Progress value={rating.percentage} className="flex-1 h-2" />
+                        <Progress className="flex-1 h-2" value={rating.percentage} />
                         <span className="ml-2 text-sm text-gray-600 w-10">{rating.percentage}%</span>
                     </div>
                 ))}

@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/util/cn";
-import LocalizedClientLink from "@/modules/common/components/localized-client-link";
+import LocalizedClientLink from "@/components/ui/link";
 
 const buttonConfig: any = {
     primary: {

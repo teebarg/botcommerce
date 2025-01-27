@@ -22,6 +22,7 @@ export function ProgressBar({ className, children }: { className: string; childr
         <ProgressBarContext.Provider value={progress}>
             {progress.state !== "complete" && (
                 <div
+                    className={className}
                     style={{
                         width,
                         transition: "width 0.2s ease-out, opacity 0.2s ease-out",
@@ -29,7 +30,6 @@ export function ProgressBar({ className, children }: { className: string; childr
                         zIndex: 1000,
                         position: "fixed",
                     }}
-                    className={className}
                 />
             )}
 
@@ -46,10 +46,12 @@ function useProgress() {
         () => {
             if (value === 100) {
                 setValue(0);
+
                 return;
             }
 
             let diff;
+
             if (value === 0) {
                 diff = 15;
             } else if (value < 50) {
@@ -92,6 +94,7 @@ function useInterval(callback: () => void, delay: number | null) {
         if (delay !== null) {
             savedCallback.current();
             const id = setInterval(savedCallback.current, delay);
+
             return () => clearInterval(id);
         }
     }, [delay]);

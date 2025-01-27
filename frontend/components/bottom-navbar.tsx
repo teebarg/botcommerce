@@ -1,8 +1,9 @@
 import { cn } from "@lib/util/cn";
 import React from "react";
 import { HeartFilled, Home, Search, User } from "nui-react-icons";
-import LocalizedClientLink from "@modules/common/components/localized-client-link";
+
 import { Cart } from "@/modules/layout/components/cart";
+import LocalizedClientLink from "@/components/ui/link";
 
 const ButtonNav = async ({ className }: { className?: string }) => {
     interface NavLink {
@@ -47,7 +48,7 @@ const ButtonNav = async ({ className }: { className?: string }) => {
             )}
         >
             {nav.map((item: NavLink, index: number) => (
-                <LocalizedClientLink key={index} className={cn("flex flex-col items-center")} active="text-rose-600" href={item.href}>
+                <LocalizedClientLink key={index} active="text-rose-600" className={cn("flex flex-col items-center")} href={item.href}>
                     {item.icon}
                     <p className="text-sm font-semibold">{item.label}</p>
                 </LocalizedClientLink>

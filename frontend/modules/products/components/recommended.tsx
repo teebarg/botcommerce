@@ -1,7 +1,7 @@
 import { search } from "@lib/data";
 import { Product, SearchParams } from "types/global";
 import dynamic from "next/dynamic";
-const ProductCard = dynamic(() => import("@/modules/products/components/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 type RecommendedProductsProps = {
     exclude?: Array<string | number>;

@@ -5,10 +5,9 @@ import { HeartFilled, Heart } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 
-import { addWish, removeWish } from "../../actions";
-
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
+import { addWish, removeWish } from "@/modules/products/actions";
 
 interface ComponentProps {
     product: Product;

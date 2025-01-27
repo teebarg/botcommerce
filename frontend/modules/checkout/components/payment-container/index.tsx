@@ -50,7 +50,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, sel
                         "h-5 w-5 rounded-full border-2",
                         selectedPaymentOptionId === paymentSession.provider_id ? "border-green-500 bg-green-500" : "border-gray-300"
                     )}
-                ></div>
+                />
             </RadioGroup.Option>
         </>
     );
