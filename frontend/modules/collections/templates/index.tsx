@@ -68,7 +68,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
             </div>
             <div className="w-full flex-1 flex-col">
                 {/* Mobile banner */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 my-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden">
                     <div className="flex items-center space-x-3">
                         <Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />
                         <div>

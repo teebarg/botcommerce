@@ -7,6 +7,14 @@ from functools import wraps
 from fastapi import HTTPException
 
 from app.services.cache import get_cache_service
+import time
+from typing import Generator, Callable, TypeVar, ParamSpec
+from sqlalchemy.exc import OperationalError, DBAPIError
+import logging
+
+# Type variables for generic function signatures
+T = TypeVar('T')
+P = ParamSpec('P')
 
 
 def limit(rate_string: str):
@@ -127,4 +135,47 @@ def cache(expire: int = 86400, key: str | None = None, hash: bool = True):
 
         return wrapped
 
+    return decorator
+
+
+def with_retry(
+    retries: int = 3,
+    delay: float = 1.0,
+    backoff: float = 2.0,
+    exceptions: tuple = (OperationalError, DBAPIError)
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    """
+    Decorator that implements retry logic for database operations.
+    
+    Args:
+        retries: Number of retries before giving up
+        delay: Initial delay between retries in seconds
+        backoff: Multiplier applied to delay between retries
+        exceptions: Tuple of exceptions to catch and retry on
+    """
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            last_exception = None
+            current_delay = delay
+
+            for attempt in range(retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    last_exception = e
+                    if attempt == retries:
+                        logging.error(f"Failed after {retries} retries: {str(e)}")
+                        raise
+                    
+                    logging.warning(
+                        f"Database operation failed (attempt {attempt + 1}/{retries + 1}): {str(e)}"
+                        f"\nRetrying in {current_delay} seconds..."
+                    )
+                    
+                    time.sleep(current_delay)
+                    current_delay *= backoff
+            
+            raise last_exception  # This line should never be reached
+        return wrapper
     return decorator

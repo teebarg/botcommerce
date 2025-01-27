@@ -68,7 +68,7 @@ const ReviewsSection: React.FC = () => {
                 <Chip
                     key={index}
                     className="py-1 px-3 cursor-pointer capitalize"
-                    color={selectedFilter === filter ? "default" : "secondary"}
+                    color={selectedFilter === filter ? "default" : "warning"}
                     size="lg"
                     title={filter}
                     onClick={() => setSelectedFilter(filter)}
@@ -82,7 +82,7 @@ const ReviewsSection: React.FC = () => {
     );
 
     const RatingBreakdown = () => (
-        <div className="bg-white p-4 rounded-lg mb-4">
+        <div className="bg-content1 p-6 rounded-lg mb-4">
             <div className="flex items-center mb-4">
                 <div className="flex items-center mr-4">
                     <span className="text-3xl font-bold mr-2">4.7</span>
@@ -92,7 +92,7 @@ const ReviewsSection: React.FC = () => {
                         ))}
                     </div>
                 </div>
-                <span className="text-sm text-gray-600">128 reviews</span>
+                <span className="text-sm text-default-600">128 reviews</span>
             </div>
 
             <div className="space-y-1">
@@ -100,7 +100,7 @@ const ReviewsSection: React.FC = () => {
                     <div key={index} className="flex items-center">
                         <span className="mr-2 text-sm w-6">{rating.stars}★</span>
                         <Progress className="flex-1 h-2" value={rating.percentage} />
-                        <span className="ml-2 text-sm text-gray-600 w-10">{rating.percentage}%</span>
+                        <span className="ml-2 text-sm text-default-600 w-10">{rating.percentage}%</span>
                     </div>
                 ))}
             </div>
@@ -108,24 +108,24 @@ const ReviewsSection: React.FC = () => {
     );
 
     const ReviewCard = ({ review }: { review: ReviewData }) => (
-        <div className="bg-white p-4 rounded-lg mb-4 shadow-sm">
+        <div className="bg-content1 p-6 rounded-lg mb-4 shadow-sm">
             <div className="flex justify-between items-start mb-2">
                 <div>
                     <div className="flex items-center">
-                        <span className="font-medium mr-2">{review.name}</span>
+                        <span className="font-semibold mr-2">{review.name}</span>
                         {review.verified && <Chip color="success" title="Verified" />}
                     </div>
                     <div className="flex">
                         {[...Array(5)].map((_, i) => (
                             <Star key={i} className={`h-4 w-4 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
                         ))}
-                        <span className="text-xs text-gray-500 ml-2">{review.date}</span>
+                        <span className="text-xs text-default-500 ml-2">{review.date}</span>
                     </div>
                 </div>
             </div>
 
-            <p className="text-sm text-gray-700 mb-2">{review.text}</p>
-            <div className="flex items-center text-sm text-gray-600">
+            <p className="text-sm text-default-700 mb-2">{review.text}</p>
+            <div className="flex items-center text-sm text-default-600">
                 <span className="mr-4 flex items-center">
                     <ThumbsUpIcon className="h-4 w-4 mr-1" /> {review.likes}
                 </span>

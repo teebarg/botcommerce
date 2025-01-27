@@ -1,5 +1,6 @@
+from collections.abc import Generator
 import json
-from typing import Annotated, Generator
+from typing import Annotated
 
 import firebase_admin
 import jwt
@@ -19,33 +20,20 @@ from app.models.generic import Address, Product, User
 from app.models.token import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
-from sqlalchemy.exc import OperationalError
-import time
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
 )
 
 
-def get_db() -> Generator:
-    retries = 10  # Number of retries
-    wait_time = 2  # Initial wait time (seconds)
-    session = None
-
-    for attempt in range(retries):
-        try:
-            session = Session(engine)
-            yield session  # Provide the session to the caller
-            break  # Exit retry loop if successful
-        except OperationalError:
-            print(f"Database is waking up, retrying in {wait_time} seconds... (Attempt {attempt + 1}/{retries})")
-            time.sleep(wait_time)
-            wait_time *= 2  # Exponential backoff
-        finally:
-            if session:
-                session.close()  # Ensure the session is closed after every attempt
-    else:
-        raise Exception("Database connection failed after multiple retries.")
+# @retry(
+#     retry=retry_if_exception_type(ConnectionError),  # Retry on connection errors
+#     wait=wait_exponential(multiplier=1, min=4, max=10),  # Exponential backoff
+#     stop=stop_after_attempt(5),  # Max 5 attempts
+# )
+def get_db() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session
 
 
 SessionDep = Annotated[Session, Depends(get_db)]
