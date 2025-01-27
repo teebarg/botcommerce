@@ -52,7 +52,7 @@ const CollectionTemplateSkeleton = () => {
                             <Skeleton className="h-14 w-full rounded" />
 
                             <main className="mt-4 w-full px-1">
-                                <div className="block md:rounded-medium md:border-medium border-dashed border-divider md:px-2 py-4">
+                                <div className="block md:rounded-medium md:border-2 border-dashed border-divider md:px-2 py-4">
                                     <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-4">
                                         {/* Generate 8 skeleton product cards */}
                                         {[...Array(8)].map((_, index) => (

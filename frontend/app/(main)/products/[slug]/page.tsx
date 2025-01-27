@@ -15,6 +15,7 @@ import Image from "next/image";
 
 import { currency } from "@/lib/util/util";
 import ProductDetails from "@/modules/products/templates/details";
+import ReviewsSection from "@/components/review";
 
 type Props = {
     params: { slug: string };
@@ -145,6 +146,8 @@ export default async function ProductPage({ params }: Props) {
                         </div>
                     </div>
                 </div>
+                {/* <ReviewSection /> */}
+                <ReviewsSection />
                 <div className="max-w-7xl mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
                     <Suspense fallback={<SkeletonRelatedProducts />}>
                         <RelatedProducts product={product} />

@@ -60,8 +60,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <link href="/site.webmanifest" rel="manifest" />
             </head>
             <body className="min-h-screen bg-background">
-                <NotificationProviders>
-                    <ProgressBar className="h-1 bg-primary">
+                <ProgressBar className="h-1 bg-primary">
+                    <NotificationProviders>
                         <OverlayClientProvider>
                             <div className="relative flex flex-col min-h-screen">
                                 <PushNotificationManager />
@@ -70,8 +70,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                             </div>
                             {!customer && <Google />}
                         </OverlayClientProvider>
-                    </ProgressBar>
-                </NotificationProviders>
+                    </NotificationProviders>
+                </ProgressBar>
             </body>
         </html>
     );

@@ -67,12 +67,50 @@ body {
     .light,
     [data-theme="light"] {
         color-scheme: light;
-        /* Background and Foreground */
-        --background: 0 0% 100%; /* Soft, warm off-white */
+        /* Base colors */
+        --background: 0 0% 100%;
+        --foreground-50: 0 0% 98.04%;
         --foreground-100: 240 4.76% 95.88%;
-        --foreground-500: 240 3.83% 46.08%; /* Deep charcoal for primary text */
-        --foreground-900: 240 3.7% 15.88%; /* Pure black for emphatic text */
-        --foreground: 201.81999999999994 24.44% 8.82%; /* Soft black for standard text */
+        --foreground-200: 240 5.88% 90%;
+        --foreground-300: 240 4.88% 83.92%;
+        --foreground-400: 240 5.03% 64.9%;
+        --foreground-500: 240 3.83% 46.08%;
+        --foreground-600: 240 5.2% 33.92%;
+        --foreground-700: 240 5.26% 26.08%;
+        --foreground-800: 240 3.7% 15.88%;
+        --foreground-900: 240 5.88% 10%;
+        --foreground: 201.81999999999994 24.44% 8.82%;
+        --divider: 0 0% 6.67%;
+        --divider-opacity: 0.15;
+        --focus: 212.01999999999998 100% 46.67%;
+        --overlay: 0 0% 0%;
+        /* --content1: 0 0% 100%;
+        --content1-foreground: 201.81999999999994 24.44% 8.82%;
+        --content2: 240 4.76% 95.88%;
+        --content2-foreground: 240 3.7% 15.88%;
+        --content3: 240 5.88% 90%;
+        --content3-foreground: 240 5.26% 26.08%;
+        --content4: 240 4.88% 83.92%;
+        --content4-foreground: 240 5.2% 33.92%; */
+        --default-50: 0 0% 98.04%;
+        --default-100: 240 4.76% 95.88%;
+        --default-200: 240 5.88% 90%;
+        --default-300: 240 4.88% 83.92%;
+        --default-400: 240 5.03% 64.9%;
+        --default-500: 240 3.83% 46.08%;
+        --default-600: 240 5.2% 33.92%;
+        --default-700: 240 5.26% 26.08%;
+        --default-800: 240 3.7% 15.88%;
+        --default-900: 240 5.88% 10%;
+        --default-foreground: 0 0% 0%;
+        --default: 240 4.88% 83.92%;
+
+        /* Background and Foreground */
+        /* --background: 0 0% 100%;
+        --foreground-100: 240 4.76% 95.88%;
+        --foreground-500: 240 3.83% 46.08%;
+        --foreground-900: 240 3.7% 15.88%;
+        --foreground: 201.81999999999994 24.44% 8.82%; */
 
         /* Content Layers */
         --content1: 0 0% 100%; /* Pristine white for primary content */
@@ -85,11 +123,11 @@ body {
         --content4-foreground: 240 5.2% 33.92%; /* Dark text for readability */
 
         /* Default State Colors */
-        --default-100: 240 4.76% 95.88%; /* Light silver */
-        --default-500: 240 3.83% 46.08%; /* Medium silver */
-        --default-900: 240 5.88% 10%; /* Dark silver */
+        /* --default-100: 240 4.76% 95.88%;
+        --default-500: 240 3.83% 46.08%;
+        --default-900: 240 5.88% 10%;
         --default-foreground: 0 0% 0%;
-        --default: 240 4.88% 83.92%;
+        --default: 240 4.88% 83.92%; */
 
         /* Primary Brand Colors */
         --primary-100: 43 65% 55%; /* Soft gold highlight */
@@ -106,23 +144,42 @@ body {
         --secondary: 20 25% 35%; /* Bronze accent */
 
         /* Semantic Colors */
-        --success-100: 122 39% 49%; /* Soft green */
-        --success-500: 122 61% 39%; /* Medium green */
-        --success-900: 122 61% 29%; /* Dark green */
-        --success-foreground: 0 0% 100%; /* White text on green */
-        --success: 122 50% 45%; /* Success green */
-
-        --warning-100: 45 100% 51%; /* Light amber */
-        --warning-500: 36 100% 50%; /* Medium amber */
-        --warning-900: 33 100% 50%; /* Dark amber */
-        --warning-foreground: 0 0% 0%; /* Black text on amber */
-        --warning: 40 100% 50%; /* Warning amber */
-
-        --danger-100: 4 76% 52%; /* Light red */
-        --danger-500: 4 69% 44%; /* Medium red */
-        --danger-900: 4 82% 34%; /* Dark red */
-        --danger-foreground: 0 0% 100%; /* White text on red */
-        --danger: 4 75% 50%; /* Danger red */
+        --success-50: 146.66999999999996 64.29% 94.51%;
+        --success-100: 145.71000000000004 61.4% 88.82%;
+        --success-200: 146.2 61.74% 77.45%;
+        --success-300: 145.78999999999996 62.57% 66.47%;
+        --success-400: 146.01 62.45% 55.1%;
+        --success-500: 145.96000000000004 79.46% 43.92%;
+        --success-600: 146.01 79.89% 35.1%;
+        --success-700: 145.78999999999996 79.26% 26.47%;
+        --success-800: 146.2 79.78% 17.45%;
+        --success-900: 145.71000000000004 77.78% 8.82%;
+        --success-foreground: 0 0% 0%;
+        --success: 145.96000000000004 79.46% 43.92%;
+        --warning-50: 54.55000000000001 91.67% 95.29%;
+        --warning-100: 37.139999999999986 91.3% 90.98%;
+        --warning-200: 37.139999999999986 91.3% 81.96%;
+        --warning-300: 36.95999999999998 91.24% 73.14%;
+        --warning-400: 37.00999999999999 91.26% 64.12%;
+        --warning-500: 37.02999999999997 91.27% 55.1%;
+        --warning-600: 37.00999999999999 74.22% 44.12%;
+        --warning-700: 36.95999999999998 73.96% 33.14%;
+        --warning-800: 37.139999999999986 75% 21.96%;
+        --warning-900: 37.139999999999986 75% 10.98%;
+        --warning-foreground: 0 0% 0%;
+        --warning: 37.02999999999997 91.27% 55.1%;
+        --danger-50: 339.13 92% 95.1%;
+        --danger-100: 340 91.84% 90.39%;
+        --danger-200: 339.3299999999999 90% 80.39%;
+        --danger-300: 339.11 90.6% 70.78%;
+        --danger-400: 339 90% 60.78%;
+        --danger-500: 339.20000000000005 90.36% 51.18%;
+        --danger-600: 339 86.54% 40.78%;
+        --danger-700: 339.11 85.99% 30.78%;
+        --danger-800: 339.3299999999999 86.54% 20.39%;
+        --danger-900: 340 84.91% 10.39%;
+        --danger-foreground: 0 0% 100%;
+        --danger: 339.20000000000005 90.36% 51.18%;
 
         --divider: 0 0% 6.67%;
         --divider-opacity: 0.15;
@@ -141,9 +198,6 @@ body {
         --radius-small: 8px;
         --radius-medium: 12px;
         --radius-large: 14px;
-        --border-width-small: 1px;
-        --border-width-medium: 2px;
-        --border-width-large: 3px;
         --box-shadow-small: 0px 0px 5px 0px rgb(0 0 0 / 0.02), 0px 2px 10px 0px rgb(0 0 0 / 0.06), 0px 0px 1px 0px rgb(0 0 0 / 0.3);
         --box-shadow-medium: 0px 0px 15px 0px rgb(0 0 0 / 0.03), 0px 2px 30px 0px rgb(0 0 0 / 0.08), 0px 0px 1px 0px rgb(0 0 0 / 0.3);
         --box-shadow-large: 0px 0px 30px 0px rgb(0 0 0 / 0.04), 0px 30px 60px 0px rgb(0 0 0 / 0.12), 0px 0px 1px 0px rgb(0 0 0 / 0.3);
@@ -155,14 +209,23 @@ body {
     .dark,
     [data-theme="dark"] {
         color-scheme: dark;
-        /* Background and Foreground */
+        /* Base color */
         --background: 0 0% 0%;
+        --foreground-50: 240 5.88% 10%;
         --foreground-100: 240 3.7% 15.88%;
+        --foreground-200: 240 5.26% 26.08%;
+        --foreground-300: 240 5.2% 33.92%;
+        --foreground-400: 240 3.83% 46.08%;
         --foreground-500: 240 5.03% 64.9%;
-        --foreground-900: 240 4.76% 95.88%;
+        --foreground-600: 240 4.88% 83.92%;
+        --foreground-700: 240 5.88% 90%;
+        --foreground-800: 240 4.76% 95.88%;
+        --foreground-900: 0 0% 98.04%;
         --foreground: 210 5.56% 92.94%;
-
-        /* Content Layers */
+        --focus: 212.01999999999998 100% 46.67%;
+        --overlay: 0 0% 0%;
+        --divider: 0 0% 100%;
+        --divider-opacity: 0.15;
         --content1: 240 5.88% 10%;
         --content1-foreground: 0 0% 98.04%;
         --content2: 240 3.7% 15.88%;
@@ -171,13 +234,42 @@ body {
         --content3-foreground: 240 5.88% 90%;
         --content4: 240 5.2% 33.92%;
         --content4-foreground: 240 4.88% 83.92%;
-
-        /* Default State Colors */
-        --default-100: 240 3.7% 15.88%; /* Dark silver */
-        --default-500: 240 5.03% 64.9%; /* Medium dark silver */
-        --default-900: 240 4.76% 95.88%;
+        --default-50: 240 5.88% 10%;
+        --default-100: 240 3.7% 15.88%;
+        --default-200: 240 5.26% 26.08%;
+        --default-300: 240 5.2% 33.92%;
+        --default-400: 240 3.83% 46.08%;
+        --default-500: 240 5.03% 64.9%;
+        --default-600: 240 4.88% 83.92%;
+        --default-700: 240 5.88% 90%;
+        --default-800: 240 4.76% 95.88%;
+        --default-900: 0 0% 98.04%;
         --default-foreground: 0 0% 100%;
         --default: 240 5.26% 26.08%;
+
+        /* Background and Foreground */
+        /* --background: 0 0% 0%;
+        --foreground-100: 240 3.7% 15.88%;
+        --foreground-500: 240 5.03% 64.9%;
+        --foreground-900: 240 4.76% 95.88%;
+        --foreground: 210 5.56% 92.94%; */
+
+        /* Content Layers */
+        /* --content1: 240 5.88% 10%;
+        --content1-foreground: 0 0% 98.04%;
+        --content2: 240 3.7% 15.88%;
+        --content2-foreground: 240 4.76% 95.88%;
+        --content3: 240 5.26% 26.08%;
+        --content3-foreground: 240 5.88% 90%;
+        --content4: 240 5.2% 33.92%;
+        --content4-foreground: 240 4.88% 83.92%; */
+
+        /* Default State Colors */
+        /* --default-100: 240 3.7% 15.88%;
+        --default-500: 240 5.03% 64.9%;
+        --default-900: 240 4.76% 95.88%;
+        --default-foreground: 0 0% 100%;
+        --default: 240 5.26% 26.08%; */
 
         /* Primary Brand Colors */
         --primary-100: 43 65% 45%; /* Rich gold */
@@ -194,23 +286,42 @@ body {
         --secondary: 20 25% 35%; /* Bronze accent */
 
         /* Semantic Colors */
-        --success-100: 122 61% 29%; /* Dark green */
-        --success-500: 122 61% 39%; /* Medium green */
-        --success-900: 122 39% 49%; /* Soft green */
-        --success-foreground: 0 0% 100%; /* White text on green */
-        --success: 122 50% 45%; /* Success green */
-
-        --warning-100: 33 100% 50%; /* Dark amber */
-        --warning-500: 36 100% 50%; /* Medium amber */
-        --warning-900: 45 100% 51%; /* Light amber */
-        --warning-foreground: 0 0% 0%; /* Black text on amber */
-        --warning: 40 100% 50%; /* Warning amber */
-
-        --danger-100: 4 82% 34%; /* Dark red */
-        --danger-500: 4 69% 44%; /* Medium red */
-        --danger-900: 4 76% 52%; /* Light red */
-        --danger-foreground: 0 0% 100%; /* White text on red */
-        --danger: 4 75% 50%; /* Danger red */
+        --success-50: 145.71000000000004 77.78% 8.82%;
+        --success-100: 146.2 79.78% 17.45%;
+        --success-200: 145.78999999999996 79.26% 26.47%;
+        --success-300: 146.01 79.89% 35.1%;
+        --success-400: 145.96000000000004 79.46% 43.92%;
+        --success-500: 146.01 62.45% 55.1%;
+        --success-600: 145.78999999999996 62.57% 66.47%;
+        --success-700: 146.2 61.74% 77.45%;
+        --success-800: 145.71000000000004 61.4% 88.82%;
+        --success-900: 146.66999999999996 64.29% 94.51%;
+        --success-foreground: 0 0% 0%;
+        --success: 145.96000000000004 79.46% 43.92%;
+        --warning-50: 37.139999999999986 75% 10.98%;
+        --warning-100: 37.139999999999986 75% 21.96%;
+        --warning-200: 36.95999999999998 73.96% 33.14%;
+        --warning-300: 37.00999999999999 74.22% 44.12%;
+        --warning-400: 37.02999999999997 91.27% 55.1%;
+        --warning-500: 37.00999999999999 91.26% 64.12%;
+        --warning-600: 36.95999999999998 91.24% 73.14%;
+        --warning-700: 37.139999999999986 91.3% 81.96%;
+        --warning-800: 37.139999999999986 91.3% 90.98%;
+        --warning-900: 54.55000000000001 91.67% 95.29%;
+        --warning-foreground: 0 0% 0%;
+        --warning: 37.02999999999997 91.27% 55.1%;
+        --danger-50: 340 84.91% 10.39%;
+        --danger-100: 339.3299999999999 86.54% 20.39%;
+        --danger-200: 339.11 85.99% 30.78%;
+        --danger-300: 339 86.54% 40.78%;
+        --danger-400: 339.20000000000005 90.36% 51.18%;
+        --danger-500: 339 90% 60.78%;
+        --danger-600: 339.11 90.6% 70.78%;
+        --danger-700: 339.3299999999999 90% 80.39%;
+        --danger-800: 340 91.84% 90.39%;
+        --danger-900: 339.13 92% 95.1%;
+        --danger-foreground: 0 0% 100%;
+        --danger: 339.20000000000005 90.36% 51.18%;
 
         --focus: 212.01999999999998 100% 46.67%;
         --overlay: 0 0% 0%;
@@ -230,9 +341,6 @@ body {
         --radius-small: 8px;
         --radius-medium: 12px;
         --radius-large: 14px;
-        --border-width-small: 1px;
-        --border-width-medium: 2px;
-        --border-width-large: 3px;
         --box-shadow-small: 0px 0px 5px 0px rgb(0 0 0 / 0.05), 0px 2px 10px 0px rgb(0 0 0 / 0.2), inset 0px 0px 1px 0px rgb(255 255 255 / 0.15);
         --box-shadow-medium: 0px 0px 15px 0px rgb(0 0 0 / 0.06), 0px 2px 30px 0px rgb(0 0 0 / 0.22), inset 0px 0px 1px 0px rgb(255 255 255 / 0.15);
         --box-shadow-large: 0px 0px 30px 0px rgb(0 0 0 / 0.07), 0px 30px 60px 0px rgb(0 0 0 / 0.26), inset 0px 0px 1px 0px rgb(255 255 255 / 0.15);

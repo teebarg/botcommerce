@@ -11,6 +11,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
+import Alert from "@/components/ui/alert";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
@@ -56,6 +57,15 @@ export default async function Home() {
     return (
         <React.Fragment>
             <div>
+                <div className="flex items-center justify-center w-full">
+                    <div className="flex flex-col w-full">
+                        {["default", "primary", "secondary", "success", "warning", "danger"].map((color: any) => (
+                            <div key={color} className="w-full flex items-center my-3">
+                                <Alert color={color} title={`This is a ${color} alert`} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative hidden md:grid grid-cols-5 gap-4 rounded-xl py-6">
                         <div className="hidden md:block">

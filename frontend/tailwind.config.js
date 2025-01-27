@@ -1,3 +1,19 @@
+const generateColorScale = (baseName) => {
+    const scale = {};
+    const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+    // Dynamically generate color scales
+    steps.forEach((step) => {
+        scale[step] = `hsl(var(--${baseName}-${step}))`;
+    });
+
+    // Add the default and foreground variants
+    scale["DEFAULT"] = `hsl(var(--${baseName}))`;
+    scale["foreground"] = `hsl(var(--${baseName}-foreground))`;
+
+    return scale;
+};
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: ["./modules/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
@@ -29,9 +45,8 @@ module.exports = {
                 "top-corners": "5px 5px 0 0",
             },
             borderWidth: {
-                small: "var(--border-width-small)",
-                medium: "var(--border-width-medium)",
-                large: "var(--border-width-large)",
+                1: "1px",
+                3: "3px",
             },
             boxShadow: {
                 small: "var(--box-shadow-small)",
@@ -64,13 +79,6 @@ module.exports = {
                     500: "hsl(var(--foreground-500))",
                     900: "hsl(var(--foreground-900))",
                 },
-                default: {
-                    DEFAULT: "hsl(var(--default))",
-                    100: "hsl(var(--default-100))",
-                    500: "hsl(var(--default-500))",
-                    900: "hsl(var(--default-900))",
-                    foreground: "hsl(var(--default-foreground))",
-                },
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     100: "hsl(var(--primary-100))",
@@ -85,27 +93,10 @@ module.exports = {
                     900: "hsl(var(--secondary-900))",
                     foreground: "hsl(var(--secondary-foreground))",
                 },
-                success: {
-                    DEFAULT: "hsl(var(--success))",
-                    100: "hsl(var(--success-100))",
-                    500: "hsl(var(--success-500))",
-                    900: "hsl(var(--success-900))",
-                    foreground: "hsl(var(--success-foreground))",
-                },
-                danger: {
-                    DEFAULT: "hsl(var(--danger))",
-                    100: "hsl(var(--danger-100))",
-                    500: "hsl(var(--danger-500))",
-                    900: "hsl(var(--danger-900))",
-                    foreground: "hsl(var(--danger-foreground))",
-                },
-                warning: {
-                    DEFAULT: "hsl(var(--warning))",
-                    100: "hsl(var(--warning-100))",
-                    500: "hsl(var(--warning-500))",
-                    900: "hsl(var(--warning-900))",
-                    foreground: "hsl(var(--warning-foreground))",
-                },
+                default: generateColorScale("default"),
+                danger: generateColorScale("danger"),
+                success: generateColorScale("success"), // Add other color names as needed
+                warning: generateColorScale("warning"),
                 muted: {
                     DEFAULT: "hsl(var(--muted))",
                     foreground: "hsl(var(--muted-foreground))",

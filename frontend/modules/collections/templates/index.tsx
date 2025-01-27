@@ -126,7 +126,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                 />
                             </div>
                             <main className="mt-4 w-full overflow-visible px-1">
-                                <div className="block md:rounded-medium md:border-medium border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
+                                <div className="block md:rounded-medium md:border-2 border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
                                     {products.length === 0 ? (
                                         <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1">
                                             <div className="max-w-md mx-auto text-center">
