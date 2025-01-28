@@ -1,63 +1,59 @@
-"use client";
+import React from "react";
+import { Star } from "nui-react-icons";
 
-import React, { useState } from "react";
-import { ChevronDown, Star, ThumbsDownIcon, ThumbsUpIcon } from "nui-react-icons";
-
-import { Button } from "@/components/ui/button";
 import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { Product } from "@/types/global";
+import { getProductReviews } from "@/lib/data";
+import { BtnLink } from "../ui/btnLink";
 
 interface Prop {
     product: Product;
 }
 
-const ReviewsSection: React.FC<Prop> = ({ product }) => {
-    const [selectedFilter, setSelectedFilter] = useState<string>("recent");
+const ReviewsSection: React.FC<Prop> = async ({ product }) => {
+    const { reviews } = await getProductReviews(product.id);
+
+    if (!reviews) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-lg p-6 text-center">
+                {/* Decorative elements */}
+                <div className="relative mb-6">
+                    <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Star className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center">
+                        {/* <MessageSquare className="w-12 h-12 text-blue-500" /> */}
+                    </div>
+                    <div className="absolute -bottom-3 -left-3 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        {/* <PencilLine className="w-5 h-5 text-blue-600" /> */}
+                    </div>
+                </div>
+
+                <h3 className="text-xl font-bold mb-2">No Reviews Yet</h3>
+                <p className="text-gray-600 mb-6 max-w-sm">
+                    Be the first to share your experience with this product and help others make informed decisions!
+                </p>
+
+                <BtnLink href="">Write a Review</BtnLink>
+
+                {/* Decorative patterns */}
+                <div className="absolute top-10 left-10 w-4 h-4 border-2 border-blue-200 rounded-full opacity-20" />
+                <div className="absolute bottom-10 right-10 w-6 h-6 border-2 border-blue-200 rounded-full opacity-20" />
+                <div className="absolute top-1/2 right-20 w-3 h-3 bg-blue-100 rounded-full opacity-30" />
+                <div className="absolute bottom-1/4 left-16 w-3 h-3 bg-blue-100 rounded-full opacity-30" />
+            </div>
+        );
+    }
 
     interface ReviewData {
         id: number;
         name: string;
         rating: number;
-        date: string;
+        created_at: string;
         verified: boolean;
-        text: string;
-        likes: number;
-        dislikes: number;
+        comment: string;
     }
-
-    const reviewData: ReviewData[] = [
-        {
-            id: 1,
-            name: "Sarah M.",
-            rating: 5,
-            date: "2 weeks ago",
-            verified: true,
-            text: "Absolutely love this product! High quality and exceeded my expectations.",
-            likes: 24,
-            dislikes: 2,
-        },
-        {
-            id: 2,
-            name: "Michael K.",
-            rating: 4,
-            date: "1 month ago",
-            verified: true,
-            text: "Great product, slight delay in shipping but overall very satisfied.",
-            likes: 12,
-            dislikes: 1,
-        },
-        {
-            id: 3,
-            name: "Emma L.",
-            rating: 5,
-            date: "3 weeks ago",
-            verified: true,
-            text: "Perfect fit and amazing quality. Will definitely buy again!",
-            likes: 18,
-            dislikes: 0,
-        },
-    ];
 
     const ratingDistribution = [
         { stars: 5, percentage: 75 },
@@ -66,25 +62,6 @@ const ReviewsSection: React.FC<Prop> = ({ product }) => {
         { stars: 2, percentage: 1 },
         { stars: 1, percentage: 1 },
     ];
-
-    const ReviewFilter = () => (
-        <div className="flex overflow-x-auto gap-2 mb-4 pb-2">
-            {["recent", "top", "verified"].map((filter: string, index: number) => (
-                <Chip
-                    key={index}
-                    className="py-1 px-3 cursor-pointer capitalize"
-                    color={selectedFilter === filter ? "default" : "warning"}
-                    size="lg"
-                    title={filter}
-                    onClick={() => setSelectedFilter(filter)}
-                />
-            ))}
-            <Button className="ml-2 h-8" size="sm">
-                filter
-                {/* <Filter className="h-4 w-4" /> */}
-            </Button>
-        </div>
-    );
 
     const RatingBreakdown = () => (
         <div className="bg-content1 p-6 rounded-lg mb-4">
@@ -124,20 +101,12 @@ const ReviewsSection: React.FC<Prop> = ({ product }) => {
                         {[...Array(5)].map((_, i) => (
                             <Star key={i} className={`h-4 w-4 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
                         ))}
-                        <span className="text-xs text-default-500 ml-2">{review.date}</span>
+                        <span className="text-xs text-default-500 ml-2">{review.created_at}</span>
                     </div>
                 </div>
             </div>
 
-            <p className="text-sm text-default-700 mb-2">{review.text}</p>
-            <div className="flex items-center text-sm text-default-600">
-                <span className="mr-4 flex items-center">
-                    <ThumbsUpIcon className="h-4 w-4 mr-1" /> {review.likes}
-                </span>
-                <span className="flex items-center">
-                    <ThumbsDownIcon className="h-4 w-4 mr-1" /> {review.dislikes}
-                </span>
-            </div>
+            <p className="text-sm text-default-700 mb-2">{review.comment}</p>
         </div>
     );
 
@@ -146,20 +115,16 @@ const ReviewsSection: React.FC<Prop> = ({ product }) => {
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 Customer Reviews <Chip color="success" title="All from verified purchases" />
             </h2>
-
             <RatingBreakdown />
-
-            <ReviewFilter />
-
             <div>
-                {reviewData.map((review: ReviewData, index: number) => (
+                {reviews?.map((review: ReviewData, index: number) => (
                     <ReviewCard key={index} review={review} />
                 ))}
             </div>
 
-            <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
+            {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews
-            </Button>
+            </Button> */}
         </div>
     );
 };

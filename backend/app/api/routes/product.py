@@ -25,7 +25,7 @@ from app.core.deps import (
 )
 from app.core.logging import logger
 from app.core.utils import url_to_list
-from app.models.generic import Product, ProductPublic
+from app.models.generic import Product, ProductPublic, ReviewPublic, Reviews
 from app.models.message import Message
 from app.models.product import (
     ProductCreate,
@@ -219,6 +219,19 @@ async def read(slug: str, db: SessionDep) -> ProductPublic:
         raise HTTPException(status_code=404, detail="Product not found")
 
     return ProductPublic.model_validate(product)
+
+
+@router.get("/{id}/reviews")
+@cache(key="reviews", hash=False)
+async def read_reviews(id: str, db: SessionDep) -> Reviews:
+    """
+    Get a specific product reviews with Redis caching.
+    """
+    product = crud.product.get(db=db, id=id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    reviews = crud.product.reviews(db=db, product_id=id)
+    return Reviews(reviews=reviews)
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])

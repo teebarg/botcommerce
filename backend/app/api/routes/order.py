@@ -12,7 +12,7 @@ from app.core.deps import (
     Notification,
     SessionDep,
     Storage,
-    get_current_active_superuser,
+    get_current_superuser,
     get_current_user,
 )
 from app.core.logging import logger
@@ -46,7 +46,7 @@ async def index(user: CurrentUser) -> Orders:
     return Orders(orders=orders)
 
 
-@router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
+@router.get("/admin/all", dependencies=[Depends(get_current_superuser)])
 @cache(key="orders")
 async def admin_index(
     page: int = Query(default=1, gt=0),
@@ -116,7 +116,7 @@ async def read(id: str, user: CurrentUser) -> Any:
     )
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_active_superuser)])
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update(
     id: str,
     update_data: OrderDetails,

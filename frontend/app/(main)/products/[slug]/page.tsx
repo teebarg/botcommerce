@@ -13,8 +13,9 @@ import { siteConfig } from "@/lib/config";
 import SkeletonProductTemplate from "@/modules/products/skeleton-product";
 import { currency, imgSrc } from "@/lib/util/util";
 import ProductDetails from "@/modules/products/templates/details";
-import ReviewsSection from "@/components/review";
+// import ReviewsSection from "@/components/review";
 import LocalizedClientLink from "@/components/ui/link";
+import ReviewsSection from "@/components/product/product-reviews";
 
 type Props = {
     params: { slug: string };
@@ -150,7 +151,10 @@ export default async function ProductPage({ params }: Props) {
                     </div>
                 </div>
                 {/* <ReviewSection /> */}
-                <ReviewsSection />
+                <Suspense fallback={<div>This is a test</div>}>
+                    <ReviewsSection product={product} />
+                </Suspense>
+
                 <div className="max-w-7xl mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
                     <Suspense fallback={<SkeletonRelatedProducts />}>
                         <RelatedProducts product={product} />

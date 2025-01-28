@@ -509,6 +509,28 @@ export const getProductBySlug = async function (slug: string): Promise<any> {
     }
 };
 
+export const getProductReviews = async function (id: number): Promise<any> {
+    const headers = getHeaders([]);
+
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/reviews`, {
+            method: "GET",
+            headers: {
+                accept: "application/json",
+                ...headers,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        return await res.json();
+    } catch (error) {
+        return { message: error, status: "error" };
+    }
+};
+
 export const getProduct = cache(async function (slug: string): Promise<any> {
     try {
         const headers = getHeaders(["products"]);
