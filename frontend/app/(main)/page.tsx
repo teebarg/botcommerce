@@ -191,17 +191,15 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative h-8 md:h-28">
-                    <Image
-                        fill
-                        priority
-                        alt="banner"
-                        className="object-contain"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
-                        src="/frontend.webp"
+                <div className="relative">
+                    <PromotionalBanner
+                        title="Big Sale on Top Brands!"
+                        subtitle="Get up to 50% OFF on select products."
+                        outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl"
+                        btnClass="text-purple-600"
                     />
                 </div>
-                <div className="bg-content1 py-16">
+                <div className="bg-content1 py-12">
                     <div className="max-w-8xl mx-auto px-4">
                         <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>

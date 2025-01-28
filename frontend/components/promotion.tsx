@@ -15,7 +15,7 @@ const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass,
     return (
         <div
             className={cn(
-                "bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden",
+                "bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 md:mx-0 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden",
                 outerClass
             )}
         >

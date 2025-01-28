@@ -88,7 +88,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                     </div>
                 </div>
                 <div className="w-full">
-                    <nav className="hidden md:block" data-slot="base">
+                    <nav className="hidden md:block mt-6" data-slot="base">
                         <ol className="flex flex-wrap list-none rounded-lg" data-slot="list">
                             <li className="flex items-center" data-slot="base">
                                 <LocalizedClientLink href="/">Home</LocalizedClientLink>
