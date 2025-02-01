@@ -1,5 +1,5 @@
 fastapi[standard]>=0.114.2,<1.0.0
-firebase-admin==6.4.0
+firebase-admin==6.6.0
 passlib[bcrypt]>=1.7.4,<2.0.0
 pyjwt>=2.8.0,<3.0.0
 psycopg2-binary==2.9.9
