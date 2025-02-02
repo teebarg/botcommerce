@@ -5,7 +5,7 @@ import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { Product } from "@/types/global";
 import { getProductReviews } from "@/lib/data";
-import { BtnLink } from "../ui/btnLink";
+import { BtnLink } from "@/components/ui/btnLink";
 
 interface Prop {
     product: Product;
@@ -116,11 +116,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                 Customer Reviews <Chip color="success" title="All from verified purchases" />
             </h2>
             <RatingBreakdown />
-            <div>
-                {reviews?.map((review: ReviewData, index: number) => (
-                    <ReviewCard key={index} review={review} />
-                ))}
-            </div>
+            <div>{reviews?.map((review: ReviewData, index: number) => <ReviewCard key={index} review={review} />)}</div>
 
             {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews

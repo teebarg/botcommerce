@@ -17,7 +17,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
 
     return (
         <React.Fragment>
-            <div className="text-sm py-8 bg-yellow-50 md:bg-content1 -mx-2 px-2 md:px-0">
+            <div className="text-sm py-8 bg-yellow-50 md:bg-content1 -mx-2 px-2 rounded-none md:rounded-md">
                 <div className="grid grid-cols-1 gap-y-8">
                     <div className="flex items-start gap-x-2">
                         <FastDelivery />

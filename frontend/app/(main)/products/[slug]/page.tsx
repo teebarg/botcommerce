@@ -11,7 +11,7 @@ import Image from "next/image";
 
 import { siteConfig } from "@/lib/config";
 import SkeletonProductTemplate from "@/modules/products/skeleton-product";
-import { currency, imgSrc } from "@/lib/util/util";
+import { currency } from "@/lib/util/util";
 import ProductDetails from "@/modules/products/templates/details";
 // import ReviewsSection from "@/components/review";
 import LocalizedClientLink from "@/components/ui/link";

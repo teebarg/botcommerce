@@ -4,8 +4,8 @@ from sqlmodel import Field, SQLModel
 
 
 class BaseModel(SQLModel):
-    created_at: datetime = Field(default=datetime.now())
-    updated_at: datetime = Field(default=datetime.now())
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
     # Custom method for serialization (if needed)
     class Config:
