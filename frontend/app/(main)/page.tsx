@@ -226,16 +226,16 @@ export default async function Home() {
                                 </p>
                                 <ContactForm />
                             </div>
-                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 p-4 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
+                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 px-4 py-12 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
                                 <div>
-                                    <p className="font-semibold mt-4 text-xl">Our Contacts</p>
+                                    <p className="font-semibold text-xl">Our Contacts</p>
                                     <div className="flex gap-2">
                                         <Mail />
                                         <p>{siteConfig.contactEmail}</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Location</p>
                                     <div className="flex gap-2">
-                                        <LocationIcon />
+                                        <LocationIcon className="fill-current" />
                                         <p className="underline">Lagos, LA NG</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Opening Hours</p>

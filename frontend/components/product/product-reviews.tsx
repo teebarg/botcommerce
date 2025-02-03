@@ -11,12 +11,30 @@ interface Prop {
     product: Product;
 }
 
+interface ReviewData {
+    id: number;
+    name: string;
+    rating: number;
+    created_at: string;
+    verified: boolean;
+    comment: string;
+    product_id: number;
+    user: {
+        firstname: string;
+    };
+}
+
+interface RatingDistribution {
+    stars: number;
+    percentage: number;
+}
+
 const ReviewsSection: React.FC<Prop> = async ({ product }) => {
     const { reviews } = await getProductReviews(product.id);
 
-    if (!reviews) {
+    if (!reviews || reviews?.length == 0) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-lg p-6 text-center">
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-content1 rounded-lg p-16 text-center">
                 {/* Decorative elements */}
                 <div className="relative mb-6">
                     <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -31,7 +49,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                 </div>
 
                 <h3 className="text-xl font-bold mb-2">No Reviews Yet</h3>
-                <p className="text-gray-600 mb-6 max-w-sm">
+                <p className="text-default-600 mb-6 max-w-sm">
                     Be the first to share your experience with this product and help others make informed decisions!
                 </p>
 
@@ -45,36 +63,42 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
             </div>
         );
     }
+    // Calculate rating distribution
+    const ratingDistribution: RatingDistribution[] = Array.from({ length: 5 }, (_, index) => ({
+        stars: 5 - index, // 5 to 1
+        percentage: 0,
+    }));
 
-    interface ReviewData {
-        id: number;
-        name: string;
-        rating: number;
-        created_at: string;
-        verified: boolean;
-        comment: string;
-    }
+    let totalRating = 0;
+    const totalReviews = reviews.length;
 
-    const ratingDistribution = [
-        { stars: 5, percentage: 75 },
-        { stars: 4, percentage: 20 },
-        { stars: 3, percentage: 3 },
-        { stars: 2, percentage: 1 },
-        { stars: 1, percentage: 1 },
-    ];
+    reviews.forEach((review: ReviewData) => {
+        if (review.rating >= 1 && review.rating <= 5) {
+            ratingDistribution[5 - review.rating].percentage += 1; // Increment count for the corresponding rating
+            totalRating += review.rating; // Sum up the ratings
+        }
+    });
+
+    // Calculate percentage
+    ratingDistribution.forEach((rating: RatingDistribution) => {
+        rating.percentage = Math.round((rating.percentage / totalReviews) * 100);
+    });
+
+    // Calculate average rating
+    const averageRating = (totalRating / reviews.length).toFixed(1);
 
     const RatingBreakdown = () => (
         <div className="bg-content1 p-6 rounded-lg mb-4">
             <div className="flex items-center mb-4">
                 <div className="flex items-center mr-4">
-                    <span className="text-3xl font-bold mr-2">4.7</span>
+                    <span className="text-3xl font-bold mr-2">{averageRating || "N/A"}</span>
                     <div className="flex">
                         {[...Array(5)].map((_, index: number) => (
                             <Star key={index} className={`h-5 w-5 ${index < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
                         ))}
                     </div>
                 </div>
-                <span className="text-sm text-default-600">128 reviews</span>
+                <span className="text-sm text-default-600">{totalReviews} reviews</span>
             </div>
 
             <div className="space-y-1">
@@ -94,7 +118,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
             <div className="flex justify-between items-start mb-2">
                 <div>
                     <div className="flex items-center">
-                        <span className="font-semibold mr-2">{review.name}</span>
+                        <span className="font-semibold mr-2">{review.user.firstname}</span>
                         {review.verified && <Chip color="success" title="Verified" />}
                     </div>
                     <div className="flex">

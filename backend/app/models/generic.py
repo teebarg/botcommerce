@@ -252,3 +252,7 @@ class Wishlist(WishlistBase, table=True):
         foreign_key="product.id", nullable=False, ondelete="CASCADE"
     )
     # product: Product = Relationship(back_populates="product")
+    
+
+class Wishlists(SQLModel):
+    wishlists: list[Wishlist]

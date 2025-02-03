@@ -11,7 +11,7 @@ class ReviewBase(BaseModel):
 
 class ReviewCreate(BM):
     product_id: int
-    rating: int = 10
+    rating: int = 1
     verified: bool = False
     comment: str
 

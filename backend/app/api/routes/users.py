@@ -12,10 +12,10 @@ from app.core.deps import (
     SessionDep,
 )
 from app.core.logging import logger
-from app.models.generic import Address, UserPublic, Wishlist
+from app.models.generic import Address, UserPublic, Wishlist, Wishlists
 from app.models.message import Message
 from app.models.user import UserUpdateMe
-from app.models.wishlist import WishlistCreate, Wishlists
+from app.models.wishlist import WishlistCreate
 
 # Create a router for users
 router = APIRouter()

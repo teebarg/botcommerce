@@ -21,7 +21,7 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
     return (
         <>
             <React.Fragment>
-                <span className="flex flex-col gap-3 h-full" id={`${product.id}`}>
+                <div className="flex flex-col gap-3 h-full" id={`${product.id}`}>
                     {/* <div className="max-w-fit min-w-min inline-flex items-center justify-between box-border whitespace-nowrap px-1 h-5 text-xs rounded-lg bg-secondary-100 text-secondary-foreground absolute right-7 top-4 z-20">
                         <span className="flex-1 text-inherit px-1 pl-0.5 font-semibold">New</span>
                     </div> */}
@@ -46,7 +46,7 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
                             </Suspense>
                         </div>
                     </div>
-                </span>
+                </div>
             </React.Fragment>
         </>
     );
