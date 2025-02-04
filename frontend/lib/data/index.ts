@@ -510,11 +510,12 @@ export const getProductBySlug = async function (slug: string): Promise<any> {
     }
 };
 
-export const getProductReviews = async function (id: number): Promise<any> {
-    const headers = getHeaders([]);
+export const getProductReviews = async (product_id?: number, page: number = 1, limit: number = 20): Promise<any> => {
+    const headers = getHeaders(["reviews"]);
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/reviews`, {
+        const res = await fetch(url, {
             method: "GET",
             headers: {
                 accept: "application/json",

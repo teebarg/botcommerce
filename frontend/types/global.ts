@@ -231,3 +231,13 @@ export type SiteConfig = {
     created_at: string;
     updated_at: string;
 };
+
+export type Review = {
+    id: number;
+    rating: number;
+    comment: string;
+    verified?: boolean;
+    product_id: number;
+    created_at: string;
+    user: Customer;
+};

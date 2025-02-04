@@ -18,6 +18,7 @@ interface Props {
     children: React.ReactNode;
     columns: string[];
     pagination?: PaginationType;
+    canAdd?: boolean;
     canExport?: boolean;
     canIndex?: boolean;
     canSearch?: boolean;
@@ -30,6 +31,7 @@ const Table: React.FC<Props> = ({
     columns,
     children,
     pagination,
+    canAdd = true,
     canExport = false,
     canIndex = false,
     canSearch = true,
@@ -104,9 +106,11 @@ const Table: React.FC<Props> = ({
                             )}
                         </div>
                         <div className="flex items-center gap-3">
-                            <Button color="primary" endContent={<Plus />} onClick={() => state.open()}>
-                                Add New
-                            </Button>
+                            {canAdd && (
+                                <Button color="primary" endContent={<Plus />} onClick={() => state.open()}>
+                                    Add New
+                                </Button>
+                            )}
                             {canExport && (
                                 <Button className="min-w-28" color="secondary" disabled={isExporting} isLoading={isExporting} onClick={handleExport}>
                                     Export

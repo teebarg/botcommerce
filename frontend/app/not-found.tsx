@@ -9,7 +9,11 @@ export const metadata: Metadata = {
 };
 
 const NotFound: React.FC = async () => {
-    return <NF />;
+    return (
+        <div className="h-screen">
+            <NF />
+        </div>
+    );
 };
 
 export default NotFound;

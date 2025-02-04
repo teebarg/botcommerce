@@ -16,5 +16,7 @@ class ReviewCreate(BM):
     comment: str
 
 
-class ReviewUpdate(ReviewBase):
-    pass
+class ReviewUpdate(BM):
+    rating: int = 1
+    verified: bool = False
+    comment: str

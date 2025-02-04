@@ -214,11 +214,14 @@ async def read(slug: str, db: SessionDep) -> ProductPublic:
     """
     Get a specific product by slug with Redis caching.
     """
-    product = crud.product.get_by_key(db=db, key="slug", value=slug)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+    try:
+        product = crud.product.get_by_key(db=db, key="slug", value=slug)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
 
-    return ProductPublic.model_validate(product)
+        return ProductPublic.model_validate(product)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"{e}")
 
 
 @router.get("/{id}/reviews")
@@ -227,11 +230,15 @@ async def read_reviews(id: str, db: SessionDep) -> Reviews:
     """
     Get a specific product reviews with Redis caching.
     """
-    product = crud.product.get(db=db, id=id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    reviews = crud.product.reviews(db=db, product_id=id)
-    return Reviews(reviews=reviews)
+    try:
+        product = crud.product.get(db=db, id=id)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        reviews = crud.product.reviews(db=db, product_id=id)
+        return Reviews(reviews=reviews)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"{e}")
+    
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])

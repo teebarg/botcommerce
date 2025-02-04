@@ -14,7 +14,6 @@ import LocalizedClientLink from "@/components/ui/link";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
-const FlashBanner = dynamic(() => import("@components/flash"), { ssr: false });
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 export const metadata: Metadata = {
@@ -87,7 +86,7 @@ export default async function Home() {
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold">Call to Order</p>
-                                        <p className="text-xs font-medium">0700-000-0000</p>
+                                        <p className="text-xs font-medium">{siteConfig.contactPhone}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
@@ -139,7 +138,12 @@ export default async function Home() {
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
                             <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
                                 {categories?.map((category: Collection, index: number) => (
-                                    <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
+                                    <BtnLink
+                                        key={index}
+                                        className="flex-none h-24 min-w-24 rounded-full text-lg"
+                                        color="secondary"
+                                        href={`/collections?cat_ids=${category.slug}`}
+                                    >
                                         {category.name}
                                     </BtnLink>
                                 ))}
@@ -180,7 +184,12 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <FlashBanner />
+                <PromotionalBanner
+                    title="Big Sale on Top Brands!"
+                    subtitle="Get up to 50% OFF on select products."
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    btnClass="text-purple-600"
+                />
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>

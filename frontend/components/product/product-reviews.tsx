@@ -5,7 +5,8 @@ import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { Product } from "@/types/global";
 import { getProductReviews } from "@/lib/data";
-import { BtnLink } from "@/components/ui/btnLink";
+import ReviewForm from "./review-form";
+import { timeAgo } from "@/lib/util/util";
 
 interface Prop {
     product: Product;
@@ -30,11 +31,11 @@ interface RatingDistribution {
 }
 
 const ReviewsSection: React.FC<Prop> = async ({ product }) => {
-    const { reviews } = await getProductReviews(product.id);
+    const { reviews } = await getProductReviews(product.id, 1, 5);
 
     if (!reviews || reviews?.length == 0) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] bg-content1 rounded-lg p-16 text-center">
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">
                 {/* Decorative elements */}
                 <div className="relative mb-6">
                     <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -52,14 +53,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                 <p className="text-default-600 mb-6 max-w-sm">
                     Be the first to share your experience with this product and help others make informed decisions!
                 </p>
-
-                <BtnLink href="">Write a Review</BtnLink>
-
-                {/* Decorative patterns */}
-                <div className="absolute top-10 left-10 w-4 h-4 border-2 border-blue-200 rounded-full opacity-20" />
-                <div className="absolute bottom-10 right-10 w-6 h-6 border-2 border-blue-200 rounded-full opacity-20" />
-                <div className="absolute top-1/2 right-20 w-3 h-3 bg-blue-100 rounded-full opacity-30" />
-                <div className="absolute bottom-1/4 left-16 w-3 h-3 bg-blue-100 rounded-full opacity-30" />
+                <ReviewForm product_id={product.id} />
             </div>
         );
     }
@@ -88,7 +82,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
     const averageRating = (totalRating / reviews.length).toFixed(1);
 
     const RatingBreakdown = () => (
-        <div className="bg-content1 p-6 rounded-lg mb-4">
+        <div className="py-4 rounded-lg mb-4">
             <div className="flex items-center mb-4">
                 <div className="flex items-center mr-4">
                     <span className="text-3xl font-bold mr-2">{averageRating || "N/A"}</span>
@@ -114,7 +108,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
     );
 
     const ReviewCard = ({ review }: { review: ReviewData }) => (
-        <div className="bg-content1 p-6 rounded-lg mb-4 shadow-sm">
+        <div className="bg-content2 px-6 py-4 rounded-lg mb-4 shadow-sm">
             <div className="flex justify-between items-start mb-2">
                 <div>
                     <div className="flex items-center">
@@ -125,7 +119,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                         {[...Array(5)].map((_, i) => (
                             <Star key={i} className={`h-4 w-4 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
                         ))}
-                        <span className="text-xs text-default-500 ml-2">{review.created_at}</span>
+                        <span className="text-xs text-default-500 ml-2">{timeAgo(review.created_at)}</span>
                     </div>
                 </div>
             </div>
@@ -135,16 +129,18 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
     );
 
     return (
-        <div className="p-4 max-w-7xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                Customer Reviews <Chip color="success" title="All from verified purchases" />
-            </h2>
-            <RatingBreakdown />
-            <div>{reviews?.map((review: ReviewData, index: number) => <ReviewCard key={index} review={review} />)}</div>
-
-            {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
+        <div className="bg-content1">
+            <div className="px-4 py-8 max-w-7xl mx-auto w-full">
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                    Customer Reviews <Chip color="success" title="All from verified purchases" />
+                </h2>
+                <RatingBreakdown />
+                <div className="mb-8">{reviews?.map((review: ReviewData, index: number) => <ReviewCard key={index} review={review} />)}</div>
+                <ReviewForm product_id={product.id} />
+                {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews
             </Button> */}
+            </div>
         </div>
     );
 };

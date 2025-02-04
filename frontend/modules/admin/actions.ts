@@ -468,3 +468,58 @@ export async function deleteSiteConfig(configId: string) {
         return { success: false, message: error instanceof Error ? error.message : "Error deleting config" };
     }
 }
+
+export async function updateReview(currentState: unknown, formData: FormData) {
+    const accessToken = cookies().get("access_token")?.value as string;
+
+    const id = formData.get("id");
+
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/${id}`, {
+            method: "PATCH",
+            headers: {
+                "X-Auth": accessToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                verified: Boolean(formData.get("verified")) ?? false,
+                rating: formData.get("rating"),
+                comment: formData.get("comment"),
+            }),
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("reviews");
+
+        return { success: true, message: "Review updated successfully", data: await res.json() };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error creating brand", error: true };
+    }
+}
+
+export async function deleteReview(id: string) {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/${id}`, {
+            method: "DELETE",
+            headers: {
+                accept: "application/json",
+                "X-Auth": cookies().get("access_token")?.value as string,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        // Revalidate the UI data
+        revalidateTag("reviews");
+
+        return { success: true, message: "Review deleted successfully" };
+    } catch (error) {
+        return { success: false, message: error instanceof Error ? error.message : "Error deleting review" };
+    }
+}

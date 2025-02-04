@@ -96,11 +96,7 @@ export default async function ProductPage({ params }: Props) {
                                 ))}
                             </div>
                             <div className="flex-1">
-                                <div
-                                    className="bg-fixed bg-auto bg-top h-[60vh] block md:hidden"
-                                    style={{ backgroundImage: `url(${product.image as string})` }}
-                                ></div>
-                                <div className="hidden md:block h-[60vh] relative rounded-lg overflow-hidden">
+                                <div className="h-[60vh] relative rounded-lg overflow-hidden">
                                     <Image fill alt={product.name} src={product.image as string} />
                                 </div>
                             </div>
@@ -150,12 +146,12 @@ export default async function ProductPage({ params }: Props) {
                         </div>
                     </div>
                 </div>
-                {/* <ReviewSection /> */}
+                {/* ReviewSection */}
                 <Suspense fallback={<Skeleton className="h-44" />}>
                     <ReviewsSection product={product} />
                 </Suspense>
 
-                <div className="max-w-7xl mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
+                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
                     <Suspense fallback={<SkeletonRelatedProducts />}>
                         <RelatedProducts product={product} />
                     </Suspense>

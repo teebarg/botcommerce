@@ -57,7 +57,7 @@ export default function UserDropDown({ customer }: any) {
                                     <span className="text-xs text-default-500">{customer?.email}</span>
                                 </div>
                                 <span
-                                    className="md:hidden border-2 border-secondary text-secondary px-4 rounded-full flex items-center"
+                                    className="md:hidden border-2 border-primary text-primary px-4 rounded-full flex items-center"
                                     data-testid="logout-button"
                                     role="button"
                                     onClick={handleLogout}

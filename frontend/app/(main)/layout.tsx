@@ -20,18 +20,18 @@ export const metadata: Metadata = {
 
 export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
-        <React.Fragment>
+        <div className="flex flex-col min-h-screen">
             <Banner />
             <Navbar />
             <div className="px-4 py-2 md:hidden sticky top-0 z-40 bg-background flex items-center gap-4 select-none">
                 <BackButton />
                 <Search className="w-full justify-between flex-1" />
             </div>
-            <main>{props.children}</main>
+            <main className="flex-1 flex flex-col">{props.children}</main>
             <Cookie />
             <ChatBot />
             <Footer />
             <ButtonNav />
-        </React.Fragment>
+        </div>
     );
 }
