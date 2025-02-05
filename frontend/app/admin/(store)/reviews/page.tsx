@@ -16,8 +16,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
 };
 
-export default async function ReviewsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {
-    const search = searchParams.search || "";
+export default async function ReviewsPage({ searchParams }: { searchParams: { page?: string; limit?: string } }) {
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
     const { reviews, ...pagination } = await getProductReviews(undefined, page, limit);
@@ -30,8 +29,8 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
                     <Table
                         columns={["S/N", "Comment", "Rating", "Status", "Created At", "Actions"]}
                         pagination={pagination}
-                        searchQuery={search}
                         canAdd={false}
+                        canSearch={false}
                     >
                         {reviews?.map((item: Review, index: number) => (
                             <tr key={item.id} className="even:bg-content2">

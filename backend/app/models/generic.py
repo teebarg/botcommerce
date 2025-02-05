@@ -1,5 +1,5 @@
 import secrets
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 from app.models.reviews import ReviewBase
@@ -181,14 +181,14 @@ class ProductPublic(ProductBase):
     id: int
     slug: str
     images: list[ProductImages] = []
+    brands: list[Brand] = []
     categories: list[Category] = []
     collections: list[Collection] = []
-    # tags: list[Tag] = []
-    brands: list[Brand] = []
 
 
 class Products(SQLModel):
-    products: list[ProductPublic]
+    products: list[Any]
+    facets: Any
     page: int
     limit: int
     total_count: int

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug, search } from "@lib/data";
+import { getProductBySlug, productSearch } from "@lib/data";
 import { Product, SearchParams } from "types/global";
 import React, { Suspense } from "react";
 import ProductActions from "@modules/products/components/product-actions";
@@ -26,7 +26,7 @@ export async function generateStaticParams() {
         limit: 100,
     };
 
-    const { products } = await search(queryParams);
+    const { products } = await productSearch(queryParams);
 
     return products?.map((product: Product) => ({
         slug: String(product.slug),
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
     const product = await getProductBySlug(params.slug);
 
-    if (!product) {
+    if (!product || product.error) {
         notFound();
     }
 

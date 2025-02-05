@@ -1,7 +1,7 @@
 import React from "react";
 import { ExclamationIcon } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { getCustomer, search } from "@lib/data";
+import { getCustomer, productSearch } from "@lib/data";
 import { Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 import dynamic from "next/dynamic";
 import { BtnLink } from "@/components/ui/btnLink";
@@ -42,7 +42,7 @@ const ProductListings: React.FC<ComponentProps> = async ({ query = "", collectio
         queryParams["categories"] = searchParams?.cat_ids;
     }
 
-    const { products, facets, ...pagination } = await search(queryParams);
+    const { products, facets, ...pagination } = await productSearch(queryParams);
 
     return (
         <React.Fragment>

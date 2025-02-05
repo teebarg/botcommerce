@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { updateReview } from "../actions";
 
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Number } from "@/components/ui/number";
 import { TextArea } from "@/components/ui/textarea";
@@ -19,7 +18,7 @@ interface Props {
     onClose?: () => void;
 }
 
-const ReviewForm: React.FC<Props> = ({ onClose, current = { rating: 1, comment: "", verified: true } }) => {
+const ReviewForm: React.FC<Props> = ({ onClose, current = { rating: 1, comment: "", verified: false } }) => {
     const router = useRouter();
 
     const { enqueueSnackbar } = useSnackbar();

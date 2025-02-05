@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { Product } from "types/global";
+import { Product, SearchParams } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
-import { getBrands, getCategories, getCustomer, getProducts } from "@lib/data";
+import { getBrands, getCategories, getCustomer, productSearch } from "@lib/data";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteProduct, getCollections } from "@modules/admin/actions";
@@ -23,7 +23,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { products, ...pagination } = await getProducts(search, undefined, page, limit);
+    const queryParams: SearchParams = {
+        query: search,
+        limit,
+        page,
+    };
+    const { products, ...pagination } = await productSearch(queryParams);
     const { brands } = (await getBrands()) as { brands: [] };
     const { collections } = (await getCollections(1, 100)) as { collections: [] };
     const { categories } = await getCategories();

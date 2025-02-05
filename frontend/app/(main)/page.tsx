@@ -5,7 +5,7 @@ import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
-import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
+import { getCategories, getCustomer, getWishlist, productSearch } from "@lib/data";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
@@ -26,12 +26,10 @@ async function getLandingProducts(collection: string, limit: number = 4): Promis
         query: "",
         limit,
         page: 1,
-        sort: "created_at:desc",
         collections: collection,
     };
 
-    const { products } = await search(queryParams);
-
+    const { products } = await productSearch(queryParams);
     return products;
 }
 
@@ -193,7 +191,7 @@ export default async function Home() {
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
                             {trending?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}

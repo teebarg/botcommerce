@@ -1,6 +1,3 @@
-
-from pydantic import BaseModel as BM
-
 from app.models.base import BaseModel
 
 
@@ -29,15 +26,3 @@ class ProductUpdate(ProductBase):
     categories: list[int] = []
     collections: list[int] = []
     tags: list[int] = []
-
-
-class ProductSearch(BM):
-    query: str | None = ""
-    brands: str | None = ""
-    categories: str | None = ""
-    collections: str | None = ""
-    min_price: int | None = 0
-    max_price: int | None = 100
-    page: int | None = 1
-    limit: int | None = 20
-    sort: str | None = "created_at:desc"

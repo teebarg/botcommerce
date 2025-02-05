@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
+import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, productSearch } from "@lib/data";
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 import dynamic from "next/dynamic";
 
@@ -60,7 +60,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         queryParams["categories"] = searchParams?.cat_ids;
     }
 
-    const { products, facets, ...pagination } = await search(queryParams);
+    const { products, facets, ...pagination } = await productSearch(queryParams);
 
     return (
         <React.Fragment>

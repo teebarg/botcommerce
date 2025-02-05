@@ -13,7 +13,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import { Product, SearchParams } from "@/types/global";
 import NoProductsFound from "@/modules/products/components/no-products";
-import { debounce } from "@/lib/util/util";
+import { buildUrl, debounce } from "@/lib/util/util";
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 interface Props {
@@ -34,15 +34,13 @@ const Search: React.FC<Props> = ({ className }) => {
                 query: event?.target?.value,
                 limit: 15,
                 page: 1,
-                sort: "created_at:desc",
             };
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`, {
-                method: "POST",
+            const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...queryParams });
+            const response = await fetch(url, {
+                method: "GET",
                 headers: {
                     accept: "application/json",
-                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(queryParams),
             });
 
             if (!response.ok) {

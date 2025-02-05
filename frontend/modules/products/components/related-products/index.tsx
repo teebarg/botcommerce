@@ -1,4 +1,4 @@
-import { search } from "@lib/data";
+import { productSearch } from "@lib/data";
 import dynamic from "next/dynamic";
 import { Product } from "types/global";
 
@@ -18,13 +18,11 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
         }
 
         params.limit = 4;
-        params.sort = "created_at:desc";
-
         return params;
     };
 
     const queryParams = setQueryParams();
-    const { products } = await search(queryParams);
+    const { products } = await productSearch(queryParams);
     const productPreviews = products.filter((item: Product) => item.id !== product.id);
 
     if (!productPreviews.length) {
