@@ -17,7 +17,3 @@ class WishlistCreate(SQLModel):
 # Properties to return via API, id is always required
 class WishlistPublic(WishlistBase):
     id: int
-
-
-class Wishlists(SQLModel):
-    wishlists: list[WishlistPublic]

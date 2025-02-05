@@ -5,6 +5,7 @@ import WishlistItem from "@/modules/common/components/wishlist";
 import { getWishlist } from "@/lib/data";
 import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
+import PromotionalBanner from "@/components/promotion";
 
 export const revalidate = 3;
 
@@ -22,14 +23,14 @@ export default async function Wishlist() {
 
     if (!wishlists) {
         return (
-            <div className="text-center py-24 space-y-6">
+            <div className="h-[55vh] flex flex-col justify-center items-center gap-4">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-warning">
-                    <Heart className="w-10 h-10 text-default-500" />
+                    <Heart className="w-10 h-10 text-white" />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 text-center">
                     <h2 className="text-2xl font-semibold tracking-tight text-default-900">Your Wishlist is Empty</h2>
-                    <p className="text-default-500 max-w-md mx-auto">Explore our collection and save your favorite luxury items for later</p>
+                    <p className="text-default-500 max-w-sm mx-auto">Explore our luxury collection to add items</p>
                 </div>
 
                 <BtnLink color="primary" href="/collections" size="md">
@@ -40,15 +41,18 @@ export default async function Wishlist() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto mt-6">
-            <h1 className="text-3xl font-bold text-center text-default-900">Your Wishlist</h1>
-            <p className="text-center text-default-500 mt-1">Curate your luxury collection.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+        <div className="max-w-5xl mx-auto mt-4">
+            <PromotionalBanner
+                title="Big Sale on Top Brands!"
+                subtitle="Get up to 50% OFF on select products."
+                outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                btnClass="text-purple-600"
+            />
+            <h1 className="text-3xl font-bold text-center text-default-900 mt-4">Your Wishlist</h1>
+            <p className="text-center text-default-500">Curate your luxury collection.</p>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-8 mt-10 px-1">
                 {wishlists?.map((item: any) => <WishlistItem key={item.id} {...item} />)}
             </div>
-            {wishlists?.length === 0 && (
-                <p className="text-center text-default-500 mt-10">Your wishlist is empty. Explore our luxury collection to add items.</p>
-            )}
         </div>
     );
 }

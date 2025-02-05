@@ -25,11 +25,10 @@ from app.core.deps import (
 )
 from app.core.logging import logger
 from app.core.utils import url_to_list
-from app.models.generic import Product, ProductPublic
+from app.models.generic import Product, ProductPublic, Products, Reviews
 from app.models.message import Message
 from app.models.product import (
     ProductCreate,
-    ProductSearch,
     ProductUpdate,
 )
 from app.services.export import validate_file
@@ -80,6 +79,7 @@ async def export_products(
 @cache(key="products")
 async def index(
     search: str = "",
+    sort: str = "created_at:desc",
     brands: str = Query(default=""),
     categories: str = Query(default=""),
     collections: str = Query(default=""),
@@ -87,7 +87,7 @@ async def index(
     minPrice: int = Query(default=1, gt=0),
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-) -> Any:
+) -> Products:
     """
     Retrieve products using Meilisearch, sorted by latest.
     """
@@ -106,57 +106,7 @@ async def index(
     search_params = {
         "limit": limit,
         "offset": (page - 1) * limit,
-        "sort": [
-            "created_at:desc"
-        ],  # Sort by latest (assuming there's a 'created_at' field)
-    }
-
-    if filters:
-        search_params["filter"] = " AND ".join(filters)
-
-    search_results = search_documents(index_name="products", query=search, **search_params)
-
-    total_count = search_results["estimatedTotalHits"]
-    total_pages = (total_count // limit) + (total_count % limit > 0)
-
-    return {
-        "products": search_results["hits"],
-        "page": page,
-        "limit": limit,
-        "total_count": total_count,
-        "total_pages": total_pages,
-    }
-
-
-@router.post("/search")
-@cache(key="products")
-async def search_products(params: ProductSearch) -> Any:
-    """
-    Search products using Meilisearch with Redis caching, sorted by relevance.
-    """
-    brands = params.brands
-    categories = params.categories
-    collections = params.collections
-    min_price = params.min_price
-    max_price = params.max_price
-    limit = params.limit
-    page = params.page
-    sort = params.sort
-
-    filters = []
-    if brands:
-        filters.append(f"brands IN {url_to_list(brands)}")
-    if categories:
-        filters.append(f"categories IN {url_to_list(categories)}")
-    if collections:
-        filters.append(f"collections IN {url_to_list(collections)}")
-    if min_price and max_price:
-        filters.append(f"price >= {min_price} AND price <= {max_price}")
-
-    search_params = {
-        "limit": limit,
-        "offset": (page - 1) * limit,
-        "sort": [sort],  # Sort by specified field
+        "sort": [sort],
         "facets": ["brands", "categories", "collections"],
     }
 
@@ -164,10 +114,10 @@ async def search_products(params: ProductSearch) -> Any:
         search_params["filter"] = " AND ".join(filters)
 
     try:
-        search_results = search_documents(index_name="products", query=params.query, **search_params)
+        search_results = search_documents(index_name="products", query=search, **search_params)
     except Exception as e:
         raise HTTPException(
-            status_code=500,
+            status_code=400,
             detail=f"Error searching products: {str(e)}"
         )
 
@@ -214,11 +164,31 @@ async def read(slug: str, db: SessionDep) -> ProductPublic:
     """
     Get a specific product by slug with Redis caching.
     """
-    product = crud.product.get_by_key(db=db, key="slug", value=slug)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+    try:
+        product = crud.product.get_by_key(db=db, key="slug", value=slug)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
 
-    return ProductPublic.model_validate(product)
+        return ProductPublic.model_validate(product)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"{e}")
+
+
+@router.get("/{id}/reviews")
+@cache(key="reviews", hash=False)
+async def read_reviews(id: str, db: SessionDep) -> Reviews:
+    """
+    Get a specific product reviews with Redis caching.
+    """
+    try:
+        product = crud.product.get(db=db, id=id)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        reviews = crud.product.reviews(db=db, product_id=id)
+        return Reviews(reviews=reviews)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"{e}")
+    
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])

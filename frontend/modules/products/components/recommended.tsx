@@ -1,4 +1,4 @@
-import { search } from "@lib/data";
+import { productSearch } from "@lib/data";
 import { Product, SearchParams } from "types/global";
 import dynamic from "next/dynamic";
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
@@ -11,10 +11,9 @@ export default async function RecommendedProducts({ exclude = [] }: RecommendedP
     // edit this function to define your related products logic
     const queryParams: SearchParams = {
         limit: 40,
-        sort: "created_at:desc",
     };
 
-    const { products } = await search(queryParams);
+    const { products } = await productSearch(queryParams);
 
     if (!products.length) {
         return null;

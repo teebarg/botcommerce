@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, search } from "@lib/data";
+import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, productSearch } from "@lib/data";
 import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
 import dynamic from "next/dynamic";
 
@@ -10,6 +10,7 @@ import { CollectionsSideBar } from "./sidebar";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
+import PromotionalBanner from "@/components/promotion";
 
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
@@ -59,7 +60,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         queryParams["categories"] = searchParams?.cat_ids;
     }
 
-    const { products, facets, ...pagination } = await search(queryParams);
+    const { products, facets, ...pagination } = await productSearch(queryParams);
 
     return (
         <React.Fragment>
@@ -68,31 +69,26 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
             </div>
             <div className="w-full flex-1 flex-col">
                 {/* Mobile banner */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 my-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden">
-                    <div className="flex items-center space-x-3">
-                        <Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />
-                        <div>
-                            <h3 className="text-white font-bold text-base animate-fade-in-up">Exclusive Offer!</h3>
-                            <p className="text-white/80 text-xs animate-fade-in-up delay-100">Get 20% Off Today</p>
-                        </div>
-                    </div>
-                    <BtnLink className="bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold" href="/">
-                        <span>Shop Now</span>
-                    </BtnLink>
-                </div>
+                <PromotionalBanner
+                    title="Exclusive Offer!"
+                    subtitle="Get 20% Off Today"
+                    icon={<Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />}
+                    outerClass="from-blue-600 to-purple-700"
+                    btnClass="text-blue-600"
+                />
                 {/* Categories */}
                 <div className="px-4 my-6 md:hidden">
                     <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
                         {cat.map((category: Collection, index: number) => (
-                            <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
+                            <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                 {category.name}
                             </BtnLink>
                         ))}
                     </div>
                 </div>
                 <div className="w-full">
-                    <nav className="hidden md:block" data-slot="base">
+                    <nav className="hidden md:block mt-6" data-slot="base">
                         <ol className="flex flex-wrap list-none rounded-lg" data-slot="list">
                             <li className="flex items-center" data-slot="base">
                                 <LocalizedClientLink href="/">Home</LocalizedClientLink>

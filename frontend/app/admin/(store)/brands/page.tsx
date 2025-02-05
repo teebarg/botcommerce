@@ -23,9 +23,9 @@ export default async function BrandsPage({ searchParams }: { searchParams: { sea
 
     return (
         <React.Fragment>
-            <div className="bg-content2 h-full">
-                <div className="max-w-7xl mx-auto p-8">
-                    <h1 className="text-2xl font-semibold mb-4">Brands</h1>
+            <div className="h-full">
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl font-semibold mb-8">Brands</h1>
                     <Table
                         columns={["S/N", "Name", "Status", "Created At", "Actions"]}
                         form={<BrandForm type="create" />}

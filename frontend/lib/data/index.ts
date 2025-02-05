@@ -81,28 +81,6 @@ export const getCart = cache(async function (cartId: string) {
     return await response.json();
 });
 
-export const getProducts = async (search?: string, collections?: string, page?: number, limit?: number) => {
-    const headers = getHeaders([]);
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { search, collections, page, limit });
-
-    try {
-        const res = await fetch(url, {
-            headers: {
-                accept: "application/json",
-                ...headers,
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (error: any) {
-        return { products: [], success: false, message: error.toString() };
-    }
-};
-
 export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
     try {
         const headers = getHeaders(["cart"]);
@@ -492,6 +470,30 @@ export const getProductBySlug = async function (slug: string): Promise<any> {
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`, {
+            cache: "force-cache",
+            method: "GET",
+            headers: {
+                accept: "application/json",
+                ...headers,
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+
+        return await res.json();
+    } catch (error) {
+        return { message: error, status: "error", error: true };
+    }
+};
+
+export const getProductReviews = async (product_id?: number, page: number = 1, limit: number = 20): Promise<any> => {
+    const headers = getHeaders(["reviews"]);
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });
+
+    try {
+        const res = await fetch(url, {
             method: "GET",
             headers: {
                 accept: "application/json",
@@ -626,17 +628,13 @@ interface SearchResult {
     total_pages: number;
 }
 
-export async function search(searchParams: SearchParams): Promise<SearchResult> {
+export async function productSearch(searchParams: SearchParams): Promise<SearchResult> {
+    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`, {
-            method: "POST",
+        const response = await fetch(url, {
+            method: "GET",
             headers: {
                 accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(searchParams),
-            next: {
-                tags: ["search"],
             },
         });
 

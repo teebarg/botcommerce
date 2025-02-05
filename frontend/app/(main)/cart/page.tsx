@@ -11,6 +11,7 @@ import RecommendedProducts from "@/modules/products/components/recommended";
 import { CartItem } from "@/types/global";
 import { siteConfig } from "@/lib/config";
 import Items from "@/components/order/cart-details";
+import PromotionalBanner from "@/components/promotion";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -27,6 +28,12 @@ export default async function Cart() {
         <>
             <SummaryMobile cart={cart} />
             <div className="py-0 md:py-12">
+                <PromotionalBanner
+                    title="Big Sale on Top Brands!"
+                    subtitle="Get up to 50% OFF on select products."
+                    outerClass="bg-gradient-to-r from-indigo-500/100 via-purple-500/75 to-pink-500 mx-2 md:mx-auto max-w-7xl"
+                    btnClass="text-purple-600"
+                />
                 <div className="max-w-7xl mx-auto" data-testid="cart-container">
                     {cart?.items.length ? (
                         <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8">

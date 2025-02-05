@@ -54,7 +54,7 @@ const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", varia
     return (
         <LocalizedClientLink
             className={cn(
-                "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap roun",
+                "z-0 group relative inline-flex items-center justify-center whitespace-nowrap",
                 "font-medium overflow-hidden outline-none transition-all hover:opacity-80",
                 variant === "shadow" && buttonConfig[color].shadow,
                 buttonConfig[size],

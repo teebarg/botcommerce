@@ -34,7 +34,7 @@ export default async function Menu() {
     const isAdmin: boolean = Boolean(customer?.is_superuser);
 
     return (
-        <div className="px-4">
+        <div className="flex flex-col px-4 flex-1">
             <div className="mt-6 space-y-3">
                 <NavLink href="/" icon={<Home className="h-8 w-8" />} title="Home" />
                 <NavLink href="/account/profile" icon={<User className="h-8 w-8" viewBox="0 0 20 20" />} title="Profile" />
@@ -44,13 +44,13 @@ export default async function Menu() {
                 {isAdmin && <NavLink href="/admin" icon={<UserGroup className="h-8 w-8" viewBox="0 0 24 24" />} title="Admin" />}
             </div>
 
-            <hr className="tb-divider my-4" />
+            <hr className="tb-divider my-8" />
 
             <div className="space-y-3">
                 <NavLink href="/our-story" title="Our Story" />
                 <NavLink href="/support" title="Contact Us" />
             </div>
-            <div className="mt-8 mb-2 md:hidden">
+            <div className="mt-auto mb-2 md:hidden">
                 {customer ? (
                     <UserDropDown customer={customer} />
                 ) : (

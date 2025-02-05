@@ -18,7 +18,7 @@ interface WishlistItemProps {
     description: string;
 }
 
-const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, description }) => {
+const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [isAdding, setIsAdding] = useState<boolean>(false);
 
@@ -54,14 +54,13 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, price, des
     return (
         <>
             <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-content1 w-full snap-start h-full" id={`${id}`}>
-                <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl bg-content2 h-[12rem] md:h-[20rem] justify-between">
+                <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl bg-content2 h-[16rem] md:h-[20rem] justify-between">
                     <div className="relative md:rounded-1xl z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
                         <Image fill alt={name} className="hover:scale-95" src={image as string} />
                     </div>
                 </div>
                 <div className="space-y-1">
                     <h3 className="font-medium line-clamp-1">{name}</h3>
-                    {/* <p className="text-default-500 line-clamp-1">{description}</p> */}
                 </div>
                 <div className="flex gap-3">
                     <Button

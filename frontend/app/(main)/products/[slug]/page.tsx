@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug, search } from "@lib/data";
+import { getProductBySlug, productSearch } from "@lib/data";
 import { Product, SearchParams } from "types/global";
 import React, { Suspense } from "react";
 import ProductActions from "@modules/products/components/product-actions";
@@ -13,8 +13,9 @@ import { siteConfig } from "@/lib/config";
 import SkeletonProductTemplate from "@/modules/products/skeleton-product";
 import { currency } from "@/lib/util/util";
 import ProductDetails from "@/modules/products/templates/details";
-import ReviewsSection from "@/components/review";
 import LocalizedClientLink from "@/components/ui/link";
+import ReviewsSection from "@/components/product/product-reviews";
+import { Skeleton } from "@/components/skeleton";
 
 type Props = {
     params: { slug: string };
@@ -25,7 +26,7 @@ export async function generateStaticParams() {
         limit: 100,
     };
 
-    const { products } = await search(queryParams);
+    const { products } = await productSearch(queryParams);
 
     return products?.map((product: Product) => ({
         slug: String(product.slug),
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
     const product = await getProductBySlug(params.slug);
 
-    if (!product) {
+    if (!product || product.error) {
         notFound();
     }
 
@@ -145,9 +146,12 @@ export default async function ProductPage({ params }: Props) {
                         </div>
                     </div>
                 </div>
-                {/* <ReviewSection /> */}
-                <ReviewsSection />
-                <div className="max-w-7xl mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
+                {/* ReviewSection */}
+                <Suspense fallback={<Skeleton className="h-44" />}>
+                    <ReviewsSection product={product} />
+                </Suspense>
+
+                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
                     <Suspense fallback={<SkeletonRelatedProducts />}>
                         <RelatedProducts product={product} />
                     </Suspense>

@@ -4,6 +4,7 @@ from app.core.cruds.brand import BrandCRUD
 from app.core.cruds.category import CategoryCRUD
 from app.core.cruds.collection import CollectionCRUD
 from app.core.cruds.product import ProductCRUD
+from app.core.cruds.reviews import ReviewCRUD
 from app.core.cruds.siteconfig import SiteConfigCRUD
 from app.core.cruds.tag import TagCRUD
 from app.core.cruds.user import UserCRUD
@@ -15,6 +16,7 @@ from app.models.generic import (
     Category,
     Collection,
     Product,
+    Review,
     Tag,
     User,
 )
@@ -26,5 +28,6 @@ category = CategoryCRUD(Category)
 collection = CollectionCRUD(Collection)
 product = ProductCRUD(Product)
 siteconfig = SiteConfigCRUD(SiteConfig)
+review = ReviewCRUD(Review)
 tag = TagCRUD(Tag)
 user = UserCRUD(User)

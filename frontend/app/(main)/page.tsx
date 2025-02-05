@@ -5,7 +5,7 @@ import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
-import { getCategories, getCustomer, getWishlist, search } from "@lib/data";
+import { getCategories, getCustomer, getWishlist, productSearch } from "@lib/data";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
@@ -14,7 +14,6 @@ import LocalizedClientLink from "@/components/ui/link";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
-const FlashBanner = dynamic(() => import("@components/flash"), { ssr: false });
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
 
 export const metadata: Metadata = {
@@ -27,12 +26,10 @@ async function getLandingProducts(collection: string, limit: number = 4): Promis
         query: "",
         limit,
         page: 1,
-        sort: "created_at:desc",
         collections: collection,
     };
 
-    const { products } = await search(queryParams);
-
+    const { products } = await productSearch(queryParams);
     return products;
 }
 
@@ -87,7 +84,7 @@ export default async function Home() {
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold">Call to Order</p>
-                                        <p className="text-xs font-medium">0700-000-0000</p>
+                                        <p className="text-xs font-medium">{siteConfig.contactPhone}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
@@ -139,7 +136,12 @@ export default async function Home() {
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
                             <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
                                 {categories?.map((category: Collection, index: number) => (
-                                    <BtnLink key={index} className="flex-none" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
+                                    <BtnLink
+                                        key={index}
+                                        className="flex-none h-24 min-w-24 rounded-full text-lg"
+                                        color="secondary"
+                                        href={`/collections?cat_ids=${category.slug}`}
+                                    >
                                         {category.name}
                                     </BtnLink>
                                 ))}
@@ -148,7 +150,12 @@ export default async function Home() {
                     </div>
                 </div>
                 <div className="relative py-2">
-                    <PromotionalBanner />
+                    <PromotionalBanner
+                        title="Big Sale on Top Brands!"
+                        subtitle="Get up to 50% OFF on select products."
+                        outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                        btnClass="text-purple-600"
+                    />
                 </div>
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-2 md:py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -175,28 +182,31 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <FlashBanner />
+                <PromotionalBanner
+                    title="Big Sale on Top Brands!"
+                    subtitle="Get up to 50% OFF on select products."
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    btnClass="text-purple-600"
+                />
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
                             {trending?.map((product: Product, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
                 </div>
-                <div className="relative h-8 md:h-28">
-                    <Image
-                        fill
-                        priority
-                        alt="banner"
-                        className="object-contain"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 60vw"
-                        src="/frontend.webp"
+                <div className="relative">
+                    <PromotionalBanner
+                        title="Big Sale on Top Brands!"
+                        subtitle="Get up to 50% OFF on select products."
+                        outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl"
+                        btnClass="text-purple-600"
                     />
                 </div>
-                <div className="bg-content1 py-16">
+                <div className="bg-content1 py-12">
                     <div className="max-w-8xl mx-auto px-4">
                         <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
@@ -223,16 +233,16 @@ export default async function Home() {
                                 </p>
                                 <ContactForm />
                             </div>
-                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 p-4 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
+                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 px-4 py-12 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
                                 <div>
-                                    <p className="font-semibold mt-4 text-xl">Our Contacts</p>
+                                    <p className="font-semibold text-xl">Our Contacts</p>
                                     <div className="flex gap-2">
                                         <Mail />
                                         <p>{siteConfig.contactEmail}</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Location</p>
                                     <div className="flex gap-2">
-                                        <LocationIcon />
+                                        <LocationIcon className="fill-current" />
                                         <p className="underline">Lagos, LA NG</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Opening Hours</p>

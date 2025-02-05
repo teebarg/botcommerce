@@ -1,7 +1,8 @@
 import secrets
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
+from app.models.reviews import ReviewBase
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.activities import ActivityBase
@@ -128,6 +129,29 @@ class Collection(CollectionBase, table=True):
     )
 
 
+class Review(ReviewBase, table=True):
+    __tablename__ = "reviews"
+    id: int | None = Field(default=None, primary_key=True)
+    product_id: int = Field(default=None, foreign_key="product.id")
+    product: "Product" = Relationship(back_populates="reviews")
+    user_id: int = Field(default=None, foreign_key="user.id")
+    user: "User" = Relationship(back_populates="reviews")
+
+
+class ReviewPublic(ReviewBase):
+    id: int
+    user: "User"
+
+class Reviews(SQLModel):
+    reviews: list[ReviewPublic]
+
+class PaginatedReviews(Reviews):
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int
+
+
 class Tag(TagBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     slug: str
@@ -150,20 +174,21 @@ class Product(ProductBase, table=True):
     brands: list["Brand"] = Relationship(
         back_populates="products", link_model=ProductBrand
     )
+    reviews: list[Review] = Relationship(back_populates="product")
 
 
 class ProductPublic(ProductBase):
     id: int
     slug: str
     images: list[ProductImages] = []
+    brands: list[Brand] = []
     categories: list[Category] = []
     collections: list[Collection] = []
-    # tags: list[Tag] = []
-    brands: list[Brand] = []
 
 
 class Products(SQLModel):
-    products: list[ProductPublic]
+    products: list[Any]
+    facets: Any
     page: int
     limit: int
     total_count: int
@@ -176,6 +201,7 @@ class User(UserBase, table=True):
     addresses: list["Address"] = Relationship(back_populates="user")
     activity_logs: list["ActivityLog"] = Relationship(back_populates="user")
     wishlists: list["Wishlist"] = Relationship(back_populates="user")
+    reviews: list["Review"] = Relationship(back_populates="user")
 
 
 class UserPublic(UserBase):
@@ -226,3 +252,7 @@ class Wishlist(WishlistBase, table=True):
         foreign_key="product.id", nullable=False, ondelete="CASCADE"
     )
     # product: Product = Relationship(back_populates="product")
+    
+
+class Wishlists(SQLModel):
+    wishlists: list[Wishlist]

@@ -37,9 +37,9 @@ const buttonConfig: any = {
     },
 
     // Sizes
-    sm: "px-4 min-w-20 h-10 text-xs gap-2 rounded-lg",
-    md: "px-6 min-w-20 h-12 text-sm gap-2 rounded-xl",
-    lg: "px-8 min-w-24 h-14 text-base gap-3 rounded-1xl",
+    sm: "px-4 min-w-20 h-10 text-sm gap-2 rounded-lg",
+    md: "px-6 min-w-20 h-12 text-base gap-2 rounded-xl",
+    lg: "px-8 min-w-24 h-14 text-lg gap-3 rounded-1xl",
 };
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

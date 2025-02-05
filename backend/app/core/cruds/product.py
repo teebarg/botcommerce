@@ -6,7 +6,7 @@ from app.core import crud
 from app.core.cruds.base import BaseCRUD
 from app.core.logging import logger
 from app.core.utils import generate_slug
-from app.models.generic import Brand, Category, Collection, Product, Tag
+from app.models.generic import Brand, Category, Collection, Product, Review, ReviewPublic, Tag
 from app.models.product import (
     ProductCreate,
     ProductUpdate,
@@ -14,6 +14,9 @@ from app.models.product import (
 
 
 class ProductCRUD(BaseCRUD[Product, ProductCreate, ProductUpdate]):
+    def reviews(self, db: Session, product_id: int) -> list[ReviewPublic]:
+        return db.query(Review).filter(Review.product_id == product_id).order_by(Review.created_at.desc()).all()
+
     def create(self, db: Session, obj_in: ProductCreate) -> Product:
         db_obj = Product.model_validate(
             obj_in,

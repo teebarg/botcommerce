@@ -12,6 +12,7 @@ from app.api.routes import (
     product,
     tag,
     users,
+    reviews,
     websocket,
 )
 
@@ -27,4 +28,5 @@ api_router.include_router(order.router, prefix="/order", tags=["order"])
 api_router.include_router(product.router, prefix="/product", tags=["product"])
 api_router.include_router(tag.router, prefix="/tag", tags=["tag"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
+api_router.include_router(reviews.router, prefix="/reviews", tags=["reviews"])
 api_router.include_router(websocket.router, prefix="/ws", tags=["websocket"])

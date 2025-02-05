@@ -50,7 +50,12 @@ export default async function OverviewTemplate() {
     return (
         <div data-testid="overview-page-wrapper">
             <div>
-                <PromotionalBanner />
+                <PromotionalBanner
+                    title="Big Sale on Top Brands!"
+                    subtitle="Get up to 50% OFF on select products."
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    btnClass="text-purple-600"
+                />
                 <div className="text-xl hidden md:flex justify-between items-center mt-4">
                     <span data-testid="welcome-message" data-value={customer?.firstname}>
                         Hello {customer?.firstname}
