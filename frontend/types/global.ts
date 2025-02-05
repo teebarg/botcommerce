@@ -11,6 +11,16 @@ export type Customer = {
     shipping_addresses?: Record<string, any>[];
 };
 
+export type Review = {
+    id: number;
+    rating: number;
+    comment: string;
+    verified?: boolean;
+    product_id: number;
+    created_at: string;
+    user: Customer;
+};
+
 export type Product = {
     id: number;
     name: string;
@@ -25,6 +35,7 @@ export type Product = {
     inventory?: number;
     created_at?: string;
     collections: string[];
+    reviews?: Review[];
 };
 
 export type Brand = {
@@ -230,14 +241,4 @@ export type SiteConfig = {
     value: string;
     created_at: string;
     updated_at: string;
-};
-
-export type Review = {
-    id: number;
-    rating: number;
-    comment: string;
-    verified?: boolean;
-    product_id: number;
-    created_at: string;
-    user: Customer;
 };

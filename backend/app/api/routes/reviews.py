@@ -68,10 +68,14 @@ async def read(id: int, db: SessionDep) -> ReviewPublic:
 
 @router.post("/")
 async def create(review: ReviewCreate, db: SessionDep, user: CurrentUser, cache: CacheService) -> Review:
+    product = crud.product.get(db=db, id=review.product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
     try:
         review = crud.review.create(db=db, obj_in=review, user_id=user.id)
         # Invalidate cache
         cache.invalidate("reviews")
+        cache.delete(f"product:{product.slug}")
         return review
     except IntegrityError as e:
         logger.error(f"Error creating review, {e.orig.pgerror}")

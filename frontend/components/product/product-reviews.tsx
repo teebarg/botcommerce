@@ -3,26 +3,12 @@ import { Star } from "nui-react-icons";
 
 import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
-import { Product } from "@/types/global";
-import { getProductReviews } from "@/lib/data";
+import { Product, Review } from "@/types/global";
 import ReviewForm from "./review-form";
 import { timeAgo } from "@/lib/util/util";
 
 interface Prop {
     product: Product;
-}
-
-interface ReviewData {
-    id: number;
-    name: string;
-    rating: number;
-    created_at: string;
-    verified: boolean;
-    comment: string;
-    product_id: number;
-    user: {
-        firstname: string;
-    };
 }
 
 interface RatingDistribution {
@@ -31,7 +17,9 @@ interface RatingDistribution {
 }
 
 const ReviewsSection: React.FC<Prop> = async ({ product }) => {
-    const { reviews } = await getProductReviews(product.id, 1, 5);
+    const reviews: Review[] = product.reviews?.sort(
+        (a: Review, b: Review) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    ) as unknown as Review[];
 
     if (!reviews || reviews?.length == 0) {
         return (
@@ -66,7 +54,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
     let totalRating = 0;
     const totalReviews = reviews.length;
 
-    reviews.forEach((review: ReviewData) => {
+    reviews.forEach((review: Review) => {
         if (review.rating >= 1 && review.rating <= 5) {
             ratingDistribution[5 - review.rating].percentage += 1; // Increment count for the corresponding rating
             totalRating += review.rating; // Sum up the ratings
@@ -107,12 +95,12 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
         </div>
     );
 
-    const ReviewCard = ({ review }: { review: ReviewData }) => (
+    const ReviewCard = ({ review }: { review: Review }) => (
         <div className="bg-content2 px-6 py-4 rounded-lg mb-4 shadow-sm">
             <div className="flex justify-between items-start mb-2">
                 <div>
                     <div className="flex items-center">
-                        <span className="font-semibold mr-2">{review.user.firstname}</span>
+                        <span className="font-semibold mr-2">{review?.user?.firstname}</span>
                         {review.verified && <Chip color="success" title="Verified" />}
                     </div>
                     <div className="flex">
@@ -131,11 +119,15 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
     return (
         <div className="bg-content1">
             <div className="px-4 py-8 max-w-7xl mx-auto w-full">
-                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                     Customer Reviews <Chip color="success" title="All from verified purchases" />
                 </h2>
                 <RatingBreakdown />
-                <div className="mb-8">{reviews?.map((review: ReviewData, index: number) => <ReviewCard key={index} review={review} />)}</div>
+                <div className="mb-8">
+                    {reviews?.slice(0, 5).map((review: Review, index: number) => (
+                        <ReviewCard key={index} review={review} />
+                    ))}
+                </div>
                 <ReviewForm product_id={product.id} />
                 {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews

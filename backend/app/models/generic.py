@@ -184,6 +184,7 @@ class ProductPublic(ProductBase):
     brands: list[Brand] = []
     categories: list[Category] = []
     collections: list[Collection] = []
+    reviews: list[ReviewPublic] = []
 
 
 class Products(SQLModel):
