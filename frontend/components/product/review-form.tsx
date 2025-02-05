@@ -67,7 +67,7 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
                 />
             </div>
 
-            <Button type="submit" isLoading={loading} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button size="md" type="submit" isLoading={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                 Submit Review
             </Button>
         </form>

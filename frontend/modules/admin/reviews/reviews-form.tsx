@@ -52,8 +52,7 @@ const ReviewForm: React.FC<Props> = ({ onClose, current = { rating: 1, comment: 
                                 <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                 <Number isRequired defaultValue={current.rating} label="Rating" name="rating" placeholder="5" />
                                 <TextArea isRequired defaultValue={current.comment} label="Comment" name="comment" placeholder="Great product." />
-                                <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
-                                <Checkbox defaultSelected={current.verified} label="Verified" name="verified" />
+                                <Checkbox color="warning" defaultSelected={current.verified} label="Verified" name="verified" />
                             </div>
                         </div>
                     </div>

@@ -68,7 +68,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                 </Modal>
             )}
             {slideOverState.isOpen && (
-                <SlideOver className="bg-default-100" isOpen={slideOverState.isOpen} title={`Edit ${label}`} onClose={slideOverState.close}>
+                <SlideOver className="bg-content1" isOpen={slideOverState.isOpen} title={`Edit ${label}`} onClose={slideOverState.close}>
                     {slideOverState.isOpen && formWithHandler}
                 </SlideOver>
             )}

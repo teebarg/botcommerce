@@ -47,7 +47,7 @@ const Number: React.FC<Props> = ({ name, errorMessage, hidden, size = "md", clas
             >
                 <div
                     className={cn(
-                        "relative w-full inline-flex shadow-sm px-3 bg-content1 rounded-xl flex-col items-start justify-center outline-none",
+                        "relative w-full inline-flex shadow-sm px-3 bg-default-100 rounded-xl flex-col items-start justify-center outline-none",
                         {
                             "h-12 py-1.5": size === "sm",
                             "h-14 py-2": size === "md",

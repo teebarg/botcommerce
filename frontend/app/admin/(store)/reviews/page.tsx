@@ -25,7 +25,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
     return (
         <React.Fragment>
             <div className="h-full">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-7xl mx-auto px-4">
                     <h1 className="text-2xl font-semibold mb-8">Reviews</h1>
                     <Table
                         columns={["S/N", "Comment", "Rating", "Status", "Created At", "Actions"]}
@@ -37,10 +37,10 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { se
                             <tr key={item.id} className="even:bg-content2">
                                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <div className="font-bold truncate max-w-32">{item?.comment}</div>
+                                    <div className="font-bold truncate w-60">{item?.comment}</div>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <div className="font-bold truncate max-w-32">{item?.rating}</div>
+                                    <div className="font-bold truncate w-8">{item?.rating}</div>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
                                     <Chip color={item.verified ? "success" : "danger"} title={item.verified ? "verified" : "un-verified"} />

@@ -1,8 +1,7 @@
 import { ExclamationIcon } from "nui-react-icons";
 import React from "react";
-
-import { BtnLink } from "@/components/ui/btnLink";
 import { cn } from "@/lib/util/cn";
+import { BackButton } from "@/components/back";
 
 interface Props {
     className?: string;
@@ -15,9 +14,7 @@ const NF: React.FC<Props> = async ({ className }) => {
                 <ExclamationIcon className="w-20 h-20 mx-auto text-danger" />
                 <h1 className="text-4xl font-bold mt-6">Oops! Page Not Found</h1>
                 <p className="text-default-500 my-4">{`The page you're looking for doesn't exist or has been moved.`}</p>
-                <BtnLink color="primary" size="md" href="/">
-                    Go to Home
-                </BtnLink>
+                <BackButton />
             </div>
         </div>
     );

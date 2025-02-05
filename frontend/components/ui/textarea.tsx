@@ -58,10 +58,7 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
                 data-slot="base"
             >
                 <div
-                    className={cn(
-                        "relative w-full inline-flex shadow-sm px-3 bg-content1p bg-default-100 rounded-xl flex-col py-2",
-                        classNames?.["inputWrapper"]
-                    )}
+                    className={cn("relative w-full inline-flex shadow-sm px-3 bg-default-100 rounded-xl flex-col py-2", classNames?.["inputWrapper"])}
                     data-hover={isHovered ? "true" : "false"}
                     data-slot="input-wrapper"
                     style={{ cursor: "text" }}
