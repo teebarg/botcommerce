@@ -42,7 +42,6 @@ export async function addWish(id: number) {
 
 export async function addReview(product_id: number, rating: number, comment: string) {
     const headers = getHeaders(["reviews"]);
-    // const token = cookies().get("access_token")?.value;
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`;
 
     try {

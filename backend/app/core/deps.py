@@ -26,11 +26,6 @@ reusable_oauth2 = OAuth2PasswordBearer(
 )
 
 
-# @retry(
-#     retry=retry_if_exception_type(ConnectionError),  # Retry on connection errors
-#     wait=wait_exponential(multiplier=1, min=4, max=10),  # Exponential backoff
-#     stop=stop_after_attempt(5),  # Max 5 attempts
-# )
 def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session

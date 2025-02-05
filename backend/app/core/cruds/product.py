@@ -15,7 +15,7 @@ from app.models.product import (
 
 class ProductCRUD(BaseCRUD[Product, ProductCreate, ProductUpdate]):
     def reviews(self, db: Session, product_id: int) -> list[ReviewPublic]:
-        return db.query(Review).filter(Review.product_id == product_id).order_by(Review.created_at.desc()).limit(5).all()
+        return db.query(Review).filter(Review.product_id == product_id).order_by(Review.created_at.desc()).all()
 
     def create(self, db: Session, obj_in: ProductCreate) -> Product:
         db_obj = Product.model_validate(

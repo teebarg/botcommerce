@@ -21,7 +21,6 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // onSubmit({ rating, comment });
         const res = await addReview(product_id, rating, comment);
         setLoading(false);
         if (res.error) {
