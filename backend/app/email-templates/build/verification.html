@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Email Verification{% endblock %}
+
+{% block additional_styles %}
+.verification-code {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <p>Hello,</p>
+    <p>Thank you for signing up for {{company_name}}!</p>
+    <p>Your {{code_length}}-digit verification code is:</p>
+    <div class="verification-code">{{verification_code}}</div>
+    <p>Enter this verification code on the registration page where you requested the code. This code is valid for {{validity_minutes}} minutes.</p>
+    <p>Welcome and happy building!</p>
+    <p>Thank you,<br>{{company_name}}</p>
+</div>
+{% endblock %}

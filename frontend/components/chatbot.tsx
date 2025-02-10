@@ -19,17 +19,15 @@ const ChatBot: React.FC<Props> = () => {
     const [input, setInput] = useState("");
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [hasBeenClosed, setHasBeenClosed] = useState<boolean>(false);
 
     useEffect(() => {
         // Set isOpen after hydration
         const savedIsOpen = localStorage.getItem("chatbotOpen") !== "false";
-
         setIsOpen(savedIsOpen);
     }, []);
 
     useEffect(() => {
-        if (!isOpen) return; // Don't set initial messages if chat is closed
-
         const timer = setTimeout(() => {
             setMessages([
                 { text: "Hi, welcome to our store", isUser: false },
@@ -43,6 +41,21 @@ const ChatBot: React.FC<Props> = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Replace the existing auto-open useEffect
+    useEffect(() => {
+        const hasBeenClosedThisSession = sessionStorage.getItem("chatbotClosed") === "true";
+        setHasBeenClosed(hasBeenClosedThisSession);
+
+        if (!hasBeenClosedThisSession) {
+            const timer = setTimeout(() => {
+                setIsOpen(true);
+                localStorage.setItem("chatbotOpen", "true");
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+    }, []); // Empty dependency array means this runs once on mount
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -85,10 +98,19 @@ const ChatBot: React.FC<Props> = () => {
 
     const toggleChat = () => {
         const newIsOpen = !isOpen;
-
         setIsOpen(newIsOpen);
+
+        if (!newIsOpen) {
+            setHasBeenClosed(true);
+            sessionStorage.setItem("chatbotClosed", "true");
+        }
+
         localStorage.setItem("chatbotOpen", newIsOpen.toString());
     };
+
+    if (hasBeenClosed) {
+        return null;
+    }
 
     return (
         <React.Fragment>

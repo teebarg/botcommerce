@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}{% endblock %}</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+            }
+            .header {
+                background: linear-gradient(90deg, #000000, #0043ce);
+                padding: 20px;
+                color: white;
+            }
+            .content {
+                padding: 20px;
+                color: #333333;
+            }
+            .verification-code {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+            .footer {
+                background-color: #000000;
+                color: white;
+                padding: 20px;
+                font-size: 12px;
+            }
+            .footer a {
+                color: #4589ff;
+                text-decoration: none;
+            }
+        </style>
+        {% block additional_styles %}{% endblock %}
+    </head>
+    <body>
+        <div class="container">{% include 'components/header.html' %} {% block content %}{% endblock %} {% include 'components/footer.html' %}</div>
+    </body>
+</html>
