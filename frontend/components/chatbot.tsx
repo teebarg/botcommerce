@@ -2,7 +2,7 @@
 
 import { cn } from "@lib/util/cn";
 import React, { useState, useEffect, useRef } from "react";
-import { CogSixTooth, Send, Smiley } from "nui-react-icons";
+import { CogSixTooth, RefreshCcw, Send, Smiley, XMark } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 
@@ -13,10 +13,19 @@ interface Message {
     isUser: boolean;
 }
 
+const TypingIndicator = () => (
+    <div className="flex gap-2 p-2">
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+    </div>
+);
+
 const ChatBot: React.FC<Props> = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState("");
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [input, setInput] = useState<string>("");
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [hasBeenClosed, setHasBeenClosed] = useState<boolean>(false);
@@ -24,13 +33,17 @@ const ChatBot: React.FC<Props> = () => {
     useEffect(() => {
         // Set isOpen after hydration
         const savedIsOpen = localStorage.getItem("chatbotOpen") !== "false";
+
         setIsOpen(savedIsOpen);
     }, []);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setMessages([
-                { text: "Hi, welcome to our store", isUser: false },
+                {
+                    text: "Hello Adeniyi! I’m the Virtual Assistant, an automated support tool here to assist you with your questions. Ask me a question, or type 'help' for additional information.",
+                    isUser: false,
+                },
                 { text: "How can we help you today?", isUser: false },
             ]);
         }, 2000);
@@ -45,16 +58,17 @@ const ChatBot: React.FC<Props> = () => {
     // Replace the existing auto-open useEffect
     useEffect(() => {
         const hasBeenClosedThisSession = sessionStorage.getItem("chatbotClosed") === "true";
+
         setHasBeenClosed(hasBeenClosedThisSession);
 
-        if (!hasBeenClosedThisSession) {
-            const timer = setTimeout(() => {
-                setIsOpen(true);
-                localStorage.setItem("chatbotOpen", "true");
-            }, 2000);
+        // if (!hasBeenClosedThisSession) {
+        //     const timer = setTimeout(() => {
+        //         setIsOpen(true);
+        //         localStorage.setItem("chatbotOpen", "true");
+        //     }, 2000);
 
-            return () => clearTimeout(timer);
-        }
+        //     return () => clearTimeout(timer);
+        // }
     }, []); // Empty dependency array means this runs once on mount
 
     const scrollToBottom = () => {
@@ -85,25 +99,29 @@ const ChatBot: React.FC<Props> = () => {
 
     // Update handleSend function to use Rasa
     const handleSend = async () => {
-        if (input.trim()) {
-            setMessages([...messages, { text: input, isUser: true }]);
-            setInput("");
+        if (!input.trim()) return;
+        // if (input.trim()) {
+        setIsLoading(true);
+        setMessages([...messages, { text: input, isUser: true }]);
+        setInput("");
 
-            // Get response from Rasa
-            const botResponse = await getRasaResponse(input);
+        // Get response from Rasa
+        const botResponse = await getRasaResponse(input);
 
-            setMessages((prev) => [...prev, { text: botResponse, isUser: false }]);
-        }
+        setMessages((prev) => [...prev, { text: botResponse, isUser: false }]);
+        setIsLoading(false);
+        // }
     };
 
     const toggleChat = () => {
         const newIsOpen = !isOpen;
+
         setIsOpen(newIsOpen);
 
-        if (!newIsOpen) {
-            setHasBeenClosed(true);
-            sessionStorage.setItem("chatbotClosed", "true");
-        }
+        // if (!newIsOpen) {
+        //     setHasBeenClosed(true);
+        //     sessionStorage.setItem("chatbotClosed", "true");
+        // }
 
         localStorage.setItem("chatbotOpen", newIsOpen.toString());
     };
@@ -238,7 +256,98 @@ const ChatBot: React.FC<Props> = () => {
                     </div>
                 </div>
             </div>
-            <div
+            <React.Fragment>
+                <div className="fixed right-6 bottom-6 z-50">
+                    <div
+                        className="max-w-md w-[calc(100%-30px)] sm:w-[400px] h-[600px] bg-gray-900 rounded-lg shadow-xl hidden data-[open=true]:flex flex-col"
+                        data-open={isOpen ? "true" : "false"}
+                    >
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                            <h1 className="text-white text-lg font-semibold">Virtual Assistant</h1>
+                            <div className="flex items-center gap-4">
+                                <button className="text-gray-400 hover:text-white transition">
+                                    <RefreshCcw className="w-5 h-5" />
+                                </button>
+                                <button className="text-gray-400 hover:text-white transition" onClick={toggleChat}>
+                                    {" "}
+                                    <XMark className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Messages Container */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                            {messages.map((message, index: number) => (
+                                <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
+                                    <div
+                                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                                            message.isUser ? "bg-blue-500 text-white rounded-br-none" : "bg-gray-800 text-gray-200 rounded-bl-none"
+                                        }`}
+                                    >
+                                        <p className="text-sm">{message.text}</p>
+                                    </div>
+                                </div>
+                            ))}
+                            {/* Typing Indicator */}
+                            {isLoading && (
+                                // <div className="flex">
+                                <TypingIndicator />
+                                // </div>
+                            )}
+                        </div>
+
+                        {/* Input Area */}
+                        <div className="p-4 border-t border-gray-800">
+                            <div className="flex items-center gap-2">
+                                <button className="p-2 hover:bg-zinc-700 rounded-full">
+                                    <Smiley />
+                                </button>
+                                <input
+                                    className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-400"
+                                    placeholder="Enter your response (English only)"
+                                    type="text"
+                                    value={input}
+                                    onChange={(event) => setInput(event.target.value)}
+                                />
+                                <button
+                                    className="p-2 text-blue-700 hover:text-blue-400 transition disabled:opacity-50"
+                                    disabled={!input.trim()}
+                                    onClick={handleSend}
+                                >
+                                    <Send className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="block data-[open=true]:hidden" data-open={isOpen ? "true" : "false"}>
+                        <button
+                            className="group bg-[#0f62fe] text-white min-w-12 place-items-center flex duration-300 transition-all py-2 px-4"
+                            type="button"
+                            onClick={toggleChat}
+                            onMouseEnter={(e) => e.currentTarget.setAttribute("data-hover", "true")}
+                            onMouseLeave={(e) => e.currentTarget.removeAttribute("data-hover")}
+                        >
+                            <svg
+                                aria-hidden="true"
+                                aria-label="Click to open"
+                                className="cds--btn__icon"
+                                fill="currentColor"
+                                focusable="false"
+                                height="32"
+                                role="img"
+                                viewBox="0 0 32 32"
+                                width="32"
+                            >
+                                <path d="M16 19a6.9908 6.9908 0 01-5.833-3.1287l1.666-1.1074a5.0007 5.0007 0 008.334 0l1.666 1.1074A6.9908 6.9908 0 0116 19zM20 8a2 2 0 102 2A1.9806 1.9806 0 0020 8zM12 8a2 2 0 102 2A1.9806 1.9806 0 0012 8z" />
+                                <path d="M17.7358,30,16,29l4-7h6a1.9966,1.9966,0,0,0,2-2V6a1.9966,1.9966,0,0,0-2-2H6A1.9966,1.9966,0,0,0,4,6V20a1.9966,1.9966,0,0,0,2,2h9v2H6a3.9993,3.9993,0,0,1-4-4V6A3.9988,3.9988,0,0,1,6,2H26a3.9988,3.9988,0,0,1,4,4V20a3.9993,3.9993,0,0,1-4,4H21.1646Z" />
+                            </svg>
+                            <span className="ml-2 hidden group-data-[hover=true]:block">Virtual assistant</span>
+                        </button>
+                    </div>
+                </div>
+            </React.Fragment>
+            {/* <div
                 aria-disabled="false"
                 aria-hidden="true"
                 aria-label="Open chat with Max - Unread messages: 1"
@@ -263,7 +372,7 @@ const ChatBot: React.FC<Props> = () => {
                 <div className="flex justify-center absolute -top-1 -right-1 w-[18px] h-[18px] rounded-50 bg-rose-800 leading-4 text-white group-data-[open=true]:invisible">
                     1
                 </div>
-            </div>
+            </div> */}
         </React.Fragment>
     );
 };
