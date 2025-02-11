@@ -20,7 +20,6 @@ const payMethods = [
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
-    console.log("🚀 ~ Payment ~ cart:", cart);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
