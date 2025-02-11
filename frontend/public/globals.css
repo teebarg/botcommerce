@@ -28,28 +28,6 @@ body {
         @apply shrink-0 bg-divider border-none w-full h-[1px];
     }
 
-    .chatbot-icon:after,
-    .chatbot-icon:before {
-        height: 3px;
-        margin: -1px 0 0;
-        content: "";
-        position: absolute;
-        width: 100%;
-        background-color: inherit;
-    }
-
-
-    .chatinput-wrapper pre,
-    .chatinput-wrapper textarea {
-        width: 114.2%;
-        height: 114.3%;
-        border-radius: 6px;
-        padding: 10px 36px 10px 12px;
-        transform: scale(0.875);
-        transform-origin: top left;
-        line-height: 20px;
-    }
-
     /* track line */
     .track:before {
         content: attr(x);
@@ -157,9 +135,9 @@ body {
         --danger-foreground: 0 0% 100%;
         --danger: 339.20000000000005 90.36% 51.18%;
 
-        --box-shadow-small: 0px 0px 5px 0px rgb(0 0 0 / 0.02), 0px 2px 10px 0px rgb(0 0 0 / 0.06), 0px 0px 1px 0px rgb(0 0 0 / 0.3);
-        --box-shadow-medium: 0px 0px 15px 0px rgb(0 0 0 / 0.03), 0px 2px 30px 0px rgb(0 0 0 / 0.08), 0px 0px 1px 0px rgb(0 0 0 / 0.3);
-        --box-shadow-large: 0px 0px 30px 0px rgb(0 0 0 / 0.04), 0px 30px 60px 0px rgb(0 0 0 / 0.12), 0px 0px 1px 0px rgb(0 0 0 / 0.3);
+        --box-shadow-small: 0px 0px 5px 0px rgba(0, 0, 0, .02), 0px 2px 10px 0px rgba(0, 0, 0, .06), 0px 0px 1px 0px rgba(0, 0, 0, .3);
+        --box-shadow-medium: 0px 0px 15px 0px rgba(0, 0, 0, .03), 0px 2px 30px 0px rgba(0, 0, 0, .08), 0px 0px 1px 0px rgba(0, 0, 0, .3);
+        --box-shadow-large: 0px 0px 30px 0px rgba(0, 0, 0, .04), 0px 30px 60px 0px rgba(0, 0, 0, .12), 0px 0px 1px 0px rgba(0, 0, 0, .3);
 
         --divider: 0 0% 6.67%;
     }
@@ -256,9 +234,9 @@ body {
         --danger-foreground: 0 0% 100%;
         --danger: 339.20000000000005 90.36% 51.18%;
 
-        --box-shadow-small: 0px 0px 5px 0px rgb(0 0 0 / 0.05), 0px 2px 10px 0px rgb(0 0 0 / 0.2), inset 0px 0px 1px 0px rgb(255 255 255 / 0.15);
-        --box-shadow-medium: 0px 0px 15px 0px rgb(0 0 0 / 0.06), 0px 2px 30px 0px rgb(0 0 0 / 0.22), inset 0px 0px 1px 0px rgb(255 255 255 / 0.15);
-        --box-shadow-large: 0px 0px 30px 0px rgb(0 0 0 / 0.07), 0px 30px 60px 0px rgb(0 0 0 / 0.26), inset 0px 0px 1px 0px rgb(255 255 255 / 0.15);
+        --box-shadow-small: 0px 0px 5px 0px rgba(0, 0, 0, .05), 0px 2px 10px 0px rgba(0, 0, 0, .2), inset 0px 0px 1px 0px hsla(0, 0%, 100%, .15);
+        --box-shadow-medium: 0px 0px 15px 0px rgba(0, 0, 0, .06), 0px 2px 30px 0px rgba(0, 0, 0, .22), inset 0px 0px 1px 0px hsla(0, 0%, 100%, .15);
+        --box-shadow-large: 0px 0px 30px 0px rgba(0, 0, 0, .07), 0px 30px 60px 0px rgba(0, 0, 0, .26), inset 0px 0px 1px 0px hsla(0, 0%, 100%, .15);
 
         --divider: 0 0% 100%;
     }

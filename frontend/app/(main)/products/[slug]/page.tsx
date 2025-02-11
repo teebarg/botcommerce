@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const product = await getProductBySlug(params.slug);
 
     if (!product || product.error) {
-        return {}
+        return {};
     }
 
     return {

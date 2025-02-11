@@ -123,11 +123,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                     Customer Reviews <Chip color="success" title="All from verified purchases" />
                 </h2>
                 <RatingBreakdown />
-                <div className="mb-8">
-                    {reviews?.slice(0, 5).map((review: Review, index: number) => (
-                        <ReviewCard key={index} review={review} />
-                    ))}
-                </div>
+                <div className="mb-8">{reviews?.slice(0, 5).map((review: Review, index: number) => <ReviewCard key={index} review={review} />)}</div>
                 <ReviewForm product_id={product.id} />
                 {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews

@@ -47,7 +47,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
 
     return (
         <div>
-            <div className="w-full grid grid-cols-1 gap-y-8">
+            <div className="w-full grid grid-cols-1 gap-y-4">
                 <Addresses cart={cart} customer={customer} />
                 <Shipping availableShippingMethods={availableShippingMethods} cart={cart} />
                 <Payment cart={cart} />

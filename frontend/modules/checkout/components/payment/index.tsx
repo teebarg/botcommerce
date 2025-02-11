@@ -3,17 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ErrorMessage from "@modules/checkout/components/error-message";
-import { CheckCircleSolid, CreditCard } from "nui-react-icons";
+import { CreditCard, Pencil } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
 import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
 import { Cart, PaymentSession } from "types/global";
-import { Tooltip } from "@components/ui/tooltip";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/spinner";
 
 const payMethods = [
     { id: "stripe", provider_id: "stripe" },
@@ -22,6 +20,7 @@ const payMethods = [
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
+    console.log("🚀 ~ Payment ~ cart:", cart);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +32,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const paymentReady = cart?.payment_session && cart?.shipping_method?.name;
+    const hasPaymentMethod = !!cart?.payment_session?.id && !!cart?.shipping_method?.id;
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -81,98 +80,75 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
     }, [isOpen]);
 
     return (
-        <div>
-            <div className="flex flex-row items-center justify-between mb-4">
-                <h2
-                    className={cn("flex flex-row text-lg font-bold gap-x-2 items-baseline", {
-                        "opacity-50 pointer-events-none select-none": !isOpen && !paymentReady,
-                    })}
+        <div
+            className={cn(
+                "bg-content1 shadow-medium p-6 rounded border-l-2",
+                isOpen || hasPaymentMethod ? "border-l-indigo-500" : "border-l-content3 opacity-50"
+            )}
+        >
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className={cn("w-2 h-2 bg-gray-500 rounded-full", { "bg-blue-500": isOpen || hasPaymentMethod })}></div>
+                    <span className="font-medium">Payment Method</span>
+                </div>
+                <button
+                    aria-label="edit"
+                    className={cn("text-blue-500 items-center gap-2 text-sm hidden", !isOpen && cart?.shipping_method?.id && "flex")}
+                    onClick={handleEdit}
                 >
-                    Payment
-                    {!isOpen && paymentReady && <CheckCircleSolid className="text-success" />}
-                </h2>
-                {!isOpen && paymentReady && (
-                    <button aria-label="edit payment" className="hover:text-blue-400" data-testid="edit-payment-button" onClick={handleEdit}>
-                        Edit
-                    </button>
+                    Edit <Pencil />
+                </button>
+            </div>
+
+            {/* Form */}
+            <div className={isOpen ? "block mt-4" : "hidden"}>
+                <div className={cn("hidden flex-col w-1/3", { flex: paidByGiftcard })}>
+                    <p className="font-medium text-base mb-1">Payment method</p>
+                    <p className="font-normal text-base text-default-500" data-testid="payment-method-summary">
+                        Gift card
+                    </p>
+                </div>
+                {!paidByGiftcard && (
+                    <RadioGroup name="payment" value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
+                        {payMethods.map((item) => (
+                            <PaymentContainer
+                                key={item.id}
+                                paymentInfoMap={paymentInfoMap}
+                                paymentSession={item}
+                                selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
+                            />
+                        ))}
+                    </RadioGroup>
                 )}
+
+                <ErrorMessage data-testid="payment-method-error-message" error={error} />
+
+                <Button
+                    className="mt-4 font-semibold"
+                    data-testid="submit-payment-button"
+                    disabled={!hasPaymentMethod && !paidByGiftcard}
+                    isLoading={isLoading}
+                    size="sm"
+                    onClick={handleSubmit}
+                >
+                    Continue to review
+                </Button>
             </div>
-            <div>
-                <div className={isOpen ? "block" : "hidden"}>
-                    {!paidByGiftcard ? (
-                        <RadioGroup name="payment" value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
-                            {payMethods.map((item) => (
-                                <PaymentContainer
-                                    key={item.id}
-                                    paymentInfoMap={paymentInfoMap}
-                                    paymentSession={item}
-                                    selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
-                                />
-                            ))}
-                        </RadioGroup>
-                    ) : paidByGiftcard ? (
-                        <div className="flex flex-col w-1/3">
-                            <p className="font-medium text-base mb-1">Payment method</p>
-                            <p className="font-normal text-base text-default-500" data-testid="payment-method-summary">
-                                Gift card
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center px-4 py-16">
-                            <Spinner />
-                        </div>
-                    )}
 
-                    <ErrorMessage data-testid="payment-method-error-message" error={error} />
-
-                    <Button
-                        className="mt-4 font-semibold"
-                        data-testid="submit-payment-button"
-                        disabled={!cart?.payment_session && !paidByGiftcard}
-                        isLoading={isLoading}
-                        size="sm"
-                        onClick={handleSubmit}
-                    >
-                        Continue to review
-                    </Button>
+            {/* Payment Method Section */}
+            {!isOpen && hasPaymentMethod && (
+                <div className="text-xs md:text-sm mt-6" data-testid="payment-method-summary">
+                    <p className="font-medium mb-1 text-base">Payment method</p>
+                    <p className="font-normal text-default-500 text-xs md:text-sm">
+                        {paymentInfoMap[cart.payment_session.id]?.title || cart.payment_session.provider_id}
+                        <br />
+                        {paymentInfoMap[cart.payment_session.id]?.description}
+                    </p>
+                    <div className="shadow-lg rounded-lg flex items-center h-7 w-fit p-2 bg-default-100">
+                        {paymentInfoMap[cart.payment_session.id]?.icon || <CreditCard />}
+                    </div>
                 </div>
-
-                <div className={isOpen ? "hidden" : "block"}>
-                    {cart && paymentReady && cart.payment_session.provider_id ? (
-                        <div className="flex items-start gap-x-1 w-full flex-wrap space-y-2 md:space-y-0">
-                            <div className="flex flex-col w-full md:w-1/3">
-                                <p className="font-medium text-base mb-1">Payment method</p>
-                                <p className="font-normal text-xs md:text-base text-default-500" data-testid="payment-method-summary">
-                                    {paymentInfoMap[cart.payment_session.id]?.title || cart.payment_session.provider_id}
-                                </p>
-                                {process.env.NODE_ENV === "development" && !Object.hasOwn(paymentInfoMap, cart.payment_session.provider_id) && (
-                                    <Tooltip content="You can add a user-friendly name and icon for this payment provider in 'modules/checkout/components/payment/index.tsx'" />
-                                )}
-                            </div>
-                            <div className="flex flex-col w-full md:w-1/3">
-                                <p className="font-medium text-base mb-1">Payment details</p>
-                                <div
-                                    className="flex gap-2 font-normal text-xs md:text-base text-default-500 items-center"
-                                    data-testid="payment-details-summary"
-                                >
-                                    <div className="shadow-lg rounded-lg flex items-center h-7 w-fit p-2 bg-default-100">
-                                        {paymentInfoMap[cart.payment_session.id]?.icon || <CreditCard />}
-                                    </div>
-                                    <p>{"Another step will appear"}</p>
-                                </div>
-                            </div>
-                        </div>
-                    ) : paidByGiftcard ? (
-                        <div className="flex flex-col w-1/3">
-                            <p className="font-medium text-base mb-1">Payment method</p>
-                            <p className="font-normal text-base text-default-500" data-testid="payment-method-summary">
-                                Gift card
-                            </p>
-                        </div>
-                    ) : null}
-                </div>
-            </div>
-            <hr className="tb-divider mt-8" />
+            )}
         </div>
     );
 };
