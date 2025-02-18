@@ -188,7 +188,7 @@ async def read_reviews(id: str, db: SessionDep) -> Reviews:
         return Reviews(reviews=reviews)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"{e}")
-    
+
 
 
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])
@@ -293,7 +293,7 @@ async def upload_products(
         cache.invalidate("search")
 
         # Re-index
-        index_products(db=db)
+        index_products(db=db, cache=cache)
 
         # crud.activities.create_product_upload_activity(
         #     db=db, user_id=user.id, filename=file.filename
@@ -355,14 +355,14 @@ async def upload_product_image(
 
 
 @router.post("/reindex", dependencies=[], response_model=Message)
-async def reindex_products(db: SessionDep, background_tasks: BackgroundTasks):
+async def reindex_products(db: SessionDep, cache: CacheService, background_tasks: BackgroundTasks):
     """
     Re-index all products in the database to Meilisearch.
     This operation is performed asynchronously in the background.
     """
     try:
         # Add the task to background tasks
-        background_tasks.add_task(index_products, db)
+        background_tasks.add_task(index_products, db, cache)
 
         return Message(message="Product reindexing started. This may take a while.")
     except Exception as e:
@@ -431,7 +431,7 @@ async def config_delete_index() -> dict:
         ) from e
 
 
-async def prepare_product_data_for_indexing(product: Product) -> dict:
+def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
     product_dict["collections"] = [
         collection.name for collection in product.collections
@@ -441,7 +441,7 @@ async def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["images"] = [image.image for image in product.images]
     return product_dict
 
-async def index_products(db: SessionDep):
+def index_products(db: SessionDep, cache: CacheService):
     """
     Re-index all products in the database to Meilisearch.
     """
@@ -457,6 +457,11 @@ async def index_products(db: SessionDep):
 
         # Add all documents to the 'products' index
         add_documents_to_index(index_name="products", documents=documents)
+
+        # Clear all product-related cache
+        cache.invalidate("product")
+        cache.invalidate("products")
+        cache.invalidate("search")
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
     except Exception as e:
