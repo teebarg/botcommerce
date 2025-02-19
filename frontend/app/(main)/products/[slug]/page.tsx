@@ -36,8 +36,8 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const product = await getProductBySlug(params.slug);
 
-    if (!product) {
-        notFound();
+    if (!product || product.error) {
+        return {};
     }
 
     return {
@@ -104,7 +104,7 @@ export default async function ProductPage({ params }: Props) {
                         <div className="flex flex-col px-2 md:px-0 mt-6 md:mt-0">
                             <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
                             <div className="my-2 flex items-center gap-2">
-                                <p className="text-sm text-default-500">669 reviews</p>
+                                <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
                             </div>
                             <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2">
                                 <div className="flex items-center text-white">

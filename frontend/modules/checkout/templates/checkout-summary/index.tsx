@@ -19,7 +19,7 @@ const CheckoutSummary = async () => {
     }
 
     return (
-        <div className="relative md:sticky top-0 flex gap-y-8 w-full rounded-xl bg-content1 px-2 py-4 dark:bg-content1 md:px-6 md:py-8 lg:w-[400px] lg:flex-none mt-6 sm:mt-0">
+        <div className="relative md:sticky top-0 flex gap-y-8 w-full rounded-xl bg-content1 shadow-medium px-2 py-4 md:px-6 md:py-8 lg:w-[400px] lg:flex-none mt-6 sm:mt-0">
             <div className="w-full">
                 <h2 className="font-medium text-default-500">Cart Summary</h2>
                 <hr className="tb-divider mt-4" />

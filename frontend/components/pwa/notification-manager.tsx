@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
-import { Bell, CancelIcon } from "nui-react-icons";
 
-import { subscribeUser, unsubscribeUser } from "./actions";
+import { subscribeUser } from "./actions";
 
 import { Button } from "@/components/ui/button";
 
@@ -32,7 +31,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 
 function PushNotificationManager() {
     const { enqueueSnackbar } = useSnackbar();
-    const [isSupported, setIsSupported] = useState<boolean>(false);
+    const [isSupported, setIsSupported] = useState<boolean>(true);
     const [newContent, setNewContent] = useState<boolean>(false);
     const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
 
@@ -51,6 +50,13 @@ function PushNotificationManager() {
             registerServiceWorker();
             setIsSupported(true);
         }
+
+        const timer = setTimeout(() => {
+            if (!subscription) return;
+            handleNotificationOptIn();
+        }, 10000);
+
+        return () => clearTimeout(timer);
     }, []);
 
     async function requestNotificationPermission() {
@@ -118,11 +124,11 @@ function PushNotificationManager() {
         setSubscription(sub);
     }
 
-    async function unsubscribeFromPush() {
-        await subscription?.unsubscribe();
-        setSubscription(null);
-        await unsubscribeUser();
-    }
+    // async function unsubscribeFromPush() {
+    //     await subscription?.unsubscribe();
+    //     setSubscription(null);
+    //     await unsubscribeUser();
+    // }
 
     function handleReload() {
         window.location.reload();
@@ -130,36 +136,6 @@ function PushNotificationManager() {
 
     return (
         <div>
-            {/* Add notification opt-in button */}
-            {isSupported && !subscription && (
-                <div className="fixed top-4 left-4 right-4 md:right-auto md:max-w-[25rem] z-50">
-                    <div className="bg-content2 rounded-lg shadow-xl p-8">
-                        {/* Close button */}
-                        <button className="absolute top-2 right-2 text-default-500 hover:text-default-500/5" onClick={() => setIsSupported(false)}>
-                            <CancelIcon className="h-6 w-6" />
-                        </button>
-
-                        {/* Icon and content container */}
-                        <div className="flex items-start space-x-4">
-                            <div className="bg-secondary p-3 rounded-full">
-                                <Bell className="w-6 h-6 text-white" />
-                            </div>
-
-                            <div className="flex-1">
-                                <h3 className="font-semibold text-default-900 mb-1">Stay Updated</h3>
-                                <p className="text-sm text-default-500 mb-3">
-                                    Get instant updates about your orders, exclusive deals, and special offers
-                                </p>
-
-                                {/* Enable button */}
-                                <Button color="secondary" startContent={<Bell size={20} />} onClick={handleNotificationOptIn}>
-                                    <span>Enable Notifications</span>
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
             {newContent && (
                 <Button aria-label="reload page" className="w-full" color="primary" onClick={handleReload}>
                     New content available

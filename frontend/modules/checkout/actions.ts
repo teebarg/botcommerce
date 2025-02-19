@@ -99,8 +99,8 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 
     const data: any = {
         shipping_address: {
-            first_name: formData.get("shipping_address.first_name"),
-            last_name: formData.get("shipping_address.last_name"),
+            firstname: formData.get("shipping_address.firstname"),
+            lastname: formData.get("shipping_address.lastname"),
             address_1: formData.get("shipping_address.address_1"),
             address_2: "",
             company: formData.get("shipping_address.company"),
@@ -118,8 +118,8 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 
     if (sameAsBilling !== "on")
         data.billing_address = {
-            first_name: formData.get("billing_address.first_name"),
-            last_name: formData.get("billing_address.last_name"),
+            firstname: formData.get("billing_address.firstname"),
+            lastname: formData.get("billing_address.lastname"),
             address_1: formData.get("billing_address.address_1"),
             address_2: "",
             company: formData.get("billing_address.company"),
@@ -130,7 +130,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         };
 
     try {
-        await updateCart(cartId, data);
+        await cartUpdate(data);
         revalidateTag("cart");
     } catch (error: any) {
         return error.toString();

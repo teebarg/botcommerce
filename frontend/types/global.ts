@@ -11,6 +11,16 @@ export type Customer = {
     shipping_addresses?: Record<string, any>[];
 };
 
+export type Review = {
+    id: number;
+    rating: number;
+    comment: string;
+    verified?: boolean;
+    product_id: number;
+    created_at: string;
+    user: Customer;
+};
+
 export type Product = {
     id: number;
     name: string;
@@ -25,6 +35,7 @@ export type Product = {
     inventory?: number;
     created_at?: string;
     collections: string[];
+    reviews?: Review[];
 };
 
 export type Brand = {
@@ -41,50 +52,6 @@ export type Collection = {
     slug: string;
     is_active?: boolean;
     created_at: string;
-};
-
-export type FeaturedProduct = {
-    id: string;
-    title: string;
-    slug: string;
-    thumbnail?: string;
-};
-
-export type ProductPreviewType = {
-    id: string;
-    title: string;
-    slug: string | null;
-    thumbnail: string | null;
-    created_at?: Date;
-    price?: {
-        calculated_price: string;
-        original_price: string;
-        difference: string;
-        price_type: "default" | "sale";
-    };
-    isFeatured?: boolean;
-};
-
-export type ProductCollectionWithPreviews = Omit<any, "products"> & {
-    products: ProductPreviewType[];
-};
-
-export type InfiniteProductPage = {
-    response: {
-        products: any[];
-        count: number;
-    };
-};
-
-export type ProductVariantInfo = Pick<any, "prices">;
-
-export type CartWithCheckoutStep = Omit<any, "beforeInsert" | "beforeUpdate" | "afterUpdateOrLoad"> & {
-    checkout_step: "address" | "delivery" | "payment";
-};
-
-export type ProductCategoryWithChildren = Omit<any, "category_children"> & {
-    category_children: any[];
-    category_parent?: any;
 };
 
 export type User = {
@@ -230,14 +197,4 @@ export type SiteConfig = {
     value: string;
     created_at: string;
     updated_at: string;
-};
-
-export type Review = {
-    id: number;
-    rating: number;
-    comment: string;
-    verified?: boolean;
-    product_id: number;
-    created_at: string;
-    user: Customer;
 };

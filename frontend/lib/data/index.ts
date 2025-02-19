@@ -470,7 +470,6 @@ export const getProductBySlug = async function (slug: string): Promise<any> {
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`, {
-            cache: "force-cache",
             method: "GET",
             headers: {
                 accept: "application/json",

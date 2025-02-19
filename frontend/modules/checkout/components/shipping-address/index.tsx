@@ -58,7 +58,7 @@ const ShippingAddress = ({
                 <Input
                     isRequired
                     autoComplete="given-name"
-                    data-testid="shipping-first-name-input"
+                    data-testid="shipping-firstname-input"
                     label="First name"
                     name="shipping_address.firstname"
                     value={formData["shipping_address.firstname"]}
@@ -67,7 +67,7 @@ const ShippingAddress = ({
                 <Input
                     isRequired
                     autoComplete="family-name"
-                    data-testid="shipping-last-name-input"
+                    data-testid="shipping-lastname-input"
                     label="Last name"
                     name="shipping_address.lastname"
                     value={formData["shipping_address.lastname"]}
