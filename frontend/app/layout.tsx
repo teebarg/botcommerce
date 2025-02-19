@@ -10,9 +10,9 @@ import { cn } from "@/lib/util/cn";
 import { siteConfig } from "@/lib/config";
 import ProgressBar from "@/components/ui/progress-bar";
 
-const Google = dynamic(() => import("./google"), { ssr: false });
-const NotificationProviders = dynamic(() => import("./notistack-providers"), { ssr: false });
-const OverlayClientProvider = dynamic(() => import("./overlay-providers"), { ssr: false });
+const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
+const NotificationProviders = dynamic(() => import("./notistack-providers"));
+const OverlayClientProvider = dynamic(() => import("./overlay-providers"));
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 

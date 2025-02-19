@@ -17,9 +17,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import ReviewsSection from "@/components/product/product-reviews";
 import { Skeleton } from "@/components/skeleton";
 
-type Props = {
-    params: { slug: string };
-};
+type Params = Promise<{ slug: string }>;
 
 export async function generateStaticParams() {
     const queryParams: SearchParams = {
@@ -33,8 +31,9 @@ export async function generateStaticParams() {
     }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const product = await getProductBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Params }) {
+    const { slug } = await params;
+    const product = await getProductBySlug(slug);
 
     if (!product || product.error) {
         return {};
@@ -51,8 +50,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
-export default async function ProductPage({ params }: Props) {
-    const product = await getProductBySlug(params.slug);
+export default async function ProductPage({ params }: { params: Params }) {
+    const { slug } = await params;
+    const product = await getProductBySlug(slug);
 
     if (!product || product.error) {
         notFound();

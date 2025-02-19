@@ -6,13 +6,18 @@ import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { DeliveryOption, Order, PaymentSession } from "types/global";
 
-export async function cartUpdate(data: any) {
-    const cartId = cookies().get("_cart_id")?.value;
+async function cartId() {
+    const cookieStore = await cookies();
+    return cookieStore.get("_cart_id")?.value;
+}
 
-    if (!cartId) return "No cartId cookie found";
+export async function cartUpdate(data: any) {
+    const id = await cartId();
+
+    if (!id) return "No cartId cookie found";
 
     try {
-        await updateCart(cartId, data);
+        await updateCart(id, data);
         revalidateTag("cart");
     } catch (error: any) {
         return error.toString();
@@ -20,12 +25,12 @@ export async function cartUpdate(data: any) {
 }
 
 export async function applyDiscount(code: string) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) return "No cartId cookie found";
+    if (!id) return "No cartId cookie found";
 
     try {
-        await updateCart(cartId, { discounts: [{ code }] }).then(() => {
+        await updateCart(id, { discounts: [{ code }] }).then(() => {
             revalidateTag("cart");
         });
     } catch (error: any) {
@@ -34,12 +39,12 @@ export async function applyDiscount(code: string) {
 }
 
 export async function applyGiftCard(code: string) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) return "No cartId cookie found";
+    if (!id) return "No cartId cookie found";
 
     try {
-        await updateCart(cartId, { gift_cards: [{ code }] }).then(() => {
+        await updateCart(id, { gift_cards: [{ code }] }).then(() => {
             revalidateTag("cart");
         });
     } catch (error: any) {
@@ -48,9 +53,9 @@ export async function applyGiftCard(code: string) {
 }
 
 export async function removeDiscount(code: string) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) return "No cartId cookie found";
+    if (!id) return "No cartId cookie found";
 
     try {
         // await deleteDiscount(cartId, code);
@@ -61,12 +66,12 @@ export async function removeDiscount(code: string) {
 }
 
 export async function removeGiftCard(codeToRemove: string, giftCards: any[]) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) return "No cartId cookie found";
+    if (!id) return "No cartId cookie found";
 
     try {
-        await updateCart(cartId, {
+        await updateCart(id, {
             gift_cards: [...giftCards].filter((gc) => gc.code !== codeToRemove).map((gc) => ({ code: gc.code })),
         }).then(() => {
             revalidateTag("cart");
@@ -93,9 +98,9 @@ export async function submitDiscountForm(currentState: unknown, formData: FormDa
 export async function setAddresses(currentState: unknown, formData: FormData) {
     if (!formData) return "No form data received";
 
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) return { message: "No cartId cookie found" };
+    if (!id) return { message: "No cartId cookie found" };
 
     const data: any = {
         shipping_address: {
@@ -140,12 +145,12 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 }
 
 export async function setShippingMethod(option: DeliveryOption) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) throw new Error("No cartId cookie found");
+    if (!id) throw new Error("No cartId cookie found");
 
     try {
-        await updateCart(cartId, { shipping_method: option });
+        await updateCart(id, { shipping_method: option });
         revalidateTag("cart");
     } catch (error: any) {
         throw error;
@@ -153,12 +158,12 @@ export async function setShippingMethod(option: DeliveryOption) {
 }
 
 export async function setPaymentMethod(method: PaymentSession) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) throw new Error("No cartId cookie found");
+    if (!id) throw new Error("No cartId cookie found");
 
     try {
-        await updateCart(cartId, { payment_session: method });
+        await updateCart(id, { payment_session: method });
         revalidateTag("cart");
     } catch (error: any) {
         throw error;
@@ -166,16 +171,17 @@ export async function setPaymentMethod(method: PaymentSession) {
 }
 
 export async function placeOrder() {
-    const cartId = cookies().get("_cart_id")?.value;
+    const id = await cartId();
 
-    if (!cartId) throw new Error("No cartId cookie found");
+    if (!id) throw new Error("No cartId cookie found");
 
     let order: Order;
 
     try {
-        order = await completeCart(cartId);
+        order = await completeCart(id);
         revalidateTag("cart");
-        cookies().set("_cart_id", "", { maxAge: -1 });
+        const cookieStore = await cookies();
+        cookieStore.set("_cart_id", "", { maxAge: -1 });
         redirect(`/order/confirmed/${order.order_id}`);
     } catch (error: any) {
         throw error;

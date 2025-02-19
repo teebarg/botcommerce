@@ -12,9 +12,9 @@ import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 
-const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
-const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+const BannerCarousel = dynamic(() => import("@components/carousel"));
+const ContactForm = dynamic(() => import("@modules/store/components/contact-form"));
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,

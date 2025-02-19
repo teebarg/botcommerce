@@ -3,9 +3,7 @@ import { retrieveOrder } from "@lib/data";
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template";
 import { notFound } from "next/navigation";
 
-type Props = {
-    params: { id: string };
-};
+type Params = Promise<{ id: string }>;
 
 async function getOrder(id: string) {
     const order = await retrieveOrder(id);
@@ -22,8 +20,9 @@ export const metadata: Metadata = {
     description: "You purchase was successful",
 };
 
-export default async function OrderConfirmedPage({ params }: Props) {
-    const order = await getOrder(params.id);
+export default async function OrderConfirmedPage({ params }: { params: Params }) {
+    const { id } = await params;
+    const order = await getOrder(id);
 
     return <OrderCompletedTemplate order={order} />;
 }

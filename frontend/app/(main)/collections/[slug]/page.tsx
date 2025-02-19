@@ -8,14 +8,13 @@ import React, { Suspense } from "react";
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { siteConfig } from "@/lib/config";
 
-type Props = {
-    params: { slug: string };
-    searchParams: {
-        page?: number;
-        sortBy?: SortOptions;
-        cat_ids?: string;
-    };
-};
+type Params = Promise<{ slug: string }>;
+// type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+type SearchParams = Promise<{
+    page?: number;
+    sortBy?: SortOptions;
+    cat_ids?: string;
+}>;
 
 export const revalidate = 6;
 
@@ -31,8 +30,9 @@ export async function generateStaticParams() {
     }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const collection = await getCollectionBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Params }) {
+    const { slug } = await params;
+    const collection = await getCollectionBySlug(slug);
 
     if (!collection) {
         notFound();
@@ -44,7 +44,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     } as Metadata;
 }
 
-export default async function CollectionPage({ params, searchParams }: Props) {
+export default async function CollectionPage(props: { params: Params; searchParams: SearchParams }) {
+    const params = await props.params;
+    const searchParams = await props.searchParams;
+
     const { sortBy, page } = searchParams;
 
     const collection = await getCollectionBySlug(params.slug).then((collection) => collection);

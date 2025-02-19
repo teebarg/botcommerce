@@ -59,7 +59,7 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
                     id="comment"
                     name="comment"
                     value={comment}
-                    onChange={(e) => setComment(e)}
+                    onChange={(e) => setComment(e.target.value)}
                     placeholder="Write your review here..."
                     className="mt-1"
                     isRequired

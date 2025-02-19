@@ -3,9 +3,14 @@
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
+async function token() {
+    const cookieStore = await cookies();
+    return cookieStore.get("access_token")?.value as string;
+}
+
 export async function indexProducts() {
     // const headers = getHeaders([]);
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/reindex`;
 
     try {
@@ -30,7 +35,7 @@ export async function indexProducts() {
 }
 
 export async function exportProducts() {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/export`;
 
     try {
@@ -52,7 +57,7 @@ export async function exportProducts() {
 }
 
 export async function uploadProductImage({ productId, formData }: { productId: string; formData: FormData }) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}/image`;
 
     try {
@@ -79,7 +84,7 @@ export async function uploadProductImage({ productId, formData }: { productId: s
 }
 
 export async function createProduct(currentState: unknown, formData: FormData) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const productId = formData.get("id") as string;
     const type = formData.get("type") as string;
 
@@ -122,7 +127,7 @@ export async function createProduct(currentState: unknown, formData: FormData) {
 }
 
 export async function deleteProduct(productId: string) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
 
     try {
@@ -147,7 +152,7 @@ export async function deleteProduct(productId: string) {
 }
 
 export async function createCategory(currentState: unknown, formData: FormData) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const categoryUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category`;
 
     const id = formData.get("id");
@@ -190,7 +195,7 @@ export async function createCategory(currentState: unknown, formData: FormData) 
 }
 
 export async function deleteCategory(id: number) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
 
     try {
@@ -215,7 +220,7 @@ export async function deleteCategory(id: number) {
 }
 
 export async function createBrand(currentState: unknown, formData: FormData) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const brandUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand`;
 
     const id = formData.get("id");
@@ -250,7 +255,7 @@ export async function createBrand(currentState: unknown, formData: FormData) {
 }
 
 export async function deleteBrand(brandId: string) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/${brandId}`;
 
     try {
@@ -275,7 +280,7 @@ export async function deleteBrand(brandId: string) {
 }
 
 export async function createCollection(currentState: unknown, formData: FormData) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const collectionUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection`;
 
     const id = formData.get("id");
@@ -310,7 +315,7 @@ export async function createCollection(currentState: unknown, formData: FormData
 }
 
 export async function updateCollection(collectionId: string, collectionData: any) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${collectionId}`;
 
     try {
@@ -337,7 +342,7 @@ export async function updateCollection(collectionId: string, collectionData: any
 }
 
 export async function deleteCollection(collectionId: string) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${collectionId}`;
 
     try {
@@ -362,7 +367,7 @@ export async function deleteCollection(collectionId: string) {
 }
 
 export async function getCollections(page: number = 1, limit: number = 10) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/?page=${page}&limit=${limit}`;
 
     try {
@@ -386,7 +391,7 @@ export async function getCollections(page: number = 1, limit: number = 10) {
 }
 
 export async function bulkUploadProducts({ formData }: { formData: FormData }) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {
@@ -410,7 +415,7 @@ export async function bulkUploadProducts({ formData }: { formData: FormData }) {
 }
 
 export async function createSiteConfig(currentState: unknown, formData: FormData) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const configUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config`;
 
     const id = formData.get("id");
@@ -445,7 +450,7 @@ export async function createSiteConfig(currentState: unknown, formData: FormData
 }
 
 export async function deleteSiteConfig(configId: string) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config/${configId}`;
 
     try {
@@ -470,7 +475,7 @@ export async function deleteSiteConfig(configId: string) {
 }
 
 export async function updateReview(currentState: unknown, formData: FormData) {
-    const accessToken = cookies().get("access_token")?.value as string;
+    const accessToken = await token();
 
     const id = formData.get("id");
 
@@ -502,12 +507,13 @@ export async function updateReview(currentState: unknown, formData: FormData) {
 }
 
 export async function deleteReview(id: string) {
+    const accessToken = await token();
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/${id}`, {
             method: "DELETE",
             headers: {
                 accept: "application/json",
-                "X-Auth": cookies().get("access_token")?.value as string,
+                "X-Auth": accessToken,
             },
         });
 

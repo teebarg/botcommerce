@@ -1,17 +1,6 @@
 import React from "react";
-import { SortOptions } from "types/global";
 
-type Props = {
-    children: React.ReactNode;
-    params?: { slug: string };
-    searchParams?: {
-        page?: number;
-        sortBy?: SortOptions;
-        cat_ids?: string;
-    };
-};
-
-export default async function CheckoutLayout({ children }: Props) {
+export default async function CheckoutLayout({ children }: { children: React.ReactNode }) {
     return (
         <React.Fragment>
             <div className="w-full md:px-2 py-0 md:py-4 mx-auto max-w-8xl">

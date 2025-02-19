@@ -6,7 +6,8 @@ import { getCart } from "@lib/data";
 import { Cart } from "types/global";
 
 const CheckoutSummary = async () => {
-    const cartId = cookies().get("_cart_id")?.value;
+    const cookieStore = await cookies();
+    const cartId = cookieStore.get("_cart_id")?.value;
 
     if (!cartId) {
         return null;

@@ -12,11 +12,12 @@ import { generateId } from "@lib/util/util";
  * @example
  */
 export async function getOrSetCart() {
-    let cartId = cookies().get("_cart_id")?.value;
+    const cookieStore = await cookies();
+    let cartId = cookieStore.get("_cart_id")?.value;
 
     if (!cartId) {
         cartId = generateId();
-        cookies().set("_cart_id", cartId, {
+        cookieStore.set("_cart_id", cartId, {
             maxAge: 60 * 60 * 24 * 7,
             httpOnly: true,
             sameSite: "strict",
@@ -29,7 +30,8 @@ export async function getOrSetCart() {
 }
 
 export async function retrieveCart() {
-    const cartId = cookies().get("_cart_id")?.value;
+    const cookieStore = await cookies();
+    const cartId = cookieStore.get("_cart_id")?.value;
 
     if (!cartId) {
         return null;
@@ -60,7 +62,8 @@ export async function addToCart({ product_id, quantity }: { product_id: string; 
 }
 
 export async function updateLineItem({ lineId, quantity }: { lineId: string; quantity: number }) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const cookieStore = await cookies();
+    const cartId = cookieStore.get("_cart_id")?.value;
 
     if (!cartId) {
         return "Missing cart ID";
@@ -79,7 +82,8 @@ export async function updateLineItem({ lineId, quantity }: { lineId: string; qua
 }
 
 export async function deleteLineItem(lineId: string) {
-    const cartId = cookies().get("_cart_id")?.value;
+    const cookieStore = await cookies();
+    const cartId = cookieStore.get("_cart_id")?.value;
 
     if (!cartId) {
         return "Missing cart ID";

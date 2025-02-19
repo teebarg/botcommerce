@@ -16,7 +16,7 @@ cat e2e/.env.example >> .env
 
 and configuring the `.env` file from there. There are more details below about what the test values correspond to and how to set them. But we mention that
 
--   `CLIENT_SERVER` - is the server the next server is listening on
+- `CLIENT_SERVER` - is the server the next server is listening on
 
 ## Playwright
 
@@ -32,27 +32,27 @@ Note that **these tests drop and reset the database** after each test run. This 
 
 ### Environment variables
 
--   `TEST_POSTGRES_USER` - user for connecting to the test database, for example, `postgres`
--   `TEST_POSTGRES_PASSWORD` - password for connecting to the test database, for example `my_secret_password`
--   `TEST_POSTGRES_DATABASE` - name of the test database, must start with the prefix `test*`, for example `test_db`
--   `TEST_POSTGRES_HOST` - optional - host for the postgres database, defaults to `localhost`
--   `TEST_POSTGREST_PORT` - optional - host for the postgres
--   `PRODUCTION_POSTGRES_DATABASE` - name of the production database, for example `db`
+- `TEST_POSTGRES_USER` - user for connecting to the test database, for example, `postgres`
+- `TEST_POSTGRES_PASSWORD` - password for connecting to the test database, for example `my_secret_password`
+- `TEST_POSTGRES_DATABASE` - name of the test database, must start with the prefix `test*`, for example `test_db`
+- `TEST_POSTGRES_HOST` - optional - host for the postgres database, defaults to `localhost`
+- `TEST_POSTGREST_PORT` - optional - host for the postgres
+- `PRODUCTION_POSTGRES_DATABASE` - name of the production database, for example `db`
 
 in addition, there are environment variables for connecting to the database as a superuser, so we can efficiently reset the database.
 
--   `PGHOST` - host for the postgres instance
--   `PGPORT` - port for the postgres instance
--   `PGUSER` - superuser for the postgres instance
--   `PGPASSWORD` - superuser password for the postgres instance
--   `PGDATABASE` - database we connect to while updating the other databases
+- `PGHOST` - host for the postgres instance
+- `PGPORT` - port for the postgres instance
+- `PGUSER` - superuser for the postgres instance
+- `PGPASSWORD` - superuser password for the postgres instance
+- `PGDATABASE` - database we connect to while updating the other databases
 
 ### Test Database Failsafes
 
 There are a few failsafes to ensure the test and production databases don't get mixed up. This includes:
 
--   Ensuring the production database doesn't have the same name as the test database
--   Ensuring the test database starts with the prefix `test_`
+- Ensuring the production database doesn't have the same name as the test database
+- Ensuring the test database starts with the prefix `test_`
 
 Note running the test suite will trigger database drops and recreations of the test database.
 

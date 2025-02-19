@@ -12,7 +12,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
 
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 interface ComponentProps {
     query?: string;

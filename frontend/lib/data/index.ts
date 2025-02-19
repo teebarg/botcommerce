@@ -10,14 +10,15 @@ import { revalidateTag } from "next/cache";
  * @param tags
  * @returns custom headers for API requests
  */
-const getHeaders = (tags: string[] = []) => {
+const getHeaders = async (tags: string[] = []) => {
     const headers = {
         next: {
             tags,
         },
     } as Record<string, any>;
 
-    const token = cookies().get("access_token")?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
 
     headers["X-Auth"] = token ?? "";
 
@@ -43,14 +44,13 @@ export async function createCart(data = {}) {
 }
 
 export async function updateCart(cartId: string, data: any) {
-    const headers = getHeaders(["cart"]);
+    const headers = await getHeaders(["cart"]);
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update-cart-details`;
     const response = await fetch(url, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
             ...headers,
-            cartId,
         },
         body: JSON.stringify(data),
     });
@@ -63,7 +63,7 @@ export async function updateCart(cartId: string, data: any) {
 }
 
 export const getCart = cache(async function (cartId: string) {
-    const headers = getHeaders(["cart"]);
+    const headers = await getHeaders(["cart"]);
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
     const response = await fetch(url, {
         method: "GET",
@@ -83,7 +83,7 @@ export const getCart = cache(async function (cartId: string) {
 
 export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
     try {
-        const headers = getHeaders(["cart"]);
+        const headers = await getHeaders(["cart"]);
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`;
         const response = await fetch(url, {
             method: "POST",
@@ -106,7 +106,7 @@ export async function addItem({ cartId, product_id, quantity }: { cartId: string
 }
 
 export async function updateItem({ cartId, lineId, quantity }: { cartId: string; lineId: string; quantity: number }) {
-    const headers = getHeaders(["cart"]);
+    const headers = await getHeaders(["cart"]);
 
     try {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
@@ -131,7 +131,7 @@ export async function updateItem({ cartId, lineId, quantity }: { cartId: string;
 }
 
 export async function removeItem({ cartId, lineId }: { cartId: string; lineId: string }) {
-    const headers = getHeaders(["cart"]);
+    const headers = await getHeaders(["cart"]);
 
     try {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/${lineId}`;
@@ -164,7 +164,7 @@ export async function setPaymentSession({ cartId, providerId }: { cartId: string
 }
 
 export async function completeCart(cartId: string) {
-    const headers = getHeaders(["cart"]);
+    const headers = await getHeaders(["cart"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`, {
@@ -188,7 +188,7 @@ export async function completeCart(cartId: string) {
 
 // Order actions
 export const retrieveOrder = cache(async function (id: string) {
-    const headers = getHeaders(["order"]);
+    const headers = await getHeaders(["order"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/${id}`, {
@@ -230,7 +230,8 @@ export async function getToken(credentials: any) {
         const { access_token } = await response.json();
 
         if (access_token) {
-            cookies().set("access_token", access_token, {
+            const cookieStore = await cookies();
+            cookieStore.set("access_token", access_token, {
                 maxAge: 60 * 60 * 24 * 7, // 7 days
                 httpOnly: true,
                 sameSite: "strict",
@@ -245,7 +246,7 @@ export async function getToken(credentials: any) {
 }
 
 export async function authenticate(credentials: any) {
-    const headers = getHeaders(["auth"]);
+    const headers = await getHeaders(["auth"]);
 
     // return client.auth
     //     .authenticate(credentials, headers)
@@ -255,7 +256,7 @@ export async function authenticate(credentials: any) {
 
 // Customer actions
 export async function getCustomer() {
-    const headers = getHeaders(["customer"]);
+    const headers = await getHeaders(["customer"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`, {
@@ -297,7 +298,7 @@ export async function logOut() {
 
 // Customer actions
 export async function getAdresses() {
-    const headers = getHeaders(["addresses"]);
+    const headers = await getHeaders(["addresses"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/`, {
@@ -329,7 +330,7 @@ export async function createCustomer(data: any) {
 }
 
 export async function updateCustomer(data: any) {
-    const headers = getHeaders(["customer"]);
+    const headers = await getHeaders(["customer"]);
 
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`, {
@@ -352,7 +353,7 @@ export async function updateCustomer(data: any) {
 }
 
 export async function addShippingAddress(createData: any) {
-    const headers = getHeaders(["addresses"]);
+    const headers = await getHeaders(["addresses"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/`, {
@@ -375,7 +376,7 @@ export async function addShippingAddress(createData: any) {
 }
 
 export async function deleteShippingAddress(addressId: string | number) {
-    const headers = getHeaders(["customer"]);
+    const headers = await getHeaders(["customer"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/${addressId}`, {
@@ -397,7 +398,7 @@ export async function deleteShippingAddress(addressId: string | number) {
 }
 
 export async function updateShippingAddress(addressId: string, updateData: any) {
-    const headers = getHeaders(["addresses"]);
+    const headers = await getHeaders(["addresses"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/${addressId}`, {
@@ -420,7 +421,7 @@ export async function updateShippingAddress(addressId: string, updateData: any) 
 }
 
 export async function updateBillingAddress(updateData: any) {
-    const headers = getHeaders(["addresses"]);
+    const headers = await getHeaders(["addresses"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/billing_address`, {
@@ -444,7 +445,7 @@ export async function updateBillingAddress(updateData: any) {
 }
 
 export const listCustomerOrders = cache(async function (limit: number = 10, offset: number = 0) {
-    const headers = getHeaders(["orders"]);
+    const headers = await getHeaders(["orders"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`, {
@@ -466,7 +467,7 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
 });
 
 export const getProductBySlug = async function (slug: string): Promise<any> {
-    const headers = getHeaders(["product"]);
+    const headers = await getHeaders(["product"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`, {
@@ -488,7 +489,7 @@ export const getProductBySlug = async function (slug: string): Promise<any> {
 };
 
 export const getProductReviews = async (product_id?: number, page: number = 1, limit: number = 20): Promise<any> => {
-    const headers = getHeaders(["reviews"]);
+    const headers = await getHeaders(["reviews"]);
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });
 
     try {
@@ -512,7 +513,7 @@ export const getProductReviews = async (product_id?: number, page: number = 1, l
 
 export const getProduct = cache(async function (slug: string): Promise<any> {
     try {
-        const headers = getHeaders(["products"]);
+        const headers = await getHeaders(["products"]);
 
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
         const response = await fetch(url, {
@@ -557,7 +558,7 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
 
 export const getWishlist = cache(async function (): Promise<any> {
     try {
-        const headers = getHeaders(["wishlist"]);
+        const headers = await getHeaders(["wishlist"]);
 
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
         const response = await fetch(url, {
@@ -578,7 +579,7 @@ export const getWishlist = cache(async function (): Promise<any> {
 });
 
 export async function addWishlist(product_id: number) {
-    const headers = getHeaders(["wishlist"]);
+    const headers = await getHeaders(["wishlist"]);
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
     const response = await fetch(url, {
         method: "POST",
@@ -597,7 +598,7 @@ export async function addWishlist(product_id: number) {
 }
 
 export async function removeWishlist(product_id: number) {
-    const headers = getHeaders(["wishlist"]);
+    const headers = await getHeaders(["wishlist"]);
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist/${product_id}`;
     const response = await fetch(url, {
         method: "DELETE",
@@ -754,7 +755,7 @@ export const listCategories = cache(async function () {
 });
 
 export const getActivites = cache(async function (limit: number = 10) {
-    const headers = getHeaders(["activities"]);
+    const headers = await getHeaders(["activities"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities`, {
@@ -776,7 +777,7 @@ export const getActivites = cache(async function (limit: number = 10) {
 });
 
 export async function deleteActivities(id: string | number) {
-    const headers = getHeaders(["activities"]);
+    const headers = await getHeaders(["activities"]);
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/${id}`, {
@@ -799,7 +800,7 @@ export async function deleteActivities(id: string | number) {
 
 export const getSiteConfigs = async (skip: number = 0, limit: number = 20): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config/`, { skip, limit });
-    const headers = getHeaders(["configs"]);
+    const headers = await getHeaders(["configs"]);
 
     revalidateTag("configs");
 

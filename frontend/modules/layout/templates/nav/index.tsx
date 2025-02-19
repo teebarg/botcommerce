@@ -14,7 +14,6 @@ import LocalizedClientLink from "@/components/ui/link";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
-        ssr: false,
         loading: () => <div className="w-6 h-6" />,
     });
 

@@ -4,14 +4,15 @@ import { addWishlist, removeWishlist } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
-const getHeaders = (tags: string[] = []) => {
+const getHeaders = async (tags: string[] = []) => {
     const headers = {
         next: {
             tags,
         },
     } as Record<string, any>;
 
-    const token = cookies().get("access_token")?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
 
     headers["X-Auth"] = token ?? "";
 
@@ -41,7 +42,7 @@ export async function addWish(id: number) {
 }
 
 export async function addReview(product_id: number, rating: number, comment: string) {
-    const headers = getHeaders(["reviews"]);
+    const headers = await getHeaders(["reviews"]);
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`;
 
     try {

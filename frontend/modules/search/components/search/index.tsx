@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Product, SearchParams } from "@/types/global";
 import NoProductsFound from "@/modules/products/components/no-products";
 import { buildUrl, debounce } from "@/lib/util/util";
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 interface Props {
     className?: string;
