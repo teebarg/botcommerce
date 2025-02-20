@@ -30,6 +30,7 @@ async function getLandingProducts(collection: string, limit: number = 4): Promis
     };
 
     const { products } = await productSearch(queryParams);
+
     return products;
 }
 
@@ -151,10 +152,10 @@ export default async function Home() {
                 </div>
                 <div className="relative py-2">
                     <PromotionalBanner
-                        title="Big Sale on Top Brands!"
-                        subtitle="Get up to 50% OFF on select products."
-                        outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
                         btnClass="text-purple-600"
+                        outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                        subtitle="Get up to 50% OFF on select products."
+                        title="Big Sale on Top Brands!"
                     />
                 </div>
                 <div className="bg-content1">
@@ -183,10 +184,10 @@ export default async function Home() {
                     </div>
                 </div>
                 <PromotionalBanner
-                    title="Big Sale on Top Brands!"
-                    subtitle="Get up to 50% OFF on select products."
-                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
                     btnClass="text-purple-600"
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    subtitle="Get up to 50% OFF on select products."
+                    title="Big Sale on Top Brands!"
                 />
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
@@ -200,10 +201,10 @@ export default async function Home() {
                 </div>
                 <div className="relative">
                     <PromotionalBanner
-                        title="Big Sale on Top Brands!"
-                        subtitle="Get up to 50% OFF on select products."
-                        outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl"
                         btnClass="text-purple-600"
+                        outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl"
+                        subtitle="Get up to 50% OFF on select products."
+                        title="Big Sale on Top Brands!"
                     />
                 </div>
                 <div className="bg-content1 py-12">

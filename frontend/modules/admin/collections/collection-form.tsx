@@ -1,9 +1,7 @@
 "use client";
 
-import React, { forwardRef, useRef } from "react";
-import { FormButton } from "@modules/common/components/form-button";
+import React, { forwardRef, useActionState, useRef } from "react";
 import { useSnackbar } from "notistack";
-import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 
@@ -27,7 +25,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     const isCreate = type === "create";
 
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(createCollection, {
+    const [state, formAction, isPending] = useActionState(createCollection, {
         success: false,
         message: "",
         data: null,
@@ -61,12 +59,12 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                         </div>
                     </div>
                     <div className="flex flex-shrink-0 justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
-                        <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                        <Button aria-label="cancel" className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
                             Cancel
                         </Button>
-                        <FormButton className="min-w-32" color="primary" variant="shadow">
+                        <Button aria-label="update" className="min-w-32" color="primary" isLoading={isPending} type="submit" variant="shadow">
                             {isCreate ? "Submit" : "Update"}
-                        </FormButton>
+                        </Button>
                     </div>
                 </form>
             </div>

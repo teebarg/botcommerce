@@ -1,4 +1,3 @@
-import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductBySlug, productSearch } from "@lib/data";
 import { Product, SearchParams } from "types/global";

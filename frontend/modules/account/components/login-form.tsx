@@ -1,20 +1,20 @@
-import { useFormState } from "react-dom";
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
-import { FormButton } from "@modules/common/components/form-button";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { signIn } from "@modules/auth/action";
 import { Input } from "@components/ui/input";
+import { useActionState } from "react";
 
 import { GoogleLogin } from "./google";
 
 import LocalizedClientLink from "@/components/ui/link";
+import { Button } from "@/components/ui/button";
 
 type Props = {};
 
 const CheckoutLoginForm: React.FC<Props> = () => {
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(signIn, null);
+    const [state, formAction, isPending] = useActionState(signIn, null);
 
     useWatch(state, () => {
         if (state?.error) {
@@ -33,9 +33,17 @@ const CheckoutLoginForm: React.FC<Props> = () => {
                     <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
                     <Input isRequired data-testid="password-input" label="Password" name="password" type="password" />
                 </div>
-                <FormButton className="w-full mt-6" color="primary" data-testid="sign-in-button" size="md">
+                <Button
+                    aria-label="sign in"
+                    className="w-full mt-6"
+                    color="primary"
+                    data-testid="sign-in-button"
+                    isLoading={isPending}
+                    size="md"
+                    type="submit"
+                >
                     Sign in
-                </FormButton>
+                </Button>
             </form>
             <span className="text-default-900 text-sm mt-2 block">
                 Not a member?{" "}

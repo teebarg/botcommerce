@@ -81,6 +81,7 @@ export default function ProductActions({
             </div>
 
             <Button
+                aria-label="add to cart"
                 className={cn("w-full", btnClassName)}
                 color="primary"
                 data-testid="add-product-button"

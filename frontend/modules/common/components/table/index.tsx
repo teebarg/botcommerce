@@ -107,17 +107,31 @@ const Table: React.FC<Props> = ({
                         </div>
                         <div className="flex items-center gap-3">
                             {canAdd && (
-                                <Button color="primary" endContent={<Plus />} onClick={() => state.open()}>
+                                <Button aria-label="add new" color="primary" endContent={<Plus />} onClick={() => state.open()}>
                                     Add New
                                 </Button>
                             )}
                             {canExport && (
-                                <Button className="min-w-28" color="secondary" disabled={isExporting} isLoading={isExporting} onClick={handleExport}>
+                                <Button
+                                    aria-label="export"
+                                    className="min-w-28"
+                                    color="secondary"
+                                    disabled={isExporting}
+                                    isLoading={isExporting}
+                                    onClick={handleExport}
+                                >
                                     Export
                                 </Button>
                             )}
                             {canIndex && (
-                                <Button className="min-w-28" color="secondary" disabled={isIndexing} isLoading={isIndexing} onClick={handleIndex}>
+                                <Button
+                                    aria-label="index"
+                                    className="min-w-28"
+                                    color="secondary"
+                                    disabled={isIndexing}
+                                    isLoading={isIndexing}
+                                    onClick={handleIndex}
+                                >
                                     Index
                                 </Button>
                             )}

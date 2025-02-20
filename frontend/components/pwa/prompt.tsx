@@ -64,7 +64,11 @@ function InstallPrompt() {
             <div className="fixed bottom-4 left-4 right-4 md:max-w-[25rem] z-50">
                 <div className="bg-content2 rounded-lg shadow-xl p-8">
                     {/* Close button */}
-                    <button className="absolute top-2 right-2 text-default-500 hover:text-default-500/50" onClick={() => setDeferredPrompt(null)}>
+                    <button
+                        aria-label="cancel"
+                        className="absolute top-2 right-2 text-default-500 hover:text-default-500/50"
+                        onClick={() => setDeferredPrompt(null)}
+                    >
                         <CancelIcon className="h-6 w-6" />
                     </button>
 
@@ -77,7 +81,7 @@ function InstallPrompt() {
                             <p className="text-sm text-default-500 mb-3">Get faster checkout, exclusive offers and real-time order tracking</p>
 
                             {/* Install button */}
-                            <Button className="w-full space-x-2" color="primary" onClick={handleInstallClick}>
+                            <Button aria-label="install" className="w-full space-x-2" color="primary" onClick={handleInstallClick}>
                                 {/* <Download size={20} /> */}
                                 <span>Add to Home Screen</span>
                             </Button>

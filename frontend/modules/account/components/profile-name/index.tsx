@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useFormState } from "react-dom";
+import React, { useActionState, useEffect } from "react";
 import { updateCustomerName } from "@modules/account/actions";
 import { Input } from "@components/ui/input";
 
@@ -14,7 +13,7 @@ type MyInformationProps = {
 const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
     const [successState, setSuccessState] = React.useState(false);
 
-    const [state, formAction] = useFormState(updateCustomerName, {
+    const [state, formAction] = useActionState(updateCustomerName, {
         error: false,
         success: false,
     });

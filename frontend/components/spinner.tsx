@@ -19,7 +19,7 @@ const Spinner: React.FC<Props> = ({ size = "sm", color = "primary", className })
     };
 
     return (
-        <div aria-label="spinner" className={cn("inline-flex", className)}>
+        <div aria-label="spinner" className={cn("", className)}>
             <div
                 className={cn("relative", {
                     "w-5 h-5": size === "sm",
@@ -29,13 +29,13 @@ const Spinner: React.FC<Props> = ({ size = "sm", color = "primary", className })
             >
                 <i
                     className={cn(
-                        "absolute w-full h-full rounded-full animate-spinner-ease-spin border-solid border-t-transparent border-l-transparent border-r-transparent border-[3px]",
+                        "absolute inset-0 w-full h-full rounded-full animate-spinner-ease-spin border-solid border-t-transparent border-l-transparent border-r-transparent border-[3px]",
                         colorClass[color]
                     )}
                 />
                 <i
                     className={cn(
-                        "absolute w-full h-full rounded-full opacity-75 animate-spinner-linear-spin border-dotted border-t-transparent border-l-transparent border-r-transparent border-[3px]",
+                        "absolute inset-0 w-full h-full rounded-full opacity-75 animate-spinner-linear-spin border-dotted border-t-transparent border-l-transparent border-r-transparent border-[3px]",
                         colorClass[color]
                     )}
                 />

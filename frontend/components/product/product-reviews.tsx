@@ -1,10 +1,11 @@
 import React from "react";
 import { Star } from "nui-react-icons";
 
+import ReviewForm from "./review-form";
+
 import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { Product, Review } from "@/types/global";
-import ReviewForm from "./review-form";
 import { timeAgo } from "@/lib/util/util";
 
 interface Prop {

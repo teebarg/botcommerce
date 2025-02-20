@@ -52,7 +52,9 @@ const Cookie: FC<CookieProps> = () => {
                         >
                             Accept All
                         </Button>
-                        <Button className="border-2 w-full bg-transparent border-default-100 font-medium">Reject All</Button>
+                        <Button aria-label="reject" className="border-2 w-full bg-transparent border-default-100 font-medium">
+                            Reject All
+                        </Button>
                     </div>
                 </div>
             </div>

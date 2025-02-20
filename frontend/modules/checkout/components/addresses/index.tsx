@@ -2,16 +2,16 @@
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Pencil } from "nui-react-icons";
-import { useFormState } from "react-dom";
 import compareAddresses from "@lib/util/compare-addresses";
-import { FormButton } from "@modules/common/components/form-button";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { Cart } from "types/global";
 
 import ShippingAddress from "../shipping-address";
 import { setAddresses } from "../../actions";
 import ErrorMessage from "../error-message";
+
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
 const Addresses = ({
     cart,
@@ -34,7 +34,7 @@ const Addresses = ({
         router.push(pathname + "?step=address");
     };
 
-    const [message, formAction] = useFormState(setAddresses, null);
+    const [message, formAction, isPending] = useActionState(setAddresses, null);
 
     return (
         <div>
@@ -42,7 +42,7 @@ const Addresses = ({
             <div className="bg-content1 shadow-medium p-6 rounded border-l-2 border-l-indigo-500">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
                         <span className="font-medium">Shipping Address</span>
                     </div>
                     {!isOpen && cart?.shipping_address && (
@@ -52,12 +52,12 @@ const Addresses = ({
                     )}
                 </div>
 
-                <form className={cn("hidden", isOpen && "block")} action={formAction}>
+                <form action={formAction} className={cn("hidden", isOpen && "block")}>
                     <ShippingAddress cart={cart} checked={sameAsSBilling} customer={customer} onChange={() => setSameAsSBilling(!sameAsSBilling)} />
                     <input readOnly checked={true} className="hidden" name="same_as_billing" type="checkbox" />
-                    <FormButton className="mt-6" data-testid="submit-address-button">
+                    <Button aria-label="continue" className="mt-6" data-testid="submit-address-button" isLoading={isPending} type="submit">
                         Continue to delivery
-                    </FormButton>
+                    </Button>
                     <ErrorMessage data-testid="address-error-message" error={message} />
                 </form>
                 {/* Account Information Section */}

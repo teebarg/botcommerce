@@ -1,11 +1,12 @@
-import { Spinner, Trash } from "nui-react-icons";
+import { Trash } from "nui-react-icons";
 import { useState } from "react";
 import { deleteLineItem } from "@modules/cart/actions";
 import { useSnackbar } from "notistack";
 
 import { cn } from "@/lib/util/cn";
+import { Button } from "@/components/ui/button";
 
-const DeleteButton = ({ id, children, className }: { id: string; children?: React.ReactNode; className?: string }) => {
+const CartDeleteButton = ({ id, children, className }: { id: string; children?: React.ReactNode; className?: string }) => {
     const { enqueueSnackbar } = useSnackbar();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
@@ -21,13 +22,12 @@ const DeleteButton = ({ id, children, className }: { id: string; children?: Reac
     };
 
     return (
-        <div className={cn("flex items-center justify-between text-sm", className)}>
-            <button aria-label="delete" className="flex gap-x-1 text-red-500 hover:text-default-900 cursor-pointer" onClick={() => handleDelete(id)}>
-                {isDeleting ? <Spinner className="animate-spin" /> : <Trash />}
-                <span>{children}</span>
-            </button>
+        <div className={cn("text-sm", className)}>
+            <Button aria-label="delete" isLoading={isDeleting} startContent={<Trash />} onClick={() => handleDelete(id)}>
+                {children}
+            </Button>
         </div>
     );
 };
 
-export default DeleteButton;
+export default CartDeleteButton;

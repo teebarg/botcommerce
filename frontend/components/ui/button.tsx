@@ -1,6 +1,6 @@
 import * as React from "react";
-
-import { Spinner } from "../spinner";
+// import { Spinner } from "../spinner";
+import { Spinner } from "nui-react-icons";
 
 import { cn } from "@/lib/util/cn";
 
@@ -37,7 +37,7 @@ const buttonConfig: any = {
     },
 
     // Sizes
-    sm: "px-4 min-w-20 h-10 text-sm gap-2 rounded-lg",
+    sm: "px-4 min-w-20 h-10 text-sm gap-1 rounded-lg",
     md: "px-6 min-w-20 h-12 text-base gap-2 rounded-xl",
     lg: "px-8 min-w-24 h-14 text-lg gap-3 rounded-1xl",
 };
@@ -75,8 +75,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <button
                 ref={ref}
                 className={cn(
-                    "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap text",
-                    "font-medium overflow-hidden outline-none transition transition-transform-colors-opacity hover:opacity-80",
+                    "z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap",
+                    "font-medium overflow-hidden outline-none transition hover:opacity-80",
                     buttonConfig[size],
                     variant === "shadow" && buttonConfig[color].shadow,
                     disabled ? "pointer-events-none opacity-50" : "",
@@ -88,10 +88,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 type={type} // Explicitly forward the type prop
                 {...props}
             >
-                {isLoading && <Spinner className="mr-2" color="current" />}
-                {startContent}
-                {children}
-                {endContent}
+                {isLoading ? (
+                    <>
+                        <Spinner className="animate-spin" />
+                        Loading...
+                    </>
+                ) : (
+                    <>
+                        {startContent}
+                        {children}
+                        {endContent}
+                    </>
+                )}
             </button>
         );
     }

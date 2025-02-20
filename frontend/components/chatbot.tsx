@@ -144,10 +144,10 @@ const ChatBot: React.FC<Props> = () => {
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
                         <h1 className="text-white text-lg font-semibold">Virtual Assistant</h1>
                         <div className="flex items-center gap-4">
-                            <button className="text-gray-400 hover:text-white transition" onClick={minimize}>
+                            <button aria-label="minimize chat" className="text-gray-400 hover:text-white transition" onClick={minimize}>
                                 <RefreshCcw className="w-5 h-5" />
                             </button>
-                            <button className="text-gray-400 hover:text-white transition" onClick={toggleChat}>
+                            <button aria-label="close chat" className="text-gray-400 hover:text-white transition" onClick={toggleChat}>
                                 {" "}
                                 <XMark className="w-5 h-5" />
                             </button>
@@ -178,7 +178,7 @@ const ChatBot: React.FC<Props> = () => {
                     {/* Input Area */}
                     <div className="p-4 border-t border-gray-800">
                         <div className="flex items-center gap-2">
-                            <button className="p-2 hover:bg-zinc-700 rounded-full">
+                            <button aria-label="smiley" className="p-2 hover:bg-zinc-700 rounded-full">
                                 <Smiley />
                             </button>
                             <input

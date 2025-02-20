@@ -2,23 +2,22 @@
 
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
-import { FormButton } from "@modules/common/components/form-button";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@modules/account/components/google";
-import { useFormState } from "react-dom";
-import React from "react";
+import React, { useActionState } from "react";
 import { Input } from "@components/ui/input";
 
 import { signUp } from "../action";
 
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
+import { Button } from "@/components/ui/button";
 
 type Props = {};
 
 const SignUpForm: React.FC<Props> = () => {
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(signUp, null);
+    const [state, formAction, isPending] = useActionState(signUp, null);
 
     useWatch(state, () => {
         if (state?.error) {
@@ -53,9 +52,17 @@ const SignUpForm: React.FC<Props> = () => {
                     </LocalizedClientLink>
                     .
                 </span>
-                <FormButton className="w-full mt-6" color="warning" data-testid="register-button" size="md">
+                <Button
+                    aria-label="join us"
+                    className="w-full mt-6"
+                    color="warning"
+                    data-testid="register-button"
+                    isLoading={isPending}
+                    size="md"
+                    type="submit"
+                >
                     Join Us
-                </FormButton>
+                </Button>
             </form>
             <hr className="tb-divider my-6" />
             <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>

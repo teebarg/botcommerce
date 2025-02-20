@@ -33,9 +33,17 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, customer, "data-tes
         case "paystack":
             return <ManualTestPaymentButton customer={customer} data-testid={dataTestId} notReady={notReady} />;
         case "stripe":
-            return <Button disabled>Continue to payment</Button>;
+            return (
+                <Button disabled aria-label="continue">
+                    Continue to payment
+                </Button>
+            );
         default:
-            return <Button disabled>Select a payment method</Button>;
+            return (
+                <Button disabled aria-label="default">
+                    Select a payment method
+                </Button>
+            );
     }
 };
 
@@ -48,7 +56,7 @@ const GiftCardPaymentButton = () => {
     };
 
     return (
-        <Button data-testid="submit-order-button" isLoading={submitting} onClick={handleOrder}>
+        <Button aria-label="place order" data-testid="submit-order-button" isLoading={submitting} onClick={handleOrder}>
             Place order
         </Button>
     );

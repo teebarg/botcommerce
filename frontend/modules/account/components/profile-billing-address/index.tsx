@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
-import { useFormState } from "react-dom";
+import React, { useActionState, useEffect, useMemo } from "react";
 import { updateCustomerBillingAddress } from "@modules/account/actions";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
@@ -17,7 +16,7 @@ type MyInformationProps = {
 const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
     const [successState, setSuccessState] = React.useState(false);
 
-    const [state, formAction] = useFormState(updateCustomerBillingAddress, {
+    const [state, formAction] = useActionState(updateCustomerBillingAddress, {
         error: false,
         success: false,
     });
@@ -94,7 +93,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                     <div className="grid grid-cols-[144px_1fr] gap-x-2">
                         <Input
                             isRequired
-                            data-testid="billing-postcal-code-input"
+                            data-testid="billing-postal-code-input"
                             defaultValue={customer.billing_address?.postal_code || undefined}
                             label="Postal code"
                             name="billing_address.postal_code"

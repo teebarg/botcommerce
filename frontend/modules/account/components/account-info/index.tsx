@@ -39,7 +39,7 @@ const AccountInfo = ({
 
     useEffect(() => {
         if (isSuccess) {
-            enqueueSnackbar(`${label} updated succesfully`, { variant: "success" });
+            enqueueSnackbar(`${label} updated successfully`, { variant: "success" });
             close();
 
             return;
@@ -87,7 +87,7 @@ const AccountInfo = ({
                 <div className="flex flex-col gap-y-2 py-4">
                     <div>{children}</div>
                     <div className="flex items-center justify-end mt-2">
-                        <Button className="w-full sm:max-w-[140px]" data-testid="save-button" isLoading={pending} type="submit">
+                        <Button aria-label="save" className="w-full sm:max-w-[140px]" data-testid="save-button" isLoading={pending} type="submit">
                             Save changes
                         </Button>
                     </div>

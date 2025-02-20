@@ -76,7 +76,7 @@ export default async function Checkout() {
                 </div>
                 {/* Header */}
                 <header className="flex justify-between items-center p-4">
-                    <LocalizedClientLink href="/" className="text-xl font-semibold">
+                    <LocalizedClientLink className="text-xl font-semibold" href="/">
                         {siteConfig.name}
                     </LocalizedClientLink>
                     <ThemeButton />
@@ -89,9 +89,9 @@ export default async function Checkout() {
                             <h1 className="text-3xl font-light">Checkout your cart</h1>
                             <p className="text-default-400 mb-4">
                                 Already have an IBM Cloud account?{" "}
-                                <a href="#" className="text-blue-400">
+                                <LocalizedClientLink className="text-blue-400" href="/sign-in">
                                     Log in
-                                </a>
+                                </LocalizedClientLink>
                             </p>
                             <nav aria-label="Breadcrumbs" data-slot="base">
                                 <ol className="flex flex-wrap list-none rounded-lg mb-2" data-slot="list">

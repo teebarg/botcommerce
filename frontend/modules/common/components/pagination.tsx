@@ -120,10 +120,16 @@ const Pagination: React.FC<Props> = ({ pagination }) => {
                 </ul>
             </nav>
             <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                <Button disabled={pagination?.total_pages === 1 || page == 1} size="sm" variant="flat" onClick={onPreviousPage}>
+                <Button aria-label="previous" disabled={pagination?.total_pages === 1 || page == 1} size="sm" variant="flat" onClick={onPreviousPage}>
                     Previous
                 </Button>
-                <Button disabled={pagination?.total_pages === 1 || page == pagination?.total_pages} size="sm" variant="flat" onClick={onNextPage}>
+                <Button
+                    aria-label="next"
+                    disabled={pagination?.total_pages === 1 || page == pagination?.total_pages}
+                    size="sm"
+                    variant="flat"
+                    onClick={onNextPage}
+                >
                     Next
                 </Button>
             </div>

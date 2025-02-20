@@ -4,8 +4,7 @@ import CartTotals from "@modules/common/components/cart-totals";
 import { Cart } from "types/global";
 import DiscountCode from "@modules/checkout/components/discount-code";
 
-import { Button } from "@/components/ui/button";
-import LocalizedClientLink from "@/components/ui/link";
+import { BtnLink } from "@/components/ui/btnLink";
 
 type SummaryProps = {
     cart: Cart;
@@ -18,9 +17,9 @@ const Summary = ({ cart }: SummaryProps) => {
             <DiscountCode cart={cart} />
             <hr className="tb-divider" />
             <CartTotals data={cart} />
-            <LocalizedClientLink data-testid="checkout-button" href={"/checkout?step=" + cart.checkout_step}>
-                <Button className="w-full h-10">Go to checkout</Button>
-            </LocalizedClientLink>
+            <BtnLink className="w-full h-10" data-testid="checkout-button" href={"/checkout?step=" + cart.checkout_step}>
+                Go to checkout
+            </BtnLink>
         </div>
     );
 };

@@ -1,15 +1,14 @@
 "use client";
 
 import { InformationCircleSolid, Trash } from "nui-react-icons";
-import React, { useMemo } from "react";
-import { useFormState } from "react-dom";
+import React, { useActionState, useMemo } from "react";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { removeDiscount, removeGiftCard, submitDiscountForm } from "@modules/checkout/actions";
-import { FormButton } from "@modules/common/components/form-button";
 import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
 
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type DiscountCodeProps = {
     cart: Omit<any, "refundable_amount" | "refunded_total">;
@@ -44,7 +43,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
         await removeDiscount(discounts[0].code);
     };
 
-    const [message, formAction] = useFormState(submitDiscountForm, null);
+    const [message, formAction, isPending] = useActionState(submitDiscountForm, null);
 
     return (
         <div className="w-full flex flex-col">
@@ -124,7 +123,9 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                             <>
                                 <div className="flex w-full gap-x-2 items-center">
                                     <Input data-testid="discount-input" label="Please enter code" name="code" size="sm" type="text" />
-                                    <FormButton className="px-4 min-w-20 h-10 text-sm gap-2">Apply</FormButton>
+                                    <Button aria-label="apply" className="px-4 min-w-20 h-10 text-sm gap-2" isLoading={isPending} type="submit">
+                                        Apply
+                                    </Button>
                                 </div>
                                 <ErrorMessage data-testid="discount-error-message" error={message} />
                             </>

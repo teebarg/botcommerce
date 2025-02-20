@@ -27,10 +27,10 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { pa
                 <div className="max-w-7xl mx-auto px-4">
                     <h1 className="text-2xl font-semibold mb-8">Reviews</h1>
                     <Table
-                        columns={["S/N", "Comment", "Rating", "Status", "Created At", "Actions"]}
-                        pagination={pagination}
                         canAdd={false}
                         canSearch={false}
+                        columns={["S/N", "Comment", "Rating", "Status", "Created At", "Actions"]}
+                        pagination={pagination}
                     >
                         {reviews?.map((item: Review, index: number) => (
                             <tr key={item.id} className="even:bg-content2">

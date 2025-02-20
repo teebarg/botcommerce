@@ -4,6 +4,7 @@ import { cn } from "@lib/util/cn";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowLongLeft } from "nui-react-icons";
 import React from "react";
+
 import { Button } from "./ui/button";
 
 interface Props {
@@ -31,8 +32,8 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
     return (
         <Button
             aria-label="back button"
-            size="md"
             className={cn(className, "bg-transparent md:bg-indigo-700 px-0 md:px-8 min-w-2 md:text-white", pathname == "/" && "hidden")}
+            size="md"
             onClick={handleGoBack}
         >
             <ArrowLongLeft className="h-6 w-6" viewBox="0 0 15 15" />

@@ -71,7 +71,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                             <div className="h-72 w-80 rounded-lg overflow-hidden relative">
                                 <Image fill alt="Product" src={preview} />
                             </div>
-                            <Button onClick={() => setPreview(undefined)}>
+                            <Button aria-label="preview" onClick={() => setPreview(undefined)}>
                                 <EditIcon size={24} />
                             </Button>
                         </div>
@@ -86,7 +86,15 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                     />
                 )}
                 {preview && isDirty && (
-                    <Button className="min-w-24 mt-2" color="secondary" disabled={status} isLoading={status} variant="shadow" onClick={handleSubmit}>
+                    <Button
+                        aria-label="upload"
+                        className="min-w-24 mt-2"
+                        color="secondary"
+                        disabled={status}
+                        isLoading={status}
+                        variant="shadow"
+                        onClick={handleSubmit}
+                    >
                         Upload{status ? "ing" : ""}
                     </Button>
                 )}

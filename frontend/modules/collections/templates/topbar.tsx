@@ -37,7 +37,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
             <header className="relative z-20 flex flex-col sm:gap-2 rounded-xl bg-content1 px-4 pb-3 pt-2 md:pt-3">
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
-                        <Button className="md:hidden h-12" onClick={state.open}>
+                        <Button aria-label="filters" className="md:hidden h-12" onClick={state.open}>
                             <FunnelIcon className="text-default-500" focusable="false" role="img" size={16} />
                             Filters ({count})
                         </Button>

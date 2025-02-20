@@ -231,6 +231,7 @@ export async function getToken(credentials: any) {
 
         if (access_token) {
             const cookieStore = await cookies();
+
             cookieStore.set("access_token", access_token, {
                 maxAge: 60 * 60 * 24 * 7, // 7 days
                 httpOnly: true,
@@ -630,6 +631,7 @@ interface SearchResult {
 
 export async function productSearch(searchParams: SearchParams): Promise<SearchResult> {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
+
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -678,8 +680,6 @@ export const getBrands = async (search: string = "", page: number = 1, limit: nu
 
 export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, { search, page, limit });
-
-    revalidateTag("categories");
 
     try {
         const response = await fetch(url, {

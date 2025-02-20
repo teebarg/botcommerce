@@ -1,16 +1,16 @@
 "use client";
 
-import { useFormState } from "react-dom";
 import { newsletterForm } from "@modules/account/actions";
-import { FormButton } from "@modules/common/components/form-button";
-import { useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { Mail } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 import { Input } from "@components/ui/input";
 
+import { Button } from "@/components/ui/button";
+
 export default function NewsletterForm() {
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(newsletterForm, { success: false, message: "" });
+    const [state, formAction, isPending] = useActionState(newsletterForm, { success: false, message: "" });
     const formRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
@@ -31,9 +31,9 @@ export default function NewsletterForm() {
                     type="email"
                 />
                 <div className="mt-4 sm:ml-4 sm:mt-0 sm:flex-shrink-0">
-                    <FormButton color="secondary" size="sm" variant="shadow">
+                    <Button aria-label="subscribe" color="secondary" isLoading={isPending} size="sm" type="submit" variant="shadow">
                         Subscribe
-                    </FormButton>
+                    </Button>
                 </div>
             </div>
         </form>
