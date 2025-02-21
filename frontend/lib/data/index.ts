@@ -467,27 +467,27 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
     }
 });
 
-export const getProductBySlug = async function (slug: string): Promise<any> {
-    const headers = await getHeaders(["product"]);
+// export const getProductBySlug = async function (slug: string): Promise<any> {
+//     const headers = await getHeaders(["product"]);
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`, {
-            method: "GET",
-            headers: {
-                accept: "application/json",
-                ...headers,
-            },
-        });
+//     try {
+//         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`, {
+//             method: "GET",
+//             headers: {
+//                 accept: "application/json",
+//                 ...headers,
+//             },
+//         });
 
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
+//         if (!res.ok) {
+//             throw new Error(res.statusText);
+//         }
 
-        return await res.json();
-    } catch (error) {
-        return { message: error, status: "error", error: true };
-    }
-};
+//         return await res.json();
+//     } catch (error) {
+//         return { message: error, status: "error", error: true };
+//     }
+// };
 
 export const getProductReviews = async (product_id?: number, page: number = 1, limit: number = 20): Promise<any> => {
     const headers = await getHeaders(["reviews"]);

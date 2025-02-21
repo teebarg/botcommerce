@@ -1,29 +1,37 @@
 import { Metadata } from "next";
-import { Product, SearchParams } from "types/global";
+import { Product, SearchParams as QP } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
 import { getBrands, getCategories, getCustomer, productSearch } from "@lib/data";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
-import { deleteProduct, getCollections } from "@modules/admin/actions";
+import { getCollections } from "@modules/admin/actions";
 import { ProductForm } from "@modules/admin/products/product-form";
 import { CheckMini } from "nui-react-icons";
 import { Avatar } from "@modules/common/components/avatar";
 
 import { siteConfig } from "@/lib/config";
 import { Badge } from "@/components/ui/badge";
+import { api } from "@/api";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
     description: siteConfig.description,
 };
 
-export default async function ProductsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {
+type SearchParams = Promise<{
+    page?: string;
+    limit?: string;
+    search?: string;
+}>;
+
+export default async function ProductsPage(props: { searchParams: SearchParams }) {
+    const searchParams = await props.searchParams;
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const queryParams: SearchParams = {
+    const queryParams: QP = {
         query: search,
         limit,
         page,
@@ -34,6 +42,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
     const { categories } = await getCategories();
 
     const customer = await getCustomer().catch(() => null);
+
+    const deleteProduct = async (id: string) => {
+        "use server";
+        try {
+            await api.product.delete(id);
+        } catch (error) {
+            console.error("Failed to delete draft:", error);
+        }
+    };
 
     return (
         <React.Fragment>
@@ -63,7 +80,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { s
                                             placement="bottom-right"
                                             size="md"
                                         >
-                                            <Avatar className="h-full w-full" radius="md" src={item.image} />
+                                            <Avatar className="h-full w-full" radius="md" src={item.image ?? null} />
                                         </Badge>
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">

@@ -12,7 +12,14 @@ export const metadata: Metadata = {
     description: siteConfig.description,
 };
 
-export default async function CategoriesPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {
+type SearchParams = Promise<{
+    page?: string;
+    limit?: string;
+    search?: string;
+}>;
+
+export default async function CategoriesPage(props: { searchParams: SearchParams }) {
+    const searchParams = await props.searchParams;
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "100", 10);

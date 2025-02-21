@@ -5,12 +5,13 @@ import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
-import { getCategories, getCustomer, getWishlist, productSearch } from "@lib/data";
+import { getCategories, getCustomer, getWishlist } from "@lib/data";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/api";
 
 const BannerCarousel = dynamic(() => import("@components/carousel"));
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"));
@@ -21,27 +22,31 @@ export const metadata: Metadata = {
     description: siteConfig.description,
 };
 
-async function getLandingProducts(collection: string, limit: number = 4): Promise<any[]> {
+// Helper function to fetch products
+const fetchProducts = async (collection: string, limit: number = 4) => {
     const queryParams: SearchParams = {
         query: "",
         limit,
         page: 1,
         collections: collection,
     };
-
-    const { products } = await productSearch(queryParams);
+    const { products } = await api.product.search(queryParams);
 
     return products;
-}
+};
 
 export default async function Home() {
+    const { message } = await api.example.hello("Niyi");
     const [trending, latest, featured, { categories }, customer] = await Promise.all([
-        getLandingProducts("trending"),
-        getLandingProducts("latest"),
-        getLandingProducts("featured", 6),
+        fetchProducts("trending"),
+        fetchProducts("latest"),
+        fetchProducts("featured", 6),
         getCategories(),
         getCustomer(),
     ]);
+
+    console.log("🚀 ~ Home ~ message:", message);
+    console.log(trending);
 
     let wishlist: WishlistItem[] = [];
 

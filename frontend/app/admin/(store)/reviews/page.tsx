@@ -16,7 +16,13 @@ export const metadata: Metadata = {
     description: siteConfig.description,
 };
 
-export default async function ReviewsPage({ searchParams }: { searchParams: { page?: string; limit?: string } }) {
+type SearchParams = Promise<{
+    page?: string;
+    limit?: string;
+}>;
+
+export default async function ReviewsPage(props: { searchParams: SearchParams }) {
+    const searchParams = await props.searchParams;
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
     const { reviews, ...pagination } = await getProductReviews(undefined, page, limit);

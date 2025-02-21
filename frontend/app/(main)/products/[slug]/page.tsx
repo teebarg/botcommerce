@@ -1,6 +1,4 @@
 import { notFound } from "next/navigation";
-import { getProductBySlug, productSearch } from "@lib/data";
-import { Product, SearchParams } from "types/global";
 import React, { Suspense } from "react";
 import ProductActions from "@modules/products/components/product-actions";
 import RelatedProducts from "@modules/products/components/related-products";
@@ -15,26 +13,32 @@ import ProductDetails from "@/modules/products/templates/details";
 import LocalizedClientLink from "@/components/ui/link";
 import ReviewsSection from "@/components/product/product-reviews";
 import { Skeleton } from "@/components/skeleton";
+import { api } from "@/api";
 
 type Params = Promise<{ slug: string }>;
 
 export async function generateStaticParams() {
-    const queryParams: SearchParams = {
-        limit: 100,
-    };
-
-    const { products } = await productSearch(queryParams);
-
-    return products?.map((product: Product) => ({
-        slug: String(product.slug),
-    }));
+    return [];
 }
+
+// export async function generateStaticParams() {
+//     const queryParams: SearchParams = {
+//         limit: 100,
+//     };
+
+//     const { products } = await productSearch(queryParams);
+//     // const { products } = await api.product.search(queryParams);
+
+//     return products?.map((product: Product) => ({
+//         slug: String(product.slug),
+//     }));
+// }
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
-    const product = await getProductBySlug(slug);
+    const product = await api.product.get(slug);
 
-    if (!product || product.error) {
+    if (!product) {
         return {};
     }
 
@@ -51,9 +55,9 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
-    const product = await getProductBySlug(slug);
+    const product = await api.product.get(slug);
 
-    if (!product || product.error) {
+    if (!product) {
         notFound();
     }
 

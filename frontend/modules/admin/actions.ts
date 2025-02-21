@@ -84,73 +84,73 @@ export async function uploadProductImage({ productId, formData }: { productId: s
     }
 }
 
-export async function createProduct(currentState: unknown, formData: FormData) {
-    const accessToken = await token();
-    const productId = formData.get("id") as string;
-    const type = formData.get("type") as string;
+// export async function createProduct(currentState: unknown, formData: FormData) {
+//     const accessToken = await token();
+//     const productId = formData.get("id") as string;
+//     const type = formData.get("type") as string;
 
-    const url =
-        type === "create" ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/` : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
+//     const url =
+//         type === "create" ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/` : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
 
-    const productData = {
-        name: formData.get("name"),
-        is_active: Boolean(formData.get("is_active")) ?? false,
-        description: formData.get("description"),
-        brands: JSON.parse(formData.get("brands") as string) ?? [],
-        categories: JSON.parse(formData.get("categories") as string) ?? [],
-        collections: JSON.parse(formData.get("collections") as string) ?? [],
-        price: formData.get("price") ?? 0,
-        old_price: formData.get("old_price") ?? 0,
-    };
+//     const productData = {
+//         name: formData.get("name"),
+//         is_active: Boolean(formData.get("is_active")) ?? false,
+//         description: formData.get("description"),
+//         brands: JSON.parse(formData.get("brands") as string) ?? [],
+//         categories: JSON.parse(formData.get("categories") as string) ?? [],
+//         collections: JSON.parse(formData.get("collections") as string) ?? [],
+//         price: formData.get("price") ?? 0,
+//         old_price: formData.get("old_price") ?? 0,
+//     };
 
-    try {
-        const res = await fetch(url, {
-            method: type === "create" ? "POST" : "PATCH",
-            headers: {
-                "X-Auth": accessToken,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(productData),
-        });
+//     try {
+//         const res = await fetch(url, {
+//             method: type === "create" ? "POST" : "PATCH",
+//             headers: {
+//                 "X-Auth": accessToken,
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify(productData),
+//         });
 
-        if (!res.ok) {
-            return { success: false, message: "Error creating product" };
-        }
+//         if (!res.ok) {
+//             return { success: false, message: "Error creating product" };
+//         }
 
-        // Revalidate the UI data
-        revalidateTag("products");
-        revalidateTag("campaigns");
+//         // Revalidate the UI data
+//         revalidateTag("products");
+//         revalidateTag("campaigns");
 
-        return { success: true, message: "Product created successfully", data: await res.json() };
-    } catch (error) {
-        return { success: false, message: "Error creating product" };
-    }
-}
+//         return { success: true, message: "Product created successfully", data: await res.json() };
+//     } catch (error) {
+//         return { success: false, message: "Error creating product" };
+//     }
+// }
 
-export async function deleteProduct(productId: string) {
-    const accessToken = await token();
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
+// export async function deleteProduct(productId: string) {
+//     const accessToken = await token();
+//     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}`;
 
-    try {
-        const res = await fetch(url, {
-            method: "DELETE",
-            headers: {
-                "X-Auth": accessToken,
-            },
-        });
+//     try {
+//         const res = await fetch(url, {
+//             method: "DELETE",
+//             headers: {
+//                 "X-Auth": accessToken,
+//             },
+//         });
 
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-        }
+//         if (!res.ok) {
+//             throw new Error(`HTTP error! status: ${res.status}`);
+//         }
 
-        // Revalidate the UI data
-        revalidateTag("products");
+//         // Revalidate the UI data
+//         revalidateTag("products");
 
-        return { success: true, message: "Product deleted successfully" };
-    } catch (error) {
-        return { success: false, message: "Error deleting product" };
-    }
-}
+//         return { success: true, message: "Product deleted successfully" };
+//     } catch (error) {
+//         return { success: false, message: "Error deleting product" };
+//     }
+// }
 
 export async function createCategory(currentState: unknown, formData: FormData) {
     const accessToken = await token();

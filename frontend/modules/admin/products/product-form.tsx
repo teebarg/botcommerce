@@ -9,11 +9,12 @@ import { Input } from "@components/ui/input";
 import { Number } from "@components/ui/number";
 import { TextArea } from "@components/ui/textarea";
 
-import { createProduct, uploadProductImage } from "../actions";
+import { uploadProductImage } from "../actions";
 
 import { Multiselect } from "@/components/ui/multiselect";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { mutateProduct } from "@/actions/product";
 
 interface Props {
     current?: any;
@@ -47,7 +48,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
         }, [current.collections]);
 
         const { enqueueSnackbar } = useSnackbar();
-        const [state, formAction, isPending] = useActionState(createProduct, {
+        const [state, formAction, isPending] = useActionState(mutateProduct, {
             success: false,
             message: "",
             data: null,

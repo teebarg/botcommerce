@@ -1,204 +1,3 @@
-export type Customer = {
-    id: number;
-    firstname: string;
-    lastname?: string;
-    email?: string;
-    phone?: string;
-    is_active?: boolean;
-    is_superuser?: number;
-    created_at?: string;
-    billing_addresses?: Record<string, any>[];
-    shipping_addresses?: Record<string, any>[];
-};
-
-export type Review = {
-    id: number;
-    rating: number;
-    comment: string;
-    verified?: boolean;
-    product_id: number;
-    created_at: string;
-    user: Customer;
-};
-
-export type Product = {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string;
-    price: number;
-    old_price: number;
-    image: string;
-    images?: string[];
-    is_active?: boolean;
-    ratings?: number;
-    inventory?: number;
-    created_at?: string;
-    collections: string[];
-    reviews?: Review[];
-};
-
-export type Brand = {
-    id: number;
-    name: string;
-    slug: string;
-    is_active?: boolean;
-    created_at: string;
-};
-
-export type Collection = {
-    id: number;
-    name: string;
-    slug: string;
-    is_active?: boolean;
-    created_at: string;
-};
-
-export type User = {
-    id: number;
-    firstname: string;
-    email: string;
-    role: string;
-    status: string;
-    created_at: string;
-};
-
-export type Pagination = {
-    page: number;
-    limit: number;
-    total_count: number;
-    total_pages: number;
-};
-
-export enum FileTypes {
-    png = "image/png",
-    jpeg = "image/jpeg",
-    jpg = "image/jpg",
-    avif = "image/avif",
-    csv = "text/csv",
-    xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    xls = "application/vnd.ms-excel",
-}
-
-export type Cart = {
-    cart_id: string;
-    customer_id: string;
-    email: string;
-    items: CartItem[];
-    checkout_step?: "address" | "delivery" | "payment";
-    subtotal: number;
-    tax_total: number;
-    discount_total: number;
-    delivery_fee: number;
-    total: number;
-    billing_address: Record<string, any>;
-    shipping_address: Record<string, any>;
-    shipping_method: any;
-    payment_session: any;
-    gift_cards: any;
-};
-
-export type CartItem = {
-    item_id: string;
-    product_id: string;
-    slug: string;
-    name: string;
-    description?: string;
-    image?: string;
-    quantity: number;
-    price: number;
-    created_at: string;
-};
-
-export type DeliveryOption = {
-    id: string;
-    name: string;
-    amount: number;
-};
-
-export type PaymentSession = {
-    id: string;
-    provider_id: string;
-};
-
-export type Order = {
-    order_id: string;
-    status?: "pending" | "processing" | "fulfilled";
-    fulfillment_status: "fulfilled" | "not_fulfilled";
-    cart_id: string;
-    customer_id: string;
-    email: string;
-    line_items: CartItem[];
-    checkout_step?: "address" | "delivery" | "payment";
-    subtotal: number;
-    tax_total: number;
-    delivery_fee: number;
-    total: number;
-    billing_address: Record<string, any>;
-    shipping_address: Record<string, any>;
-    shipping_method: Record<string, any>;
-    payment_session: Record<string, any>;
-    fulfillments: Record<string, any>[];
-    payment_status: "pending" | "paid";
-    created_at: string;
-};
-
-export type SortOptions = "price_asc" | "price_desc" | "created_at";
-
-export type Address = {
-    created_at: string;
-    updated_at: string;
-    firstname: string;
-    lastname: string;
-    address_1: string;
-    address_2: string;
-    city: string;
-    postal_code: string;
-    state: string;
-    phone: string;
-    id: string;
-};
-
-export type Category = {
-    id: number;
-    name: string;
-    slug?: string;
-    is_active: boolean;
-    children: any;
-    parent_id: number;
-    created_at: string;
-    updated_at: string;
-};
-
-export interface SearchParams {
-    query?: string;
-    categories?: string;
-    collections?: string;
-    min_price?: number | string;
-    max_price?: number | string;
-    page?: number;
-    limit?: number;
-    sort?: string;
-}
-
-export type WishlistItem = {
-    id: number;
-    name: string;
-    description?: string;
-    user_id?: number;
-    product_id?: number;
-    image: string;
-    created_at?: string;
-};
-
-export type SiteConfig = {
-    id: number;
-    key: string;
-    value: string;
-    created_at: string;
-    updated_at: string;
-};
-
 import { z } from "zod";
 
 const CustomerSchema = z.object({
@@ -224,8 +23,8 @@ const ReviewSchema = z.object({
     user: CustomerSchema,
 });
 
-const ProductSchema = z.object({
-    id: z.number(),
+export const ProductSchema = z.object({
+    id: z.number().optional(),
     name: z.string(),
     slug: z.string(),
     description: z.string().optional(),
@@ -388,4 +187,19 @@ const SiteConfigSchema = z.object({
     value: z.string(),
     created_at: z.string(),
     updated_at: z.string(),
+});
+
+export const PaginatedProductSchema = z.object({
+    products: z.array(ProductSchema),
+    facets: z
+        .object({
+            brands: z.record(z.string()).optional(),
+            categories: z.record(z.string()).optional(),
+            collections: z.record(z.string()).optional(),
+        })
+        .optional(),
+    page: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
 });
