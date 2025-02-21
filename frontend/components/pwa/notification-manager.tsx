@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 
-import { subscribeUser } from "./actions";
+import { saveSubscription } from "./actions";
 
 import { Button } from "@/components/ui/button";
 
@@ -50,13 +50,6 @@ function PushNotificationManager() {
             registerServiceWorker();
             setIsSupported(true);
         }
-
-        const timer = setTimeout(() => {
-            if (!subscription) return;
-            handleNotificationOptIn();
-        }, 10000);
-
-        return () => clearTimeout(timer);
     }, []);
 
     async function requestNotificationPermission() {
@@ -79,6 +72,7 @@ function PushNotificationManager() {
         if (!sub) {
             // Don't auto-subscribe, let user initiate
             setSubscription(null);
+            handleNotificationOptIn();
 
             return;
         }
@@ -93,7 +87,7 @@ function PushNotificationManager() {
 
             return;
         }
-
+        if (subscription) return;
         // await registerServiceWorker();
         await subscribeToPush();
     }
@@ -113,7 +107,13 @@ function PushNotificationManager() {
         });
 
         // Send subscription to your backend
-        const res = await subscribeUser(sub);
+        const subscriptionData = {
+            endpoint: sub.endpoint,
+            p256dh: sub.toJSON().keys?.p256dh || "",
+            auth: sub.toJSON().keys?.auth || "",
+        };
+
+        const res = await saveSubscription(subscriptionData);
 
         if (!res.success) {
             enqueueSnackbar(res.message as string, { variant: "error" });

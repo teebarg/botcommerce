@@ -52,6 +52,7 @@ export async function googleLogin(customer: { firstname: string; lastname: strin
 
         if (access_token) {
             const cookieStore = await cookies();
+
             cookieStore.set("access_token", access_token, {
                 maxAge: 60 * 60 * 24 * 7, // 7 days
                 httpOnly: true,
@@ -249,6 +250,7 @@ export async function updateCustomerBillingAddress(_currentState: Record<string,
 
 export async function signOut() {
     const cookieStore = await cookies();
+
     cookieStore.set("access_token", "", {
         maxAge: -1,
     });

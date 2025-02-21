@@ -70,11 +70,11 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
             <div className="w-full flex-1 flex-col">
                 {/* Mobile banner */}
                 <PromotionalBanner
-                    title="Exclusive Offer!"
-                    subtitle="Get 20% Off Today"
+                    btnClass="text-blue-600"
                     icon={<Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />}
                     outerClass="from-blue-600 to-purple-700"
-                    btnClass="text-blue-600"
+                    subtitle="Get 20% Off Today"
+                    title="Exclusive Offer!"
                 />
                 {/* Categories */}
                 <div className="px-4 my-6 md:hidden">

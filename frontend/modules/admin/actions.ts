@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 
 async function token() {
     const cookieStore = await cookies();
+
     return cookieStore.get("access_token")?.value as string;
 }
 
@@ -508,6 +509,7 @@ export async function updateReview(currentState: unknown, formData: FormData) {
 
 export async function deleteReview(id: string) {
     const accessToken = await token();
+
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/${id}`, {
             method: "DELETE",

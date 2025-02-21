@@ -6,12 +6,14 @@ import { Suspense } from "react";
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { siteConfig } from "@/lib/config";
 
+type SearchParams = Promise<{
+    page?: number;
+    sortBy?: SortOptions;
+    cat_ids?: string;
+}>;
+
 type Props = {
-    searchParams: {
-        page?: number;
-        sortBy?: SortOptions;
-        cat_ids?: string;
-    };
+    searchParams: SearchParams;
 };
 
 export const revalidate = 3;
@@ -26,11 +28,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Collections({ searchParams }: Props) {
-    const { sortBy, page } = searchParams;
+    const sP = await searchParams;
+    const { sortBy, page } = sP;
 
     return (
         <Suspense fallback={<CollectionTemplateSkeleton />}>
-            <CollectionTemplate page={page} searchParams={searchParams} sortBy={sortBy} />
+            <CollectionTemplate page={page} searchParams={sP} sortBy={sortBy} />
         </Suspense>
     );
 }

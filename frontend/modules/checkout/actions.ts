@@ -8,6 +8,7 @@ import { DeliveryOption, Order, PaymentSession } from "types/global";
 
 async function cartId() {
     const cookieStore = await cookies();
+
     return cookieStore.get("_cart_id")?.value;
 }
 
@@ -181,6 +182,7 @@ export async function placeOrder() {
         order = await completeCart(id);
         revalidateTag("cart");
         const cookieStore = await cookies();
+
         cookieStore.set("_cart_id", "", { maxAge: -1 });
         redirect(`/order/confirmed/${order.order_id}`);
     } catch (error: any) {

@@ -659,8 +659,6 @@ export async function productSearch(searchParams: SearchParams): Promise<SearchR
 export const getBrands = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/`, { search, page, limit });
 
-    revalidateTag("brands");
-
     try {
         const response = await fetch(url, {
             next: {
@@ -801,8 +799,6 @@ export async function deleteActivities(id: string | number) {
 export const getSiteConfigs = async (skip: number = 0, limit: number = 20): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config/`, { skip, limit });
     const headers = await getHeaders(["configs"]);
-
-    revalidateTag("configs");
 
     try {
         const response = await fetch(url, {
