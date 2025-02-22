@@ -11,9 +11,10 @@ import dynamic from "next/dynamic";
 
 import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
-import { Product, SearchParams } from "@/types/global";
+import { SearchParams } from "@/types/global";
 import NoProductsFound from "@/modules/products/components/no-products";
 import { buildUrl, debounce } from "@/lib/util/util";
+import { Product } from "@/lib/models";
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 interface Props {

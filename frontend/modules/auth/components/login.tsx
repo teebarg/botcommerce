@@ -9,10 +9,9 @@ import { redirect } from "next/navigation";
 import { Input } from "@components/ui/input";
 import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 
-import { signIn } from "../action";
-
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
+import { signIn } from "@/actions/auth";
 
 type Props = {};
 

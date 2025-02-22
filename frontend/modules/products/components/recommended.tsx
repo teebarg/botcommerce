@@ -1,6 +1,7 @@
-import { productSearch } from "@lib/data";
-import { Product, SearchParams } from "types/global";
+import { SearchParams } from "types/global";
 import dynamic from "next/dynamic";
+import { api } from "@/api";
+import { Product } from "@/lib/models";
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 type RecommendedProductsProps = {
@@ -13,13 +14,13 @@ export default async function RecommendedProducts({ exclude = [] }: RecommendedP
         limit: 40,
     };
 
-    const { products } = await productSearch(queryParams);
+    const { products } = await api.product.search(queryParams);
 
     if (!products.length) {
         return null;
     }
 
-    const filteredProducts = exclude?.length ? products.filter((product: Product) => !exclude.includes(product.id.toString())) : products;
+    const filteredProducts = exclude?.length ? products.filter((product: Product) => !exclude.includes(product.id!.toString())) : products;
 
     return (
         <div>

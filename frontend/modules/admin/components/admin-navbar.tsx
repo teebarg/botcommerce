@@ -1,4 +1,3 @@
-import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import ActivityTray from "@modules/common/components/activity-tray";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
@@ -7,6 +6,7 @@ import dynamic from "next/dynamic";
 
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/api";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
@@ -14,7 +14,7 @@ const getThemeToggler = () =>
     });
 
 const AdminNavbar = async () => {
-    const customer = await getCustomer().catch(() => null);
+    const customer = await api.user.me();
     const ThemeButton = getThemeToggler();
 
     return (

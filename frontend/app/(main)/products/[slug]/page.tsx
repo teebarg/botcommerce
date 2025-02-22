@@ -21,19 +21,6 @@ export async function generateStaticParams() {
     return [];
 }
 
-// export async function generateStaticParams() {
-//     const queryParams: SearchParams = {
-//         limit: 100,
-//     };
-
-//     const { products } = await productSearch(queryParams);
-//     // const { products } = await api.product.search(queryParams);
-
-//     return products?.map((product: Product) => ({
-//         slug: String(product.slug),
-//     }));
-// }
-
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
     const product = await api.product.get(slug);

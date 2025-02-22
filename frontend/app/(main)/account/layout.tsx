@@ -1,11 +1,10 @@
-import { getCustomer } from "@lib/data";
-import { Customer } from "types/global";
 import { Package, User } from "nui-react-icons";
 
 import RecommendedProducts from "@/modules/products/components/recommended";
 import AccountNav from "@/modules/account/components/account-nav";
 import MapPin from "@/modules/common/icons/map-pin";
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/api";
 
 const navLinks = [
     {
@@ -35,7 +34,7 @@ const navLinks = [
 ];
 
 export default async function AccountPageLayout({ dashboard }: { dashboard?: React.ReactNode }) {
-    const customer = (await getCustomer()) as Customer;
+    const user = await api.user.me();
 
     return (
         <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">
@@ -46,9 +45,9 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
                     </div>
                     <div>
                         <h1 className="text-xl font-bold">
-                            {customer?.firstname} {customer?.lastname}
+                            {user?.firstname} {user?.lastname}
                         </h1>
-                        <p className="text-blue-100">{customer?.email}</p>
+                        <p className="text-blue-100">{user?.email}</p>
                     </div>
                 </div>
             </div>
@@ -75,7 +74,7 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
             </div>
             <div className="flex-1 h-full max-w-7xl mx-auto bg-content1 flex flex-col rounded-md md:px-8">
                 <div className="md:flex md:gap-4 py-4 md:py-12">
-                    <div className="md:min-w-[15rem]">{customer && <AccountNav customer={customer} />}</div>
+                    <div className="md:min-w-[15rem]">{user && <AccountNav user={user} />}</div>
                     <div className="md:flex-1">{dashboard}</div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-end justify-between sm:border-t border-gray-300 dark:border-gray-500 py-4 md:py-12 gap-8">

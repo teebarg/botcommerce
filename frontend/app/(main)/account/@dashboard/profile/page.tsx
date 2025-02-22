@@ -4,8 +4,9 @@ import ProfileBillingAddress from "@modules/account/components/profile-billing-a
 import ProfileEmail from "@modules/account/components/profile-email";
 import ProfileName from "@modules/account/components/profile-name";
 import ProfilePassword from "@modules/account/components/profile-password";
-import { getCustomer } from "@lib/data";
+
 import { notFound } from "next/navigation";
+import { api } from "@/api";
 
 export const metadata: Metadata = {
     title: "Profile",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Profile() {
-    const customer = await getCustomer();
+    const customer = await api.user.me();
 
     if (!customer) {
         notFound();

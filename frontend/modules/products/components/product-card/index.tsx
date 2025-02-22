@@ -1,6 +1,5 @@
 "use client";
 
-import { Product, WishlistItem } from "types/global";
 import { Suspense } from "react";
 import React from "react";
 import Image from "next/image";
@@ -8,10 +7,11 @@ import Image from "next/image";
 import ProductActions from "../product-actions";
 
 import { ProductWishList } from "@/components/product/product-wishlist";
+import { Product, WishItem } from "@/lib/models";
 
 interface ComponentProps {
     product: Product;
-    wishlist?: WishlistItem[];
+    wishlist?: WishItem[];
     showWishlist?: boolean;
 }
 

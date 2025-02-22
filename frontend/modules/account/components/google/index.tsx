@@ -1,11 +1,11 @@
 import React from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useSnackbar } from "notistack";
-import { googleLogin } from "@modules/account/actions";
 import Image from "next/image";
 
 import Google from "@/public/google.svg";
 import { Button } from "@/components/ui/button";
+import { googleLogin } from "@/actions/auth";
 
 interface Props {}
 

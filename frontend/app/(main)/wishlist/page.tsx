@@ -2,10 +2,10 @@ import { Metadata } from "next";
 import { Heart } from "nui-react-icons";
 
 import WishlistItem from "@/modules/common/components/wishlist";
-import { getWishlist } from "@/lib/data";
 import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
+import { api } from "@/api";
 
 export const revalidate = 3;
 
@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Wishlist() {
-    const { wishlists } = (await getWishlist()) || {};
+    const { wishlists } = await api.user.wishlist();
 
     if (!wishlists) {
         return (

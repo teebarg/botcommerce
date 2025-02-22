@@ -5,14 +5,14 @@ import { notFound } from "next/navigation";
 import FastDelivery from "@modules/common/icons/fast-delivery";
 import Refresh from "@modules/common/icons/refresh";
 import Back from "@modules/common/icons/back";
-import { Product } from "@/types/global";
+import { Product } from "@/lib/models";
 
 type ProductDetailsProps = {
     product: Product;
 };
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
-    if (!product || !product.id) {
+    if (!product) {
         return notFound();
     }
 

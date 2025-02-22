@@ -1,8 +1,6 @@
 import React, { Suspense } from "react";
-import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
-import { Customer } from "types/global";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 import { HeartFilled, Heart, Home, UserGroup, User, Checkout, Collection } from "nui-react-icons";
 import dynamic from "next/dynamic";
@@ -11,6 +9,7 @@ import Search from "@/modules/search/components/search";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/api";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
@@ -34,7 +33,7 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 };
 
 const Navbar = async () => {
-    const customer: Customer = await getCustomer().catch(() => null);
+    const customer = await api.user.me();
     const isAdmin: boolean = Boolean(customer?.is_superuser);
     const ThemeButton = getThemeToggler();
 

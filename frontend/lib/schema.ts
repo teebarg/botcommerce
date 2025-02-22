@@ -1,30 +1,43 @@
 import { z } from "zod";
 
-const CustomerSchema = z.object({
+export const TokenSchema = z.object({
+    access_token: z.string(),
+    token_type: z.string().default("bearer"),
+});
+
+export const UserSchema = z.object({
     id: z.number(),
     firstname: z.string(),
     lastname: z.string().optional(),
     email: z.string().email().optional(),
     phone: z.string().optional(),
     is_active: z.boolean().optional(),
-    is_superuser: z.number().optional(),
+    is_superuser: z.boolean().optional(),
     created_at: z.string().optional(),
     billing_addresses: z.array(z.record(z.any())).optional(),
     shipping_addresses: z.array(z.record(z.any())).optional(),
 });
 
-const ReviewSchema = z.object({
+export const ReviewSchema = z.object({
     id: z.number(),
     rating: z.number(),
     comment: z.string(),
     verified: z.boolean().optional(),
     product_id: z.number(),
     created_at: z.string(),
-    user: CustomerSchema,
+    user: UserSchema,
+});
+
+export const PaginatedReviewSchema = z.object({
+    reviews: z.array(ReviewSchema),
+    page: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
 });
 
 export const ProductSchema = z.object({
-    id: z.number().optional(),
+    id: z.number(),
     name: z.string(),
     slug: z.string(),
     description: z.string().optional(),
@@ -48,7 +61,7 @@ const BrandSchema = z.object({
     created_at: z.string(),
 });
 
-const CollectionSchema = z.object({
+export const CollectionSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
@@ -56,13 +69,12 @@ const CollectionSchema = z.object({
     created_at: z.string(),
 });
 
-const UserSchema = z.object({
-    id: z.number(),
-    firstname: z.string(),
-    email: z.string().email(),
-    role: z.string(),
-    status: z.string(),
-    created_at: z.string(),
+export const PaginatedCollectionSchema = z.object({
+    collections: z.array(CollectionSchema),
+    page: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
 });
 
 const PaginationSchema = z.object({
@@ -149,15 +161,23 @@ const AddressSchema = z.object({
     id: z.string(),
 });
 
-const CategorySchema = z.object({
+export const CategorySchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string().optional(),
-    is_active: z.boolean(),
-    children: z.any(),
-    parent_id: z.number(),
+    is_active: z.boolean().default(true),
+    children: z.any().optional(),
+    parent_id: z.number().optional(),
     created_at: z.string(),
     updated_at: z.string(),
+});
+
+export const PaginatedCategorySchema = z.object({
+    categories: z.array(CategorySchema),
+    page: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
 });
 
 const SearchParamsSchema = z.object({
@@ -171,7 +191,7 @@ const SearchParamsSchema = z.object({
     sort: z.string().optional(),
 });
 
-const WishlistItemSchema = z.object({
+export const WishItemSchema = z.object({
     id: z.number(),
     name: z.string(),
     description: z.string().optional(),
@@ -179,6 +199,10 @@ const WishlistItemSchema = z.object({
     product_id: z.number().optional(),
     image: z.string(),
     created_at: z.string().optional(),
+});
+
+export const WishlistSchema = z.object({
+    wishlists: z.array(WishItemSchema),
 });
 
 const SiteConfigSchema = z.object({
@@ -189,15 +213,15 @@ const SiteConfigSchema = z.object({
     updated_at: z.string(),
 });
 
+export const FacetSchema = z.object({
+    brands: z.record(z.string()).optional(),
+    categories: z.record(z.string()).optional(),
+    collections: z.record(z.string()).optional(),
+});
+
 export const PaginatedProductSchema = z.object({
     products: z.array(ProductSchema),
-    facets: z
-        .object({
-            brands: z.record(z.string()).optional(),
-            categories: z.record(z.string()).optional(),
-            collections: z.record(z.string()).optional(),
-        })
-        .optional(),
+    facets: FacetSchema.optional(),
     page: z.number(),
     limit: z.number(),
     total_count: z.number(),

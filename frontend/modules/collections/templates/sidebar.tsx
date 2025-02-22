@@ -1,23 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { Brand, Category, Collection } from "types/global";
+import { Brand } from "types/global";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 
 import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import LocalizedClientLink from "@/components/ui/link";
+import { Category, Collection, Facet } from "@/lib/models";
 
 interface ComponentProps {
     brands: Brand[];
     collections: Collection[];
     categories: Category[];
-    facets?: {
-        brands: Record<string, string>;
-        categories: Record<string, string>;
-        collections: Record<string, string>;
-    };
+    facets?: Facet;
     searchParams?: {
         maxPrice?: string;
         minPrice?: string;

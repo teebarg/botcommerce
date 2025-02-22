@@ -1,65 +1,8 @@
-export type Customer = {
-    id: number;
-    firstname: string;
-    lastname?: string;
-    email?: string;
-    phone?: string;
-    is_active?: boolean;
-    is_superuser?: number;
-    created_at?: string;
-    billing_addresses?: Record<string, any>[];
-    shipping_addresses?: Record<string, any>[];
-};
-
-export type Review = {
-    id: number;
-    rating: number;
-    comment: string;
-    verified?: boolean;
-    product_id: number;
-    created_at: string;
-    user: Customer;
-};
-
-export type Product = {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string;
-    price: number;
-    old_price: number;
-    image: string;
-    images?: string[];
-    is_active?: boolean;
-    ratings?: number;
-    inventory?: number;
-    created_at?: string;
-    collections: string[];
-    reviews?: Review[];
-};
-
 export type Brand = {
     id: number;
     name: string;
     slug: string;
     is_active?: boolean;
-    created_at: string;
-};
-
-export type Collection = {
-    id: number;
-    name: string;
-    slug: string;
-    is_active?: boolean;
-    created_at: string;
-};
-
-export type User = {
-    id: number;
-    firstname: string;
-    email: string;
-    role: string;
-    status: string;
     created_at: string;
 };
 
@@ -159,17 +102,6 @@ export type Address = {
     id: string;
 };
 
-export type Category = {
-    id: number;
-    name: string;
-    slug?: string;
-    is_active: boolean;
-    children: any;
-    parent_id: number;
-    created_at: string;
-    updated_at: string;
-};
-
 export interface SearchParams {
     query?: string;
     categories?: string;
@@ -180,16 +112,6 @@ export interface SearchParams {
     limit?: number;
     sort?: string;
 }
-
-export type WishlistItem = {
-    id: number;
-    name: string;
-    description?: string;
-    user_id?: number;
-    product_id?: number;
-    image: string;
-    created_at?: string;
-};
 
 export type SiteConfig = {
     id: number;

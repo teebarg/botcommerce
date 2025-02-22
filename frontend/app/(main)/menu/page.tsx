@@ -1,12 +1,11 @@
 import { Metadata } from "next";
 import React from "react";
-import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
-import { Customer } from "types/global";
 import { Heart, Home, UserGroup, User, Checkout, Collection } from "nui-react-icons";
 
 import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/api";
 
 export const metadata: Metadata = {
     title: "Menu",
@@ -30,7 +29,7 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 };
 
 export default async function Menu() {
-    const customer: Customer = await getCustomer().catch(() => null);
+    const customer = await api.user.me();
     const isAdmin: boolean = Boolean(customer?.is_superuser);
 
     return (

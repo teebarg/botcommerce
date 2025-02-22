@@ -1,8 +1,8 @@
 import React from "react";
 import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, productSearch } from "@lib/data";
-import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
+import { getBrands } from "@lib/data";
+import { SearchParams, SortOptions } from "types/global";
 import dynamic from "next/dynamic";
 
 import { CollectionsTopBar } from "./topbar";
@@ -11,6 +11,8 @@ import { CollectionsSideBar } from "./sidebar";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
+import { api } from "@/api";
+import { Category, Collection, Product, WishItem } from "@/lib/models";
 
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
@@ -30,17 +32,17 @@ interface ComponentProps {
 
 const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, sortBy, searchParams }) => {
     const { brands } = await getBrands();
-    const { collections } = await getCollectionsList();
-    const customer: Customer = await getCustomer().catch(() => null);
-    let wishlist: WishlistItem[] = [];
+    const { collections } = await api.collection.all();
+    const customer = await api.user.me();
+    let wishlist: WishItem[] = [];
 
     if (customer) {
-        const { wishlists } = (await getWishlist()) || {};
+        const { wishlists } = await api.user.wishlist();
 
         wishlist = wishlists;
     }
 
-    const { categories: cat } = await getCategories();
+    const { categories: cat } = await await api.category.all();
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
     const queryParams: SearchParams = {
@@ -60,7 +62,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         queryParams["categories"] = searchParams?.cat_ids;
     }
 
-    const { products, facets, ...pagination } = await productSearch(queryParams);
+    const { products, facets, ...pagination } = await api.product.search(queryParams);
 
     return (
         <React.Fragment>
@@ -80,7 +82,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                 <div className="px-4 my-6 md:hidden">
                     <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
-                        {cat.map((category: Collection, index: number) => (
+                        {cat.map((category: Category, index: number) => (
                             <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                 {category.name}
                             </BtnLink>

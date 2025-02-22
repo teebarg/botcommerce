@@ -1,8 +1,6 @@
 import { Metadata } from "next";
-import { Review } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
-import { getProductReviews } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteReview } from "@modules/admin/actions";
 
@@ -10,6 +8,8 @@ import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
 import { ReviewForm } from "@/modules/admin/reviews/reviews-form";
 import { timeAgo } from "@/lib/util/util";
+import { Review } from "@/lib/models";
+import { api } from "@/api";
 
 export const metadata: Metadata = {
     title: `Reviews Page | Children clothing | ${siteConfig.name} Store`,
@@ -25,7 +25,7 @@ export default async function ReviewsPage(props: { searchParams: SearchParams })
     const searchParams = await props.searchParams;
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { reviews, ...pagination } = await getProductReviews(undefined, page, limit);
+    const { reviews, ...pagination } = await api.product.reviews({ page, limit });
 
     return (
         <React.Fragment>

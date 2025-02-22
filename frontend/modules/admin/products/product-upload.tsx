@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { Customer } from "types/global";
 
 import { bulkUploadProducts } from "../actions";
 import { Excel } from "../components/file-uploader";
+import { User } from "@/lib/models";
 
 interface ProductUploadProps {
-    customer: Customer;
+    customer: User;
 }
 
 const ProductUpload: React.FC<ProductUploadProps> = ({ customer }) => {

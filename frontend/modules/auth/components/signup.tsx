@@ -7,11 +7,10 @@ import { GoogleLogin } from "@modules/account/components/google";
 import React, { useActionState } from "react";
 import { Input } from "@components/ui/input";
 
-import { signUp } from "../action";
-
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
+import { signUp } from "@/actions/auth";
 
 type Props = {};
 

@@ -2,13 +2,14 @@
 
 import { useSearchParams } from "next/navigation";
 import { siteConfig } from "@lib/config";
-import { Cart, Customer } from "types/global";
+import { Cart } from "types/global";
 
 import PaymentButton from "../payment-button";
 
 import { cn } from "@/lib/util/cn";
+import { User } from "@/lib/models";
 
-const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">; customer: Customer }) => {
+const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">; customer: User }) => {
     const searchParams = useSearchParams();
 
     const isOpen = searchParams.get("step") === "review";
@@ -35,7 +36,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
                             and Returns Policy and acknowledge that you have read {siteConfig.name}&apos;s Privacy Policy.
                         </p>
                     </div>
-                    <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
+                    <PaymentButton cart={cart} user={customer} data-testid="submit-order-button" />
                 </>
             )}
         </div>

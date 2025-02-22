@@ -1,4 +1,3 @@
-import { getCustomer } from "@lib/data";
 import Addresses from "@modules/checkout/components/addresses";
 import Payment from "@modules/checkout/components/payment";
 import Review from "@modules/checkout/components/review";
@@ -7,6 +6,7 @@ import { cookies } from "next/headers";
 import { Cart } from "types/global";
 
 import { currency } from "@/lib/util/util";
+import { api } from "@/api";
 
 type CheckoutFormProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -44,7 +44,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
     ];
 
     // get customer if logged in
-    const customer = await getCustomer();
+    const customer = await api.user.me();
 
     return (
         <div>

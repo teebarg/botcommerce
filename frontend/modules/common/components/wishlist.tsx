@@ -6,9 +6,9 @@ import { useSnackbar } from "notistack";
 import Image from "next/image";
 
 import { cn } from "@/lib/util/cn";
-import { removeWish } from "@/modules/products/actions";
 import { addToCart } from "@/modules/cart/actions";
 import { Button } from "@/components/ui/button";
+import { removeWish } from "@/actions/user";
 
 interface WishlistItemProps {
     id: number;

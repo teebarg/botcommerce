@@ -1,71 +1,9 @@
 "use server";
 
-import {
-    addShippingAddress,
-    authenticate,
-    createCustomer,
-    deleteActivities,
-    deleteShippingAddress,
-    getToken,
-    updateBillingAddress,
-    updateCustomer,
-    updateShippingAddress,
-} from "@lib/data";
+import { addShippingAddress, deleteActivities, deleteShippingAddress, updateBillingAddress, updateCustomer, updateShippingAddress } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-
-export async function signUp(_currentState: unknown, formData: FormData) {
-    const customer = {
-        email: formData.get("email"),
-        password: formData.get("password"),
-        firstname: formData.get("first_name"),
-        lastname: formData.get("last_name"),
-        phone: formData.get("phone"),
-    } as any;
-
-    try {
-        await createCustomer(customer);
-        await getToken({ email: customer.email, password: customer.password }).then(() => {
-            revalidateTag("customer");
-        });
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
-    }
-}
-
-export async function googleLogin(customer: { firstname: string; lastname: string; password: string; email: string }) {
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/social`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(customer),
-        });
-
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
-        const { access_token } = await response.json();
-
-        if (access_token) {
-            const cookieStore = await cookies();
-
-            cookieStore.set("access_token", access_token, {
-                maxAge: 60 * 60 * 24 * 7, // 7 days
-                httpOnly: true,
-                sameSite: "strict",
-                secure: process.env.NODE_ENV === "production",
-            });
-        }
-
-        return access_token;
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
-    }
-}
 
 export async function updateCustomerName(_currentState: Record<string, unknown>, formData: FormData) {
     const customer = {
@@ -128,17 +66,17 @@ export async function updateCustomerPassword(
     const old_password = formData.get("old_password") as string;
     const confirm_password = formData.get("confirm_password") as string;
 
-    const isValid = await authenticate({ email, password: old_password })
-        .then(() => true)
-        .catch(() => false);
+    // const isValid = await authenticate({ email, password: old_password })
+    //     .then(() => true)
+    //     .catch(() => false);
 
-    if (!isValid) {
-        return {
-            customer: currentState.customer,
-            success: false,
-            error: "Old password is incorrect",
-        };
-    }
+    // if (!isValid) {
+    //     return {
+    //         customer: currentState.customer,
+    //         success: false,
+    //         error: "Old password is incorrect",
+    //     };
+    // }
 
     if (new_password !== confirm_password) {
         return {

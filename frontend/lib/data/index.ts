@@ -1,8 +1,6 @@
 import { cache } from "react";
-import { Product, SearchParams } from "types/global";
 import { cookies } from "next/headers";
 import { buildUrl } from "@lib/util/util";
-import { revalidateTag } from "next/cache";
 
 /**
  * Function for getting custom headers for API requests, including the JWT token and cache revalidation tags.
@@ -209,94 +207,6 @@ export const retrieveOrder = cache(async function (id: string) {
     }
 });
 
-// Authentication actions
-export async function getToken(credentials: any) {
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            next: {
-                tags: ["auth"],
-            },
-            body: JSON.stringify(credentials),
-        });
-
-        if (!response.ok) {
-            throw new Error("Login failed");
-        }
-
-        const { access_token } = await response.json();
-
-        if (access_token) {
-            const cookieStore = await cookies();
-
-            cookieStore.set("access_token", access_token, {
-                maxAge: 60 * 60 * 24 * 7, // 7 days
-                httpOnly: true,
-                sameSite: "strict",
-                secure: process.env.NODE_ENV === "production",
-            });
-        }
-
-        return access_token;
-    } catch (error) {
-        throw new Error("Wrong email or password.");
-    }
-}
-
-export async function authenticate(credentials: any) {
-    const headers = await getHeaders(["auth"]);
-
-    // return client.auth
-    //     .authenticate(credentials, headers)
-    //     .then(({ customer }) => customer)
-    //     .catch((err) => Error(err));
-}
-
-// Customer actions
-export async function getCustomer() {
-    const headers = await getHeaders(["customer"]);
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                ...headers,
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (_e) {
-        return null;
-    }
-}
-
-export async function logOut() {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/logout`, {
-            method: "POST",
-            headers: {
-                accept: "application/json",
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (error) {
-        return null;
-    }
-}
-
 // Customer actions
 export async function getAdresses() {
     const headers = await getHeaders(["addresses"]);
@@ -319,15 +229,6 @@ export async function getAdresses() {
     } catch (error) {
         return null;
     }
-}
-
-export async function createCustomer(data: any) {
-    const headers = getHeaders(["customer"]);
-
-    // return client.customers
-    //     .create(data, headers)
-    //     .then(({ customer }) => customer)
-    //     .catch((err) => Error(err));
 }
 
 export async function updateCustomer(data: any) {
@@ -467,51 +368,6 @@ export const listCustomerOrders = cache(async function (limit: number = 10, offs
     }
 });
 
-// export const getProductBySlug = async function (slug: string): Promise<any> {
-//     const headers = await getHeaders(["product"]);
-
-//     try {
-//         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`, {
-//             method: "GET",
-//             headers: {
-//                 accept: "application/json",
-//                 ...headers,
-//             },
-//         });
-
-//         if (!res.ok) {
-//             throw new Error(res.statusText);
-//         }
-
-//         return await res.json();
-//     } catch (error) {
-//         return { message: error, status: "error", error: true };
-//     }
-// };
-
-export const getProductReviews = async (product_id?: number, page: number = 1, limit: number = 20): Promise<any> => {
-    const headers = await getHeaders(["reviews"]);
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });
-
-    try {
-        const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                accept: "application/json",
-                ...headers,
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (error) {
-        return { message: error, status: "error" };
-    }
-};
-
 export const getProduct = cache(async function (slug: string): Promise<any> {
     try {
         const headers = await getHeaders(["products"]);
@@ -557,105 +413,6 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
     }
 });
 
-export const getWishlist = cache(async function (): Promise<any> {
-    try {
-        const headers = await getHeaders(["wishlist"]);
-
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                ...headers,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch wishlist");
-        }
-
-        return await response.json();
-    } catch (error) {
-        return null;
-    }
-});
-
-export async function addWishlist(product_id: number) {
-    const headers = await getHeaders(["wishlist"]);
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            ...headers,
-        },
-        body: JSON.stringify({ product_id }),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to add product to wishlist: ${response.statusText}`);
-    }
-
-    return await response.json();
-}
-
-export async function removeWishlist(product_id: number) {
-    const headers = await getHeaders(["wishlist"]);
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist/${product_id}`;
-    const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            ...headers,
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to remove item from wishlist: ${response.statusText}`);
-    }
-
-    return await response.json();
-}
-
-interface SearchResult {
-    products: Product[];
-    facets?: {
-        brands: Record<string, string>;
-        categories: Record<string, string>;
-        collections: Record<string, string>;
-    };
-    page: number;
-    limit: number;
-    total_count: number;
-    total_pages: number;
-}
-
-export async function productSearch(searchParams: SearchParams): Promise<SearchResult> {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
-
-    try {
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                accept: "application/json",
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch search");
-        }
-
-        return await response.json();
-    } catch (_error) {
-        return {
-            products: [],
-            page: 1,
-            limit: 20,
-            total_count: 0,
-            total_pages: 0,
-        };
-    }
-}
-
 export const getBrands = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
     const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/`, { search, page, limit });
 
@@ -675,82 +432,6 @@ export const getBrands = async (search: string = "", page: number = 1, limit: nu
         return { message: error instanceof Error ? error.message : "Error fetching brands" };
     }
 };
-
-export const getCategories = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, { search, page, limit });
-
-    try {
-        const response = await fetch(url, {
-            next: {
-                tags: ["categories"],
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch categories");
-        }
-
-        return await response.json();
-    } catch (error) {
-        return { message: error instanceof Error ? error.message : "Error fetching categories" };
-    }
-};
-
-export const getCollectionsList = cache(async function (search: string = "", page: number = 1, limit: number = 100): Promise<any> {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, { search, page, limit });
-
-    try {
-        const response = await fetch(url, {
-            next: {
-                tags: ["collections"],
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
-        return await response.json();
-    } catch (error) {
-        return { message: error instanceof Error ? error.message : "Error fetching collections" };
-    }
-});
-
-export const getCollectionBySlug = async (slug: string): Promise<any> => {
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/slug/${slug}`, {
-            headers: {
-                accept: "application/json",
-            },
-            next: { tags: ["collection"] },
-        });
-
-        if (!response.ok) {
-            console.log(response.statusText);
-            throw new Error(response.statusText);
-        }
-
-        return await response.json();
-    } catch (error: any) {
-        throw new Error(`Error fetching collection by slug: ${error.statusText}`);
-    }
-};
-
-// Category actions
-export const listCategories = cache(async function () {
-    const headers = {
-        next: {
-            tags: ["collections"],
-        },
-    } as Record<string, any>;
-
-    // return client.productCategories
-    //     .list({ expand: "category_children" }, headers)
-    //     .then(({ product_categories }) => product_categories)
-    //     .catch((err) => {
-    //         throw err;
-    //     });
-});
 
 export const getActivites = cache(async function (limit: number = 10) {
     const headers = await getHeaders(["activities"]);

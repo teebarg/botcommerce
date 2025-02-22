@@ -5,7 +5,7 @@ import { api } from "@/api";
 export async function mutateProduct(currentState: unknown, formData: FormData) {
     const id = formData.get("id") as string;
     const type = formData.get("type") as string;
-    const productData = {
+    const productData: any = {
         name: formData.get("name") as string,
         slug: formData.get("slug") as string,
         image: formData.get("image") as string,
@@ -17,8 +17,6 @@ export async function mutateProduct(currentState: unknown, formData: FormData) {
         price: Number(formData.get("price")) ?? 0,
         old_price: Number(formData.get("old_price")) ?? 0,
     };
-
-    console.log(productData);
 
     if (type === "create") {
         await api.product.create(productData);

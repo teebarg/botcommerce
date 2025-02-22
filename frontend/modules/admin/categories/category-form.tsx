@@ -3,13 +3,12 @@
 import React, { forwardRef, useActionState, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
-import { Category } from "types/global";
 import { Input } from "@components/ui/input";
-
-import { createCategory } from "../actions";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Category } from "@/lib/models";
+import { mutateCategory } from "@/actions/category";
 
 interface Props {
     current?: Category;
@@ -29,7 +28,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(
         const isCreate = type === "create";
 
         const { enqueueSnackbar } = useSnackbar();
-        const [state, formAction, isPending] = useActionState(createCategory, {
+        const [state, formAction, isPending] = useActionState(mutateCategory, {
             success: false,
             message: "",
             data: null,

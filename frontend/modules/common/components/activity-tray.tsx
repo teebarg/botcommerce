@@ -9,12 +9,12 @@ import { fetchWithAuth } from "@lib/util/api";
 import { useSnackbar } from "notistack";
 import { useWebSocket } from "@lib/hooks/use-websocket";
 import useWatch from "@lib/hooks/use-watch";
-import { Customer } from "types/global";
 
 import Activity from "./activity";
+import { User } from "@/lib/models";
 
 interface Props {
-    customer: Customer;
+    customer: User;
 }
 
 const ActivityTray: React.FC<Props> = ({ customer }) => {

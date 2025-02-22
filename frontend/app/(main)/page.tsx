@@ -1,19 +1,19 @@
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Category, Collection, Product, SearchParams, WishlistItem } from "types/global";
+import { SearchParams } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
-import { getCategories, getCustomer, getWishlist } from "@lib/data";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/api";
+import { Category, Product, WishItem } from "@/lib/models";
+import BannerCarousel from "@/components/carousel";
 
-const BannerCarousel = dynamic(() => import("@components/carousel"));
 const ContactForm = dynamic(() => import("@modules/store/components/contact-form"));
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
@@ -36,22 +36,18 @@ const fetchProducts = async (collection: string, limit: number = 4) => {
 };
 
 export default async function Home() {
-    const { message } = await api.example.hello("Niyi");
     const [trending, latest, featured, { categories }, customer] = await Promise.all([
         fetchProducts("trending"),
         fetchProducts("latest"),
         fetchProducts("featured", 6),
-        getCategories(),
-        getCustomer(),
+        api.category.all({ limit: 100 }),
+        api.user.me(),
     ]);
 
-    console.log("🚀 ~ Home ~ message:", message);
-    console.log(trending);
-
-    let wishlist: WishlistItem[] = [];
+    let wishlist: WishItem[] = [];
 
     if (customer) {
-        const { wishlists } = (await getWishlist()) || {};
+        const { wishlists } = await api.user.wishlist();
 
         wishlist = wishlists;
     }
@@ -141,7 +137,7 @@ export default async function Home() {
                     >
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
                             <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
-                                {categories?.map((category: Collection, index: number) => (
+                                {categories?.map((category: Category, index: number) => (
                                     <BtnLink
                                         key={index}
                                         className="flex-none h-24 min-w-24 rounded-full text-lg"

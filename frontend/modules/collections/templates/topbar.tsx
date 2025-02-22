@@ -6,13 +6,14 @@ import useWatch from "@lib/hooks/use-watch";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { SlideOver } from "@modules/common/components/slideover";
-import { Brand, Category, Collection } from "types/global";
+import { Brand } from "types/global";
 
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
 
 import { ComboBox } from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
+import { Category, Collection } from "@/lib/models";
 
 interface ComponentProps {
     count: any;

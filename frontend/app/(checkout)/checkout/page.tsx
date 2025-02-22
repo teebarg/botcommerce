@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import Wrapper from "@modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
-import { getCart, getCustomer } from "@lib/data";
+import { getCart } from "@lib/data";
 import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 
 import PaymentButton from "@/modules/checkout/components/payment-button";
@@ -14,6 +14,7 @@ import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
+import { api } from "@/api";
 
 export const metadata: Metadata = {
     title: `Clothings | ${siteConfig.name} Store | Checkout`,
@@ -54,8 +55,7 @@ export default async function Checkout() {
     if (!cart) {
         return <EmptyCart />;
     }
-
-    const customer = await getCustomer();
+    const user = await api.user.me();
 
     const { total } = cart;
 
@@ -121,7 +121,7 @@ export default async function Checkout() {
                 {/* Mobile cart summary */}
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
-                        <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
+                        <PaymentButton cart={cart} user={user} data-testid="submit-order-button" />
                         <p className="font-semibold text-xl">Total: {getAmount(total)}</p>
                     </div>
                 </div>

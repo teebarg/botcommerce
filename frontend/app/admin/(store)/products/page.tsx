@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { Product, SearchParams as QP } from "types/global";
+import { SearchParams as QP } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
-import { getBrands, getCategories, getCustomer, productSearch } from "@lib/data";
+import { getBrands } from "@lib/data";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
 import { getCollections } from "@modules/admin/actions";
@@ -14,6 +14,7 @@ import { Avatar } from "@modules/common/components/avatar";
 import { siteConfig } from "@/lib/config";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/api";
+import { Product } from "@/lib/models";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
@@ -36,12 +37,12 @@ export default async function ProductsPage(props: { searchParams: SearchParams }
         limit,
         page,
     };
-    const { products, ...pagination } = await productSearch(queryParams);
+    const { products, ...pagination } = await api.product.search(queryParams);
     const { brands } = (await getBrands()) as { brands: [] };
     const { collections } = (await getCollections(1, 100)) as { collections: [] };
-    const { categories } = await getCategories();
+    const { categories } = await api.category.all({});
 
-    const customer = await getCustomer().catch(() => null);
+    const customer = await api.user.me();
 
     const deleteProduct = async (id: string) => {
         "use server";
@@ -68,54 +69,50 @@ export default async function ProductsPage(props: { searchParams: SearchParams }
                         pagination={pagination}
                         searchQuery={search}
                     >
-                        {products
-                            ?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                            .map((item: Product, index: number) => (
-                                <tr key={item.id} className="even:bg-content2">
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        <Badge
-                                            color={item.is_active ? "success" : "danger"}
-                                            content={<CheckMini viewBox="0 0 20 20" />}
-                                            placement="bottom-right"
-                                            size="md"
-                                        >
-                                            <Avatar className="h-full w-full" radius="md" src={item.image ?? null} />
-                                        </Badge>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <div className="font-bold truncate max-w-32">{item?.name}</div>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <div className="font-bold truncate max-w-32">{item?.description}</div>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <p>{currency(Number(item?.price) ?? 0)}</p>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <p>{currency(Number(item?.old_price) ?? 0)}</p>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        {new Date(item.created_at as string).toLocaleDateString()}
-                                    </td>
-                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
-                                        <Actions
-                                            deleteAction={deleteProduct}
-                                            form={
-                                                <ProductForm
-                                                    brands={brands}
-                                                    categories={categories}
-                                                    collections={collections}
-                                                    current={item}
-                                                    type="update"
-                                                />
-                                            }
-                                            item={item}
-                                            label="product"
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
+                        {products.map((item: Product, index: number) => (
+                            <tr key={item.id} className="even:bg-content2">
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
+                                    <Badge
+                                        color={item.is_active ? "success" : "danger"}
+                                        content={<CheckMini viewBox="0 0 20 20" />}
+                                        placement="bottom-right"
+                                        size="md"
+                                    >
+                                        <Avatar className="h-full w-full" radius="md" src={item.image ?? null} />
+                                    </Badge>
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                    <div className="font-bold truncate max-w-32">{item?.name}</div>
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                    <div className="font-bold truncate max-w-32">{item?.description}</div>
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                    <p>{currency(Number(item?.price) ?? 0)}</p>
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                    <p>{currency(Number(item?.old_price) ?? 0)}</p>
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">{new Date(item.created_at as string).toLocaleDateString()}</td>
+                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                                    <Actions
+                                        deleteAction={deleteProduct}
+                                        form={
+                                            <ProductForm
+                                                brands={brands}
+                                                categories={categories}
+                                                collections={collections}
+                                                current={item}
+                                                type="update"
+                                            />
+                                        }
+                                        item={item}
+                                        label="product"
+                                    />
+                                </td>
+                            </tr>
+                        ))}
                     </Table>
                 </div>
             </div>

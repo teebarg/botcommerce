@@ -2,10 +2,38 @@ import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/util/util";
 import { SearchParams } from "@/types/global";
-import { PaginatedProduct, PaginatedReview, Product } from "@/lib/models";
+import { PaginatedProduct, Product, User, Wishlist } from "@/lib/models";
 
 // Product API methods
-export const productApi = {
+export const userApi = {
+    async me(): Promise<User> {
+        try {
+            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`;
+            const response = await fetcher<User>(url);
+            return response;
+        } catch (error) {
+            console.error("Failed to fetch user:", error);
+            return null as unknown as User;
+        }
+    },
+    async wishlist(): Promise<Wishlist> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
+        const response = await fetcher<Wishlist>(url, { next: { tags: ["beaf"] } });
+
+        return response;
+    },
+    async addWishlist(product_id: number): Promise<Product> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
+        const response = await fetcher<Product>(url, { method: "POST", body: JSON.stringify({ product_id }) });
+
+        return response;
+    },
+    async deleteWishlist(id: number): Promise<{ success: boolean; message: string }> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist/${id}`;
+        const res = await fetcher<Product>(url, { method: "DELETE" });
+
+        return { success: true, message: "Wishlist deleted successfully" };
+    },
     async search(searchParams: SearchParams): Promise<PaginatedProduct> {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
         const response = await fetcher<PaginatedProduct>(url);
@@ -35,11 +63,5 @@ export const productApi = {
         await fetcher<Product>(url, { method: "DELETE" });
 
         return { success: true, message: "Product deleted successfully" };
-    },
-    async reviews({ product_id, page = 1, limit = 20 }: { product_id?: number; page: number; limit: number }): Promise<PaginatedReview> {
-        const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });
-        const response = await fetcher<PaginatedReview>(url);
-
-        return response;
     },
 };

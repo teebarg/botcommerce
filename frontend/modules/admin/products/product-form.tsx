@@ -4,7 +4,7 @@ import React, { forwardRef, useActionState, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { ImageUpload } from "@modules/common/components/image-upload";
 import { useRouter } from "next/navigation";
-import { Brand, Category, Collection } from "types/global";
+import { Brand } from "types/global";
 import { Input } from "@components/ui/input";
 import { Number } from "@components/ui/number";
 import { TextArea } from "@components/ui/textarea";
@@ -15,6 +15,7 @@ import { Multiselect } from "@/components/ui/multiselect";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { mutateProduct } from "@/actions/product";
+import { Category, Collection } from "@/lib/models";
 
 interface Props {
     current?: any;

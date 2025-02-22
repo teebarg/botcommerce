@@ -1,15 +1,15 @@
 import { Metadata } from "next";
-import { Collection } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
-import { getCollectionsList, getCustomer } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
 import { deleteCollection } from "@modules/admin/actions";
 
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
+import { api } from "@/api";
+import { Collection } from "@/lib/models";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
@@ -27,8 +27,8 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { collections, ...pagination } = await getCollectionsList(search, page, limit);
-    const customer = await getCustomer().catch(() => null);
+    const { collections, ...pagination } = await api.collection.all({ search, page, limit });
+    const customer = await api.user.me();
 
     return (
         <React.Fragment>
@@ -45,30 +45,26 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
                         pagination={pagination}
                         searchQuery={search}
                     >
-                        {collections
-                            ?.sort((a: Collection, b: Collection) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                            .map((item: Collection, index: number) => (
-                                <tr key={item.id} className="even:bg-content2">
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <div className="font-bold truncate max-w-32">{item?.name}</div>
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <Chip color={item.is_active ? "success" : "danger"} title={item.is_active ? "Active" : "Inactive"} />
-                                    </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        {new Date(item.created_at as string).toLocaleDateString()}
-                                    </td>
-                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
-                                        <Actions
-                                            deleteAction={deleteCollection}
-                                            form={<CollectionForm current={item} type="update" />}
-                                            item={item}
-                                            label="collection"
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
+                        {collections.map((item: Collection, index: number) => (
+                            <tr key={item.id} className="even:bg-content2">
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                    <div className="font-bold truncate max-w-32">{item?.name}</div>
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                    <Chip color={item.is_active ? "success" : "danger"} title={item.is_active ? "Active" : "Inactive"} />
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">{new Date(item.created_at as string).toLocaleDateString()}</td>
+                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                                    <Actions
+                                        deleteAction={deleteCollection}
+                                        form={<CollectionForm current={item} type="update" />}
+                                        item={item}
+                                        label="collection"
+                                    />
+                                </td>
+                            </tr>
+                        ))}
                         {collections?.length === 0 && (
                             <tr>
                                 <td className="text-center py-4 text-lg text-default-500" colSpan={5}>

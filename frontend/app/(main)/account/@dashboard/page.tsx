@@ -1,19 +1,21 @@
 import { Metadata } from "next";
-import { getCustomer, listCustomerOrders } from "@lib/data";
+import { listCustomerOrders } from "@lib/data";
 import { notFound } from "next/navigation";
-import { Customer, Order } from "types/global";
+import { Order } from "types/global";
 import { currency } from "@lib/util/util";
 import { ChevronDown } from "nui-react-icons";
 
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/api";
+import { User } from "@/lib/models";
 
 export const metadata: Metadata = {
     title: "Account",
     description: "Overview of your account activity.",
 };
 
-const getProfileCompletion = (customer: Omit<Customer, "password_hash"> | null) => {
+const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
     let count = 0;
 
     if (!customer) {
@@ -40,7 +42,7 @@ const getProfileCompletion = (customer: Omit<Customer, "password_hash"> | null) 
 };
 
 export default async function OverviewTemplate() {
-    const customer = await getCustomer().catch(() => null);
+    const customer = await api.user.me();
     const { orders } = await listCustomerOrders();
 
     if (!customer) {

@@ -1,16 +1,16 @@
 "use client";
 
-import { User } from "nui-react-icons";
+import { User as UserIcon } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import { signOut } from "@modules/account/actions";
 import MapPin from "@modules/common/icons/map-pin";
 import Package from "@modules/common/icons/package";
-import { Customer } from "types/global";
 import { cn } from "@lib/util/cn";
 
 import LocalizedClientLink from "@/components/ui/link";
+import { User } from "@/lib/models";
 
-const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | null }) => {
+const AccountNav = ({ user }: { user: Omit<User, "password_hash"> | null }) => {
     const route = usePathname();
 
     const handleLogout = async () => {
@@ -20,13 +20,13 @@ const AccountNav = ({ customer }: { customer: Omit<Customer, "password_hash"> | 
     const navLinks = [
         {
             href: "/account",
-            icon: <User className="h-8 w-8" viewBox="0 0 20 20" />,
+            icon: <UserIcon className="h-8 w-8" viewBox="0 0 20 20" />,
             label: "Overview",
             dataTestid: "overview-link",
         },
         {
             href: "/account/profile",
-            icon: <User className="h-8 w-8" viewBox="0 0 20 20" />,
+            icon: <UserIcon className="h-8 w-8" viewBox="0 0 20 20" />,
             label: "Profile",
             dataTestid: "addresses-link",
         },

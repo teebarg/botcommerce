@@ -1,7 +1,6 @@
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { signIn } from "@modules/auth/action";
 import { Input } from "@components/ui/input";
 import { useActionState } from "react";
 
@@ -9,6 +8,7 @@ import { GoogleLogin } from "./google";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
+import { signIn } from "@/actions/auth";
 
 type Props = {};
 

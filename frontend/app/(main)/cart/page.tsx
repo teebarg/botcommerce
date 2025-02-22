@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { getCustomer } from "@lib/data";
 import { Shield } from "nui-react-icons";
 import { retrieveCart } from "@modules/cart/actions";
 import SignInPrompt from "@modules/cart/components/sign-in-prompt";
@@ -12,6 +11,7 @@ import { CartItem } from "@/types/global";
 import { siteConfig } from "@/lib/config";
 import Items from "@/components/order/cart-details";
 import PromotionalBanner from "@/components/promotion";
+import { api } from "@/api";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default async function Cart() {
     const cart = await retrieveCart();
-    const customer = await getCustomer();
+    const user = await api.user.me();
 
     const product_ids = cart?.items?.map((x: CartItem) => x.product_id);
 
@@ -38,7 +38,7 @@ export default async function Cart() {
                     {cart?.items.length ? (
                         <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8">
                             <div className="flex flex-col bg-content1 px-4 py-6 gap-y-6 rounded-md">
-                                {!customer && (
+                                {!user && (
                                     <>
                                         <SignInPrompt />
                                         <hr className="tb-divider" />
