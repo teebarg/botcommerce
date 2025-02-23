@@ -2,13 +2,14 @@ import { Metadata } from "next";
 import { Brand } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
-import { getBrands } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
 import { deleteBrand } from "@modules/admin/actions";
 
 import { BrandForm } from "@/modules/admin/brands/brand-form";
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
+import { api } from "@/api";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Brands Page | Children clothing | ${siteConfig.name} Store`,
@@ -26,7 +27,11 @@ export default async function BrandsPage(props: { searchParams: SearchParams }) 
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { brands, ...pagination } = await getBrands(search, page, limit);
+    const res = await api.brand.all({ search, page, limit });
+    if (!res) {
+        return <ServerError />;
+    }
+    const { brands, ...pagination } = res;
 
     return (
         <React.Fragment>

@@ -1,5 +1,6 @@
-import { api } from "@/api";
 import { revalidateTag } from "next/cache";
+
+import { api } from "@/api";
 
 export async function mutateCategory(currentState: unknown, formData: FormData) {
     const body: any = {

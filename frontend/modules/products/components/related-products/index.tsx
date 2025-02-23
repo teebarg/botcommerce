@@ -1,6 +1,7 @@
+import dynamic from "next/dynamic";
+
 import { api } from "@/api";
 import { Product } from "@/lib/models";
-import dynamic from "next/dynamic";
 
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
@@ -18,6 +19,7 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
         }
 
         params.limit = 4;
+
         return params;
     };
 

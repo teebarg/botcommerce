@@ -1,5 +1,6 @@
 import { SearchParams } from "types/global";
 import dynamic from "next/dynamic";
+
 import { api } from "@/api";
 import { Product } from "@/lib/models";
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });

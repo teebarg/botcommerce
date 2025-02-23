@@ -1,7 +1,8 @@
 "use server";
 
-import { api } from "@/api";
 import { revalidateTag } from "next/cache";
+
+import { api } from "@/api";
 
 export async function removeWish(id: number) {
     try {

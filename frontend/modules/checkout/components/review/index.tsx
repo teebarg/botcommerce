@@ -36,7 +36,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
                             and Returns Policy and acknowledge that you have read {siteConfig.name}&apos;s Privacy Policy.
                         </p>
                     </div>
-                    <PaymentButton cart={cart} user={customer} data-testid="submit-order-button" />
+                    <PaymentButton cart={cart} data-testid="submit-order-button" user={customer} />
                 </>
             )}
         </div>

@@ -13,6 +13,7 @@ export async function fetcher<T>(url: string, options?: RequestInit): Promise<T>
             "X-Auth": accessToken ?? "", // Ensure the header is always set
             ...options?.headers,
         },
+        cache: "force-cache",
     });
 
     if (!res.ok) {

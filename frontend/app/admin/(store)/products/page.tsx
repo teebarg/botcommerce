@@ -1,12 +1,9 @@
 import { Metadata } from "next";
-import { SearchParams as QP } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
-import { getBrands } from "@lib/data";
 import { currency } from "@lib/util/util";
 import { Actions } from "@modules/admin/components/actions";
-import { getCollections } from "@modules/admin/actions";
 import { ProductForm } from "@modules/admin/products/product-form";
 import { CheckMini } from "nui-react-icons";
 import { Avatar } from "@modules/common/components/avatar";
@@ -15,6 +12,7 @@ import { siteConfig } from "@/lib/config";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/api";
 import { Product } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
@@ -27,22 +25,32 @@ type SearchParams = Promise<{
     search?: string;
 }>;
 
-export default async function ProductsPage(props: { searchParams: SearchParams }) {
-    const searchParams = await props.searchParams;
-    const search = searchParams.search || "";
-    const page = parseInt(searchParams.page || "1", 10);
-    const limit = parseInt(searchParams.limit || "10", 10);
-    const queryParams: QP = {
-        query: search,
-        limit,
-        page,
-    };
-    const { products, ...pagination } = await api.product.search(queryParams);
-    const { brands } = (await getBrands()) as { brands: [] };
-    const { collections } = (await getCollections(1, 100)) as { collections: [] };
-    const { categories } = await api.category.all({});
+type ProductPageProps = {
+    searchParams: SearchParams;
+};
 
-    const customer = await api.user.me();
+export default async function ProductsPage({ searchParams }: ProductPageProps) {
+    const { search = "", page: pageStr = "1", limit: limitStr = "10" } = await searchParams;
+    const page = parseInt(pageStr, 10);
+    const limit = parseInt(limitStr, 10);
+
+    const [productsResponse, brandRes, collectionsRes, catRes, customer] = await Promise.all([
+        api.product.search({ query: search, limit, page }),
+        api.brand.all(),
+        api.collection.all({ page: 1, limit: 100 }),
+        api.category.all(),
+        api.user.me(),
+    ]);
+
+    // Early returns for error handling
+    if (!brandRes || !collectionsRes || !catRes) {
+        return <ServerError />;
+    }
+
+    const { products, ...pagination } = productsResponse;
+    const { brands } = brandRes;
+    const { collections } = collectionsRes;
+    const { categories } = catRes;
 
     const deleteProduct = async (id: string) => {
         "use server";
@@ -59,7 +67,7 @@ export default async function ProductsPage(props: { searchParams: SearchParams }
                 <div className="max-w-7xl mx-auto p-8">
                     <h1 className="text-2xl font-semibold mb-2">Products</h1>
                     <div className="py-4">
-                        <ProductUpload customer={customer} />
+                        <ProductUpload userId={customer.id} />
                     </div>
                     <Table
                         canExport

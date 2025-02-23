@@ -413,26 +413,6 @@ export const getProductsList = cache(async function (queryParams: any): Promise<
     }
 });
 
-export const getBrands = async (search: string = "", page: number = 1, limit: number = 100): Promise<any> => {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/`, { search, page, limit });
-
-    try {
-        const response = await fetch(url, {
-            next: {
-                tags: ["brands"],
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch brands");
-        }
-
-        return await response.json();
-    } catch (error) {
-        return { message: error instanceof Error ? error.message : "Error fetching brands" };
-    }
-};
-
 export const getActivites = cache(async function (limit: number = 10) {
     const headers = await getHeaders(["activities"]);
 

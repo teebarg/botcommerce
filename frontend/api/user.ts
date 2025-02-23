@@ -10,9 +10,10 @@ export const userApi = {
         try {
             const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`;
             const response = await fetcher<User>(url);
+
             return response;
         } catch (error) {
-            console.error("Failed to fetch user:", error);
+            // console.error("Failed to fetch user:");
             return null as unknown as User;
         }
     },
@@ -60,6 +61,7 @@ export const userApi = {
     },
     async delete(id: string): Promise<{ success: boolean; message: string }> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}`;
+
         await fetcher<Product>(url, { method: "DELETE" });
 
         return { success: true, message: "Product deleted successfully" };

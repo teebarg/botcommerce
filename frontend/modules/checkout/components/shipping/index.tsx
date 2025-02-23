@@ -70,7 +70,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
         >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <div className={cn("w-2 h-2 bg-default-500 rounded-full", { "bg-blue-500": isOpen || hasShippingMethod })}></div>
+                    <div className={cn("w-2 h-2 bg-default-500 rounded-full", { "bg-blue-500": isOpen || hasShippingMethod })} />
                     <span className="font-medium">Delivery Option</span>
                 </div>
                 <button
@@ -83,7 +83,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
             </div>
 
             {/* Form */}
-            <div data-testid="delivery-options-container" className={cn("mt-6", isOpen ? "block" : "hidden")}>
+            <div className={cn("mt-6", isOpen ? "block" : "hidden")} data-testid="delivery-options-container">
                 <RadioGroup
                     className="grid grid-cols-1 md:grid-cols-3 gap-2"
                     name="shipping-method"

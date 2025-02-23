@@ -231,30 +231,6 @@ export async function deleteCollection(collectionId: string) {
     }
 }
 
-export async function getCollections(page: number = 1, limit: number = 10) {
-    const accessToken = await token();
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/?page=${page}&limit=${limit}`;
-
-    try {
-        const res = await fetch(url, {
-            headers: {
-                "X-Auth": accessToken,
-            },
-            next: {
-                tags: ["collections"],
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (error: any) {
-        throw new Error(`Error fetching collections: ${error.statusText}`);
-    }
-}
-
 export async function bulkUploadProducts({ formData }: { formData: FormData }) {
     const accessToken = await token();
 

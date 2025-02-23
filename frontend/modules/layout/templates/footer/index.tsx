@@ -6,6 +6,7 @@ import NewsletterForm from "@modules/store/components/newsletter";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/api";
 import { Category } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 const about = [
     {
@@ -46,7 +47,11 @@ const legal = [
 ];
 
 export default async function Footer() {
-    const { collections } = await api.collection.all({ limit: 6 });
+    const res = await api.collection.all({ limit: 6 });
+    if (!res) {
+        return <ServerError />;
+    }
+    const { collections } = res;
     const { categories: cat } = await api.category.all({ limit: 100 });
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 

@@ -10,6 +10,7 @@ import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
 import { api } from "@/api";
 import { Collection } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
@@ -27,7 +28,11 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { collections, ...pagination } = await api.collection.all({ search, page, limit });
+    const res = await api.collection.all({ search, page, limit });
+    if (!res) {
+        return <ServerError />;
+    }
+    const { collections, ...pagination } = res;
     const customer = await api.user.me();
 
     return (
@@ -36,7 +41,7 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
                 <div className="max-w-7xl mx-auto p-8">
                     <h1 className="text-2xl font-semibold mb-2">Collections</h1>
                     <div className="py-4">
-                        <ProductUpload customer={customer} />
+                        <ProductUpload userId={customer.id} />
                     </div>
                     <Table
                         canExport

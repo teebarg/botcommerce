@@ -1,7 +1,6 @@
 import { fetcher } from "./fetcher";
 
 import { Token } from "@/lib/models";
-import { cookies } from "next/headers";
 
 // Product API methods
 export const authApi = {

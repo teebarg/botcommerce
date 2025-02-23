@@ -14,6 +14,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import ReviewsSection from "@/components/product/product-reviews";
 import { Skeleton } from "@/components/skeleton";
 import { api } from "@/api";
+import ServerError from "@/components/server-error";
 
 type Params = Promise<{ slug: string }>;
 
@@ -43,6 +44,10 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
     const product = await api.product.get(slug);
+
+    if (product == null) {
+        return <ServerError />;
+    }
 
     if (!product) {
         notFound();
@@ -87,7 +92,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                             </div>
                             <div className="flex-1">
                                 <div className="h-[60vh] relative rounded-lg overflow-hidden">
-                                    <Image fill alt={product.name} src={product.image as string} />
+                                    {product.image && <Image fill alt={product.name} src={product.image} />}
                                 </div>
                             </div>
                         </div>

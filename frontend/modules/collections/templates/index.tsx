@@ -1,7 +1,6 @@
 import React from "react";
 import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { getBrands } from "@lib/data";
 import { SearchParams, SortOptions } from "types/global";
 import dynamic from "next/dynamic";
 
@@ -13,6 +12,8 @@ import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/api";
 import { Category, Collection, Product, WishItem } from "@/lib/models";
+import { auth } from "@/actions/auth";
+import ServerError from "@/components/server-error";
 
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
@@ -31,19 +32,26 @@ interface ComponentProps {
 }
 
 const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, sortBy, searchParams }) => {
-    const { brands } = await getBrands();
-    const { collections } = await api.collection.all();
-    const customer = await api.user.me();
+    const user = await auth();
+    const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
+
+    // Early returns for error handling
+    if (!brandRes || !collectionsRes || !catRes) {
+        return <ServerError />;
+    }
+
+    const { brands } = brandRes;
+    const { collections } = collectionsRes;
+    const { categories: cat } = catRes;
+    const categories = cat?.filter((cat: Category) => !cat.parent_id);
+
     let wishlist: WishItem[] = [];
 
-    if (customer) {
+    if (user) {
         const { wishlists } = await api.user.wishlist();
 
         wishlist = wishlists;
     }
-
-    const { categories: cat } = await await api.category.all();
-    const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
     const queryParams: SearchParams = {
         query,
@@ -140,7 +148,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                         <React.Fragment>
                                             <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
                                                 {products.map((product: Product, index: number) => (
-                                                    <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                                    <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                                 ))}
                                             </div>
                                             {pagination.total_pages > 1 && <Pagination pagination={pagination} />}

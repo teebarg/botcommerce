@@ -32,6 +32,7 @@ export const categoryApi = {
     },
     async delete(id: number): Promise<{ success: boolean; message: string }> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
+
         await fetcher<Category>(url, { method: "DELETE" });
 
         return { success: true, message: "Category deleted successfully" };

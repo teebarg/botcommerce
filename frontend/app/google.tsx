@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import authTap from "auth-tap";
 import { useSnackbar } from "notistack";
+
 import { googleLogin } from "@/actions/auth";
 
 export default function Google() {

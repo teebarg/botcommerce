@@ -53,12 +53,23 @@ export const ProductSchema = z.object({
     reviews: z.array(ReviewSchema).optional(),
 });
 
-const BrandSchema = z.object({
+export const PagSchema = z.object({
+    page: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
+});
+
+export const BrandSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
     is_active: z.boolean().optional(),
     created_at: z.string(),
+});
+
+export const PaginatedBrandSchema = PagSchema.extend({
+    brands: z.array(BrandSchema),
 });
 
 export const CollectionSchema = z.object({
@@ -69,12 +80,8 @@ export const CollectionSchema = z.object({
     created_at: z.string(),
 });
 
-export const PaginatedCollectionSchema = z.object({
+export const PaginatedCollectionSchema = PagSchema.extend({
     collections: z.array(CollectionSchema),
-    page: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
 });
 
 const PaginationSchema = z.object({
@@ -172,12 +179,8 @@ export const CategorySchema = z.object({
     updated_at: z.string(),
 });
 
-export const PaginatedCategorySchema = z.object({
+export const PaginatedCategorySchema = PagSchema.extend({
     categories: z.array(CategorySchema),
-    page: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
 });
 
 const SearchParamsSchema = z.object({
@@ -219,11 +222,18 @@ export const FacetSchema = z.object({
     collections: z.record(z.string()).optional(),
 });
 
-export const PaginatedProductSchema = z.object({
+export const PaginatedProductSchema = PagSchema.extend({
     products: z.array(ProductSchema),
     facets: FacetSchema.optional(),
-    page: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
+});
+
+export const SessionSchema = z.object({
+    id: z.number(),
+    firstname: z.string(),
+    lastname: z.string().optional(),
+    email: z.string(),
+    image: z.string().optional(),
+    phone: z.string().optional(),
+    isActive: z.boolean(),
+    isAdmin: z.boolean(),
 });

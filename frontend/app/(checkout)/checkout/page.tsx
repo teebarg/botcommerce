@@ -121,7 +121,7 @@ export default async function Checkout() {
                 {/* Mobile cart summary */}
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
-                        <PaymentButton cart={cart} user={user} data-testid="submit-order-button" />
+                        <PaymentButton cart={cart} data-testid="submit-order-button" user={user} />
                         <p className="font-semibold text-xl">Total: {getAmount(total)}</p>
                     </div>
                 </div>

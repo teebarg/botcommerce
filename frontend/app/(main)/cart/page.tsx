@@ -11,7 +11,7 @@ import { CartItem } from "@/types/global";
 import { siteConfig } from "@/lib/config";
 import Items from "@/components/order/cart-details";
 import PromotionalBanner from "@/components/promotion";
-import { api } from "@/api";
+import { auth } from "@/actions/auth";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default async function Cart() {
     const cart = await retrieveCart();
-    const user = await api.user.me();
+    const user = await auth();
 
     const product_ids = cart?.items?.map((x: CartItem) => x.product_id);
 

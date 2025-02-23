@@ -89,6 +89,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children, color = "default",
             </div>
             {isVisible && (
                 <div
+                    aria-label="tooltip"
                     ref={tooltipRef}
                     className={cn(
                         "px-3 py-2 text-sm font-medium rounded-md shadow-md text-default-foreground max-w-sm",

@@ -11,13 +11,12 @@ import { useWebSocket } from "@lib/hooks/use-websocket";
 import useWatch from "@lib/hooks/use-watch";
 
 import Activity from "./activity";
-import { User } from "@/lib/models";
 
 interface Props {
-    customer: User;
+    userId: string | number;
 }
 
-const ActivityTray: React.FC<Props> = ({ customer }) => {
+const ActivityTray: React.FC<Props> = ({ userId }) => {
     const { enqueueSnackbar } = useSnackbar();
     const state = useOverlayTriggerState({});
     const buttonRef = React.useRef(null);
@@ -41,7 +40,7 @@ const ActivityTray: React.FC<Props> = ({ customer }) => {
     const { messages: wsMessages, connect: initializeWebsocket, disconnect: disconnectWebsocket } = useWebSocket({ type: ["activities"] });
 
     const currentMessage = wsMessages[wsMessages.length - 1];
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/${customer.id}/`;
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/${userId}/`;
 
     useEffect(() => {
         fetchActivities();

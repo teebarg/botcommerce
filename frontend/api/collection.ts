@@ -5,12 +5,15 @@ import { PaginatedCollection, Collection } from "@/lib/models";
 
 // Collection API methods
 export const collectionApi = {
-    async all(input?: { search?: string; page?: number; limit?: number }): Promise<PaginatedCollection> {
+    async all(input?: { search?: string; page?: number; limit?: number }): Promise<PaginatedCollection | null> {
         const searchParams = { search: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, searchParams);
-        const response = await fetcher<PaginatedCollection>(url);
-
-        return response;
+        try {
+            const response = await fetcher<PaginatedCollection>(url);
+            return response;
+        } catch (error) {
+            return null;
+        }
     },
     async get(id: string): Promise<Collection> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}`;
@@ -38,6 +41,7 @@ export const collectionApi = {
     },
     async delete(id: string): Promise<{ success: boolean; message: string }> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}`;
+
         await fetcher<Collection>(url, { method: "DELETE" });
 
         return { success: true, message: "Collection deleted successfully" };

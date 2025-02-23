@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/api";
+import { auth } from "@/actions/auth";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
@@ -14,7 +14,7 @@ const getThemeToggler = () =>
     });
 
 const AdminNavbar = async () => {
-    const customer = await api.user.me();
+    const user = await auth();
     const ThemeButton = getThemeToggler();
 
     return (
@@ -34,11 +34,11 @@ const AdminNavbar = async () => {
                 <NavbarItem className="flex items-center gap-2.5">
                     {/* <Notification /> */}
                     <ThemeButton />
-                    <ActivityTray customer={customer} />
+                    {user?.id && <ActivityTray userId={user.id} />}
                 </NavbarItem>
                 <NavbarItem className="flex">
-                    {customer ? (
-                        <UserDropDown customer={customer} />
+                    {user ? (
+                        <UserDropDown user={user} />
                     ) : (
                         <LocalizedClientLink href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>

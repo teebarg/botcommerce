@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
 import { SearchParams } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
@@ -13,9 +12,9 @@ import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/api";
 import { Category, Product, WishItem } from "@/lib/models";
 import BannerCarousel from "@/components/carousel";
-
-const ContactForm = dynamic(() => import("@modules/store/components/contact-form"));
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
+import ProductCard from "@/components/product/product-card";
+import ContactForm from "@/modules/store/components/contact-form";
+import { auth } from "@/actions/auth";
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -36,17 +35,17 @@ const fetchProducts = async (collection: string, limit: number = 4) => {
 };
 
 export default async function Home() {
-    const [trending, latest, featured, { categories }, customer] = await Promise.all([
+    const user = await auth();
+    const [trending, latest, featured, { categories }] = await Promise.all([
         fetchProducts("trending"),
         fetchProducts("latest"),
         fetchProducts("featured", 6),
         api.category.all({ limit: 100 }),
-        api.user.me(),
     ]);
 
     let wishlist: WishItem[] = [];
 
-    if (customer) {
+    if (user) {
         const { wishlists } = await api.user.wishlist();
 
         wishlist = wishlists;
@@ -178,7 +177,7 @@ export default async function Home() {
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                                 {featured?.map((product: Product, index: number) => (
-                                    <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                    <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                 ))}
                             </div>
                         </div>
@@ -195,7 +194,7 @@ export default async function Home() {
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
                             {trending?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
@@ -218,7 +217,7 @@ export default async function Home() {
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
                             {latest?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>

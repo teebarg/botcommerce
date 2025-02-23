@@ -8,7 +8,7 @@ import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
 import { siteConfig } from "@/lib/config";
 import ProgressBar from "@/components/ui/progress-bar";
-import { api } from "@/api";
+import { auth } from "@/actions/auth";
 
 const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
 const NotificationProviders = dynamic(() => import("./notistack-providers"));
@@ -46,7 +46,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    const user = await api.user.me();
+    const user = await auth();
 
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">

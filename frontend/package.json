@@ -39,6 +39,7 @@
         "auth-tap": "^0.0.2",
         "clsx": "^2.1.1",
         "date-fns": "^4.1.0",
+        "jsonwebtoken": "^9.0.2",
         "next": "15.1.7",
         "notistack": "^3.0.1",
         "nui-react-icons": "0.0.20",
@@ -52,6 +53,7 @@
     "devDependencies": {
         "@babel/core": "^7.17.5",
         "@playwright/test": "^1.41.1",
+        "@types/jsonwebtoken": "^9.0.9",
         "@types/lodash": "^4.17.9",
         "@types/node": "20.5.7",
         "@types/prop-types": "^15.7.13",

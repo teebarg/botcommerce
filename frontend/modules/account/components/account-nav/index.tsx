@@ -8,9 +8,8 @@ import Package from "@modules/common/icons/package";
 import { cn } from "@lib/util/cn";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { User } from "@/lib/models";
 
-const AccountNav = ({ user }: { user: Omit<User, "password_hash"> | null }) => {
+const AccountNav = () => {
     const route = usePathname();
 
     const handleLogout = async () => {

@@ -31,15 +31,15 @@ def get_recently_viewed(cache, user_id: str) -> list[str]:
 
 async def get_product(cache, product_id: str) -> dict | None:
     """Get product from cache, return None if not found"""
-    key = f"product:{product_id}"
-    cached_product = cache.get(key)
+    # key = f"product:{product_id}"
+    # cached_product = cache.get(key)
 
-    if cached_product:
-        return json.loads(cached_product)
+    # if cached_product:
+    #     return json.loads(cached_product)
 
     doc = get_document_by_id("products", product_id)
 
     # Cache the result
-    cache.set(key, CACHE_EXPIRY, json.dumps(doc))
+    # cache.set(key, CACHE_EXPIRY, json.dumps(doc))
 
     return doc

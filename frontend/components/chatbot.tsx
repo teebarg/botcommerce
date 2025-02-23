@@ -200,6 +200,7 @@ const ChatBot: React.FC<Props> = () => {
                 </div>
                 <div className="block data-[open=true]:hidden" data-open={isOpen ? "true" : "false"}>
                     <button
+                        aria-label="assistant"
                         className="group bg-[#0f62fe] text-white min-w-12 place-items-center flex duration-300 transition-all py-2 px-4"
                         type="button"
                         onClick={toggleChat}
