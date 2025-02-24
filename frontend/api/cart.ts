@@ -1,7 +1,7 @@
 import { revalidate, revalidateCart } from "@/actions/revalidate";
 import { fetcher } from "./fetcher";
 
-import { Cart, Exception } from "@/lib/models";
+import { Cart, Exception, Order } from "@/lib/models";
 
 // Cart API methods
 export const cartApi = {
@@ -41,11 +41,31 @@ export const cartApi = {
             return { message: "", error: true };
         }
     },
+    async updateDetails(data: any): Promise<Cart | Exception> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update-cart-details`;
+        try {
+            const response = await fetcher<Cart>(url, { method: "PATCH", body: JSON.stringify(data) });
+            revalidateCart();
+            return response;
+        } catch (error) {
+            return { message: "", error: true };
+        }
+    },
     async delete(product_id: string): Promise<{ success: boolean; message: string }> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/${product_id}`;
 
         await fetcher<Cart>(url, { method: "DELETE" });
         revalidateCart();
         return { success: true, message: "Cart deleted successfully" };
+    },
+    async complete(): Promise<Order | Exception> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`;
+        try {
+            const response = await fetcher<Order>(url, { method: "POST" });
+            revalidate("cart");
+            return response;
+        } catch (error) {
+            return { message: "", error: true };
+        }
     },
 };

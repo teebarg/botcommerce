@@ -1,11 +1,10 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { completeCart, updateCart } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { DeliveryOption, PaymentSession } from "types/global";
-import { Order } from "@/lib/models";
+import { api } from "@/api";
 
 async function cartId() {
     const cookieStore = await cookies();
@@ -14,41 +13,24 @@ async function cartId() {
 }
 
 export async function cartUpdate(data: any) {
-    const id = await cartId();
-
-    if (!id) return "No cartId cookie found";
-
     try {
-        await updateCart(id, data);
-        revalidateTag("cart");
+        await api.cart.updateDetails(data);
     } catch (error: any) {
         return error.toString();
     }
 }
 
 export async function applyDiscount(code: string) {
-    const id = await cartId();
-
-    if (!id) return "No cartId cookie found";
-
     try {
-        await updateCart(id, { discounts: [{ code }] }).then(() => {
-            revalidateTag("cart");
-        });
+        await api.cart.updateDetails({ discounts: [{ code }] });
     } catch (error: any) {
         throw error;
     }
 }
 
 export async function applyGiftCard(code: string) {
-    const id = await cartId();
-
-    if (!id) return "No cartId cookie found";
-
     try {
-        await updateCart(id, { gift_cards: [{ code }] }).then(() => {
-            revalidateTag("cart");
-        });
+        await api.cart.updateDetails({ gift_cards: [{ code }] });
     } catch (error: any) {
         throw error;
     }
@@ -68,15 +50,9 @@ export async function removeDiscount(code: string) {
 }
 
 export async function removeGiftCard(codeToRemove: string, giftCards: any[]) {
-    const id = await cartId();
-
-    if (!id) return "No cartId cookie found";
-
     try {
-        await updateCart(id, {
+        await api.cart.updateDetails({
             gift_cards: [...giftCards].filter((gc) => gc.code !== codeToRemove).map((gc) => ({ code: gc.code })),
-        }).then(() => {
-            revalidateTag("cart");
         });
     } catch (error: any) {
         throw error;
@@ -147,26 +123,16 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 }
 
 export async function setShippingMethod(option: DeliveryOption) {
-    const id = await cartId();
-
-    if (!id) throw new Error("No cartId cookie found");
-
     try {
-        await updateCart(id, { shipping_method: option });
-        revalidateTag("cart");
+        await api.cart.updateDetails({ shipping_method: option });
     } catch (error: any) {
         throw error;
     }
 }
 
 export async function setPaymentMethod(method: PaymentSession) {
-    const id = await cartId();
-
-    if (!id) throw new Error("No cartId cookie found");
-
     try {
-        await updateCart(id, { payment_session: method });
-        revalidateTag("cart");
+        await api.cart.updateDetails({ payment_session: method });
     } catch (error: any) {
         throw error;
     }
@@ -177,14 +143,11 @@ export async function placeOrder() {
 
     if (!id) throw new Error("No cartId cookie found");
 
-    let order: Order;
-
     try {
-        order = await completeCart(id);
-        revalidateTag("cart");
-        const cookieStore = await cookies();
-
-        cookieStore.set("_cart_id", "", { maxAge: -1 });
+        const order = await api.cart.complete();
+        if ("error" in order) {
+            throw Error(order.message);
+        }
         redirect(`/order/confirmed/${order.order_id}`);
     } catch (error: any) {
         throw error;
