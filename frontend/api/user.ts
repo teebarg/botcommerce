@@ -7,7 +7,7 @@ export const userApi = {
     async me(): Promise<User> {
         try {
             const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`;
-            const response = await fetcher<User>(url);
+            const response = await fetcher<User>(url, { next: { tags: ["user"] } });
 
             return response;
         } catch (error) {

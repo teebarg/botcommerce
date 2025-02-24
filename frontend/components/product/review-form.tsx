@@ -6,7 +6,8 @@ import { useSnackbar } from "notistack";
 
 import { TextArea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { addReview } from "@/modules/products/actions";
+import { api } from "@/api";
+import { Exception, Review } from "@/lib/models";
 
 interface ReviewFormProps {
     className?: string;
@@ -22,10 +23,10 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const res = await addReview(product_id, rating, comment);
+        const res: Review | Exception = await api.product.addReview({ product_id, rating, comment });
 
         setLoading(false);
-        if (res.error) {
+        if ("error" in res) {
             enqueueSnackbar(res.message, { variant: "error" });
 
             return;

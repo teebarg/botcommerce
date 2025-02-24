@@ -237,3 +237,8 @@ export const SessionSchema = z.object({
     isActive: z.boolean(),
     isAdmin: z.boolean(),
 });
+
+export const ExceptionSchema = z.object({
+    message: z.string(),
+    error: z.boolean().default(true),
+});

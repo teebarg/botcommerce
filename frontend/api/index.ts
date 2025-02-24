@@ -4,7 +4,6 @@ import { cartApi } from "./cart";
 import { orderApi } from "./order";
 import { categoryApi } from "./category";
 import { collectionApi } from "./collection";
-import { exampleApi } from "./example";
 import { productApi } from "./product";
 import { userApi } from "./user";
 
@@ -14,7 +13,6 @@ export const api = {
     cart: cartApi,
     collection: collectionApi,
     category: categoryApi,
-    example: exampleApi,
     order: orderApi,
     product: productApi,
     user: userApi,

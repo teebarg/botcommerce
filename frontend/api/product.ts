@@ -1,7 +1,8 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/util/util";
-import { PaginatedProduct, PaginatedReview, Product } from "@/lib/models";
+import { Exception, PaginatedProduct, PaginatedReview, Product, Review } from "@/lib/models";
+import { revalidateProduct } from "@/actions/revalidate";
 
 interface SearchParams {
     query?: string;
@@ -26,7 +27,7 @@ export const productApi = {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
 
         try {
-            const response = await fetcher<Product>(url);
+            const response = await fetcher<Product>(url, { next: { tags: ["product"] } });
 
             return response;
         } catch (error) {
@@ -57,5 +58,18 @@ export const productApi = {
         const response = await fetcher<PaginatedReview>(url);
 
         return response;
+    },
+    async addReview(input: { product_id: number; rating: number; comment: string }): Promise<Review | Exception> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`;
+
+        try {
+            const res = await fetcher<Review>(url, { method: "POST", body: JSON.stringify(input) });
+
+            revalidateProduct();
+
+            return res;
+        } catch (error) {
+            return { message: (error as Error).message || "An error occurred", error: true };
+        }
     },
 };

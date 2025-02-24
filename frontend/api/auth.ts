@@ -1,5 +1,6 @@
 import { fetcher } from "./fetcher";
 
+import { revalidateUser } from "@/actions/revalidate";
 import { Token } from "@/lib/models";
 
 // Product API methods
@@ -7,6 +8,8 @@ export const authApi = {
     async login(input: { email: string; password: string }): Promise<string> {
         const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/login`;
         const { access_token } = await fetcher<Token>(url, { method: "POST", body: JSON.stringify(input) });
+
+        revalidateUser();
 
         return access_token;
     },
