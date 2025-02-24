@@ -1,10 +1,10 @@
 import { Trash } from "nui-react-icons";
 import { useState } from "react";
-import { deleteLineItem } from "@modules/cart/actions";
 import { useSnackbar } from "notistack";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
+import { api } from "@/api";
 
 const CartDeleteButton = ({ id, children, className }: { id: string; children?: React.ReactNode; className?: string }) => {
     const { enqueueSnackbar } = useSnackbar();
@@ -13,7 +13,7 @@ const CartDeleteButton = ({ id, children, className }: { id: string; children?: 
     const handleDelete = async (id: string) => {
         setIsDeleting(true);
         try {
-            await deleteLineItem(id);
+            await api.cart.delete(id);
         } catch (error) {
             enqueueSnackbar(`Error deleting item: ${error}`, { variant: "error" });
         } finally {

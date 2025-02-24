@@ -13,6 +13,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import { api } from "@/api";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Clothings | ${siteConfig.name} Store | Checkout`,
@@ -38,6 +39,10 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
 
 export default async function Checkout() {
     const [cart, user] = await Promise.all([api.cart.get(), api.user.me()]);
+
+    if ("error" in cart) {
+        return <ServerError />;
+    }
 
     if (!cart) {
         return <EmptyCart />;

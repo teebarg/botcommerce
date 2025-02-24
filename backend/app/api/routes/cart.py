@@ -1,6 +1,7 @@
+from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException, Response
 from firebase_cart import CartHandler, CartItem, FirebaseConfig
 
 from app.core.config import settings
@@ -25,10 +26,21 @@ router = APIRouter()
 
 @router.get("/")
 @cache(key="cart", hash=False)
-async def index(cartId: str = Header(default=None)) -> Any:
+async def index(response: Response, cartId: str = Header(default=None)) -> Any:
     """
     Retrieve cart.
     """
+    if not cartId:
+        id = generate_id()
+        cart = cart_handler.create_cart(cart_id=id, customer_id="", email="")
+        response.set_cookie(
+            key="_cart_id",
+            value=id,
+            max_age=timedelta(days=7),
+            secure=True,
+            httponly=True,
+        )
+        return cart_handler.get_cart(cart_id=cart.get("cart_id"))
     return cart_handler.get_cart(cart_id=cartId)
 
 
@@ -71,7 +83,7 @@ async def create_cart():
         ) from e
 
 
-@router.post("/update")
+@router.patch("/update")
 async def update_cart(cart_in: CartItemIn, cache: CacheService, cartId: str = Header(default=None)):
     try:
         cart = cart_handler.update_cart_quantity(

@@ -12,6 +12,7 @@ import PromotionalBanner from "@/components/promotion";
 import { auth } from "@/actions/auth";
 import { api } from "@/api";
 import { CartItem } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -20,6 +21,9 @@ export const metadata: Metadata = {
 
 export default async function Cart() {
     const cart = await api.cart.get();
+    if ("error" in cart) {
+        return <ServerError />;
+    }
     const user = await auth();
 
     const product_ids = cart?.items?.map((x: CartItem) => x.product_id);

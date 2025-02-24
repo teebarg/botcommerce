@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { addToCart } from "@modules/cart/actions";
 import { currency } from "@lib/util/util";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
 import { Product } from "@/lib/models";
+import { api } from "@/api";
 
 type ProductActionsProps = {
     product: Product;
@@ -48,7 +48,7 @@ export default function ProductActions({
     const handleAddToCart = async () => {
         if (!product) return;
         setIsAdding(true);
-        await addToCart({
+        await api.cart.add({
             product_id: product.id!.toString(),
             quantity: 1,
         });

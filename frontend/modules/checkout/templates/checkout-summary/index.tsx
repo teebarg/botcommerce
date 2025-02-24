@@ -3,9 +3,14 @@ import DiscountCode from "@modules/checkout/components/discount-code";
 import CartTotals from "@modules/common/components/cart-totals";
 
 import { api } from "@/api";
+import ServerError from "@/components/server-error";
 
 const CheckoutSummary = async () => {
     const cart = await api.cart.get();
+
+    if ("error" in cart) {
+        return <ServerError />;
+    }
 
     if (!cart) {
         return null;
