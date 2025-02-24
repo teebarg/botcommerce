@@ -6,7 +6,7 @@ import { useSnackbar } from "notistack";
 
 import { TextArea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Exception, Review } from "@/lib/models";
 
 interface ReviewFormProps {

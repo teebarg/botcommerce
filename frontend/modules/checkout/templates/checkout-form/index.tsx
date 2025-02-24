@@ -5,7 +5,7 @@ import Shipping from "@modules/checkout/components/shipping";
 import { cookies } from "next/headers";
 
 import { currency } from "@/lib/util/util";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Cart } from "@/lib/models";
 
 type CheckoutFormProps = {

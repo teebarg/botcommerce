@@ -4,7 +4,7 @@ import Link from "next/link";
 import NewsletterForm from "@modules/store/components/newsletter";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Category } from "@/lib/models";
 import ServerError from "@/components/server-error";
 

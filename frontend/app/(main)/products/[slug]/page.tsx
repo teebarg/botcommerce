@@ -13,7 +13,7 @@ import ProductDetails from "@/modules/products/templates/details";
 import LocalizedClientLink from "@/components/ui/link";
 import ReviewsSection from "@/components/product/product-reviews";
 import { Skeleton } from "@/components/skeleton";
-import { api } from "@/api";
+import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 
 type Params = Promise<{ slug: string }>;

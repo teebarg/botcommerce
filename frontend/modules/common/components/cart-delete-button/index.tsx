@@ -4,7 +4,7 @@ import { useSnackbar } from "notistack";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 const CartDeleteButton = ({ id, children, className }: { id: string; children?: React.ReactNode; className?: string }) => {
     const { enqueueSnackbar } = useSnackbar();

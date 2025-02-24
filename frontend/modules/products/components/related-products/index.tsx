@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Product } from "@/lib/models";
 
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });

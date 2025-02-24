@@ -5,7 +5,7 @@ import WishlistItem from "@/modules/common/components/wishlist";
 import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 export const revalidate = 3;
 

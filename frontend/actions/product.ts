@@ -1,6 +1,6 @@
 "use server";
 
-import { api } from "@/api";
+import { api } from "@/apis";
 
 export async function mutateProduct(currentState: unknown, formData: FormData) {
     const id = formData.get("id") as string;

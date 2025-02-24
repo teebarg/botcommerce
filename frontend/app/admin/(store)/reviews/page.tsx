@@ -9,7 +9,7 @@ import Chip from "@/components/ui/chip";
 import { ReviewForm } from "@/modules/admin/reviews/reviews-form";
 import { timeAgo } from "@/lib/util/util";
 import { Review } from "@/lib/models";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 export const metadata: Metadata = {
     title: `Reviews Page | Children clothing | ${siteConfig.name} Store`,

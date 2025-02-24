@@ -8,7 +8,7 @@ import Image from "next/image";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Category, Product, WishItem } from "@/lib/models";
 import BannerCarousel from "@/components/carousel";
 import ProductCard from "@/components/product/product-card";

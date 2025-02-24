@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import OrderDetailsTemplate from "@modules/order/templates/order-details-template";
 
 import { Order } from "@/lib/models";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 type Params = Promise<{ id: string }>;
 

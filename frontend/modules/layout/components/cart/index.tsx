@@ -2,7 +2,7 @@ import React from "react";
 
 import { CartComponent } from "./cart-component";
 
-import { api } from "@/api";
+import { api } from "@/apis";
 
 interface ComponentProps {}
 

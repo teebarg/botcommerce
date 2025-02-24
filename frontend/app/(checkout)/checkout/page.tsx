@@ -12,7 +12,7 @@ import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
-import { api } from "@/api";
+import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {

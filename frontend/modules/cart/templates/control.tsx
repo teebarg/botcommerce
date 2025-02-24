@@ -7,7 +7,7 @@ import { Spinner } from "@components/spinner";
 
 import CartDeleteButton from "@/modules/common/components/cart-delete-button";
 import { CartItem } from "@/lib/models";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 type ItemsTemplateProps = {
     item: CartItem;

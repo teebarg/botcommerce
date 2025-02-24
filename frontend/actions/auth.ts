@@ -4,7 +4,7 @@ import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Session } from "@/lib/models";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);

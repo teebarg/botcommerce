@@ -6,7 +6,7 @@ import { ChevronDown } from "nui-react-icons";
 
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Order, User } from "@/lib/models";
 
 export const metadata: Metadata = {

@@ -7,7 +7,7 @@ import { deleteBrand } from "@modules/admin/actions";
 import { BrandForm } from "@/modules/admin/brands/brand-form";
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
-import { api } from "@/api";
+import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import { Brand } from "@/lib/models";
 

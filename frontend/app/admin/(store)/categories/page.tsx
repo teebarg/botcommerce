@@ -4,7 +4,7 @@ import CategoryTree from "@modules/admin/categories/tree";
 import AddCategory from "@modules/admin/categories/add-categories";
 
 import { siteConfig } from "@/lib/config";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Category } from "@/lib/models";
 
 export const metadata: Metadata = {

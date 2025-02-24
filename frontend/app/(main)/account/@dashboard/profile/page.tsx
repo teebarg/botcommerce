@@ -6,7 +6,7 @@ import ProfileName from "@modules/account/components/profile-name";
 import ProfilePassword from "@modules/account/components/profile-password";
 import { notFound } from "next/navigation";
 
-import { api } from "@/api";
+import { api } from "@/apis";
 
 export const metadata: Metadata = {
     title: "Profile",

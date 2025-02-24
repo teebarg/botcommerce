@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template";
 import { notFound } from "next/navigation";
 
-import { api } from "@/api";
+import { api } from "@/apis";
 
 type Params = Promise<{ id: string }>;
 

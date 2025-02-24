@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { DeliveryOption, PaymentSession } from "types/global";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 async function cartId() {
     const cookieStore = await cookies();

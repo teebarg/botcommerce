@@ -7,7 +7,7 @@ import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
 import { Product } from "@/lib/models";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 type ProductActionsProps = {
     product: Product;

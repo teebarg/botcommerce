@@ -8,7 +8,7 @@ import Image from "next/image";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { removeWish } from "@/actions/user";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 interface WishlistItemProps {
     id: number;

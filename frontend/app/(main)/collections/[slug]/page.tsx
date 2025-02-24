@@ -6,7 +6,7 @@ import React, { Suspense } from "react";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { siteConfig } from "@/lib/config";
-import { api } from "@/api";
+import { api } from "@/apis";
 
 type Params = Promise<{ slug: string }>;
 // type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;

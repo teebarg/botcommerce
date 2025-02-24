@@ -10,7 +10,7 @@ import { Avatar } from "@modules/common/components/avatar";
 
 import { siteConfig } from "@/lib/config";
 import { Badge } from "@/components/ui/badge";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Product } from "@/lib/models";
 import ServerError from "@/components/server-error";
 

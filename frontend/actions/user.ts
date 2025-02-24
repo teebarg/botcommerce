@@ -2,7 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 
-import { api } from "@/api";
+import { api } from "@/apis";
 
 export async function removeWish(id: number) {
     try {

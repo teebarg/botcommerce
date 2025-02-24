@@ -10,7 +10,7 @@ import { CollectionsSideBar } from "./sidebar";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Category, Collection, Product, WishItem } from "@/lib/models";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/server-error";

@@ -8,7 +8,7 @@ import { deleteCollection } from "@modules/admin/actions";
 
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
-import { api } from "@/api";
+import { api } from "@/apis";
 import { Collection } from "@/lib/models";
 import ServerError from "@/components/server-error";
 
