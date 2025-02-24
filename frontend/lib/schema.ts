@@ -91,7 +91,7 @@ const PaginationSchema = z.object({
     total_pages: z.number(),
 });
 
-const CartItemSchema = z.object({
+export const CartItemSchema = z.object({
     item_id: z.string(),
     product_id: z.string(),
     slug: z.string(),
@@ -103,7 +103,7 @@ const CartItemSchema = z.object({
     created_at: z.string(),
 });
 
-const CartSchema = z.object({
+export const CartSchema = z.object({
     cart_id: z.string(),
     customer_id: z.string(),
     email: z.string().email(),
@@ -132,7 +132,7 @@ const PaymentSessionSchema = z.object({
     provider_id: z.string(),
 });
 
-const OrderSchema = z.object({
+export const OrderSchema = z.object({
     order_id: z.string(),
     status: z.enum(["pending", "processing", "fulfilled"]).optional(),
     fulfillment_status: z.enum(["fulfilled", "not_fulfilled"]),

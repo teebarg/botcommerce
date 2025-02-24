@@ -60,25 +60,6 @@ export async function updateCart(cartId: string, data: any) {
     return await response.json();
 }
 
-export const getCart = cache(async function (cartId: string) {
-    const headers = await getHeaders(["cart"]);
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            ...headers,
-            cartId,
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to create cart: ${response.statusText}`);
-    }
-
-    return await response.json();
-});
-
 export async function addItem({ cartId, product_id, quantity }: { cartId: string; product_id: string; quantity: number }) {
     try {
         const headers = await getHeaders(["cart"]);
@@ -183,29 +164,6 @@ export async function completeCart(cartId: string) {
         return { message: error, status: "error" };
     }
 }
-
-// Order actions
-export const retrieveOrder = cache(async function (id: string) {
-    const headers = await getHeaders(["order"]);
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/${id}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                ...headers,
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (error) {
-        return { message: error, status: "error" };
-    }
-});
 
 // Customer actions
 export async function getAdresses() {

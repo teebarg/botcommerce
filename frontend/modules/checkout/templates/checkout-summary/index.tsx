@@ -1,19 +1,11 @@
 import ItemsPreviewTemplate from "@modules/cart/templates/preview";
 import DiscountCode from "@modules/checkout/components/discount-code";
 import CartTotals from "@modules/common/components/cart-totals";
-import { cookies } from "next/headers";
-import { getCart } from "@lib/data";
-import { Cart } from "types/global";
+
+import { api } from "@/api";
 
 const CheckoutSummary = async () => {
-    const cookieStore = await cookies();
-    const cartId = cookieStore.get("_cart_id")?.value;
-
-    if (!cartId) {
-        return null;
-    }
-
-    const cart: Cart = await getCart(cartId).then((cart) => cart);
+    const cart = await api.cart.get();
 
     if (!cart) {
         return null;

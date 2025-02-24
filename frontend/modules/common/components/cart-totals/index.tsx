@@ -2,9 +2,10 @@
 
 import { InformationCircleSolid } from "nui-react-icons";
 import React from "react";
-import { Cart } from "types/global";
 import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
+
+import { Cart } from "@/lib/models";
 
 type CartTotalsProps = {
     data: Omit<Cart, "refundable_amount" | "refunded_total"> | any;

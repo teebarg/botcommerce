@@ -6,10 +6,10 @@ import Help from "@modules/order/components/help";
 import OrderDetails from "@modules/order/components/order-details";
 import OrderSummary from "@modules/order/components/order-summary";
 import ShippingDetails from "@modules/order/components/shipping-details";
-import { Order } from "types/global";
 
 import Items from "@/components/order/cart-details";
 import LocalizedClientLink from "@/components/ui/link";
+import { Order } from "@/lib/models";
 
 type OrderDetailsTemplateProps = {
     order: Order;

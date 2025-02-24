@@ -3,10 +3,10 @@ import Help from "@modules/order/components/help";
 import OrderDetails from "@modules/order/components/order-details";
 import ShippingDetails from "@modules/order/components/shipping-details";
 import PaymentDetails from "@modules/order/components/payment-details";
-import { Order } from "types/global";
 import { notFound } from "next/navigation";
 
 import Items from "@/components/order/cart-details";
+import { Order } from "@/lib/models";
 
 type OrderCompletedTemplateProps = {
     order: Order;

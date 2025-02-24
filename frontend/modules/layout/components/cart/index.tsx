@@ -1,12 +1,13 @@
-import { retrieveCart } from "@modules/cart/actions";
 import React from "react";
 
 import { CartComponent } from "./cart-component";
 
+import { api } from "@/api";
+
 interface ComponentProps {}
 
 const Cart: React.FC<ComponentProps> = async () => {
-    const cart = await retrieveCart();
+    const cart = await api.cart.get();
 
     return <CartComponent cart={cart} />;
 };

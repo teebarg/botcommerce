@@ -1,5 +1,6 @@
 import { currency } from "@lib/util/util";
-import { Order } from "types/global";
+
+import { Order } from "@/lib/models";
 
 type ShippingDetailsProps = {
     order: Order;

@@ -2,7 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-import { addItem, getCart, removeItem, updateItem } from "@lib/data";
+import { addItem, removeItem, updateItem } from "@lib/data";
 import { generateId } from "@lib/util/util";
 
 /**
@@ -27,23 +27,6 @@ export async function getOrSetCart() {
     }
 
     return cartId;
-}
-
-export async function retrieveCart() {
-    const cookieStore = await cookies();
-    const cartId = cookieStore.get("_cart_id")?.value;
-
-    if (!cartId) {
-        return null;
-    }
-
-    try {
-        const cart = await getCart(cartId).then((cart: any) => cart);
-
-        return cart;
-    } catch (e) {
-        return null;
-    }
 }
 
 export async function addToCart({ product_id, quantity }: { product_id: string; quantity: number }) {

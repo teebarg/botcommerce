@@ -18,6 +18,9 @@ import {
     BrandSchema,
     PaginatedBrandSchema,
     PagSchema,
+    CartItemSchema,
+    CartSchema,
+    OrderSchema,
 } from "./schema";
 
 export type Facet = z.infer<typeof FacetSchema>;
@@ -37,4 +40,9 @@ export type PaginatedReview = z.infer<typeof PaginatedReviewSchema>;
 export type Token = z.infer<typeof TokenSchema>;
 export type Session = z.infer<typeof SessionSchema>;
 export type Pag = z.infer<typeof PagSchema>;
+// cart
+export type CartItem = z.infer<typeof CartItemSchema>;
+export type Cart = z.infer<typeof CartSchema>;
+
+export type Order = z.infer<typeof OrderSchema>;
 // export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;

@@ -4,13 +4,13 @@ import LineItemPrice from "@modules/common/components/line-item-price";
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
 import Thumbnail from "@modules/products/components/thumbnail";
 import { Table } from "@modules/common/components/table";
-import { CartItem } from "types/global";
 import Image from "next/image";
 import { currency } from "@lib/util/util";
 
 import Control from "@/modules/cart/templates/control";
 import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";
+import { CartItem } from "@/lib/models";
 
 type ItemsTemplateProps = {
     items: CartItem[];

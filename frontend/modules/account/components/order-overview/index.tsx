@@ -1,9 +1,8 @@
 "use client";
 
-import { Order } from "types/global";
-
 import OrderCard from "../order-card";
 
+import { Order } from "@/lib/models";
 import { BtnLink } from "@/components/ui/btnLink";
 
 const OrderOverview = ({ orders }: { orders: any[] }) => {

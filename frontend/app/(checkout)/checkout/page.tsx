@@ -1,10 +1,8 @@
 import React from "react";
 import { Metadata } from "next";
-import { cookies } from "next/headers";
 import Wrapper from "@modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
-import { getCart } from "@lib/data";
 import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 
 import PaymentButton from "@/modules/checkout/components/payment-button";
@@ -38,24 +36,12 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
     );
 };
 
-const fetchCart = async () => {
-    const cookieStore = await cookies();
-    const cartId = cookieStore.get("_cart_id")?.value;
-
-    if (!cartId) {
-        return null;
-    }
-
-    return await getCart(cartId).then((cart) => cart);
-};
-
 export default async function Checkout() {
-    const cart = await fetchCart();
+    const [cart, user] = await Promise.all([api.cart.get(), api.user.me()]);
 
     if (!cart) {
         return <EmptyCart />;
     }
-    const user = await api.user.me();
 
     const { total } = cart;
 

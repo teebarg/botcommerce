@@ -1,6 +1,5 @@
 "use client";
 
-import { Cart, CartItem } from "types/global";
 import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
 
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
 import { BtnLink } from "@/components/ui/btnLink";
+import { Cart, CartItem } from "@/lib/models";
 
 type SummaryProps = {
     cart: Cart;

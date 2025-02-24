@@ -8,8 +8,10 @@ export const collectionApi = {
     async all(input?: { search?: string; page?: number; limit?: number }): Promise<PaginatedCollection | null> {
         const searchParams = { search: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, searchParams);
+
         try {
             const response = await fetcher<PaginatedCollection>(url);
+
             return response;
         } catch (error) {
             return null;

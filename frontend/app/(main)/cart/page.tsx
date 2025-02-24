@@ -1,17 +1,17 @@
 import { Metadata } from "next";
 import { Shield } from "nui-react-icons";
-import { retrieveCart } from "@modules/cart/actions";
 import SignInPrompt from "@modules/cart/components/sign-in-prompt";
 import Summary from "@modules/cart/templates/summary";
 import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 import RecommendedProducts from "@/modules/products/components/recommended";
-import { CartItem } from "@/types/global";
 import { siteConfig } from "@/lib/config";
 import Items from "@/components/order/cart-details";
 import PromotionalBanner from "@/components/promotion";
 import { auth } from "@/actions/auth";
+import { api } from "@/api";
+import { CartItem } from "@/lib/models";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Cart() {
-    const cart = await retrieveCart();
+    const cart = await api.cart.get();
     const user = await auth();
 
     const product_ids = cart?.items?.map((x: CartItem) => x.product_id);

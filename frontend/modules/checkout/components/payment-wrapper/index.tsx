@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Cart } from "types/global";
+
+import { Cart } from "@/lib/models";
 
 type WrapperProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;

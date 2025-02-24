@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
-import { retrieveOrder } from "@lib/data";
 import OrderDetailsTemplate from "@modules/order/templates/order-details-template";
-import { Order } from "types/global";
+
+import { Order } from "@/lib/models";
+import { api } from "@/api";
 
 type Params = Promise<{ id: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { id } = await params;
-    const order: Order = await retrieveOrder(id);
+    const order: Order = await api.order.get(id);
 
     if (!order) {
         notFound();
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function OrderDetailPage({ params }: { params: Params }) {
     const { id } = await params;
-    const order = await retrieveOrder(id);
+    const order = await api.order.get(id);
 
     if (!order) {
         notFound();

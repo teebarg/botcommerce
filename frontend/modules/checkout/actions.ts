@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 import { completeCart, updateCart } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { DeliveryOption, Order, PaymentSession } from "types/global";
+import { DeliveryOption, PaymentSession } from "types/global";
+import { Order } from "@/lib/models";
 
 async function cartId() {
     const cookieStore = await cookies();
@@ -188,6 +189,4 @@ export async function placeOrder() {
     } catch (error: any) {
         throw error;
     }
-
-    return order;
 }

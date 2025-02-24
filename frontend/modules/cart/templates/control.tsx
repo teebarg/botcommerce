@@ -4,10 +4,10 @@ import CartItemSelect from "@modules/cart/components/cart-item-select";
 import { updateLineItem } from "@modules/cart/actions";
 import { useState } from "react";
 import { useSnackbar } from "notistack";
-import { CartItem } from "types/global";
 import { Spinner } from "@components/spinner";
 
 import CartDeleteButton from "@/modules/common/components/cart-delete-button";
+import { CartItem } from "@/lib/models";
 
 type ItemsTemplateProps = {
     item: CartItem;

@@ -2,14 +2,14 @@
 
 import { placeOrder } from "@modules/checkout/actions";
 import React, { useEffect, useState } from "react";
-import { Cart, PaymentSession } from "types/global";
+import { PaymentSession } from "types/global";
 import { Modal } from "@modules/common/components/modal";
 import { useSnackbar } from "notistack";
 import { useOverlayTriggerState } from "react-stately";
 import CheckoutLoginForm from "@modules/account/components/login-form";
 
 import { Button } from "@/components/ui/button";
-import { User } from "@/lib/models";
+import { Cart, User } from "@/lib/models";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;

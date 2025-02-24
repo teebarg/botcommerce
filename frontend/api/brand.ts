@@ -8,8 +8,10 @@ export const brandApi = {
     async all(input?: { search?: string; page?: number; limit?: number }): Promise<PaginatedBrand | null> {
         const searchParams = { search: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/`, searchParams);
+
         try {
             const response = await fetcher<PaginatedBrand>(url);
+
             return response;
         } catch (error) {
             return null;

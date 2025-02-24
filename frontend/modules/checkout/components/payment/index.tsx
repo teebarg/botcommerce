@@ -7,11 +7,12 @@ import { CreditCard, Pencil } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
 import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
-import { Cart, PaymentSession } from "types/global";
+import { PaymentSession } from "types/global";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
+import { Cart } from "@/lib/models";
 
 const payMethods = [
     { id: "stripe", provider_id: "stripe" },

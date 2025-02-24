@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Cart } from "types/global";
 import { Input } from "@components/ui/input";
 
 import AddressSelect from "../address-select";
+
+import { Cart } from "@/lib/models";
 
 const ShippingAddress = ({
     customer,

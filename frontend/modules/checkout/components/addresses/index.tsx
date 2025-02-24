@@ -4,7 +4,6 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Pencil } from "nui-react-icons";
 import compareAddresses from "@lib/util/compare-addresses";
 import { useActionState, useState } from "react";
-import { Cart } from "types/global";
 
 import ShippingAddress from "../shipping-address";
 import { setAddresses } from "../../actions";
@@ -12,6 +11,7 @@ import ErrorMessage from "../error-message";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
+import { Cart } from "@/lib/models";
 
 const Addresses = ({
     cart,

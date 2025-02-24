@@ -2,12 +2,11 @@
 
 import { useSearchParams } from "next/navigation";
 import { siteConfig } from "@lib/config";
-import { Cart } from "types/global";
 
 import PaymentButton from "../payment-button";
 
 import { cn } from "@/lib/util/cn";
-import { User } from "@/lib/models";
+import { Cart, User } from "@/lib/models";
 
 const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">; customer: User }) => {
     const searchParams = useSearchParams();

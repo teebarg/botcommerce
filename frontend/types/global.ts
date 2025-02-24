@@ -8,36 +8,6 @@ export enum FileTypes {
     xls = "application/vnd.ms-excel",
 }
 
-export type Cart = {
-    cart_id: string;
-    customer_id: string;
-    email: string;
-    items: CartItem[];
-    checkout_step?: "address" | "delivery" | "payment";
-    subtotal: number;
-    tax_total: number;
-    discount_total: number;
-    delivery_fee: number;
-    total: number;
-    billing_address: Record<string, any>;
-    shipping_address: Record<string, any>;
-    shipping_method: any;
-    payment_session: any;
-    gift_cards: any;
-};
-
-export type CartItem = {
-    item_id: string;
-    product_id: string;
-    slug: string;
-    name: string;
-    description?: string;
-    image?: string;
-    quantity: number;
-    price: number;
-    created_at: string;
-};
-
 export type DeliveryOption = {
     id: string;
     name: string;
@@ -47,28 +17,6 @@ export type DeliveryOption = {
 export type PaymentSession = {
     id: string;
     provider_id: string;
-};
-
-export type Order = {
-    order_id: string;
-    status?: "pending" | "processing" | "fulfilled";
-    fulfillment_status: "fulfilled" | "not_fulfilled";
-    cart_id: string;
-    customer_id: string;
-    email: string;
-    line_items: CartItem[];
-    checkout_step?: "address" | "delivery" | "payment";
-    subtotal: number;
-    tax_total: number;
-    delivery_fee: number;
-    total: number;
-    billing_address: Record<string, any>;
-    shipping_address: Record<string, any>;
-    shipping_method: Record<string, any>;
-    payment_session: Record<string, any>;
-    fulfillments: Record<string, any>[];
-    payment_status: "pending" | "paid";
-    created_at: string;
 };
 
 export type SortOptions = "price_asc" | "price_desc" | "created_at";
