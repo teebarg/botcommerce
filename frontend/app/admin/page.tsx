@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { Pagination as PaginationType } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import { Card, CardHeader, CardTitle, CardContent } from "components/ui/card";
@@ -8,6 +7,7 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config";
+import { Pag } from "@/lib/models";
 
 const users = [
     {
@@ -79,7 +79,7 @@ const stats = [
     },
 ];
 
-const pagination: PaginationType = {
+const pagination: Pag = {
     page: 1,
     limit: 5,
     total_count: 6,

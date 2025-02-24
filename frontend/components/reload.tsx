@@ -16,9 +16,9 @@ const Reload: React.FC<Props> = ({ className }) => {
             aria-label="reload button"
             className={cn(className, "bg-indigo-700 text-white px-8 rounded-full min-w-48")}
             size="md"
+            startContent={<RefreshCcw className="h-4 w-4" />}
             onClick={() => window.location.reload()}
         >
-            <RefreshCcw className="h-4 w-4 mr-1" />
             <span>Reload</span>
         </Button>
     );

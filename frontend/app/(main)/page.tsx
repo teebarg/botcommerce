@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { SearchParams } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
@@ -23,13 +22,7 @@ export const metadata: Metadata = {
 
 // Helper function to fetch products
 const fetchProducts = async (collection: string, limit: number = 4) => {
-    const queryParams: SearchParams = {
-        query: "",
-        limit,
-        page: 1,
-        collections: collection,
-    };
-    const { products } = await api.product.search(queryParams);
+    const { products } = await api.product.search({ limit, page: 1, collections: collection });
 
     return products;
 };

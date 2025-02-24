@@ -1,4 +1,3 @@
-import { SearchParams } from "types/global";
 import dynamic from "next/dynamic";
 
 import { api } from "@/api";
@@ -10,12 +9,7 @@ type RecommendedProductsProps = {
 };
 
 export default async function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
-    // edit this function to define your related products logic
-    const queryParams: SearchParams = {
-        limit: 40,
-    };
-
-    const { products } = await api.product.search(queryParams);
+    const { products } = await api.product.search({ limit: 40 });
 
     if (!products.length) {
         return null;

@@ -10,13 +10,13 @@ type SearchParams = Promise<{
     page?: number;
     sortBy?: SortOptions;
     cat_ids?: string;
+    maxPrice?: string;
+    minPrice?: string;
 }>;
 
 type Props = {
     searchParams: SearchParams;
 };
-
-export const revalidate = 3;
 
 export async function generateMetadata(): Promise<Metadata> {
     const metadata = {
@@ -28,12 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Collections({ searchParams }: Props) {
-    const sP = await searchParams;
-    const { sortBy, page } = sP;
-
     return (
         <Suspense fallback={<CollectionTemplateSkeleton />}>
-            <CollectionTemplate page={page} searchParams={sP} sortBy={sortBy} />
+            <CollectionTemplate searchParams={searchParams} />
         </Suspense>
     );
 }

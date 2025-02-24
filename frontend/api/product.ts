@@ -1,8 +1,18 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/util/util";
-import { SearchParams } from "@/types/global";
 import { PaginatedProduct, PaginatedReview, Product } from "@/lib/models";
+
+interface SearchParams {
+    query?: string;
+    categories?: string;
+    collections?: string;
+    min_price?: number | string;
+    max_price?: number | string;
+    page?: number;
+    limit?: number;
+    sort?: string;
+}
 
 // Product API methods
 export const productApi = {
@@ -14,6 +24,7 @@ export const productApi = {
     },
     async get(slug: string): Promise<Product | null> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
+
         try {
             const response = await fetcher<Product>(url);
 

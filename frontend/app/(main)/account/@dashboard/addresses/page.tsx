@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AddressBook from "@modules/account/components/address-book";
 import { getAdresses } from "@lib/data";
+
 import { auth } from "@/actions/auth";
 
 export const metadata: Metadata = {

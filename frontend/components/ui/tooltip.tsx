@@ -89,8 +89,8 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children, color = "default",
             </div>
             {isVisible && (
                 <div
-                    aria-label="tooltip"
                     ref={tooltipRef}
+                    aria-label="tooltip"
                     className={cn(
                         "px-3 py-2 text-sm font-medium rounded-md shadow-md text-default-foreground max-w-sm",
                         "animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",

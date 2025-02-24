@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { SearchParams, SortOptions } from "types/global";
+import { SortOptions } from "types/global";
 import dynamic from "next/dynamic";
 
 import { CollectionsTopBar } from "./topbar";
@@ -17,21 +17,22 @@ import ServerError from "@/components/server-error";
 
 const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
+type SearchParams = Promise<{
+    page?: number;
+    sortBy?: SortOptions;
+    cat_ids?: string;
+    maxPrice?: string;
+    minPrice?: string;
+}>;
+
 interface ComponentProps {
     query?: string;
     collection?: Collection;
-    page?: number;
-    sortBy?: SortOptions;
-    searchParams?: {
-        page?: number;
-        sortBy?: SortOptions;
-        cat_ids?: string;
-        maxPrice?: string;
-        minPrice?: string;
-    };
+    searchParams?: SearchParams;
 }
 
-const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, sortBy, searchParams }) => {
+const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, searchParams }) => {
+    const { minPrice, maxPrice, cat_ids, page, sortBy } = (await searchParams) || {};
     const user = await auth();
     const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
 
@@ -53,29 +54,29 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         wishlist = wishlists;
     }
 
-    const queryParams: SearchParams = {
+    const queryParams: any = {
         query,
         limit: 12,
         page: page ?? 1,
         sort: sortBy ?? "created_at:desc",
-        max_price: searchParams?.maxPrice ?? 100000000,
-        min_price: searchParams?.minPrice ?? 0,
+        max_price: maxPrice ?? 100000000,
+        min_price: minPrice ?? 0,
+        collections: collection?.slug,
+        categories: cat_ids,
     };
-
-    if (collection?.id) {
-        queryParams["collections"] = collection.slug as string;
-    }
-
-    if (searchParams?.cat_ids) {
-        queryParams["categories"] = searchParams?.cat_ids;
-    }
 
     const { products, facets, ...pagination } = await api.product.search(queryParams);
 
     return (
         <React.Fragment>
             <div className="hidden md:block">
-                <CollectionsSideBar brands={brands} categories={categories} collections={collections} facets={facets} searchParams={searchParams} />
+                <CollectionsSideBar
+                    brands={brands}
+                    categories={categories}
+                    collections={collections}
+                    facets={facets}
+                    searchParams={{ minPrice, maxPrice }}
+                />
             </div>
             <div className="w-full flex-1 flex-col">
                 {/* Mobile banner */}

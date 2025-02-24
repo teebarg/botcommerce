@@ -10,10 +10,13 @@ import { api } from "@/api";
 
 type Params = Promise<{ slug: string }>;
 // type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
 type SearchParams = Promise<{
     page?: number;
     sortBy?: SortOptions;
     cat_ids?: string;
+    maxPrice?: string;
+    minPrice?: string;
 }>;
 
 export async function generateStaticParams() {
@@ -34,13 +37,10 @@ export async function generateMetadata({ params }: { params: Params }) {
     } as Metadata;
 }
 
-export default async function CollectionPage(props: { params: Params; searchParams: SearchParams }) {
-    const params = await props.params;
-    const searchParams = await props.searchParams;
+export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
+    const { slug } = await params;
 
-    const { sortBy, page } = searchParams;
-
-    const collection = await api.collection.getBySlug(params.slug).then((collection) => collection);
+    const collection = await api.collection.getBySlug(slug).then((collection) => collection);
 
     if (!collection) {
         notFound();
@@ -48,7 +48,7 @@ export default async function CollectionPage(props: { params: Params; searchPara
 
     return (
         <Suspense fallback={<CollectionTemplateSkeleton />}>
-            <CollectionTemplate collection={collection} page={page} searchParams={searchParams} sortBy={sortBy} />
+            <CollectionTemplate collection={collection} searchParams={searchParams} />
         </Suspense>
     );
 }

@@ -29,6 +29,7 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
     const res = await api.collection.all({ search, page, limit });
+
     if (!res) {
         return <ServerError />;
     }

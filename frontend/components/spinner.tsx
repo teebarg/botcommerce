@@ -19,7 +19,7 @@ const Spinner: React.FC<Props> = ({ size = "sm", color = "primary", className })
     };
 
     return (
-        <div aria-label="spinner" className={cn("", className)}>
+        <div aria-label="spinner" className={cn("inline-flex", className)}>
             <div
                 className={cn("relative", {
                     "w-5 h-5": size === "sm",

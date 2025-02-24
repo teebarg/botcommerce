@@ -1,7 +1,6 @@
 "use client";
 
 import React, { cloneElement, isValidElement, useState } from "react";
-import { Pagination as PaginationType } from "types/global";
 import { Plus, Search } from "nui-react-icons";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
@@ -13,11 +12,12 @@ import { Pagination } from "../pagination";
 import { SlideOver } from "../slideover";
 
 import { Button } from "@/components/ui/button";
+import { Pag } from "@/lib/models";
 
 interface Props {
     children: React.ReactNode;
     columns: string[];
-    pagination?: PaginationType;
+    pagination?: Pag;
     canAdd?: boolean;
     canExport?: boolean;
     canIndex?: boolean;
