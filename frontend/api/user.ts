@@ -11,15 +11,19 @@ export const userApi = {
 
             return response;
         } catch (error) {
-            // console.error("Failed to fetch user:");
             return null as unknown as User;
         }
     },
-    async wishlist(): Promise<Wishlist> {
+    async wishlist(): Promise<Wishlist | null> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
-        const response = await fetcher<Wishlist>(url, { next: { tags: ["beaf"] } });
 
-        return response;
+        try {
+            const response = await fetcher<Wishlist>(url, { next: { tags: ["wishlist"] } });
+
+            return response;
+        } catch (error) {
+            return null;
+        }
     },
     async addWishlist(product_id: number): Promise<Wishlist> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;

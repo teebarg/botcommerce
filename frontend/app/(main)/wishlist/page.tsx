@@ -19,7 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Wishlist() {
-    const { wishlists } = await api.user.wishlist();
+    const res = await api.user.wishlist();
+    const wishlists = res ? res.wishlists : null;
 
     if (!wishlists) {
         return (

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { Session } from "./lib/models";
+
+import { verifyToken } from "./actions/auth";
 /**
  * Middleware to handle onboarding status.
  */
@@ -15,8 +15,9 @@ export async function middleware(request: NextRequest) {
 
     const token = request.cookies.get("access_token")?.value;
     let user = null;
+
     if (token) {
-        user = jwt.verify(token, process.env.JWT_SECRET!) as unknown as Session;
+        user = await verifyToken(token);
     }
 
     if (["/sign-in", "/sign-up"].includes(pathname) && user) {

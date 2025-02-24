@@ -49,9 +49,9 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     let wishlist: WishItem[] = [];
 
     if (user) {
-        const { wishlists } = await api.user.wishlist();
+        const res = await api.user.wishlist();
 
-        wishlist = wishlists;
+        wishlist = res ? res.wishlists : [];
     }
 
     const queryParams: any = {

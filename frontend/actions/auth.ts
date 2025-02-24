@@ -2,13 +2,24 @@
 
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
 import { api } from "@/api";
 import { Session } from "@/lib/models";
 
+const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+
+export async function verifyToken(token: string) {
+    const { payload } = await jwtVerify(token, secret);
+
+    console.log("🚀 ~ verifyToken ~ payload:", payload);
+
+    return payload;
+}
+
 export async function setSession(token: string) {
     const cookieStore = await cookies();
+
     cookieStore.set("access_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -20,24 +31,27 @@ export async function setSession(token: string) {
 
 export async function getSession() {
     const cookieStore = await cookies();
+
     return cookieStore.get("access_token")?.value || null;
 }
 
 export async function clearSession() {
     const cookieStore = await cookies();
+
     cookieStore.delete("access_token");
 }
 
 export async function auth(): Promise<Session | null> {
     const token = await getSession();
+
     if (!token) return null;
 
     try {
-        const user = jwt.verify(token, process.env.JWT_SECRET!) as any;
+        const user = (await verifyToken(token)) as any;
 
         return {
-            id: 1,
-            email: user.sub,
+            id: user.id,
+            email: user.sub ?? user.email,
             firstname: user.firstname,
             lastname: user.lastname,
             image: user.image,
