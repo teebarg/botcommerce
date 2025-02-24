@@ -19,10 +19,6 @@ type SearchParams = Promise<{
     minPrice?: string;
 }>;
 
-export async function generateStaticParams() {
-    return [];
-}
-
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
     const collection = await api.collection.getBySlug(slug);
