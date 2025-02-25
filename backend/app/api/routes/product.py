@@ -47,7 +47,7 @@ from app.services.run_sheet import generate_excel_file, process_products
 router = APIRouter()
 
 
-@router.get("/export")
+@router.post("/export")
 async def export_products(
     current_user: CurrentUser,
     db: SessionDep,
@@ -340,8 +340,10 @@ async def upload_product_image(
 
             update_document(index_name="products", document=product_data)
 
-            # Remove cached data
+            # Invalidate cache
+            cache.delete(f"product:{product.slug}")
             cache.delete(f"product:{product.id}")
+            cache.invalidate("products")
 
             # Return the updated product
             return product
@@ -364,12 +366,12 @@ async def reindex_products(db: SessionDep, cache: CacheService, background_tasks
         # Add the task to background tasks
         background_tasks.add_task(index_products, db, cache)
 
-        return Message(message="Product reindexing started. This may take a while.")
+        return Message(message="Product re-indexing started. This may take a while.")
     except Exception as e:
-        logger.error(f"Error during product reindexing: {e}")
+        logger.error(f"Error during product re-indexing: {e}")
         raise HTTPException(
             status_code=500,
-            detail="An error occurred while starting the reindexing process.",
+            detail="An error occurred while starting the re-indexing process.",
         ) from e
 
 
