@@ -154,6 +154,10 @@ export const OrderSchema = z.object({
     created_at: z.string(),
 });
 
+export const PaginatedOrderSchema = PagSchema.extend({
+    orders: z.array(OrderSchema),
+});
+
 const AddressSchema = z.object({
     created_at: z.string(),
     updated_at: z.string(),
@@ -183,17 +187,6 @@ export const PaginatedCategorySchema = PagSchema.extend({
     categories: z.array(CategorySchema),
 });
 
-const SearchParamsSchema = z.object({
-    query: z.string().optional(),
-    categories: z.string().optional(),
-    collections: z.string().optional(),
-    min_price: z.union([z.number(), z.string()]).optional(),
-    max_price: z.union([z.number(), z.string()]).optional(),
-    page: z.number().optional(),
-    limit: z.number().optional(),
-    sort: z.string().optional(),
-});
-
 export const WishItemSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -208,12 +201,16 @@ export const WishlistSchema = z.object({
     wishlists: z.array(WishItemSchema),
 });
 
-const SiteConfigSchema = z.object({
+export const SiteConfigSchema = z.object({
     id: z.number(),
     key: z.string(),
     value: z.string(),
     created_at: z.string(),
     updated_at: z.string(),
+});
+
+export const PaginatedSiteConfigSchema = PagSchema.extend({
+    configs: z.array(SiteConfigSchema),
 });
 
 export const FacetSchema = z.object({
@@ -238,7 +235,7 @@ export const SessionSchema = z.object({
     isAdmin: z.boolean(),
 });
 
-export const ExceptionSchema = z.object({
+export const MessageSchema = z.object({
     message: z.string(),
-    error: z.boolean().default(true),
+    error: z.boolean().default(false),
 });

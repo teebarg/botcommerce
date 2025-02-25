@@ -5,10 +5,9 @@ import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 
-import { createBrand } from "../actions";
-
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { mutateBrand } from "@/actions/product";
 
 interface Props {
     current?: any;
@@ -25,7 +24,7 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
     const isCreate = type === "create";
 
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction, isPending] = useActionState(createBrand, {
+    const [state, formAction, isPending] = useActionState(mutateBrand, {
         success: false,
         message: "",
         data: null,

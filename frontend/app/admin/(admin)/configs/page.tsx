@@ -2,12 +2,12 @@ import { Metadata } from "next";
 import { SiteConfig } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
-import { getSiteConfigs } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
-import { deleteSiteConfig } from "@modules/admin/actions";
 
 import { SiteConfigForm } from "@/modules/admin/siteconfigs/siteconfigs-form";
 import { siteConfig } from "@/lib/config";
+import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `SiteConfigs | ${siteConfig.name} Store`,
@@ -18,7 +18,18 @@ export default async function SiteConfigsPage({ searchParams }: { searchParams: 
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "0", 10);
     const limit = parseInt(searchParams.limit || "20", 10);
-    const { configs, ...pagination } = await getSiteConfigs(page, limit);
+    const res = await api.config.all({ search, skip: page, limit });
+
+    if (!res) {
+        return <ServerError />;
+    }
+
+    const { configs, ...pagination } = res;
+
+    const deleteSiteConfig = async (id: string) => {
+        "use server";
+        await api.config.delete(id);
+    };
 
     return (
         <React.Fragment>

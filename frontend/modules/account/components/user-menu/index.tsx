@@ -1,6 +1,5 @@
 "use client";
 
-import { signOut } from "@modules/account/actions";
 import React from "react";
 import Image from "next/image";
 
@@ -8,10 +7,11 @@ import Dropdown from "@/components/ui/dropdown";
 import ProfileAvatar from "@/public/profile.svg";
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/lib/models";
+import { api } from "@/apis";
 
 export default function UserDropDown({ user }: { user: Session }) {
     const handleLogout = async () => {
-        await signOut();
+        await api.auth.logOut();
     };
 
     const links = [

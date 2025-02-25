@@ -1,3 +1,5 @@
+import { Message } from "../models";
+
 const buildUrl = (baseUrl: string, queryParams: Record<string, string | number | Date | undefined | null>): string => {
     let url = baseUrl;
     let firstQueryParam = true;
@@ -130,4 +132,8 @@ const timeAgo = (timestamp: string) => {
     else return `${Math.floor(diff / 86400)} days ago`;
 };
 
-export { imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo };
+const handleError = (error: any): Message => {
+    return { message: (error as Error).message || "An error occurred", error: true };
+};
+
+export { handleError, imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo };

@@ -5,10 +5,9 @@ import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 
-import { createCollection } from "../actions";
-
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { mutateCollection } from "@/actions/product";
 
 interface Props {
     current?: any;
@@ -25,24 +24,26 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     const isCreate = type === "create";
 
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction, isPending] = useActionState(createCollection, {
-        success: false,
-        message: "",
+    const [state, formAction, isPending] = useActionState(mutateCollection, {
         data: null,
+        error: null,
     });
+
+    console.log(state);
 
     const formRef = useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {
-        if (state.success) {
-            enqueueSnackbar(state.message || "Collection created successfully", { variant: "success" });
+        if (state.data) {
+            enqueueSnackbar("Successful", { variant: "success" });
             // Leave the slider open and clear form
             if (formRef.current) {
                 formRef.current.reset();
-                router.refresh();
+                onClose?.();
+                // router.refresh();
             }
         }
-    }, [state.success, state.message, enqueueSnackbar]);
+    }, [state.data, state.error, enqueueSnackbar]);
 
     return (
         <React.Fragment>

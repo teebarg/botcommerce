@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 import OrderOverview from "@modules/account/components/order-overview";
-import { listCustomerOrders } from "@lib/data";
 import { notFound } from "next/navigation";
+
+import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: "Orders",
@@ -9,7 +11,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Orders() {
-    const { orders } = await listCustomerOrders();
+    const res = await api.order.query();
+
+    if ("error" in res) {
+        return <ServerError />;
+    }
+
+    const { orders } = res;
 
     if (!orders) {
         notFound();

@@ -4,7 +4,6 @@ import React, { cloneElement, isValidElement, useState } from "react";
 import { Plus, Search } from "nui-react-icons";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
-import { exportProducts, indexProducts } from "@modules/admin/actions";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Input } from "@components/ui/input";
 
@@ -13,6 +12,7 @@ import { SlideOver } from "../slideover";
 
 import { Button } from "@/components/ui/button";
 import { Pag } from "@/lib/models";
+import { api } from "@/apis";
 
 interface Props {
     children: React.ReactNode;
@@ -60,23 +60,19 @@ const Table: React.FC<Props> = ({
     }, [onSearchChange]);
 
     const handleIndex = async () => {
-        try {
-            setIsIndexing(true);
-            await indexProducts();
-            enqueueSnackbar("Products indexed successfully", { variant: "success" });
-        } catch (error) {
-            enqueueSnackbar("Error indexing products", { variant: "error" });
-        } finally {
-            setIsIndexing(false);
-        }
+        setIsIndexing(true);
+        const res = await api.product.reIndex();
+
+        enqueueSnackbar(res.message, { variant: res.error ? "error" : "success" });
+        setIsIndexing(false);
     };
 
     const handleExport = async () => {
         try {
             setIsExporting(true);
-            const res = await exportProducts();
+            const res = await api.product.export();
 
-            enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
+            enqueueSnackbar(res.message, { variant: "success" });
         } catch (error) {
             enqueueSnackbar("Error exporting products", { variant: "error" });
         } finally {

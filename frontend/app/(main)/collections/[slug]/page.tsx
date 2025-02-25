@@ -21,7 +21,7 @@ type SearchParams = Promise<{
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
-    const collection = await api.collection.getBySlug(slug);
+    const { data: collection } = await api.collection.getBySlug(slug);
 
     if (!collection) {
         notFound();
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
     const { slug } = await params;
 
-    const collection = await api.collection.getBySlug(slug).then((collection) => collection);
+    const { data: collection } = await api.collection.getBySlug(slug).then((collection) => collection);
 
     if (!collection) {
         notFound();

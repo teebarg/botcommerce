@@ -8,13 +8,12 @@ import { Input } from "@components/ui/input";
 import { Number } from "@components/ui/number";
 import { TextArea } from "@components/ui/textarea";
 
-import { uploadProductImage } from "../actions";
-
 import { Multiselect } from "@/components/ui/multiselect";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { mutateProduct } from "@/actions/product";
 import { Brand, Category, Collection } from "@/lib/models";
+import { api } from "@/apis";
 
 interface Props {
     current?: any;
@@ -68,17 +67,10 @@ const ProductForm = forwardRef<ChildRef, Props>(
             }
         }, [state, enqueueSnackbar]);
 
-        const handleUpload = async (data: any) => {
-            try {
-                const res = await uploadProductImage({ productId: current.id, formData: data });
+        const handleUpload = async (formData: FormData) => {
+            const res = await api.product.uploadImage({ id: current.id, formData });
 
-                if (res.success) {
-                    router.refresh();
-                }
-                enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
-            } catch (error) {
-                enqueueSnackbar(`${error}`, { variant: "error" });
-            }
+            enqueueSnackbar(res.message, { variant: res.error ? "error" : "success" });
         };
 
         return (

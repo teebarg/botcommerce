@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import { Actions } from "@modules/admin/components/actions";
-import { deleteReview } from "@modules/admin/actions";
 
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
@@ -25,7 +24,12 @@ export default async function ReviewsPage(props: { searchParams: SearchParams })
     const searchParams = await props.searchParams;
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { reviews, ...pagination } = await api.product.reviews({ page, limit });
+    const { reviews, ...pagination } = await api.review.all({ page, limit });
+
+    const deleteReview = async (id: string) => {
+        "use server";
+        await api.review.delete(id);
+    };
 
     return (
         <React.Fragment>

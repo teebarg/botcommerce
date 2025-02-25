@@ -2,18 +2,18 @@
 
 import { User as UserIcon } from "nui-react-icons";
 import { usePathname } from "next/navigation";
-import { signOut } from "@modules/account/actions";
 import MapPin from "@modules/common/icons/map-pin";
 import Package from "@modules/common/icons/package";
 import { cn } from "@lib/util/cn";
 
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/apis";
 
 const AccountNav = () => {
     const route = usePathname();
 
     const handleLogout = async () => {
-        await signOut();
+        await api.auth.logOut();
     };
 
     const navLinks = [

@@ -4,12 +4,11 @@ import React, { useActionState, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 
-import { updateReview } from "../actions";
-
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Number } from "@/components/ui/number";
 import { TextArea } from "@/components/ui/textarea";
+import { updateReview } from "@/actions/reviews";
 
 interface Props {
     current?: any;
@@ -21,23 +20,22 @@ const ReviewForm: React.FC<Props> = ({ onClose, current = { rating: 1, comment: 
 
     const { enqueueSnackbar } = useSnackbar();
     const [state, formAction, isPending] = useActionState(updateReview, {
-        success: false,
+        error: false,
         message: "",
-        data: null,
     });
 
     const formRef = useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {
-        if (state.success) {
-            enqueueSnackbar(state.message || "Review created successfully", { variant: "success" });
+        if (!("error" in state)) {
+            enqueueSnackbar("Action successful", { variant: "success" });
             // Leave the slider open and clear form
             if (formRef.current) {
                 formRef.current.reset();
                 router.refresh();
             }
         }
-    }, [state.success, state.message, enqueueSnackbar]);
+    }, [enqueueSnackbar]);
 
     return (
         <React.Fragment>

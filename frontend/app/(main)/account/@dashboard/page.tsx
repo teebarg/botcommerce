@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { listCustomerOrders } from "@lib/data";
 import { notFound } from "next/navigation";
 import { currency } from "@lib/util/util";
 import { ChevronDown } from "nui-react-icons";
@@ -8,6 +7,7 @@ import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import { Order, User } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: "Account",
@@ -42,7 +42,13 @@ const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
 
 export default async function OverviewTemplate() {
     const customer = await api.user.me();
-    const { orders } = await listCustomerOrders();
+    const res = await api.order.query();
+
+    if ("error" in res) {
+        return <ServerError />;
+    }
+
+    const { orders } = res;
 
     if (!customer) {
         notFound();

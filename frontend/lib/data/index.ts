@@ -1,6 +1,5 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { buildUrl } from "@lib/util/util";
 
 /**
  * Function for getting custom headers for API requests, including the JWT token and cache revalidation tags.
@@ -22,24 +21,6 @@ const getHeaders = async (tags: string[] = []) => {
 
     return headers;
 };
-
-// Cart actions
-export async function createCart(data = {}) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/create`;
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to create cart: ${response.statusText}`);
-    }
-
-    return await response.json();
-}
 
 // Customer actions
 export async function getAdresses() {
@@ -180,73 +161,6 @@ export async function updateBillingAddress(updateData: any) {
     }
 }
 
-export const listCustomerOrders = cache(async function (limit: number = 10, offset: number = 0) {
-    const headers = await getHeaders(["orders"]);
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                ...headers,
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error("Login failed");
-        }
-
-        return await res.json();
-    } catch (error) {
-        return { message: error, status: "error" };
-    }
-});
-
-export const getProduct = cache(async function (slug: string): Promise<any> {
-    try {
-        const headers = await getHeaders(["products"]);
-
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                ...headers,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch product");
-        }
-
-        return await response.json();
-    } catch (error) {
-        return null;
-    }
-});
-
-export const getProductsList = cache(async function (queryParams: any): Promise<any> {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`;
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                // ...headers,
-            },
-            body: JSON.stringify(queryParams),
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch products");
-        }
-
-        return await response.json();
-    } catch (error) {
-        throw error;
-    }
-});
-
 export const getActivites = cache(async function (limit: number = 10) {
     const headers = await getHeaders(["activities"]);
 
@@ -290,25 +204,3 @@ export async function deleteActivities(id: string | number) {
         throw new Error(`Error: ${error}`);
     }
 }
-
-export const getSiteConfigs = async (skip: number = 0, limit: number = 20): Promise<any> => {
-    const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/config/`, { skip, limit });
-    const headers = await getHeaders(["configs"]);
-
-    try {
-        const response = await fetch(url, {
-            headers: {
-                accept: "application/json",
-                ...headers,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch configs");
-        }
-
-        return await response.json();
-    } catch (error) {
-        return { message: error instanceof Error ? error.message : "Error fetching configs" };
-    }
-};

@@ -186,17 +186,6 @@ export async function updateCustomerBillingAddress(_currentState: Record<string,
     }
 }
 
-export async function signOut() {
-    const cookieStore = await cookies();
-
-    cookieStore.set("access_token", "", {
-        maxAge: -1,
-    });
-    revalidateTag("auth");
-    revalidateTag("customer");
-    redirect(`/`);
-}
-
 type resType = {
     success: boolean;
     message: string;

@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 interface Props {
-    onUpload: (formData: any) => void;
+    onUpload: (formData: FormData) => void;
     wsUrl?: string;
     revalidateKey?: string;
     defaultImage?: string;
@@ -34,6 +34,12 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
         const formData = new FormData();
 
         formData.append("file", file);
+        console.log("formData");
+        console.log(formData);
+        console.dir(formData);
+        console.dir(formData.get("file"));
+        console.dir("form data end");
+        console.log(file);
 
         try {
             await onUpload(formData);

@@ -1,6 +1,6 @@
 import { fetcher } from "./fetcher";
 
-import { revalidateUser } from "@/actions/revalidate";
+import { revalidate, signOut } from "@/actions/revalidate";
 import { Token } from "@/lib/models";
 
 // Product API methods
@@ -9,13 +9,15 @@ export const authApi = {
         const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/login`;
         const { access_token } = await fetcher<Token>(url, { method: "POST", body: JSON.stringify(input) });
 
-        revalidateUser();
+        revalidate("user");
 
         return access_token;
     },
     async logOut(): Promise<{ message: string }> {
         const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/logout`;
         const response = await fetcher<{ message: string }>(url, { method: "POST" });
+
+        await signOut();
 
         return response;
     },

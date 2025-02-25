@@ -4,7 +4,6 @@ import { Table } from "@modules/common/components/table";
 import ProductUpload from "@modules/admin/products/product-upload";
 import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
-import { deleteCollection } from "@modules/admin/actions";
 
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
@@ -35,6 +34,11 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
     }
     const { collections, ...pagination } = res;
     const customer = await api.user.me();
+
+    const deleteCollection = async (id: string) => {
+        "use server";
+        await api.collection.delete(id);
+    };
 
     return (
         <React.Fragment>

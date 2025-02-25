@@ -1,12 +1,13 @@
-import { revalidate, revalidateCart } from "@/actions/revalidate";
 import { fetcher } from "./fetcher";
 
-import { Cart, Exception, Order } from "@/lib/models";
+import { revalidate } from "@/actions/revalidate";
+import { Cart, Message, Order } from "@/lib/models";
 
 // Cart API methods
 export const cartApi = {
-    async get(): Promise<Cart | Exception> {
+    async get(): Promise<Cart | Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
+
         try {
             const response = await fetcher<Cart>(url, { next: { tags: ["cart"] } });
 
@@ -21,48 +22,65 @@ export const cartApi = {
 
         return response;
     },
-    async add({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Exception> {
+    async add({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`;
+
         try {
             const response = await fetcher<Cart>(url, { method: "POST", body: JSON.stringify({ product_id, quantity }) });
+
             revalidate("cart");
+
             return response;
         } catch (error) {
             return { message: "", error: true };
         }
     },
-    async update({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Exception> {
+    async update({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
+
         try {
             const response = await fetcher<Cart>(url, { method: "PATCH", body: JSON.stringify({ product_id, quantity }) });
-            revalidateCart();
+
+            revalidate("cart");
+
             return response;
         } catch (error) {
             return { message: "", error: true };
         }
     },
-    async updateDetails(data: any): Promise<Cart | Exception> {
+    async updateDetails(data: any): Promise<Cart | Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update-cart-details`;
+
         try {
             const response = await fetcher<Cart>(url, { method: "PATCH", body: JSON.stringify(data) });
-            revalidateCart();
+
+            revalidate("cart");
+
             return response;
         } catch (error) {
             return { message: "", error: true };
         }
     },
-    async delete(product_id: string): Promise<{ success: boolean; message: string }> {
+    async delete(product_id: string): Promise<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/${product_id}`;
 
-        await fetcher<Cart>(url, { method: "DELETE" });
-        revalidateCart();
-        return { success: true, message: "Cart deleted successfully" };
+        try {
+            await fetcher<Cart>(url, { method: "DELETE" });
+            revalidate("cart");
+
+            return { error: false, message: "Cart deleted successfully" };
+        } catch (error) {
+            return { error: true, message: "Deleted" };
+        }
     },
-    async complete(): Promise<Order | Exception> {
+    async complete(): Promise<Order | Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`;
+
         try {
             const response = await fetcher<Order>(url, { method: "POST" });
+
             revalidate("cart");
+
             return response;
         } catch (error) {
             return { message: "", error: true };

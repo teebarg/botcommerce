@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import { Actions } from "@modules/admin/components/actions";
-import { deleteBrand } from "@modules/admin/actions";
 
 import { BrandForm } from "@/modules/admin/brands/brand-form";
 import { siteConfig } from "@/lib/config";
@@ -33,6 +32,11 @@ export default async function BrandsPage(props: { searchParams: SearchParams }) 
         return <ServerError />;
     }
     const { brands, ...pagination } = res;
+
+    const deleteBrand = async (id: string) => {
+        "use server";
+        await api.brand.delete(id);
+    };
 
     return (
         <React.Fragment>

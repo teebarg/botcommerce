@@ -2,8 +2,9 @@
 
 import React from "react";
 
-import { bulkUploadProducts } from "../actions";
 import { Excel } from "../components/file-uploader";
+
+import { api } from "@/apis";
 
 interface ProductUploadProps {
     userId: string | number;
@@ -12,8 +13,8 @@ interface ProductUploadProps {
 const ProductUpload: React.FC<ProductUploadProps> = ({ userId }) => {
     const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/${userId}/`;
 
-    const handleUpload = async (formData: any) => {
-        await bulkUploadProducts({ formData });
+    const handleUpload = async (formData: FormData) => {
+        await api.product.bulkUpload(formData);
     };
 
     return <Excel wsUrl={wsUrl} onUpload={handleUpload} />;

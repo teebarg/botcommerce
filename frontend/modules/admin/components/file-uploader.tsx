@@ -10,7 +10,7 @@ import { DragNDrop } from "./drag-drop";
 import { Button } from "@/components/ui/button";
 
 interface Props {
-    onUpload: (formData: any) => void;
+    onUpload: (formData: FormData) => void;
     wsUrl: string;
 }
 
