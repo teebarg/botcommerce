@@ -1,9 +1,10 @@
 import { Metadata } from "next";
 import React from "react";
 import AdminNavbar from "@modules/admin/components/admin-navbar";
-import { getCustomer } from "@lib/data";
 import { redirect } from "next/navigation";
 import { SideBar } from "@modules/common/components/sidebar";
+
+import { auth } from "@/actions/auth";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 
@@ -12,9 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default async function PageLayout(props: { children: React.ReactNode }) {
-    const customer = await getCustomer().catch(() => null);
+    const user = await auth();
 
-    if (!customer) {
+    if (!user) {
         redirect("/account");
     }
 

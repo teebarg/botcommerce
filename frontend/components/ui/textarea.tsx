@@ -7,11 +7,14 @@ import { useTextField } from "@react-aria/textfield";
 
 type InputClassNames = Partial<Record<"base" | "inputWrapper" | "label" | "innerWrapper" | "description" | "input", string>>;
 
-interface Props extends AriaTextFieldProps {
+interface Props extends Omit<AriaTextFieldProps, "onChange" | "onFocus" | "onBlur"> {
     hidden?: boolean;
     className?: string;
     errorMessage?: string;
     classNames?: InputClassNames;
+    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onFocus?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
 }
 
 const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames, ...props }) => {
@@ -20,14 +23,18 @@ const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames
     let { label } = props;
     let textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
+    // ... existing code ...
     let { labelProps, inputProps, descriptionProps, errorMessageProps, isInvalid, validationErrors } = useTextField(
         {
             ...props,
             inputElementType: "textarea",
+            onChange: props.onChange ? (value) => props.onChange?.({ target: { value } } as any) : undefined,
+            onFocus: props.onFocus ? () => props.onFocus?.({} as any) : undefined,
+            onBlur: props.onBlur ? () => props.onBlur?.({} as any) : undefined,
         },
         textareaRef
     );
-
+    // ... existing code ...
     const adjustHeight = () => {
         if (textareaRef.current) {
             // Reset height to auto to calculate the scroll height properly

@@ -50,7 +50,7 @@ const NoProductsFound = ({
 
                     <div className="flex flex-wrap justify-center gap-2">
                         {suggestedCategories.map((category) => (
-                            <Button key={category} aria-label="categories">
+                            <Button key={category} aria-label={category}>
                                 {category}
                             </Button>
                         ))}

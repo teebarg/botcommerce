@@ -1,38 +1,27 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCollectionBySlug, getCollectionsList } from "@lib/data";
 import { CollectionTemplate } from "@modules/collections/templates";
-import { Collection, SortOptions } from "types/global";
+import { SortOptions } from "types/global";
 import React, { Suspense } from "react";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { siteConfig } from "@/lib/config";
+import { api } from "@/apis";
 
-type Props = {
-    params: { slug: string };
-    searchParams: {
-        page?: number;
-        sortBy?: SortOptions;
-        cat_ids?: string;
-    };
-};
+type Params = Promise<{ slug: string }>;
+// type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-export const revalidate = 6;
+type SearchParams = Promise<{
+    page?: number;
+    sortBy?: SortOptions;
+    cat_ids?: string;
+    maxPrice?: string;
+    minPrice?: string;
+}>;
 
-export async function generateStaticParams() {
-    const { collections }: { collections: Collection[] } = await getCollectionsList();
-
-    if (!collections) {
-        return [];
-    }
-
-    return collections?.map((collection: Collection) => ({
-        slug: String(collection.slug),
-    }));
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const collection = await getCollectionBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Params }) {
+    const { slug } = await params;
+    const { data: collection } = await api.collection.getBySlug(slug);
 
     if (!collection) {
         notFound();
@@ -44,10 +33,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     } as Metadata;
 }
 
-export default async function CollectionPage({ params, searchParams }: Props) {
-    const { sortBy, page } = searchParams;
+export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
+    const { slug } = await params;
 
-    const collection = await getCollectionBySlug(params.slug).then((collection) => collection);
+    const { data: collection } = await api.collection.getBySlug(slug).then((collection) => collection);
 
     if (!collection) {
         notFound();
@@ -55,7 +44,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
 
     return (
         <Suspense fallback={<CollectionTemplateSkeleton />}>
-            <CollectionTemplate collection={collection} page={page} searchParams={searchParams} sortBy={sortBy} />
+            <CollectionTemplate collection={collection} searchParams={searchParams} />
         </Suspense>
     );
 }

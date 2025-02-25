@@ -1,17 +1,14 @@
 "use client";
 
-import React, { useRef } from "react";
-import { FormButton } from "@modules/common/components/form-button";
+import React, { useActionState, useRef } from "react";
 import { useSnackbar } from "notistack";
-import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
-
-import { updateReview } from "../actions";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Number } from "@/components/ui/number";
 import { TextArea } from "@/components/ui/textarea";
+import { updateReview } from "@/actions/reviews";
 
 interface Props {
     current?: any;
@@ -22,24 +19,23 @@ const ReviewForm: React.FC<Props> = ({ onClose, current = { rating: 1, comment: 
     const router = useRouter();
 
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(updateReview, {
-        success: false,
+    const [state, formAction, isPending] = useActionState(updateReview, {
+        error: false,
         message: "",
-        data: null,
     });
 
     const formRef = useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {
-        if (state.success) {
-            enqueueSnackbar(state.message || "Review created successfully", { variant: "success" });
+        if (!("error" in state)) {
+            enqueueSnackbar("Action successful", { variant: "success" });
             // Leave the slider open and clear form
             if (formRef.current) {
                 formRef.current.reset();
                 router.refresh();
             }
         }
-    }, [state.success, state.message, enqueueSnackbar]);
+    }, [enqueueSnackbar]);
 
     return (
         <React.Fragment>
@@ -56,12 +52,12 @@ const ReviewForm: React.FC<Props> = ({ onClose, current = { rating: 1, comment: 
                         </div>
                     </div>
                     <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
-                        <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                        <Button aria-label="cancel" className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
                             Cancel
                         </Button>
-                        <FormButton className="min-w-32" color="primary" variant="shadow">
+                        <Button aria-label="update" className="min-w-32" color="primary" isLoading={isPending} type="submit" variant="shadow">
                             Update
-                        </FormButton>
+                        </Button>
                     </div>
                 </form>
             </div>

@@ -71,6 +71,7 @@ const Alert: React.FC<Props> = ({ title, color = "primary", variant = "solid" })
         <React.Fragment>
             <div className="w-full flex items-center my-3">
                 <div
+                    aria-label="alert"
                     className={cn(
                         "flex flex-grow flex-row w-full py-3 px-4 gap-x-1 rounded-xl items-start",
                         colorCss[color].outer,

@@ -1,18 +1,16 @@
 import ItemsPreviewTemplate from "@modules/cart/templates/preview";
 import DiscountCode from "@modules/checkout/components/discount-code";
 import CartTotals from "@modules/common/components/cart-totals";
-import { cookies } from "next/headers";
-import { getCart } from "@lib/data";
-import { Cart } from "types/global";
+
+import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
 const CheckoutSummary = async () => {
-    const cartId = cookies().get("_cart_id")?.value;
+    const cart = await api.cart.get();
 
-    if (!cartId) {
-        return null;
+    if ("error" in cart) {
+        return <ServerError />;
     }
-
-    const cart: Cart = await getCart(cartId).then((cart) => cart);
 
     if (!cart) {
         return null;

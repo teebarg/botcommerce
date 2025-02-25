@@ -1,11 +1,12 @@
 import React from "react";
 import { Star } from "nui-react-icons";
 
+import ReviewForm from "./review-form";
+
 import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
-import { Product, Review } from "@/types/global";
-import ReviewForm from "./review-form";
 import { timeAgo } from "@/lib/util/util";
+import { Product, Review } from "@/lib/models";
 
 interface Prop {
     product: Product;
@@ -41,7 +42,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                 <p className="text-default-600 mb-6 max-w-sm">
                     Be the first to share your experience with this product and help others make informed decisions!
                 </p>
-                <ReviewForm product_id={product.id} />
+                {product.id && <ReviewForm product_id={product.id} />}
             </div>
         );
     }
@@ -124,7 +125,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                 </h2>
                 <RatingBreakdown />
                 <div className="mb-8">{reviews?.slice(0, 5).map((review: Review, index: number) => <ReviewCard key={index} review={review} />)}</div>
-                <ReviewForm product_id={product.id} />
+                {product.id && <ReviewForm product_id={product.id} />}
                 {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews
             </Button> */}

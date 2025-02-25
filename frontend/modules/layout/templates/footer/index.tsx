@@ -1,11 +1,12 @@
-import { getCategories, getCollectionsList } from "@lib/data";
 import { siteConfig } from "@lib/config";
 import { GithubIcon, YoutubeIcon, TwitterIcon, WhatsAppIcon } from "nui-react-icons";
 import Link from "next/link";
 import NewsletterForm from "@modules/store/components/newsletter";
-import { Category } from "types/global";
 
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/apis";
+import { Category } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 const about = [
     {
@@ -46,8 +47,12 @@ const legal = [
 ];
 
 export default async function Footer() {
-    const { collections } = await getCollectionsList(undefined, 1, 6);
-    const { categories: cat } = await getCategories("", 1, 100);
+    const res = await api.collection.all({ limit: 6 });
+    if (!res) {
+        return <ServerError />;
+    }
+    const { collections } = res;
+    const { categories: cat } = await api.category.all({ limit: 100 });
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (

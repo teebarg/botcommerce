@@ -2,10 +2,10 @@ import { Metadata } from "next";
 import { Heart } from "nui-react-icons";
 
 import WishlistItem from "@/modules/common/components/wishlist";
-import { getWishlist } from "@/lib/data";
 import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
+import { api } from "@/apis";
 
 export const revalidate = 3;
 
@@ -19,7 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Wishlist() {
-    const { wishlists } = (await getWishlist()) || {};
+    const res = await api.user.wishlist();
+    const wishlists = res ? res.wishlists : null;
 
     if (!wishlists) {
         return (
@@ -43,10 +44,10 @@ export default async function Wishlist() {
     return (
         <div className="max-w-5xl mx-auto mt-4">
             <PromotionalBanner
-                title="Big Sale on Top Brands!"
-                subtitle="Get up to 50% OFF on select products."
-                outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
                 btnClass="text-purple-600"
+                outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                subtitle="Get up to 50% OFF on select products."
+                title="Big Sale on Top Brands!"
             />
             <h1 className="text-3xl font-bold text-center text-default-900 mt-4">Your Wishlist</h1>
             <p className="text-center text-default-500">Curate your luxury collection.</p>

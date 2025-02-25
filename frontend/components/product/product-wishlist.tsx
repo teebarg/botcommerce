@@ -1,13 +1,13 @@
 "use client";
 
-import { Product } from "types/global";
 import { HeartFilled, Heart } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
-import { addWish, removeWish } from "@/modules/products/actions";
+import { addWish, removeWish } from "@/actions/user";
+import { Product } from "@/lib/models";
 
 interface ComponentProps {
     product: Product;
@@ -24,9 +24,9 @@ const ProductWishList: React.FC<ComponentProps> = ({ product, inWishlist, classN
             let res;
 
             if (inWishlist) {
-                res = await removeWish(product.id);
+                res = await removeWish(product.id!);
             } else {
-                res = await addWish(product.id);
+                res = await addWish(product.id!);
             }
 
             if (!res.success) {

@@ -35,6 +35,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
         try {
             await deleteAction(current.id);
             router.refresh();
+            deleteModalState.close();
         } catch (error) {
             enqueueSnackbar(`Error deleting ${label}`, { variant: "error" });
         }

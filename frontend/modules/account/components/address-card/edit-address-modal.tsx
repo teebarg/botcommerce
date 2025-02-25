@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import { PencilSquare as Edit, Trash } from "nui-react-icons";
 import { Modal } from "@modules/common/components/modal";
 import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@modules/account/actions";
-import { useFormState } from "react-dom";
-import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { Address } from "types/global";
 import { useOverlayTriggerState } from "react-stately";
@@ -27,7 +25,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
     const [removing, setRemoving] = useState(false);
     const modalState = useOverlayTriggerState({});
 
-    const [formState, formAction] = useFormState(updateCustomerShippingAddress, {
+    const [formState, formAction, isPending] = useActionState(updateCustomerShippingAddress, {
         success: false,
         error: null,
         addressId: address.id,
@@ -170,12 +168,26 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                             </div>
                             <div className="flex gap-3 mt-6">
-                                <Button className="min-w-32" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
+                                <Button
+                                    aria-label="cancel"
+                                    className="min-w-32"
+                                    color="danger"
+                                    data-testid="cancel-button"
+                                    type="reset"
+                                    onClick={modalState.close}
+                                >
                                     Cancel
                                 </Button>
-                                <FormButton className="min-w-32" color="primary" data-testid="save-button">
+                                <Button
+                                    aria-label="update"
+                                    className="min-w-32"
+                                    color="primary"
+                                    data-testid="save-button"
+                                    isLoading={isPending}
+                                    type="submit"
+                                >
                                     Update
-                                </FormButton>
+                                </Button>
                             </div>
                         </form>
                     </div>

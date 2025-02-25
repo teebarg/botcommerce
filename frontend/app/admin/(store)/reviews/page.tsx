@@ -1,25 +1,35 @@
 import { Metadata } from "next";
-import { Review } from "types/global";
 import React from "react";
 import { Table } from "@modules/common/components/table";
-import { getProductReviews } from "@lib/data";
 import { Actions } from "@modules/admin/components/actions";
-import { deleteReview } from "@modules/admin/actions";
 
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
 import { ReviewForm } from "@/modules/admin/reviews/reviews-form";
 import { timeAgo } from "@/lib/util/util";
+import { Review } from "@/lib/models";
+import { api } from "@/apis";
 
 export const metadata: Metadata = {
     title: `Reviews Page | Children clothing | ${siteConfig.name} Store`,
     description: siteConfig.description,
 };
 
-export default async function ReviewsPage({ searchParams }: { searchParams: { page?: string; limit?: string } }) {
+type SearchParams = Promise<{
+    page?: string;
+    limit?: string;
+}>;
+
+export default async function ReviewsPage(props: { searchParams: SearchParams }) {
+    const searchParams = await props.searchParams;
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const { reviews, ...pagination } = await getProductReviews(undefined, page, limit);
+    const { reviews, ...pagination } = await api.review.all({ page, limit });
+
+    const deleteReview = async (id: string) => {
+        "use server";
+        await api.review.delete(id);
+    };
 
     return (
         <React.Fragment>
@@ -27,10 +37,10 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { pa
                 <div className="max-w-7xl mx-auto px-4">
                     <h1 className="text-2xl font-semibold mb-8">Reviews</h1>
                     <Table
-                        columns={["S/N", "Comment", "Rating", "Status", "Created At", "Actions"]}
-                        pagination={pagination}
                         canAdd={false}
                         canSearch={false}
+                        columns={["S/N", "Comment", "Rating", "Status", "Created At", "Actions"]}
+                        pagination={pagination}
                     >
                         {reviews?.map((item: Review, index: number) => (
                             <tr key={item.id} className="even:bg-content2">

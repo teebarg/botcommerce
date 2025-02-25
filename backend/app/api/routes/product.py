@@ -152,7 +152,7 @@ async def create(*, db: SessionDep, product_in: ProductCreate, cache: CacheServi
         product_data = prepare_product_data_for_indexing(product)
 
         add_documents_to_index(index_name="products", documents=[product_data])
-        cache.invalidate("search")
+        cache.invalidate("products")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
     return product
@@ -215,7 +215,7 @@ async def update(
         # Invalidate cache
         cache.delete(f"product:{product.slug}")
         cache.delete(f"product:{id}")
-        cache.invalidate("search")
+        cache.invalidate("products")
 
         # Define the background task
         def update_task(product: Product):
@@ -251,7 +251,7 @@ async def delete(id: int, db: SessionDep, cache: CacheService,) -> Message:
         # Invalidate cache
         cache.delete(f"product:{product.slug}")
         cache.delete(f"product:{id}")
-        cache.invalidate("search")
+        cache.invalidate("products")
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
@@ -290,7 +290,7 @@ async def upload_products(
 
         # Clear all product-related cache
         cache.invalidate("product")
-        cache.invalidate("search")
+        cache.invalidate("products")
 
         # Re-index
         index_products(db=db, cache=cache)
@@ -461,7 +461,6 @@ def index_products(db: SessionDep, cache: CacheService):
         # Clear all product-related cache
         cache.invalidate("product")
         cache.invalidate("products")
-        cache.invalidate("search")
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
     except Exception as e:

@@ -1,16 +1,13 @@
 "use client";
 
-import React, { forwardRef, useRef } from "react";
-import { FormButton } from "@modules/common/components/form-button";
+import React, { forwardRef, useActionState, useRef } from "react";
 import { useSnackbar } from "notistack";
-import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 
-import { createBrand } from "../actions";
-
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { mutateBrand } from "@/actions/product";
 
 interface Props {
     current?: any;
@@ -27,7 +24,7 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
     const isCreate = type === "create";
 
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(createBrand, {
+    const [state, formAction, isPending] = useActionState(mutateBrand, {
         success: false,
         message: "",
         data: null,
@@ -61,12 +58,12 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
                         </div>
                     </div>
                     <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
-                        <Button className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                        <Button aria-label="cancel" className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
                             Cancel
                         </Button>
-                        <FormButton className="min-w-32" color="primary" variant="shadow">
+                        <Button aria-label="submit" className="min-w-32" color="primary" isLoading={isPending} type="submit" variant="shadow">
                             {isCreate ? "Submit" : "Update"}
-                        </FormButton>
+                        </Button>
                     </div>
                 </form>
             </div>

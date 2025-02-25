@@ -1,13 +1,13 @@
 "use client";
 
-import { useFormState } from "react-dom";
 import { submitContactForm } from "@modules/account/actions";
-import { FormButton } from "@modules/common/components/form-button";
-import { useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { Input } from "@components/ui/input";
 import { TextArea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
+
+import { Button } from "@/components/ui/button";
 
 const inputClass = {
     inputWrapper: "bg-white/70",
@@ -18,7 +18,7 @@ const inputClass = {
 
 export default function ContactForm() {
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(submitContactForm, { success: false, message: "" });
+    const [state, formAction, isPending] = useActionState(submitContactForm, { success: false, message: "" });
     const formRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
@@ -46,9 +46,9 @@ export default function ContactForm() {
                 <div className="text-gray-100">
                     <Checkbox defaultSelected color="danger" label="I allow this website to store my submission." name="agreement" />
                 </div>
-                <FormButton className="min-w-32" color="danger" fullWidth={true}>
+                <Button aria-label="submit" className="min-w-32" color="danger" isLoading={isPending} type="submit">
                     Submit
-                </FormButton>
+                </Button>
             </div>
         </form>
     );

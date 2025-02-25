@@ -1,6 +1,5 @@
 "use client";
 
-import { Cart, CartItem } from "types/global";
 import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
 
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
 import { BtnLink } from "@/components/ui/btnLink";
+import { Cart, CartItem } from "@/lib/models";
 
 type SummaryProps = {
     cart: Cart;
@@ -37,7 +37,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
             <div className={cn("overflow-hidden transition-all duration-500 px-2", isExpanded ? "max-h-48" : "max-h-0")}>
                 <div className="flex items-center justify-between py-2">
                     <p className="text-xl font-medium">Summary</p>
-                    <Button className="bg-inherit min-w-0 w-auto px-0" onClick={toggleSummary}>
+                    <Button aria-label="close" className="bg-inherit min-w-0 w-auto px-0" onClick={toggleSummary}>
                         <XMark />
                     </Button>
                 </div>

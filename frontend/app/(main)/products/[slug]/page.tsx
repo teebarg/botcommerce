@@ -1,7 +1,4 @@
-import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug, productSearch } from "@lib/data";
-import { Product, SearchParams } from "types/global";
 import React, { Suspense } from "react";
 import ProductActions from "@modules/products/components/product-actions";
 import RelatedProducts from "@modules/products/components/related-products";
@@ -16,27 +13,20 @@ import ProductDetails from "@/modules/products/templates/details";
 import LocalizedClientLink from "@/components/ui/link";
 import ReviewsSection from "@/components/product/product-reviews";
 import { Skeleton } from "@/components/skeleton";
+import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
-type Props = {
-    params: { slug: string };
-};
+type Params = Promise<{ slug: string }>;
 
-export async function generateStaticParams() {
-    const queryParams: SearchParams = {
-        limit: 100,
-    };
+// export async function generateStaticParams() {
+//     return [];
+// }
 
-    const { products } = await productSearch(queryParams);
+export async function generateMetadata({ params }: { params: Params }) {
+    const { slug } = await params;
+    const product = await api.product.get(slug);
 
-    return products?.map((product: Product) => ({
-        slug: String(product.slug),
-    }));
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const product = await getProductBySlug(params.slug);
-
-    if (!product || product.error) {
+    if (!product) {
         return {};
     }
 
@@ -51,10 +41,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
-export default async function ProductPage({ params }: Props) {
-    const product = await getProductBySlug(params.slug);
+export default async function ProductPage({ params }: { params: Params }) {
+    const { slug } = await params;
+    const product = await api.product.get(slug);
 
-    if (!product || product.error) {
+    if (product == null) {
+        return <ServerError />;
+    }
+
+    if (!product) {
         notFound();
     }
 
@@ -97,7 +92,7 @@ export default async function ProductPage({ params }: Props) {
                             </div>
                             <div className="flex-1">
                                 <div className="h-[60vh] relative rounded-lg overflow-hidden">
-                                    <Image fill alt={product.name} src={product.image as string} />
+                                    {product.image && <Image fill alt={product.name} src={product.image} />}
                                 </div>
                             </div>
                         </div>

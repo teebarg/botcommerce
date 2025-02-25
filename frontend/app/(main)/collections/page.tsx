@@ -6,15 +6,17 @@ import { Suspense } from "react";
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { siteConfig } from "@/lib/config";
 
-type Props = {
-    searchParams: {
-        page?: number;
-        sortBy?: SortOptions;
-        cat_ids?: string;
-    };
-};
+type SearchParams = Promise<{
+    page?: number;
+    sortBy?: SortOptions;
+    cat_ids?: string;
+    maxPrice?: string;
+    minPrice?: string;
+}>;
 
-export const revalidate = 3;
+type Props = {
+    searchParams: SearchParams;
+};
 
 export async function generateMetadata(): Promise<Metadata> {
     const metadata = {
@@ -26,11 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Collections({ searchParams }: Props) {
-    const { sortBy, page } = searchParams;
-
     return (
         <Suspense fallback={<CollectionTemplateSkeleton />}>
-            <CollectionTemplate page={page} searchParams={searchParams} sortBy={sortBy} />
+            <CollectionTemplate searchParams={searchParams} />
         </Suspense>
     );
 }

@@ -2,17 +2,14 @@
 
 interface PushSubscriptionData {
     endpoint: string;
-    expirationTime: number | null;
-    keys: {
-        p256dh: string;
-        auth: string;
-    };
+    p256dh: string;
+    auth: string;
 }
 
 export async function getSubscription(endpoint: string) {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}/api/v1/notifications/subscription`, {
-            method: "POST",
+        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}?q=${endpoint}`, {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -31,9 +28,9 @@ export async function getSubscription(endpoint: string) {
     }
 }
 
-async function saveSubscription(subscriptionData: PushSubscriptionData) {
+export async function saveSubscription(subscriptionData: PushSubscriptionData) {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}/api/v1/notifications/subscribe`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -51,10 +48,6 @@ async function saveSubscription(subscriptionData: PushSubscriptionData) {
     } catch (error: any) {
         return { success: false, message: error.message, data: null };
     }
-}
-
-export async function subscribeUser(sub: PushSubscription) {
-    return saveSubscription(sub as unknown as PushSubscriptionData);
 }
 
 export async function unsubscribeUser() {

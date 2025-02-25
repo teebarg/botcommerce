@@ -111,7 +111,9 @@ const SupportPage = () => {
                     For personalized assistance beyond our standard support channels, our dedicated concierge team is available to provide white-glove
                     service tailored to your unique needs.
                 </p>
-                <Button color="secondary">Request Personal Assistance</Button>
+                <Button aria-label="support" color="secondary">
+                    Request Personal Assistance
+                </Button>
             </div>
         </div>
     );

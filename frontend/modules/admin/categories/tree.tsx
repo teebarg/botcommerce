@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Category } from "types/global";
 import { ChevronRight, DotsSix, Folder, Tag } from "nui-react-icons";
 
 import CategoryAction from "./categories-control";
 
 import { cn } from "@/lib/util/cn";
 import Chip from "@/components/ui/chip";
+import { Category } from "@/lib/models";
 
 interface Props {
     categories: Category[];
@@ -41,11 +41,11 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                         aria-label="open"
                                         className="flex items-center"
                                         disabled={item?.children.length == 0}
-                                        onClick={() => handleClick(item.id)}
+                                        onClick={() => handleClick(item.id!)}
                                     >
                                         <ChevronRight
                                             className={cn("transition-transform duration-300 text-default-900", {
-                                                "rotate-90": open.includes(item.id),
+                                                "rotate-90": open.includes(item.id!),
                                                 "!text-default-500": item?.children.length == 0,
                                             })}
                                         />
@@ -61,7 +61,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                 <CategoryAction category={item} />
                             </div>
                         </div>
-                        {item.children && open.includes(item.id) && (
+                        {item.children && open.includes(item.id!) && (
                             <ol className="mt-4 mb-4 block">
                                 {item.children?.map((sub: Category, index: number) => (
                                     <li key={index} className="ml-10 min-h-10">

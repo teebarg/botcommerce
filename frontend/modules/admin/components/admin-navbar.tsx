@@ -1,4 +1,3 @@
-import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import ActivityTray from "@modules/common/components/activity-tray";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
@@ -7,15 +6,15 @@ import dynamic from "next/dynamic";
 
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
+import { auth } from "@/actions/auth";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
-        ssr: false,
         loading: () => <div className="w-6 h-6" />,
     });
 
 const AdminNavbar = async () => {
-    const customer = await getCustomer().catch(() => null);
+    const user = await auth();
     const ThemeButton = getThemeToggler();
 
     return (
@@ -35,11 +34,11 @@ const AdminNavbar = async () => {
                 <NavbarItem className="flex items-center gap-2.5">
                     {/* <Notification /> */}
                     <ThemeButton />
-                    <ActivityTray customer={customer} />
+                    {user?.id && <ActivityTray userId={user.id} />}
                 </NavbarItem>
                 <NavbarItem className="flex">
-                    {customer ? (
-                        <UserDropDown customer={customer} />
+                    {user ? (
+                        <UserDropDown user={user} />
                     ) : (
                         <LocalizedClientLink href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>

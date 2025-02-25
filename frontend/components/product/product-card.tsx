@@ -1,6 +1,5 @@
 "use client";
 
-import { Product, WishlistItem } from "types/global";
 import { Suspense } from "react";
 import React from "react";
 import Image from "next/image";
@@ -8,10 +7,11 @@ import Image from "next/image";
 import { ProductWishList } from "./product-wishlist";
 
 import ProductActions from "@/modules/products/components/product-actions";
+import { Product, WishItem } from "@/lib/models";
 
 interface ComponentProps {
     product: Product;
-    wishlist?: WishlistItem[];
+    wishlist?: WishItem[];
     showWishlist?: boolean;
 }
 
@@ -27,13 +27,15 @@ const ProductCard: React.FC<ComponentProps> = ({ product, wishlist = [], showWis
                     </div> */}
                     <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl bg-content2 h-[15rem] md:h-[18rem] justify-between">
                         <div className="relative md:rounded-1xl z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
-                            <Image
-                                fill
-                                alt={product.name}
-                                className="hover:scale-95"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                src={product.image as string}
-                            />
+                            {product.image && (
+                                <Image
+                                    fill
+                                    alt={product.name}
+                                    className="hover:scale-95"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    src={product.image}
+                                />
+                            )}
                         </div>
                     </div>
                     <div className="flex flex-col md:px-1 flex-1">

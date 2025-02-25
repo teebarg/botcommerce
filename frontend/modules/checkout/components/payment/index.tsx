@@ -7,11 +7,12 @@ import { CreditCard, Pencil } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
 import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
-import { Cart, PaymentSession } from "types/global";
+import { PaymentSession } from "types/global";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
+import { Cart } from "@/lib/models";
 
 const payMethods = [
     { id: "stripe", provider_id: "stripe" },
@@ -87,7 +88,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
         >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <div className={cn("w-2 h-2 bg-gray-500 rounded-full", { "bg-blue-500": isOpen || hasPaymentMethod })}></div>
+                    <div className={cn("w-2 h-2 bg-gray-500 rounded-full", { "bg-blue-500": isOpen || hasPaymentMethod })} />
                     <span className="font-medium">Payment Method</span>
                 </div>
                 <button

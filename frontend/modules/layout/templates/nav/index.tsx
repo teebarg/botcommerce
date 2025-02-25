@@ -1,8 +1,6 @@
 import React, { Suspense } from "react";
-import { getCustomer } from "@lib/data";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
-import { Customer } from "types/global";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
 import { HeartFilled, Heart, Home, UserGroup, User, Checkout, Collection } from "nui-react-icons";
 import dynamic from "next/dynamic";
@@ -11,10 +9,10 @@ import Search from "@/modules/search/components/search";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";
+import { auth } from "@/actions/auth";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
-        ssr: false,
         loading: () => <div className="w-6 h-6" />,
     });
 
@@ -35,8 +33,7 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 };
 
 const Navbar = async () => {
-    const customer: Customer = await getCustomer().catch(() => null);
-    const isAdmin: boolean = Boolean(customer?.is_superuser);
+    const user = await auth();
     const ThemeButton = getThemeToggler();
 
     return (
@@ -49,7 +46,7 @@ const Navbar = async () => {
                     <LocalizedClientLink className="hidden md:block" href={"/collections"}>
                         Collections
                     </LocalizedClientLink>
-                    {isAdmin && (
+                    {user?.isAdmin && (
                         <LocalizedClientLink className="hidden md:block" href={"/admin"}>
                             Admin
                         </LocalizedClientLink>
@@ -70,7 +67,7 @@ const Navbar = async () => {
                     </Suspense>
                     <ThemeButton />
                     <div className="hidden md:flex">
-                        {customer ? (
+                        {user ? (
                             <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
                                 <HeartFilled className="h-8 w-8 text-primary-500" />
                             </LocalizedClientLink>
@@ -79,8 +76,8 @@ const Navbar = async () => {
                         )}
                     </div>
                     <div className="hidden sm:flex">
-                        {customer ? (
-                            <UserDropDown customer={customer} />
+                        {user ? (
+                            <UserDropDown user={user} />
                         ) : (
                             <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
                                 Log In <span aria-hidden="true">&rarr;</span>
@@ -97,8 +94,8 @@ const Navbar = async () => {
                     <NavLink href="/account/profile" icon={<User className="h-8 w-8" viewBox="0 0 20 20" />} title="Profile" />
                     <NavLink href="/collections" icon={<Collection className="h-8 w-8" />} title="Collections" />
                     <NavLink href="/checkout" icon={<Checkout className="h-8 w-8" />} title="Checkout" />
-                    {customer && <NavLink href="/wishlist" icon={<Heart className="h-8 w-8" />} title="Saved Items" />}
-                    {isAdmin && <NavLink href="/admin" icon={<UserGroup className="h-8 w-8" viewBox="0 0 24 24" />} title="Admin" />}
+                    {user && <NavLink href="/wishlist" icon={<Heart className="h-8 w-8" />} title="Saved Items" />}
+                    {user?.isAdmin && <NavLink href="/admin" icon={<UserGroup className="h-8 w-8" viewBox="0 0 24 24" />} title="Admin" />}
                 </div>
 
                 <hr className="tb-divider my-4" />
@@ -108,8 +105,8 @@ const Navbar = async () => {
                     <NavLink href="/support" title="Contact Us" />
                 </div>
                 <div className="mt-auto mb-2 md:hidden">
-                    {customer ? (
-                        <UserDropDown customer={customer} />
+                    {user ? (
+                        <UserDropDown user={user} />
                     ) : (
                         <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>

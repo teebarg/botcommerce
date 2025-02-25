@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response
 from firebase_cart import FirebaseConfig, Order, OrderHandler
 from sqlmodel import SQLModel, select
 
@@ -61,6 +61,7 @@ async def admin_index(
 @router.post("/", dependencies=[Depends(get_current_user)])
 async def create(
     *,
+    response: Response,
     user: CurrentUser,
     cartId: str = Header(default=None),
     notification: Notification,
@@ -73,6 +74,9 @@ async def create(
 
     # Invalidate cache
     cache.invalidate("orders")
+
+    # Invalidate cart cookie
+    response.delete_cookie(key="_cart_id")
 
     # Send invoice email
     email_data = generate_invoice_email(order=order_details.get("order", {}), user=user)

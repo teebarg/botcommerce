@@ -11,17 +11,17 @@ export const metadata: Metadata = {
     description: "Explore all of our products.",
 };
 
-type Params = {
-    params: { query: string };
-    searchParams: {
-        sortBy?: SortOptions;
-        page?: number;
-    };
-};
+type Params = Promise<{ query: string }>;
+type SearchParams = Promise<{
+    page?: number;
+    sortBy?: SortOptions;
+    cat_ids?: string;
+    maxPrice?: string;
+    minPrice?: string;
+}>;
 
-export default async function SearchResults({ params, searchParams }: Params) {
-    const { query } = params;
-    const { sortBy, page } = searchParams;
+export default async function SearchResults({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
+    const { query } = await params;
 
     return (
         <div className="max-w-8xl mx-auto mt-4">
@@ -37,7 +37,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
             <div className="w-full py-0 md:py-4">
                 <div className="flex gap-6 mt-0 md:mt-6">
                     <Suspense fallback={<CollectionTemplateSkeleton />}>
-                        <CollectionTemplate page={page} query={query} searchParams={searchParams} sortBy={sortBy} />
+                        <CollectionTemplate query={query} searchParams={searchParams} />
                     </Suspense>
                 </div>
             </div>

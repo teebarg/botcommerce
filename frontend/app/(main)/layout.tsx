@@ -5,12 +5,12 @@ import dynamic from "next/dynamic";
 
 import { BackButton } from "@/components/back";
 
-const Banner = dynamic(() => import("@modules/common/components/banner"), { ssr: false });
-const ButtonNav = dynamic(() => import("@/components/bottom-navbar"), { ssr: false });
-const Cookie = dynamic(() => import("@modules/store/components/cookie"), { ssr: false });
-const ChatBot = dynamic(() => import("@components/chatbot"), { ssr: false });
-const Navbar = dynamic(() => import("@modules/layout/templates/nav"), { ssr: false });
-const Search = dynamic(() => import("@/modules/search/components/search"), { ssr: false });
+const Banner = dynamic(() => import("@modules/common/components/banner"), { loading: () => <p>Loading...</p> });
+const ButtonNav = dynamic(() => import("@/components/bottom-navbar"));
+const Cookie = dynamic(() => import("@modules/store/components/cookie"));
+const ChatBot = dynamic(() => import("@components/chatbot"));
+const Navbar = dynamic(() => import("@modules/layout/templates/nav"));
+const Search = dynamic(() => import("@/modules/search/components/search"));
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 

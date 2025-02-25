@@ -6,7 +6,7 @@ import { cn } from "@/lib/util/cn";
 
 export function CustomRadioGroup({ options, value, onChange, name, className }: CustomRadioGroupProps) {
     return (
-        <div className={cn("grid gap-4", className)} role="radiogroup">
+        <div aria-label="radio" className={cn("grid gap-4", className)} role="radiogroup">
             {options.map((option) => (
                 <RadioItem
                     key={option.id}
@@ -101,7 +101,7 @@ function Radio({ checked }: { checked: boolean }) {
 function RadioGroup({ value, onChange, name, children, className }: RadioGroupProps) {
     return (
         <RadioGroupContext.Provider value={{ value, onChange, name }}>
-            <div className={cn("", className)} role="radiogroup">
+            <div aria-label="group" className={cn("", className)} role="radiogroup">
                 {children}
             </div>
         </RadioGroupContext.Provider>

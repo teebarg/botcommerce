@@ -1,25 +1,21 @@
-import { productSearch } from "@lib/data";
-import { Product, SearchParams } from "types/global";
 import dynamic from "next/dynamic";
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+
+import { api } from "@/apis";
+import { Product } from "@/lib/models";
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 type RecommendedProductsProps = {
     exclude?: Array<string | number>;
 };
 
 export default async function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
-    // edit this function to define your related products logic
-    const queryParams: SearchParams = {
-        limit: 40,
-    };
-
-    const { products } = await productSearch(queryParams);
+    const { products } = await api.product.search({ limit: 40 });
 
     if (!products.length) {
         return null;
     }
 
-    const filteredProducts = exclude?.length ? products.filter((product: Product) => !exclude.includes(product.id.toString())) : products;
+    const filteredProducts = exclude?.length ? products.filter((product: Product) => !exclude.includes(product.id!.toString())) : products;
 
     return (
         <div>

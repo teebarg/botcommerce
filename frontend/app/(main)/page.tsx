@@ -1,53 +1,47 @@
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
-import { Category, Collection, Product, SearchParams, WishlistItem } from "types/global";
 import React from "react";
 import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
-import { getCategories, getCustomer, getWishlist, productSearch } from "@lib/data";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
-
-const BannerCarousel = dynamic(() => import("@components/carousel"), { ssr: false });
-const ContactForm = dynamic(() => import("@modules/store/components/contact-form"), { ssr: false });
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+import { api } from "@/apis";
+import { Category, Product, WishItem } from "@/lib/models";
+import BannerCarousel from "@/components/carousel";
+import ProductCard from "@/components/product/product-card";
+import ContactForm from "@/modules/store/components/contact-form";
+import { auth } from "@/actions/auth";
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
     description: siteConfig.description,
 };
 
-async function getLandingProducts(collection: string, limit: number = 4): Promise<any[]> {
-    const queryParams: SearchParams = {
-        query: "",
-        limit,
-        page: 1,
-        collections: collection,
-    };
+// Helper function to fetch products
+const fetchProducts = async (collection: string, limit: number = 4) => {
+    const { products } = await api.product.search({ limit, page: 1, collections: collection });
 
-    const { products } = await productSearch(queryParams);
     return products;
-}
+};
 
 export default async function Home() {
-    const [trending, latest, featured, { categories }, customer] = await Promise.all([
-        getLandingProducts("trending"),
-        getLandingProducts("latest"),
-        getLandingProducts("featured", 6),
-        getCategories(),
-        getCustomer(),
+    const user = await auth();
+    const [trending, latest, featured, { categories }] = await Promise.all([
+        fetchProducts("trending"),
+        fetchProducts("latest"),
+        fetchProducts("featured", 6),
+        api.category.all({ limit: 100 }),
     ]);
 
-    let wishlist: WishlistItem[] = [];
+    let wishlist: WishItem[] = [];
 
-    if (customer) {
-        const { wishlists } = (await getWishlist()) || {};
+    if (user) {
+        const res = await api.user.wishlist();
 
-        wishlist = wishlists;
+        wishlist = res ? res.wishlists : [];
     }
 
     return (
@@ -135,7 +129,7 @@ export default async function Home() {
                     >
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
                             <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
-                                {categories?.map((category: Collection, index: number) => (
+                                {categories?.map((category: Category, index: number) => (
                                     <BtnLink
                                         key={index}
                                         className="flex-none h-24 min-w-24 rounded-full text-lg"
@@ -151,10 +145,10 @@ export default async function Home() {
                 </div>
                 <div className="relative py-2">
                     <PromotionalBanner
-                        title="Big Sale on Top Brands!"
-                        subtitle="Get up to 50% OFF on select products."
-                        outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
                         btnClass="text-purple-600"
+                        outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                        subtitle="Get up to 50% OFF on select products."
+                        title="Big Sale on Top Brands!"
                     />
                 </div>
                 <div className="bg-content1">
@@ -176,34 +170,34 @@ export default async function Home() {
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                                 {featured?.map((product: Product, index: number) => (
-                                    <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                    <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                 ))}
                             </div>
                         </div>
                     </div>
                 </div>
                 <PromotionalBanner
-                    title="Big Sale on Top Brands!"
-                    subtitle="Get up to 50% OFF on select products."
-                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
                     btnClass="text-purple-600"
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    subtitle="Get up to 50% OFF on select products."
+                    title="Big Sale on Top Brands!"
                 />
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
                             {trending?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
                 </div>
                 <div className="relative">
                     <PromotionalBanner
-                        title="Big Sale on Top Brands!"
-                        subtitle="Get up to 50% OFF on select products."
-                        outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl"
                         btnClass="text-purple-600"
+                        outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl"
+                        subtitle="Get up to 50% OFF on select products."
+                        title="Big Sale on Top Brands!"
                     />
                 </div>
                 <div className="bg-content1 py-12">
@@ -216,7 +210,7 @@ export default async function Home() {
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
                             {latest?.map((product: Product, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>

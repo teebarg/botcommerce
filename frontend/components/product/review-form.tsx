@@ -2,10 +2,11 @@
 
 import { Star } from "nui-react-icons";
 import { useState } from "react";
+import { useSnackbar } from "notistack";
+
 import { TextArea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { addReview } from "@/modules/products/actions";
-import { useSnackbar } from "notistack";
+import { api } from "@/apis";
 
 interface ReviewFormProps {
     className?: string;
@@ -21,10 +22,12 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const res = await addReview(product_id, rating, comment);
+        const res = await api.product.addReview({ product_id, rating, comment });
+
         setLoading(false);
-        if (res.error) {
+        if ("error" in res) {
             enqueueSnackbar(res.message, { variant: "error" });
+
             return;
         }
         // Reset form
@@ -34,16 +37,16 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
     };
 
     return (
-        <form onSubmit={handleSubmit} className={`space-y-4 w-full max-w-xl mx-auto text-center mt-4 ${className}`}>
+        <form className={`space-y-4 w-full max-w-xl mx-auto text-center mt-4 ${className}`} onSubmit={handleSubmit}>
             <div>
                 <label className="block text-sm font-medium text-default-700">Rating</label>
                 <div className="flex items-center justify-center mt-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                         <button
                             key={star}
+                            className={`${star <= rating ? "text-yellow-400" : "text-gray-300"} hover:text-yellow-400`}
                             type="button"
                             onClick={() => setRating(star)}
-                            className={`${star <= rating ? "text-yellow-400" : "text-gray-300"} hover:text-yellow-400`}
                         >
                             <Star className="h-8 w-8" />
                         </button>
@@ -52,21 +55,21 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
             </div>
 
             <div>
-                <label htmlFor="comment" className="block text-sm font-medium text-default-700">
+                <label className="block text-sm font-medium text-default-700" htmlFor="comment">
                     Your Review
                 </label>
                 <TextArea
+                    isRequired
+                    className="mt-1"
                     id="comment"
                     name="comment"
-                    value={comment}
-                    onChange={(e) => setComment(e)}
                     placeholder="Write your review here..."
-                    className="mt-1"
-                    isRequired
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
                 />
             </div>
 
-            <Button size="md" type="submit" isLoading={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Button aria-label="submit review" className="bg-indigo-600 hover:bg-indigo-700 text-white" isLoading={loading} size="md" type="submit">
                 Submit Review
             </Button>
         </form>

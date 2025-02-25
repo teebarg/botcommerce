@@ -1,17 +1,18 @@
 import { Metadata } from "next";
-import { getCustomer } from "@lib/data";
 import { Shield } from "nui-react-icons";
-import { retrieveCart } from "@modules/cart/actions";
 import SignInPrompt from "@modules/cart/components/sign-in-prompt";
 import Summary from "@modules/cart/templates/summary";
 import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 import RecommendedProducts from "@/modules/products/components/recommended";
-import { CartItem } from "@/types/global";
 import { siteConfig } from "@/lib/config";
 import Items from "@/components/order/cart-details";
 import PromotionalBanner from "@/components/promotion";
+import { auth } from "@/actions/auth";
+import { api } from "@/apis";
+import { CartItem } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -19,8 +20,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Cart() {
-    const cart = await retrieveCart();
-    const customer = await getCustomer();
+    const cart = await api.cart.get();
+    if ("error" in cart) {
+        return <ServerError />;
+    }
+    const user = await auth();
 
     const product_ids = cart?.items?.map((x: CartItem) => x.product_id);
 
@@ -29,16 +33,16 @@ export default async function Cart() {
             <SummaryMobile cart={cart} />
             <div className="py-0 md:py-12">
                 <PromotionalBanner
-                    title="Big Sale on Top Brands!"
-                    subtitle="Get up to 50% OFF on select products."
-                    outerClass="bg-gradient-to-r from-indigo-500/100 via-purple-500/75 to-pink-500 mx-2 md:mx-auto max-w-7xl"
                     btnClass="text-purple-600"
+                    outerClass="bg-gradient-to-r from-indigo-500/100 via-purple-500/75 to-pink-500 mx-2 md:mx-auto max-w-7xl"
+                    subtitle="Get up to 50% OFF on select products."
+                    title="Big Sale on Top Brands!"
                 />
                 <div className="max-w-7xl mx-auto" data-testid="cart-container">
                     {cart?.items.length ? (
                         <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8">
                             <div className="flex flex-col bg-content1 px-4 py-6 gap-y-6 rounded-md">
-                                {!customer && (
+                                {!user && (
                                     <>
                                         <SignInPrompt />
                                         <hr className="tb-divider" />

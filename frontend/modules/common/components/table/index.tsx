@@ -1,11 +1,9 @@
 "use client";
 
 import React, { cloneElement, isValidElement, useState } from "react";
-import { Pagination as PaginationType } from "types/global";
 import { Plus, Search } from "nui-react-icons";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSnackbar } from "notistack";
-import { exportProducts, indexProducts } from "@modules/admin/actions";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Input } from "@components/ui/input";
 
@@ -13,11 +11,13 @@ import { Pagination } from "../pagination";
 import { SlideOver } from "../slideover";
 
 import { Button } from "@/components/ui/button";
+import { Pag } from "@/lib/models";
+import { api } from "@/apis";
 
 interface Props {
     children: React.ReactNode;
     columns: string[];
-    pagination?: PaginationType;
+    pagination?: Pag;
     canAdd?: boolean;
     canExport?: boolean;
     canIndex?: boolean;
@@ -60,23 +60,19 @@ const Table: React.FC<Props> = ({
     }, [onSearchChange]);
 
     const handleIndex = async () => {
-        try {
-            setIsIndexing(true);
-            await indexProducts();
-            enqueueSnackbar("Products indexed successfully", { variant: "success" });
-        } catch (error) {
-            enqueueSnackbar("Error indexing products", { variant: "error" });
-        } finally {
-            setIsIndexing(false);
-        }
+        setIsIndexing(true);
+        const res = await api.product.reIndex();
+
+        enqueueSnackbar(res.message, { variant: res.error ? "error" : "success" });
+        setIsIndexing(false);
     };
 
     const handleExport = async () => {
         try {
             setIsExporting(true);
-            const res = await exportProducts();
+            const res = await api.product.export();
 
-            enqueueSnackbar(res.message, { variant: res.success ? "success" : "error" });
+            enqueueSnackbar(res.message, { variant: "success" });
         } catch (error) {
             enqueueSnackbar("Error exporting products", { variant: "error" });
         } finally {
@@ -107,17 +103,31 @@ const Table: React.FC<Props> = ({
                         </div>
                         <div className="flex items-center gap-3">
                             {canAdd && (
-                                <Button color="primary" endContent={<Plus />} onClick={() => state.open()}>
+                                <Button aria-label="add new" color="primary" endContent={<Plus />} onClick={() => state.open()}>
                                     Add New
                                 </Button>
                             )}
                             {canExport && (
-                                <Button className="min-w-28" color="secondary" disabled={isExporting} isLoading={isExporting} onClick={handleExport}>
+                                <Button
+                                    aria-label="export"
+                                    className="min-w-28"
+                                    color="secondary"
+                                    disabled={isExporting}
+                                    isLoading={isExporting}
+                                    onClick={handleExport}
+                                >
                                     Export
                                 </Button>
                             )}
                             {canIndex && (
-                                <Button className="min-w-28" color="secondary" disabled={isIndexing} isLoading={isIndexing} onClick={handleIndex}>
+                                <Button
+                                    aria-label="index"
+                                    className="min-w-28"
+                                    color="secondary"
+                                    disabled={isIndexing}
+                                    isLoading={isIndexing}
+                                    onClick={handleIndex}
+                                >
                                     Index
                                 </Button>
                             )}

@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Category } from "types/global";
-import { deleteCategory } from "@modules/admin/actions";
 import { EllipsisHorizontal, PencilSquare, Plus, Trash } from "nui-react-icons";
 import { useOverlayTriggerState } from "react-stately";
 import { SlideOver } from "@modules/common/components/slideover";
@@ -15,6 +13,8 @@ import { CategoryForm } from "./category-form";
 
 import Dropdown from "@/components/ui/dropdown";
 import { cn } from "@/lib/util/cn";
+import { Category } from "@/lib/models";
+import { deleteCategory } from "@/actions/category";
 
 interface Props {
     canAdd?: boolean;
@@ -43,7 +43,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
             return;
         }
         try {
-            await deleteCategory(category.id);
+            await deleteCategory(category.id!);
             router.refresh();
             deleteModalState.close();
         } catch (error) {

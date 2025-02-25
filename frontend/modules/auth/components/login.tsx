@@ -2,25 +2,23 @@
 
 import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
-import { FormButton } from "@modules/common/components/form-button";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@modules/account/components/google";
-import { useFormState } from "react-dom";
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import { redirect } from "next/navigation";
 import { Input } from "@components/ui/input";
 import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 
-import { signIn } from "../action";
-
 import LocalizedClientLink from "@/components/ui/link";
+import { Button } from "@/components/ui/button";
+import { signIn } from "@/actions/auth";
 
 type Props = {};
 
 const LoginForm: React.FC<Props> = () => {
     const [show, setShow] = useState<boolean>(false);
     const { enqueueSnackbar } = useSnackbar();
-    const [state, formAction] = useFormState(signIn, null);
+    const [state, formAction, isPending] = useActionState(signIn, null);
 
     useWatch(state, () => {
         if (state?.error) {
@@ -56,9 +54,9 @@ const LoginForm: React.FC<Props> = () => {
                         type={show ? "text" : "password"}
                     />
                 </div>
-                <FormButton className="w-full mt-6" data-testid="sign-in-button" size="md">
+                <Button aria-label="sign in" className="w-full mt-6" data-testid="sign-in-button" isLoading={isPending} size="md" type="submit">
                     Sign in
-                </FormButton>
+                </Button>
             </form>
             <span className="text-center text-default-900 text-sm mt-6">
                 Not a member?{" "}

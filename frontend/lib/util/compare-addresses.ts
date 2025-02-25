@@ -25,5 +25,6 @@ export default function compareAddresses(address1: any, address2: any) {
         "is_billing",
         "company",
     ]);
+
     return isEqual(sanitizedAddress1, sanitizedAddress2);
 }

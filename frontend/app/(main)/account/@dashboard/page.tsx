@@ -1,19 +1,20 @@
 import { Metadata } from "next";
-import { getCustomer, listCustomerOrders } from "@lib/data";
 import { notFound } from "next/navigation";
-import { Customer, Order } from "types/global";
 import { currency } from "@lib/util/util";
 import { ChevronDown } from "nui-react-icons";
 
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
+import { api } from "@/apis";
+import { Order, User } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: "Account",
     description: "Overview of your account activity.",
 };
 
-const getProfileCompletion = (customer: Omit<Customer, "password_hash"> | null) => {
+const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
     let count = 0;
 
     if (!customer) {
@@ -40,8 +41,14 @@ const getProfileCompletion = (customer: Omit<Customer, "password_hash"> | null) 
 };
 
 export default async function OverviewTemplate() {
-    const customer = await getCustomer().catch(() => null);
-    const { orders } = await listCustomerOrders();
+    const customer = await api.user.me();
+    const res = await api.order.query();
+
+    if ("error" in res) {
+        return <ServerError />;
+    }
+
+    const { orders } = res;
 
     if (!customer) {
         notFound();
@@ -51,10 +58,10 @@ export default async function OverviewTemplate() {
         <div data-testid="overview-page-wrapper">
             <div>
                 <PromotionalBanner
-                    title="Big Sale on Top Brands!"
-                    subtitle="Get up to 50% OFF on select products."
-                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
                     btnClass="text-purple-600"
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    subtitle="Get up to 50% OFF on select products."
+                    title="Big Sale on Top Brands!"
                 />
                 <div className="text-xl hidden md:flex justify-between items-center mt-4">
                     <span data-testid="welcome-message" data-value={customer?.firstname}>

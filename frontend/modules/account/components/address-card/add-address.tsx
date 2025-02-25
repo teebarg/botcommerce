@@ -1,11 +1,9 @@
 "use client";
 
 import { Plus } from "nui-react-icons";
-import React, { useEffect } from "react";
-import { useFormState } from "react-dom";
+import React, { useActionState, useEffect } from "react";
 import { Modal } from "@modules/common/components/modal";
 import { addCustomerShippingAddress } from "@modules/account/actions";
-import { FormButton } from "@modules/common/components/form-button";
 import { useSnackbar } from "notistack";
 import { useOverlayTriggerState } from "react-stately";
 import { states } from "@modules/collections/templates/data";
@@ -18,7 +16,7 @@ const AddAddress = () => {
     const { enqueueSnackbar } = useSnackbar();
     const modalState = useOverlayTriggerState({});
 
-    const [formState, formAction] = useFormState(addCustomerShippingAddress, {
+    const [formState, formAction, isPending] = useActionState(addCustomerShippingAddress, {
         success: false,
         error: null,
     });
@@ -72,12 +70,26 @@ const AddAddress = () => {
                                 <Input autoComplete="phone" data-testid="phone-input" label="Phone" name="phone" />
                             </div>
                             <div className="flex gap-3 mt-6">
-                                <Button className="min-w-36" color="danger" data-testid="cancel-button" type="reset" onClick={modalState.close}>
+                                <Button
+                                    aria-label="cancel"
+                                    className="min-w-36"
+                                    color="danger"
+                                    data-testid="cancel-button"
+                                    type="reset"
+                                    onClick={modalState.close}
+                                >
                                     Cancel
                                 </Button>
-                                <FormButton className="min-w-36" color="primary" data-testid="save-button">
+                                <Button
+                                    aria-label="save"
+                                    className="min-w-36"
+                                    color="primary"
+                                    data-testid="save-button"
+                                    isLoading={isPending}
+                                    type="submit"
+                                >
                                     Save
-                                </FormButton>
+                                </Button>
                             </div>
                         </form>
                     </div>

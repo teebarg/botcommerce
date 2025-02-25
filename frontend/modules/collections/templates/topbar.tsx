@@ -6,13 +6,13 @@ import useWatch from "@lib/hooks/use-watch";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { SlideOver } from "@modules/common/components/slideover";
-import { Brand, Category, Collection } from "types/global";
 
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
 
 import { ComboBox } from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
+import { Brand, Category, Collection } from "@/lib/models";
 
 interface ComponentProps {
     count: any;
@@ -37,7 +37,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
             <header className="relative z-20 flex flex-col sm:gap-2 rounded-xl bg-content1 px-4 pb-3 pt-2 md:pt-3">
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
-                        <Button className="md:hidden h-12" onClick={state.open}>
+                        <Button aria-label="filters" className="md:hidden h-12" onClick={state.open}>
                             <FunnelIcon className="text-default-500" focusable="false" role="img" size={16} />
                             Filters ({count})
                         </Button>

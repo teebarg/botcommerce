@@ -1,12 +1,13 @@
 "use client";
 
 import CartItemSelect from "@modules/cart/components/cart-item-select";
-import DeleteButton from "@modules/common/components/delete-button";
-import { updateLineItem } from "@modules/cart/actions";
 import { useState } from "react";
 import { useSnackbar } from "notistack";
-import { CartItem } from "types/global";
 import { Spinner } from "@components/spinner";
+
+import CartDeleteButton from "@/modules/common/components/cart-delete-button";
+import { CartItem } from "@/lib/models";
+import { api } from "@/apis";
 
 type ItemsTemplateProps = {
     item: CartItem;
@@ -19,25 +20,19 @@ const Control = ({ item }: ItemsTemplateProps) => {
     const changeQuantity = async (id: string, quantity: number) => {
         setUpdating(true);
 
-        const message = await updateLineItem({
-            lineId: id,
+        const res = await api.cart.update({
+            product_id: id,
             quantity,
-        })
-            .catch((err) => {
-                return err.message;
-            })
-            .finally(() => {
-                setUpdating(false);
-            });
+        });
 
-        if (message) {
-            enqueueSnackbar(message, { variant: "error" });
+        if ("error" in res) {
+            enqueueSnackbar(res.message, { variant: "error" });
         }
     };
 
     return (
         <div className="flex gap-2 items-center w-28">
-            <DeleteButton data-testid="product-delete-button" id={item.item_id} />
+            <CartDeleteButton data-testid="product-delete-button" id={item.item_id} />
             <CartItemSelect
                 className="w-14 h-10 p-4"
                 data-testid="product-select-button"

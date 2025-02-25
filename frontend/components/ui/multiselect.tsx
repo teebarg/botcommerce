@@ -72,6 +72,7 @@ const Multiselect: React.FC<MultiselectProps> = ({ name, label, options, default
                                 >
                                     {item.name}
                                     <span
+                                        aria-label="close"
                                         className="ml-1 hover:bg-blue-200 rounded-full"
                                         role="button"
                                         onClick={(e) => {

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
-
 import { ArrowUpRightMini, ExclamationIcon } from "nui-react-icons";
+
 import Reload from "@/components/reload";
 import { BtnLink } from "@/components/ui/btnLink";
 

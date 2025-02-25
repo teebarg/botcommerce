@@ -4,12 +4,12 @@ import React from "react";
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
 import LineItemPrice from "@modules/common/components/line-item-price";
 import Image from "next/image";
-import { CartItem } from "types/global";
 import { cn } from "@lib/util/cn";
 
 import Control from "./control";
 
 import LocalizedClientLink from "@/components/ui/link";
+import { CartItem } from "@/lib/models";
 
 type ItemsTemplateProps = {
     className?: string;

@@ -1,8 +1,7 @@
 import React from "react";
 import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { getBrands, getCategories, getCollectionsList, getCustomer, getWishlist, productSearch } from "@lib/data";
-import { Category, Collection, Customer, Product, SearchParams, SortOptions, WishlistItem } from "types/global";
+import { SortOptions } from "types/global";
 import dynamic from "next/dynamic";
 
 import { CollectionsTopBar } from "./topbar";
@@ -11,76 +10,88 @@ import { CollectionsSideBar } from "./sidebar";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
+import { api } from "@/apis";
+import { Category, Collection, Product, WishItem } from "@/lib/models";
+import { auth } from "@/actions/auth";
+import ServerError from "@/components/server-error";
 
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
+
+type SearchParams = Promise<{
+    page?: number;
+    sortBy?: SortOptions;
+    cat_ids?: string;
+    maxPrice?: string;
+    minPrice?: string;
+}>;
 
 interface ComponentProps {
     query?: string;
     collection?: Collection;
-    page?: number;
-    sortBy?: SortOptions;
-    searchParams?: {
-        page?: number;
-        sortBy?: SortOptions;
-        cat_ids?: string;
-        maxPrice?: string;
-        minPrice?: string;
-    };
+    searchParams?: SearchParams;
 }
 
-const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, page, sortBy, searchParams }) => {
-    const { brands } = await getBrands();
-    const { collections } = await getCollectionsList();
-    const customer: Customer = await getCustomer().catch(() => null);
-    let wishlist: WishlistItem[] = [];
+const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collection, searchParams }) => {
+    const { minPrice, maxPrice, cat_ids, page, sortBy } = (await searchParams) || {};
+    const user = await auth();
+    const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
 
-    if (customer) {
-        const { wishlists } = (await getWishlist()) || {};
-
-        wishlist = wishlists;
+    // Early returns for error handling
+    if (!brandRes || !collectionsRes || !catRes) {
+        return <ServerError />;
     }
 
-    const { categories: cat } = await getCategories();
+    const { brands } = brandRes;
+    const { collections } = collectionsRes;
+    const { categories: cat } = catRes;
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
-    const queryParams: SearchParams = {
+    let wishlist: WishItem[] = [];
+
+    if (user) {
+        const res = await api.user.wishlist();
+
+        wishlist = res ? res.wishlists : [];
+    }
+
+    const queryParams: any = {
         query,
         limit: 12,
         page: page ?? 1,
         sort: sortBy ?? "created_at:desc",
-        max_price: searchParams?.maxPrice ?? 100000000,
-        min_price: searchParams?.minPrice ?? 0,
+        max_price: maxPrice ?? 100000000,
+        min_price: minPrice ?? 0,
+        collections: collection?.slug,
+        categories: cat_ids,
     };
 
-    if (collection?.id) {
-        queryParams["collections"] = collection.slug as string;
-    }
-
-    if (searchParams?.cat_ids) {
-        queryParams["categories"] = searchParams?.cat_ids;
-    }
-
-    const { products, facets, ...pagination } = await productSearch(queryParams);
+    const { products, facets, ...pagination } = await api.product.search(queryParams);
 
     return (
         <React.Fragment>
             <div className="hidden md:block">
-                <CollectionsSideBar brands={brands} categories={categories} collections={collections} facets={facets} searchParams={searchParams} />
+                <CollectionsSideBar
+                    brands={brands}
+                    categories={categories}
+                    collections={collections}
+                    facets={facets}
+                    searchParams={{ minPrice, maxPrice }}
+                />
             </div>
             <div className="w-full flex-1 flex-col">
                 {/* Mobile banner */}
                 <PromotionalBanner
-                    title="Exclusive Offer!"
-                    subtitle="Get 20% Off Today"
+                    btnClass="text-blue-600"
                     icon={<Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />}
                     outerClass="from-blue-600 to-purple-700"
-                    btnClass="text-blue-600"
+                    subtitle="Get 20% Off Today"
+                    title="Exclusive Offer!"
                 />
                 {/* Categories */}
                 <div className="px-4 my-6 md:hidden">
                     <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
-                        {cat.map((category: Collection, index: number) => (
+                        {cat.map((category: Category, index: number) => (
                             <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                 {category.name}
                             </BtnLink>
@@ -138,7 +149,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                         <React.Fragment>
                                             <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
                                                 {products.map((product: Product, index: number) => (
-                                                    <ProductCard key={index} product={product} showWishlist={Boolean(customer)} wishlist={wishlist} />
+                                                    <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                                 ))}
                                             </div>
                                             {pagination.total_pages > 1 && <Pagination pagination={pagination} />}

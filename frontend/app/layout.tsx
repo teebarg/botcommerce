@@ -1,7 +1,6 @@
 import "public/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
-import { getCustomer } from "@lib/data";
 import dynamic from "next/dynamic";
 
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
@@ -9,10 +8,11 @@ import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
 import { siteConfig } from "@/lib/config";
 import ProgressBar from "@/components/ui/progress-bar";
+import { auth } from "@/actions/auth";
 
-const Google = dynamic(() => import("./google"), { ssr: false });
-const NotificationProviders = dynamic(() => import("./notistack-providers"), { ssr: false });
-const OverlayClientProvider = dynamic(() => import("./overlay-providers"), { ssr: false });
+const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
+const NotificationProviders = dynamic(() => import("./notistack-providers"));
+const OverlayClientProvider = dynamic(() => import("./overlay-providers"));
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -46,7 +46,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    const customer = await getCustomer().catch(() => null);
+    const user = await auth();
 
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">
@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                                 <InstallPrompt />
                                 {children}
                             </div>
-                            {!customer && <Google />}
+                            {!user && <Google />}
                         </OverlayClientProvider>
                     </NotificationProviders>
                 </ProgressBar>

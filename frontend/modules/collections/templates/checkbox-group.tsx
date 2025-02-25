@@ -3,15 +3,13 @@ import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { Facet } from "@/lib/models";
 
 interface CheckboxGroupProps {
     groupName: string;
     checkboxes: Record<string, any>[];
     item?: any;
-    facets?: {
-        categories: Record<string, string>;
-        collections: Record<string, string>;
-    };
+    facets?: Facet;
 }
 
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, facets, item }) => {

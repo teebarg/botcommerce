@@ -6,9 +6,9 @@ import { useSnackbar } from "notistack";
 import Image from "next/image";
 
 import { cn } from "@/lib/util/cn";
-import { removeWish } from "@/modules/products/actions";
-import { addToCart } from "@/modules/cart/actions";
 import { Button } from "@/components/ui/button";
+import { removeWish } from "@/actions/user";
+import { api } from "@/apis";
 
 interface WishlistItemProps {
     id: number;
@@ -43,7 +43,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image }) => {
     const handleAddToCart = async () => {
         setIsAdding(true);
 
-        await addToCart({
+        await api.cart.add({
             product_id: id.toString(),
             quantity: 1,
         });

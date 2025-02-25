@@ -11,10 +11,10 @@ import dynamic from "next/dynamic";
 
 import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
-import { Product, SearchParams } from "@/types/global";
 import NoProductsFound from "@/modules/products/components/no-products";
 import { buildUrl, debounce } from "@/lib/util/util";
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+import { Product } from "@/lib/models";
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 interface Props {
     className?: string;
@@ -30,7 +30,7 @@ const Search: React.FC<Props> = ({ className }) => {
     const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
         setValue(event?.target?.value);
         try {
-            const queryParams: SearchParams = {
+            const queryParams: any = {
                 query: event?.target?.value,
                 limit: 15,
                 page: 1,

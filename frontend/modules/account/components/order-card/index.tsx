@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { CartItem, Order } from "types/global";
 import { currency } from "@lib/util/util";
 import Image from "next/image";
 
 import LocalizedClientLink from "@/components/ui/link";
+import { CartItem, Order } from "@/lib/models";
 
 type OrderCardProps = {
     order: Omit<Order, "beforeInsert">;

@@ -1,8 +1,9 @@
-import { productSearch } from "@lib/data";
 import dynamic from "next/dynamic";
-import { Product } from "types/global";
 
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { ssr: false });
+import { api } from "@/apis";
+import { Product } from "@/lib/models";
+
+const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
 
 type RelatedProductsProps = {
     product: Product;
@@ -18,11 +19,12 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
         }
 
         params.limit = 4;
+
         return params;
     };
 
     const queryParams = setQueryParams();
-    const { products } = await productSearch(queryParams);
+    const { products } = await api.product.search(queryParams);
     const productPreviews = products.filter((item: Product) => item.id !== product.id);
 
     if (!productPreviews.length) {

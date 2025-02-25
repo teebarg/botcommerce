@@ -10,28 +10,28 @@
 
 This is a custom e-commerce storefront built with:
 
--   [Next.js](https://nextjs.org/)
--   [Tailwind CSS](https://tailwindcss.com/)
--   [Typescript](https://www.typescriptlang.org/)
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Typescript](https://www.typescriptlang.org/)
 
 Features include:
 
--   Full ecommerce support:
-    -   Product Detail Page
-    -   Product Overview Page
-    -   Search with MeiliSearch
-    -   Product Collections
-    -   Cart
-    -   Checkout
-    -   User Accounts
-    -   Order Details
--   Full Next.js 14 support:
-    -   App Router
-    -   Next fetching/caching
-    -   Server Components
-    -   Server Actions
-    -   Streaming
-    -   Static Pre-Rendering
+- Full ecommerce support:
+    - Product Detail Page
+    - Product Overview Page
+    - Search with MeiliSearch
+    - Product Collections
+    - Cart
+    - Checkout
+    - User Accounts
+    - Order Details
+- Full Next.js 14 support:
+    - App Router
+    - Next fetching/caching
+    - Server Components
+    - Server Actions
+    - Streaming
+    - Static Pre-Rendering
 
 # Quickstart
 
@@ -147,6 +147,6 @@ Next.js Middleware, which is basically an Edge function that runs before (almost
 
 ## Learn more about Next.js
 
--   [Website](https://nextjs.org/)
--   [GitHub](https://github.com/vercel/next.js)
--   [Documentation](https://nextjs.org/docs)
+- [Website](https://nextjs.org/)
+- [GitHub](https://github.com/vercel/next.js)
+- [Documentation](https://nextjs.org/docs)

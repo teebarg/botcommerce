@@ -1,6 +1,7 @@
 import { Input } from "@components/ui/input";
 import React, { useState, useEffect } from "react";
-import { Cart } from "types/global";
+
+import { Cart } from "@/lib/models";
 
 const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const [formData, setFormData] = useState({

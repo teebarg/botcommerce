@@ -1,10 +1,8 @@
 import React from "react";
 import { Metadata } from "next";
-import { cookies } from "next/headers";
 import Wrapper from "@modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
-import { getCart, getCustomer } from "@lib/data";
 import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 
 import PaymentButton from "@/modules/checkout/components/payment-button";
@@ -14,6 +12,8 @@ import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
+import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Clothings | ${siteConfig.name} Store | Checkout`,
@@ -37,24 +37,16 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
     );
 };
 
-const fetchCart = async () => {
-    const cartId = cookies().get("_cart_id")?.value;
-
-    if (!cartId) {
-        return null;
-    }
-
-    return await getCart(cartId).then((cart) => cart);
-};
-
 export default async function Checkout() {
-    const cart = await fetchCart();
+    const [cart, user] = await Promise.all([api.cart.get(), api.user.me()]);
+
+    if ("error" in cart) {
+        return <ServerError />;
+    }
 
     if (!cart) {
         return <EmptyCart />;
     }
-
-    const customer = await getCustomer();
 
     const { total } = cart;
 
@@ -75,7 +67,7 @@ export default async function Checkout() {
                 </div>
                 {/* Header */}
                 <header className="flex justify-between items-center p-4">
-                    <LocalizedClientLink href="/" className="text-xl font-semibold">
+                    <LocalizedClientLink className="text-xl font-semibold" href="/">
                         {siteConfig.name}
                     </LocalizedClientLink>
                     <ThemeButton />
@@ -88,9 +80,9 @@ export default async function Checkout() {
                             <h1 className="text-3xl font-light">Checkout your cart</h1>
                             <p className="text-default-400 mb-4">
                                 Already have an IBM Cloud account?{" "}
-                                <a href="#" className="text-blue-400">
+                                <LocalizedClientLink className="text-blue-400" href="/sign-in">
                                     Log in
-                                </a>
+                                </LocalizedClientLink>
                             </p>
                             <nav aria-label="Breadcrumbs" data-slot="base">
                                 <ol className="flex flex-wrap list-none rounded-lg mb-2" data-slot="list">
@@ -120,7 +112,7 @@ export default async function Checkout() {
                 {/* Mobile cart summary */}
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
-                        <PaymentButton cart={cart} customer={customer} data-testid="submit-order-button" />
+                        <PaymentButton cart={cart} data-testid="submit-order-button" user={user} />
                         <p className="font-semibold text-xl">Total: {getAmount(total)}</p>
                     </div>
                 </div>
