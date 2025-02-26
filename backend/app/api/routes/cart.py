@@ -5,12 +5,10 @@ from fastapi import APIRouter, Header, HTTPException, Response
 from firebase_cart import CartHandler, CartItem, FirebaseConfig
 
 from app.core.config import settings
-from app.core.decorators import cache
-from app.core.deps import CacheService
+from app.core.deps import CacheService, SessionDep
 from app.core.utils import generate_id
-from app.models.generic import CartDetails, CartItemIn
+from app.models.generic import CartDetails, CartItemIn, Product
 from app.models.message import Message
-from app.services.product import get_product
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
@@ -25,7 +23,6 @@ router = APIRouter()
 
 
 @router.get("/")
-@cache(key="cart", hash=False)
 async def index(response: Response, cartId: str = Header(default=None)) -> Any:
     """
     Retrieve cart.
@@ -46,24 +43,21 @@ async def index(response: Response, cartId: str = Header(default=None)) -> Any:
 
 @router.post("/add")
 async def add_to_cart(
+    db: SessionDep,
     cart_in: CartItemIn,
-    cache: CacheService,
     cartId: str = Header(default=None),
 ):
 
-    doc = await get_product(cache=cache, product_id=cart_in.product_id)
+    doc = db.get(Product, cart_in.product_id)
     if not doc:
         raise HTTPException(
             status_code=400,
             detail="Could not find product",
         )
-    id = str(doc.get("id"))
-    cart_item = CartItem(**doc, item_id=id, product_id=id, quantity=cart_in.quantity)
+    id = str(doc.id)
+    cart_item = CartItem(**doc.dict(), item_id=id, product_id=id, quantity=cart_in.quantity)
     try:
-        cart = cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
-        # Invalidate cache
-        cache.delete(f"cart:{cartId}")
-        return cart
+        return cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
     except Exception as e:
         raise HTTPException(
             status_code=400,
@@ -89,8 +83,6 @@ async def update_cart(cart_in: CartItemIn, cache: CacheService, cartId: str = He
         cart = cart_handler.update_cart_quantity(
             cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity
         )
-        # Invalidate cache
-        cache.delete(f"cart:{cartId}")
         return cart
     except Exception as e:
         raise HTTPException(
@@ -105,11 +97,7 @@ async def update_cart_details(
 ):
     try:
         update_data = cart_in.dict(exclude_unset=True)
-        cart = cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
-
-        # Invalidate cache
-        cache.delete(f"cart:{cartId}")
-        return cart
+        return cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
     except Exception as e:
         raise HTTPException(
             status_code=400,
@@ -123,10 +111,7 @@ async def delete(id: str, cache: CacheService, cartId: str = Header(default=None
     Delete item from cart.
     """
     try:
-        cart = cart_handler.remove_from_cart(cart_id=cartId, item_id=id)
-        # Invalidate cache
-        cache.delete(f"cart:{cartId}")
-        return cart
+        return cart_handler.remove_from_cart(cart_id=cartId, item_id=id)
     except Exception as e:
         raise HTTPException(
             status_code=500,
