@@ -1,6 +1,6 @@
 "use client";
 
-import { RightArrowIcon } from "nui-react-icons";
+import { RightArrow } from "nui-react-icons";
 import React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -54,7 +54,7 @@ const Banner: React.FC<ComponentProps> = () => {
                         <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F54180_0%,#338EF7_50%,#F54180_100%)]" />
                         <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background group-hover:bg-background/70 transition-background px-3 py-1 text-sm font-medium text-foreground backdrop-blur-3xl">
                             Shop Now
-                            <RightArrowIcon
+                            <RightArrow
                                 aria-hidden="true"
                                 className="outline-none transition-transform group-hover:translate-x-0.5 [&amp;>path]:stroke-[2px]"
                                 role="img"

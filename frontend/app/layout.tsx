@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                                 <InstallPrompt />
                                 {children}
                             </div>
-                            {!user && <Google />}
+                            {/* {!user && <Google />} */}
                         </OverlayClientProvider>
                     </NotificationProviders>
                 </ProgressBar>

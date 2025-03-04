@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import React from "react";
-import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
+import { Commerce, Deal, Location, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import { imgSrc } from "@lib/util/util";
 import Image from "next/image";
@@ -236,7 +236,7 @@ export default async function Home() {
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Location</p>
                                     <div className="flex gap-2">
-                                        <LocationIcon className="fill-current" />
+                                        <Location className="fill-current" />
                                         <p className="underline">Lagos, LA NG</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Opening Hours</p>

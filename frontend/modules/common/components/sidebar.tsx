@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Calendar, Check, ChevronRight, CogSixTooth, Component, DocumentText, EcommerceIcon, User, Users, Window } from "nui-react-icons";
+import { Calendar, Check, ChevronRight, CogSixTooth, Component, DocumentText, Ecommerce, User, Users, Window } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@lib/util/cn";
@@ -184,7 +184,7 @@ const SideBar: React.FC = () => {
         },
         {
             subMenu: "Store",
-            icon: <EcommerceIcon size={20} />,
+            icon: <Ecommerce size={20} />,
             menuItems: [
                 {
                     label: "Products",
