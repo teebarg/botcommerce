@@ -4,7 +4,7 @@ import type { FileDropItem } from "@react-aria/dnd";
 
 import { DropZone } from "react-aria-components";
 import React from "react";
-import { CancelIcon, UploadIcon } from "nui-react-icons";
+import { Cancel, UploadIcon } from "nui-react-icons";
 import { FileTrigger } from "@modules/common/components/file-trigger";
 import useWatch from "@lib/hooks/use-watch";
 import { FileTypes } from "types/global";
@@ -64,7 +64,7 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
         >
             {files[0] && (
                 <button aria-label="cancel" className="absolute top-3 right-4" type="button" onClick={handleCancel}>
-                    <CancelIcon aria-hidden="true" size={24} />
+                    <Cancel aria-hidden="true" size={24} />
                 </button>
             )}
             <FileTrigger
