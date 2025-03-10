@@ -23,6 +23,7 @@ from app.models.generic import (
     NewsletterCreate,
     Product,
 )
+from app.prisma_client import prisma
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
 
@@ -212,3 +213,13 @@ async def generate_sitemap(db: deps.SessionDep, cache: deps.CacheService ):
 #                 aio_pika.Message(body=order_data.encode()),
 #                 routing_key=product_queue.name,
 #             )
+
+
+@app.on_event("startup")
+async def startup():
+    await prisma.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await prisma.disconnect()
+

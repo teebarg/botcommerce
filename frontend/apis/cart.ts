@@ -2,6 +2,7 @@ import { fetcher } from "./fetcher";
 
 import { revalidate } from "@/actions/revalidate";
 import { Cart, Message, Order } from "@/lib/models";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Cart API methods
 export const cartApi = {
@@ -22,18 +23,15 @@ export const cartApi = {
 
         return response;
     },
-    async add({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Message> {
+    async add({ product_id, quantity }: { product_id: string; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`;
+        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify({ product_id, quantity }) }));
 
-        try {
-            const response = await fetcher<Cart>(url, { method: "POST", body: JSON.stringify({ product_id, quantity }) });
-
+        if (!response.error) {
             revalidate("cart");
-
-            return response;
-        } catch (error) {
-            return { message: "", error: true };
         }
+
+        return response;
     },
     async update({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;

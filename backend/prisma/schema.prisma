@@ -1,0 +1,389 @@
+generator client {
+  provider  = "prisma-client-py"
+  interface = "asyncio"
+  recursive_type_depth = -1
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums for consistent data values
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  PAYPAL
+  CASH_ON_DELIVERY
+  BANK_TRANSFER
+  PAYSTACK
+}
+
+enum ProductStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+}
+
+enum CartStatus {
+  ACTIVE
+  ABANDONED
+  CONVERTED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum ShippingMethod {
+  STANDARD
+  EXPRESS
+  PICKUP
+}
+
+enum Role {
+  ADMIN    @map("admin")
+  CUSTOMER @map("customer")
+
+  @@map("roles")
+}
+
+enum Status {
+    PENDING   @map("pending")
+    ACTIVE    @map("active")
+    INACTIVE  @map("inactive")
+
+    @@map("statuses")
+}
+
+model ActivityLog {
+  id                  Int       @id @default(autoincrement())
+  user_id             Int
+  activity_type       String?   @db.VarChar(255)
+  description         String?   @db.VarChar(255)
+  action_download_url String?   @db.VarChar(255)
+  is_success          Boolean?
+  user                User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@map("activity_logs")
+}
+
+// Address Model
+model Address {
+  id              Int       @id @default(autoincrement())
+  user            User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id         Int
+  first_name      String?
+  last_name       String?
+  address_1       String
+  address_2       String?
+  city            String?
+  state           String?
+  postal_code     String?
+  phone           String?
+  is_billing      Boolean   @default(false)
+  shipping_orders Order[]   @relation("ShippingAddress")
+  billing_orders  Order[]   @relation("BillingAddress")
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@map("addresses")
+}
+
+model Brand {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(255)
+  slug         String         @unique @db.VarChar(255)
+  is_active    Boolean
+  products     Product[]      @relation("ProductBrands")
+
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  @@map("brands")
+}
+
+model Category {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  slug         String   @unique
+  is_active    Boolean  @default(true)
+  parent_id    Int?     // Nullable for top-level categories
+  parent        Category?   @relation("CategoryToSubcategory", fields: [parent_id], references: [id], onDelete: Cascade)
+  subcategories Category[]  @relation("CategoryToSubcategory")
+  products     Product[]  @relation("ProductCategories")
+
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+
+model Collection {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique @db.VarChar(255)
+  slug              String              @unique @db.VarChar(255)
+  is_active         Boolean
+  products          Product[]           @relation("ProductCollections")
+
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  @@map("collections")
+}
+
+model Product {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique @db.VarChar(255)
+  slug               String               @unique @db.VarChar(255)
+  description        String?
+  price              Float
+  old_price          Float
+  image              String?              @db.VarChar(255)
+  status             ProductStatus        @default(IN_STOCK)
+  variants           ProductVariant[]
+  ratings            Float?               @default(0)
+  categories         Category[]         @relation("ProductCategories")
+  collections        Collection[]         @relation("ProductCollections")
+  brands             Brand[]              @relation("ProductBrands")
+  tags               Tag[]                @relation("ProductTags")
+  images             ProductImage[]
+  reviews            Review[]
+  favorites          Favorite[]
+
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  @@index([name, slug])
+  @@map("products")
+}
+
+// ProductVariant Model
+model ProductVariant {
+  id          Int       @id @default(autoincrement())
+  product     Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product_id  Int
+  name        String   @unique
+  slug        String   @unique
+  sku         String   @unique
+  status      ProductStatus   @default(IN_STOCK)
+  price       Float     @db.DoublePrecision
+  old_price   Float?     @db.DoublePrecision
+  inventory   Int
+  order_items OrderItem[]
+  cart_items  CartItem[] // Added relation to CartItem
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("product_variants")
+}
+
+model ProductImage {
+  id         Int     @id @default(autoincrement())
+  image      String? @db.VarChar(255)
+  product_id Int
+  product    Product @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("product_images")
+}
+
+
+model Review {
+  id         Int       @id @default(autoincrement())
+  comment    String
+  rating     Int
+  verified   Boolean  @default(false)
+  user_id    Int
+  product_id Int
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  product    Product   @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user       User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("reviews")
+}
+
+model SiteConfig {
+  id         Int       @id @default(autoincrement())
+  key        String    @unique @db.VarChar(255)
+  value      String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("site_config")
+}
+
+model Tag {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique @db.VarChar(255)
+  slug       String    @unique @db.VarChar(255)
+  is_active  Boolean  @default(true)
+  products   Product[] @relation("ProductTags")
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("tags")
+}
+
+// Order Model
+model Order {
+  id              Int          @id @default(autoincrement())
+  order_number    String       @unique
+  user            User         @relation(fields: [user_id], references: [id], onDelete: NoAction)
+  user_id         Int
+  shipping_address Address     @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: NoAction)
+  shipping_address_id Int
+  billing_address Address      @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: NoAction)
+  billing_address_id Int
+  order_items     OrderItem[]
+  total           Float       @db.DoublePrecision
+  subtotal        Float       @db.DoublePrecision
+  tax             Float       @db.DoublePrecision
+  status          OrderStatus @default(PENDING)
+  payment         Payment?
+  payment_status  PaymentStatus? @default(PENDING)
+  shipping_method ShippingMethod?
+  shipping_fee    Float       @db.DoublePrecision
+  coupon          Coupon?      @relation(fields: [coupon_id], references: [id], onDelete: NoAction)
+  coupon_id       Int?
+  cart            Cart?        @relation(fields: [cart_id], references: [id], onDelete: NoAction) // Optional link to originating cart
+  cart_id         Int?         @unique // Added relation to Cart
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  @@map("orders")
+}
+
+// OrderItem Model
+model OrderItem {
+  id           Int            @id @default(autoincrement())
+  order        Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order_id     Int
+  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
+  variant_id   Int
+  quantity     Int
+  price        Float          @db.DoublePrecision
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+
+  @@map("order_items")
+}
+
+// Payment Model
+model Payment {
+  id             Int           @id @default(autoincrement())
+  order          Order         @relation(fields: [order_id], references: [id], onDelete: NoAction)
+  order_id       Int           @unique
+  amount         Float         @db.DoublePrecision
+  payment_method PaymentMethod
+  transaction_id String
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+// Coupon Model
+model Coupon {
+  id             Int          @id @default(autoincrement())
+  code           String       @unique
+  discount_type  DiscountType
+  discount_value Float        @db.DoublePrecision
+  expiration_date DateTime
+  orders         Order[]
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  @@map("coupons")
+}
+
+// Cart Model (New)
+model Cart {
+  id           Int         @id @default(autoincrement())
+  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id      Int
+  items        CartItem[]  // List of items in the cart
+  status       CartStatus  @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
+  order        Order?      @relation // Links to the order if cart is converted
+  created_at   DateTime    @default(now())
+  last_updated DateTime    @updatedAt // Used to detect abandoned carts
+
+  @@map("carts")
+}
+
+// CartItem Model (New)
+model CartItem {
+  id           Int            @id @default(autoincrement())
+  cart         Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  cart_id      Int
+  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
+  variant_id   Int
+  quantity     Int
+  price        Float          @db.DoublePrecision
+  image        String?
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+
+  @@map("cart_items")
+}
+
+
+// User Model
+model User {
+    id            Int         @id @default(autoincrement())
+    firstName     String? @map("first_name")
+    lastName      String? @map("last_name")
+    email         String?   @unique
+    emailVerified DateTime?
+    status        Status    @default(PENDING)
+    hashed_password      String
+    image         String?
+    role          Role @default(CUSTOMER)
+    addresses     Address[]
+    orders        Order[]
+    reviews       Review[]
+    favorites     Favorite[]
+    carts         Cart[]    // Added relation to Cart
+    activity_logs ActivityLog[]
+
+    createdAt     DateTime? @default(now()) @map("created_at")
+    updatedAt     DateTime? @updatedAt @map("updated_at")
+
+    @@index([firstName, lastName, email])
+
+    @@map("users")
+}
+
+model Favorite {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id     Int
+  product     Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product_id  Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("favorites")
+}

@@ -1,35 +1,19 @@
 from typing import Annotated, Any
 
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    Query,
-    UploadFile,
-)
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import SQLModel, func, or_, select
-
 from app.core import crud
 from app.core.decorators import cache
-from app.core.deps import (
-    CacheService,
-    CurrentUser,
-    SessionDep,
-    Storage,
-    get_current_user,
-)
+from app.core.deps import (CacheService, CurrentUser, SessionDep, Storage,
+                        get_current_user)
 from app.core.logging import logger
-from app.models.category import (
-    CategoryCreate,
-    CategoryUpdate,
-)
+from app.models.category import CategoryCreate, CategoryUpdate
 from app.models.generic import Category, CategoryPublic
 from app.models.message import Message
+from app.prisma_client import prisma
 from app.services.export import export, process_file, validate_file
+from fastapi import (APIRouter, BackgroundTasks, Depends, File, Form,
+                    HTTPException, Query, UploadFile)
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import SQLModel, func, or_, select
 
 # Create a router for categories
 router = APIRouter()
@@ -47,16 +31,30 @@ class Search(SQLModel):
 
 
 @router.get("/", dependencies=[])
-@cache(key="categories")
+# @cache(key="categories")
 async def index(
     db: SessionDep,
     name: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-) -> Categories:
+) -> Any:
     """
     Retrieve categories with Redis caching.
     """
+    categories = await prisma.category.find_many(
+        skip=(page - 1) * limit,
+        take=limit,
+        order={"created_at": "desc"},
+    )
+    print(categories)
+    return categories
+    # return Categories(
+    #     categories=categories,
+    #     page=page,
+    #     limit=limit,
+    #     total_pages=10,
+    #     total_count=20,
+    # )
     query = {"name": name}
     filters = crud.category.build_query(query)
 
@@ -214,6 +212,7 @@ async def export_collections(
         logger.error(f"Export categories error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
 
+
 @router.get("/autocomplete/")
 @cache(key="categories")
 async def autocomplete(
@@ -226,7 +225,8 @@ async def autocomplete(
     statement = select(Category)
     if search:
         statement = statement.where(
-            or_(Category.name.like(f"%{search}%"), Category.slug.like(f"%{search}%"))
+            or_(Category.name.like(f"%{search}%"),
+                Category.slug.like(f"%{search}%"))
         )
 
     data = db.exec(statement)
