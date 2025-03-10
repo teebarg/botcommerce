@@ -24,8 +24,8 @@ export const cartApi = {
         return response;
     },
     async add({ product_id, quantity }: { product_id: string; quantity: number }): ApiResult<Cart> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`;
-        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify({ product_id, quantity }) }));
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items`;
+        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify({ variant_id: product_id, quantity }) }));
 
         if (!response.error) {
             revalidate("cart");

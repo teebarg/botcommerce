@@ -322,8 +322,9 @@ model Coupon {
 // Cart Model (New)
 model Cart {
   id           Int         @id @default(autoincrement())
-  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id      Int
+  cart_number  String       @unique
+  user         User?        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id      Int?
   items        CartItem[]  // List of items in the cart
   status       CartStatus  @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
   order        Order?      @relation // Links to the order if cart is converted

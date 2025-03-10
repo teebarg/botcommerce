@@ -21,8 +21,8 @@ from app.models.brand import (
     Brands,
     BrandUpdate,
 )
-from app.models.generic import Brand
 from app.models.message import Message
+from app.models.brand import Brand
 
 # Create a router for brands
 router = APIRouter()

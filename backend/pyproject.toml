@@ -25,6 +25,7 @@ dependencies = [
     "firebase-cart==0.1.1",
     "redis==5.2.1",
     "prisma<1.0.0,>=0.11.0",
+    "supabase==2.13.0"
 ]
 
 [tool.uv]

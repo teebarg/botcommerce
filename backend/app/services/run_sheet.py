@@ -26,6 +26,7 @@ from app.models.generic import (
     ProductCollection,
     ProductImages,
 )
+from app.prisma_client import prisma
 
 
 async def broadcast_channel(data, user_id: int):
@@ -355,120 +356,96 @@ async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int
 # Export products
 async def generate_excel_file(bucket: Any, email: str):
     logger.debug("Products export started.......")
-    with Session(engine) as session:
-        products = session.exec(select(Product)).all()
 
-        if not products:
-            raise HTTPException(status_code=404, detail="No products found")
+    products = await prisma.product.find_many(
+        include={
+            "categories": True,
+            "collections": True,
+            "brands": True,
+            "images": True,
+        }
+    )
 
-        # Create a workbook and select the active worksheet
-        workbook = Workbook()
-        sheet = workbook.active
-        sheet.title = "Products"
+    if not products:
+        raise HTTPException(status_code=404, detail="No products found")
 
-        # Define the header row
-        headers = [
-            "id",
-            "name",
-            "slug",
-            "description",
-            "price",
-            "old_price",
-            "inventory",
-            "ratings",
-            "image",
-            "is_active",
-            "categories",
-            "collections",
-            "brands",
-            "images",
-        ]
-        sheet.append(headers)
+    # Create a workbook and select the active worksheet
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Products"
 
-        # Fetch product data and append each product as a row
-        for product in products:
-            categories = session.exec(
-                select(Category.slug)
-                .join(ProductCategory, Category.id == ProductCategory.category_id)
-                .where(ProductCategory.product_id == product.id)
-            ).all()
+    # Define the header row
+    headers = [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "price",
+        "old_price",
+        # "inventory",
+        "ratings",
+        "image",
+        "is_active",
+        "categories",
+        "collections",
+        "brands",
+        "images",
+    ]
+    sheet.append(headers)
 
-            # Fetch product collections as a comma-separated string
-            collections = session.exec(
-                select(Collection.slug)
-                .join(
-                    ProductCollection, Collection.id == ProductCollection.collection_id
-                )
-                .where(ProductCollection.product_id == product.id)
-            ).all()
+    # Fetch product data and append each product as a row
+    for product in products:
+        # Create a comma-separated string of collection names
+        brands_str = ",".join(product.brands)
+        categories_str = ",".join(product.categories)
+        collections_str = ",".join(product.collections)
+        images_str = "|".join(product.images)
 
-            # Fetch product brands as a comma-separated string
-            brands = session.exec(
-                select(Brand.slug)
-                .join(
-                    ProductBrand, Brand.id == ProductBrand.brand_id
-                )
-                .where(ProductBrand.product_id == product.id)
-            ).all()
-
-            # Fetch product images as a |-separated string
-            images = session.exec(
-                select(ProductImages.image).where(
-                    ProductImages.product_id == product.id
-                )
-            ).all()
-
-            # Create a comma-separated string of collection names
-            brands_str = ",".join(brands)
-            categories_str = ",".join(categories)
-            collections_str = ",".join(collections)
-            images_str = "|".join(images)
-
-            # Append the product data as a row
-            sheet.append(
-                [
-                    product.id,
-                    product.name,
-                    product.slug,
-                    product.description,
-                    product.price,
-                    product.old_price,
-                    product.inventory,
-                    product.ratings,
-                    product.image,
-                    product.is_active,
-                    categories_str,
-                    collections_str,
-                    brands_str,
-                    images_str,
-                ]
-            )
-
-        # Create an in-memory Excel file using BytesIO
-        output = BytesIO()
-        workbook.save(output)
-        output.seek(0)
-
-        # Generate a unique filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"product_export_{timestamp}.xlsx"
-
-        # Upload the in-memory file to Firebase
-        blob = bucket.blob(f"exports/{filename}")
-        blob.upload_from_file(
-            output,
-            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        # Append the product data as a row
+        sheet.append(
+            [
+                product.id,
+                product.name,
+                product.slug,
+                product.description,
+                product.price,
+                product.old_price,
+                # product.inventory,
+                product.ratings,
+                product.image,
+                product.is_active,
+                categories_str,
+                collections_str,
+                brands_str,
+                images_str,
+            ]
         )
-        blob.make_public()  # Make the file publicly accessible
-        download_url = blob.public_url
 
-        # Send email with download link
-        email_data = generate_data_export_email(download_link=download_url)
-        send_email(
-            email_to=email,
-            subject="Product Export Ready",
-            html_content=email_data.html_content,
-        )
-        logger.debug("Product export complete")
+    # Create an in-memory Excel file using BytesIO
+    output = BytesIO()
+    workbook.save(output)
+    output.seek(0)
 
-        return download_url
+    # Generate a unique filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"product_export_{timestamp}.xlsx"
+
+    # Upload the in-memory file to Firebase
+    blob = bucket.blob(f"exports/{filename}")
+    blob.upload_from_file(
+        output,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    blob.make_public()  # Make the file publicly accessible
+    download_url = blob.public_url
+
+    # Send email with download link
+    email_data = generate_data_export_email(download_link=download_url)
+    send_email(
+        email_to=email,
+        subject="Product Export Ready",
+        html_content=email_data.html_content,
+    )
+    logger.debug("Product export complete")
+
+    return download_url

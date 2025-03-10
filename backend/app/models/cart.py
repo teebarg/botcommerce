@@ -1,0 +1,55 @@
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import datetime
+from enum import Enum
+
+# Enums
+class CartStatus(str, Enum):
+    ACTIVE = "ACTIVE"
+    ABANDONED = "ABANDONED"
+    CONVERTED = "CONVERTED"
+
+# Pydantic models for request/response validation
+class CartItemBase(BaseModel):
+    variant_id: int
+    quantity: int
+    price: float
+    image: Optional[str] = None
+
+class CartItemCreate(BaseModel):
+    variant_id: int
+    quantity: int
+
+class CartItemResponse(CartItemBase):
+    id: int
+    cart_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class CartCreate(BaseModel):
+    cart_number: str
+    status: Optional[CartStatus] = CartStatus.ACTIVE
+
+class CartUpdate(BaseModel):
+    status: Optional[CartStatus] = None
+
+class CartDetails(BaseModel):
+    shipping_address: dict | None = None
+    billing_address: dict | None = None
+    email: str | None = None
+    shipping_method: dict | None = None
+    payment_session: dict | None = None
+
+class CartResponse(BaseModel):
+    id: int
+    user_id: int
+    status: CartStatus
+    items: List[CartItemResponse]
+    created_at: datetime
+    last_updated: datetime
+
+    class Config:
+        orm_mode = True

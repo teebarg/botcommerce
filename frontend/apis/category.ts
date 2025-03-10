@@ -6,7 +6,7 @@ import { PaginatedCategory, Category } from "@/lib/models";
 // Product API methods
 export const categoryApi = {
     async all(input?: { search?: string; page?: number; limit?: number }): Promise<PaginatedCategory> {
-        const searchParams = { search: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
+        const searchParams = { query: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, searchParams);
         const response = await fetcher<PaginatedCategory>(url);
 

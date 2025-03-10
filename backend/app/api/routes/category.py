@@ -1,110 +1,94 @@
-from typing import Annotated, Any
+from math import ceil
+from typing import Any
 
-from app.core import crud
-from app.core.decorators import cache
-from app.core.deps import (CacheService, CurrentUser, SessionDep, Storage,
-                        get_current_user)
-from app.core.logging import logger
-from app.models.category import CategoryCreate, CategoryUpdate
-from app.models.generic import Category, CategoryPublic
+from app.core.deps import (get_current_user)
+from app.models.category import Categories, Category, CategoryCreate, CategoryUpdate
 from app.models.message import Message
-from app.prisma_client import prisma
-from app.services.export import export, process_file, validate_file
-from fastapi import (APIRouter, BackgroundTasks, Depends, File, Form,
-                    HTTPException, Query, UploadFile)
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import SQLModel, func, or_, select
+from app.core.db import PrismaDb
+from app.core.utils import slugify
+from fastapi import (APIRouter, Depends, HTTPException, Query)
+from pydantic import BaseModel
+
+from prisma.errors import PrismaError
 
 # Create a router for categories
 router = APIRouter()
 
-class Categories(SQLModel):
-    categories: list[CategoryPublic]
-    page: int
-    limit: int
-    total_count: int
-    total_pages: int
 
-
-class Search(SQLModel):
-    results: list[CategoryPublic]
+class Search(BaseModel):
+    results: list[Category]
 
 
 @router.get("/", dependencies=[])
 # @cache(key="categories")
 async def index(
-    db: SessionDep,
-    name: str = "",
+    db: PrismaDb,
+    query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
 ) -> Any:
     """
     Retrieve categories with Redis caching.
     """
-    categories = await prisma.category.find_many(
+    # Define the where clause based on query parameter
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    categories = await db.category.find_many(
+        where=where_clause,
         skip=(page - 1) * limit,
         take=limit,
         order={"created_at": "desc"},
     )
-    print(categories)
-    return categories
-    # return Categories(
-    #     categories=categories,
-    #     page=page,
-    #     limit=limit,
-    #     total_pages=10,
-    #     total_count=20,
-    # )
-    query = {"name": name}
-    filters = crud.category.build_query(query)
-
-    count_statement = select(func.count()).select_from(Category)
-    if filters:
-        count_statement = count_statement.where(or_(*filters))
-    total_count = db.exec(count_statement).one()
-
-    categories = crud.category.get_multi(
-        db=db,
-        filters=filters,
-        limit=limit,
-        offset=(page - 1) * limit,
-    )
-
-    total_pages = (total_count // limit) + (total_count % limit > 0)
-
+    total = await db.category.count(where=where_clause)
+    return {
+        "categories":categories,
+        "page":page,
+        "limit":limit,
+        "total_pages":ceil(total/limit),
+        "total_count":total,
+    }
     return Categories(
         categories=categories,
         page=page,
         limit=limit,
-        total_pages=total_pages,
-        total_count=total_count,
+        total_pages=ceil(total/limit),
+        total_count=total,
     )
 
 
 @router.post("/")
-async def create(*, db: SessionDep, create_data: CategoryCreate, cache: CacheService) -> Category:
+async def create(*, db: PrismaDb, data: CategoryCreate) -> Category:
     """
     Create new category.
     """
-    category = crud.category.get_by_key(db=db, value=create_data.name)
-    if category:
-        raise HTTPException(
-            status_code=400,
-            detail="The category already exists in the system.",
+    try:
+        category = await db.category.create(
+            data={
+                "name": data.name,
+                "slug": slugify(data.name),
+                "parent_id": data.parent_id
+            }
         )
-
-    category = crud.category.create(db=db, obj_in=create_data)
-    cache.invalidate("categories")
-    return category
+        return category
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{id}")
-@cache(key="category", hash=False)
-async def read(id: int, db: SessionDep) -> CategoryPublic:
+# @cache(key="category", hash=False)
+async def read(id: int, db: PrismaDb) -> Any:
     """
     Get a specific category by id with Redis caching.
     """
-    category = crud.category.get(db=db, id=id)
+    category = await db.category.find_unique(
+        where={"id": id}
+    )
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
 
@@ -112,12 +96,14 @@ async def read(id: int, db: SessionDep) -> CategoryPublic:
 
 
 @router.get("/slug/{slug}")
-@cache(key="category", hash=False)
-async def get_by_slug(slug: str, db: SessionDep) -> Category:
+# @cache(key="category", hash=False)
+async def get_by_slug(slug: str, db: PrismaDb) -> Category:
     """
     Get a category by its slug.
     """
-    category = crud.category.get_by_key(db=db, key="slug", value=slug)
+    category = await db.category.find_unique(
+        where={"slug": slug}
+    )
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
 
@@ -127,107 +113,69 @@ async def get_by_slug(slug: str, db: SessionDep) -> Category:
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])
 async def update(
     *,
-    db: SessionDep,
-    cache: CacheService,
+    db: PrismaDb,
     id: int,
     update_data: CategoryUpdate,
 ) -> Category:
     """
     Update a category and invalidate cache.
     """
-    category = crud.category.get(db=db, id=id)
-    if not category:
-        raise HTTPException(
-            status_code=404,
-            detail="Category not found",
-        )
+    existing = await db.category.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
     try:
-        category = crud.category.update(
-            db=db, db_obj=category, obj_in=update_data
+        update = await db.category.update(
+            where={"id": id},
+            data=update_data.model_dump()
         )
-        # Invalidate cache
-        cache.delete(f"category:{category.slug}")
-        cache.delete(f"category:{id}")
-        cache.invalidate("categories")
-        return category
-    except IntegrityError as e:
-        logger.error(f"Error updating category, {e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{e}",
-        ) from e
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}")
-async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
+async def delete(id: int, db: PrismaDb) -> Message:
     """
     Delete a category.
     """
-    category = crud.category.get(db=db, id=id)
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    crud.category.remove(db=db, id=id)
-    cache.delete(f"category:{category.slug}")
-    cache.delete(f"category:{id}")
-    cache.invalidate("categories")
-    return Message(message="Category deleted successfully")
-
-
-@router.post("/excel/{task_id}")
-async def upload_collections(
-    file: Annotated[UploadFile, File()],
-    batch: Annotated[str, Form()],
-    task_id: str,
-    db: SessionDep,
-    background_tasks: BackgroundTasks,
-):
-    await validate_file(file=file)
-
-    contents = await file.read()
-    background_tasks.add_task(
-        process_file, contents, task_id, db, crud.category.bulk_upload
+    # Check if draft exists
+    existing = await db.draft.find_unique(
+        where={"id": id}
     )
-    return {"batch": batch, "message": "File upload started"}
-
-
-@router.post("/export")
-async def export_collections(
-    current_user: CurrentUser, db: SessionDep, bucket: Storage
-):
+    if not existing:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
     try:
-        categories = db.exec(select(Category))
-        file_url = await export(
-            columns=["name", "slug"],
-            data=categories,
-            name="Category",
-            bucket=bucket,
-            email=current_user.email,
+        await db.draft.delete(
+            where={"id": id}
         )
-
-        return {"message": "Data Export successful", "file_url": file_url}
-    except Exception as e:
-        logger.error(f"Export categories error: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        return Message(message="Category deleted successfully")
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/autocomplete/")
-@cache(key="categories")
 async def autocomplete(
-    db: SessionDep,
-    search: str = "",
+    db: PrismaDb,
+    query: str = "",
 ) -> Any:
     """
     Retrieve categories for autocomplete.
     """
-    statement = select(Category)
-    if search:
-        statement = statement.where(
-            or_(Category.name.like(f"%{search}%"),
-                Category.slug.like(f"%{search}%"))
-        )
-
-    data = db.exec(statement)
-    return Search(results=data)
+    # Define the where clause based on query parameter
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    categories = await db.category.find_many(
+        where=where_clause,
+        order={"created_at": "desc"},
+    )
+    return Search(results=categories)

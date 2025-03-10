@@ -8,6 +8,9 @@ class ReviewBase(BaseModel):
     verified: bool = False
     product_id: int
 
+class Review(BaseModel):
+    pass
+
 
 class ReviewCreate(BM):
     product_id: int
