@@ -7,6 +7,9 @@ class BrandBase(BaseModel):
     name: str = Field(index=True, unique=True)
     is_active: bool = True
 
+class Brand(BrandBase):
+   pass
+
 
 class BrandCreate(BrandBase):
     pass

@@ -1,17 +1,27 @@
-# from functools import lru_cache
-# from typing import Annotated
+from typing import Annotated
 
-# from fastapi import Depends
-# from supabase import Client, create_client
+from prisma import Prisma
+from contextlib import asynccontextmanager
+from fastapi import Depends
 
-# from app.core.config import settings
-
-
-# @lru_cache()
-# def get_supabase_client() -> Client:
-#     return create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+# Initialize Prisma client
+prisma = Prisma()
 
 
-# Supabase = Annotated[Client, Depends(get_supabase_client)]
+# Context manager for database connections
+@asynccontextmanager
+async def get_db():
+    await prisma.connect()
+    try:
+        yield prisma
+    finally:
+        await prisma.disconnect()
 
-# db = get_supabase_client()
+
+# Dependency for database connection
+async def get_prisma():
+    async with get_db() as db:
+        yield db
+
+
+PrismaDb = Annotated[Prisma, Depends(get_prisma)]

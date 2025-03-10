@@ -1,28 +1,69 @@
+from typing import List, Optional, Literal
+from pydantic import BaseModel, Field, HttpUrl
+
 from app.models.base import BaseModel
 
+# Models
+class VariantCreate(BaseModel):
+    name: str = Field(..., min_length=1, description="Variant name is required")
+    slug: str = Field(..., min_length=1, description="Variant slug is required")
+    price: float = Field(..., gt=0, description="Price must be positive")
+    inventory: int = Field(..., ge=0, description="Inventory cannot be negative")
 
-class ProductBase(BaseModel):
-    name: str
-    description: str | None = ""
-    image: str | None = ""
-    price: float
-    old_price: float = 0.0
-    is_active: bool = True
-    ratings: float = 5.0
-    inventory: int = 1
+class VariantUpdate(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = Field(None, min_length=1)
+    slug: Optional[str] = Field(None, min_length=1)
+    price: Optional[float] = Field(None, gt=0)
+    inventory: Optional[int] = Field(None, ge=0)
+
+class VariantWithStatus(BaseModel):
+    name: str = Field(..., min_length=1, description="Variant name is required")
+    sku: Optional[str] = None
+    price: float = Field(..., gt=0, description="Price must be positive")
+    inventory: int = Field(..., ge=0, description="Inventory cannot be negative")
+    status: Literal["IN_STOCK", "OUT_OF_STOCK"]
 
 
-# Properties to receive via API on creation
-class ProductCreate(ProductBase):
-    brands: list[int] = []
-    categories: list[int] = []
-    collections: list[int] = []
-    tags: list[int] = []
+class ProductCreate(BaseModel):
+    name: str = Field(..., min_length=1, description="Name is required")
+    description: str = Field(..., min_length=1, description="Description is required")
+    brand_ids: Optional[List[int]] = None
+    category_ids: Optional[List[int]] = None
+    collections_ids: Optional[List[int]] = None
+    tags_ids: Optional[List[int]] = None
+    sku: Optional[str] = None
+    variants: Optional[List[VariantCreate]] = None
+    images: Optional[List[HttpUrl]] = None
 
+class ProductUpdate(BaseModel):
+    id: int = Field(..., gt=0)
+    name: Optional[str] = Field(None, min_length=1)
+    description: Optional[str] = Field(None, min_length=1)
+    brand_ids: Optional[List[int]] = None
+    category_ids: Optional[List[int]] = None
+    collections_ids: Optional[List[int]] = None
+    tags_ids: Optional[List[int]] = None
+    variants: Optional[List[VariantUpdate]] = None
+    images: Optional[List[HttpUrl]] = None
 
-# Properties to receive via API on update, all are optional
-class ProductUpdate(ProductBase):
-    brands: list[int] = []
-    categories: list[int] = []
-    collections: list[int] = []
-    tags: list[int] = []
+class ReviewCreate(BaseModel):
+    product_id: int = Field(..., gt=0)
+    text: str = Field(..., min_length=1, description="Review text is required")
+    rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
+
+class ImageUpload(BaseModel):
+    file: str  # Base64 encoded file
+    file_name: str
+    content_type: str
+    product_id: int = Field(..., gt=0)
+
+class ImageDelete(BaseModel):
+    id: int
+
+class PaginationParams(BaseModel):
+    page: int = Field(1, ge=1)
+    page_size: int = Field(10, ge=1, le=100)
+    category_slug: Optional[str] = None
+    search: Optional[str] = None
+    sort: Literal["asc", "desc"] = "desc"

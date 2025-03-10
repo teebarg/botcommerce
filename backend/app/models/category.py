@@ -1,10 +1,11 @@
 from sqlmodel import Field
 
 # from pydantic import BaseModel as PDBModel, computed_field
-from app.models.base import BaseModel
+from app.models.base import BaseModel as BM
+from pydantic import BaseModel
 
 
-class CategoryBase(BaseModel):
+class CategoryBase(BM):
     name: str = Field(index=True, unique=True)
     is_active: bool = True
 
@@ -15,8 +16,24 @@ class CategoryCreate(CategoryBase):
 
 
 # Properties to receive via API on update, all are optional
-class CategoryUpdate(CategoryBase):
-    pass
+class Category(BaseModel):
+    name: str
+    slug: str
+    is_active: bool = True
+    parent_id: int = None
+
+
+class CategoryUpdate(BaseModel):
+    name: str
+    is_active: bool = True
+
+
+class Categories(BaseModel):
+    categories: list[Category]
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int
 
 
 # class CategoryPublic(CategoryBase):

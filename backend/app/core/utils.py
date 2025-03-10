@@ -51,6 +51,36 @@ def url_to_list(url: str) -> list[str]:
     return [f'{item.replace("-", " ")}' for item in url.split(",")]
 
 
+def slugify(text) -> str:
+    """
+    Convert a string into a URL-friendly slug.
+    Removes special characters, converts to lowercase, and replaces spaces with hyphens.
+    
+    Args:
+        text (str): The input string to convert
+        
+    Returns:
+        str: The slugified string
+    """
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Replace spaces with hyphens
+    text = text.replace(' ', '-')
+    
+    # Remove special characters, keeping only alphanumeric and hyphens
+    slug = ''.join(char for char in text if char.isalnum() or char == '-')
+    
+    # Remove multiple consecutive hyphens
+    while '--' in slug:
+        slug = slug.replace('--', '-')
+    
+    # Remove leading/trailing hyphens
+    slug = slug.strip('-')
+    
+    return slug
+
+
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
     # Set up Jinja2 environment and add the custom filter
     template_path = Path(__file__).parent.parent / "email-templates" / "build"

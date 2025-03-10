@@ -1,4 +1,4 @@
-import { CheckCircleSolid, ExclamationIcon, InformationCircleSolid, Shield } from "nui-react-icons";
+import { CheckCircleSolid, Exclamation, InformationCircleSolid, Shield } from "nui-react-icons";
 import React from "react";
 
 import { cn } from "@/lib/util/cn";
@@ -41,7 +41,7 @@ const Alert: React.FC<Props> = ({ title, color = "primary", variant = "solid" })
         danger: {
             outer: "",
             inner: "bg-danger-50 dark:bg-danger-100 border-danger-100",
-            icon: <ExclamationIcon />,
+            icon: <Exclamation />,
             variant: {
                 bordered: "border-1 bg-transparent border-danger text-danger",
                 solid: "text-danger-600 dark:text-danger-500 bg-danger-50 dark:bg-danger-50/60",

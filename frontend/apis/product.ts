@@ -19,9 +19,14 @@ interface SearchParams {
 export const productApi = {
     async search(searchParams: SearchParams): Promise<PaginatedProduct> {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
-        const response = await fetcher<PaginatedProduct>(url, { next: { tags: ["product"] } });
 
-        return response;
+        try {
+            const response = await fetcher<PaginatedProduct>(url, { next: { tags: ["product"] } });
+
+            return response;
+        } catch (error) {
+            return { products: [], facets: {}, page: 1, limit: 10, total_count: 0, total_pages: 0 };
+        }
     },
     async get(slug: string): Promise<Product | null> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
