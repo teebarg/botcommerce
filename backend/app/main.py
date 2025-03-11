@@ -132,7 +132,7 @@ async def log_error(error: dict, notification: deps.Notification):
 
 
 @app.get("/sitemap.xml", response_class=Response)
-async def generate_sitemap(db: deps.SessionDep, cache: deps.CacheService ):
+async def generate_sitemap(cache: deps.CacheService ):
     base_url = settings.FRONTEND_HOST
 
     # Try to get sitemap from cache first
@@ -141,9 +141,9 @@ async def generate_sitemap(db: deps.SessionDep, cache: deps.CacheService ):
         return Response(content=cached_sitemap, media_type="application/xml")
 
     # If not in cache, fetch from database
-    products = db.query(Product).with_entities(Product.slug).all()
-    categories = db.query(Category).with_entities(Category.slug).all()
-    collections = db.query(Collection).with_entities(Collection.slug).all()
+    products = await prisma.product.find_many()
+    categories = await prisma.category.find_many()
+    collections = await prisma.collection.find_many()
 
     urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 

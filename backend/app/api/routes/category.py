@@ -27,7 +27,7 @@ async def index(
     query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-) -> Any:
+) -> Categories:
     """
     Retrieve categories with Redis caching.
     """
@@ -45,8 +45,10 @@ async def index(
         skip=(page - 1) * limit,
         take=limit,
         order={"created_at": "desc"},
+        include={"subcategories": True}
     )
     total = await db.category.count(where=where_clause)
+    # return Categories(categories=categories, page=page, limit=limit, total_pages=ceil(total/limit), total_count=total)
     return {
         "categories":categories,
         "page":page,
@@ -81,7 +83,8 @@ async def read(id: int) -> Any:
     Get a specific category by id with Redis caching.
     """
     category = await db.category.find_unique(
-        where={"id": id}
+        where={"id": id},
+        include={"subcategories": True}
     )
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -96,7 +99,8 @@ async def get_by_slug(slug: str) -> Category:
     Get a category by its slug.
     """
     category = await db.category.find_unique(
-        where={"slug": slug}
+        where={"slug": slug},
+        include={"subcategories": True}
     )
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")

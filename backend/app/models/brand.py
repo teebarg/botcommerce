@@ -1,14 +1,14 @@
-from sqlmodel import Field, SQLModel
+from app.models.base import BM
+from pydantic import BaseModel, Field
 
-from app.models.base import BaseModel
 
-
-class BrandBase(BaseModel):
-    name: str = Field(index=True, unique=True)
+class BrandBase(BM):
+    name: str = Field(..., min_length=1, description="Variant name is required")
     is_active: bool = True
 
 class Brand(BrandBase):
-    pass
+    id: int
+    slug: str = Field(..., min_length=1)
 
 
 class BrandCreate(BrandBase):
@@ -19,13 +19,8 @@ class BrandUpdate(BrandBase):
     pass
 
 
-class BrandPublic(BrandBase):
-    id: int
-    slug: str
-
-
-class Brands(SQLModel):
-    brands: list[BrandPublic]
+class Brands(BaseModel):
+    brands: list[Brand]
     page: int
     limit: int
     total_count: int

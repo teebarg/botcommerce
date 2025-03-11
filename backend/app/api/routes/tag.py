@@ -14,20 +14,12 @@ from math import ceil
 from prisma.errors import PrismaError
 
 from app.core import crud
-from app.core.decorators import cache
-from app.core.deps import (
-    CacheService,
-    CurrentUser,
-    SessionDep,
-    Storage,
-    get_current_user,
-)
+from app.core.deps import get_current_user
 from app.core.logging import logger
 from app.models.message import Message
 from app.models.tag import (
     Search,
     TagCreate,
-    TagPublic,
     Tags,
     Tag,
     TagUpdate,
@@ -41,7 +33,7 @@ router = APIRouter()
 
 
 @router.get("/", dependencies=[Depends(get_current_user)])
-@cache(key="tags")
+# @cache(key="tags")
 async def index(
     query: str = "",
     page: int = Query(default=1, gt=0),
@@ -75,7 +67,7 @@ async def index(
 
 
 @router.post("/")
-async def create(*, create_data: TagCreate) -> TagPublic:
+async def create(*, create_data: TagCreate) -> Tag:
     """
     Create new tag.
     """
@@ -93,7 +85,7 @@ async def create(*, create_data: TagCreate) -> TagPublic:
 
 @router.get("/{id}")
 # @cache(key="tag")
-async def read(id: int) -> TagPublic:
+async def read(id: int) -> Tag:
     """
     Get a specific tag by id.
     """
@@ -110,7 +102,7 @@ async def update(
     *,
     id: int,
     update_data: TagUpdate,
-) -> TagPublic:
+) -> Tag:
     """
     Update a tag.
     """

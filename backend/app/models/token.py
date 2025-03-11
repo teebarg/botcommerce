@@ -1,6 +1,5 @@
-from sqlmodel import SQLModel
-
+from pydantic import BaseModel
 
 # Contents of JWT token
-class TokenPayload(SQLModel):
+class TokenPayload(BaseModel):
     sub: str | None = None

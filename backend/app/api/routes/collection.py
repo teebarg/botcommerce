@@ -1,20 +1,12 @@
-from typing import Annotated, Any
-
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Depends,
-    File,
-    Form,
     HTTPException,
-    Query,
-    UploadFile,
+    Query
 )
 
-from app.core import crud
-from app.core.decorators import cache
+
 from app.core.deps import (
-    CacheService,
     CurrentUser,
     Storage,
     get_current_user,
@@ -22,30 +14,30 @@ from app.core.deps import (
 from app.core.logging import logger
 from app.models.collection import (
     CollectionCreate,
+    Collection,
     Collections,
     CollectionUpdate,
     Search,
 )
-from app.models.collection import Collection
 from app.models.message import Message
-from app.services.export import export, process_file, validate_file
+from app.services.export import export
 # from app.core.db import PrismaDb
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
+from math import ceil
 
 # Create a router for collections
 router = APIRouter()
 
 
 @router.get("/")
-@cache(key="collections")
+# @cache(key="collections")
 async def index(
-    # db: PrismaDb,
     query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-) -> Any:
+) -> Collections:
     """
     Retrieve collections with Redis caching.
     """
@@ -74,15 +66,15 @@ async def index(
 
 
 @router.post("/")
-async def create(*, data: CollectionCreate) -> Collection:
+async def create(*, create_data: CollectionCreate) -> Collection:
     """
     Create new collection.
     """
     try:
         collection = await db.collection.create(
             data={
-                "name": data.name,
-                "slug": slugify(data.name)
+                **create_data.model_dump(),
+                "slug": slugify(create_data.name)
             }
         )
         return collection
@@ -92,7 +84,7 @@ async def create(*, data: CollectionCreate) -> Collection:
 
 @router.get("/{id}")
 # @cache(key="collection", hash=False)
-async def read(id: int):
+async def read(id: int) -> Collection:
     """
     Get a specific collection by id with Redis caching.
     """
@@ -165,22 +157,6 @@ async def delete(id: int) -> Message:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.post("/excel/{task_id}")
-async def upload_collections(
-    file: Annotated[UploadFile, File()],
-    batch: Annotated[str, Form()],
-    task_id: str,
-    background_tasks: BackgroundTasks,
-):
-    await validate_file(file=file)
-
-    contents = await file.read()
-    background_tasks.add_task(
-        process_file, contents, task_id, db, crud.collection.bulk_upload
-    )
-    return {"batch": batch, "message": "File upload started"}
-
-
 @router.post("/export")
 async def export_collections(
     current_user: CurrentUser, bucket: Storage
@@ -202,8 +178,8 @@ async def export_collections(
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 @router.get("/autocomplete/")
-@cache(key="collections")
-async def autocomplete(search: str = "") -> Any:
+# @cache(key="collections")
+async def autocomplete(search: str = "") -> Search:
     """
     Retrieve collections for autocomplete.
     """

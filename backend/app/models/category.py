@@ -1,31 +1,26 @@
-from sqlmodel import Field
-
-# from pydantic import BaseModel as PDBModel, computed_field
-from app.models.base import BaseModel as BM
-from pydantic import BaseModel
+from app.models.base import BM
+from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class CategoryBase(BM):
-    name: str = Field(index=True, unique=True)
+    name: str = Field(..., min_length=1, description="Name is required")
     is_active: bool = True
 
 
-# Properties to receive via API on creation
+class Category(CategoryBase):
+    id: int
+    slug: str = Field(..., min_length=1)
+    parent: Optional[list["Category"]] = None
+    subcategories: Optional[list["Category"]] = None
+
+
 class CategoryCreate(CategoryBase):
     parent_id: int = None
 
 
-# Properties to receive via API on update, all are optional
-class Category(BaseModel):
-    name: str
-    slug: str
-    is_active: bool = True
-    parent_id: int = None
-
-
-class CategoryUpdate(BaseModel):
-    name: str
-    is_active: bool = True
+class CategoryUpdate(CategoryBase):
+    pass
 
 
 class Categories(BaseModel):
@@ -36,25 +31,5 @@ class Categories(BaseModel):
     total_pages: int
 
 
-# class CategoryPublic(CategoryBase):
-#     id: int
-#     slug: str
-#     parent_id: Optional[int]
-
-#     @computed_field
-#     @property
-#     def parent(self) -> Optional["Category"]:
-#         """
-#         Computed property to get the parent category.
-#         """
-#         if not self.parent_id:
-#             return None
-
-#         # Fetch parent category from Supabase
-#         response = db.table("categories")
-#                   .select("*")
-#                   .eq("id", self.parent_id).single().execute()
-#         if not response.data:
-#             return None
-
-#         return Category(**response.data)
+class Search(BaseModel):
+    results: list[Category]

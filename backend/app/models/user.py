@@ -1,11 +1,10 @@
-from pydantic import EmailStr
-from sqlmodel import Field, SQLModel
+from pydantic import EmailStr, BaseModel, Field
 
-from app.models.base import BaseModel
+from app.models.base import BM
 
 
 # Shared properties
-class UserBase(BaseModel):
+class UserBase(BM):
     email: EmailStr | None = Field(unique=True, index=True, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
@@ -24,15 +23,16 @@ class UserUpdate(UserBase):
     password: str | None = Field(default=None, min_length=8, max_length=40)
 
 
-class UserUpdateMe(SQLModel):
+class UserUpdateMe(BaseModel):
     firstname: str | None = Field(default=None, max_length=255)
     lastname: str | None = Field(default=None, max_length=255)
     email: EmailStr | None = Field(default=None, max_length=255)
 
 
-class User(UserBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    hashed_password: str = ""
+class User(UserBase):
+    pass
+    # id: int | None = Field(default=None, primary_key=True)
+    # hashed_password: str = ""
     # addresses: list["Address"] = Relationship(back_populates="user")
     # activity_logs: list["ActivityLog"] = Relationship(back_populates="user")
     # wishlists: list["Wishlist"] = Relationship(back_populates="user")

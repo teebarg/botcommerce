@@ -1,125 +1,123 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
 
-from app.core import crud
-from app.core.decorators import cache
 from app.core.deps import (
-    CacheService,
     CurrentUser,
-    SessionDep,
 )
-from app.models.order import OrderResponse, OrderStatus
-from app.core.logging import logger
-from app.models.address import Address
+from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists
 from app.models.message import Message
 from app.models.user import UserUpdateMe, User
 from app.models.wishlist import WishlistCreate
 from app.prisma_client import prisma as db
+from prisma.errors import PrismaError
 
 # Create a router for users
 router = APIRouter()
 
 
 @router.get("/me")
-@cache(key="user", hash=False)
+# @cache(key="user", hash=False)
 async def read_user_me(
-    db: SessionDep,
     user: CurrentUser
-) -> User:
+):
     """Get current user with caching."""
-    shipping_addresses = db.exec(
-        select(Address).where(Address.user_id == user.id, Address.is_billing.is_(False))
-    ).all()
+    user = await db.user.find_unique(
+        where={"id": user.id},
+        include={"addresses": True}
+    )
+    return user
+    # shipping_addresses = db.exec(
+    #     select(Address).where(Address.user_id == user.id, Address.is_billing.is_(False))
+    # ).all()
 
-    billing_address = db.exec(
-        select(Address).where(Address.user_id == user.id, Address.is_billing)
-    ).first()
+    # billing_address = db.exec(
+    #     select(Address).where(Address.user_id == user.id, Address.is_billing)
+    # ).first()
 
-    return User(**user.model_dump(), shipping_addresses=shipping_addresses, billing_address=billing_address)
+    # return User(**user.model_dump(), shipping_addresses=shipping_addresses, billing_address=billing_address)
 
 
 @router.patch("/me")
 async def update_user_me(
-    *,
-    db: SessionDep,
     user_in: UserUpdateMe,
-    current_user: CurrentUser,
-    cache: CacheService,
+    user: CurrentUser,
 ) -> Any:
     """
     Update own user.
     """
-
     if user_in.email:
-        existing_user = crud.user.get_by_email(db=db, email=user_in.email)
-        if existing_user and existing_user.id != current_user.id:
-            raise HTTPException(
-                status_code=409, detail="User with this email already exists"
-            )
+        existing = await db.user.find_unique(
+            where={
+                "email": user_in.email, 
+                "NOT": {
+                    id: user.id
+                }
+            }
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="User with this email already exists")
 
     try:
-        user = crud.user.update(
-            db=db, db_obj=current_user, obj_in=user_in
+        update = await db.user.update(
+            where={"id": id},
+            data=user_in.model_dump()
         )
-        # Invalidate cache
-        cache.delete(f"user:{user.id}")
-        return user
-    except IntegrityError as e:
-        logger.error(f"Error updating user, {e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{e}",
-        ) from e
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/wishlist")
-@cache(key="wishlist", hash=False)
+# @cache(key="wishlist", hash=False)
 async def read_wishlist(
-    db: SessionDep,
     user: CurrentUser
 ) -> Wishlists:
-    results = crud.user.get_user_wishlist(db=db, user_id=user.id)
-    return Wishlists(wishlists=results)
+    favorites = await db.favorite.find_many(
+        where={"user_id": user.id},
+        order={"created_at": "desc"},
+        include={"product": True}
+    )
+    return favorites
 
 
 @router.post("/wishlist", response_model=Wishlist)
-def create_user_wishlist_item(item: WishlistCreate, db: SessionDep, user: CurrentUser, cache: CacheService):
-    result = crud.user.create_wishlist_item(db=db, item=item, user_id=user.id)
-    # Invalidate cache
-    cache.delete(f"wishlist:{user.id}")
-    return result
+async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser):
+    try:
+        favorite = await db.favorite.create(
+            data={
+                **item.model_dump(),
+                "user_id": user.id
+            }
+        )
+        return favorite
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    # result = crud.user.create_wishlist_item(db=db, item=item, user_id=user.id)
+    # # Invalidate cache
+    # cache.delete(f"wishlist:{user.id}")
+    # return result
 
 
 @router.delete("/wishlist/{product_id}", response_model=Message)
 async def remove_wishlist_item(
     product_id: int,
-    db: SessionDep,
     user: CurrentUser,
-    cache: CacheService,
 ):
-    wishlist_item = db.exec(
-        select(Wishlist)
-        .where(Wishlist.user_id == user.id)
-        .where(Wishlist.product_id == product_id)
-    ).first()
-    if not wishlist_item:
-        raise HTTPException(
-            status_code=404, detail="Product not found or not owned by user"
+    existing = await db.favorite.find_unique(
+        where={"product_id": product_id, "user_id": user.id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    try:
+        await db.favorite.delete(
+            where={"product_id": product_id, "user_id": user.id}
         )
-    db.delete(wishlist_item)
-    db.commit()
-
-    # Invalidate cache
-    cache.delete(f"wishlist:{user.id}")
-
-    return Message(message="Item deleted successfully")
+        return Message(message="Product deleted successfully")
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/orders", response_model=list[OrderResponse])

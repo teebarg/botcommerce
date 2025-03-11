@@ -1,14 +1,15 @@
-from sqlmodel import Field, SQLModel
+from app.models.base import BM
+from pydantic import BaseModel, Field
 
-from app.models.base import BaseModel
 
-
-class TagBase(BaseModel):
-    name: str = Field(index=True, unique=True)
+class TagBase(BM):
+    name: str = Field(..., min_length=1, description="Name is required")
     is_active: bool = True
 
 class Tag(TagBase):
-    pass
+    id: int
+    slug: str = Field(..., min_length=1)
+
 
 class TagCreate(TagBase):
     pass
@@ -18,18 +19,13 @@ class TagUpdate(TagBase):
     pass
 
 
-class TagPublic(TagBase):
-    id: int
-    slug: str
-
-
-class Tags(SQLModel):
-    tags: list[TagPublic]
+class Tags(BaseModel):
+    tags: list[Tag]
     page: int
     limit: int
     total_count: int
     total_pages: int
 
 
-class Search(SQLModel):
-    results: list[TagPublic]
+class Search(BaseModel):
+    results: list[Tag]

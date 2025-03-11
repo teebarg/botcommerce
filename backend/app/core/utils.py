@@ -8,12 +8,12 @@ from pathlib import Path
 from typing import Any
 
 import emails  # type: ignore
-from firebase_cart import Order
 from jinja2 import Environment, FileSystemLoader, Template
 
 from app.core.config import settings
 from app.core.logging import logger
 from app.models.user import User
+from app.models.order import OrderResponse
 
 
 @dataclass
@@ -137,7 +137,7 @@ def generate_test_email(email_to: str) -> EmailData:
     return EmailData(html_content=html_content, subject=subject)
 
 
-def generate_invoice_email(order: Order, user: User) -> EmailData:
+def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Order Confirmation"
     html_content = render_email_template(

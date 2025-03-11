@@ -1,13 +1,8 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import func, select
 
-from app.core import crud
 from app.core.decorators import cache
-from app.core.deps import CacheService, SessionDep
-from app.core.logging import logger
 from app.models.config import (
     SiteConfig,
     SiteConfigCreate,
@@ -16,26 +11,27 @@ from app.models.config import (
 )
 from app.models.message import Message
 from prisma.errors import PrismaError
+from app.prisma_client import prisma as db
+from math import ceil
 
 router = APIRouter()
 
 
 @router.get("/site-config", response_model=dict[str, str])
 @cache(key="configs")  # Cache for 24hrs
-async def site_config(
-    db: SessionDep,
-) -> Any:
+async def site_config() -> Any:
     """
     Retrieve site configuration.
     """
-    return crud.siteconfig.configs(db=db)
+    configs = await db.siteconfig.find_many()
+    return configs
 
 
 @router.get("/")
 # @cache(key="configs")  # Cache for 24hrs
 async def index(
     skip: int = 0, limit: int = 20
-):
+) -> SiteConfigs:
     """
     Retrieve configs with Redis caching.
     """
@@ -73,7 +69,7 @@ async def read(id: int) -> SiteConfig:
 async def create(
     *,
     config_in: SiteConfigCreate
-) -> Any:
+) -> SiteConfig:
     """
     Create new site configuration.
     """
@@ -90,12 +86,11 @@ async def create(
             status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}", response_model=SiteConfig)
+@router.patch("/{id}")
 async def update(
-    *,
-    id: str,
+    id: int,
     config_in: SiteConfigUpdate
-) -> Any:
+) -> SiteConfig:
     """
     Update site configuration.
     """

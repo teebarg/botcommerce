@@ -1,48 +1,35 @@
-from typing import Any
-
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response
-from firebase_cart import FirebaseConfig, Order, OrderHandler
-from sqlmodel import SQLModel, select
+# from firebase_cart import FirebaseConfig, Order, OrderHandler
 
-from app.core.config import settings
-from app.core.decorators import cache
 from app.core.deps import (
-    CacheService,
     CurrentUser,
     Notification,
-    SessionDep,
     Storage,
     get_current_superuser,
     get_current_user,
 )
 from app.core.logging import logger
 from app.core.utils import generate_invoice_email
-from app.models.message import Message
 from app.services.export import export
-from fastapi import FastAPI, HTTPException, Depends
-from prisma import Prisma
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
+from typing import Optional
 import uuid
-from enum import Enum
 from app.prisma_client import prisma as db
 from app.models.order import OrderCreate, OrderResponse, OrderStatus, OrderUpdate
 
-firebase_config = FirebaseConfig(
-    credentials=settings.FIREBASE_CRED,
-    database_url=settings.DATABASE_URL,
-    bucket=settings.STORAGE_BUCKET,
-)
+# firebase_config = FirebaseConfig(
+#     credentials=settings.FIREBASE_CRED,
+#     database_url=settings.DATABASE_URL,
+#     bucket=settings.STORAGE_BUCKET,
+# )
 
-order_handler = OrderHandler(firebase_config)
+# order_handler = OrderHandler(firebase_config)
 
 # Create a router for orders
 router = APIRouter()
 
 
 @router.post("/", response_model=OrderResponse)
-async def create_order(response: Response, notification: Notification, order: OrderCreate, cartId: str = Header(default=None),):
+async def create_order(response: Response, notification: Notification, order: OrderCreate, cartId: str = Header(default=None)):
     # Generate unique order number
     order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
 
@@ -94,8 +81,7 @@ async def create_order(response: Response, notification: Notification, order: Or
     response.delete_cookie(key="_cart_id")
 
     # Send invoice email
-    email_data = generate_invoice_email(
-        order=order_details.get("order", {}), user=user)
+    email_data = generate_invoice_email(order=new_order, user=user)
     notification.send_notification(
         channel_name="email",
         recipient="neyostica2000@yahoo.com",
@@ -106,11 +92,11 @@ async def create_order(response: Response, notification: Notification, order: Or
     # Send to slack
     slack_message = {
         "text": f"🛍️ *New Order Created* 🛍️\n"
-                f"*Order ID:* {order_details.get('order', {}).get('order_id')}\n"
+                f"*Order ID:* {new_order.order_number}\n"
                 f"*Customer:* {user.firstname} {user.lastname}\n"
                 f"*Email:* {user.email}\n"
-                f"*Amount:* ${order_details.get('order', {}).get('total', 0)}\n"
-                f"*Payment Status:* ${order_details.get('order', {}).get('payment_status', 0)}"
+                f"*Amount:* ${new_order.total}\n"
+                f"*Payment Status:* ${new_order.payment_status}"
     }
 
     notification.send_notification(
@@ -197,10 +183,6 @@ async def delete_order(order_id: int):
 
     await db.order.delete(where={"id": order_id})
     return {"message": "Order deleted successfully"}
-
-
-# Additional utility endpoint
-
 
 
 # @router.get("/", dependencies=[Depends(get_current_user)])
@@ -307,10 +289,10 @@ async def delete_order(order_id: int):
 
 @router.post("/export")
 async def export_orders(
-    current_user: CurrentUser, db: SessionDep, bucket: Storage
+    current_user: CurrentUser, bucket: Storage
 ):
     try:
-        orders = db.exec(select(Order))
+        orders = await db.order.find_many()
         file_url = await export(
             data=orders, name="Order", bucket=bucket, email=current_user.email
         )
