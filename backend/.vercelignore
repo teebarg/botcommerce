@@ -17,8 +17,6 @@ htmlcov
 .vscode
 README.md
 tests
-alembic
-alembic.ini
 .DS_Store
 .venv
 .ruff_cache

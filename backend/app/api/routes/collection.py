@@ -8,7 +8,6 @@ from fastapi import (
 
 from app.core.deps import (
     CurrentUser,
-    Storage,
     get_current_user,
 )
 from app.core.logging import logger
@@ -158,9 +157,7 @@ async def delete(id: int) -> Message:
 
 
 @router.post("/export")
-async def export_collections(
-    current_user: CurrentUser, bucket: Storage
-):
+async def export_collections(current_user: CurrentUser):
     try:
         collections = await db.collection.find_many()
 
@@ -168,7 +165,6 @@ async def export_collections(
             columns=["name", "slug"],
             data=collections,
             name="Collection",
-            bucket=bucket,
             email=current_user.email,
         )
 

@@ -1,13 +1,9 @@
-from collections.abc import Generator
 import json
 from typing import Annotated
 
-import firebase_admin
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
-from firebase_admin import credentials, storage
-from google.cloud.storage.bucket import Bucket
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 
@@ -35,24 +31,6 @@ reusable_oauth2 = OAuth2PasswordBearer(
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 
 
-def get_storage() -> Generator:
-    try:
-        if not firebase_admin._apps:  # Check if the app is not already initialized
-            cred = credentials.Certificate(settings.FIREBASE_CRED)
-            firebase_admin.initialize_app(
-                cred, {"storageBucket": settings.STORAGE_BUCKET}
-            )
-
-        # Get a reference to the bucket
-        yield storage.bucket()
-    except Exception as e:
-        logger.error(f"storage init error, {e}")
-        raise
-    finally:
-        logger.debug("storage closed")
-
-
-Storage = Annotated[Bucket, Depends(get_storage)]
 CacheService = Annotated[CacheService, Depends(get_cache_service)]
 
 

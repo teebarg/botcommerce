@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response
-# from firebase_cart import FirebaseConfig, Order, OrderHandler
+from fastapi import APIRouter, Depends, Header, HTTPException, Response
 
 from app.core.deps import (
     CurrentUser,
     Notification,
-    Storage,
     get_current_superuser,
     get_current_user,
 )
@@ -15,14 +13,6 @@ from typing import Optional
 import uuid
 from app.prisma_client import prisma as db
 from app.models.order import OrderCreate, OrderResponse, OrderStatus, OrderUpdate
-
-# firebase_config = FirebaseConfig(
-#     credentials=settings.FIREBASE_CRED,
-#     database_url=settings.DATABASE_URL,
-#     bucket=settings.STORAGE_BUCKET,
-# )
-
-# order_handler = OrderHandler(firebase_config)
 
 # Create a router for orders
 router = APIRouter()
@@ -288,13 +278,11 @@ async def delete_order(order_id: int):
 
 
 @router.post("/export")
-async def export_orders(
-    current_user: CurrentUser, bucket: Storage
-):
+async def export_orders(current_user: CurrentUser):
     try:
         orders = await db.order.find_many()
         file_url = await export(
-            data=orders, name="Order", bucket=bucket, email=current_user.email
+            data=orders, name="Order", email=current_user.email
         )
 
         return {"message": "Data Export successful", "file_url": file_url}

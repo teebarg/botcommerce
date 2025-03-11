@@ -44,7 +44,7 @@ def format_naira(value: int):
 
 
 def format_image(image: str):
-    return f"https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/products%2F{image}?alt=media"
+    return image
 
 
 def url_to_list(url: str) -> list[str]:

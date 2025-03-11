@@ -31,7 +31,6 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
-    FIREBASE_CRED: dict = {}
     DATABASE_URL: str = ""
 
     POSTGRES_SERVER: str
@@ -39,7 +38,6 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "postgres"
     POSTGRES_PORT: int = 5432
-    STORAGE_BUCKET: str = "bucket"
     SQLALCHEMY_DATABASE_URI: str | None = None
 
     DOMAIN: str = "localhost"

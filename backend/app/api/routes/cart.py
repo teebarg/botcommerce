@@ -2,19 +2,9 @@ from datetime import timedelta
 
 from app.core.utils import generate_id
 from app.models.message import Message
-# from app.core.db import PrismaDb
 from app.models.cart import CartCreate, CartDetails, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Response
-# from firebase_cart import CartHandler, CartItem, FirebaseConfig
 from app.prisma_client import prisma as db
-
-# firebase_config = FirebaseConfig(
-#     credentials=settings.FIREBASE_CRED,
-#     database_url=settings.DATABASE_URL,
-#     bucket=settings.STORAGE_BUCKET,
-# )
-
-# cart_handler = CartHandler(firebase_config)
 
 # Create a router for carts
 router = APIRouter()

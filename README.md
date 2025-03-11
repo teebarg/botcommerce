@@ -21,7 +21,7 @@ Botcommerce is an e-commerce platform that leverages modern web technologies to 
 
 ### Backend
 - [FastAPI](https://fastapi.tiangolo.com/) - Modern, fast (high-performance) Python web framework
-- (PostgreSQL, Firebase)
+- (PostgreSQL, supabase)
 - Redis for caching
 - Meillisearch
 

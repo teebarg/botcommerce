@@ -17,7 +17,6 @@ from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     CurrentUser,
-    Storage,
     get_current_user,
 )
 from app.core.logging import logger
@@ -59,14 +58,13 @@ router = APIRouter()
 @router.post("/export")
 async def export_products(
     current_user: CurrentUser,
-    bucket: Storage,
     background_tasks: BackgroundTasks,
 ) -> Any:
     try:
         # Define the background task
         def run_task():
             download_url = asyncio.run(
-                generate_excel_file(bucket=bucket, email=current_user.email)
+                generate_excel_file(email=current_user.email)
             )
 
             # crud.activities.create_product_export_activity(
@@ -530,7 +528,7 @@ async def upload_image(image_data: ImageUpload):
     file_extension = image_data.file_name.split('.')[-1]
     unique_filename = f"{image_data.product_id}/{uuid.uuid4()}.{file_extension}"
 
-    # Upload file to Supabase Storage
+    # Upload file to Supabase
     result = supabase.storage.from_("product-images").upload(
         unique_filename,
         file_bytes,
@@ -566,7 +564,7 @@ async def delete_image(image_id: int):
     # Extract file path from URL
     file_path = image.url.split("/storage/v1/object/public/product-images/")[1]
 
-    # Delete from Supabase Storage
+    # Delete from Supabase
     result = supabase.storage.from_("product-images").remove([file_path])
 
     if result.get("error"):

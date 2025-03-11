@@ -27,7 +27,7 @@ class CartItemResponse(CartItemBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CartCreate(BaseModel):
     cart_number: str
@@ -51,9 +51,6 @@ class CartResponse(BaseModel):
     items: List[CartItemResponse]
     created_at: datetime
     last_updated: datetime
-
-    class Config:
-        orm_mode = True
 
 
 class CartItemIn(BaseModel):

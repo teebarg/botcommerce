@@ -49,7 +49,8 @@ async def send_status_update(task_id: str):
     )
 
 
-async def export(data: list, name: str, bucket: Any, email: str, columns: list) -> str:
+async def export(data: list, name: str, email: str, columns: list) -> str:
+    # TODO: Implement export to supabase
     try:
         return ""
         # # Convert data to CSV
@@ -62,7 +63,7 @@ async def export(data: list, name: str, bucket: Any, email: str, columns: list) 
         # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         # filename = f"{name}_export_{timestamp}.csv"
 
-        # # Upload to Firebase
+        # # Upload
         # blob = bucket.blob(f"exports/{filename}")
         # blob.upload_from_string(csv_content, content_type="text/csv")
         # blob.make_public()

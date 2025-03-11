@@ -27,6 +27,7 @@ from app.models.category import Category
 from app.models.collection import Collection
 from app.models.brand import Brand
 from app.prisma_client import prisma
+from app.core.config import settings
 
 
 async def broadcast_channel(data, user_id: int):
@@ -354,7 +355,7 @@ async def delete_products_not_in_sheet(product_slugs_in_sheet: set, user_id: int
 
 
 # Export products
-async def generate_excel_file(bucket: Any, email: str):
+async def generate_excel_file(email: str):
     logger.debug("Products export started.......")
 
     products = await prisma.product.find_many(
@@ -430,14 +431,13 @@ async def generate_excel_file(bucket: Any, email: str):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"product_export_{timestamp}.xlsx"
 
-    # Upload the in-memory file to Firebase
-    blob = bucket.blob(f"exports/{filename}")
-    blob.upload_from_file(
-        output,
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    # Upload the in-memory file to Supabase
+    client: Client = create_client(
+        url=settings.SUPABASE_URL,
+        key=settings.SUPABASE_KEY,
     )
-    blob.make_public()  # Make the file publicly accessible
-    download_url = blob.public_url
+    data = client.storage.from_("exports").upload(filename, output, {"contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
+    download_url = data["publicUrl"]
 
     # Send email with download link
     email_data = generate_data_export_email(download_link=download_url)
