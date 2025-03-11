@@ -23,3 +23,18 @@ class ReviewUpdate(BM):
     rating: int = 1
     verified: bool = False
     comment: str
+
+class ReviewPublic(ReviewBase):
+    id: int
+
+
+class Reviews(BaseModel):
+    reviews: list[ReviewPublic]
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int
+
+
+class PaginatedReviews(Reviews):
+    pass

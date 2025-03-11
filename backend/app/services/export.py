@@ -5,16 +5,13 @@ from fastapi import (
 )
 
 from app.api.routes.websocket import manager
-from app.core.deps import (
-    SessionDep,
-)
 from app.core.logging import logger
 from app.models.generic import UploadStatus
 
 upload_statuses: dict[str, UploadStatus] = {}
 
 
-async def process_file(file, task_id: str, db: SessionDep, upload_func):
+async def process_file(file, task_id: str, db, upload_func):
     logger.debug("Processing file")
     # chunk_size = 100
     # try:

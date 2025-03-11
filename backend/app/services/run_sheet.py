@@ -16,16 +16,16 @@ from app.api.routes.websocket import manager
 from app.core.logging import logger
 from app.core.utils import generate_data_export_email, send_email
 from app.db.engine import engine
-from app.models.generic import (
-    Brand,
-    Category,
-    Collection,
+from app.models.product import (
     Product,
     ProductBrand,
     ProductCategory,
     ProductCollection,
     ProductImages,
 )
+from app.models.category import Category
+from app.models.collection import Collection
+from app.models.brand import Brand
 from app.prisma_client import prisma
 
 

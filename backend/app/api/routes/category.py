@@ -4,12 +4,13 @@ from typing import Any
 from app.core.deps import (get_current_user)
 from app.models.category import Categories, Category, CategoryCreate, CategoryUpdate
 from app.models.message import Message
-from app.core.db import PrismaDb
+# from app.core.db import PrismaDb
 from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException, Query)
 from pydantic import BaseModel
 
 from prisma.errors import PrismaError
+from app.prisma_client import prisma as db
 
 # Create a router for categories
 router = APIRouter()
@@ -22,7 +23,7 @@ class Search(BaseModel):
 @router.get("/", dependencies=[])
 # @cache(key="categories")
 async def index(
-    db: PrismaDb,
+    # db: PrismaDb,
     query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -53,17 +54,10 @@ async def index(
         "total_pages":ceil(total/limit),
         "total_count":total,
     }
-    return Categories(
-        categories=categories,
-        page=page,
-        limit=limit,
-        total_pages=ceil(total/limit),
-        total_count=total,
-    )
 
 
 @router.post("/")
-async def create(*, db: PrismaDb, data: CategoryCreate) -> Category:
+async def create(*, data: CategoryCreate) -> Category:
     """
     Create new category.
     """
@@ -82,7 +76,7 @@ async def create(*, db: PrismaDb, data: CategoryCreate) -> Category:
 
 @router.get("/{id}")
 # @cache(key="category", hash=False)
-async def read(id: int, db: PrismaDb) -> Any:
+async def read(id: int) -> Any:
     """
     Get a specific category by id with Redis caching.
     """
@@ -97,7 +91,7 @@ async def read(id: int, db: PrismaDb) -> Any:
 
 @router.get("/slug/{slug}")
 # @cache(key="category", hash=False)
-async def get_by_slug(slug: str, db: PrismaDb) -> Category:
+async def get_by_slug(slug: str) -> Category:
     """
     Get a category by its slug.
     """
@@ -113,7 +107,7 @@ async def get_by_slug(slug: str, db: PrismaDb) -> Category:
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])
 async def update(
     *,
-    db: PrismaDb,
+    # db: PrismaDb,
     id: int,
     update_data: CategoryUpdate,
 ) -> Category:
@@ -125,7 +119,7 @@ async def update(
     )
     if not existing:
         raise HTTPException(status_code=404, detail="Category not found")
-    
+
     try:
         update = await db.category.update(
             where={"id": id},
@@ -137,19 +131,18 @@ async def update(
 
 
 @router.delete("/{id}")
-async def delete(id: int, db: PrismaDb) -> Message:
+async def delete(id: int) -> Message:
     """
     Delete a category.
     """
-    # Check if draft exists
-    existing = await db.draft.find_unique(
+    existing = await db.category.find_unique(
         where={"id": id}
     )
     if not existing:
         raise HTTPException(status_code=404, detail="Category not found")
-    
+
     try:
-        await db.draft.delete(
+        await db.category.delete(
             where={"id": id}
         )
         return Message(message="Category deleted successfully")
@@ -159,7 +152,7 @@ async def delete(id: int, db: PrismaDb) -> Message:
 
 @router.get("/autocomplete/")
 async def autocomplete(
-    db: PrismaDb,
+    # db: PrismaDb,
     query: str = "",
 ) -> Any:
     """

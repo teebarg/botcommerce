@@ -8,7 +8,7 @@ class BrandBase(BaseModel):
     is_active: bool = True
 
 class Brand(BrandBase):
-   pass
+    pass
 
 
 class BrandCreate(BrandBase):

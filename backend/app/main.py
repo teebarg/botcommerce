@@ -17,12 +17,14 @@ from app.core.utils import (
     send_email,
 )
 from app.models.generic import (
-    Category,
-    Collection,
     ContactFormCreate,
-    NewsletterCreate,
-    Product,
+    NewsletterCreate
 )
+from app.models.collection import (
+    Collection,
+)
+from app.models.category import Category
+from app.models.product import Product
 from app.prisma_client import prisma
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")

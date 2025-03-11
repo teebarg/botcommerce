@@ -3,7 +3,7 @@ from sqlmodel import select
 
 from app.core.cruds.base import BaseCRUD
 from app.models.address import AddressCreate, AddressUpdate
-from app.models.generic import Address
+from app.models.address import Address
 
 
 class AddressCRUD(BaseCRUD[Address, AddressCreate, AddressUpdate]):

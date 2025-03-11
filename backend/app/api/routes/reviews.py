@@ -1,6 +1,5 @@
 
-from app.models.reviews import ReviewCreate, ReviewUpdate
-from app.models.generic import PaginatedReviews, Review, ReviewPublic
+from app.models.reviews import PaginatedReviews, Review, ReviewCreate, ReviewUpdate, ReviewPublic
 from fastapi import ( APIRouter, HTTPException, Depends, HTTPException, Query)
 
 from app.core import crud
@@ -86,7 +85,7 @@ async def create(review: ReviewCreate, db: SessionDep, user: CurrentUser, cache:
             status_code=400,
             detail=e,
         ) from e
-    
+
 
 # @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 @router.patch("/{id}")

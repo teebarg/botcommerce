@@ -22,7 +22,7 @@ from app.models.address import (
     AddressCreate,
     AddressUpdate,
 )
-from app.models.generic import Address, Addresses, AddressPublic
+from app.models.address import Address, Addresses, AddressPublic
 from app.models.message import Message
 
 # Create a router for addresses

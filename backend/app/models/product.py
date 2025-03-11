@@ -1,5 +1,5 @@
 from typing import List, Optional, Literal
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel as BM, Field, HttpUrl
 
 from app.models.base import BaseModel
 
@@ -25,6 +25,18 @@ class VariantWithStatus(BaseModel):
     status: Literal["IN_STOCK", "OUT_OF_STOCK"]
 
 
+class Product(BaseModel):
+    name: str = Field(..., min_length=1, description="Name is required")
+    description: str = Field(..., min_length=1, description="Description is required")
+    brand_ids: Optional[List[int]] = None
+    category_ids: Optional[List[int]] = None
+    collections_ids: Optional[List[int]] = None
+    tags_ids: Optional[List[int]] = None
+    sku: Optional[str] = None
+    variants: Optional[List[VariantCreate]] = None
+    images: Optional[List[HttpUrl]] = None
+
+
 class ProductCreate(BaseModel):
     name: str = Field(..., min_length=1, description="Name is required")
     description: str = Field(..., min_length=1, description="Description is required")
@@ -35,6 +47,9 @@ class ProductCreate(BaseModel):
     sku: Optional[str] = None
     variants: Optional[List[VariantCreate]] = None
     images: Optional[List[HttpUrl]] = None
+
+class ProductPublic(BaseModel):
+    id: int
 
 class ProductUpdate(BaseModel):
     id: int = Field(..., gt=0)
@@ -67,3 +82,56 @@ class PaginationParams(BaseModel):
     category_slug: Optional[str] = None
     search: Optional[str] = None
     sort: Literal["asc", "desc"] = "desc"
+
+
+class ProductPublic(BaseModel):
+    id: int
+
+
+class ProductBrand(BaseModel):
+    id: int
+
+
+class ProductCategory(BaseModel):
+    id: int
+
+
+class ProductCollection(BaseModel):
+    id: int
+
+
+class ProductImages(BaseModel):
+    id: int
+
+
+class Product(BaseModel):
+    id: int
+    name: str
+    slug: str
+    description: str
+    price: float
+    old_price: float
+    image: str
+    status: str
+    variants: Optional[List[str]] = None
+    ratings: float
+    categories: List[str]
+    collections: List[str]
+    brands: List[str]
+    tags: Optional[List[str]] = None
+    images: Optional[List[str]] = None
+    reviews: Optional[List[str]] = None
+    favorites: Optional[List[str]] = None
+
+class Facets(BaseModel):
+    brands: dict[str, int]
+    categories: dict[str, int]
+    collections: dict[str, int]
+
+class Products(BM):
+    products: List[Product]
+    facets: Facets
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int

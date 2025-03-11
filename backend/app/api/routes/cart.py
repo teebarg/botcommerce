@@ -4,12 +4,12 @@ from typing import Any
 from app.core.config import settings
 from app.core.deps import CacheService, SessionDep
 from app.core.utils import generate_id
-# from app.models.generic import CartDetails, CartItemIn, Product
 from app.models.message import Message
-from app.core.db import PrismaDb
+# from app.core.db import PrismaDb
 from app.models.cart import CartCreate, CartDetails, CartItemCreate, CartItemResponse, CartResponse, CartUpdate
 from fastapi import APIRouter, Header, HTTPException, Response
 from firebase_cart import CartHandler, CartItem, FirebaseConfig
+from app.prisma_client import prisma as db
 
 firebase_config = FirebaseConfig(
     credentials=settings.FIREBASE_CRED,
@@ -109,7 +109,7 @@ router = APIRouter()
 
 # Endpoints
 @router.post("/", response_model=CartResponse)
-async def create_cart(cart: CartCreate, db: PrismaDb):
+async def create_cart(cart: CartCreate):
     """Create a new cart for a user"""
     id = generate_id()
     # Check if user exists
@@ -137,7 +137,7 @@ async def create_cart(cart: CartCreate, db: PrismaDb):
     return new_cart
 
 @router.get("/", response_model=CartResponse)
-async def get_cart(response: Response, db: PrismaDb, cartId: str = Header(default=None)):
+async def get_cart(response: Response, cartId: str = Header(default=None)):
     """Get a specific cart by ID"""
     cart = await db.cart.find_unique(
         where={"cart_number": cartId},
@@ -177,7 +177,7 @@ async def get_cart(response: Response, db: PrismaDb, cartId: str = Header(defaul
 #     return cart
 
 @router.put("/", response_model=CartResponse)
-async def update_cart(cart_update: CartDetails, db: PrismaDb, cartId: str = Header(default=None)):
+async def update_cart(cart_update: CartDetails, cartId: str = Header(default=None)):
     """Update cart status"""
     cart = await db.cart.find_unique(where={"cart_number": cartId})
     if not cart:
@@ -192,7 +192,7 @@ async def update_cart(cart_update: CartDetails, db: PrismaDb, cartId: str = Head
 
 
 @router.delete("/{id}")
-async def delete(id: str, db: PrismaDb, cartId: str = Header(default=None)) -> Message:
+async def delete(id: str, cartId: str = Header(default=None)) -> Message:
     """
     Delete item from cart.
     """
@@ -215,7 +215,7 @@ async def delete(id: str, db: PrismaDb, cartId: str = Header(default=None)) -> M
 #     return {"message": "Cart deleted successfully"}
 
 @router.post("/items", response_model=CartItemResponse)
-async def add_item_to_cart(response: Response, item: CartItemCreate, db: PrismaDb, cartId: str = Header(default=None)):
+async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str = Header(default=None)):
     """Add an item to cart"""
     # Verify cart exists
     cart = await db.cart.find_unique(where={"cart_number": cartId})
@@ -235,10 +235,9 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, db: PrismaD
             httponly=True,
         )
         # raise HTTPException(status_code=404, detail="Cart not found")
-    
+
     # Verify product variant exists and is in stock
     variant = await db.productvariant.find_unique(where={"id": item.variant_id}, include={"product": True})
-    print(variant)
     if not variant or variant.status != "IN_STOCK":
         raise HTTPException(status_code=400, detail="Product variant not available")
 
@@ -249,7 +248,7 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, db: PrismaD
             "variant_id": item.variant_id
         }
     )
-    
+
     if existing_item:
         # Update quantity if item exists
         updated_item = await db.cartitem.update(
@@ -257,7 +256,7 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, db: PrismaD
             data={"quantity": existing_item.quantity + item.quantity}
         )
         return updated_item
-    
+
     # Create new cart item
     new_item = await db.cartitem.create(
         data={
@@ -271,7 +270,7 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, db: PrismaD
     return new_item
 
 @router.delete("/items/{item_id}")
-async def remove_item_from_cart(item_id: int, db: PrismaDb, cartId: str = Header(default=None)):
+async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)):
     """Remove an item from cart"""
     cart_item = await db.cartitem.find_unique(where={"id": item_id})
     if not cart_item or cart_item.cart_id != cartId:
@@ -281,7 +280,7 @@ async def remove_item_from_cart(item_id: int, db: PrismaDb, cartId: str = Header
     return {"message": "Item removed from cart successfully"}
 
 @router.put("/items/{item_id}", response_model=CartItemResponse)
-async def update_cart_item_quantity(item_id: int, quantity: int, db: PrismaDb, cartId: str = Header(default=None)):
+async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = Header(default=None)):
     """Update quantity of an item in cart"""
     cart_item = await db.cartitem.find_unique(where={"id": item_id})
     if not cart_item or cart_item.cart_id != cartId:

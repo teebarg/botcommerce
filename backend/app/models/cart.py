@@ -45,7 +45,8 @@ class CartDetails(BaseModel):
 
 class CartResponse(BaseModel):
     id: int
-    user_id: int
+    user_id: int | None = None
+    cart_number: str
     status: CartStatus
     items: List[CartItemResponse]
     created_at: datetime
@@ -53,3 +54,16 @@ class CartResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class CartItemIn(BaseModel):
+    product_id: str
+    quantity: int
+
+
+class CartDetails(BaseModel):
+    shipping_address: dict | None = None
+    billing_address: dict | None = None
+    email: str | None = None
+    shipping_method: dict | None = None
+    payment_session: dict | None = None

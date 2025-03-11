@@ -9,8 +9,7 @@ from app.core.deps import (
     SessionDep,
 )
 from app.core.logging import logger
-from app.models.activities import Activities, ActivityCreate
-from app.models.generic import ActivityLog
+from app.models.activities import Activities, ActivityCreate, ActivityLog
 from app.models.message import Message
 
 # Create a router for activities

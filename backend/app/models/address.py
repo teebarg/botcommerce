@@ -1,5 +1,5 @@
-from pydantic import field_validator
-from sqlmodel import Field
+from pydantic import field_validator, BaseModel
+from sqlmodel import Field, SQLModel
 
 from app.models.base import BaseModel
 
@@ -21,10 +21,27 @@ class AddressBase(BaseModel):
             raise ValueError(f"{info.field_name} cannot be empty")
         return v
 
-
 class AddressCreate(AddressBase):
     pass
 
 
 class AddressUpdate(AddressBase):
     pass
+
+
+class Address(AddressBase, table=True):
+    __tablename__ = "addresses"
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(default=None, foreign_key="user.id")
+
+
+class AddressPublic(AddressBase):
+    id: int
+
+
+class Addresses(BaseModel):
+    addresses: list[AddressPublic]
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int

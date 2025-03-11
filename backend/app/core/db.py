@@ -3,6 +3,7 @@ from typing import Annotated
 from prisma import Prisma
 from contextlib import asynccontextmanager
 from fastapi import Depends
+from app.core.logging import logger
 
 # Initialize Prisma client
 prisma = Prisma()
@@ -11,9 +12,12 @@ prisma = Prisma()
 # Context manager for database connections
 @asynccontextmanager
 async def get_db():
-    await prisma.connect()
+    # await prisma.connect()
     try:
+        await prisma.connect()
         yield prisma
+    except Exception as e:
+        logger.error(f"Database connection error: {e}")
     finally:
         await prisma.disconnect()
 

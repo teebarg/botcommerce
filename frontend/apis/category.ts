@@ -8,9 +8,14 @@ export const categoryApi = {
     async all(input?: { search?: string; page?: number; limit?: number }): Promise<PaginatedCategory> {
         const searchParams = { query: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`, searchParams);
-        const response = await fetcher<PaginatedCategory>(url);
 
-        return response;
+        try {
+            const response = await fetcher<PaginatedCategory>(url, { next: { tags: ["categories"] } });
+
+            return response;
+        } catch (error) {
+            return { categories: [], page: 1, limit: 20, total_count: 0, total_pages: 1 };
+        }
     },
     async get(id: string): Promise<Category> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;

@@ -3,7 +3,7 @@ from sqlmodel import Session
 from app.core.cruds.base import BaseCRUD
 from app.core.utils import generate_slug
 from app.models.category import CategoryCreate, CategoryUpdate
-from app.models.generic import Category
+from app.models.category import Category
 
 
 class CategoryCRUD(BaseCRUD[Category, CategoryCreate, CategoryUpdate]):

@@ -2,7 +2,7 @@ from sqlmodel import Session
 
 from app.core.cruds.base import BaseCRUD
 from app.models.reviews import ReviewCreate, ReviewUpdate
-from app.models.generic import Review
+from app.models.reviews import Review
 
 
 class ReviewCRUD(BaseCRUD[Review, ReviewCreate, ReviewUpdate]):

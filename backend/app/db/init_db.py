@@ -3,8 +3,7 @@ from sqlmodel import Session, select
 from app.core import crud
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.generic import User
-from app.models.user import UserCreate
+from app.models.user import User,  UserCreate
 
 # make sure all SQLModel models are imported (app.models) before initializing DB
 # otherwise, SQLModel might fail to initialize relationships properly

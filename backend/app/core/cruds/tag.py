@@ -2,8 +2,7 @@ from sqlmodel import Session
 
 from app.core.cruds.base import BaseCRUD
 from app.core.utils import generate_slug
-from app.models.generic import Tag
-from app.models.tag import TagCreate, TagUpdate
+from app.models.tag import Tag, TagCreate, TagUpdate
 
 
 class TagCRUD(BaseCRUD[Tag, TagCreate, TagUpdate]):

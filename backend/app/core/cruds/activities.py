@@ -4,8 +4,7 @@ from sqlmodel import Session
 
 from app.api.routes.websocket import manager
 from app.core.cruds.base import BaseCRUD
-from app.models.activities import ActivityCreate, ActivityUpdate
-from app.models.generic import ActivityLog
+from app.models.activities import ActivityLog, ActivityCreate, ActivityUpdate
 
 
 class ActivityCRUD(BaseCRUD[ActivityLog, ActivityCreate, ActivityUpdate]):

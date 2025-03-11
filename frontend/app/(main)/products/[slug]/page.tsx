@@ -150,7 +150,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                     <ReviewsSection product={product} />
                 </Suspense>
 
-                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
+                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products-container">
                     <Suspense fallback={<SkeletonRelatedProducts />}>
                         <RelatedProducts product={product} />
                     </Suspense>

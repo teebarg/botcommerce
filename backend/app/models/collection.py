@@ -5,12 +5,20 @@ from app.models.base import BaseModel
 
 class CollectionBase(BaseModel):
     name: str = Field(index=True, unique=True)
+    slug: str = Field(index=True, unique=True)
     is_active: bool = True
 
 
 # Properties to receive via API on creation
-class CollectionCreate(CollectionBase):
-    pass
+class Collection(BaseModel):
+    name: str = Field(..., min_length=1, description="Name is required")
+    slug: str = Field(..., min_length=1, description="Slug is required")
+    is_active: bool = True
+
+class CollectionCreate(BaseModel):
+    name: str = Field(..., min_length=1, description="Name is required")
+    slug: str = Field(..., min_length=1, description="Slug is required")
+    is_active: bool = True
 
 
 # Properties to receive via API on update, all are optional

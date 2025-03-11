@@ -3,7 +3,7 @@ import base64
 from typing import Annotated, Any
 import uuid
 
-from app.core.db import PrismaDb
+# from app.core.db import PrismaDb
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -22,7 +22,8 @@ from app.core.deps import (
 )
 from app.core.logging import logger
 from app.core.utils import slugify, url_to_list
-from app.models.generic import Product, Products, Reviews
+from app.models.product import Product, Products
+from app.models.reviews import  Reviews
 from app.models.message import Message
 from app.models.product import (
     ImageUpload,
@@ -44,6 +45,7 @@ from app.services.run_sheet import generate_excel_file, process_products
 from prisma.models import Product, ProductVariant, ProductImage, Review
 from supabase import create_client, Client
 from app.core.config import settings
+from app.prisma_client import prisma as db
 
 # Initialize Supabase client
 supabase_url = settings.SUPABASE_URL
@@ -165,15 +167,15 @@ async def index(
 
 
 @router.post("/")
-async def create_product(product: ProductCreate, db: PrismaDb):
+async def create_product(product: ProductCreate):
     slugified_name = slugify(product.name)
     sku = product.sku or f"SK{slugified_name}"
-    
+
     # Prepare category connections if provided
     category_connect = None
     if product.category_ids:
         category_connect = [{"id": id} for id in product.category_ids]
-    
+
     # Prepare variants if provided
     variants_create = None
     if product.variants:
@@ -187,12 +189,12 @@ async def create_product(product: ProductCreate, db: PrismaDb):
                 "price": variant.price,
                 "inventory": variant.inventory
             })
-    
+
     # Prepare images if provided
     images_create = None
     if product.images:
         images_create = [{"url": str(url)} for url in product.images]
-    
+
     # Create product with all related data
     created_product = await db.product.create(
         data={
@@ -220,13 +222,13 @@ async def create_product(product: ProductCreate, db: PrismaDb):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
     # return product
-    
+
     return created_product
 
 
 @router.get("/{slug}")
 # @cache(key="product", hash=False)
-async def read(slug: str, db: PrismaDb):
+async def read(slug: str):
     """
     Get a specific product by slug with Redis caching.
     """
@@ -247,7 +249,7 @@ async def read(slug: str, db: PrismaDb):
 
 @router.get("/{id}/reviews")
 @cache(key="reviews", hash=False)
-async def read_reviews(id: str, db: PrismaDb) -> Reviews:
+async def read_reviews(id: str) -> Reviews:
     """
     Get a specific product reviews with Redis caching.
     """
@@ -311,29 +313,29 @@ async def read_reviews(id: str, db: PrismaDb) -> Reviews:
 #             status_code=400,
 #             detail=f"{e}",
 #         ) from e
-    
+
 
 @router.put("/{id}")
-async def update_product(id: int, product: ProductUpdate, db: PrismaDb, background_tasks: BackgroundTasks):
+async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
     # Check if product exists
     existing_product = await db.product.find_unique(where={"id": id})
     if not existing_product:
         raise HTTPException(status_code=404, detail="Product not found")
-    
+
     # Prepare update data
     update_data = {}
-    
+
     if product.name is not None:
         update_data["name"] = product.name
-    
+
     if product.description is not None:
         update_data["description"] = product.description
-    
+
     # Handle category updates if provided
     if product.category_ids is not None:
         category_ids = [{"id": id} for id in product.category_ids]
         update_data["categories"] = {"set": category_ids}
-    
+
     # Handle variant updates if provided
     if product.variants is not None:
         variant_updates = []
@@ -348,7 +350,7 @@ async def update_product(id: int, product: ProductUpdate, db: PrismaDb, backgrou
                     variant_data["price"] = variant.price
                 if variant.inventory is not None:
                     variant_data["inventory"] = variant.inventory
-                
+
                 # Only include in updates if there's data to update
                 if variant_data:
                     variant_updates.append({
@@ -367,21 +369,21 @@ async def update_product(id: int, product: ProductUpdate, db: PrismaDb, backgrou
                             "inventory": variant.inventory or 0
                         }
                     })
-        
+
         # Add variant updates to the update_data
         if variant_updates:
             update_data["variants"] = {"upsert": variant_updates}
-    
+
     # Handle image updates if provided
     if product.images is not None:
         # Delete existing images
         await db.product_image.delete_many(where={"product_id": id})
-        
+
         # Create new images
         image_creates = [{"url": str(url), "product_id": id} for url in product.images]
         for image_data in image_creates:
             await db.product_image.create(data=image_data)
-    
+
     # Update the product
     updated_product = await db.product.update(
         where={"id": id},
@@ -412,7 +414,7 @@ async def update_product(id: int, product: ProductUpdate, db: PrismaDb, backgrou
 
 
 @router.delete("/{id}")
-async def delete_product(id: int, db: PrismaDb, user=Depends(get_current_user))-> Message:
+async def delete_product(id: int, user=Depends(get_current_user))-> Message:
     """
     Delete a product.
     """
@@ -420,10 +422,10 @@ async def delete_product(id: int, db: PrismaDb, user=Depends(get_current_user))-
     await db.product_image.delete_many(where={"product_id": id})
     await db.review.delete_many(where={"product_id": id})
     await db.product_variant.delete_many(where={"product_id": id})
-    
+
     # Delete the product
     await db.product.delete(where={"id": id})
-    
+
     try:
         delete_document(index_name="products", document_id=str(id))
     except Exception as e:
@@ -451,15 +453,15 @@ async def delete_product(id: int, db: PrismaDb, user=Depends(get_current_user))-
 
 
 @router.post("/{id}/variants")
-async def create_variant(id: int, db: PrismaDb ,variant: VariantWithStatus):
+async def create_variant(id: int, variant: VariantWithStatus):
     # Check if product exists
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    
+
     # Create slug from name
     slug = slugify(variant.name)
-    
+
     # Create the variant
     created_variant = await db.product_variant.create(
         data={
@@ -472,78 +474,78 @@ async def create_variant(id: int, db: PrismaDb ,variant: VariantWithStatus):
             "status": variant.status
         }
     )
-    
+
     return created_variant
 
 @router.put("/variants/{variant_id}")
-async def update_variant(variant_id: int, db: PrismaDb, variant: VariantWithStatus):
+async def update_variant(variant_id: int, variant: VariantWithStatus):
     # Check if variant exists
     existing_variant = await db.product_variant.find_unique(where={"id": variant_id})
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
-    
+
     # Prepare update data
     update_data = {}
-    
+
     if variant.name:
         update_data["name"] = variant.name
         slug = slugify(variant.name)
         update_data["slug"] = slug
-    
+
     if variant.price:
         update_data["price"] = variant.price
-    
+
     if variant.inventory is not None:
         update_data["inventory"] = variant.inventory
-    
+
     if variant.status:
         update_data["status"] = variant.status
-    
+
     # Update the variant
     updated_variant = await db.product_variant.update(
         where={"id": variant_id},
         data=update_data
     )
-    
+
     return updated_variant
 
 @router.delete("/variants/{variant_id}")
-async def delete_variant(variant_id: int, db: PrismaDb):
+async def delete_variant(variant_id: int):
     # Delete the variant
     deleted_variant = await db.product_variant.delete(where={"id": variant_id})
-    
+
     return deleted_variant
 
 @router.post("/upload-image")
-async def upload_image(image_data: ImageUpload, db: PrismaDb):
+async def upload_image(image_data: ImageUpload):
     # Check if product exists
     product = await db.product.find_unique(where={"id": image_data.product_id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    
+
     # Decode base64 file
     file_bytes = base64.b64decode(image_data.file)
-    
+
     # Generate unique filename
     file_extension = image_data.file_name.split('.')[-1]
     unique_filename = f"{image_data.product_id}/{uuid.uuid4()}.{file_extension}"
-    
+
     # Upload file to Supabase Storage
     result = supabase.storage.from_("product-images").upload(
         unique_filename,
         file_bytes,
         {"content-type": image_data.content_type}
     )
-    
+
     if result.get("error"):
         raise HTTPException(
             status_code=500,
             detail=f"Upload failed: {result['error']}"
         )
-    
+
     # Get public URL
     public_url = supabase.storage.from_("product-images").get_public_url(unique_filename)
-    
+
     # Create image record in database
     image = await db.product_image.create(
         data={
@@ -551,37 +553,37 @@ async def upload_image(image_data: ImageUpload, db: PrismaDb):
             "product_id": image_data.product_id
         }
     )
-    
+
     return image
 
 @router.delete("/images/{image_id}")
-async def delete_image(image_id: int, db: PrismaDb):
+async def delete_image(image_id: int):
     # Get image details
     image = await db.product_image.find_unique(where={"id": image_id})
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
-    
+
     # Extract file path from URL
     file_path = image.url.split("/storage/v1/object/public/product-images/")[1]
-    
+
     # Delete from Supabase Storage
     result = supabase.storage.from_("product-images").remove([file_path])
-    
+
     if result.get("error"):
         raise HTTPException(
             status_code=500,
             detail=f"Delete failed: {result['error']}"
         )
-    
+
     # Delete from database
     await db.product_image.delete(where={"id": image_id})
-    
+
     return {"success": True}
 
 
 @router.post("/upload-products/")
 async def upload_products(
-    db: PrismaDb,
+    # db: PrismaDb,
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
     background_tasks: BackgroundTasks,
@@ -618,7 +620,7 @@ async def upload_products(
         asyncio.run(
             index_products(products=products, cache=cache)
         )
-        
+
 
         # crud.activities.create_product_upload_activity(
         #     db=db, user_id=user.id, filename=file.filename
@@ -693,7 +695,7 @@ async def upload_products(
 
 
 @router.post("/reindex", dependencies=[], response_model=Message)
-async def reindex_products(db: PrismaDb, cache: CacheService, background_tasks: BackgroundTasks):
+async def reindex_products(db, cache: CacheService, background_tasks: BackgroundTasks):
     """
     Re-index all products in the database to Meilisearch.
     This operation is performed asynchronously in the background.

@@ -13,7 +13,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.generic import User
+from app.models.user import User
 
 
 @dataclass
@@ -55,29 +55,29 @@ def slugify(text) -> str:
     """
     Convert a string into a URL-friendly slug.
     Removes special characters, converts to lowercase, and replaces spaces with hyphens.
-    
+
     Args:
         text (str): The input string to convert
-        
+
     Returns:
         str: The slugified string
     """
     # Convert to lowercase
     text = text.lower()
-    
+
     # Replace spaces with hyphens
     text = text.replace(' ', '-')
-    
+
     # Remove special characters, keeping only alphanumeric and hyphens
     slug = ''.join(char for char in text if char.isalnum() or char == '-')
-    
+
     # Remove multiple consecutive hyphens
     while '--' in slug:
         slug = slug.replace('--', '-')
-    
+
     # Remove leading/trailing hyphens
     slug = slug.strip('-')
-    
+
     return slug
 
 

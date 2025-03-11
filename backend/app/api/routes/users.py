@@ -11,11 +11,14 @@ from app.core.deps import (
     CurrentUser,
     SessionDep,
 )
+from app.models.order import OrderResponse, OrderStatus
 from app.core.logging import logger
-from app.models.generic import Address, UserPublic, Wishlist, Wishlists
+from app.models.address import Address
+from app.models.wishlist import Wishlist, Wishlists
 from app.models.message import Message
-from app.models.user import UserUpdateMe
+from app.models.user import UserUpdateMe, User
 from app.models.wishlist import WishlistCreate
+from app.prisma_client import prisma as db
 
 # Create a router for users
 router = APIRouter()
@@ -26,7 +29,7 @@ router = APIRouter()
 async def read_user_me(
     db: SessionDep,
     user: CurrentUser
-) -> UserPublic:
+) -> User:
     """Get current user with caching."""
     shipping_addresses = db.exec(
         select(Address).where(Address.user_id == user.id, Address.is_billing.is_(False))
@@ -36,10 +39,10 @@ async def read_user_me(
         select(Address).where(Address.user_id == user.id, Address.is_billing)
     ).first()
 
-    return UserPublic(**user.model_dump(), shipping_addresses=shipping_addresses, billing_address=billing_address)
+    return User(**user.model_dump(), shipping_addresses=shipping_addresses, billing_address=billing_address)
 
 
-@router.patch("/me", response_model=UserPublic)
+@router.patch("/me")
 async def update_user_me(
     *,
     db: SessionDep,
@@ -117,3 +120,15 @@ async def remove_wishlist_item(
     cache.delete(f"wishlist:{user.id}")
 
     return Message(message="Item deleted successfully")
+
+
+@router.get("/orders", response_model=list[OrderResponse])
+async def get_user_orders(current_user: CurrentUser, skip: int = 0, take: int = 20):
+    orders = await db.order.find_many(
+        where={"user_id": current_user.id},
+        skip=skip,
+        take=take,
+        order={"created_at": "desc"},
+        include={"order_items": True}
+    )
+    return orders

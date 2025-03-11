@@ -7,6 +7,8 @@ class TagBase(BaseModel):
     name: str = Field(index=True, unique=True)
     is_active: bool = True
 
+class Tag(TagBase):
+    pass
 
 class TagCreate(TagBase):
     pass

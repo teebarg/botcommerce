@@ -3,7 +3,7 @@ from sqlmodel import Session
 
 from app.core.cruds.base import BaseCRUD
 from app.models.collection import CollectionCreate, CollectionUpdate
-from app.models.generic import Collection
+from app.models.collection import Collection
 
 
 class CollectionCRUD(BaseCRUD[Collection, CollectionCreate, CollectionUpdate]):

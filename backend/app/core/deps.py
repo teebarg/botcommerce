@@ -16,7 +16,9 @@ from app.core import crud, security
 from app.core.config import settings
 from app.core.logging import logger
 from app.db.engine import engine
-from app.models.generic import Address, Product, User
+from app.models.user import User
+from app.models.product import Product
+from app.models.address import Address
 from app.models.token import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
