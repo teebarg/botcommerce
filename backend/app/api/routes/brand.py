@@ -13,7 +13,7 @@ from app.models.brand import (
     Brands,
     BrandUpdate,
 )
-from app.models.message import Message
+from app.models.generic import Message
 from app.prisma_client import prisma as db
 from math import ceil
 from app.core.utils import slugify

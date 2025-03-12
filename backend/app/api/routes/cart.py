@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from app.core.utils import generate_id
-from app.models.message import Message
+from app.models.generic import Message
 from app.models.cart import CartCreate, CartDetails, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Response
 from app.prisma_client import prisma as db

@@ -18,9 +18,8 @@ from app.models.collection import (
     CollectionUpdate,
     Search,
 )
-from app.models.message import Message
+from app.models.generic import Message
 from app.services.export import export
-# from app.core.db import PrismaDb
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError

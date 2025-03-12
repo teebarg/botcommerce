@@ -3,8 +3,7 @@ from typing import Any
 
 from app.core.deps import (get_current_user)
 from app.models.category import Categories, Category, CategoryCreate, CategoryUpdate
-from app.models.message import Message
-# from app.core.db import PrismaDb
+from app.models.generic import Message
 from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException, Query)
 from pydantic import BaseModel

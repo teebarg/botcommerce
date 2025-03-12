@@ -3,7 +3,6 @@ import base64
 from typing import Annotated, Any
 import uuid
 
-# from app.core.db import PrismaDb
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -23,7 +22,7 @@ from app.core.logging import logger
 from app.core.utils import slugify, url_to_list
 from app.models.product import Product, Products
 from app.models.reviews import  Reviews
-from app.models.message import Message
+from app.models.generic import Message
 from app.models.product import (
     ImageUpload,
     ProductCreate,
@@ -58,12 +57,12 @@ router = APIRouter()
 @router.post("/export")
 async def export_products(
     current_user: CurrentUser,
-    background_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks
 ) -> Any:
     try:
         # Define the background task
         def run_task():
-            download_url = asyncio.run(
+            asyncio.run(
                 generate_excel_file(email=current_user.email)
             )
 
@@ -256,14 +255,6 @@ async def read_reviews(id: str) -> Reviews:
         raise HTTPException(status_code=404, detail="Reviews not found")
 
     return review
-    # try:
-    #     product = crud.product.get(db=db, id=id)
-    #     if not product:
-    #         raise HTTPException(status_code=404, detail="Product not found")
-    #     reviews = crud.product.reviews(db=db, product_id=id)
-    #     return Reviews(reviews=reviews)
-    # except Exception as e:
-    #     raise HTTPException(status_code=400, detail=f"{e}")
 
 
 
@@ -430,25 +421,6 @@ async def delete_product(id: int, user=Depends(get_current_user))-> Message:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
 
-# @router.delete("/{id}")
-# async def delete(id: int, db: SessionDep, cache: CacheService,) -> Message:
-#     """
-#     Delete a product.
-#     """
-#     product = crud.product.get(db=db, id=id)
-#     if not product:
-#         raise HTTPException(status_code=404, detail="Product not found")
-#     crud.product.remove(db=db, id=id)
-#     try:
-#         delete_document(index_name="products", document_id=str(id))
-#         # Invalidate cache
-#         cache.delete(f"product:{product.slug}")
-#         cache.delete(f"product:{id}")
-#         cache.invalidate("products")
-#     except Exception as e:
-#         logger.error(f"Error deleting document from Meilisearch: {e}")
-#     return Message(message="Product deleted successfully")
-
 
 @router.post("/{id}/variants")
 async def create_variant(id: int, variant: VariantWithStatus):
@@ -581,7 +553,6 @@ async def delete_image(image_id: int):
 
 @router.post("/upload-products/")
 async def upload_products(
-    # db: PrismaDb,
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
     background_tasks: BackgroundTasks,
@@ -604,20 +575,17 @@ async def upload_products(
 
     # Define the background task
     def update_task(products):
-        asyncio.run(
-            process_products(
-                file_content=contents, content_type=content_type, user_id=user.id
+        try:
+            asyncio.run(
+                process_products(file_content=contents, content_type=content_type, user_id=user.id)
             )
-        )
 
-        # Clear all product-related cache
-        cache.invalidate("product")
-        cache.invalidate("products")
-
-        # Re-index
-        asyncio.run(
-            index_products(products=products, cache=cache)
-        )
+            # Re-index
+            asyncio.run(
+                index_products(products=products, cache=cache)
+            )
+        except Exception as e:
+            logger.error(f"Error processing data from file: {e}")
 
 
         # crud.activities.create_product_upload_activity(
@@ -693,7 +661,7 @@ async def upload_products(
 
 
 @router.post("/reindex", dependencies=[], response_model=Message)
-async def reindex_products(db, cache: CacheService, background_tasks: BackgroundTasks):
+async def reindex_products(cache: CacheService, background_tasks: BackgroundTasks):
     """
     Re-index all products in the database to Meilisearch.
     This operation is performed asynchronously in the background.
@@ -807,8 +775,8 @@ async def index_products(products, cache: CacheService):
         add_documents_to_index(index_name="products", documents=documents)
 
         # Clear all product-related cache
-        cache.invalidate("product")
-        cache.invalidate("products")
+        # cache.invalidate("product")
+        # cache.invalidate("products")
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
     except Exception as e:

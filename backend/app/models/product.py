@@ -1,7 +1,7 @@
 from typing import List, Optional, Literal
-from pydantic import BaseModel as BM, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl
 
-from app.models.base import BaseModel
+from app.models.base import BM
 
 # Models
 class VariantCreate(BaseModel):
@@ -25,7 +25,7 @@ class VariantWithStatus(BaseModel):
     status: Literal["IN_STOCK", "OUT_OF_STOCK"]
 
 
-class Product(BaseModel):
+class Product(BM):
     name: str = Field(..., min_length=1, description="Name is required")
     description: str = Field(..., min_length=1, description="Description is required")
     brand_ids: Optional[List[int]] = None
@@ -128,7 +128,7 @@ class Facets(BaseModel):
     categories: dict[str, int]
     collections: dict[str, int]
 
-class Products(BM):
+class Products(BaseModel):
     products: List[Product]
     facets: Facets
     page: int

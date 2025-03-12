@@ -11,7 +11,7 @@ from app.core import security
 from app.core.config import settings
 from app.core.logging import logger
 from app.models.user import User
-from app.models.token import TokenPayload
+from app.models.generic import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
 from app.prisma_client import prisma
@@ -27,9 +27,7 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 
 # SessionDep = Annotated[Session, Depends(get_db)]
-# TokenDep = Annotated[str, Depends(reusable_oauth2)]
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
-
 
 CacheService = Annotated[CacheService, Depends(get_cache_service)]
 
@@ -59,7 +57,7 @@ async def get_current_user(access_token: TokenDep, cache: CacheService) -> User:
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-    if not user.is_active:
+    if user.status == "inactive":
         raise HTTPException(status_code=400, detail="Inactive user")
     return user
 

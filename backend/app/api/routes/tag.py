@@ -13,10 +13,9 @@ from fastapi import (
 from math import ceil
 from prisma.errors import PrismaError
 
-from app.core import crud
 from app.core.deps import get_current_user
 from app.core.logging import logger
-from app.models.message import Message
+from app.models.generic import Message
 from app.models.tag import (
     Search,
     TagCreate,
@@ -24,7 +23,7 @@ from app.models.tag import (
     Tag,
     TagUpdate,
 )
-from app.services.export import export, process_file, validate_file
+from app.services.export import export, validate_file
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 
@@ -152,7 +151,7 @@ async def upload_tags(
     await validate_file(file=file)
 
     contents = await file.read()
-    background_tasks.add_task(process_file, contents, task_id, db, crud.tag.bulk_upload)
+    background_tasks.add_task(process_file, contents, task_id, db)
     return {"batch": batch, "message": "File upload started"}
 
 

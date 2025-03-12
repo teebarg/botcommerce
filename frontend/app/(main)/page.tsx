@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import React from "react";
 import { Commerce, Deal, Location, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
-import { imgSrc } from "@lib/util/util";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
@@ -215,7 +214,13 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-fixed bg-center" style={{ backgroundImage: `url(${imgSrc("banners%2Fhero-contact.jpg")})` }}>
+                <div
+                    className="bg-fixed bg-center"
+                    style={{
+                        backgroundImage:
+                            'url("https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fhero-contact.jpg?alt=media")',
+                    }}
+                >
                     <div className="flex items-center h-full">
                         <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
                             <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/50 text-gray-100 p-4 sm:p-8 rounded-lg">

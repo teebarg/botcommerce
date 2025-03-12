@@ -11,7 +11,7 @@ from app.models.generic import UploadStatus
 upload_statuses: dict[str, UploadStatus] = {}
 
 
-async def process_file(file, task_id: str, db, upload_func):
+async def process_file(file, task_id: str, db, upload_func = None):
     logger.debug("Processing file")
     # chunk_size = 100
     # try:

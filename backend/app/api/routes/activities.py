@@ -5,7 +5,7 @@ from app.api.routes.websocket import manager
 from app.core.deps import CurrentUser
 from app.core.logging import logger
 from app.models.activities import Activities, ActivityCreate, Activity
-from app.models.message import Message
+from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 
@@ -35,18 +35,14 @@ async def log_activity(user: CurrentUser, activity: ActivityCreate):
 
 
 # Get recent activities for a user
-@router.get("/", response_model=Activities)
+@router.get("/")
 # @cache(key="activities")
 async def get_recent_activities(user: CurrentUser, limit: int = 10):
     activities = await db.activitylog.find_many(
         where={"user_id": user.id},
-        limit=limit
+        take=limit
     )
     return activities
-    # activities = crud.activities.get_activity_logs_by_user(
-    #     db=db, user_id=user.id, limit=limit
-    # )
-    # return Activities(activities=activities)
 
 
 @router.delete("/{activity_id}", response_model=Message)

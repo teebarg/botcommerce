@@ -12,7 +12,7 @@ from app.models.address import (
     AddressUpdate,
 )
 from app.models.address import Address, Addresses
-from app.models.message import Message
+from app.models.generic import Message
 from app.prisma_client import prisma as db
 from math import ceil
 from prisma.errors import PrismaError
@@ -98,7 +98,7 @@ async def set_billing_address(user: CurrentUser, address: AddressCreate) -> Addr
                 data=address.model_dump()
             )
             return update
-        
+
         address = await db.address.create(
             data={
                 **address.model_dump(),
@@ -125,7 +125,7 @@ async def update(
     )
     if not existing:
         raise HTTPException(status_code=404, detail="Address not found")
-    
+
     if not user.is_superuser and user.id != existing.user_id:
         raise HTTPException(
             status_code=401, detail="Unauthorized to access this address."

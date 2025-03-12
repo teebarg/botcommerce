@@ -11,10 +11,17 @@ import { useSnackbar } from "notistack";
 
 import { CategoryForm } from "./category-form";
 
-import Dropdown from "@/components/ui/dropdown";
 import { cn } from "@/lib/util/cn";
 import { Category } from "@/lib/models";
 import { deleteCategory } from "@/actions/category";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Props {
     canAdd?: boolean;
@@ -59,35 +66,33 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                         <Plus />
                     </button>
                 )}
-                <Dropdown align="end" trigger={<EllipsisHorizontal />}>
-                    <div>
-                        <div className="bg-default-100 rounded-lg shadow-md p-3 min-w-[100px] text-sm font-medium">
-                            <div className="mb-2">
-                                <button aria-label="edit category" className="flex w-full items-center" onClick={editModal}>
-                                    <span className="mr-2">
-                                        <PencilSquare />
-                                    </span>
-                                    <span>Edit</span>
-                                </button>
-                            </div>
-                            <div>
-                                <button
-                                    aria-label="delete catrgory"
-                                    className={cn("flex w-full items-center text-rose-500", {
-                                        "pointer-events-none select-none opacity-50": category?.children.length > 0,
-                                    })}
-                                    disabled={category?.children.length > 0}
-                                    onClick={deleteModalState.open}
-                                >
-                                    <span className="mr-2">
-                                        <Trash />
-                                    </span>
-                                    <span>Delete</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </Dropdown>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <EllipsisHorizontal />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={editModal}>
+                            <PencilSquare className="mr-2" />
+                            Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <button
+                                aria-label="delete catrgory"
+                                className={cn("flex w-full items-center text-rose-500", {
+                                    "pointer-events-none select-none opacity-50": category?.children.length > 0,
+                                })}
+                                disabled={category?.children.length > 0}
+                                onClick={deleteModalState.open}
+                            >
+                                <span className="mr-2">
+                                    <Trash />
+                                </span>
+                                <span>Delete</span>
+                            </button>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
             {slideOverState.isOpen && (
                 <SlideOver

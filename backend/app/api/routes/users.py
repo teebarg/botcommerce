@@ -7,7 +7,7 @@ from app.core.deps import (
 )
 from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists
-from app.models.message import Message
+from app.models.generic import Message
 from app.models.user import UserUpdateMe, User
 from app.models.wishlist import WishlistCreate
 from app.prisma_client import prisma as db
@@ -50,7 +50,7 @@ async def update_user_me(
     if user_in.email:
         existing = await db.user.find_unique(
             where={
-                "email": user_in.email, 
+                "email": user_in.email,
                 "NOT": {
                     id: user.id
                 }
@@ -94,10 +94,6 @@ async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser):
         return favorite
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    # result = crud.user.create_wishlist_item(db=db, item=item, user_id=user.id)
-    # # Invalidate cache
-    # cache.delete(f"wishlist:{user.id}")
-    # return result
 
 
 @router.delete("/wishlist/{product_id}", response_model=Message)

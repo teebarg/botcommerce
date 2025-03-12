@@ -9,7 +9,7 @@ from app.models.config import (
     SiteConfigs,
     SiteConfigUpdate,
 )
-from app.models.message import Message
+from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from math import ceil
