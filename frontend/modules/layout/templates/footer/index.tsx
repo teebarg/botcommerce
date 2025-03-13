@@ -52,7 +52,8 @@ export default async function Footer() {
         return <ServerError />;
     }
     const { collections } = res;
-    const { categories: cat } = await api.category.all({ limit: 100 });
+    const catRes = await api.category.all({ limit: 100 });
+    const { categories: cat } = catRes.data ?? {};
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (

@@ -45,9 +45,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         return (
             <Comp
                 className={cn(
-                    buttonVariants({ variant, size, className }),
                     "relative flex items-center justify-center",
-                    isLoading && "opacity-50 cursor-not-allowed"
+                    isLoading && "opacity-50 cursor-not-allowed",
+                    buttonVariants({ variant, size, className })
                 )}
                 ref={ref}
                 disabled={isLoading || props.disabled}

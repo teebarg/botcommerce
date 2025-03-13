@@ -9,10 +9,11 @@ import { cn } from "@/lib/util/cn";
 import { siteConfig } from "@/lib/config";
 import ProgressBar from "@/components/ui/progress-bar";
 import { auth } from "@/actions/auth";
+import { Toaster } from "sonner";
 
 const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
-const NotificationProviders = dynamic(() => import("./notistack-providers"));
-const OverlayClientProvider = dynamic(() => import("./overlay-providers"));
+// const NotificationProviders = dynamic(() => import("./notistack-providers"));
+// const OverlayClientProvider = dynamic(() => import("./overlay-providers"));
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -61,16 +62,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </head>
             <body className="min-h-screen bg-background">
                 <ProgressBar className="h-1 bg-primary">
-                    <NotificationProviders>
-                        <OverlayClientProvider>
-                            <div className="relative flex flex-col min-h-screen">
-                                <PushNotificationManager />
-                                <InstallPrompt />
-                                {children}
-                            </div>
-                            {/* {!user && <Google />} */}
-                        </OverlayClientProvider>
-                    </NotificationProviders>
+                    {/* <NotificationProviders>
+                        <OverlayClientProvider> */}
+                    <div className="relative flex flex-col min-h-screen">
+                        <PushNotificationManager />
+                        <InstallPrompt />
+                        <Toaster position="top-right" richColors expand={false} duration={10000} closeButton />
+                        {children}
+                    </div>
+                    {/* {!user && <Google />} */}
+                    {/* </OverlayClientProvider>
+                    </NotificationProviders> */}
                 </ProgressBar>
             </body>
         </html>

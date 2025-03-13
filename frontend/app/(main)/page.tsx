@@ -28,12 +28,14 @@ const fetchProducts = async (collection: string, limit: number = 4) => {
 
 export default async function Home() {
     const user = await auth();
-    const [trending, latest, featured, { categories }] = await Promise.all([
+    const [trending, latest, featured, catRes] = await Promise.all([
         fetchProducts("trending"),
         fetchProducts("latest"),
         fetchProducts("featured", 6),
         api.category.all({ limit: 100 }),
     ]);
+
+    const { categories } = catRes.data ?? {};
 
     let wishlist: WishItem[] = [];
 

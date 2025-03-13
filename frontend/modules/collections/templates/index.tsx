@@ -43,7 +43,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
 
     const { brands } = brandRes;
     const { collections } = collectionsRes;
-    const { categories: cat } = catRes;
+    const { categories: cat } = catRes.data ?? {};
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
     let wishlist: WishItem[] = [];
@@ -91,7 +91,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                 <div className="px-4 my-6 md:hidden">
                     <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
-                        {cat.map((category: Category, index: number) => (
+                        {cat?.map((category: Category, index: number) => (
                             <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                 {category.name}
                             </BtnLink>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useActionState, useRef } from "react";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 
@@ -9,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Category } from "@/lib/models";
 import { mutateCategory } from "@/actions/category";
+import { toast } from "sonner";
 
 interface Props {
     current?: Category;
@@ -27,7 +27,6 @@ const CategoryForm = forwardRef<ChildRef, Props>(
         const router = useRouter();
         const isCreate = type === "create";
 
-        const { enqueueSnackbar } = useSnackbar();
         const [state, formAction, isPending] = useActionState(mutateCategory, {
             success: false,
             message: "",
@@ -38,14 +37,15 @@ const CategoryForm = forwardRef<ChildRef, Props>(
 
         React.useEffect(() => {
             if (state.success) {
-                enqueueSnackbar(state.message || "Category created successfully", { variant: "success" });
+                toast.success(state.message || "Category created successfully");
                 // Leave the slider open and clear form
                 if (formRef.current) {
                     formRef.current.reset();
                     router.refresh();
                 }
+                onClose?.();
             }
-        }, [state.success, state.message, enqueueSnackbar]);
+        }, [state.success, state.message]);
 
         return (
             <React.Fragment>

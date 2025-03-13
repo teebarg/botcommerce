@@ -37,18 +37,10 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
                         </p>
                     </div>
                     <div className="flex justify-end gap-2 mt-8">
-                        <Button aria-label="submit" className="min-w-36" color="default" variant="shadow" onClick={onClose}>
+                        <Button aria-label="submit" className="min-w-36" variant="outline" onClick={onClose}>
                             Close
                         </Button>
-                        <Button
-                            aria-label="submit"
-                            className="min-w-36"
-                            color="danger"
-                            isLoading={isPending}
-                            type="submit"
-                            variant="shadow"
-                            onClick={onSubmit}
-                        >
+                        <Button aria-label="submit" className="min-w-36" isLoading={isPending} type="submit" variant="destructive" onClick={onSubmit}>
                             Delete
                         </Button>
                     </div>

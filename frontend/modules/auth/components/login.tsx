@@ -12,20 +12,18 @@ import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/actions/auth";
+import { toast } from "sonner";
 
 type Props = {};
 
 const LoginForm: React.FC<Props> = () => {
     const [show, setShow] = useState<boolean>(false);
-    const { enqueueSnackbar } = useSnackbar();
+    // const { enqueueSnackbar } = useSnackbar();
     const [state, formAction, isPending] = useActionState(signIn, null);
 
     useWatch(state, () => {
         if (state?.error) {
-            enqueueSnackbar(state.message, {
-                variant: "error",
-            });
-
+            toast.error(state.message);
             return;
         }
         redirect("/");
@@ -54,7 +52,7 @@ const LoginForm: React.FC<Props> = () => {
                         type={show ? "text" : "password"}
                     />
                 </div>
-                <Button aria-label="sign in" className="w-full mt-6" data-testid="sign-in-button" isLoading={isPending} size="md" type="submit">
+                <Button aria-label="sign in" className="w-full mt-6" data-testid="sign-in-button" isLoading={isPending} size="lg" type="submit">
                     Sign in
                 </Button>
             </form>

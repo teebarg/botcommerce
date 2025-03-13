@@ -50,7 +50,7 @@ export default async function ProductsPage({ searchParams }: ProductPageProps) {
     const { products, ...pagination } = productsResponse;
     const { brands } = brandRes;
     const { collections } = collectionsRes;
-    const { categories } = catRes;
+    const { categories } = catRes.data ?? {};
 
     const deleteProduct = async (id: string) => {
         "use server";
