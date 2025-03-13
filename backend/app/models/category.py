@@ -12,6 +12,7 @@ class Category(CategoryBase):
     id: int
     slug: str = Field(..., min_length=1)
     parent: Optional[list["Category"]] = None
+    parent_id: Optional[int] = None
     subcategories: Optional[list["Category"]] = None
 
 

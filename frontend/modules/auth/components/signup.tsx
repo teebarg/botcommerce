@@ -31,13 +31,13 @@ const SignUpForm: React.FC<Props> = () => {
             <form action={formAction} className="w-full flex flex-col">
                 <div className="flex flex-col w-full gap-y-2">
                     <div className="flex flex-col md:flex-row gap-2">
-                        <Input isRequired autoComplete="given-name" data-testid="first-name-input" label="First name" name="first_name" />
-                        <Input isRequired autoComplete="family-name" data-testid="last-name-input" label="Last name" name="last_name" />
+                        <Input required autoComplete="given-name" data-testid="first-name-input" label="First name" name="first_name" />
+                        <Input required autoComplete="family-name" data-testid="last-name-input" label="Last name" name="last_name" />
                     </div>
-                    <Input isRequired autoComplete="email" data-testid="email-input" label="Email" name="email" type="email" />
+                    <Input required autoComplete="email" data-testid="email-input" label="Email" name="email" type="email" />
                     <div className="flex flex-col md:flex-row gap-2">
                         <Input autoComplete="tel" data-testid="phone-input" label="Phone" name="phone" type="tel" />
-                        <Input isRequired autoComplete="new-password" data-testid="password-input" label="Password" name="password" type="password" />
+                        <Input required autoComplete="new-password" data-testid="password-input" label="Password" name="password" type="password" />
                     </div>
                 </div>
                 <span className="text-center text-default-500 text-xs mt-6">

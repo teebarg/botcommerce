@@ -35,9 +35,9 @@ const LoginForm: React.FC<Props> = () => {
         <React.Fragment>
             <form action={formAction} className="w-full">
                 <div className="flex flex-col w-full gap-y-4">
-                    <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
+                    <Input required data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
                     <Input
-                        isRequired
+                        required
                         data-testid="password-input"
                         endContent={
                             <button

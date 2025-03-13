@@ -52,7 +52,7 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
                             <div className="space-y-8 ">
                                 <input readOnly className="hidden" name="type" type="text" value={type} />
                                 <input readOnly className="hidden" name="id" type="text" value={current.id} />
-                                <Input isRequired defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
+                                <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
                                 <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
                             </div>
                         </div>

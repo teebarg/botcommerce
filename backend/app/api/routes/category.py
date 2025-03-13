@@ -47,7 +47,6 @@ async def index(
         include={"subcategories": True}
     )
     total = await db.category.count(where=where_clause)
-    # return Categories(categories=categories, page=page, limit=limit, total_pages=ceil(total/limit), total_count=total)
     return {
         "categories":categories,
         "page":page,

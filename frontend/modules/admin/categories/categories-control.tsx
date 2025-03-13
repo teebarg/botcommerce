@@ -14,14 +14,7 @@ import { CategoryForm } from "./category-form";
 import { cn } from "@/lib/util/cn";
 import { Category } from "@/lib/models";
 import { deleteCategory } from "@/actions/category";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface Props {
     canAdd?: boolean;
@@ -72,22 +65,22 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={editModal}>
-                            <PencilSquare className="mr-2" />
-                            Edit
+                        <DropdownMenuItem>
+                            <button aria-label="edit category" className="flex w-full items-center" onClick={editModal}>
+                                <PencilSquare className="mr-2" />
+                                <span>Edit</span>
+                            </button>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                             <button
                                 aria-label="delete catrgory"
                                 className={cn("flex w-full items-center text-rose-500", {
-                                    "pointer-events-none select-none opacity-50": category?.children.length > 0,
+                                    "pointer-events-none select-none opacity-50": Boolean(category?.subcategories?.length),
                                 })}
-                                disabled={category?.children.length > 0}
+                                disabled={Boolean(category?.subcategories?.length)}
                                 onClick={deleteModalState.open}
                             >
-                                <span className="mr-2">
-                                    <Trash />
-                                </span>
+                                <Trash className="mr-2" />
                                 <span>Delete</span>
                             </button>
                         </DropdownMenuItem>
