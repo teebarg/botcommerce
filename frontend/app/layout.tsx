@@ -2,18 +2,16 @@ import "public/globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import dynamic from "next/dynamic";
+import { Toaster } from "sonner";
 
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
 import { siteConfig } from "@/lib/config";
-import ProgressBar from "@/components/ui/progress-bar";
 import { auth } from "@/actions/auth";
-import { Toaster } from "sonner";
+import { ProgressBar } from "@/components/ui/progress-bar";
 
 const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
-// const NotificationProviders = dynamic(() => import("./notistack-providers"));
-// const OverlayClientProvider = dynamic(() => import("./overlay-providers"));
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
 
@@ -57,22 +55,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
                 <link href="/favicon.ico" rel="shortcut icon" />
                 <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
-                <meta content="Botmerce" name="apple-mobile-web-app-title" />
+                <meta content="Botcommerce" name="apple-mobile-web-app-title" />
                 <link href="/site.webmanifest" rel="manifest" />
             </head>
             <body className="min-h-screen bg-background">
                 <ProgressBar className="h-1 bg-primary">
-                    {/* <NotificationProviders>
-                        <OverlayClientProvider> */}
                     <div className="relative flex flex-col min-h-screen">
                         <PushNotificationManager />
                         <InstallPrompt />
-                        <Toaster position="top-right" richColors expand={false} duration={10000} closeButton />
+                        <Toaster closeButton richColors duration={10000} expand={false} position="top-right" />
                         {children}
                     </div>
                     {/* {!user && <Google />} */}
-                    {/* </OverlayClientProvider>
-                    </NotificationProviders> */}
                 </ProgressBar>
             </body>
         </html>

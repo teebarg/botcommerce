@@ -1,64 +1,29 @@
-import React from "react";
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/util/cn";
 
-interface BadgeProps {
-    children: React.ReactNode;
-    content?: React.ReactNode | string;
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
-    placement?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
-    size?: "sm" | "md" | "lg";
-    isBordered?: boolean;
+const badgeVariants = cva(
+    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    {
+        variants: {
+            variant: {
+                default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+                secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+                outline: "text-foreground",
+            },
+        },
+        defaultVariants: {
+            variant: "default",
+        },
+    }
+);
+
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+    return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
 }
 
-const Badge: React.FC<BadgeProps> = ({ children, content, isBordered = false, color = "primary", placement = "bottom-right", size = "sm" }) => {
-    const cssClass = {
-        default: "bg-default text-default-foreground",
-        primary: "bg-primary text-primary-foreground",
-        secondary: "bg-secondary text-secondary-foreground",
-        danger: "bg-danger text-danger-foreground",
-        warning: "bg-warning text-warning-foreground",
-        success: "bg-success text-success-foreground",
-    };
-
-    return (
-        <React.Fragment>
-            <div className="relative inline-flex shrink-0">
-                <span
-                    className={cn(
-                        "flex relative justify-center items-center box-border overflow-hidden align-middle z-0 outline-none rounded-xl",
-                        {
-                            "ring-2 ring-offset-2 ring-offset-background dark:ring-offset-background-dark ring-success": isBordered,
-                            "w-10 h-10": size == "sm",
-                            "w-12 h-12": size == "md",
-                            "w-14 h-14": size == "lg",
-                        },
-                        cssClass[color]
-                    )}
-                >
-                    {children}
-                </span>
-                <span
-                    className={cn(
-                        "flex z-10 flex-wrap absolute box-border rounded-full whitespace-nowrap place-content-center origin-center",
-                        "items-center select-none px-0 border-2 border-background",
-                        {
-                            "text-xs w-4 h-4 min-w-4 min-h-4": size == "sm",
-                            "text-sm w-5 h-5 min-w-5 min-h-5": size == "md",
-                            "text-sm w-6 h-6 min-w-6 min-h-6": size == "lg",
-                            "top-[5%] right-[5%] translate-x-1/2 -translate-y-1/2": placement == "top-right",
-                            "bottom-[5%] right-[5%] translate-x-1/2 translate-y-1/2": placement == "bottom-right",
-                            "top-[5%] left-[5%] -translate-x-1/2 -translate-y-1/2": placement == "top-left",
-                            "bottom-[5%] left-[5%] -translate-x-1/2 translate-y-1/2": placement == "bottom-left",
-                        },
-                        cssClass[color]
-                    )}
-                >
-                    {content}
-                </span>
-            </div>
-        </React.Fragment>
-    );
-};
-
-export { Badge };
+export { Badge, badgeVariants };

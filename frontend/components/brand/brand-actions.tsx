@@ -1,85 +1,65 @@
 "use client";
 
+import { PencilSquare } from "nui-react-icons";
 import React, { useState } from "react";
-import { PencilSquare, Plus, Trash } from "nui-react-icons";
 import { useOverlayTriggerState } from "react-stately";
 import { useRouter } from "next/navigation";
+import { Trash } from "nui-react-icons";
 import { toast } from "sonner";
 
-import { CategoryForm } from "./category-form";
-
-import { Category } from "@/lib/models";
-import { deleteCategory } from "@/actions/category";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { BrandForm } from "@/modules/admin/brands/brand-form";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 
 interface Props {
-    canAdd?: boolean;
-    category?: Category;
+    item: any;
+    deleteAction: (id: number) => void;
 }
 
-const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
-    const deleteState = useOverlayTriggerState({});
-    const state = useOverlayTriggerState({});
-    const editState = useOverlayTriggerState({});
+const Actions: React.FC<Props> = ({ item, deleteAction }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
+    const deleteState = useOverlayTriggerState({});
+    const editState = useOverlayTriggerState({});
     const router = useRouter();
 
     const onConfirmDelete = async () => {
-        if (!category) {
-            return;
-        }
         try {
             setIsPending(true);
-            await deleteCategory(category.id!);
+            await deleteAction(item.id);
             router.refresh();
             deleteState.close();
         } catch (error) {
-            toast.error("Error deleting category");
+            toast.error("Error deleting brand");
+            setIsPending(false);
         }
     };
 
     return (
         <React.Fragment>
-            <div className="flex items-center gap-2">
-                {canAdd && (
-                    <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
-                        <DrawerTrigger>
-                            <Plus />
-                        </DrawerTrigger>
-                        <DrawerContent className="px-8">
-                            <DrawerHeader>
-                                <DrawerTitle>Add SubCat to {category?.name}</DrawerTitle>
-                            </DrawerHeader>
-                            <div className="max-w-2xl">
-                                <CategoryForm hasParent parent_id={category?.id} onClose={state.close} />
-                            </div>
-                        </DrawerContent>
-                    </Drawer>
-                )}
+            <div className="relative flex items-center gap-2">
                 <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
                     <DrawerTrigger>
                         <PencilSquare />
                     </DrawerTrigger>
                     <DrawerContent className="px-8">
                         <DrawerHeader>
-                            <DrawerTitle>Edit {category?.name}</DrawerTitle>
+                            <DrawerTitle>Edit {item.name}</DrawerTitle>
                         </DrawerHeader>
                         <div className="max-w-2xl">
-                            <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
+                            <BrandForm current={item} type="update" onClose={editState.close} />
                         </div>
                     </DrawerContent>
                 </Drawer>
                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                     <DialogTrigger>
-                        <Trash />
+                        <Trash className="text-red-500" />
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Delete Category</DialogTitle>
+                            <DialogTitle>Delete {item.name}</DialogTitle>
                         </DialogHeader>
-                        <p>Are you sure you want to delete this category?</p>
+                        <p>Are you sure you want to delete {item.name}?</p>
                         <DialogFooter>
                             <Button aria-label="close" className="min-w-36" variant="outline" onClick={deleteState.close}>
                                 Close
@@ -95,4 +75,4 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
     );
 };
 
-export default CategoryAction;
+export { Actions };

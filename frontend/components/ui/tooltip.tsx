@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@lib/util/cn";
 import React, { useState, useRef, useEffect } from "react";
 
