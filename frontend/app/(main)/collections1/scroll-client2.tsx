@@ -21,6 +21,7 @@ import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
 import ProductCard from "@/components/product/product-card";
 import { set } from "lodash";
 import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
 interface SearchParams {
     page?: number;
@@ -191,7 +192,18 @@ export default function InfiniteScrollClient({
                                     {/* {JSON.stringify(products)} */}
                                     <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
                                         {products.map((product: Product, index: number) => (
-                                            <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
+                                            <motion.div
+                                                key={index}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{
+                                                    duration: 0.4,
+                                                    ease: [0.25, 0.25, 0, 1],
+                                                    delay: index * 0.1,
+                                                }}
+                                            >
+                                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
+                                            </motion.div>
                                         ))}
                                     </div>
                                 </div>
