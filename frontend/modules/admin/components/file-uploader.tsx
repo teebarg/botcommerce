@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useWebSocket } from "@lib/hooks/use-websocket";
-import { ProgressBar } from "@modules/common/components/progress-bar";
 
 import { DragNDrop } from "./drag-drop";
 
 import { Button } from "@/components/ui/button";
+import Progress from "@/components/ui/progress";
 
 interface Props {
     onUpload: (formData: FormData) => void;
@@ -74,7 +74,7 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
                     color="secondary"
                     disabled={status || currentMessage?.status == "processing"}
                     isLoading={status || currentMessage?.status == "processing"}
-                    variant="shadow"
+                    variant="outline"
                     onClick={() => handleSubmit()}
                 >
                     {currentStatus()}
@@ -82,9 +82,9 @@ const Excel: React.FC<Props> = ({ onUpload, wsUrl }) => {
             </div>
             <div className="mt-8">
                 {wsMessages && (
-                    <ProgressBar
+                    <Progress
                         aria-label="Downloading..."
-                        label={`progress: ${currentMessage?.processed_rows || 0} / ${currentMessage?.total_rows || 0} rows`}
+                        // label={`progress: ${currentMessage?.processed_rows || 0} / ${currentMessage?.total_rows || 0} rows`}
                         value={(currentMessage?.processed_rows / currentMessage?.total_rows) * 100 || 0}
                     />
                 )}

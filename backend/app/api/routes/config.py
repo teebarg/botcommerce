@@ -1,136 +1,130 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import func, select
 
-from app.core import crud
 from app.core.decorators import cache
-from app.core.deps import CacheService, SessionDep
-from app.core.logging import logger
 from app.models.config import (
     SiteConfig,
     SiteConfigCreate,
     SiteConfigs,
     SiteConfigUpdate,
 )
-from app.models.message import Message
+from app.models.generic import Message
+from prisma.errors import PrismaError
+from app.prisma_client import prisma as db
+from math import ceil
 
 router = APIRouter()
 
+
 @router.get("/site-config", response_model=dict[str, str])
 @cache(key="configs")  # Cache for 24hrs
-async def site_config(
-    db: SessionDep,
-) -> Any:
+async def site_config() -> Any:
     """
     Retrieve site configuration.
     """
-    return crud.siteconfig.configs(db=db)
+    configs = await db.siteconfig.find_many()
+    return configs
 
 
-@router.get(
-    "/",
-    dependencies=[],
-)
-@cache(key="configs")  # Cache for 24hrs
+@router.get("/")
+# @cache(key="configs")  # Cache for 24hrs
 async def index(
-    db: SessionDep,
     skip: int = 0, limit: int = 20
 ) -> SiteConfigs:
     """
     Retrieve configs with Redis caching.
     """
-    count_statement = select(func.count()).select_from(SiteConfig)
-    count = db.exec(count_statement).one()
-    statement = select(SiteConfig).offset(skip).limit(limit)
-    items = db.exec(statement).all()
-
-
-    pages = (count // limit) + (count % limit > 0)
-
-    return SiteConfigs(
-        configs=items,
-        page=skip,
-        limit=limit,
-        total_pages=pages,
-        total_count=count,
+    configs = await db.siteconfig.find_many(
+        skip=skip,
+        take=limit,
+        order={"created_at": "desc"},
     )
+    total = await db.siteconfig.count()
+    return {
+        "configs": configs,
+        "page": skip,
+        "limit": limit,
+        "total_pages": ceil(total/limit),
+        "total_count": total,
+    }
+
 
 @router.get("/{id}")
-@cache(key="config")  # Cache for 24hrs
-async def read(id: int, db: SessionDep) -> SiteConfig:
+# @cache(key="config")  # Cache for 24hrs
+async def read(id: int) -> SiteConfig:
     """
     Get a specific config by id with Redis caching.
     """
-    config = crud.siteconfig.get(db=db, id=id)
+    config = await db.siteconfig.find_unique(
+        where={"id": id}
+    )
     if not config:
         raise HTTPException(status_code=404, detail="Config not found")
 
     return config
 
+
 @router.post("/", response_model=SiteConfig)
 async def create(
     *,
-    db: SessionDep,
-    config_in: SiteConfigCreate,
-    cache: CacheService,
-) -> Any:
+    config_in: SiteConfigCreate
+) -> SiteConfig:
     """
     Create new site configuration.
     """
-    config = crud.siteconfig.get_by_key(db=db, key="key",value=config_in.key)
-    if config:
-        raise HTTPException(
-            status_code=400,
-            detail="The config already exists in the system.",
+    try:
+        config = await db.siteconfig.create(
+            data={
+                "key": config_in.key,
+                "value": config_in.value
+            }
         )
+        return config
+    except PrismaError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Database error: {str(e)}")
 
-    cache.invalidate("configs")
-    return crud.siteconfig.create(db=db, obj_in=config_in)
 
-
-@router.patch("/{id}", response_model=SiteConfig)
+@router.patch("/{id}")
 async def update(
-    *,
-    db: SessionDep,
-    id: str,
-    config_in: SiteConfigUpdate,
-    cache: CacheService,
-) -> Any:
+    id: int,
+    config_in: SiteConfigUpdate
+) -> SiteConfig:
     """
     Update site configuration.
     """
-    config = crud.siteconfig.get(db=db, id=id)
-    if not config:
-        raise HTTPException(status_code=404, detail="Site configuration not found")
+    existing = await db.siteconfig.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Config not found")
 
     try:
-        config = crud.siteconfig.update(db=db, db_obj=config, obj_in=config_in)
-        # Invalidate cache
-        cache.delete(f"config:{id}")
-        cache.invalidate("configs")
-        return config
-    except IntegrityError as e:
-        logger.error(f"Error updating config, {e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{e}",
-        ) from e
+        update = await db.siteconfig.update(
+            where={"id": id},
+            data=config_in.model_dump()
+        )
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
 @router.delete("/{id}")
-async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
+async def delete(id: int) -> Message:
     """
     Delete a config.
     """
-    config = crud.siteconfig.get(db=db, id=id)
-    if not config:
+    existing = await db.siteconfig.find_unique(
+        where={"id": id}
+    )
+    if not existing:
         raise HTTPException(status_code=404, detail="Config not found")
-    crud.siteconfig.remove(db=db, id=id)
-    # Invalidate cache
-    cache.delete(f"config:{id}")
-    cache.invalidate("configs")
-    return Message(message="Config deleted successfully")
+
+    try:
+        await db.siteconfig.delete(
+            where={"id": id}
+        )
+        return Message(message="Config deleted successfully")
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

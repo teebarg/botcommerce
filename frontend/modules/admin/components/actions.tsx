@@ -2,7 +2,7 @@
 
 import { Confirm } from "@modules/common/components/confirm";
 import { Modal } from "@modules/common/components/modal";
-import { Delete, EditIcon, Eye } from "nui-react-icons";
+import { Delete, Edit, Eye } from "nui-react-icons";
 import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { useSnackbar } from "notistack";
@@ -53,7 +53,7 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                 )}
                 <Tooltip content={`Edit ${label}`}>
                     <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
-                        <EditIcon onClick={() => slideOverState.open()} />
+                        <Edit onClick={() => slideOverState.open()} />
                     </span>
                 </Tooltip>
                 <Tooltip color="danger" content={`Delete ${label}`}>

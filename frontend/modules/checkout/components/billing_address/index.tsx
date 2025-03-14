@@ -39,7 +39,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
         <>
             <div className="grid grid-cols-2 gap-4">
                 <Input
-                    isRequired
+                    required
                     autoComplete="given-name"
                     data-testid="billing-first-name-input"
                     label="First name"
@@ -48,7 +48,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     onChange={(e) => handleChange(e, "billing_address.firstname")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="family-name"
                     data-testid="billing-last-name-input"
                     label="Last name"
@@ -57,7 +57,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     onChange={(e) => handleChange(e, "billing_address.last_name")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="address-line1"
                     data-testid="billing-address-input"
                     label="Address"
@@ -74,7 +74,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     onChange={(e) => handleChange(e, "billing_address.company")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="postal-code"
                     data-testid="billing-postal-input"
                     label="Postal code"
@@ -83,7 +83,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     onChange={(e) => handleChange(e, "billing_address.postal_code")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="address-level2"
                     data-testid="billing-city-input"
                     label="City"

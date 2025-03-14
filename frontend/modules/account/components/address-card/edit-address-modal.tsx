@@ -101,7 +101,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                             <div className="grid grid-cols-1 gap-y-2 w-full py-2">
                                 <div className="grid grid-cols-2 gap-x-2">
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="given-name"
                                         data-testid="first-name-input"
                                         defaultValue={address.firstname || undefined}
@@ -109,7 +109,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         name="firstname"
                                     />
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="family-name"
                                         data-testid="last-name-input"
                                         defaultValue={address.lastname || undefined}
@@ -118,7 +118,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                     />
                                 </div>
                                 <Input
-                                    isRequired
+                                    required
                                     autoComplete="address-line1"
                                     data-testid="address-1-input"
                                     defaultValue={address.address_1 || undefined}
@@ -134,7 +134,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                                 <div className="grid grid-cols-[144px_1fr] gap-x-2">
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="postal-code"
                                         data-testid="postal-code-input"
                                         defaultValue={address.postal_code || undefined}
@@ -143,7 +143,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         type="number"
                                     />
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="locality"
                                         data-testid="city-input"
                                         defaultValue={address.city || undefined}

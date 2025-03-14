@@ -4,91 +4,86 @@ from fastapi import (
     HTTPException,
     Query,
 )
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import func, or_, select
 
-from app.core import crud
-from app.core.decorators import cache
-from app.core.deps import (
-    CacheService,
-    SessionDep,
-    get_current_user,
-)
+from app.core.deps import get_current_user
 from app.core.logging import logger
 from app.models.brand import (
     BrandCreate,
-    BrandPublic,
+    Brand,
     Brands,
     BrandUpdate,
 )
-from app.models.generic import Brand
-from app.models.message import Message
+from app.models.generic import Message
+from app.prisma_client import prisma as db
+from math import ceil
+from app.core.utils import slugify
+from prisma.errors import PrismaError
 
 # Create a router for brands
 router = APIRouter()
 
 
 @router.get("/")
-@cache(key="brands")
+# @cache(key="brands")
 async def index(
-    db: SessionDep,
-    name: str = "",
+    query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
 ) -> Brands:
     """
     Retrieve brands with Redis caching.
     """
-    query = {"name": name}
-    filters = crud.brand.build_query(query)
-
-    count_statement = select(func.count()).select_from(Brand)
-    if filters:
-        count_statement = count_statement.where(or_(*filters))
-    total_count = db.exec(count_statement).one()
-
-    brands = crud.brand.get_multi(
-        db=db,
-        filters=filters,
-        limit=limit,
-        offset=(page - 1) * limit,
+    # Define the where clause based on query parameter
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    brands = await db.brand.find_many(
+        where=where_clause,
+        skip=(page - 1) * limit,
+        take=limit,
+        order={"created_at": "desc"},
     )
-
-    total_pages = (total_count // limit) + (total_count % limit > 0)
-
-    return Brands(
-        brands=brands,
-        page=page,
-        limit=limit,
-        total_pages=total_pages,
-        total_count=total_count,
-    )
+    total = await db.brand.count(where=where_clause)
+    return {
+        "brands":brands,
+        "page":page,
+        "limit":limit,
+        "total_pages":ceil(total/limit),
+        "total_count":total,
+    }
 
 
 @router.post("/")
-async def create(*, db: SessionDep, create_data: BrandCreate, cache: CacheService) -> BrandPublic:
+async def create(*, create_data: BrandCreate) -> Brand:
     """
     Create new brand.
     """
-    brand = crud.brand.get_by_key(db=db, value=create_data.name)
-    if brand:
-        raise HTTPException(
-            status_code=400,
-            detail="The brand already exists in the system.",
+    try:
+        brand = await db.brand.create(
+            data={
+                **create_data.model_dump(),
+                "slug": slugify(create_data.name)
+            }
         )
-
-    brand = crud.brand.create(db=db, obj_in=create_data)
-    cache.invalidate("brands")
-    return brand
+        return brand
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{id}")
-@cache(key="brand", hash=False)
-async def read(id: int, db: SessionDep) -> BrandPublic:
+# @cache(key="brand", hash=False)
+async def read(id: int):
     """
     Get a specific brand by id with Redis caching.
     """
-    brand = crud.brand.get(db=db, id=id)
+    brand = await db.brand.find_unique(
+        where={"id": id}
+    )
     if not brand:
         raise HTTPException(status_code=404, detail="Brand not found")
 
@@ -96,12 +91,14 @@ async def read(id: int, db: SessionDep) -> BrandPublic:
 
 
 @router.get("/slug/{slug}")
-@cache(key="brand", hash=False)
-async def get_by_slug(slug: str, db: SessionDep) -> Brand:
+# @cache(key="brand", hash=False)
+async def get_by_slug(slug: str) -> Brand:
     """
-    Get a collection by its slug.
+    Get a brand by its slug.
     """
-    brand = crud.collection.get_by_key(db=db, key="slug", value=slug)
+    brand = await db.brand.find_unique(
+        where={"slug": slug}
+    )
     if not brand:
         raise HTTPException(status_code=404, detail="Brand not found")
 
@@ -114,49 +111,46 @@ async def get_by_slug(slug: str, db: SessionDep) -> Brand:
 )
 async def update(
     *,
-    db: SessionDep,
-    cache: CacheService,
     id: int,
     update_data: BrandUpdate,
-) -> BrandPublic:
+) -> Brand:
     """
     Update a brand and invalidate cache.
     """
-    brand = crud.brand.get(db=db, id=id)
-    if not brand:
-        raise HTTPException(
-            status_code=404,
-            detail="Brand not found",
-        )
+    existing = await db.brand.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Brand not found")
 
     try:
-        brand = crud.brand.update(db=db, db_obj=brand, obj_in=update_data)
-        # Invalidate cache
-        cache.delete(f"brand:{brand.slug}")
-        cache.delete(f"brand:{id}")
-        cache.invalidate("brands")
-        return brand
-    except IntegrityError as e:
-        logger.error(f"Error updating brand, {e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{e}",
-        ) from e
+        update = await db.brand.update(
+            where={"id": id},
+            data={
+                **update_data.model_dump(),
+                "slug": slugify(update_data.name)
+            }
+        )
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
+async def delete(id: int) -> Message:
     """
     Delete a brand.
     """
-    brand = crud.brand.get(db=db, id=id)
-    if not brand:
+    existing = await db.brand.find_unique(
+        where={"id": id}
+    )
+    if not existing:
         raise HTTPException(status_code=404, detail="Brand not found")
-    crud.brand.remove(db=db, id=id)
-    cache.delete(f"brand:{brand.slug}")
-    cache.delete(f"brand:{id}")
-    cache.invalidate("brands")
-    return Message(message="Brand deleted successfully")
+
+    try:
+        await db.brand.delete(
+            where={"id": id}
+        )
+        return Message(message="Brand deleted successfully")
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

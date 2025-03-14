@@ -40,13 +40,13 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                     <button
                                         aria-label="open"
                                         className="flex items-center"
-                                        disabled={item?.children.length == 0}
+                                        disabled={item?.subcategories?.length == 0}
                                         onClick={() => handleClick(item.id!)}
                                     >
                                         <ChevronRight
                                             className={cn("transition-transform duration-300 text-default-900", {
                                                 "rotate-90": open.includes(item.id!),
-                                                "!text-default-500": item?.children.length == 0,
+                                                "!text-default-500": item?.subcategories?.length == 0,
                                             })}
                                         />
                                     </button>
@@ -61,9 +61,9 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                 <CategoryAction category={item} />
                             </div>
                         </div>
-                        {item.children && open.includes(item.id!) && (
+                        {item.subcategories && open.includes(item.id!) && (
                             <ol className="mt-4 mb-4 block">
-                                {item.children?.map((sub: Category, index: number) => (
+                                {item.subcategories?.map((sub: Category, index: number) => (
                                     <li key={index} className="ml-10 min-h-10">
                                         <div className="flex items-center">
                                             <div className="flex w-[32px] items-center">

@@ -1,3 +1,5 @@
+import { Category } from "@/lib/models";
+
 export enum FileTypes {
     png = "image/png",
     jpeg = "image/jpeg",
@@ -47,3 +49,75 @@ export type IconProps = {
     color?: string;
     size?: string | number;
 } & React.SVGAttributes<SVGElement>;
+
+export type Pagination = {
+    total_count: number;
+    page: number;
+    limit: number;
+    total_pages: number;
+};
+
+export interface Review {
+    id: number;
+    rating: number;
+    comment: string;
+    verified: boolean;
+    product_id: number;
+    user_id: number;
+}
+
+export interface Order {
+    id: number;
+    user_id: number;
+}
+
+export interface OrderItem {
+    id: number;
+    order_id: number;
+    product_id: number;
+    quantity: number;
+}
+
+export interface ExtendedOrder extends Order {
+    order_items: OrderItem[];
+}
+
+export interface ExtendedOrderItem extends OrderItem {
+    product: Product;
+}
+
+export interface ProductImage {
+    id: number;
+    product_id: number;
+    image: string;
+}
+
+export interface Product {
+    id: number
+}
+
+export interface ProductVariant {
+    id: number;
+    product_id: number;
+    name: string;
+    price: number;
+}
+
+export interface ExtendedProduct extends Product {
+    categories: Category[];
+    variants: ProductVariant[];
+    images: ProductImage[];
+}
+
+
+export interface User {
+    id: number;
+    firstname: string;
+    lastname: string;
+}
+
+export interface ExtendedUser extends User {
+    reviews: Review[];
+    orders: Order[];
+}
+

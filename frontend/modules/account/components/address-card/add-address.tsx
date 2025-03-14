@@ -51,20 +51,20 @@ const AddAddress = () => {
                         <form action={formAction}>
                             <div className="flex flex-col gap-y-2 w-full py-4">
                                 <div className="grid md:grid-cols-2 gap-2">
-                                    <Input isRequired autoComplete="given-name" data-testid="first-name-input" label="First name" name="firstname" />
-                                    <Input isRequired autoComplete="family-name" data-testid="last-name-input" label="Last name" name="lastname" />
+                                    <Input required autoComplete="given-name" data-testid="first-name-input" label="First name" name="firstname" />
+                                    <Input required autoComplete="family-name" data-testid="last-name-input" label="Last name" name="lastname" />
                                 </div>
-                                <Input isRequired autoComplete="address-line1" data-testid="address-1-input" label="Address" name="address_1" />
+                                <Input required autoComplete="address-line1" data-testid="address-1-input" label="Address" name="address_1" />
                                 <Input autoComplete="address-line2" data-testid="address-2-input" label="Apartment, suite, etc." name="address_2" />
                                 <div className="grid grid-cols-[144px_1fr] gap-x-2">
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="postal-code"
                                         data-testid="postal-code-input"
                                         label="Postal code"
                                         name="postal_code"
                                     />
-                                    <Input isRequired autoComplete="locality" data-testid="city-input" label="City" name="city" />
+                                    <Input required autoComplete="locality" data-testid="city-input" label="City" name="city" />
                                 </div>
                                 <ComboBox data-testid="state-input" items={states} label="State" name="state" placeholder="Select State" />
                                 <Input autoComplete="phone" data-testid="phone-input" label="Phone" name="phone" />

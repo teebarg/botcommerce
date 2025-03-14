@@ -10,9 +10,17 @@ import { Session } from "@/lib/models";
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function verifyToken(token: string) {
-    const { payload } = await jwtVerify(token, secret);
-
-    return payload;
+    try {
+        if (!secret) {
+            throw new Error("JWT_SECRET environment variable is not defined");
+        }
+    
+        const { payload } = await jwtVerify(token, secret);
+        return payload;
+    } catch (error) {
+        console.error("Token verification failed: ", error);
+        return null;
+    }
 }
 
 export async function setSession(token: string) {
@@ -46,6 +54,7 @@ export async function auth(): Promise<Session | null> {
 
     try {
         const user = (await verifyToken(token)) as any;
+        if (!user) return null;
 
         return {
             id: user.id,

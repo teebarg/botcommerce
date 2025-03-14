@@ -1,19 +1,25 @@
-from sqlmodel import Field, SQLModel
-
-from app.models.base import BaseModel
-
-
-class WishlistBase(BaseModel):
-    name: str = Field(index=True)
-    description: str | None = ""
-    image: str | None = ""
+from app.models.base import BM
+from pydantic import BaseModel
 
 
-# Properties to receive via API on creation
-class WishlistCreate(SQLModel):
+class WishlistBase(BM):
     product_id: int
 
-
-# Properties to return via API, id is always required
-class WishlistPublic(WishlistBase):
+class Wishlist(WishlistBase):
     id: int
+
+
+class WishlistCreate(WishlistBase):
+    pass
+
+
+class WishlistUpdate(WishlistBase):
+    pass
+
+
+class Wishlists(BaseModel):
+    wishlists: list[Wishlist]
+
+
+class Search(BaseModel):
+    results: list[Wishlist]

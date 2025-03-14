@@ -12,7 +12,7 @@ import { Brand, Category, Collection, Facet } from "@/lib/models";
 interface ComponentProps {
     brands: Brand[];
     collections: Collection[];
-    categories: Category[];
+    categories?: Category[];
     facets?: Facet;
     searchParams?: {
         maxPrice?: string;
@@ -52,8 +52,8 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
     };
 
     return (
-        <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16">
-            <div className="h-full w-full max-w-sm rounded-xl p-6 bg-default-100">
+        <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[80vh] sticky top-16 bg-default-100 rounded-xl pb-8">
+            <div className="h-full w-full max-w-sm p-6">
                 <div>
                     <span className="text-sm">Collections</span>
                     <hr className="shrink-0 border-none w-full h-[1px] my-1 bg-default-100" />
@@ -78,7 +78,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                 <div className="flex flex-col mt-2">
                     <span className="mb-2">Categories</span>
                     {categories?.map((item: Category, index: number) => (
-                        <CheckboxGroup key={index} checkboxes={item.children} facets={facets} groupName={item.name} item={item} />
+                        <CheckboxGroup key={index} checkboxes={item.subcategories} facets={facets} groupName={item.name} item={item} />
                     ))}
                 </div>
                 <div className="flex flex-col mt-2">

@@ -15,6 +15,7 @@ import ReviewsSection from "@/components/product/product-reviews";
 import { Skeleton } from "@/components/skeleton";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
+import ProductShare from "@/components/product/product-share";
 
 type Params = Promise<{ slug: string }>;
 
@@ -97,7 +98,10 @@ export default async function ProductPage({ params }: { params: Params }) {
                             </div>
                         </div>
                         <div className="flex flex-col px-2 md:px-0 mt-6 md:mt-0">
-                            <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
+                            <div className="flex items-center justify-between">
+                                <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
+                                <ProductShare name={product.name} />
+                            </div>
                             <div className="my-2 flex items-center gap-2">
                                 <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
                             </div>
@@ -146,7 +150,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                     <ReviewsSection product={product} />
                 </Suspense>
 
-                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4" data-testid="related-products-container">
+                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products-container">
                     <Suspense fallback={<SkeletonRelatedProducts />}>
                         <RelatedProducts product={product} />
                     </Suspense>

@@ -4,18 +4,16 @@ from typing import cast
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from sqlmodel import Session
 
 from app.core.deps import get_current_user
-from app.db.engine import engine
 from app.main import app
-from app.models.generic import User
+from app.models.user import User
 
 
-@pytest.fixture
-def db() -> Generator:
-    with Session(engine) as session:
-        yield session
+# @pytest.fixture
+# def db() -> Generator:
+#     with Session(engine) as session:
+#         yield session
 
 
 @pytest.fixture

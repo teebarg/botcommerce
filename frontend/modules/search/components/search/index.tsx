@@ -69,7 +69,7 @@ const Search: React.FC<Props> = ({ className }) => {
         <React.Fragment>
             <Button
                 className={className}
-                color="default"
+                variant="outline"
                 endContent={<Kbd keys={["command"]}>K</Kbd>}
                 startContent={<MagnifyingGlassMini />}
                 onClick={modalState.open}

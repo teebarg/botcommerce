@@ -1,4 +1,4 @@
-import { Bell, CancelIcon, Excel, Trash } from "nui-react-icons";
+import { Bell, Cancel, Excel, Trash } from "nui-react-icons";
 import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useSnackbar } from "notistack";
@@ -114,7 +114,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                         <span>{item.description}</span>
                                         <div className="mt-4 flex w-full cursor-pointer items-center">
                                             <div className="border-grey-20p flex items-center justify-center rounded-lg border p-2.5">
-                                                {item.is_success ? <Excel /> : <CancelIcon className="text-default-500" size={18} />}
+                                                {item.is_success ? <Excel /> : <Cancel className="text-default-500" size={18} />}
                                             </div>
                                             <div className="relative w-full pl-4 text-left">
                                                 <div className="text-sm max-w-[80%] overflow-hidden truncate">{item.action_download_url}</div>

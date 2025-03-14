@@ -13,6 +13,7 @@ import { SlideOver } from "../slideover";
 import { Button } from "@/components/ui/button";
 import { Pag } from "@/lib/models";
 import { api } from "@/apis";
+import { X } from "lucide-react";
 
 interface Props {
     children: React.ReactNode;
@@ -88,16 +89,11 @@ const Table: React.FC<Props> = ({
                         <div className="flex-1">
                             {canSearch && (
                                 <Input
-                                    classNames={{
-                                        base: "w-full sm:max-w-[44%]",
-                                        inputWrapper: "border-1",
-                                    }}
                                     defaultValue={searchQuery}
                                     placeholder="Search by name..."
-                                    size="md"
                                     startContent={<Search className="text-default-500" />}
-                                    onChange={onSearchChange}
-                                    onClear={() => onClear()}
+                                    onChange={(e) => onSearchChange(e.target.value)}
+                                    endContent={searchQuery && <Button aria-label="clear search" endContent={<X />} onClick={onClear} />}
                                 />
                             )}
                         </div>

@@ -57,7 +57,7 @@ const ShippingAddress = ({
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                    isRequired
+                    required
                     autoComplete="given-name"
                     data-testid="shipping-firstname-input"
                     label="First name"
@@ -66,7 +66,7 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.firstname")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="family-name"
                     data-testid="shipping-lastname-input"
                     label="Last name"
@@ -75,7 +75,7 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.lastname")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="address-line1"
                     data-testid="shipping-address-input"
                     label="Address"
@@ -84,7 +84,7 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.address_1")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="postal-code"
                     data-testid="shipping-postal-code-input"
                     label="Postal code"
@@ -93,7 +93,7 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.postal_code")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="address-level2"
                     data-testid="shipping-city-input"
                     label="City"
@@ -118,9 +118,9 @@ const ShippingAddress = ({
                     onChange={onChange}
                 />
             </div> */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                 <Input
-                    isRequired
+                    required
                     autoComplete="email"
                     data-testid="shipping-email-input"
                     label="Email"

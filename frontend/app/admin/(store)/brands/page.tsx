@@ -1,14 +1,19 @@
 import { Metadata } from "next";
 import React from "react";
-import { Table } from "@modules/common/components/table";
-import { Actions } from "@modules/admin/components/actions";
+import { Search } from "lucide-react";
+import { ArrowUpDown } from "nui-react-icons";
 
-import { BrandForm } from "@/modules/admin/brands/brand-form";
 import { siteConfig } from "@/lib/config";
-import Chip from "@/components/ui/chip";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import { Brand } from "@/lib/models";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import PaginationUI from "@/components/pagination";
+import { Badge } from "@/components/ui/badge";
+import { Actions } from "@/components/brand/brand-actions";
+import { CreateBrand } from "@/components/brand/create-brand";
 
 export const metadata: Metadata = {
     title: `Brands Page | Children clothing | ${siteConfig.name} Store`,
@@ -33,53 +38,73 @@ export default async function BrandsPage(props: { searchParams: SearchParams }) 
     }
     const { brands, ...pagination } = res;
 
-    const deleteBrand = async (id: string) => {
+    const deleteBrand = async (id: number) => {
         "use server";
         await api.brand.delete(id);
     };
 
     return (
-        <React.Fragment>
-            <div className="h-full">
-                <div className="max-w-7xl mx-auto">
-                    <h1 className="text-2xl font-semibold mb-8">Brands</h1>
-                    <Table
-                        columns={["S/N", "Name", "Status", "Created At", "Actions"]}
-                        form={<BrandForm type="create" />}
-                        pagination={pagination}
-                        searchQuery={search}
-                    >
-                        {brands.map((item: Brand, index: number) => (
-                            <tr key={item.id} className="even:bg-content2">
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{(page - 1) * limit + index + 1}</td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <div className="font-bold truncate max-w-32">{item?.name}</div>
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <Chip color={item.is_active ? "success" : "danger"} title={item.is_active ? "Active" : "Inactive"} />
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm">{new Date(item.created_at as string).toLocaleDateString()}</td>
-                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
-                                    <Actions
-                                        deleteAction={deleteBrand}
-                                        form={<BrandForm current={item} type="update" />}
-                                        item={item}
-                                        label="brand"
-                                        showDetails={false}
-                                    />
-                                </td>
-                            </tr>
-                        ))}
-                        {brands?.length === 0 && (
-                            <tr>
-                                <td className="text-center py-4 text-lg text-default-500" colSpan={5}>
-                                    No brands found.
-                                </td>
-                            </tr>
-                        )}
+        <div className="px-2 py-2">
+            <Card>
+                <CardHeader>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <CardTitle>Brands</CardTitle>
+                            <CardDescription>Manage your brands</CardDescription>
+                        </div>
+                        <div className="flex w-full items-center gap-2 sm:w-auto">
+                            <div className="relative w-full sm:w-64">
+                                <Input className="w-full" placeholder="Search brands..." startContent={<Search />} type="search" />
+                            </div>
+                            <CreateBrand />
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>S/N</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>
+                                    <div className="flex items-center gap-1">
+                                        Created At
+                                        <ArrowUpDown className="h-3 w-3" />
+                                    </div>
+                                </TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {brands.map((brand: Brand, idx: number) => (
+                                <TableRow key={`${brand.id}-${idx}`} className="even:bg-content1">
+                                    <TableCell>{(page - 1) * limit + idx + 1}</TableCell>
+                                    <TableCell className="flex-1">
+                                        <div className="font-bold truncate min-w-72">{brand?.name}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant={brand.is_active ? "default" : "destructive"}>{brand.is_active ? "Active" : "Inactive"}</Badge>
+                                    </TableCell>
+                                    <TableCell>{new Date(brand.created_at as string).toLocaleDateString()}</TableCell>
+                                    <TableCell className="flex justify-end">
+                                        <Actions key={brand.id} deleteAction={deleteBrand} item={brand} />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {brands?.length === 0 && (
+                                <TableRow>
+                                    <TableCell className="text-center py-4 text-lg text-default-500" colSpan={5}>
+                                        No brands found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
                     </Table>
-                </div>
-            </div>
-        </React.Fragment>
+                    {/* Pagination */}
+                    <PaginationUI pagination={pagination} />
+                </CardContent>
+            </Card>
+        </div>
     );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CancelIcon } from "nui-react-icons";
+import { Cancel } from "nui-react-icons";
 
 import { Button } from "@/components/ui/button";
 
@@ -69,7 +69,7 @@ function InstallPrompt() {
                         className="absolute top-2 right-2 text-default-500 hover:text-default-500/50"
                         onClick={() => setDeferredPrompt(null)}
                     >
-                        <CancelIcon className="h-6 w-6" />
+                        <Cancel className="h-6 w-6" />
                     </button>
 
                     {/* Icon and content container */}

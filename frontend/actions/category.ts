@@ -1,5 +1,3 @@
-import { revalidateTag } from "next/cache";
-
 import { api } from "@/apis";
 
 export async function mutateCategory(currentState: unknown, formData: FormData) {
@@ -24,9 +22,6 @@ export async function mutateCategory(currentState: unknown, formData: FormData) 
             await api.category.update(id, body);
         }
 
-        // Revalidate the UI data
-        revalidateTag("categories");
-
         return { success: true, message: "Category created successfully", data: null };
     } catch (error) {
         return { success: false, message: error instanceof Error ? error.message : "An error occurred" };
@@ -36,9 +31,6 @@ export async function mutateCategory(currentState: unknown, formData: FormData) 
 export async function deleteCategory(id: number) {
     try {
         await api.category.delete(id);
-
-        // Revalidate the UI data
-        revalidateTag("categories");
 
         return { success: true, message: "Category deleted successfully" };
     } catch (error) {

@@ -9,7 +9,6 @@ from fastapi import HTTPException
 from app.services.cache import get_cache_service
 import time
 from typing import Generator, Callable, TypeVar, ParamSpec
-from sqlalchemy.exc import OperationalError, DBAPIError
 import logging
 
 # Type variables for generic function signatures
@@ -54,7 +53,7 @@ def limit(rate_string: str):
 
             # if not request:
             #     raise ValueError("Rate limiting requires 'request' parameter")
-            
+
             # client_ip = request.state.client_host
 
             # client_ip = request.client.host
@@ -142,11 +141,11 @@ def with_retry(
     retries: int = 3,
     delay: float = 1.0,
     backoff: float = 2.0,
-    exceptions: tuple = (OperationalError, DBAPIError)
+    exceptions: tuple = ()
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Decorator that implements retry logic for database operations.
-    
+
     Args:
         retries: Number of retries before giving up
         delay: Initial delay between retries in seconds
@@ -167,15 +166,15 @@ def with_retry(
                     if attempt == retries:
                         logging.error(f"Failed after {retries} retries: {str(e)}")
                         raise
-                    
+
                     logging.warning(
                         f"Database operation failed (attempt {attempt + 1}/{retries + 1}): {str(e)}"
                         f"\nRetrying in {current_delay} seconds..."
                     )
-                    
+
                     time.sleep(current_delay)
                     current_delay *= backoff
-            
+
             raise last_exception  # This line should never be reached
         return wrapper
     return decorator
