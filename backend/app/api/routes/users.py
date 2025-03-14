@@ -79,7 +79,7 @@ async def read_wishlist(
         order={"created_at": "desc"},
         include={"product": True}
     )
-    return favorites
+    return {"wishlists": favorites}
 
 
 @router.post("/wishlist", response_model=Wishlist)

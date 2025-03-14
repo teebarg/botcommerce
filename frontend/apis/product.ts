@@ -3,6 +3,7 @@ import { fetcher } from "./fetcher";
 import { buildUrl, handleError } from "@/lib/util/util";
 import { Message, PaginatedProduct, PaginatedReview, Product, Review } from "@/lib/models";
 import { revalidate } from "@/actions/revalidate";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 interface SearchParams {
     query?: string;
@@ -17,66 +18,44 @@ interface SearchParams {
 
 // Product API methods
 export const productApi = {
-    async search(searchParams: SearchParams): Promise<PaginatedProduct> {
+    async search(searchParams: SearchParams): ApiResult<PaginatedProduct> {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
-
-        try {
-            const response = await fetcher<PaginatedProduct>(url, { next: { tags: ["product"] } });
-
-            return response;
-        } catch (error) {
-            return { products: [], facets: {}, page: 1, limit: 10, total_count: 0, total_pages: 0 };
-        }
+        return await tryCatch<PaginatedProduct>(fetcher(url, { next: { tags: ["products"] } }));
     },
-    async get(slug: string): Promise<Product | null> {
+    async get(slug: string): ApiResult<Product | null> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
 
-        try {
-            const response = await fetcher<Product>(url, { next: { tags: ["product"] } });
-
-            return response;
-        } catch (error) {
-            return null;
-        }
+        return await tryCatch<Product>(fetcher(url));
     },
-    async create(input: Product): Promise<Product | Message> {
+    async create(input: Product): ApiResult<Product> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`;
+        const response = await tryCatch<Product>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
 
-        try {
-            const response = await fetcher<Product>(url, { method: "POST", body: JSON.stringify(input) });
-
-            revalidate("product");
-
-            return response;
-        } catch (error) {
-            return handleError(error);
+        if (!response.error) {
+            revalidate("products");
         }
+
+        return response;
     },
-    async update(id: string, input: Product): Promise<Product | Message> {
+    async update(id: string, input: Product): ApiResult<Product> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}`;
+        const response = await tryCatch<Product>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
 
-        try {
-            const response = await fetcher<Product>(url, { method: "PATCH", body: JSON.stringify(input) });
-
-            revalidate("product");
-
-            return response;
-        } catch (error) {
-            return handleError(error);
+        if (!response.error) {
+            revalidate("products");
         }
+
+        return response;
     },
-    async delete(id: string): Promise<Message> {
+    async delete(id: string): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}`;
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
 
-        try {
-            await fetcher<Product>(url, { method: "DELETE" });
-
-            revalidate("product");
-
-            return { error: false, message: "Product deleted successfully" };
-        } catch (error) {
-            return handleError(error);
+        if (!response.error) {
+            revalidate("products");
         }
+
+        return response;
     },
     async reviews({ product_id, page = 1, limit = 20 }: { product_id?: number; page: number; limit: number }): Promise<PaginatedReview> {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });

@@ -19,10 +19,6 @@ class WishlistUpdate(WishlistBase):
 
 class Wishlists(BaseModel):
     wishlists: list[Wishlist]
-    page: int
-    limit: int
-    total_count: int
-    total_pages: int
 
 
 class Search(BaseModel):

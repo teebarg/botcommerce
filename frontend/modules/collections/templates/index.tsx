@@ -65,7 +65,18 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         categories: cat_ids,
     };
 
-    const { products, facets, ...pagination } = await api.product.search(queryParams);
+    const res = await api.product.search(queryParams);
+
+    if (res.error) {
+        return <ServerError />;
+    }
+
+
+    if (!res.data) {
+        return <>No Products</>;
+    }
+
+    const { products, facets, ...pagination } = res.data;
 
     return (
         <React.Fragment>
