@@ -20,38 +20,38 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
     return (
         <React.Fragment>
             <ul className={cn("max-h-[40vh] overflow-y-auto", className)}>
-                {items
-                    ?.sort((a: CartItem, b: CartItem) => {
-                        return a.created_at > b.created_at ? -1 : 1;
-                    })
-                    ?.map((item: CartItem, key: number) => (
-                        <li key={key} className="flex items-center gap-x-4 border-b-sm border-divider py-4">
-                            <div className="relative flex h-16 w-14 flex-shrink-0 items-center justify-center rounded-md overflow-hidden">
-                                <Image fill alt={item.name} src={item.image as string} />
+                {items?.map((item: CartItem, key: number) => (
+                    <li key={key} className="flex items-center gap-x-4 border-b-sm border-divider py-4">
+                        <div className="relative flex h-16 w-14 flex-shrink-0 items-center justify-center rounded-md overflow-hidden">
+                            {item.image && <Image fill alt={item.name} src={item.image} />}
+                        </div>
+                        <div>
+                            <p>ffff</p>
+                            {JSON.stringify(item)}
+                        </div>
+                        <div className="flex flex-1 flex-col">
+                            <div className="text-sm">
+                                <LocalizedClientLink href={`/products/${item.slug}`}>
+                                    <p className="font-semibold text-default-900 truncate max-w-40">{item.name}</p>
+                                </LocalizedClientLink>
                             </div>
-                            <div className="flex flex-1 flex-col">
-                                <div className="text-sm">
-                                    <LocalizedClientLink href={`/products/${item.slug}`}>
-                                        <p className="font-semibold text-default-900 truncate max-w-40">{item.name}</p>
-                                    </LocalizedClientLink>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <Control item={item} />
-                                </div>
+                            <div className="flex gap-2 items-center">
+                                <Control item={item} />
+                            </div>
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-default-500">{item.quantity}x</span>
+                                <span className="text-sm text-default-900">
+                                    <LineItemUnitPrice item={item} style="tight" />
+                                </span>
                             </div>
                             <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-default-500">{item.quantity}x</span>
-                                    <span className="text-sm text-default-900">
-                                        <LineItemUnitPrice item={item} style="tight" />
-                                    </span>
-                                </div>
-                                <div>
-                                    <LineItemPrice item={item} />
-                                </div>
+                                <LineItemPrice item={item} />
                             </div>
-                        </li>
-                    ))}
+                        </div>
+                    </li>
+                ))}
             </ul>
         </React.Fragment>
     );

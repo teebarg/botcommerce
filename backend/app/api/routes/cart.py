@@ -109,6 +109,13 @@ async def create_cart(cart: CartCreate):
         where={
             "cart_number": cart.cart_number,
             "status": "ACTIVE"
+        },
+        include={
+            "items": {
+                "include": {
+                    "variant": True
+                }
+            }
         }
     )
     if existing_cart:
@@ -128,8 +135,21 @@ async def get_cart(response: Response, cartId: str = Header(default=None)):
     """Get a specific cart by ID"""
     cart = await db.cart.find_unique(
         where={"cart_number": cartId},
-        include={"items": True}
+        include={
+            "items": {
+                "include": {
+                    "variant": True
+                }
+            }
+        }
     )
+    carti = await db.cartitem.find_unique(
+        where={"id": 2},
+        include={
+            "variant": True
+        }
+    )
+    print(carti)
     if not cart:
         id = generate_id()
         new_cart = await db.cart.create(

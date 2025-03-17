@@ -11,6 +11,7 @@ export async function fetcher<T>(url: string, options?: RequestInit): Promise<T>
         ...options,
         headers: {
             accept: "application/json",
+            "Content-Type": "application/json",
             "X-Auth": accessToken ?? "", // Ensure the header is always set
             cartId: cartId ?? "",
             ...options?.headers,

@@ -24,8 +24,13 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
     };
 
     const queryParams = setQueryParams();
-    const { products } = await api.product.search(queryParams);
-    const productPreviews = products.filter((item: Product) => item.id !== product.id);
+    const { data, error } = await api.product.search(queryParams);
+
+    if (error) {
+        return <ServerError />
+    }
+
+    const productPreviews = data.products?.filter((item: Product) => item.id !== product.id);
 
     if (!productPreviews.length) {
         return null;

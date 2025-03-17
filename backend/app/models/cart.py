@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 from enum import Enum
+from prisma.models import ProductVariant
 
 # Enums
 class CartStatus(str, Enum):
@@ -23,6 +24,7 @@ class CartItemCreate(BaseModel):
 class CartItemResponse(CartItemBase):
     id: int
     cart_id: int
+    variant: ProductVariant
     created_at: datetime
     updated_at: datetime
 

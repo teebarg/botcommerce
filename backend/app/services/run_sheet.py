@@ -10,7 +10,7 @@ from openpyxl import Workbook, load_workbook
 
 from app.api.routes.websocket import manager
 from app.core.logging import logger
-from app.core.utils import generate_data_export_email, send_email
+from app.core.utils import generate_data_export_email, send_email, slugify
 
 from app.core.config import settings
 

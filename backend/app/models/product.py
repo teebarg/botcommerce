@@ -115,7 +115,7 @@ class Product(BaseModel):
     description: str
     price: float
     old_price: float
-    image: str
+    image: Optional[str] = None
     status: str
     variants: Optional[List[str]] = None
     ratings: float

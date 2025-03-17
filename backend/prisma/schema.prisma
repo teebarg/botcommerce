@@ -155,6 +155,7 @@ model Product {
   slug               String               @unique @db.VarChar(255)
   sku                String               @unique
   description        String?
+  features           String[]?
   price              Float
   old_price          Float
   image              String?              @db.VarChar(255)
@@ -340,7 +341,7 @@ model CartItem {
   id           Int            @id @default(autoincrement())
   cart         Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
   cart_id      Int
-  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
+  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: Cascade)
   variant_id   Int
   quantity     Int
   price        Float          @db.DoublePrecision

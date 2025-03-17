@@ -32,7 +32,7 @@ export const useStore = create<StoreState>((set) => ({
     increase: () => set((state) => ({ count: state.count + 1 })),
     decrease: () => set((state) => ({ count: state.count - 1 })),
     products: [],
-    addProduct: (product) => set((state) => ({ products: [...state.products, product] })),
+    addProduct: (product: Product) => set((state) => ({ products: [...state.products, product] })),
     removeProduct: (id) => set((state) => ({ products: state.products.filter((product) => product.id !== id) })),
     updateProduct: (id, product) => set((state) => ({ products: state.products.map((p) => (p.id === id ? product : p)) })),
     clearProducts: () => set(() => ({ products: [] })),

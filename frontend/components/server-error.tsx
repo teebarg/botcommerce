@@ -8,7 +8,7 @@ import { siteConfig } from "@/lib/config";
 
 const ServerError = () => {
     return (
-        <div className="flex items-center justify-center bg-content1 px-4 flex-1">
+        <div className="flex items-center justify-center bg-content1 px-4 flex-1 py-24">
             <div className="max-w-lg w-full bg-content2 rounded-lg shadow-lg p-12 animate-fade-in">
                 <div className="flex justify-center mb-6">
                     <div className="bg-red-100 p-4 rounded-full">

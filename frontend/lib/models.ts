@@ -63,7 +63,7 @@ export type SiteConfig = z.infer<typeof SiteConfigSchema>;
 export type PaginatedSiteConfig = z.infer<typeof PaginatedSiteConfigSchema>;
 // export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
 
-export type ProductVariant = z.infer<typeof ProductVariantSchema>;
 export type ProductImage = z.infer<typeof ProductImageSchema>;
 
 export type ProductStatus = z.infer<typeof ProductStatusSchema>;
+export type ProductVariant = z.infer<typeof ProductVariantSchema>;

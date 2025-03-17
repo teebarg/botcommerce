@@ -28,18 +28,20 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
     }, [error]);
 
     return (
-        <div className="bg-default-100 flex items-center justify-center h-screen">
-            <div className="max-w-lg mx-auto bg-content2 rounded-lg shadow-lg overflow-hidden">
-                <div className="px-6 py-8">
+        <div className="flex items-center justify-center h-screen">
+            <div className="max-w-lg mx-auto bg-content1 rounded-lg shadow-lg overflow-hidden">
+                <div className="px-6 py-8 flex flex-col items-center">
                     <h1 className="text-4xl font-bold mb-2">500</h1>
                     <p className="text-xl text-default-900 mb-4">Internal Server Error</p>
-                    <p className="text-default-500 mb-6">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
-                    <BtnLink color="primary" href="/">
-                        Go back to homepage
-                    </BtnLink>
-                    <Button aria-label="try again" className="block mt-6 ml-4" color="danger" type="button" onClick={() => reset()}>
-                        Try again
-                    </Button>
+                    <p className="text-default-500 mb-6 text-center">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
+                    <div className="flex items-center">
+                        <BtnLink color="primary" href="/">
+                            Go back to homepage
+                        </BtnLink>
+                        <Button aria-label="try again" className="block ml-4" color="danger" type="button" onClick={() => reset()}>
+                            Try again
+                        </Button>
+                    </div>
                 </div>
                 <div className="px-6 py-4 bg-content2 border-t border-default-100 text-sm text-default-500">
                     If the problem persists, please contact our support team.

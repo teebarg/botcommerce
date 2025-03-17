@@ -28,7 +28,7 @@ export const productApi = {
 
         return await tryCatch<PaginatedProductSearch>(fetcher(url, { next: { tags: ["products"] } }));
     },
-    async get(slug: string): ApiResult<Product | null> {
+    async get(slug: string): ApiResult<Product> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
 
         return await tryCatch<Product>(fetcher(url));

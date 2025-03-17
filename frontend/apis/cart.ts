@@ -20,9 +20,9 @@ export const cartApi = {
 
         return response;
     },
-    async add({ product_id, quantity }: { product_id: string; quantity: number }): ApiResult<Cart> {
+    async add({ variant_id, quantity }: { variant_id: number; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items`;
-        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify({ variant_id: product_id, quantity }) }));
+        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify({ variant_id, quantity }) }));
 
         if (!response.error) {
             revalidate("cart");
@@ -30,7 +30,7 @@ export const cartApi = {
 
         return response;
     },
-    async update({ product_id, quantity }: { product_id: string; quantity: number }): ApiResult<Cart> {
+    async update({ product_id, quantity }: { product_id: number; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
 
         const response = await tryCatch<Cart>(fetcher(url, { method: "PATCH", body: JSON.stringify({ product_id, quantity }) }));

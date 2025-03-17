@@ -73,6 +73,7 @@ export const ProductVariantSchema = z.object({
     price: z.number(),
     old_price: z.number(),
     inventory: z.number(),
+    attributes: z.record(z.string()),
     order_items: z.null(),
     cart_items: z.null(),
     created_at: z.string(),
