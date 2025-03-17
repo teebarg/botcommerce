@@ -1,27 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
-import { api } from "@/apis";
-import { ExtendedProduct, Pagination } from "@/types/global";
-
+import { useState, useEffect } from "react";
 import React from "react";
-import { ChevronRight, Exclamation, Tag } from "nui-react-icons";
-import { SortOptions } from "types/global";
-import dynamic from "next/dynamic";
+import { ChevronRight, Tag } from "nui-react-icons";
+import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 
+import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { Category, Collection, Product, WishItem } from "@/lib/models";
-import { auth } from "@/actions/auth";
-import ServerError from "@/components/server-error";
+import { Brand, Category, Collection, Facet, PaginatedProduct, PaginatedProductSearch, Product, ProductSearch, WishItem } from "@/lib/models";
 import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
 import ProductCard from "@/components/product/product-card";
-import { set } from "lodash";
-import { useInView } from "react-intersection-observer";
-import { motion } from "framer-motion";
 
 interface SearchParams {
     page?: number;
@@ -32,50 +24,40 @@ interface SearchParams {
 }
 
 export default function InfiniteScrollClient({
-    initialProducts,
     initialSearchParams,
-    dataHasNext,
+    data,
     brands,
     categories,
     collections,
-    facets,
-    minPrice,
-    maxPrice,
     collection,
     wishlist,
     user,
-    initialPage, // changed to match the prop name
 }: {
-    initialProducts: Product[];
     initialSearchParams: SearchParams;
-    dataHasNext: boolean;
-    brands: any; // replace with appropriate type
-    categories: any; // replace with appropriate type
-    collections: any; // replace with appropriate type
-    facets: any; // replace with appropriate type
-    minPrice: string; // replace with appropriate type
-    maxPrice: string; // replace with appropriate type
-    collection?: any; // replace with appropriate type
-    wishlist: WishItem[]; // replace with appropriate type
-    user: any; // replace with appropriate type
-    initialPage: number; // replace with appropriate type
+    data: PaginatedProductSearch;
+    brands?: Brand[];
+    categories?: Category[];
+    collections?: Collection[];
+    collection?: Collection;
+    wishlist: WishItem[];
+    user?: any;
 }) {
-    const [products, setProducts] = useState<Product[]>(initialProducts);
-    const [hasNext, setHasNext] = useState<boolean>(dataHasNext);
-    const [page, setPage] = useState<number>(initialPage ?? 1);
-    const [loading, setLoading] = useState<boolean>(false);
-    const observerRef = useRef<IntersectionObserver | null>(null);
+    const [products, setProducts] = useState<ProductSearch[]>(data.products);
+    const [facets, setFacets] = useState<Facet>();
+    const [hasNext, setHasNext] = useState<boolean>(data.page < data.total_pages);
+    const [page, setPage] = useState<number>(data.page ?? 1);
+    // const [loading, setLoading] = useState<boolean>(false);
+    // const observerRef = useRef<IntersectionObserver | null>(null);
     const [scrollTrigger, isInView] = useInView();
-    console.log(initialProducts);
-    console.log(products);
 
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
 
     const fetchItems = async (page: number) => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const res = await api.product.search({ ...initialSearchParams, page });
             const data = await res.data;
+
             if (!data) {
                 return;
             }
@@ -84,17 +66,17 @@ export default function InfiniteScrollClient({
         } catch (error) {
             console.error("Error fetching data:", error);
         }
-        setLoading(false);
+        // setLoading(false);
     };
 
     useEffect(() => {
-        setProducts(initialProducts);
+        setProducts(data.products);
         setPage(1);
-        setHasNext(dataHasNext);
-    }, [initialProducts]);
+        setHasNext(data.page < data.total_pages);
+        setFacets(data.facets);
+    }, [data]);
 
     useEffect(() => {
-        console.log("page", page);
         if (page === 1) {
             return;
         }
@@ -107,31 +89,10 @@ export default function InfiniteScrollClient({
         }
     }, [isInView, hasNext]);
 
-    useEffect(() => {
-        observerRef.current = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && !loading && hasNext) {
-                setPage((prev) => prev + 1);
-            }
-        });
-
-        const loadMoreTrigger = document.getElementById("loadMoreTrigger");
-        if (observerRef.current && loadMoreTrigger) {
-            observerRef.current.observe(loadMoreTrigger);
-        }
-
-        return () => observerRef.current?.disconnect();
-    }, [loading]);
-
     return (
         <div className="flex gap-6 mt-0 md:mt-6">
             <div className="hidden md:block">
-                <CollectionsSideBar
-                    brands={brands}
-                    categories={filteredCategories}
-                    collections={collections}
-                    facets={facets}
-                    searchParams={{ minPrice, maxPrice }}
-                />
+                <CollectionsSideBar brands={brands} categories={filteredCategories} collections={collections} facets={facets} />
             </div>
             <div className="w-full flex-1 flex-col relative">
                 {/* Mobile banner */}
@@ -189,13 +150,12 @@ export default function InfiniteScrollClient({
                             </div>
                             <main className="mt-4 w-full overflow-visible px-1">
                                 <div className="block md:rounded-xl md:border-2 border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
-                                    {/* {JSON.stringify(products)} */}
                                     <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
-                                        {products.map((product: Product, index: number) => (
+                                        {products?.map((product: ProductSearch, index: number) => (
                                             <motion.div
                                                 key={index}
-                                                initial={{ opacity: 0, y: 20 }}
                                                 animate={{ opacity: 1, y: 0 }}
+                                                initial={{ opacity: 0, y: 20 }}
                                                 transition={{
                                                     duration: 0.4,
                                                     ease: [0.25, 0.25, 0, 1],
@@ -211,11 +171,7 @@ export default function InfiniteScrollClient({
                         </div>
                     </div>
                 </div>
-                <div className="absolute bottom-10 w-full">
-                    {(hasNext && <div ref={scrollTrigger}>Loading...</div>) || <p className="...">No more posts to load</p>}
-                </div>
-                {/* <div className="absolute bottom-10 w-full" id="loadMoreTrigger" style={{ height: "200px", background: "transparent" }}></div>
-                {loading && <p>Loading...</p>} */}
+                <div className="w-full">{(hasNext && <div ref={scrollTrigger}>Loading...</div>) || <p className="...">No more posts to load</p>}</div>
             </div>
         </div>
     );

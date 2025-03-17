@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class ContactFormCreate(BaseModel):
@@ -24,3 +24,10 @@ class TokenPayload(BaseModel):
 
 class Message(BaseModel):
     message: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class MagicLinkPayload(BaseModel):
+    email: EmailStr

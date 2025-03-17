@@ -25,6 +25,11 @@ import {
     PaginatedSiteConfigSchema,
     PaginatedOrderSchema,
     MessageSchema,
+    ProductVariantSchema,
+    ProductImageSchema,
+    ProductSearchSchema,
+    PaginatedProductSearchSchema,
+    ProductStatusSchema,
 } from "./schema";
 
 export type Facet = z.infer<typeof FacetSchema>;
@@ -35,7 +40,9 @@ export type PaginatedCollection = z.infer<typeof PaginatedCollectionSchema>;
 export type Category = z.infer<typeof CategorySchema>;
 export type PaginatedCategory = z.infer<typeof PaginatedCategorySchema>;
 export type Product = z.infer<typeof ProductSchema>;
+export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
+export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type Wishlist = z.infer<typeof WishlistSchema>;
 export type WishItem = z.infer<typeof WishItemSchema>;
@@ -55,3 +62,8 @@ export type Message = z.infer<typeof MessageSchema>;
 export type SiteConfig = z.infer<typeof SiteConfigSchema>;
 export type PaginatedSiteConfig = z.infer<typeof PaginatedSiteConfigSchema>;
 // export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
+
+export type ProductVariant = z.infer<typeof ProductVariantSchema>;
+export type ProductImage = z.infer<typeof ProductImageSchema>;
+
+export type ProductStatus = z.infer<typeof ProductStatusSchema>;

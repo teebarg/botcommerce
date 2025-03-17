@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
+import { useSearchParams } from "next/navigation";
 
 import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
@@ -10,18 +11,15 @@ import LocalizedClientLink from "@/components/ui/link";
 import { Brand, Category, Collection, Facet } from "@/lib/models";
 
 interface ComponentProps {
-    brands: Brand[];
-    collections: Collection[];
+    brands?: Brand[];
+    collections?: Collection[];
     categories?: Category[];
     facets?: Facet;
-    searchParams?: {
-        maxPrice?: string;
-        minPrice?: string;
-    };
 }
 
-const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, categories, facets, searchParams }) => {
+const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, categories, facets }) => {
     const [dataSet, setDataSet] = useState(new Set());
+    const searchParams = useSearchParams();
     const { updateQuery } = useUpdateQuery();
 
     const onPriceChange = (values: number | number[]) => {
@@ -52,8 +50,8 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
     };
 
     return (
-        <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[80vh] sticky top-16 bg-default-100 rounded-xl pb-8">
-            <div className="h-full w-full max-w-sm p-6">
+        <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-default-100 rounded-xl">
+            <div className="w-full max-w-sm p-6">
                 <div>
                     <span className="text-sm">Collections</span>
                     <hr className="shrink-0 border-none w-full h-[1px] my-1 bg-default-100" />
@@ -68,7 +66,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                 <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>
                 <hr className="shrink-0 border-none w-full h-[1px] my-3 bg-default-100" />
                 <RangeSlider
-                    defaultValue={[Number(searchParams?.minPrice ?? 500), Number(searchParams?.maxPrice ?? 50000)]}
+                    defaultValue={[Number(searchParams?.get("minPrice") ?? 500), Number(searchParams?.get("maxPrice") ?? 50000)]}
                     formatOptions={{ style: "currency", currency: "NGN" }}
                     label="Price"
                     maxValue={100000}

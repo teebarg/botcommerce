@@ -7,8 +7,6 @@ import { Input } from "@components/ui/input";
 
 import AccountInfo from "../account-info";
 
-import { ComboBox } from "@/components/ui/combobox";
-
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;
 };
@@ -106,14 +104,17 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                             name="billing_address.city"
                         />
                     </div>
-                    <ComboBox
+                    <select
                         data-testid="billing-state-input"
-                        defaultInputValue={customer.billing_address?.state || undefined}
-                        items={states}
-                        label="State"
+                        defaultValue={customer.billing_address?.state || undefined}
                         name="billing_address.state"
-                        placeholder="Select State"
-                    />
+                    >
+                        {states.map((state, idx: number) => (
+                            <option key={idx} value={state.id}>
+                                {state.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </AccountInfo>
         </form>

@@ -29,8 +29,6 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
         error: null,
     });
 
-    console.log(state);
-
     const formRef = useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {

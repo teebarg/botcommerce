@@ -40,10 +40,12 @@ from app.services.meilisearch import (
     update_document,
 )
 from app.services.run_sheet import generate_excel_file, process_products
-from prisma.models import Product, ProductVariant, ProductImage, Review
+from prisma.models import Product
 from supabase import create_client, Client
 from app.core.config import settings
 from app.prisma_client import prisma as db
+from math import ceil
+from prisma.enums import ProductStatus
 
 # Initialize Supabase client
 supabase_url = settings.SUPABASE_URL
@@ -81,8 +83,57 @@ async def export_products(
 
 
 @router.get("/")
-@cache(key="products")
+# @cache(key="collections")
 async def index(
+    query: str = "",
+    brands: str = Query(default=""),
+    categories: str = Query(default=""),
+    collections: str = Query(default=""),
+    page: int = Query(default=1, gt=0),
+    limit: int = Query(default=20, le=100),
+):
+    """
+    Retrieve collections with Redis caching.
+    """
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}},
+                {"description": {"contains": query, "mode": "insensitive"}},
+                {"sku": {"contains": query, "mode": "insensitive"}},
+            ]
+        }
+    products = await db.product.find_many(
+        where=where_clause,
+        skip=(page - 1) * limit,
+        take=limit,
+        order={"created_at": "desc"},
+        include={
+            "categories": True,
+            "collections": True,
+            "brands": True,
+            "tags": True,
+            "variants": True,
+            "images": True,
+            "reviews": { "include": { "user": True } },
+        }
+    )
+    total = await db.product.count(where=where_clause)
+    return {
+        "products":products,
+        "page":page,
+        "limit":limit,
+        "total_pages":ceil(total/limit),
+        "total_count":total,
+    }
+
+
+
+@router.get("/search")
+# @cache(key="products")
+async def search(
     search: str = "",
     sort: str = "created_at:desc",
     brands: str = Query(default=""),
@@ -139,39 +190,40 @@ async def index(
     }
 
 
-# @router.post("/")
-# async def create(*, db: SessionDep, product_in: ProductCreate, cache: CacheService) -> ProductPublic:
-#     """
-#     Create new product.
-#     """
-#     product = crud.product.get_by_key(db=db, value=product_in.name)
-#     if product:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="The product already exists in the system.",
-#         )
-
-#     try:
-#         product = crud.product.create(db=db, obj_in=product_in)
-#         # Create a dictionary with product data and collection names
-#         product_data = prepare_product_data_for_indexing(product)
-
-#         add_documents_to_index(index_name="products", documents=[product_data])
-#         cache.invalidate("products")
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e)) from e
-#     return product
-
-
 @router.post("/")
 async def create_product(product: ProductCreate):
     slugified_name = slugify(product.name)
     sku = product.sku or f"SK{slugified_name}"
 
+    data={
+        "name": product.name,
+        "slug": slugified_name,
+        "sku": sku,
+        "description": product.description,
+        "price": product.price or 0,
+        "old_price": product.old_price or 0,
+        "status": product.status or ProductStatus.IN_STOCK,
+    };
+
     # Prepare category connections if provided
-    category_connect = None
     if product.category_ids:
         category_connect = [{"id": id} for id in product.category_ids]
+        data["categories"] = {"connect": category_connect}
+
+    # Prepare brand connections if provided
+    if product.brand_ids:
+        brand_connect = [{"id": id} for id in product.brand_ids]
+        data["brands"] = {"connect": brand_connect}
+
+    # Prepare collection connections if provided
+    if product.collection_ids:
+        collection_connect = [{"id": id} for id in product.collection_ids]
+        data["collections"] = {"connect": collection_connect}
+
+    # Prepare tag connections if provided
+    if product.tags_ids:
+        tag_connect = [{"id": id} for id in product.tags_ids]
+        data["tags"] = {"connect": tag_connect}
 
     # Prepare variants if provided
     variants_create = None
@@ -186,25 +238,24 @@ async def create_product(product: ProductCreate):
                 "price": variant.price,
                 "inventory": variant.inventory
             })
+        data["variants"] = {"create": variants_create}
 
     # Prepare images if provided
     images_create = None
     if product.images:
         images_create = [{"url": str(url)} for url in product.images]
+        data["images"] = {"create": images_create}
+
+
 
     # Create product with all related data
     created_product = await db.product.create(
-        data={
-            "name": product.name,
-            "slug": slugified_name,
-            "sku": sku,
-            "description": product.description,
-            "categories": {"connect": category_connect} if category_connect else None,
-            "variants": {"create": variants_create} if variants_create else None,
-            "images": {"create": images_create} if images_create else None
-        },
+        data=data,
         include={
             "categories": True,
+            "brands": True,
+            "collections": True,
+            "tags": True,
             "variants": True,
             "images": True
         }
@@ -258,52 +309,6 @@ async def read_reviews(id: str) -> Reviews:
 
 
 
-# @router.patch("/{id}", dependencies=[Depends(get_current_user)])
-# async def update(
-#     *,
-#     db: SessionDep,
-#     id: int,
-#     product_in: ProductUpdate,
-#     background_tasks: BackgroundTasks,
-#     cache: CacheService,
-# ) -> ProductPublic:
-#     """
-#     Update a product.
-#     """
-#     product = crud.product.get(db=db, id=id)
-#     if not product:
-#         raise HTTPException(
-#             status_code=404,
-#             detail="Product not found",
-#         )
-
-#     try:
-#         product = crud.product.update(db=db, db_obj=product, obj_in=product_in)
-#         # Invalidate cache
-#         cache.delete(f"product:{product.slug}")
-#         cache.delete(f"product:{id}")
-#         cache.invalidate("products")
-
-#         # Define the background task
-#         def update_task(product: Product):
-#             # Prepare product data for Meilisearch indexing
-#             product_data = prepare_product_data_for_indexing(product)
-
-#             update_document(index_name="products", document=product_data)
-
-#         background_tasks.add_task(update_task, product=product)
-#         return product
-#     except IntegrityError as e:
-#         logger.error(f"Error updating collection, {e.orig.pgerror}")
-#         raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-#     except Exception as e:
-#         logger.error(e)
-#         raise HTTPException(
-#             status_code=400,
-#             detail=f"{e}",
-#         ) from e
-
-
 @router.put("/{id}")
 async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
     # Check if product exists
@@ -324,6 +329,16 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     if product.category_ids is not None:
         category_ids = [{"id": id} for id in product.category_ids]
         update_data["categories"] = {"set": category_ids}
+
+    # Handle collection updates if provided
+    if product.collection_ids is not None:
+        collection_ids = [{"id": id} for id in product.collection_ids]
+        update_data["collections"] = {"set": collection_ids}
+
+    # Handle brand updates if provided
+    if product.brand_ids is not None:
+        brand_ids = [{"id": id} for id in product.brand_ids]
+        update_data["brands"] = {"set": brand_ids}
 
     # Handle variant updates if provided
     if product.variants is not None:
@@ -558,12 +573,14 @@ async def upload_products(
     background_tasks: BackgroundTasks,
     cache: CacheService,
 ):
+    logger.info(f"File uploaded: {file.filename}")
     content_type = file.content_type
 
     if content_type not in [
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "text/csv",
     ]:
+        logger.error(f"Invalid file type: {content_type}")
         raise HTTPException(
             status_code=400,
             detail="Invalid file type. Only CSV/Excel files are supported.",
@@ -574,11 +591,23 @@ async def upload_products(
     contents = await file.read()
 
     # Define the background task
-    def update_task(products):
+    def update_task():
+        logger.info("Starting product upload processing...")
         try:
             asyncio.run(
                 process_products(file_content=contents, content_type=content_type, user_id=user.id)
             )
+
+            products = asyncio.run(db.product.find_many(
+                include={
+                    # "variants": True,
+                    "categories": True,
+                    "collections": True,
+                    "brands": True,
+                    "images": True,
+                    # "reviews": { "include": { "user": True } },
+                }
+            ))
 
             # Re-index
             asyncio.run(
@@ -592,18 +621,7 @@ async def upload_products(
         #     db=db, user_id=user.id, filename=file.filename
         # )
 
-    products = await db.product.find_many(
-        include={
-            # "variants": True,
-            "categories": True,
-            "collections": True,
-            "brands": True,
-            "images": True,
-            # "reviews": { "include": { "user": True } },
-        }
-    )
-
-    background_tasks.add_task(update_task, products)
+    background_tasks.add_task(update_task)
 
     return {"message": "Upload started"}
 

@@ -30,7 +30,7 @@ class Product(BM):
     description: str = Field(..., min_length=1, description="Description is required")
     brand_ids: Optional[List[int]] = None
     category_ids: Optional[List[int]] = None
-    collections_ids: Optional[List[int]] = None
+    collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
     sku: Optional[str] = None
     variants: Optional[List[VariantCreate]] = None
@@ -40,24 +40,28 @@ class Product(BM):
 class ProductCreate(BaseModel):
     name: str = Field(..., min_length=1, description="Name is required")
     description: str = Field(..., min_length=1, description="Description is required")
+    price: float = Field(..., gt=0, description="Price must be positive")
+    old_price: float = Field(..., ge=0, description="Old price must be positive")
     brand_ids: Optional[List[int]] = None
     category_ids: Optional[List[int]] = None
-    collections_ids: Optional[List[int]] = None
+    collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
     sku: Optional[str] = None
     variants: Optional[List[VariantCreate]] = None
     images: Optional[List[HttpUrl]] = None
+    status: Literal["IN_STOCK", "OUT_OF_STOCK"] = "IN_STOCK"
 
 class ProductPublic(BaseModel):
     id: int
 
 class ProductUpdate(BaseModel):
-    id: int = Field(..., gt=0)
     name: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = Field(None, min_length=1)
+    sku: Optional[str] = None
+    status: Optional[Literal["IN_STOCK", "OUT_OF_STOCK"]] = None
     brand_ids: Optional[List[int]] = None
     category_ids: Optional[List[int]] = None
-    collections_ids: Optional[List[int]] = None
+    collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
     variants: Optional[List[VariantUpdate]] = None
     images: Optional[List[HttpUrl]] = None

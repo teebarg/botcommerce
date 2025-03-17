@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Number } from "@/components/ui/number";
-import { TextArea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { updateReview } from "@/actions/reviews";
 
 interface Props {
@@ -46,16 +46,16 @@ const ReviewForm: React.FC<Props> = ({ onClose, current = { rating: 1, comment: 
                             <div className="space-y-8 ">
                                 <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                 <Number isRequired defaultValue={current.rating} label="Rating" name="rating" placeholder="5" />
-                                <TextArea isRequired defaultValue={current.comment} label="Comment" name="comment" placeholder="Great product." />
+                                <Textarea required defaultValue={current.comment} label="Comment" name="comment" placeholder="Great product." />
                                 <Checkbox color="warning" defaultSelected={current.verified} label="Verified" name="verified" />
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
-                        <Button aria-label="cancel" className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                        <Button aria-label="cancel" className="min-w-32" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="update" className="min-w-32" color="primary" isLoading={isPending} type="submit" variant="shadow">
+                        <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit">
                             Update
                         </Button>
                     </div>

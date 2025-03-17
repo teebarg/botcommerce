@@ -14,11 +14,17 @@ export async function verifyToken(token: string) {
         if (!secret) {
             throw new Error("JWT_SECRET environment variable is not defined");
         }
-    
-        const { payload } = await jwtVerify(token, secret);
-        return payload;
+
+        const result = await jwtVerify(token, secret);
+
+        if (!result) {
+            return null;
+        }
+
+        return result.payload;
     } catch (error) {
         console.error("Token verification failed: ", error);
+
         return null;
     }
 }
@@ -54,6 +60,7 @@ export async function auth(): Promise<Session | null> {
 
     try {
         const user = (await verifyToken(token)) as any;
+
         if (!user) return null;
 
         return {
@@ -62,8 +69,10 @@ export async function auth(): Promise<Session | null> {
             firstname: user.firstname,
             lastname: user.lastname,
             image: user.image,
-            isActive: user.is_active,
-            isAdmin: user.is_superuser,
+            isActive: user.status === "ACTIVE",
+            isAdmin: user.role === "ADMIN",
+            status: user.status,
+            role: user.role,
         };
     } catch (error) {
         return null; // Token is invalid or expired
@@ -117,6 +126,38 @@ export async function googleLogin(customer: { firstname: string; lastname: strin
         if (token) {
             await setSession(token);
         }
+    } catch (error: any) {
+        return { error: true, message: error.toString() };
+    }
+}
+
+export async function requestMagicLink(_prevState: unknown, formData: FormData) {
+    const email = formData.get("email") as string;
+
+    try {
+        const { data, error } = await api.auth.requestMagicLink(email);
+
+        if (error || !data) {
+            return { error: true, message: error?.toString() };
+        }
+
+        return { error: false, message: data.message };
+    } catch (error: any) {
+        return { error: true, message: error.toString() };
+    }
+}
+
+export async function verifyMagicLink(token: string) {
+    try {
+        const { data, error } = await api.auth.verifyMagicLink(token);
+
+        if (error || !data) {
+            return { error: true, message: error?.toString() };
+        }
+
+        await setSession(data.access_token);
+
+        return { error: false, message: "Successfully signed in" };
     } catch (error: any) {
         return { error: true, message: error.toString() };
     }

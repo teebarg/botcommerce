@@ -34,12 +34,6 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
         const formData = new FormData();
 
         formData.append("file", file);
-        console.log("formData");
-        console.log(formData);
-        console.dir(formData);
-        console.dir(formData.get("file"));
-        console.dir("form data end");
-        console.log(file);
 
         try {
             await onUpload(formData);

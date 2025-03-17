@@ -4,7 +4,7 @@ import { Star } from "nui-react-icons";
 import { useState } from "react";
 import { useSnackbar } from "notistack";
 
-import { TextArea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 
@@ -58,8 +58,8 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
                 <label className="block text-sm font-medium text-default-700" htmlFor="comment">
                     Your Review
                 </label>
-                <TextArea
-                    isRequired
+                <Textarea
+                    required
                     className="mt-1"
                     id="comment"
                     name="comment"

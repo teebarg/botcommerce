@@ -6,7 +6,8 @@ import { ImageUpload } from "@modules/common/components/image-upload";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 import { Number } from "@components/ui/number";
-import { TextArea } from "@components/ui/textarea";
+import { Textarea } from "@components/ui/textarea";
+import { toast } from "sonner";
 
 import { Multiselect } from "@/components/ui/multiselect";
 import { Button } from "@/components/ui/button";
@@ -70,7 +71,12 @@ const ProductForm = forwardRef<ChildRef, Props>(
         const handleUpload = async (formData: FormData) => {
             const res = await api.product.uploadImage({ id: current.id, formData });
 
-            enqueueSnackbar(res.message, { variant: res.error ? "error" : "success" });
+            if (res.error) {
+                toast.error(res.error);
+
+                return;
+            }
+            toast.success(res.data?.message || "Image uploaded successfully");
         };
 
         return (
@@ -89,7 +95,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                     <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
                                     <Switch defaultSelected={current.is_active} label="Is Active" name="is_active" />
-                                    <TextArea defaultValue={current.description} name="description" placeholder="Product description custom" />
+                                    <Textarea defaultValue={current.description} name="description" placeholder="Product description custom" />
                                     <Multiselect
                                         defaultValue={selectedBrands}
                                         label="Brands"
@@ -142,10 +148,10 @@ const ProductForm = forwardRef<ChildRef, Props>(
                             </div>
                         </div>
                         <div className="flex flex-shrink-0 items-center justify-end py-4 px-8 space-x-2 absolute bottom-0 bg-default-100 w-full right-0 z-50">
-                            <Button aria-label="cancel" className="min-w-32" color="danger" variant="shadow" onClick={onClose}>
+                            <Button aria-label="cancel" className="min-w-32" variant="destructive" onClick={onClose}>
                                 Cancel
                             </Button>
-                            <Button aria-label="submit" className="min-w-32" color="primary" isLoading={isPending} type="submit" variant="shadow">
+                            <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit">
                                 {isCreate ? "Submit" : "Update"}
                             </Button>
                         </div>

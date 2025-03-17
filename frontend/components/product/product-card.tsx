@@ -7,10 +7,10 @@ import Image from "next/image";
 import { ProductWishList } from "./product-wishlist";
 
 import ProductActions from "@/modules/products/components/product-actions";
-import { Product, WishItem } from "@/lib/models";
+import { Product, ProductSearch, WishItem } from "@/lib/models";
 
 interface ComponentProps {
-    product: Product;
+    product: ProductSearch;
     wishlist?: WishItem[];
     showWishlist?: boolean;
 }

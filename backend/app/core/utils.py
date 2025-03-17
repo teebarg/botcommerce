@@ -244,3 +244,17 @@ def generate_id(prefix="cart_", length=25):
     chars = string.ascii_uppercase + string.digits
     unique_part = "".join(random.choice(chars) for _ in range(length))
     return prefix + unique_part
+
+
+def generate_magic_link_email(email_to: str, magic_link: str, first_name: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Sign in to your account"
+    html_content = render_email_template(
+        template_name="magic_link.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "magic_link": magic_link,
+            "first_name": first_name
+        },
+    )
+    return EmailData(html_content=html_content, subject=subject)

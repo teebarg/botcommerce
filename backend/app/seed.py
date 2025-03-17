@@ -18,12 +18,12 @@ wait_seconds = 1
 fake = Faker()
 
 
-@retry(
-    stop=stop_after_attempt(max_tries),
-    wait=wait_fixed(wait_seconds),
-    before=before_log(logger, logging.INFO),
-    after=after_log(logger, logging.WARN),
-)
+# @retry(
+#     stop=stop_after_attempt(max_tries),
+#     wait=wait_fixed(wait_seconds),
+#     before=before_log(logger, logging.INFO),
+#     after=after_log(logger, logging.WARN),
+# )
 async def seed_database():
     db = Prisma()
     await db.connect()
@@ -53,9 +53,9 @@ async def seed_database():
             "createdAt": datetime.now(),
         })
 
-    admin = await create_user("admin@example.com", "ADMIN")
+    admin = await create_user("admin@email.com", "ADMIN")
     customers = [
-        await create_user(f"customer{i}@example.com")
+        await create_user(f"customer{i}@email.com")
         for i in range(1, 6)
     ]
 
@@ -98,21 +98,22 @@ async def seed_database():
 
     # Seed Products
     products_data = [
-        {"name": "Running Shoes", "price": 99.99, "old_price": 129.99},
-        {"name": "Sports T-Shirt", "price": 29.99, "old_price": 39.99},
-        {"name": "Gym Bag", "price": 49.99, "old_price": 59.99},
-        {"name": "Training Shorts", "price": 34.99, "old_price": 44.99},
+        {"name": "Running Shoes", "price": 99.99, "old_price": 129.99, "sku": "RUN123"},
+        {"name": "Sports T-Shirt", "price": 29.99, "old_price": 39.99, "sku": "TSH123"},
+        {"name": "Gym Bag", "price": 49.99, "old_price": 59.99, "sku": "GMB123"},
+        {"name": "Training Shorts", "price": 34.99, "old_price": 44.99, "sku": "TS123"},
     ]
 
     products = []
     for product_data in products_data:
         product = await db.product.create({
             "name": product_data["name"],
+            "sku": product_data["sku"],
             "slug": product_data["name"].lower().replace(" ", "-"),
             "description": fake.text(max_nb_chars=200),
             "price": product_data["price"],
             "old_price": product_data["old_price"],
-            "image": f"https://example.com/images/{product_data['name'].lower().replace(' ', '-')}.jpg",
+            "image": f"http://localhost/images/{product_data['name'].lower().replace(' ', '-')}.jpg",
             "status": "IN_STOCK",
             "ratings": round(random.uniform(3.0, 5.0), 1),
             "created_at": datetime.now()

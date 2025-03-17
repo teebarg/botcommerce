@@ -82,33 +82,6 @@ export interface ExtendedOrder extends Order {
     order_items: OrderItem[];
 }
 
-export interface ExtendedOrderItem extends OrderItem {
-    product: Product;
-}
-
-export interface ProductImage {
-    id: number;
-    product_id: number;
-    image: string;
-}
-
-export interface Product {
-    id: number
-}
-
-export interface ProductVariant {
-    id: number;
-    product_id: number;
-    name: string;
-    price: number;
-}
-
-export interface ExtendedProduct extends Product {
-    categories: Category[];
-    variants: ProductVariant[];
-    images: ProductImage[];
-}
-
 
 export interface User {
     id: number;

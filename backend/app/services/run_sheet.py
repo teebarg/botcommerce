@@ -550,6 +550,7 @@ async def bulk_upload_products(products: list[dict]):
                     "create": {
                         "name": product_data["name"],
                         "slug": product_data["slug"],
+                        "sku": product_data["sku"],
                         "description": product_data["description"],
                         "price": float(product_data["price"]),
                         "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
@@ -684,6 +685,7 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
                     "id": row_data.get("id", ""),
                     "name": name,
                     "slug": row_data.get("slug", name.lower().replace(" ", "-")),
+                    "sku": row_data.get("sku", f"{name.lower().replace(' ', '-')}-default"),
                     "description": row_data.get("description", ""),
                     "price": float(row_data.get("price", 0.0)),
                     "old_price": float(row_data.get("old_price", 0.0)),

@@ -10,7 +10,6 @@ import { SlideOver } from "@modules/common/components/slideover";
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
 
-import { ComboBox } from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
 import { Brand, Category, Collection } from "@/lib/models";
 
@@ -47,14 +46,13 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                         </div>
                     </div>
                     <div className="flex items-center gap-1 flex-1 sm:flex-initial">
-                        <ComboBox
-                            className="md:w-[18rem] w-auto flex-1"
-                            items={filters}
-                            name="filter"
-                            placeholder="Filter products"
-                            selectedKey={value}
-                            onSelectionChange={setValue}
-                        />
+                        <select className="md:w-[18rem] w-auto flex-1" name="filter" value={value} onChange={(e) => setValue(e.target.value)}>
+                            {filters.map((filter, idx: number) => (
+                                <option key={idx} value={filter.id}>
+                                    {filter.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </header>

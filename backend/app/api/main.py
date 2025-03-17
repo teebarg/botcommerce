@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
+    auth,
     activities,
     address,
     brand,
@@ -17,6 +18,7 @@ from app.api.routes import (
 )
 
 api_router = APIRouter()
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(activities.router, prefix="/activities", tags=["activities"])
 api_router.include_router(address.router, prefix="/address", tags=["address"])
 api_router.include_router(brand.router, prefix="/brand", tags=["brand"])

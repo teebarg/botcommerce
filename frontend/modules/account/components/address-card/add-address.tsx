@@ -9,7 +9,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 
-import { ComboBox } from "@/components/ui/combobox";
+import MultiSelectCombobox from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
 
 const AddAddress = () => {
@@ -66,7 +66,7 @@ const AddAddress = () => {
                                     />
                                     <Input required autoComplete="locality" data-testid="city-input" label="City" name="city" />
                                 </div>
-                                <ComboBox data-testid="state-input" items={states} label="State" name="state" placeholder="Select State" />
+                                <MultiSelectCombobox data-testid="state-input" name="state" options={states} placeholder="Select State" />
                                 <Input autoComplete="phone" data-testid="phone-input" label="Phone" name="phone" />
                             </div>
                             <div className="flex gap-3 mt-6">

@@ -15,6 +15,7 @@ export const categoryApi = {
     },
     async get(id: string): ApiResult<Category> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
+
         return await tryCatch<Category>(fetcher(url));
     },
     async create(input: Category): ApiResult<Category> {

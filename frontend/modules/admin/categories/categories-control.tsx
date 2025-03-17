@@ -37,6 +37,8 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
             deleteState.close();
         } catch (error) {
             toast.error("Error deleting category");
+        } finally {
+            setIsPending(false);
         }
     };
 
@@ -73,7 +75,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                 </Drawer>
                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                     <DialogTrigger>
-                        <Trash />
+                        <Trash className="text-rose-500" />
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>

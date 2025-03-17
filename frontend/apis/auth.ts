@@ -1,7 +1,8 @@
 import { fetcher } from "./fetcher";
 
 import { revalidate, signOut } from "@/actions/revalidate";
-import { Token } from "@/lib/models";
+import { Message, Token } from "@/lib/models";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Product API methods
 export const authApi = {
@@ -32,5 +33,25 @@ export const authApi = {
         const { access_token } = await fetcher<Token>(url, { method: "POST", body: JSON.stringify(input) });
 
         return access_token;
+    },
+    async requestMagicLink(email: string): ApiResult<Message> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/magic-link`;
+        const response = await tryCatch<Message>(
+            fetcher(url, { method: "POST", body: JSON.stringify({ email }), headers: { "content-type": "application/json" } })
+        );
+
+        return response;
+    },
+    async verifyMagicLink(token: string): ApiResult<Token> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/verify-magic-link`;
+        const response = await tryCatch<Token>(
+            fetcher(url, { method: "POST", body: JSON.stringify({ token }), headers: { "content-type": "application/json" } })
+        );
+
+        if (!response.error) {
+            revalidate("customer");
+        }
+
+        return response;
     },
 };

@@ -73,10 +73,10 @@ CREATE TABLE "brands" (
 -- CreateTable
 CREATE TABLE "categories" (
     "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
     "parent_id" INTEGER,
-    "name" VARCHAR(255),
-    "slug" VARCHAR(255) NOT NULL,
-    "is_active" BOOLEAN,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -100,6 +100,7 @@ CREATE TABLE "products" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "slug" VARCHAR(255) NOT NULL,
+    "sku" TEXT NOT NULL,
     "description" TEXT,
     "price" DOUBLE PRECISION NOT NULL,
     "old_price" DOUBLE PRECISION NOT NULL,
@@ -241,7 +242,8 @@ CREATE TABLE "coupons" (
 -- CreateTable
 CREATE TABLE "carts" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "cart_number" TEXT NOT NULL,
+    "user_id" INTEGER,
     "status" "CartStatus" NOT NULL DEFAULT 'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "last_updated" TIMESTAMP(3) NOT NULL,
@@ -322,6 +324,9 @@ CREATE UNIQUE INDEX "brands_name_key" ON "brands"("name");
 CREATE UNIQUE INDEX "brands_slug_key" ON "brands"("slug");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "categories_slug_key" ON "categories"("slug");
 
 -- CreateIndex
@@ -335,6 +340,9 @@ CREATE UNIQUE INDEX "products_name_key" ON "products"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "products_slug_key" ON "products"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "products_sku_key" ON "products"("sku");
 
 -- CreateIndex
 CREATE INDEX "products_name_slug_idx" ON "products"("name", "slug");
@@ -368,6 +376,9 @@ CREATE UNIQUE INDEX "payments_order_id_key" ON "payments"("order_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "coupons_code_key" ON "coupons"("code");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "carts_cart_number_key" ON "carts"("cart_number");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
@@ -406,13 +417,13 @@ ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_user_id_fkey" FOREIGN 
 ALTER TABLE "addresses" ADD CONSTRAINT "addresses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "categories" ADD CONSTRAINT "categories_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "categories"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "categories" ADD CONSTRAINT "categories_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "product_variants" ADD CONSTRAINT "product_variants_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "product_images" ADD CONSTRAINT "product_images_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "product_images" ADD CONSTRAINT "product_images_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;

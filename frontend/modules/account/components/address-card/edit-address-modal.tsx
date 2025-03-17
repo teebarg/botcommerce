@@ -10,7 +10,6 @@ import { useOverlayTriggerState } from "react-stately";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 
-import { ComboBox } from "@/components/ui/combobox";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
@@ -151,14 +150,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         name="city"
                                     />
                                 </div>
-                                <ComboBox
-                                    data-testid="state-input"
-                                    defaultInputValue={address.state || undefined}
-                                    items={states}
-                                    label="State"
-                                    name="state"
-                                    placeholder="Select State"
-                                />
+                                <select data-testid="state-input" defaultValue={address.state || undefined} name="state">
+                                    {states.map((state, idx: number) => (
+                                        <option key={idx} value={state.id}>
+                                            {state.name}
+                                        </option>
+                                    ))}
+                                </select>
                                 <Input
                                     autoComplete="phone"
                                     data-testid="phone-input"
