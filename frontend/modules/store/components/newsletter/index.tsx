@@ -26,12 +26,11 @@ export default function NewsletterForm() {
                 <Input
                     name="email"
                     placeholder="email@gmail.com"
-                    size="sm"
                     startContent={<Mail className="text-default-500 pointer-events-none flex-shrink-0" />}
                     type="email"
                 />
                 <div className="mt-4 sm:ml-4 sm:mt-0 sm:flex-shrink-0">
-                    <Button aria-label="subscribe" color="secondary" isLoading={isPending} size="sm" type="submit" variant="shadow">
+                    <Button aria-label="subscribe" isLoading={isPending} size="sm" type="submit">
                         Subscribe
                     </Button>
                 </div>

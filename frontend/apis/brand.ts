@@ -1,8 +1,9 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/util/util";
-import { PaginatedBrand, Brand } from "@/lib/models";
+import { PaginatedBrand, Brand, Message } from "@/lib/models";
 import { revalidate } from "@/actions/revalidate";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Brand API methods
 export const brandApi = {
@@ -11,7 +12,7 @@ export const brandApi = {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/`, searchParams);
 
         try {
-            const response = await fetcher<PaginatedBrand>(url);
+            const response = await fetcher<PaginatedBrand>(url, { next: { tags: ["brands"] } });
 
             return response;
         } catch (error) {
@@ -24,28 +25,36 @@ export const brandApi = {
 
         return response;
     },
-    async create(input: { name: string; is_active: boolean }): Promise<Brand> {
+    async create(input: { name: string; is_active: boolean }): ApiResult<Brand> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/`;
-        const response = await fetcher<Brand>(url, { method: "POST", body: JSON.stringify(input) });
 
-        revalidate("brands");
+        const response = await tryCatch<Brand>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
 
-        return response;
-    },
-    async update(id: string, input: { name: string; is_active: boolean }): Promise<Brand> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/${id}`;
-        const response = await fetcher<Brand>(url, { method: "PATCH", body: JSON.stringify(input) });
-
-        revalidate("brands");
+        if (!response.error) {
+            revalidate("brands");
+        }
 
         return response;
     },
-    async delete(id: string): Promise<{ success: boolean; message: string }> {
+    async update(id: string, input: { name: string; is_active: boolean }): ApiResult<Brand> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/${id}`;
+        const response = await tryCatch<Brand>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
+
+        if (!response.error) {
+            revalidate("brands");
+        }
+
+        return response;
+    },
+    async delete(id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/brand/${id}`;
 
-        await fetcher<Brand>(url, { method: "DELETE" });
-        revalidate("brands");
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
 
-        return { success: true, message: "Brand deleted successfully" };
+        if (!response.error) {
+            revalidate("brands");
+        }
+
+        return response;
     },
 };

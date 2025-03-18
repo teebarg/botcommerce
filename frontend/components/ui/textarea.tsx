@@ -1,124 +1,38 @@
-import type { AriaTextFieldProps } from "@react-types/textfield";
-
-import { cn } from "@lib/util/cn";
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { useTextField } from "@react-aria/textfield";
 
-type InputClassNames = Partial<Record<"base" | "inputWrapper" | "label" | "innerWrapper" | "description" | "input", string>>;
+import { cn } from "@/lib/util/cn";
 
-interface Props extends Omit<AriaTextFieldProps, "onChange" | "onFocus" | "onBlur"> {
-    hidden?: boolean;
-    className?: string;
-    errorMessage?: string;
-    classNames?: InputClassNames;
-    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    onFocus?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
-    onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+    error?: string;
+    label?: string;
 }
 
-const TextArea: React.FC<Props> = ({ errorMessage, hidden, className, classNames, ...props }) => {
-    const [isHovered, setIsHovered] = useState(false);
-
-    let { label } = props;
-    let textareaRef = React.useRef<HTMLTextAreaElement>(null);
-
-    // ... existing code ...
-    let { labelProps, inputProps, descriptionProps, errorMessageProps, isInvalid, validationErrors } = useTextField(
-        {
-            ...props,
-            inputElementType: "textarea",
-            onChange: props.onChange ? (value) => props.onChange?.({ target: { value } } as any) : undefined,
-            onFocus: props.onFocus ? () => props.onFocus?.({} as any) : undefined,
-            onBlur: props.onBlur ? () => props.onBlur?.({} as any) : undefined,
-        },
-        textareaRef
-    );
-    // ... existing code ...
-    const adjustHeight = () => {
-        if (textareaRef.current) {
-            // Reset height to auto to calculate the scroll height properly
-            textareaRef.current.style.height = "auto";
-            // Set height to scrollHeight but limit it to a max of 160px
-            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
-        }
-    };
-
-    useEffect(() => {
-        // Adjust height on mount
-        adjustHeight();
-    }, []);
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, label, ...props }, ref) => {
+    const id = React.useId();
 
     return (
-        <React.Fragment>
-            <div
-                className={cn("group flex flex-col data-[hidden=true]:hidden w-full focus-visible:outline-none", className, classNames?.["base"])}
-                data-filled="true"
-                data-filled-within="true"
-                data-has-elements="true"
-                data-has-helper={isInvalid || props.description}
-                data-has-label={Boolean(label)}
-                data-has-value={Boolean(inputProps.value)}
-                data-hidden={hidden}
-                data-hover={isHovered ? "true" : "false"}
-                data-invalid={isInvalid}
-                data-slot="base"
-            >
-                <div
-                    className={cn("relative w-full inline-flex shadow-sm px-3 bg-default-100 rounded-xl flex-col py-2", classNames?.["inputWrapper"])}
-                    data-hover={isHovered ? "true" : "false"}
-                    data-slot="input-wrapper"
-                    style={{ cursor: "text" }}
-                >
-                    <label
-                        {...labelProps}
-                        className={cn(
-                            "z-10 pointer-events-none block text-foreground-500 cursor-text relative text-sm pb-0.5 max-w-full",
-                            "duration-200 transition-all group-data-[filled-within=true]:text-default-500 text-ellipsis overflow-hidden",
-                            classNames?.["label"]
-                        )}
-                        data-slot="label"
-                    >
-                        {label}
-                    </label>
-                    <div
-                        className={cn("inline-flex w-full items-center h-full box-border group-data-[has-label=true]:items-end pb-0.5")}
-                        data-slot="inner-wrapper"
-                    >
-                        <textarea
-                            {...inputProps}
-                            ref={textareaRef}
-                            className={cn(
-                                "w-full font-normal bg-transparent outline-none placeholder:text-foreground-500 focus-visible:outline-none text-sm",
-                                "group-data-[has-value=true]:text-default-foreground pt-0 transition-height duration-100 resize-none autofill:bg-transparent",
-                                classNames?.["input"]
-                            )}
-                            data-hide-scroll="true"
-                            data-slot="input"
-                            style={{ height: "80px !important" }}
-                            onInput={adjustHeight}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                        />
-                    </div>
-                </div>
-                <div className="hidden group-data-[has-helper=true]:flex p-1 relative flex-col gap-1.5" data-slot="helper-wrapper">
-                    {props.description && (
-                        <div {...descriptionProps} className={cn("text-xs text-foreground-500", classNames?.["description"])} data-slot="description">
-                            {props.description}
-                        </div>
-                    )}
-                    {isInvalid && (
-                        <div {...errorMessageProps} className="text-xs text-danger" data-slot="error-message">
-                            {validationErrors.join(" ")}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </React.Fragment>
+        <>
+            {label && (
+                <label className="text-sm font-medium text-gray-500 mb-0.5" htmlFor={id}>
+                    {label}
+                </label>
+            )}
+            <textarea
+                ref={ref}
+                className={cn(
+                    "w-full h-32 p-4 border rounded-lg focus:ring-1 focus:ring-blue-50 focus:border-transparent resize-none",
+                    "flex min-h-[80px] border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                    className
+                )}
+                id={id}
+                {...props}
+            />
+            {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+        </>
     );
-};
+});
 
-TextArea.displayName = "TextArea";
+Textarea.displayName = "Textarea";
 
-export { TextArea };
+export { Textarea };

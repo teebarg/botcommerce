@@ -7,13 +7,13 @@ import { Facet } from "@/lib/models";
 
 interface CheckboxGroupProps {
     groupName: string;
-    checkboxes: Record<string, any>[];
+    checkboxes?: Record<string, any>[];
     item?: any;
     facets?: Facet;
 }
 
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, facets, item }) => {
-    const { updateQuery } = useUpdateQuery(200);
+    const { updateQuery } = useUpdateQuery(300);
     const [dataSet, setDataSet] = useState(new Set());
 
     const searchParams = useSearchParams();
@@ -24,12 +24,12 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
 
         if (checked) {
             newSet.add(item.slug);
-            checkboxes.forEach((element) => {
+            checkboxes?.forEach((element) => {
                 newSet.add(element.slug);
             });
         } else {
             newSet.delete(item.slug);
-            checkboxes.forEach((element) => {
+            checkboxes?.forEach((element) => {
                 newSet.delete(element.slug);
             });
         }
@@ -71,7 +71,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
             <div style={{ marginBottom: "16px" }}>
                 <Checkbox color="warning" isSelected={dataSet.has(item.slug)} label={groupName} onChange={handleParentChange} />
                 <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
-                    {checkboxes.map((checkbox) => (
+                    {checkboxes?.map((checkbox) => (
                         <div key={`sub-${checkbox.slug}`} className="flex justify-between">
                             <Checkbox
                                 color="warning"

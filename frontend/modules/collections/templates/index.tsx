@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRight, ExclamationIcon, Tag } from "nui-react-icons";
+import { ChevronRight, Exclamation, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import { SortOptions } from "types/global";
 import dynamic from "next/dynamic";
@@ -43,7 +43,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
 
     const { brands } = brandRes;
     const { collections } = collectionsRes;
-    const { categories: cat } = catRes;
+    const { categories: cat } = catRes.data ?? {};
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
     let wishlist: WishItem[] = [];
@@ -65,7 +65,18 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         categories: cat_ids,
     };
 
-    const { products, facets, ...pagination } = await api.product.search(queryParams);
+    const res = await api.product.search(queryParams);
+
+    if (res.error) {
+        return <ServerError />;
+    }
+
+
+    if (!res.data) {
+        return <>No Products</>;
+    }
+
+    const { products, facets, ...pagination } = res.data;
 
     return (
         <React.Fragment>
@@ -91,7 +102,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                 <div className="px-4 my-6 md:hidden">
                     <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
-                        {cat.map((category: Category, index: number) => (
+                        {cat?.map((category: Category, index: number) => (
                             <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
                                 {category.name}
                             </BtnLink>
@@ -137,7 +148,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                     {products.length === 0 ? (
                                         <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1">
                                             <div className="max-w-md mx-auto text-center">
-                                                <ExclamationIcon className="w-20 h-20 mx-auto text-danger" />
+                                                <Exclamation className="w-20 h-20 mx-auto text-danger" />
                                                 <h1 className="text-4xl font-bold mt-6">Oops! No Products Found</h1>
                                                 <p className="text-default-500 my-4">{`There are no products in this category`}</p>
                                                 <BtnLink color="primary" href="/">

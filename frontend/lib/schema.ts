@@ -5,6 +5,30 @@ export const TokenSchema = z.object({
     token_type: z.string().default("bearer"),
 });
 
+export const PagSchema = z.object({
+    page: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
+});
+
+export const CategorySchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    is_active: z.boolean(),
+    parent_id: z.number().nullable(),
+    parent: z.null(),
+    subcategories: z.array(z.any()).optional(),
+    products: z.null(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const PaginatedCategorySchema = PagSchema.extend({
+    categories: z.array(CategorySchema),
+});
+
 export const UserSchema = z.object({
     id: z.number(),
     firstname: z.string(),
@@ -36,36 +60,41 @@ export const PaginatedReviewSchema = z.object({
     total_pages: z.number(),
 });
 
-export const ProductSchema = z.object({
+export const ProductStatusSchema = z.enum(["IN_STOCK", "OUT_OF_STOCK", "DISCONTINUED"]);
+
+export const ProductVariantSchema = z.object({
     id: z.number(),
+    product: z.null(),
+    product_id: z.number(),
     name: z.string(),
     slug: z.string(),
-    description: z.string().optional(),
+    sku: z.string(),
+    status: ProductStatusSchema,
     price: z.number(),
     old_price: z.number(),
-    image: z.string(),
-    images: z.array(z.string()).optional(),
-    is_active: z.boolean().optional(),
-    ratings: z.number().optional(),
-    inventory: z.number().optional(),
-    created_at: z.string().optional(),
-    collections: z.array(z.string()),
-    reviews: z.array(ReviewSchema).optional(),
+    inventory: z.number(),
+    attributes: z.record(z.string()),
+    order_items: z.null(),
+    cart_items: z.null(),
+    created_at: z.string(),
+    updated_at: z.string(),
 });
 
-export const PagSchema = z.object({
-    page: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
+export const ProductImageSchema = z.object({
+    id: z.number(),
+    product_id: z.number(),
+    image: z.string(),
+    created_at: z.string().optional(),
 });
 
 export const BrandSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
-    is_active: z.boolean().optional(),
+    is_active: z.boolean(),
+    products: z.null(),
     created_at: z.string(),
+    updated_at: z.string(),
 });
 
 export const PaginatedBrandSchema = PagSchema.extend({
@@ -76,8 +105,10 @@ export const CollectionSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
-    is_active: z.boolean().optional(),
+    is_active: z.boolean(),
+    products: z.null(),
     created_at: z.string(),
+    updated_at: z.string(),
 });
 
 export const PaginatedCollectionSchema = PagSchema.extend({
@@ -91,12 +122,55 @@ const PaginationSchema = z.object({
     total_pages: z.number(),
 });
 
-export const CartItemSchema = z.object({
-    item_id: z.string(),
-    product_id: z.string(),
-    slug: z.string(),
+export const ProductSearchSchema = z.object({
+    id: z.number(),
     name: z.string(),
-    description: z.string().optional(),
+    slug: z.string(),
+    sku: z.string(),
+    description: z.string(),
+    price: z.number(),
+    old_price: z.number(),
+    image: z.string(),
+    status: ProductStatusSchema,
+    variants: z.array(ProductVariantSchema).nullable(),
+    ratings: z.number(),
+    categories: z.array(z.string()),
+    collections: z.array(z.string()),
+    brands: z.array(z.string()),
+    tags: z.null(),
+    images: z.array(z.string()),
+    reviews: z.array(z.any()).nullable(),
+    favorites: z.null(),
+});
+
+export const ProductSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    sku: z.string(),
+    description: z.string(),
+    price: z.number(),
+    old_price: z.number(),
+    image: z.string(),
+    status: ProductStatusSchema,
+    variants: z.array(ProductVariantSchema),
+    ratings: z.number(),
+    categories: z.array(CategorySchema),
+    collections: z.array(CollectionSchema),
+    brands: z.array(BrandSchema),
+    tags: z.null(),
+    images: z.array(ProductImageSchema),
+    reviews: z.array(ReviewSchema),
+    favorites: z.null(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const CartItemSchema = z.object({
+    id: z.number(),
+    item_id: z.string(),
+    variant_id: z.string(),
+    variant: ProductVariantSchema,
     image: z.string().optional(),
     quantity: z.number(),
     price: z.number(),
@@ -104,6 +178,7 @@ export const CartItemSchema = z.object({
 });
 
 export const CartSchema = z.object({
+    id: z.number(),
     cart_id: z.string(),
     customer_id: z.string(),
     email: z.string().email(),
@@ -172,27 +247,13 @@ const AddressSchema = z.object({
     id: z.string(),
 });
 
-export const CategorySchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    slug: z.string().optional(),
-    is_active: z.boolean().default(true),
-    children: z.any().optional(),
-    parent_id: z.number().optional(),
-    created_at: z.string(),
-    updated_at: z.string(),
-});
-
-export const PaginatedCategorySchema = PagSchema.extend({
-    categories: z.array(CategorySchema),
-});
-
 export const WishItemSchema = z.object({
     id: z.number(),
     name: z.string(),
     description: z.string().optional(),
     user_id: z.number().optional(),
     product_id: z.number().optional(),
+    product: ProductSchema,
     image: z.string(),
     created_at: z.string().optional(),
 });
@@ -219,9 +280,13 @@ export const FacetSchema = z.object({
     collections: z.record(z.string()).optional(),
 });
 
+export const PaginatedProductSearchSchema = PagSchema.extend({
+    products: z.array(ProductSearchSchema),
+    facets: FacetSchema.optional(),
+});
+
 export const PaginatedProductSchema = PagSchema.extend({
     products: z.array(ProductSchema),
-    facets: FacetSchema.optional(),
 });
 
 export const SessionSchema = z.object({
@@ -233,6 +298,8 @@ export const SessionSchema = z.object({
     phone: z.string().optional(),
     isActive: z.boolean(),
     isAdmin: z.boolean(),
+    status: z.string(),
+    role: z.string(),
 });
 
 export const MessageSchema = z.object({

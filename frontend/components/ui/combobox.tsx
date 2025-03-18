@@ -1,119 +1,171 @@
-import { Item } from "@react-stately/collections";
-import { useComboBoxState } from "@react-stately/combobox";
-import React from "react";
-import { ChevronDown } from "nui-react-icons";
-import { useButton } from "@react-aria/button";
-import { useComboBox } from "@react-aria/combobox";
-import { useFilter } from "@react-aria/i18n";
-import { cn } from "@lib/util/cn";
+import React, { useState, useEffect, useRef } from "react";
 
-interface ComboBoxItem {
-    id: number | string;
+// Define option type
+export interface Option {
+    id: string | number;
     name: string;
 }
 
-interface ComboBoxProps {
-    label?: string;
-    name: string;
-    defaultInputValue?: string;
+// Define component props
+interface MultiSelectComboboxProps {
+    options: Option[];
     placeholder?: string;
-    className?: string;
-    items: ComboBoxItem[];
-    [key: string]: any;
+    onChange?: (selectedOptions: Option[]) => void;
+    name?: string;
+    value?: Option[];
+    isDisabled?: boolean;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({ name, label, placeholder, className, ...props }) => {
-    const { contains } = useFilter({ sensitivity: "base" });
+const MultiSelectCombobox: React.FC<MultiSelectComboboxProps> = ({
+    options = [],
+    placeholder = "Select options...",
+    onChange = () => {},
+    name,
+    value = [],
+    isDisabled = false,
+}) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>("");
+    const [selectedOptions, setSelectedOptions] = useState<Option[]>(value);
+    const comboboxRef = useRef<HTMLDivElement>(null);
 
-    const state = useComboBoxState({
-        defaultFilter: contains,
-        children: (item: ComboBoxItem) => <Item key={item.id}>{item.name}</Item>,
-        ...props,
-    });
+    // Filter options based on search
+    const filteredOptions = options.filter((option) => option.name.toLowerCase().includes(search.toLowerCase()));
 
-    const triggerRef = React.useRef<HTMLButtonElement>(null);
-    const inputRef = React.useRef<HTMLInputElement>(null);
-    const listBoxRef = React.useRef<HTMLUListElement>(null);
-    const popoverRef = React.useRef<HTMLDivElement>(null);
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (comboboxRef.current && !comboboxRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
 
-    // Get props for child elements from useComboBox
-    const {
-        buttonProps: triggerProps,
-        inputProps,
-        listBoxProps,
-        labelProps,
-    } = useComboBox(
-        {
-            ...props,
-            inputRef,
-            buttonRef: triggerRef,
-            listBoxRef,
-            popoverRef,
-            menuTrigger: "input",
-        },
-        state
-    );
+        document.addEventListener("mousedown", handleClickOutside);
 
-    const { buttonProps } = useButton(triggerProps, triggerRef);
-    const { autoFocus, linkBehavior, shouldFocusOnHover, shouldSelectOnPressUp, shouldUseVirtualFocus, ...validListBoxProps } = listBoxProps;
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    // Toggle option selection
+    const toggleOption = (option: Option): void => {
+        setSelectedOptions((prev) => {
+            // Check if option is already selected
+            const isSelected = prev.some((item) => item.id === option.id);
+
+            if (isSelected) {
+                // Remove option if already selected
+                onChange(prev.filter((item) => item.id !== option.id));
+
+                return prev.filter((item) => item.id !== option.id);
+            } else {
+                // Add option if not selected
+                onChange([...prev, option]);
+
+                return [...prev, option];
+            }
+        });
+    };
+
+    // Remove a selected option
+    const removeOption = (option: Option, e: React.MouseEvent): void => {
+        e.stopPropagation();
+        setSelectedOptions((prev) => prev.filter((item) => item.id !== option.id));
+    };
 
     return (
-        <div className={cn("inline-flex flex-col", className)}>
-            {label && (
-                <label className="text-foreground-500 text-xs" {...labelProps}>
-                    {label}
-                </label>
-            )}
-            <div className="relative">
-                <button
-                    {...buttonProps}
-                    ref={triggerRef}
-                    className={cn(
-                        "relative px-3 w-full inline-flex shadow-sm outline-none bg-default-100",
-                        "rounded-xl flex-col items-start justify-center h-12 py-2"
-                    )}
-                >
-                    <input readOnly className="hidden" name={name} value={state.inputValue} />
-                    <input
-                        {...inputProps}
-                        ref={inputRef}
-                        className="bg-transparent outline-none flex-grow text-default-foreground font-normal text-sm w-full cursor-pointer"
-                        placeholder={placeholder}
-                        style={{
-                            boxSizing: "border-box",
-                        }}
-                    />
-                    <ChevronDown
-                        className={cn("absolute right-3 w-5 h-5 transition-transform duration-500 ease-out", {
-                            "rotate-180": state.isOpen,
-                        })}
-                        viewBox="0 0 24 24"
-                    />
-                </button>
-                {state.isOpen && (
-                    <div ref={popoverRef} className="absolute w-full mt-1 left-0 top-full z-50">
-                        <ul
-                            {...validListBoxProps}
-                            ref={listBoxRef}
-                            className="absolute w-full bg-default-100 shadow-lg rounded-md max-h-52 overflow-y-auto px-1 py-2 list-none m-0"
-                        >
-                            {[...state.collection].map((item) => (
-                                <li
-                                    key={item.key}
-                                    className={cn("px-2 py-4 cursor-pointer rounded-lg text-sm font-semibold hover:bg-default/20", {
-                                        "bg-default/70": state.selectionManager.isSelected(item.key),
-                                    })}
-                                    onMouseDown={() => state.selectionManager.select(item.key)}
+        <div ref={comboboxRef} className="relative w-full">
+            {/* Hidden input for form integration */}
+            <input name={name} readOnly={true} type="hidden" value={selectedOptions.map((opt) => opt.id).join(",")} />
+
+            {/* Main combobox button */}
+            <div
+                className={`flex relative min-h-10 w-full rounded-md border border-gray-300 px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                }`}
+                onClick={() => !isDisabled && setIsOpen(!isOpen)}
+            >
+                {/* Selected options display */}
+                <div className="flex flex-wrap gap-1 flex-1 min-w-0">
+                    {selectedOptions.length > 0 ? (
+                        selectedOptions.map((option) => (
+                            <span key={option.id} className="flex items-center gap-1 bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm">
+                                {option.name}
+                                <button
+                                    className="text-blue-500 hover:text-blue-700 font-bold"
+                                    type="button"
+                                    onClick={(e) => removeOption(option, e)}
                                 >
-                                    {item.rendered}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
+                                    ×
+                                </button>
+                            </span>
+                        ))
+                    ) : (
+                        <span className="text-default-500">{placeholder}</span>
+                    )}
+
+                    {/* Search input that appears when dropdown is open */}
+                    {isOpen && (
+                        <input
+                            autoFocus
+                            className="outline-none flex-1 min-w-[80px] bg-transparent"
+                            placeholder="Search..."
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    )}
+                </div>
+
+                {/* Dropdown indicator */}
+                <div className="ml-auto self-center">
+                    <svg
+                        className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+                        fill="none"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path d="M4 6L8 10L12 6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                    </svg>
+                </div>
             </div>
+            {/* Dropdown options */}
+            {isOpen && (
+                <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-background py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    {filteredOptions.length > 0 ? (
+                        filteredOptions.map((option: Option, idx: number) => {
+                            const isSelected = selectedOptions.some((item) => item.id === option.id);
+
+                            return (
+                                <div
+                                    key={idx}
+                                    className={`relative flex cursor-pointer select-none items-center px-3 py-2 ${
+                                        isSelected ? "text-blue-700" : "text-default-900"
+                                    } hover:bg-content1`}
+                                    onClick={() => toggleOption(option)}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            checked={isSelected}
+                                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            type="checkbox"
+                                            onChange={() => {}}
+                                        />
+                                        {option.name}
+                                    </div>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="relative cursor-default select-none items-center px-3 py-2 text-default-500">No options found.</div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
 
-export { ComboBox };
+export default MultiSelectCombobox;

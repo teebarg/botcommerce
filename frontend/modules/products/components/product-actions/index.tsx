@@ -6,11 +6,11 @@ import { currency } from "@lib/util/util";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
-import { Product } from "@/lib/models";
+import { ProductSearch } from "@/lib/models";
 import { api } from "@/apis";
 
 type ProductActionsProps = {
-    product: Product;
+    product: ProductSearch;
     disabled?: boolean;
     showDetails?: boolean;
     showPrice?: boolean;
@@ -33,9 +33,9 @@ export default function ProductActions({
     // check if the selected variant is in stock
     const inStock = useMemo(() => {
         // If we don't manage inventory, we can always add to cart
-        if (product.inventory) {
-            return true;
-        }
+        // if (product.inventory) {
+        //     return true;
+        // }
 
         // Otherwise, we can't add to cart
         return false;

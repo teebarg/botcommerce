@@ -30,8 +30,8 @@ const CheckoutLoginForm: React.FC<Props> = () => {
             <p className="text-center text-base mb-8">Sign in to place your order.</p>
             <form action={formAction} className="w-full">
                 <div className="flex flex-col w-full gap-y-4">
-                    <Input isRequired data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
-                    <Input isRequired data-testid="password-input" label="Password" name="password" type="password" />
+                    <Input required data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
+                    <Input required data-testid="password-input" label="Password" name="password" type="password" />
                 </div>
                 <Button
                     aria-label="sign in"
@@ -39,7 +39,6 @@ const CheckoutLoginForm: React.FC<Props> = () => {
                     color="primary"
                     data-testid="sign-in-button"
                     isLoading={isPending}
-                    size="md"
                     type="submit"
                 >
                     Sign in

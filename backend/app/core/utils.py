@@ -8,12 +8,12 @@ from pathlib import Path
 from typing import Any
 
 import emails  # type: ignore
-from firebase_cart import Order
 from jinja2 import Environment, FileSystemLoader, Template
 
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.generic import User
+from app.models.user import User
+from app.models.order import OrderResponse
 
 
 @dataclass
@@ -44,11 +44,41 @@ def format_naira(value: int):
 
 
 def format_image(image: str):
-    return f"https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/products%2F{image}?alt=media"
+    return image
 
 
 def url_to_list(url: str) -> list[str]:
     return [f'{item.replace("-", " ")}' for item in url.split(",")]
+
+
+def slugify(text) -> str:
+    """
+    Convert a string into a URL-friendly slug.
+    Removes special characters, converts to lowercase, and replaces spaces with hyphens.
+
+    Args:
+        text (str): The input string to convert
+
+    Returns:
+        str: The slugified string
+    """
+    # Convert to lowercase
+    text = text.lower()
+
+    # Replace spaces with hyphens
+    text = text.replace(' ', '-')
+
+    # Remove special characters, keeping only alphanumeric and hyphens
+    slug = ''.join(char for char in text if char.isalnum() or char == '-')
+
+    # Remove multiple consecutive hyphens
+    while '--' in slug:
+        slug = slug.replace('--', '-')
+
+    # Remove leading/trailing hyphens
+    slug = slug.strip('-')
+
+    return slug
 
 
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
@@ -107,7 +137,7 @@ def generate_test_email(email_to: str) -> EmailData:
     return EmailData(html_content=html_content, subject=subject)
 
 
-def generate_invoice_email(order: Order, user: User) -> EmailData:
+def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Order Confirmation"
     html_content = render_email_template(
@@ -214,3 +244,17 @@ def generate_id(prefix="cart_", length=25):
     chars = string.ascii_uppercase + string.digits
     unique_part = "".join(random.choice(chars) for _ in range(length))
     return prefix + unique_part
+
+
+def generate_magic_link_email(email_to: str, magic_link: str, first_name: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Sign in to your account"
+    html_content = render_email_template(
+        template_name="magic_link.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "magic_link": magic_link,
+            "first_name": first_name
+        },
+    )
+    return EmailData(html_content=html_content, subject=subject)

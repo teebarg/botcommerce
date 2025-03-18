@@ -4,7 +4,7 @@ import { submitContactForm } from "@modules/account/actions";
 import { useActionState, useEffect, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { Input } from "@components/ui/input";
-import { TextArea } from "@components/ui/textarea";
+import { Textarea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
 
 import { Button } from "@/components/ui/button";
@@ -31,18 +31,10 @@ export default function ContactForm() {
     return (
         <form ref={formRef} action={formAction}>
             <div className="mt-10 space-y-4">
-                <Input isRequired classNames={inputClass} label="Name" name="name" placeholder="Ex. John....." />
-                <Input isRequired classNames={inputClass} label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
-                <Input classNames={inputClass} label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
-                <TextArea
-                    isRequired
-                    classNames={inputClass}
-                    description="Your message to us"
-                    label="Description"
-                    name="message"
-                    placeholder="Ex. I want to make an enquiry about..."
-                    validationBehavior="native"
-                />
+                <Input required className="" label="Name" name="name" placeholder="Ex. John....." />
+                <Input required className="" label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
+                <Input className="" label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
+                <Textarea required className="" label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
                 <div className="text-gray-100">
                     <Checkbox defaultSelected color="danger" label="I allow this website to store my submission." name="agreement" />
                 </div>

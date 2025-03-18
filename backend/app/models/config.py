@@ -1,28 +1,24 @@
-
-from sqlmodel import Field, SQLModel
-
-from app.models.base import BaseModel
+from app.models.base import BM
+from pydantic import BaseModel, Field
 
 
-class SiteConfigBase(BaseModel):
-    key: str
-    value: str
+class SiteConfigBase(BM):
+    key: str = Field(..., min_length=1, description="Key is required")
+    value: str = Field(..., min_length=1, description="Value is required")
+
+class SiteConfig(SiteConfigBase):
+    id: int
+
 
 class SiteConfigCreate(SiteConfigBase):
     pass
 
-class SiteConfigUpdate(BaseModel):
-    key: str | None = None
-    value: str | None = None
+
+class SiteConfigUpdate(SiteConfigBase):
+    pass
 
 
-class SiteConfig(SiteConfigBase, table=True):
-    __tablename__ = "site_config"
-
-    id: int | None = Field(default=None, primary_key=True)
-
-
-class SiteConfigs(SQLModel):
+class SiteConfigs(BaseModel):
     configs: list[SiteConfig]
     page: int
     limit: int

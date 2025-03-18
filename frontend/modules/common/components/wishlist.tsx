@@ -2,40 +2,37 @@
 
 import { Cart, HeartFilled } from "nui-react-icons";
 import React, { useState } from "react";
-import { useSnackbar } from "notistack";
 import Image from "next/image";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { removeWish } from "@/actions/user";
 import { api } from "@/apis";
+import { toast } from "sonner";
 
 interface WishlistItemProps {
     id: number;
     name: string;
     image: string;
     price: number;
-    description: string;
 }
 
 const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image }) => {
-    const { enqueueSnackbar } = useSnackbar();
     const [isAdding, setIsAdding] = useState<boolean>(false);
 
     const onRemove = async () => {
         // Handle later
         try {
-            const res = await removeWish(id);
+            const { error } = await api.user.deleteWishlist(id);
 
-            if (!res.success) {
-                enqueueSnackbar(res.error, { variant: "error" });
+            if (error) {
+                toast.error(error);
 
                 return;
             }
 
-            enqueueSnackbar("Product Successfully removed from wishlist", { variant: "success" });
+            toast.success("Product Successfully removed from wishlist");
         } catch (error: any) {
-            enqueueSnackbar("An error occurred, please contact support", { variant: "error" });
+            toast.error("An error occurred, please contact support");
         }
     };
 
@@ -43,10 +40,10 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image }) => {
     const handleAddToCart = async () => {
         setIsAdding(true);
 
-        await api.cart.add({
-            product_id: id.toString(),
-            quantity: 1,
-        });
+        // await api.cart.add({
+        //     variant_id: variants[0].id,
+        //     quantity: 1,
+        // });
 
         setIsAdding(false);
     };

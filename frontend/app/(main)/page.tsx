@@ -1,8 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
-import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
+import { Commerce, Deal, Location, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
-import { imgSrc } from "@lib/util/util";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
@@ -29,12 +28,14 @@ const fetchProducts = async (collection: string, limit: number = 4) => {
 
 export default async function Home() {
     const user = await auth();
-    const [trending, latest, featured, { categories }] = await Promise.all([
+    const [trending, latest, featured, catRes] = await Promise.all([
         fetchProducts("trending"),
         fetchProducts("latest"),
         fetchProducts("featured", 6),
         api.category.all({ limit: 100 }),
     ]);
+
+    const { categories } = catRes.data ?? {};
 
     let wishlist: WishItem[] = [];
 
@@ -215,7 +216,13 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-fixed bg-center" style={{ backgroundImage: `url(${imgSrc("banners%2Fhero-contact.jpg")})` }}>
+                <div
+                    className="bg-fixed bg-center"
+                    style={{
+                        backgroundImage:
+                            'url("https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fhero-contact.jpg?alt=media")',
+                    }}
+                >
                     <div className="flex items-center h-full">
                         <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
                             <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/50 text-gray-100 p-4 sm:p-8 rounded-lg">
@@ -236,7 +243,7 @@ export default async function Home() {
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Location</p>
                                     <div className="flex gap-2">
-                                        <LocationIcon className="fill-current" />
+                                        <Location className="fill-current" />
                                         <p className="underline">Lagos, LA NG</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Opening Hours</p>

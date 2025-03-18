@@ -1,89 +1,88 @@
 import { fetcher } from "./fetcher";
 
 import { revalidate } from "@/actions/revalidate";
-import { Cart, Message, Order } from "@/lib/models";
+import { Cart, CartItem, Message, Order } from "@/lib/models";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Cart API methods
 export const cartApi = {
-    async get(): Promise<Cart | Message> {
+    async get(): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
 
-        try {
-            const response = await fetcher<Cart>(url, { next: { tags: ["cart"] } });
-
-            return response;
-        } catch (error) {
-            return { error: true, message: "An error occurred" };
-        }
+        return await tryCatch<Cart>(fetcher(url, { next: { tags: ["cart"] } }));
     },
-    async create(input: Cart): Promise<Cart> {
+    async create(input: Cart): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
-        const response = await fetcher<Cart>(url, { method: "POST", body: JSON.stringify(input) });
+        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
+
+        if (!response.error) {
+            revalidate("cart");
+        }
 
         return response;
     },
-    async add({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/add`;
+    async add({ variant_id, quantity }: { variant_id: number; quantity: number }): ApiResult<CartItem> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items`;
+        const response = await tryCatch<CartItem>(fetcher(url, { method: "POST", body: JSON.stringify({ variant_id, quantity }) }));
 
-        try {
-            const response = await fetcher<Cart>(url, { method: "POST", body: JSON.stringify({ product_id, quantity }) });
-
+        console.log("🚀 ~ add ~ response:", response);
+        if (!response.error) {
             revalidate("cart");
-
-            return response;
-        } catch (error) {
-            return { message: "", error: true };
         }
+
+        return response;
     },
-    async update({ product_id, quantity }: { product_id: string; quantity: number }): Promise<Cart | Message> {
+    async changeQuantity({ item_id, quantity }: { item_id: number; quantity: number }): ApiResult<Cart> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items/${item_id}?quantity=${quantity}`;
+
+        const response = await tryCatch<Cart>(fetcher(url, { method: "PUT" }));
+
+        if (!response.error) {
+            revalidate("cart");
+        }
+
+        return response;
+    },
+    async update({ product_id, quantity }: { product_id: number; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
 
-        try {
-            const response = await fetcher<Cart>(url, { method: "PATCH", body: JSON.stringify({ product_id, quantity }) });
+        const response = await tryCatch<Cart>(fetcher(url, { method: "PATCH", body: JSON.stringify({ product_id, quantity }) }));
 
+        if (!response.error) {
             revalidate("cart");
-
-            return response;
-        } catch (error) {
-            return { message: "", error: true };
         }
+
+        return response;
     },
-    async updateDetails(data: any): Promise<Cart | Message> {
+    async updateDetails(data: any): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update-cart-details`;
+        const response = await tryCatch<Cart>(fetcher(url, { method: "PATCH", body: JSON.stringify(data) }));
 
-        try {
-            const response = await fetcher<Cart>(url, { method: "PATCH", body: JSON.stringify(data) });
-
+        if (!response.error) {
             revalidate("cart");
-
-            return response;
-        } catch (error) {
-            return { message: "", error: true };
         }
-    },
-    async delete(product_id: string): Promise<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/${product_id}`;
 
-        try {
-            await fetcher<Cart>(url, { method: "DELETE" });
+        return response;
+    },
+    async delete(item_id: number): ApiResult<Message> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items/${item_id}`;
+
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
+
+        if (!response.error) {
             revalidate("cart");
-
-            return { error: false, message: "Cart deleted successfully" };
-        } catch (error) {
-            return { error: true, message: "Deleted" };
         }
+
+        return response;
     },
-    async complete(): Promise<Order | Message> {
+    async complete(): ApiResult<Order> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`;
+        const response = await tryCatch<Order>(fetcher(url, { method: "POST" }));
 
-        try {
-            const response = await fetcher<Order>(url, { method: "POST" });
-
+        if (!response.error) {
             revalidate("cart");
-
-            return response;
-        } catch (error) {
-            return { message: "", error: true };
         }
+
+        return response;
     },
 };

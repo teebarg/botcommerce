@@ -6,6 +6,8 @@ import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/apis";
+import ServerError from "@/components/server-error";
+import { WishItem } from "@/lib/models";
 
 export const revalidate = 3;
 
@@ -19,8 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Wishlist() {
-    const res = await api.user.wishlist();
-    const wishlists = res ? res.wishlists : null;
+    const { data, error } = await api.user.wishlist();
+
+    if (error) {
+        return <ServerError />;
+    }
+    const wishlists = data ? data.wishlists : null;
 
     if (!wishlists) {
         return (
@@ -52,7 +58,9 @@ export default async function Wishlist() {
             <h1 className="text-3xl font-bold text-center text-default-900 mt-4">Your Wishlist</h1>
             <p className="text-center text-default-500">Curate your luxury collection.</p>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-8 mt-10 px-1">
-                {wishlists?.map((item: any) => <WishlistItem key={item.id} {...item} />)}
+                {wishlists?.map((item: WishItem, idx: number) => (
+                    <WishlistItem key={idx} {...item.product} />
+                ))}
             </div>
         </div>
     );

@@ -7,8 +7,6 @@ import { Input } from "@components/ui/input";
 
 import AccountInfo from "../account-info";
 
-import { ComboBox } from "@/components/ui/combobox";
-
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;
 };
@@ -63,14 +61,14 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                 <div className="grid grid-cols-1 gap-y-2">
                     <div className="grid md:grid-cols-2 gap-2">
                         <Input
-                            isRequired
+                            required
                             data-testid="billing-first-name-input"
                             defaultValue={customer.billing_address?.firstname || undefined}
                             label="First name"
                             name="billing_address.firstname"
                         />
                         <Input
-                            isRequired
+                            required
                             data-testid="billing-last-name-input"
                             defaultValue={customer.billing_address?.lastname || undefined}
                             label="Last name"
@@ -78,7 +76,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                         />
                     </div>
                     <Input
-                        isRequired
+                        required
                         data-testid="billing-address-1-input"
                         defaultValue={customer.billing_address?.address_1 || undefined}
                         label="Address"
@@ -92,28 +90,31 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({ customer }) => {
                     />
                     <div className="grid grid-cols-[144px_1fr] gap-x-2">
                         <Input
-                            isRequired
+                            required
                             data-testid="billing-postal-code-input"
                             defaultValue={customer.billing_address?.postal_code || undefined}
                             label="Postal code"
                             name="billing_address.postal_code"
                         />
                         <Input
-                            isRequired
+                            required
                             data-testid="billing-city-input"
                             defaultValue={customer.billing_address?.city || undefined}
                             label="City"
                             name="billing_address.city"
                         />
                     </div>
-                    <ComboBox
+                    <select
                         data-testid="billing-state-input"
-                        defaultInputValue={customer.billing_address?.state || undefined}
-                        items={states}
-                        label="State"
+                        defaultValue={customer.billing_address?.state || undefined}
                         name="billing_address.state"
-                        placeholder="Select State"
-                    />
+                    >
+                        {states.map((state, idx: number) => (
+                            <option key={idx} value={state.id}>
+                                {state.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </AccountInfo>
         </form>

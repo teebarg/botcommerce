@@ -10,7 +10,6 @@ import { useOverlayTriggerState } from "react-stately";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 
-import { ComboBox } from "@/components/ui/combobox";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
@@ -101,7 +100,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                             <div className="grid grid-cols-1 gap-y-2 w-full py-2">
                                 <div className="grid grid-cols-2 gap-x-2">
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="given-name"
                                         data-testid="first-name-input"
                                         defaultValue={address.firstname || undefined}
@@ -109,7 +108,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         name="firstname"
                                     />
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="family-name"
                                         data-testid="last-name-input"
                                         defaultValue={address.lastname || undefined}
@@ -118,7 +117,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                     />
                                 </div>
                                 <Input
-                                    isRequired
+                                    required
                                     autoComplete="address-line1"
                                     data-testid="address-1-input"
                                     defaultValue={address.address_1 || undefined}
@@ -134,7 +133,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 />
                                 <div className="grid grid-cols-[144px_1fr] gap-x-2">
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="postal-code"
                                         data-testid="postal-code-input"
                                         defaultValue={address.postal_code || undefined}
@@ -143,7 +142,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         type="number"
                                     />
                                     <Input
-                                        isRequired
+                                        required
                                         autoComplete="locality"
                                         data-testid="city-input"
                                         defaultValue={address.city || undefined}
@@ -151,14 +150,13 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                         name="city"
                                     />
                                 </div>
-                                <ComboBox
-                                    data-testid="state-input"
-                                    defaultInputValue={address.state || undefined}
-                                    items={states}
-                                    label="State"
-                                    name="state"
-                                    placeholder="Select State"
-                                />
+                                <select data-testid="state-input" defaultValue={address.state || undefined} name="state">
+                                    {states.map((state, idx: number) => (
+                                        <option key={idx} value={state.id}>
+                                            {state.name}
+                                        </option>
+                                    ))}
+                                </select>
                                 <Input
                                     autoComplete="phone"
                                     data-testid="phone-input"
