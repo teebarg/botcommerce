@@ -3,12 +3,12 @@
 import React, { forwardRef, useActionState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Category } from "@/lib/models";
 import { mutateCategory } from "@/actions/category";
-import { toast } from "sonner";
 
 interface Props {
     current?: Category;

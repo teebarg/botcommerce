@@ -127,14 +127,51 @@ class Product(BaseModel):
     reviews: Optional[List[str]] = None
     favorites: Optional[List[str]] = None
 
+
+class Variant(BaseModel):
+    id: int
+    name: str = Field(..., min_length=1, description="Variant name is required")
+    sku: Optional[str] = None
+    slug: str = Field(..., min_length=1, description="Variant slug is required")
+    price: float = Field(..., gt=0, description="Price must be positive")
+    old_price: float = Field(..., ge=0, description="Old price must be positive")
+    inventory: int = Field(..., ge=0, description="Inventory cannot be negative")
+    status: Literal["IN_STOCK", "OUT_OF_STOCK"]
+
+class SearchProduct(BaseModel):
+    id: int
+    name: str
+    slug: str
+    description: str
+    price: float
+    old_price: float
+    image: Optional[str] = None
+    status: str
+    ratings: float
+    categories: List[str]
+    collections: List[str]
+    brands: List[str]
+    tags: Optional[List[str]] = None
+    images: Optional[List[str]] = None
+    reviews: Optional[List[str]] = None
+    favorites: Optional[List[str]] = None
+    variants: Optional[List[Variant]] = None
+
 class Facets(BaseModel):
     brands: dict[str, int]
     categories: dict[str, int]
     collections: dict[str, int]
 
+class SearchProducts(BaseModel):
+    products: List[SearchProduct]
+    facets: Facets
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int
+
 class Products(BaseModel):
     products: List[Product]
-    facets: Facets
     page: int
     limit: int
     total_count: int

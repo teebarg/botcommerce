@@ -126,7 +126,13 @@ async def create_cart(cart: CartCreate):
             "user_id": user or None,
             "cart_number": id
         },
-        include={"items": True}
+        include={
+            "items": {
+                "include": {
+                    "variant": True
+                }
+            }
+        }
     )
     return new_cart
 
@@ -143,20 +149,19 @@ async def get_cart(response: Response, cartId: str = Header(default=None)):
             }
         }
     )
-    carti = await db.cartitem.find_unique(
-        where={"id": 2},
-        include={
-            "variant": True
-        }
-    )
-    print(carti)
     if not cart:
         id = generate_id()
         new_cart = await db.cart.create(
             data={
                 "cart_number": id
             },
-            include={"items": True}
+            include={
+                "items": {
+                    "include": {
+                        "variant": True
+                    }
+                }
+            }
         )
         response.set_cookie(
             key="_cart_id",
@@ -193,7 +198,13 @@ async def update_cart(cart_update: CartDetails, cartId: str = Header(default=Non
     updated_cart = await db.cart.update(
         where={"id": cartId},
         data={"status": cart_update.status.value if cart_update.status else cart.status},
-        include={"items": True}
+        include={
+            "items": {
+                "include": {
+                    "variant": True
+                }
+            }
+        }
     )
     return updated_cart
 
@@ -232,7 +243,6 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
             data={
                 "cart_number": id
             },
-            include={"items": True}
         )
         response.set_cookie(
             key="_cart_id",
@@ -241,12 +251,11 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
             secure=True,
             httponly=True,
         )
-        # raise HTTPException(status_code=404, detail="Cart not found")
 
     # Verify product variant exists and is in stock
     variant = await db.productvariant.find_unique(where={"id": item.variant_id}, include={"product": True})
     if not variant or variant.status != "IN_STOCK":
-        raise HTTPException(status_code=400, detail="Product variant not available")
+        raise HTTPException(status_code=400, detail="Variant not available")
 
     # Check if item already exists in cart
     existing_item = await db.cartitem.find_first(
@@ -260,7 +269,10 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
         # Update quantity if item exists
         updated_item = await db.cartitem.update(
             where={"id": existing_item.id},
-            data={"quantity": existing_item.quantity + item.quantity}
+            data={"quantity": existing_item.quantity + item.quantity},
+            include={
+                "variant": True
+            }
         )
         return updated_item
 
@@ -272,6 +284,9 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
             "quantity": item.quantity,
             "price": variant.price,
             "image": variant.product.image
+        },
+        include={
+            "variant": True
         }
     )
     return new_item
@@ -279,8 +294,8 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
 @router.delete("/items/{item_id}")
 async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)):
     """Remove an item from cart"""
-    cart_item = await db.cartitem.find_unique(where={"id": item_id})
-    if not cart_item or cart_item.cart_id != cartId:
+    cart_item = await db.cartitem.find_unique(where={"id": item_id}, include={"cart": True})
+    if not cart_item or cart_item.cart.cart_number != cartId:
         raise HTTPException(status_code=404, detail="Cart item not found")
 
     await db.cartitem.delete(where={"id": item_id})
@@ -289,8 +304,9 @@ async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)
 @router.put("/items/{item_id}", response_model=CartItemResponse)
 async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = Header(default=None)):
     """Update quantity of an item in cart"""
-    cart_item = await db.cartitem.find_unique(where={"id": item_id})
-    if not cart_item or cart_item.cart_id != cartId:
+    cart_item = await db.cartitem.find_unique(where={"id": item_id}, include={"cart": True})
+
+    if not cart_item or cart_item.cart.cart_number != cartId:
         raise HTTPException(status_code=404, detail="Cart item not found")
 
     if quantity <= 0:
@@ -298,6 +314,9 @@ async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = H
 
     updated_item = await db.cartitem.update(
         where={"id": item_id},
-        data={"quantity": quantity}
+        data={"quantity": quantity},
+        include={
+            "variant": True
+        }
     )
     return updated_item

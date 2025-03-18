@@ -167,11 +167,10 @@ export const ProductSchema = z.object({
 });
 
 export const CartItemSchema = z.object({
+    id: z.number(),
     item_id: z.string(),
-    product_id: z.string(),
-    slug: z.string(),
-    name: z.string(),
-    description: z.string().optional(),
+    variant_id: z.string(),
+    variant: ProductVariantSchema,
     image: z.string().optional(),
     quantity: z.number(),
     price: z.number(),
@@ -179,6 +178,7 @@ export const CartItemSchema = z.object({
 });
 
 export const CartSchema = z.object({
+    id: z.number(),
     cart_id: z.string(),
     customer_id: z.string(),
     email: z.string().email(),

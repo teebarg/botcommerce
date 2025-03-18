@@ -1,13 +1,14 @@
 import { fetcher } from "./fetcher";
 
 import { revalidate } from "@/actions/revalidate";
-import { Cart, Message, Order } from "@/lib/models";
+import { Cart, CartItem, Message, Order } from "@/lib/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Cart API methods
 export const cartApi = {
     async get(): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
+
         return await tryCatch<Cart>(fetcher(url, { next: { tags: ["cart"] } }));
     },
     async create(input: Cart): ApiResult<Cart> {
@@ -20,9 +21,21 @@ export const cartApi = {
 
         return response;
     },
-    async add({ variant_id, quantity }: { variant_id: number; quantity: number }): ApiResult<Cart> {
+    async add({ variant_id, quantity }: { variant_id: number; quantity: number }): ApiResult<CartItem> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items`;
-        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify({ variant_id, quantity }) }));
+        const response = await tryCatch<CartItem>(fetcher(url, { method: "POST", body: JSON.stringify({ variant_id, quantity }) }));
+
+        console.log("🚀 ~ add ~ response:", response);
+        if (!response.error) {
+            revalidate("cart");
+        }
+
+        return response;
+    },
+    async changeQuantity({ item_id, quantity }: { item_id: number; quantity: number }): ApiResult<Cart> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items/${item_id}?quantity=${quantity}`;
+
+        const response = await tryCatch<Cart>(fetcher(url, { method: "PUT" }));
 
         if (!response.error) {
             revalidate("cart");
@@ -51,8 +64,8 @@ export const cartApi = {
 
         return response;
     },
-    async delete(product_id: string): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/${product_id}`;
+    async delete(item_id: number): ApiResult<Message> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items/${item_id}`;
 
         const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
 

@@ -5,15 +5,11 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 // import { SlideOver } from "@modules/common/components/slideover";
 import { usePathname } from "next/navigation";
-import { currency } from "@lib/util/util";
 
-import { CartItems } from "../cart-items";
-
-import { BtnLink } from "@/components/ui/btnLink";
 import Chip from "@/components/ui/chip";
-import LocalizedClientLink from "@/components/ui/link";
 import { Cart, CartItem } from "@/lib/models";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import CartDetails from "@/components/cart/cart-details";
 
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;
@@ -84,7 +80,8 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                         <DrawerHeader>
                             <DrawerTitle>Cart</DrawerTitle>
                         </DrawerHeader>
-                        <div className="max-w-2xl">
+                        <CartDetails items={cart?.items || []} onClose={editState.close} />
+                        {/* <div className="max-w-2xl">
                             <CartItems cartItems={cart?.items} />
                         </div>
                         <React.Fragment>
@@ -109,7 +106,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                                     </LocalizedClientLink>
                                 </div>
                             </div>
-                        </React.Fragment>
+                        </React.Fragment> */}
                     </DrawerContent>
                 </Drawer>
                 <div className="flex flex-col items-center justify-center">

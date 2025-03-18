@@ -541,7 +541,8 @@ async def bulk_upload_products(products: list[dict]):
             image_urls = await parse_images(product_data.get("images", ""))
 
             # Determine product status based on inventory
-            status = "IN_STOCK" if product_data["inventory"] > 0 else "OUT_OF_STOCK"
+            # status = "IN_STOCK" if product_data["inventory"] > 0 else "OUT_OF_STOCK"
+            status = "IN_STOCK"
 
             # Upsert product
             product = await prisma.product.upsert(

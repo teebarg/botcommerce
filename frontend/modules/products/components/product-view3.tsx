@@ -1,26 +1,16 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
-import { notFound } from "next/navigation";
-import ProductActions from "@modules/products/components/product-actions";
-import RelatedProducts from "@modules/products/components/related-products";
-import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
+import React, { useState } from "react";
 import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
-import Image from "next/image";
+import { toast } from "sonner";
 
-import { siteConfig } from "@/lib/config";
-import SkeletonProductTemplate from "@/modules/products/skeleton-product";
 import { currency } from "@/lib/util/util";
 import ProductDetails from "@/modules/products/templates/details";
 import LocalizedClientLink from "@/components/ui/link";
-import ReviewsSection from "@/components/product/product-reviews";
-import { Skeleton } from "@/components/skeleton";
 import { api } from "@/apis";
-import ServerError from "@/components/server-error";
 import ProductShare from "@/components/product/product-share";
 import { Product, ProductImage, ProductVariant } from "@/lib/models";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 interface Props {
     product: Product;
@@ -31,7 +21,7 @@ const ProductView3: React.FC<Props> = ({ product }) => {
     const [quantity, setQuantity] = useState<number>(1);
     const [isAddedToCart, setIsAddedToCart] = useState<boolean>(false);
     const [selectedImageId, setSelectedImageId] = useState<number>(product.images[0].id);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     // Find the selected image
     const selectedImage = product.images.find((img: ProductImage) => img.id === selectedImageId) || product.images[0];
@@ -57,6 +47,7 @@ const ProductView3: React.FC<Props> = ({ product }) => {
     const handleAddToCart = async () => {
         if (!selectedVariant) {
             toast.error("Please select a variant");
+
             return;
         }
 
@@ -74,6 +65,7 @@ const ProductView3: React.FC<Props> = ({ product }) => {
 
             if (response.error) {
                 toast.error(response.error);
+
                 return;
             }
 
@@ -125,12 +117,12 @@ const ProductView3: React.FC<Props> = ({ product }) => {
                             {product.images.map((image: ProductImage, idx: number) => (
                                 <button
                                     key={idx}
-                                    onClick={() => setSelectedImageId(image.id)}
                                     className={`w-16 h-16 rounded-md flex-shrink-0 border-2 overflow-hidden ${
                                         selectedImageId === image.id ? "border-indigo-500" : "border-gray-200"
                                     }`}
+                                    onClick={() => setSelectedImageId(image.id)}
                                 >
-                                    <img src={image.image} alt={`Thumbnail - ${image.image}`} className="object-cover w-full h-full" />
+                                    <img alt={`Thumbnail - ${image.image}`} className="object-cover w-full h-full" src={image.image} />
                                 </button>
                             ))}
                         </div>
@@ -139,7 +131,7 @@ const ProductView3: React.FC<Props> = ({ product }) => {
                                 {product.images[0] && <Image fill alt={product.name} src={product.images[0].image} />}
                             </div> */}
                             <div className="h-[60vh] flex items-center justify-center p-4">
-                                <img src={selectedImage.image} alt={selectedImage.image} className="object-contain h-full w-full rounded" />
+                                <img alt={selectedImage.image} className="object-contain h-full w-full rounded" src={selectedImage.image} />
                             </div>
                         </div>
                     </div>
@@ -152,7 +144,7 @@ const ProductView3: React.FC<Props> = ({ product }) => {
                         <div className="my-2 flex items-center gap-2">
                             <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
                         </div>
-                        <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2">
+                        <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4">
                             <div className="flex items-center text-white">
                                 <span className="text-3xl font-semibold ">{currency(product.price)}</span>
                                 {product.old_price > product.price && (
@@ -172,22 +164,29 @@ const ProductView3: React.FC<Props> = ({ product }) => {
                         </div> */}
                         {/* Quantity Selection */}
                         <div className="flex items-center gap-4">
-                            <label className="text-sm font-medium text-gray-700">Quantity:</label>
+                            <label className="text-sm font-medium text-default-700">Quantity:</label>
                             <div className="flex items-center border rounded-md">
-                                <Button variant="ghost" size="sm" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+                                <Button size="sm" variant="ghost" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
                                     -
                                 </Button>
                                 <span className="px-4">{quantity}</span>
-                                <Button variant="ghost" size="sm" onClick={() => setQuantity(quantity + 1)}>
+                                <Button size="sm" variant="ghost" onClick={() => setQuantity(quantity + 1)}>
                                     +
                                 </Button>
                             </div>
                         </div>
 
                         {/* Add to Cart Button */}
-                        <Button type="button" size="lg" onClick={handleAddToCart} disabled={loading || !selectedVariant} className="w-full mt-4">
-                            {loading ? "Adding to cart..." : "Add to Cart"}
-                        </Button>
+                        {selectedVariant.status == "OUT_OF_STOCK" ? (
+                            <Button className="w-full mt-4 cursor-not-allowed" disabled={true} size="lg">
+                                Out of Stock
+                            </Button>
+                        ) : (
+                            <Button className="w-full mt-4" disabled={loading || !selectedVariant} size="lg" type="button" onClick={handleAddToCart}>
+                                {loading ? "Adding to cart..." : "Add to Cart"}
+                            </Button>
+                        )}
+
                         <div className="mt-4">
                             <p className="line-clamp-3 text-base text-default-500">{product.description}</p>
                         </div>

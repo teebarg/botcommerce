@@ -20,7 +20,7 @@ from app.core.deps import (
 )
 from app.core.logging import logger
 from app.core.utils import slugify, url_to_list
-from app.models.product import Product, Products
+from app.models.product import Product, Products, SearchProducts
 from app.models.reviews import  Reviews
 from app.models.generic import Message
 from app.models.product import (
@@ -91,7 +91,7 @@ async def index(
     collections: str = Query(default=""),
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-):
+) -> Products:
     """
     Retrieve collections with Redis caching.
     """
@@ -143,7 +143,7 @@ async def search(
     minPrice: int = Query(default=1, gt=0),
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-) -> Products:
+) -> SearchProducts:
     """
     Retrieve products using Meilisearch, sorted by latest.
     """
@@ -687,7 +687,7 @@ async def reindex_products(cache: CacheService, background_tasks: BackgroundTask
     try:
         products = await db.product.find_many(
             include={
-                # "variants": True,
+                "variants": True,
                 "categories": True,
                 "collections": True,
                 "brands": True,
@@ -773,6 +773,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["brands"] = [brand.name for brand in product.brands]
     product_dict["categories"] = [category.name for category in product.categories]
     product_dict["images"] = [image.image for image in product.images]
+    product_dict["variants"] = [variant.dict() for variant in product.variants]
+
     return product_dict
 
 async def index_products(products, cache: CacheService):

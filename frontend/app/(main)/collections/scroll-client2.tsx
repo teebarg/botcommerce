@@ -13,7 +13,8 @@ import PromotionalBanner from "@/components/promotion";
 import { Brand, Category, Collection, Facet, PaginatedProduct, PaginatedProductSearch, Product, ProductSearch, WishItem } from "@/lib/models";
 import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
-import ProductCard from "@/components/product/product-card";
+import ProductCard from "@/components/products/product-card";
+// import ProductCard from "@/components/product/product-card";
 
 interface SearchParams {
     page?: number;
@@ -150,7 +151,7 @@ export default function InfiniteScrollClient({
                             </div>
                             <main className="mt-4 w-full overflow-visible px-1">
                                 <div className="block md:rounded-xl md:border-2 border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
-                                    <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
+                                    <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4p pb-4">
                                         {products?.map((product: ProductSearch, index: number) => (
                                             <motion.div
                                                 key={index}
@@ -162,7 +163,8 @@ export default function InfiniteScrollClient({
                                                     delay: index * 0.1,
                                                 }}
                                             >
-                                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
+                                                <ProductCard key={index} product={product} />
+                                                {/* <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} /> */}
                                             </motion.div>
                                         ))}
                                     </div>

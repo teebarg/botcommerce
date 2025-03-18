@@ -20,7 +20,10 @@ export async function fetcher<T>(url: string, options?: RequestInit): Promise<T>
     });
 
     if (!res.ok) {
-        throw new Error(`API Error: ${res.statusText}`);
+        const error = await res.json();
+        console.log("🚀 ~ error:", error)
+
+        throw new Error(error.detail || error.message || `API Error: ${res.statusText}`);
     }
 
     return res.json();
