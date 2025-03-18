@@ -2,6 +2,7 @@ from typing import List, Optional, Literal
 from pydantic import BaseModel, Field, HttpUrl
 
 from app.models.base import BM
+from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review, ProductVariant
 
 # Models
 class VariantCreate(BaseModel):
@@ -25,16 +26,16 @@ class VariantWithStatus(BaseModel):
     status: Literal["IN_STOCK", "OUT_OF_STOCK"]
 
 
-class Product(BM):
-    name: str = Field(..., min_length=1, description="Name is required")
-    description: str = Field(..., min_length=1, description="Description is required")
-    brand_ids: Optional[List[int]] = None
-    category_ids: Optional[List[int]] = None
-    collection_ids: Optional[List[int]] = None
-    tags_ids: Optional[List[int]] = None
-    sku: Optional[str] = None
-    variants: Optional[List[VariantCreate]] = None
-    images: Optional[List[HttpUrl]] = None
+# class Product(BM):
+#     name: str = Field(..., min_length=1, description="Name is required")
+#     description: str = Field(..., min_length=1, description="Description is required")
+#     brand_ids: Optional[List[int]] = None
+#     category_ids: Optional[List[int]] = None
+#     collection_ids: Optional[List[int]] = None
+#     tags_ids: Optional[List[int]] = None
+#     sku: Optional[str] = None
+#     variants: Optional[List[VariantCreate]] = None
+#     images: Optional[List[HttpUrl]] = None
 
 
 class ProductCreate(BaseModel):
@@ -107,27 +108,6 @@ class ProductCollection(BaseModel):
 class ProductImages(BaseModel):
     id: int
 
-
-class Product(BaseModel):
-    id: int
-    name: str
-    slug: str
-    description: str
-    price: float
-    old_price: float
-    image: Optional[str] = None
-    status: str
-    variants: Optional[List[str]] = None
-    ratings: float
-    categories: List[str]
-    collections: List[str]
-    brands: List[str]
-    tags: Optional[List[str]] = None
-    images: Optional[List[str]] = None
-    reviews: Optional[List[str]] = None
-    favorites: Optional[List[str]] = None
-
-
 class Variant(BaseModel):
     id: int
     name: str = Field(..., min_length=1, description="Variant name is required")
@@ -137,6 +117,25 @@ class Variant(BaseModel):
     old_price: float = Field(..., ge=0, description="Old price must be positive")
     inventory: int = Field(..., ge=0, description="Inventory cannot be negative")
     status: Literal["IN_STOCK", "OUT_OF_STOCK"]
+
+
+class Product(BM):
+    id: int
+    name: str
+    slug: str
+    description: str
+    price: float
+    old_price: float
+    image: Optional[str] = None
+    status: str
+    variants: Optional[List[ProductVariant]] = None
+    ratings: float
+    categories: Optional[List[Category]] = None
+    collections: Optional[List[Collection]] = None
+    brands: Optional[List[Brand]] = None
+    tags: Optional[List[Tag]] = None
+    images: Optional[List[ProductImage]] = None
+    reviews: Optional[List[Review]] = None
 
 class SearchProduct(BaseModel):
     id: int
@@ -171,7 +170,7 @@ class SearchProducts(BaseModel):
     total_pages: int
 
 class Products(BaseModel):
-    products: List[Product]
+    products: list[Product]
     page: int
     limit: int
     total_count: int

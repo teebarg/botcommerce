@@ -51,9 +51,9 @@ export default async function Collections({ searchParams }: Props) {
     let wishlist: WishItem[] = [];
 
     if (user) {
-        const res = await api.user.wishlist();
+        const { data } = await api.user.wishlist();
 
-        wishlist = res ? res.wishlists : [];
+        wishlist = data ? data.wishlists : [];
     }
 
     const queryParams: any = {
@@ -71,9 +71,11 @@ export default async function Collections({ searchParams }: Props) {
         return <ServerError />;
     }
 
+    console.log(res)
+
     if (!res.data) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1 w-full">
                 <div className="max-w-md mx-auto text-center">
                     <Exclamation className="w-20 h-20 mx-auto text-danger" />
                     <h1 className="text-4xl font-bold mt-6">Oops! No Products Found</h1>

@@ -1,5 +1,6 @@
 from typing import Any
 
+from app.core.decorators import cache
 from fastapi import APIRouter, HTTPException
 
 from app.core.deps import (

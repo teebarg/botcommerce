@@ -78,20 +78,6 @@ module.exports = {
                     500: "hsl(var(--foreground-500))",
                     900: "hsl(var(--foreground-900))",
                 },
-                primary: {
-                    DEFAULT: "hsl(var(--primary))",
-                    100: "hsl(var(--primary-100))",
-                    500: "hsl(var(--primary-500))",
-                    900: "hsl(var(--primary-900))",
-                    foreground: "hsl(var(--primary-foreground))",
-                },
-                secondary: {
-                    DEFAULT: "hsl(var(--secondary))",
-                    100: "hsl(var(--secondary-100))",
-                    500: "hsl(var(--secondary-500))",
-                    900: "hsl(var(--secondary-900))",
-                    foreground: "hsl(var(--secondary-foreground))",
-                },
                 default: generateColorScale("default"),
                 danger: generateColorScale("danger"),
                 success: generateColorScale("success"), // Add other color names as needed

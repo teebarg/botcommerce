@@ -40,7 +40,6 @@ from app.services.meilisearch import (
     update_document,
 )
 from app.services.run_sheet import generate_excel_file, process_products
-from prisma.models import Product
 from supabase import create_client, Client
 from app.core.config import settings
 from app.prisma_client import prisma as db
@@ -83,7 +82,6 @@ async def export_products(
 
 
 @router.get("/")
-# @cache(key="collections")
 async def index(
     query: str = "",
     brands: str = Query(default=""),
@@ -93,7 +91,7 @@ async def index(
     limit: int = Query(default=20, le=100),
 ) -> Products:
     """
-    Retrieve collections with Redis caching.
+    Retrieve products with Redis caching.
     """
     where_clause = None
     if query:
@@ -132,7 +130,7 @@ async def index(
 
 
 @router.get("/search")
-# @cache(key="products")
+@cache(key="search")
 async def search(
     search: str = "",
     sort: str = "created_at:desc",
@@ -191,7 +189,7 @@ async def search(
 
 
 @router.post("/")
-async def create_product(product: ProductCreate):
+async def create_product(product: ProductCreate, cache: CacheService):
     slugified_name = slugify(product.name)
     sku = product.sku or f"SK{slugified_name}"
 
@@ -266,7 +264,7 @@ async def create_product(product: ProductCreate):
         product_data = prepare_product_data_for_indexing(created_product)
 
         add_documents_to_index(index_name="products", documents=[product_data])
-        # cache.invalidate("products")
+        cache.invalidate("search")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
     # return product
@@ -276,7 +274,7 @@ async def create_product(product: ProductCreate):
 
 @router.get("/{slug}")
 # @cache(key="product", hash=False)
-async def read(slug: str):
+async def read(slug: str) -> Product:
     """
     Get a specific product by slug with Redis caching.
     """
@@ -406,6 +404,7 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
             product_data = prepare_product_data_for_indexing(product)
 
             update_document(index_name="products", document=product_data)
+            cache.invalidate("search")
 
         background_tasks.add_task(update_task, product=updated_product)
         return updated_product
@@ -624,58 +623,6 @@ async def upload_products(
     background_tasks.add_task(update_task)
 
     return {"message": "Upload started"}
-
-
-# Upload Image
-# @router.patch("/{id}/image")
-# async def upload_product_image(
-#     id: str,
-#     file: Annotated[UploadFile, File()],
-#     db: SessionDep,
-#     bucket: Storage,
-#     cache: CacheService
-# ):
-#     """
-#     Upload a product image.
-#     """
-#     try:
-#         await validate_file(file=file)
-#         contents = await file.read()
-
-#         file_name = f"product_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpeg"
-#         file_path = f"products/{file_name}"
-
-#         blob = bucket.blob(file_path)
-#         blob.upload_from_file(BytesIO(contents), content_type=file.content_type)
-#         blob.make_public()
-
-#         # Use the public URL instead of a signed URL
-#         file_url = blob.public_url
-
-#         if product := crud.product.get(db=db, id=id):
-#             product = crud.product.update(
-#                 db=db, db_obj=product, obj_in={"image": file_url}
-#             )
-
-#             # Prepare product data for Meilisearch indexing
-#             product_data = prepare_product_data_for_indexing(product)
-
-#             update_document(index_name="products", document=product_data)
-
-#             # Invalidate cache
-#             cache.delete(f"product:{product.slug}")
-#             cache.delete(f"product:{product.id}")
-#             cache.invalidate("products")
-
-#             # Return the updated product
-#             return product
-
-#         raise HTTPException(status_code=404, detail="Product not found.")
-#     except Exception as e:
-#         logger.error(f"Error uploading product image: {e}")
-#         raise HTTPException(
-#             status_code=500, detail=f"Error while uploading product image: {str(e)}"
-#         ) from e
 
 
 @router.post("/reindex", dependencies=[], response_model=Message)

@@ -74,26 +74,18 @@ export default function UserDropDown({ user }: { user: Session }) {
                     </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuLabel>
+                        <div key="user" className="gap-2 flex min-w-[15rem]">
+                            <p className="font-bold">Signed in as</p>
+                            <p className="font-bold">@{user?.firstname}</p>
+                        </div>
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {links.map((item, index: number) => (
                         <DropdownMenuItem key={index} className="px-2 py-1.5 cursor-pointer" data-key={item.dataKey}>
                             {item.child}
                         </DropdownMenuItem>
                     ))}
-                    <DropdownMenuItem>
-                        <div className="bg-content1 box-border rounded-lg shadow-md p-3 min-w-[200px] text-sm font-medium">
-                            <div key="user" className="h-14 gap-2">
-                                <p className="font-bold">Signed in as</p>
-                                <p className="font-bold">@{user?.firstname}</p>
-                            </div>
-                            {links.map((item, index: number) => (
-                                <div key={index} className="px-2 py-1.5 cursor-pointer" data-key={item.dataKey}>
-                                    {item.child}
-                                </div>
-                            ))}
-                        </div>
-                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </React.Fragment>

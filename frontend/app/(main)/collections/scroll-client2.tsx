@@ -10,10 +10,12 @@ import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { Brand, Category, Collection, Facet, PaginatedProduct, PaginatedProductSearch, Product, ProductSearch, WishItem } from "@/lib/models";
+import { Brand, Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/lib/models";
 import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
 import ProductCard from "@/components/products/product-card";
+import { Loader2 } from "lucide-react";
+import NoProductsFound from "@/modules/products/components/no-products";
 // import ProductCard from "@/components/product/product-card";
 
 interface SearchParams {
@@ -54,20 +56,13 @@ export default function InfiniteScrollClient({
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
 
     const fetchItems = async (page: number) => {
-        // setLoading(true);
-        try {
-            const res = await api.product.search({ ...initialSearchParams, page });
-            const data = await res.data;
+        const { data } = await api.product.search({ ...initialSearchParams, page });
 
-            if (!data) {
-                return;
-            }
-            setProducts((prev) => [...prev, ...data.products]);
-            setHasNext(data.page < data.total_pages);
-        } catch (error) {
-            console.error("Error fetching data:", error);
+        if (!data) {
+            return;
         }
-        // setLoading(false);
+        setProducts((prev) => [...prev, ...data.products]);
+        setHasNext(data.page < data.total_pages);
     };
 
     useEffect(() => {
@@ -151,19 +146,24 @@ export default function InfiniteScrollClient({
                             </div>
                             <main className="mt-4 w-full overflow-visible px-1">
                                 <div className="block md:rounded-xl md:border-2 border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
-                                    <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4p pb-4">
+                                    <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 pb-4">
+                                        {products.length == 0 && (
+                                            <div className="col-span-2 md:col-span-3">
+                                                <NoProductsFound />
+                                            </div>
+                                        )}
                                         {products?.map((product: ProductSearch, index: number) => (
                                             <motion.div
                                                 key={index}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 initial={{ opacity: 0, y: 20 }}
                                                 transition={{
-                                                    duration: 0.4,
+                                                    duration: 0.2,
                                                     ease: [0.25, 0.25, 0, 1],
-                                                    delay: index * 0.1,
+                                                    delay: index * 0.05,
                                                 }}
                                             >
-                                                <ProductCard key={index} product={product} />
+                                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                                 {/* <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} /> */}
                                             </motion.div>
                                         ))}
@@ -173,7 +173,14 @@ export default function InfiniteScrollClient({
                         </div>
                     </div>
                 </div>
-                <div className="w-full">{(hasNext && <div ref={scrollTrigger}>Loading...</div>) || <p className="...">No more posts to load</p>}</div>
+                <div className="w-full">
+                    {hasNext && (
+                        <div ref={scrollTrigger} className="mt-8 flex flex-col items-center justify-center text-blue-600">
+                            <Loader2 className="h-8 w-8 animate-spin mb-2" />
+                            <p className="text-sm font-medium text-gray-500">Loading more products...</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

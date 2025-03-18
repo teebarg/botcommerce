@@ -11,7 +11,7 @@ interface Props {
 }
 
 const PaginationUI: React.FC<Props> = ({ pagination }) => {
-    const { updateQuery } = useUpdateQuery(100);
+    const { updateQuery } = useUpdateQuery(200);
 
     const page = pagination?.page ?? 1;
 

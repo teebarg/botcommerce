@@ -7,6 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
 }
 
 // Enums for consistent data values
@@ -155,7 +156,7 @@ model Product {
   slug               String               @unique @db.VarChar(255)
   sku                String               @unique
   description        String?
-  features           String[]?
+  features           String[]
   price              Float
   old_price          Float
   image              String?              @db.VarChar(255)
@@ -387,6 +388,8 @@ model Favorite {
   product_id  Int
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
+
+  @@unique([user_id, product_id])
 
   @@map("favorites")
 }

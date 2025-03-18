@@ -13,7 +13,7 @@ interface CheckboxGroupProps {
 }
 
 const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, facets, item }) => {
-    const { updateQuery } = useUpdateQuery(100);
+    const { updateQuery } = useUpdateQuery(300);
     const [dataSet, setDataSet] = useState(new Set());
 
     const searchParams = useSearchParams();

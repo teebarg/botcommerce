@@ -37,7 +37,7 @@ export const authApi = {
     async requestMagicLink(email: string): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/magic-link`;
         const response = await tryCatch<Message>(
-            fetcher(url, { method: "POST", body: JSON.stringify({ email }), headers: { "content-type": "application/json" } })
+            fetcher(url, { method: "POST", body: JSON.stringify({ email }), headers: { "Content-Type": "application/json" } })
         );
 
         return response;
@@ -45,7 +45,7 @@ export const authApi = {
     async verifyMagicLink(token: string): ApiResult<Token> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/verify-magic-link`;
         const response = await tryCatch<Token>(
-            fetcher(url, { method: "POST", body: JSON.stringify({ token }), headers: { "content-type": "application/json" } })
+            fetcher(url, { method: "POST", body: JSON.stringify({ token }) })
         );
 
         if (!response.error) {

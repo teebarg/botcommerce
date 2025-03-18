@@ -253,6 +253,7 @@ export const WishItemSchema = z.object({
     description: z.string().optional(),
     user_id: z.number().optional(),
     product_id: z.number().optional(),
+    product: ProductSchema,
     image: z.string(),
     created_at: z.string().optional(),
 });

@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     DATABASE_URI: str | None = None
 
     DOMAIN: str = "localhost"
-    FRONTEND_HOST: str = "http://localhost:3000"
+    FRONTEND_HOST: str = "https://localhost:3000"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
     @computed_field  # type: ignore[misc]

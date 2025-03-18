@@ -21,12 +21,12 @@ export const productApi = {
     async all(searchParams: SearchParams): ApiResult<PaginatedProduct> {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
 
-        return await tryCatch<PaginatedProduct>(fetcher(url, { next: { tags: ["all-products"] } }));
+        return await tryCatch<PaginatedProduct>(fetcher(url, { next: { tags: ["products"] } }));
     },
     async search(searchParams: SearchParams): ApiResult<PaginatedProductSearch> {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`, { ...searchParams });
 
-        return await tryCatch<PaginatedProductSearch>(fetcher(url, { next: { tags: ["products"] } }));
+        return await tryCatch<PaginatedProductSearch>(fetcher(url, { next: { tags: ["search"] } }));
     },
     async get(slug: string): ApiResult<Product> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
@@ -41,7 +41,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("all-products");
+            revalidate("search");
         }
 
         return response;
@@ -54,7 +54,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("all-products");
+            revalidate("search");
         }
 
         return response;
@@ -65,6 +65,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
+            revalidate("search");
         }
 
         return response;
@@ -82,6 +83,7 @@ export const productApi = {
             const res = await fetcher<Review>(url, { method: "POST", body: JSON.stringify(input) });
 
             revalidate("product");
+            revalidate("search");
 
             return res;
         } catch (error) {
@@ -106,6 +108,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
+            revalidate("search")
         }
 
         return response;
@@ -117,6 +120,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
+            revalidate("search")
         }
 
         return response;
@@ -127,7 +131,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("all-products");
+            revalidate("search");
         }
 
         return response;
@@ -139,6 +143,7 @@ export const productApi = {
             await fetcher<{ message: string }>(url, { method: "POST" });
 
             revalidate("product");
+            revalidate("search")
 
             return { error: false, message: "Products indexed successfully" };
         } catch (error) {
@@ -159,6 +164,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
+            revalidate("search")
         }
 
         return response;
@@ -177,6 +183,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
+            revalidate("search")
         }
 
         return response;
@@ -187,6 +194,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
+            revalidate("search")
         }
 
         return response;
