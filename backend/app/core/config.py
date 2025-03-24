@@ -27,7 +27,7 @@ class Settings(BaseSettings):
         60 * 24 * 8
     )  # 60 minutes * 24 hours * 8 days = 8 days
     API_V1_STR: str = "/api"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = "specialsecret"
 
     PROJECT_NAME: str
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48

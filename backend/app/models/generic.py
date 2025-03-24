@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 
 class ContactFormCreate(BaseModel):
@@ -31,3 +32,4 @@ class Token(BaseModel):
 
 class MagicLinkPayload(BaseModel):
     email: EmailStr
+    callback_url: str | None = None

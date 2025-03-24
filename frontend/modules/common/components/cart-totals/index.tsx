@@ -6,17 +6,18 @@ import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
 
 import { Cart } from "@/lib/models";
+import { subtotal, taxTotal, total } from "@/lib/util/store";
 
 type CartTotalsProps = {
-    data: Omit<Cart, "refundable_amount" | "refunded_total"> | any;
+    data: Omit<Cart, "refundable_amount" | "refunded_total">;
 };
 
 const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
-    const { subtotal, discount_total, gift_card_total, tax_total, delivery_fee, total } = data;
+    const { discount_total } = data;
 
-    const getAmount = (amount: number | null | undefined) => {
-        return currency(Number(amount) || 0);
-    };
+    const subTotal = subtotal(data.items);
+    const tax = taxTotal(data.items);
+    const totalAmount = total(data.items, data.shipping_fee);
 
     return (
         <>
@@ -34,24 +35,24 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                             </span>
                         </dt>
                         <dd className="text-sm font-semibold text-default-900">
-                            <span data-testid="cart-subtotal" data-value={subtotal || 0}>
-                                {getAmount(subtotal)}
+                            <span data-testid="cart-subtotal" data-value={subTotal || 0}>
+                                {currency(subTotal)}
                             </span>
                         </dd>
                     </div>
                     <div className="flex justify-between">
                         <dt className="text-sm text-default-500">Delivery</dt>
                         <dd className="text-sm font-semibold text-default-900">
-                            <span data-testid="cart-shipping" data-value={delivery_fee || 0}>
-                                {getAmount(delivery_fee)}
+                            <span data-testid="cart-shipping" data-value={data.shipping_fee || 0}>
+                                {currency(data.shipping_fee)}
                             </span>
                         </dd>
                     </div>
                     <div className="flex justify-between">
                         <dt className="text-sm text-default-500">Taxes</dt>
                         <dd className="text-sm font-semibold text-default-900">
-                            <span data-testid="cart-taxes" data-value={tax_total || 0}>
-                                {getAmount(tax_total)}
+                            <span data-testid="cart-taxes" data-value={tax || 0}>
+                                {currency(tax)}
                             </span>
                         </dd>
                     </div>
@@ -60,17 +61,9 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                             <dt className="text-sm text-default-500">Discount</dt>
                             <dd className="text-sm font-semibold text-success">
                                 <span className="text-blue-500" data-testid="cart-discount" data-value={discount_total || 0}>
-                                    - {getAmount(discount_total)}
+                                    - {currency(discount_total)}
                                 </span>
                             </dd>
-                        </div>
-                    )}
-                    {!!gift_card_total && (
-                        <div className="flex items-center justify-between">
-                            <span>Gift card</span>
-                            <span className="text-blue-500" data-testid="cart-gift-card-amount" data-value={gift_card_total || 0}>
-                                - {getAmount(gift_card_total)}
-                            </span>
                         </div>
                     )}
 
@@ -78,8 +71,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                     <div className="flex justify-between">
                         <dt className="text-sm font-semibold text-default-500">Total</dt>
                         <dd className="text-sm font-semibold text-default-900">
-                            <span className="text-lg" data-testid="cart-total" data-value={total || 0}>
-                                {getAmount(total)}
+                            <span className="text-lg" data-testid="cart-total" data-value={totalAmount}>
+                                {currency(totalAmount)}
                             </span>
                         </dd>
                     </div>

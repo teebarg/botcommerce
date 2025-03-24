@@ -3,7 +3,11 @@
 import { api } from "@/apis";
 
 export async function mutateProduct(currentState: unknown, formData: FormData) {
-    const id = formData.get("id") as string;
+    const id = formData.get("id") as unknown as number;
+
+    if (!id) {
+        return;
+    }
     const type = formData.get("type") as string;
     const productData: any = {
         name: formData.get("name") as string,

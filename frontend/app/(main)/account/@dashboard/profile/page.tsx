@@ -7,6 +7,7 @@ import ProfilePassword from "@modules/account/components/profile-password";
 import { notFound } from "next/navigation";
 
 import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: "Profile",
@@ -14,7 +15,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Profile() {
-    const customer = await api.user.me();
+    const { data: customer, error } = await api.user.me();
+
+    if (error) {
+        return <ServerError />;
+    }
 
     if (!customer) {
         notFound();

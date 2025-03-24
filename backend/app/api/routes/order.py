@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Response, Query
 
 from app.core.deps import (
     CurrentUser,
@@ -12,63 +12,58 @@ from app.services.export import export
 from typing import Optional
 import uuid
 from app.prisma_client import prisma as db
-from app.models.order import OrderCreate, OrderResponse, OrderStatus, OrderUpdate
+from app.models.order import OrderResponse, OrderStatus, OrderUpdate, OrderCreate, Orders
+from math import ceil
 
 # Create a router for orders
 router = APIRouter()
 
 
 @router.post("/", response_model=OrderResponse)
-async def create_order(response: Response, notification: Notification, order: OrderCreate, cartId: str = Header(default=None)):
+async def create_order(notification: Notification, order_in: OrderCreate, user: CurrentUser, cartId: str = Header(default=None)):
     # Generate unique order number
     order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
 
-    # Verify user and addresses exist
-    user = await db.user.find_unique(where={"id": order.user_id})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    shipping_address = await db.address.find_unique(where={"id": order.shipping_address_id})
-    if not shipping_address:
-        raise HTTPException(
-            status_code=404, detail="Shipping address not found")
-
-    billing_address = await db.address.find_unique(where={"id": order.billing_address_id})
-    if not billing_address:
-        raise HTTPException(
-            status_code=404, detail="Billing address not found")
+    cart = await db.cart.find_unique(where={"cart_number": cartId}, include={"items": True})
+    if not cart:
+        raise HTTPException(status_code=404, detail="Cart not found")
 
     # Create order with items
     new_order = await db.order.create(
         data={
             "order_number": order_number,
-            "user_id": order.user_id,
-            "shipping_address_id": order.shipping_address_id,
-            "billing_address_id": order.billing_address_id,
-            "total": order.total,
-            "subtotal": order.subtotal,
-            "tax": order.tax,
-            "shipping_fee": order.shipping_fee,
-            "status": order.status,
-            "payment_status": order.payment_status,
-            "shipping_method": order.shipping_method,
-            "coupon_id": order.coupon_id,
-            "cart_id": cartId,
+            "email": cart.email,
+            "total": order_in.total,
+            "subtotal": order_in.subtotal,
+            "tax": order_in.tax,
+            "shipping_fee": cart.shipping_fee,
+            "status": order_in.status,
+            "payment_status": order_in.payment_status,
+            "shipping_method": cart.shipping_method,
+            # "coupon_id": order_in.coupon_id,
+            "payment_method": cart.payment_method,
+            "cart": {"connect": {"id": cart.id}},
+            "user": {"connect": {"id": user.id}},
+            "billing_address": {"connect": {"id": cart.billing_address_id}},
+            "shipping_address": {"connect": {"id": cart.shipping_address_id}},
             "order_items": {
                 "create": [
                     {
-                        "variant_id": item.variant_id,
+                        "image": item.image,
+                        "variant": {"connect": {"id": item.variant_id}},
                         "quantity": item.quantity,
                         "price": item.price
-                    } for item in order.order_items
+                    } for item in cart.items
                 ]
             }
         },
-        include={"order_items": True}
+        include={
+            "order_items": {"include": {"variant": True}},
+            "user": True,
+            "shipping_address": True,
+            "billing_address": True
+        }
     )
-
-    # Invalidate cart cookie
-    response.delete_cookie(key="_cart_id")
 
     # Send invoice email
     email_data = generate_invoice_email(order=new_order, user=user)
@@ -83,10 +78,10 @@ async def create_order(response: Response, notification: Notification, order: Or
     slack_message = {
         "text": f"🛍️ *New Order Created* 🛍️\n"
                 f"*Order ID:* {new_order.order_number}\n"
-                f"*Customer:* {user.firstname} {user.lastname}\n"
+                f"*Customer:* {user.first_name} {user.last_name}\n"
                 f"*Email:* {user.email}\n"
-                f"*Amount:* ${new_order.total}\n"
-                f"*Payment Status:* ${new_order.payment_status}"
+                f"*Amount:* {new_order.total}\n"
+                f"*Payment Status:* {new_order.payment_status}"
     }
 
     notification.send_notification(
@@ -97,14 +92,18 @@ async def create_order(response: Response, notification: Notification, order: Or
 
 
 @router.get("/{order_id}", response_model=OrderResponse)
-async def get_order(order_id: int):
+async def get_order(order_id: str):
     """
     Get a specific order by order_number.
     """
     order = await db.order.find_unique(
-        where={"id": order_id},
+        where={"order_number": order_id},
         include={
-            "order_items": True,
+            "order_items": {
+                "include": {
+                    "variant": True
+                }
+            },
             "user": True,
             "shipping_address": True,
             "billing_address": True
@@ -115,27 +114,47 @@ async def get_order(order_id: int):
     return order
 
 
-@router.get("/", response_model=list[OrderResponse], dependencies=[Depends(get_current_superuser)])
+@router.get("/")
 async def get_orders(
-    skip: int = 0,
-    take: int = 20,
+    user: CurrentUser,
+    skip: int = Query(0, ge=0),
+    take: int = Query(20, ge=1, le=100),
     status: Optional[OrderStatus] = None,
-    user_id: Optional[int] = None
-):
+    search: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    customer_id: Optional[int] = None,
+) -> Orders:
+    """List orders with filtering and pagination"""
     where = {}
     if status:
         where["status"] = status
-    if user_id:
-        where["user_id"] = user_id
+    if customer_id:
+        where["user_id"] = customer_id
+    if search:
+        where["order_number"] = search
+    if user.role == "CUSTOMER":
+        where["user_id"] = user.id
+    if start_date:
+        where["created_at"] = {"gte": start_date}
+    if end_date:
+        where["created_at"] = {"lte": end_date}
 
     orders = await db.order.find_many(
         where=where,
         skip=skip,
         take=take,
         order={"created_at": "desc"},
-        include={"order_items": True}
+        include={"order_items": True, "user": True, "shipping_address": True, "billing_address": True}
     )
-    return orders
+    total = await db.order.count(where=where)
+    return {
+        "orders":orders,
+        "page":skip,
+        "limit":take,
+        "total_pages":ceil(total/take),
+        "total_count":total,
+    }
 
 
 @router.put("/orders/{order_id}", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
@@ -175,108 +194,6 @@ async def delete_order(order_id: int):
     return {"message": "Order deleted successfully"}
 
 
-# @router.get("/", dependencies=[Depends(get_current_user)])
-# @cache(key="orders")
-# async def index(user: CurrentUser) -> Orders:
-#     """
-#     Retrieve orders.
-#     """
-#     orders = order_handler.get_orders(user_id=user.id)
-#     return Orders(orders=orders)
-
-
-# @router.get("/admin/all", dependencies=[Depends(get_current_superuser)])
-# @cache(key="orders")
-# async def admin_index(
-#     page: int = Query(default=1, gt=0),
-#     limit: int = Query(default=20, le=100),
-# ) -> Any:
-#     """
-#     Retrieve orders.
-#     """
-#     return order_handler.get_paginated_orders(page=page, limit=limit)
-
-
-# @router.post("/", dependencies=[Depends(get_current_user)])
-# async def create(
-#     *,
-#     response: Response,
-#     user: CurrentUser,
-#     cartId: str = Header(default=None),
-#     notification: Notification,
-#     cache: CacheService
-# ) -> Order:
-#     """
-#     Create new order.
-#     """
-#     order_details = order_handler.create_order(cart_id=cartId, user_id=user.id)
-
-#     # Invalidate cache
-#     cache.invalidate("orders")
-
-#     # Invalidate cart cookie
-#     response.delete_cookie(key="_cart_id")
-
-#     # Send invoice email
-#     email_data = generate_invoice_email(order=order_details.get("order", {}), user=user)
-#     notification.send_notification(
-#         channel_name="email",
-#         recipient="neyostica2000@yahoo.com",
-#         subject=email_data.subject,
-#         message=email_data.html_content
-#     )
-
-#     # Send to slack
-#     slack_message = {
-#         "text": f"🛍️ *New Order Created* 🛍️\n"
-#                 f"*Order ID:* {order_details.get('order', {}).get('order_id')}\n"
-#                 f"*Customer:* {user.firstname} {user.lastname}\n"
-#                 f"*Email:* {user.email}\n"
-#                 f"*Amount:* ${order_details.get('order', {}).get('total', 0)}\n"
-#                 f"*Payment Status:* ${order_details.get('order', {}).get('payment_status', 0)}"
-#     }
-
-#     notification.send_notification(
-#         channel_name="slack",
-#         slack_message=slack_message
-#     )
-
-#     return order_details.get("order", {})
-
-
-# @router.get("/{id}", dependencies=[Depends(get_current_user)])
-# @cache(key="order", hash=False)
-# async def read(id: str, user: CurrentUser) -> Any:
-#     """
-#     Get a specific order by order_number.
-#     """
-
-#     if not user:
-#         return {"message": "User details not found"}
-
-#     return order_handler.get_order(
-#         order_id=id, user_id=user.id, is_admin=user.is_superuser
-#     )
-
-
-# @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
-# async def update(
-#     id: str,
-#     update_data: OrderDetails,
-#     cache: CacheService
-# ) -> Message:
-#     """
-#     Update a order.
-#     """
-#     res = order_handler.update_order(
-#         order_id=id, update_data=update_data, is_admin=True
-#     )
-#     # Invalidate cache
-#     cache.delete(f"order:{id}")
-#     cache.invalidate("orders")
-#     return res
-
-
 @router.post("/export")
 async def export_orders(current_user: CurrentUser):
     try:
@@ -289,3 +206,55 @@ async def export_orders(current_user: CurrentUser):
     except Exception as e:
         logger.error(f"Export orders error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@router.post("/{order_id}/cancel", response_model=OrderResponse)
+async def cancel_order(order_id: int):
+    """Cancel an order"""
+    order = await db.order.find_unique(where={"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.status not in [OrderStatus.PENDING, OrderStatus.PROCESSING]:
+        raise HTTPException(status_code=400, detail="Order cannot be cancelled")
+
+    updated_order = await db.order.update(
+        where={"id": order_id},
+        data={"status": OrderStatus.CANCELLED},
+        include={"order_items": True}
+    )
+    return updated_order
+
+@router.post("/{order_id}/fulfill", response_model=OrderResponse)
+async def fulfill_order(order_id: int):
+    """Mark an order as fulfilled"""
+    order = await db.order.find_unique(where={"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.status != OrderStatus.PROCESSING:
+        raise HTTPException(status_code=400, detail="Order must be in processing status")
+
+    updated_order = await db.order.update(
+        where={"id": order_id},
+        data={"status": OrderStatus.FULFILLED},
+        # include={"order_items": True}
+    )
+    return updated_order
+
+@router.post("/{order_id}/refund", response_model=OrderResponse)
+async def refund_order(order_id: int):
+    """Refund an order"""
+    order = await db.order.find_unique(where={"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.status != OrderStatus.FULFILLED:
+        raise HTTPException(status_code=400, detail="Order must be fulfilled to be refunded")
+
+    updated_order = await db.order.update(
+        where={"id": order_id},
+        data={"status": OrderStatus.REFUNDED},
+        # include={"order_items": True}
+    )
+    return updated_order

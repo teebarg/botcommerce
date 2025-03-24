@@ -3,6 +3,7 @@ import OrderCompletedTemplate from "@modules/order/templates/order-completed-tem
 import { notFound } from "next/navigation";
 
 import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
 type Params = Promise<{ id: string }>;
 
@@ -13,7 +14,11 @@ export const metadata: Metadata = {
 
 export default async function OrderConfirmedPage({ params }: { params: Params }) {
     const { id } = await params;
-    const order = await api.order.get(id);
+    const { data: order, error } = await api.order.get(id);
+
+    if (error) {
+        return <ServerError />;
+    }
 
     if (!order) {
         return notFound();

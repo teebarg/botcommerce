@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";

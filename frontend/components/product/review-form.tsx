@@ -2,7 +2,7 @@
 
 import { Star } from "nui-react-icons";
 import { useState } from "react";
-import { useSnackbar } from "notistack";
+import { toast } from "sonner";
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -17,23 +17,22 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
     const [rating, setRating] = useState<number>(1);
     const [comment, setComment] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
-    const { enqueueSnackbar } = useSnackbar();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const res = await api.product.addReview({ product_id, rating, comment });
+        const { error } = await api.product.addReview({ product_id, rating, comment });
 
         setLoading(false);
-        if ("error" in res) {
-            enqueueSnackbar(res.message, { variant: "error" });
+        if (error) {
+            toast.error(error);
 
             return;
         }
         // Reset form
-        setRating(0);
+        setRating(1);
         setComment("");
-        enqueueSnackbar("Review successfully added", { variant: "success" });
+        toast.success("Review successfully added");
     };
 
     return (
@@ -69,7 +68,7 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
                 />
             </div>
 
-            <Button aria-label="submit review" className="bg-indigo-600 hover:bg-indigo-700 text-white" isLoading={loading} size="lg" type="submit">
+            <Button aria-label="submit review" isLoading={loading} size="lg" type="submit">
                 Submit Review
             </Button>
         </form>

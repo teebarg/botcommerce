@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { Drawer as DrawerPrimitive } from "vaul";
+
 import {
     Drawer,
     DrawerTrigger,
@@ -11,7 +13,6 @@ import {
     DrawerFooter,
     DrawerClose,
 } from "@/components/ui/drawer";
-import { Drawer as DrawerPrimitive } from "vaul";
 
 interface Props extends Omit<React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Root>, "ref"> {
     // interface Props extends React.ComponentProps<typeof DrawerPrimitive.Root> {
@@ -26,10 +27,11 @@ interface Props extends Omit<React.ComponentPropsWithoutRef<typeof DrawerPrimiti
 const DrawerUI: React.FC<Props> = ({ action, children, direction, trigger, title, description, ...props }) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { fadeFromIndex, ...restProps } = props;
+
     return (
         <Drawer direction={direction} {...restProps}>
             <DrawerTrigger> {trigger} </DrawerTrigger>
-            <DrawerContent direction={direction} className="p-4">
+            <DrawerContent className="p-4" direction={direction}>
                 <DrawerHeader>
                     <DrawerTitle>{title}</DrawerTitle>
                     <DrawerDescription>{description}</DrawerDescription>

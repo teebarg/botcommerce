@@ -23,8 +23,8 @@ export default function Google() {
                 const res = await googleLogin({
                     email: email,
                     password: "password",
-                    firstname: given_name,
-                    lastname: family_name,
+                    first_name: given_name,
+                    last_name: family_name,
                 });
 
                 if (res?.error) {

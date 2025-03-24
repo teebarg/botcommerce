@@ -48,15 +48,6 @@ export default async function ProductsPage({ searchParams }: ProductPageProps) {
     const { collections } = collectionsRes;
     const { categories } = catRes.data ?? {};
 
-    const deleteProduct = async (id: number) => {
-        "use server";
-        try {
-            await api.product.delete(id);
-        } catch (error) {
-            console.error("Failed to delete draft:", error);
-        }
-    };
-
     return (
         <React.Fragment>
             <ProductInventory

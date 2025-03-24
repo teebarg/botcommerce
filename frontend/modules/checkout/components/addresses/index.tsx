@@ -2,15 +2,10 @@
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Pencil } from "nui-react-icons";
-import compareAddresses from "@lib/util/compare-addresses";
-import { useActionState, useState } from "react";
 
 import ShippingAddress from "../shipping-address";
-import { setAddresses } from "../../actions";
-import ErrorMessage from "../error-message";
 
 import { cn } from "@/lib/util/cn";
-import { Button } from "@/components/ui/button";
 import { Cart } from "@/lib/models";
 
 const Addresses = ({
@@ -24,17 +19,11 @@ const Addresses = ({
     const router = useRouter();
     const pathname = usePathname();
 
-    const isOpen = searchParams.get("step") === "address";
-
-    const [sameAsSBilling, setSameAsSBilling] = useState<boolean>(
-        cart?.shipping_address && cart?.billing_address ? compareAddresses(cart?.shipping_address, cart?.billing_address) : true
-    );
+    const isOpen = searchParams.get("step") === "address" || searchParams.get("step") == null;
 
     const handleEdit = () => {
         router.push(pathname + "?step=address");
     };
-
-    const [message, formAction, isPending] = useActionState(setAddresses, null);
 
     return (
         <div>
@@ -52,21 +41,16 @@ const Addresses = ({
                     )}
                 </div>
 
-                <form action={formAction} className={cn("hidden", isOpen && "block")}>
-                    <ShippingAddress cart={cart} checked={sameAsSBilling} customer={customer} onChange={() => setSameAsSBilling(!sameAsSBilling)} />
-                    <input readOnly checked={true} className="hidden" name="same_as_billing" type="checkbox" />
-                    <Button aria-label="continue" className="mt-6" data-testid="submit-address-button" isLoading={isPending} type="submit">
-                        Continue to delivery
-                    </Button>
-                    <ErrorMessage data-testid="address-error-message" error={message} />
-                </form>
+                <div className={cn("hidden", isOpen && "block")}>
+                    <ShippingAddress cart={cart} customer={customer} />
+                </div>
                 {/* Account Information Section */}
                 {!isOpen && cart?.shipping_address?.address_1 && (
                     <div className="space-y-4">
                         <div className="text-xs md:text-sm" data-testid="shipping-address-summary">
                             <p className="font-medium mb-1 text-base">Shipping Address</p>
                             <p className="font-normal text-default-500">
-                                {cart.shipping_address.firstname} {cart.shipping_address.lastname} <br />
+                                {cart.shipping_address.first_name} {cart.shipping_address.last_name} <br />
                                 {cart.shipping_address.address_1} {cart.shipping_address.address_2} <br />
                                 {cart.shipping_address.postal_code}, {cart.shipping_address.city}
                             </p>

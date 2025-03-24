@@ -58,9 +58,7 @@ export default async function Wishlist() {
             <h1 className="text-3xl font-bold text-center text-default-900 mt-4">Your Wishlist</h1>
             <p className="text-center text-default-500">Curate your luxury collection.</p>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-8 mt-10 px-1">
-                {wishlists?.map((item: WishItem, idx: number) => (
-                    <WishlistItem key={idx} {...item.product} />
-                ))}
+                {wishlists?.map((item: WishItem, idx: number) => <WishlistItem key={idx} {...item.product} />)}
             </div>
         </div>
     );

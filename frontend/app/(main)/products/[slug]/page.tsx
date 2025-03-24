@@ -1,16 +1,13 @@
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
-import { siteConfig } from "@/lib/config";
-import SkeletonProductTemplate from "@/modules/products/skeleton-product";
-import { api } from "@/apis";
-import ServerError from "@/components/server-error";
-import ProductView from "@/modules/products/components/product-view";
-import { auth } from "@/actions/auth";
 import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
-import ProductView2 from "@/modules/products/components/product-view2";
-import ProductView3 from "@/modules/products/components/product-view3";
-import ProductView4 from "@/modules/products/components/product-view4";
+
+import { siteConfig } from "@/lib/config";
+import { api } from "@/apis";
+import ServerError from "@/components/server-error";
+import { auth } from "@/actions/auth";
+import ProductView from "@/components/store/products/product-view";
 import { Skeleton } from "@/components/skeleton";
 import ReviewsSection from "@/components/product/product-reviews";
 
@@ -51,14 +48,7 @@ export default async function ProductPage({ params }: { params: Params }) {
 
     return (
         <div className="flex flex-col gap-y-8">
-            {/* <Suspense fallback={<SkeletonProductTemplate />}>
-                <ProductView product={product} user={user} />
-            </Suspense> */}
-
-            {/* <ProductView2 /> */}
-
-            {/* <ProductView4 product={product} /> */}
-            <ProductView3 product={product} />
+            <ProductView product={product} />
 
             {/* ReviewSection */}
             <Suspense fallback={<Skeleton className="h-44" />}>

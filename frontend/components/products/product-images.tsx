@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, Trash2 } from "lucide-react";
@@ -63,31 +61,6 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
                     setIsUploading(false);
                 }
             })();
-
-            // const reader = new FileReader();
-
-            // reader.onload = () => {
-            //     const base64 = reader.result as string;
-            //     const fileName = `product-images/${Date.now()}-${file.name}`;
-
-            //     void (async () => {
-            //         try {
-            //             await uploadImage({
-            //                 file: base64.split(",")[1]!, // Remove the data URL prefix
-            //                 fileName,
-            //                 contentType: file.type,
-            //                 productId,
-            //             });
-
-            //             router.refresh();
-            //             toast.success("Image uploaded successfully");
-            //         } catch (error) {
-            //             toast.error(`Error - ${error as string}`);
-            //         }
-            //     })();
-            // };
-
-            // reader.readAsDataURL(file);
         },
     });
 

@@ -7,8 +7,8 @@ import { cookies } from "next/headers";
 
 export async function updateCustomerName(_currentState: Record<string, unknown>, formData: FormData) {
     const customer = {
-        firstname: formData.get("firstname"),
-        lastname: formData.get("lastname"),
+        first_name: formData.get("first_name"),
+        last_name: formData.get("last_name"),
     } as any;
 
     try {
@@ -107,8 +107,8 @@ export async function updateCustomerPassword(
 
 export async function addCustomerShippingAddress(_currentState: Record<string, unknown>, formData: FormData) {
     const address = {
-        firstname: formData.get("firstname") as string,
-        lastname: formData.get("lastname") as string,
+        first_name: formData.get("first_name") as string,
+        last_name: formData.get("last_name") as string,
         address_1: formData.get("address_1") as string,
         address_2: formData.get("address_2") as string,
         city: formData.get("city") as string,
@@ -131,8 +131,8 @@ export async function updateCustomerShippingAddress(currentState: Record<string,
     const addressId = currentState.addressId as string;
 
     const address = {
-        firstname: formData.get("firstname") as string,
-        lastname: formData.get("lastname") as string,
+        first_name: formData.get("first_name") as string,
+        last_name: formData.get("last_name") as string,
         address_1: formData.get("address_1") as string,
         address_2: formData.get("address_2") as string,
         city: formData.get("city") as string,
@@ -164,8 +164,8 @@ export async function deleteCustomerShippingAddress(addressId: string | number) 
 
 export async function updateCustomerBillingAddress(_currentState: Record<string, unknown>, formData: FormData) {
     const billing_address = {
-        firstname: formData.get("billing_address.firstname"),
-        lastname: formData.get("billing_address.lastname"),
+        first_name: formData.get("billing_address.first_name"),
+        last_name: formData.get("billing_address.last_name"),
         company: formData.get("billing_address.company"),
         address_1: formData.get("billing_address.address_1"),
         address_2: formData.get("billing_address.address_2"),

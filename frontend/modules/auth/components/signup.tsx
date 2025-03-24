@@ -1,11 +1,11 @@
 "use client";
 
-import { useSnackbar } from "notistack";
 import useWatch from "@lib/hooks/use-watch";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@modules/account/components/google";
 import React, { useActionState } from "react";
 import { Input } from "@components/ui/input";
+import { toast } from "sonner";
 
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
@@ -15,14 +15,11 @@ import { signUp } from "@/actions/auth";
 type Props = {};
 
 const SignUpForm: React.FC<Props> = () => {
-    const { enqueueSnackbar } = useSnackbar();
     const [state, formAction, isPending] = useActionState(signUp, null);
 
     useWatch(state, () => {
         if (state?.error) {
-            enqueueSnackbar(state.message, {
-                variant: "error",
-            });
+            toast.error(state.message);
         }
     });
 
@@ -57,7 +54,7 @@ const SignUpForm: React.FC<Props> = () => {
                     color="warning"
                     data-testid="register-button"
                     isLoading={isPending}
-                    size="md"
+                    size="lg"
                     type="submit"
                 >
                     Join Us

@@ -8,7 +8,6 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
         "billing_address.first_name": cart?.billing_address?.first_name || "",
         "billing_address.last_name": cart?.billing_address?.last_name || "",
         "billing_address.address_1": cart?.billing_address?.address_1 || "",
-        "billing_address.company": cart?.billing_address?.company || "",
         "billing_address.postal_code": cart?.billing_address?.postal_code || "",
         "billing_address.city": cart?.billing_address?.city || "",
         "billing_address.state": cart?.billing_address?.state || "",
@@ -20,7 +19,6 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
             "billing_address.first_name": cart?.billing_address?.first_name || "",
             "billing_address.last_name": cart?.billing_address?.last_name || "",
             "billing_address.address_1": cart?.billing_address?.address_1 || "",
-            "billing_address.company": cart?.billing_address?.company || "",
             "billing_address.postal_code": cart?.billing_address?.postal_code || "",
             "billing_address.city": cart?.billing_address?.city || "",
             "billing_address.state": cart?.billing_address?.state || "",
@@ -28,10 +26,10 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
         });
     }, [cart?.billing_address]);
 
-    const handleChange = (e: string, name: string) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
         setFormData({
             ...formData,
-            [name]: e,
+            [name]: e.target.value,
         });
     };
 
@@ -45,7 +43,7 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     label="First name"
                     name="billing_address.first_name"
                     value={formData["billing_address.first_name"]}
-                    onChange={(e) => handleChange(e, "billing_address.firstname")}
+                    onChange={(e) => handleChange(e, "billing_address.first_name")}
                 />
                 <Input
                     required
@@ -64,14 +62,6 @@ const BillingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refu
                     name="billing_address.address_1"
                     value={formData["billing_address.address_1"]}
                     onChange={(e) => handleChange(e, "billing_address.address_1")}
-                />
-                <Input
-                    autoComplete="organization"
-                    data-testid="billing-company-input"
-                    label="Company"
-                    name="billing_address.company"
-                    value={formData["billing_address.company"]}
-                    onChange={(e) => handleChange(e, "billing_address.company")}
                 />
                 <Input
                     required

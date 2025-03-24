@@ -31,7 +31,7 @@ export const productApi = {
     async get(slug: string): ApiResult<Product> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
 
-        return await tryCatch<Product>(fetcher(url));
+        return await tryCatch<Product>(fetcher(url, { next: { tags: ["product"] } }));
     },
     async create(input: any): ApiResult<Product> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`;
@@ -76,19 +76,16 @@ export const productApi = {
 
         return response;
     },
-    async addReview(input: { product_id: number; rating: number; comment: string }): Promise<Review | Message> {
+    async addReview(input: { product_id: number; rating: number; comment: string }): ApiResult<Review> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`;
+        const response = await tryCatch<Review>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
 
-        try {
-            const res = await fetcher<Review>(url, { method: "POST", body: JSON.stringify(input) });
-
+        if (!response.error) {
+            revalidate("products");
             revalidate("product");
-            revalidate("search");
-
-            return res;
-        } catch (error) {
-            return handleError(error);
         }
+
+        return response;
     },
     async export(): Promise<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/export`;
@@ -108,7 +105,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("search")
+            revalidate("search");
         }
 
         return response;
@@ -120,7 +117,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("search")
+            revalidate("search");
         }
 
         return response;
@@ -143,7 +140,7 @@ export const productApi = {
             await fetcher<{ message: string }>(url, { method: "POST" });
 
             revalidate("product");
-            revalidate("search")
+            revalidate("search");
 
             return { error: false, message: "Products indexed successfully" };
         } catch (error) {
@@ -164,7 +161,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("search")
+            revalidate("search");
         }
 
         return response;
@@ -183,7 +180,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("search")
+            revalidate("search");
         }
 
         return response;
@@ -194,7 +191,7 @@ export const productApi = {
 
         if (!response.error) {
             revalidate("products");
-            revalidate("search")
+            revalidate("search");
         }
 
         return response;

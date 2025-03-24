@@ -3,10 +3,8 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class AddressBase(BM):
-    name: str = Field(..., min_length=1, description="Name is required")
-    is_active: bool = True
-    firstname: str = Field(..., max_length=255)
-    lastname: str | None = Field(default=None, max_length=255)
+    first_name: str = Field(..., max_length=255)
+    last_name: str | None = Field(default=None, max_length=255)
     address_1: str = Field(..., max_length=1255)
     address_2: str | None = Field(default=None, max_length=1255)
     city: str = Field(max_length=255)
@@ -15,7 +13,7 @@ class AddressBase(BM):
     phone: str | None = Field(default=None, max_length=255)
     is_billing: bool = Field(default=False)
 
-    @field_validator("address_1", "firstname", "city", mode="before")
+    @field_validator("address_1", "first_name", "city", mode="before")
     def not_empty(cls, v, info):
         if not v or v.strip() == "":
             raise ValueError(f"{info.field_name} cannot be empty")
@@ -24,7 +22,6 @@ class AddressBase(BM):
 
 class Address(AddressBase):
     id: int
-    slug: str = Field(..., min_length=1)
 
 
 class AddressCreate(AddressBase):
@@ -32,7 +29,14 @@ class AddressCreate(AddressBase):
 
 
 class AddressUpdate(AddressBase):
-    pass
+    first_name: str | None = Field(default=None, max_length=255)
+    last_name: str | None = Field(default=None, max_length=255)
+    address_1: str | None = Field(default=None, max_length=1255)
+    address_2: str | None = Field(default=None, max_length=1255)
+    city: str | None = Field(default=None, max_length=255)
+    postal_code: str | None = Field(default=None, max_length=255)
+    state: str | None = Field(default=None, max_length=255)
+    phone: str | None = Field(default=None, max_length=255)
 
 
 class Addresses(BaseModel):
@@ -44,3 +48,13 @@ class Addresses(BaseModel):
 
 class Search(BaseModel):
     results: list[Address]
+
+class BillingAddressCreate(BaseModel):
+    first_name: str = Field(..., max_length=255)
+    last_name: str | None = Field(default=None, max_length=255)
+    address_1: str = Field(..., max_length=1255)
+    address_2: str | None = Field(default=None, max_length=1255)
+    city: str = Field(max_length=255)
+    postal_code: str | None = Field(default=None, max_length=255)
+    state: str | None = Field(default=None, max_length=255)
+    phone: str | None = Field(default=None, max_length=255)

@@ -11,15 +11,18 @@ import { toast } from "sonner";
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/actions/auth";
-import { requestMagicLink } from "@/actions/auth";
+import { api } from "@/apis";
 
-type Props = {};
+type Props = {
+    callbackUrl?: string;
+};
 
-const MagicLinkForm: React.FC<Props> = () => {
+const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
     const [show, setShow] = useState<boolean>(false);
     const [state, formAction, isLoading] = useActionState(signIn, null);
-    const [magicLinkState, magicLinkAction] = useActionState(requestMagicLink, null);
     const [showMagicLink, setShowMagicLink] = useState(false);
+    const [email, setEmail] = useState<string>();
+    const [loading, setLoading] = useState<boolean>(false);
 
     useWatch(state, () => {
         if (state?.error) {
@@ -27,26 +30,54 @@ const MagicLinkForm: React.FC<Props> = () => {
         }
     });
 
-    useWatch(magicLinkState, () => {
-        if (magicLinkState?.error) {
-            toast.error(magicLinkState.message);
-        } else if (magicLinkState?.message) {
-            toast.success(magicLinkState.message);
+    const sendLink = async () => {
+        if (!email) {
+            toast.error("Please enter a valid email");
+
+            return;
         }
-    });
+        setLoading(true);
+        const { data, error } = await api.auth.requestMagicLink(email, callbackUrl);
+
+        setLoading(false);
+
+        if (error) {
+            toast.error(error);
+
+            return;
+        }
+
+        toast.success(data?.message);
+    };
 
     if (showMagicLink) {
         return (
             <React.Fragment>
-                <form action={magicLinkAction} className="w-full">
+                <div className="w-full">
                     <div className="flex flex-col w-full gap-y-4">
-                        <Input required data-testid="email-input" label="Email" name="email" placeholder="Enter your email address" type="email" />
+                        <Input
+                            required
+                            data-testid="email-input"
+                            label="Email"
+                            name="email"
+                            placeholder="Enter your email address"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
                     </div>
-                    <Button aria-label="send magic link" className="w-full mt-6" data-testid="magic-link-button" isLoading={isLoading} type="submit">
+                    <Button
+                        aria-label="send magic link"
+                        className="w-full mt-6"
+                        data-testid="magic-link-button"
+                        isLoading={loading}
+                        type="button"
+                        onClick={sendLink}
+                    >
                         Send Magic Link
                     </Button>
-                </form>
-                <button className="text-sm text-gray-600 mt-4 hover:underline" onClick={() => setShowMagicLink(false)}>
+                </div>
+                <button className="text-sm text-default-600 mt-4 hover:underline" onClick={() => setShowMagicLink(false)}>
                     Back to password login
                 </button>
             </React.Fragment>
@@ -76,7 +107,7 @@ const MagicLinkForm: React.FC<Props> = () => {
                         type={show ? "text" : "password"}
                     />
                 </div>
-                <Button aria-label="sign in" className="w-full mt-6" color="primary" data-testid="sign-in-button" type="submit">
+                <Button aria-label="sign in" className="w-full mt-6" color="primary" data-testid="sign-in-button" isLoading={isLoading} type="submit">
                     Sign in
                 </Button>
             </form>

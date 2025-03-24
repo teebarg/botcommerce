@@ -1,9 +1,7 @@
-import dynamic from "next/dynamic";
-
 import { api } from "@/apis";
-import { Product } from "@/lib/models";
-
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
+import { Product, ProductSearch } from "@/lib/models";
+import ProductCard from "@/components/store/products/product-card";
+import ServerError from "@/components/server-error";
 
 type RelatedProductsProps = {
     product: Product;
@@ -26,11 +24,11 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
     const queryParams = setQueryParams();
     const { data, error } = await api.product.search(queryParams);
 
-    if (error) {
-        return <ServerError />
+    if (error || !data) {
+        return <ServerError />;
     }
 
-    const productPreviews = data.products?.filter((item: Product) => item.id !== product.id);
+    const productPreviews = data.products?.filter((item: ProductSearch) => item.id !== product.id);
 
     if (!productPreviews.length) {
         return null;
@@ -44,8 +42,8 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
             </div>
 
             <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-6 gap-y-8">
-                {productPreviews.slice(0, 4).map((product: Product) => (
-                    <li key={product.id}>
+                {productPreviews.slice(0, 4).map((product: ProductSearch, idx: number) => (
+                    <li key={idx}>
                         <ProductCard product={product} wishlist={[]} />
                     </li>
                 ))}

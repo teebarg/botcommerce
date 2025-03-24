@@ -1,8 +1,8 @@
 "use client";
 
-import { useTheme } from "@/lib/hooks/use-theme";
-// import { useTheme } from "@/hooks/use-theme";
 import { Toaster as Sonner } from "sonner";
+
+import { useTheme } from "@/lib/hooks/use-theme";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -11,8 +11,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
     return (
         <Sonner
-            theme={theme as ToasterProps["theme"]}
             className="toaster group"
+            theme={theme as ToasterProps["theme"]}
             toastOptions={{
                 classNames: {
                     toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",

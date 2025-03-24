@@ -122,8 +122,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                         {isOpen && (
                             <>
                                 <div className="flex w-full gap-x-2 items-center">
-                                    <Input data-testid="discount-input" label="Please enter code" name="code" size="sm" type="text" />
-                                    <Button aria-label="apply" className="px-4 min-w-20 h-10 text-sm gap-2" isLoading={isPending} type="submit">
+                                    <Input className="flex-1" data-testid="discount-input" name="code" type="text" />
+                                    <Button aria-label="apply" className="px-4 min-w-20 text-sm gap-2" isLoading={isPending} type="submit">
                                         Apply
                                     </Button>
                                 </div>

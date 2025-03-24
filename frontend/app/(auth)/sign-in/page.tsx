@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { LoginForm } from "@modules/auth/components/login";
 
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
@@ -17,7 +16,6 @@ export default function Login() {
 
             <p className="text-default-500 mb-6 text-center text-sm md:text-base">Fill in your details to log into your account</p>
             <MagicLinkForm />
-            {/* <LoginForm /> */}
             <p className="mt-6 text-xs text-default-500 text-center font-medium">
                 {`Don't have an account?`}{" "}
                 <LocalizedClientLink className="text-warning" href="/sign-up">

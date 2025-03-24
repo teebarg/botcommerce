@@ -3,7 +3,7 @@ import { currency } from "@lib/util/util";
 import Image from "next/image";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { CartItem, Order } from "@/lib/models";
+import { Order, OrderItem } from "@/lib/models";
 
 type OrderCardProps = {
     order: Omit<Order, "beforeInsert">;
@@ -11,19 +11,19 @@ type OrderCardProps = {
 
 const OrderCard = ({ order }: OrderCardProps) => {
     const numberOfLines = useMemo(() => {
-        return order.line_items.reduce((acc: number, item: CartItem) => {
+        return order.order_items.reduce((acc: number, item: OrderItem) => {
             return acc + item.quantity;
         }, 0);
     }, [order]);
 
     const numberOfProducts = useMemo(() => {
-        return order.line_items.length;
+        return order.order_items.length;
     }, [order]);
 
     return (
         <div className="bg-content2 flex flex-col p-4 rounded-lg" data-testid="order-card">
             <div className="uppercase text-lg mb-1 text-ellipsis overflow-hidden" data-testid="order-display-id">
-                {order.order_id}
+                {order.order_number}
             </div>
             <div className="flex items-center divide-x divide-gray-50 text-sm text-default-500">
                 <span className="pr-2" data-testid="order-created-at">
@@ -35,15 +35,13 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 <span className="pl-2">{`${numberOfLines} ${numberOfLines > 1 ? "items" : "item"}`}</span>
             </div>
             <div className="grid grid-cols-2 small:grid-cols-4 gap-4 my-4">
-                {order.line_items.slice(0, 3).map((i: CartItem) => {
+                {order.order_items.slice(0, 3).map((i: OrderItem, idx: number) => {
                     return (
-                        <div key={i.item_id} className="flex flex-col gap-y-2" data-testid="order-item">
-                            <div className="h-20 w-20 relative">
-                                <Image fill alt={i.name} src={i.image as string} />
-                            </div>
+                        <div key={idx} className="flex flex-col gap-y-2" data-testid="order-item">
+                            <div className="h-20 w-20 relative">{i.image && <Image fill alt={i.variant?.name || i.image} src={i.image} />}</div>
                             <div className="flex items-center text-sm text-default-500">
                                 <span className="text-default-500 font-semibold" data-testid="item-title">
-                                    {i.name}
+                                    {i.variant?.name}
                                 </span>
                                 <span className="ml-2">x</span>
                                 <span data-testid="item-quantity">{i.quantity}</span>
@@ -62,7 +60,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 <LocalizedClientLink
                     className="underline text-primary"
                     data-testid="order-details-link"
-                    href={`/account/orders/details/${order.order_id}`}
+                    href={`/account/orders/details/${order.order_number}`}
                 >
                     See details
                 </LocalizedClientLink>

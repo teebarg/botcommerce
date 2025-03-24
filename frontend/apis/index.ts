@@ -8,8 +8,10 @@ import { productApi } from "./product";
 import { userApi } from "./user";
 import { reviewsApi } from "./review";
 import { configApi } from "./config";
+import { addressApi } from "./address";
 
 export const api = {
+    address: addressApi,
     auth: authApi,
     brand: brandApi,
     cart: cartApi,

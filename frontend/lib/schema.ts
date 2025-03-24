@@ -1,5 +1,24 @@
 import { z } from "zod";
 
+// Zod Enums
+export const OrderStatusSchema = z.enum(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELED"]);
+
+export const DiscountTypeSchema = z.enum(["PERCENTAGE", "FIXED_AMOUNT"]);
+
+export const PaymentMethodSchema = z.enum(["CREDIT_CARD", "PAYPAL", "CASH_ON_DELIVERY", "BANK_TRANSFER", "PAYSTACK"]);
+
+export const ProductStatusSchema = z.enum(["IN_STOCK", "OUT_OF_STOCK"]);
+
+export const CartStatusSchema = z.enum(["ACTIVE", "ABANDONED", "CONVERTED"]);
+
+export const PaymentStatusSchema = z.enum(["PENDING", "COMPLETED", "FAILED"]);
+
+export const ShippingMethodSchema = z.enum(["STANDARD", "EXPRESS", "PICKUP"]);
+
+export const RoleSchema = z.enum(["admin", "customer"]);
+
+export const StatusSchema = z.enum(["pending", "active", "inactive"]);
+
 export const TokenSchema = z.object({
     access_token: z.string(),
     token_type: z.string().default("bearer"),
@@ -10,6 +29,25 @@ export const PagSchema = z.object({
     limit: z.number(),
     total_count: z.number(),
     total_pages: z.number(),
+});
+
+export const AddressSchema = z.object({
+    id: z.number(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional(),
+    first_name: z.string(),
+    last_name: z.string(),
+    address_1: z.string(),
+    address_2: z.string(),
+    city: z.string(),
+    postal_code: z.string(),
+    state: z.string(),
+    phone: z.string(),
+    is_billing: z.boolean().optional(),
+});
+
+export const PaginatedAddressSchema = PagSchema.extend({
+    addresses: z.array(AddressSchema),
 });
 
 export const CategorySchema = z.object({
@@ -31,12 +69,14 @@ export const PaginatedCategorySchema = PagSchema.extend({
 
 export const UserSchema = z.object({
     id: z.number(),
-    firstname: z.string(),
-    lastname: z.string().optional(),
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
-    is_active: z.boolean().optional(),
-    is_superuser: z.boolean().optional(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
+    email: z.string().email(),
+    emailVerified: z.string(),
+    status: z.string(),
+    hashed_password: z.string(),
+    image: z.string().optional(),
+    role: z.string(),
     created_at: z.string().optional(),
     billing_addresses: z.array(z.record(z.any())).optional(),
     shipping_addresses: z.array(z.record(z.any())).optional(),
@@ -59,8 +99,6 @@ export const PaginatedReviewSchema = z.object({
     total_count: z.number(),
     total_pages: z.number(),
 });
-
-export const ProductStatusSchema = z.enum(["IN_STOCK", "OUT_OF_STOCK", "DISCONTINUED"]);
 
 export const ProductVariantSchema = z.object({
     id: z.number(),
@@ -179,20 +217,21 @@ export const CartItemSchema = z.object({
 
 export const CartSchema = z.object({
     id: z.number(),
-    cart_id: z.string(),
-    customer_id: z.string(),
+    cart_number: z.string(),
+    user_id: z.number(),
     email: z.string().email(),
+    status: z.enum(["pending", "processing", "fulfilled"]).optional(),
     items: z.array(CartItemSchema),
-    checkout_step: z.enum(["address", "delivery", "payment"]).optional(),
+    checkout_step: z.enum(["address", "delivery", "payment"]).default("address").optional(),
     subtotal: z.number(),
-    tax_total: z.number(),
+    tax: z.number(),
+    shipping_fee: z.number(),
     discount_total: z.number(),
-    delivery_fee: z.number(),
     total: z.number(),
-    billing_address: z.record(z.any()),
-    shipping_address: z.record(z.any()),
-    shipping_method: z.any(),
-    payment_session: z.any(),
+    billing_address: AddressSchema,
+    shipping_address: AddressSchema,
+    shipping_method: ShippingMethodSchema,
+    payment_method: PaymentMethodSchema,
     gift_cards: z.any(),
 });
 
@@ -207,44 +246,42 @@ const PaymentSessionSchema = z.object({
     provider_id: z.string(),
 });
 
+export const OrderItemSchema = z.object({
+    id: z.number(),
+    order_id: z.number(),
+    variant_id: z.string(),
+    variant: ProductVariantSchema,
+    image: z.string().optional(),
+    quantity: z.number(),
+    price: z.number(),
+    created_at: z.string(),
+});
+
 export const OrderSchema = z.object({
-    order_id: z.string(),
-    status: z.enum(["pending", "processing", "fulfilled"]).optional(),
-    fulfillment_status: z.enum(["fulfilled", "not_fulfilled"]),
+    id: z.number(),
+    order_number: z.string(),
+    status: OrderStatusSchema,
+    email: z.string(),
     cart_id: z.string(),
-    customer_id: z.string(),
-    email: z.string().email(),
-    line_items: z.array(CartItemSchema),
-    checkout_step: z.enum(["address", "delivery", "payment"]).optional(),
+    user_id: z.number(),
+    user: UserSchema,
+    order_items: z.array(OrderItemSchema),
     subtotal: z.number(),
-    tax_total: z.number(),
-    delivery_fee: z.number(),
+    tax: z.number(),
+    shipping_fee: z.number(),
     total: z.number(),
-    billing_address: z.record(z.any()),
-    shipping_address: z.record(z.any()),
-    shipping_method: z.record(z.any()),
-    payment_session: z.record(z.any()),
-    fulfillments: z.array(z.record(z.any())),
+    coupon: z.number().optional(),
+    billing_address: AddressSchema,
+    shipping_address: AddressSchema,
+    shipping_method: ShippingMethodSchema,
+    payment_method: PaymentMethodSchema,
     payment_status: z.enum(["pending", "paid"]),
     created_at: z.string(),
+    updated_at: z.string(),
 });
 
 export const PaginatedOrderSchema = PagSchema.extend({
     orders: z.array(OrderSchema),
-});
-
-const AddressSchema = z.object({
-    created_at: z.string(),
-    updated_at: z.string(),
-    firstname: z.string(),
-    lastname: z.string(),
-    address_1: z.string(),
-    address_2: z.string(),
-    city: z.string(),
-    postal_code: z.string(),
-    state: z.string(),
-    phone: z.string(),
-    id: z.string(),
 });
 
 export const WishItemSchema = z.object({
@@ -291,8 +328,8 @@ export const PaginatedProductSchema = PagSchema.extend({
 
 export const SessionSchema = z.object({
     id: z.number(),
-    firstname: z.string(),
-    lastname: z.string().optional(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
     email: z.string(),
     image: z.string().optional(),
     phone: z.string().optional(),

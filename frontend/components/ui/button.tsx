@@ -1,9 +1,11 @@
-import * as React from "react";
-import { cn } from "@/lib/util/cn";
+"use client";
 
+import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader } from "nui-react-icons";
+
+import { cn } from "@/lib/util/cn";
 
 const buttonVariants = cva(
     "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
@@ -44,12 +46,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         return (
             <Comp
+                ref={ref}
                 className={cn(
                     "relative flex items-center justify-center",
                     isLoading && "opacity-50 cursor-not-allowed",
                     buttonVariants({ variant, size, className })
                 )}
-                ref={ref}
                 disabled={isLoading || props.disabled}
                 {...props}
             >
@@ -69,6 +71,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         );
     }
 );
+
 Button.displayName = "Button";
 
 export { Button, buttonVariants };

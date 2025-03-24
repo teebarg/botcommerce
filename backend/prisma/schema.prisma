@@ -7,7 +7,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl  = env("DIRECT_URL")
 }
 
 // Enums for consistent data values
@@ -99,8 +98,12 @@ model Address {
   postal_code     String?
   phone           String?
   is_billing      Boolean   @default(false)
+
   shipping_orders Order[]   @relation("ShippingAddress")
   billing_orders  Order[]   @relation("BillingAddress")
+  shipping_carts  Cart[]    @relation("ShippingCartAddress")
+  billing_carts   Cart[]    @relation("BillingCartAddress")
+
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
@@ -256,16 +259,20 @@ model Order {
   order_number    String       @unique
   user            User         @relation(fields: [user_id], references: [id], onDelete: NoAction)
   user_id         Int
-  shipping_address Address     @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: NoAction)
+
+  shipping_address    Address     @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: NoAction)
   shipping_address_id Int
-  billing_address Address      @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: NoAction)
-  billing_address_id Int
+  billing_address     Address     @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: NoAction)
+  billing_address_id  Int
+
+  email        String?
   order_items     OrderItem[]
   total           Float       @db.DoublePrecision
   subtotal        Float       @db.DoublePrecision
   tax             Float       @db.DoublePrecision
   status          OrderStatus @default(PENDING)
   payment         Payment?
+  payment_method  PaymentMethod
   payment_status  PaymentStatus? @default(PENDING)
   shipping_method ShippingMethod?
   shipping_fee    Float       @db.DoublePrecision
@@ -286,6 +293,7 @@ model OrderItem {
   order_id     Int
   variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
   variant_id   Int
+  image        String?
   quantity     Int
   price        Float          @db.DoublePrecision
   created_at   DateTime       @default(now())
@@ -331,8 +339,21 @@ model Cart {
   items        CartItem[]  // List of items in the cart
   status       CartStatus  @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
   order        Order?      @relation // Links to the order if cart is converted
+  email        String?
+  total           Float       @db.DoublePrecision @default(0)
+  subtotal        Float       @db.DoublePrecision @default(0)
+  tax             Float       @db.DoublePrecision @default(0)
+  shipping_fee    Float       @db.DoublePrecision @default(0)
+  payment_method PaymentMethod?
+  shipping_method ShippingMethod?
+
+  shipping_address    Address?     @relation("ShippingCartAddress", fields: [shipping_address_id], references: [id], onDelete: NoAction)
+  shipping_address_id Int?
+  billing_address     Address?     @relation("BillingCartAddress", fields: [billing_address_id], references: [id], onDelete: NoAction)
+  billing_address_id  Int?
+
   created_at   DateTime    @default(now())
-  last_updated DateTime    @updatedAt // Used to detect abandoned carts
+  updated_at   DateTime?    @updatedAt // Used to detect abandoned carts
 
   @@map("carts")
 }
@@ -357,8 +378,8 @@ model CartItem {
 // User Model
 model User {
     id            Int         @id @default(autoincrement())
-    firstName     String? @map("first_name")
-    lastName      String? @map("last_name")
+    first_name     String?
+    last_name      String?
     email         String?   @unique
     emailVerified DateTime?
     status        Status    @default(PENDING)
@@ -375,7 +396,7 @@ model User {
     createdAt     DateTime? @default(now()) @map("created_at")
     updatedAt     DateTime? @updatedAt @map("updated_at")
 
-    @@index([firstName, lastName, email])
+    @@index([first_name, last_name, email])
 
     @@map("users")
 }

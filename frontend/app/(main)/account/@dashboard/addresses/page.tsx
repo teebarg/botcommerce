@@ -1,9 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AddressBook from "@modules/account/components/address-book";
-import { getAdresses } from "@lib/data";
 
 import { auth } from "@/actions/auth";
+import { api } from "@/apis";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: "Addresses",
@@ -12,12 +13,11 @@ export const metadata: Metadata = {
 
 export default async function Addresses() {
     const user = await auth();
-    const addRes = await getAdresses();
+    const { data, error } = await api.address.all();
 
-    if (!addRes) {
-        return null;
+    if (!data || error) {
+        return <ServerError />;
     }
-    const { addresses } = addRes;
 
     if (!user) {
         notFound();
@@ -32,7 +32,7 @@ export default async function Addresses() {
                     checkout.
                 </p>
             </div>
-            <AddressBook addresses={addresses} />
+            <AddressBook addresses={data.addresses} />
         </div>
     );
 }

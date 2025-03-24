@@ -3,27 +3,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { BtnLink } from "@/components/ui/btnLink";
 import { CartItem } from "@/lib/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";
+import { subtotal, taxTotal, total } from "@/lib/util/store";
 
 interface Props {
     onClose: () => void;
     items: CartItem[];
+    shippingFee?: number;
 }
 
-const CartDetails: React.FC<Props> = ({ onClose, items }) => {
+const CartDetails: React.FC<Props> = ({ onClose, items, shippingFee }) => {
     const [mounted, setMounted] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
-
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shipping = subtotal > 100 ? 0 : 10; // Free shipping over $100
-    const total = subtotal + shipping;
 
     if (!mounted) return null;
 
@@ -159,19 +158,26 @@ const CartDetails: React.FC<Props> = ({ onClose, items }) => {
                     <motion.div animate={{ opacity: 1, y: 0 }} className="p-4 border-t space-y-3" initial={{ opacity: 0, y: 20 }}>
                         <div className="flex justify-between text-sm">
                             <span className="text-default-600">Subtotal</span>
-                            <span>{currency(Number(subtotal) || 0)}</span>
+                            <span>{currency(subtotal(items) || 0)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-default-600">Shipping</span>
-                            <span>{shipping === 0 ? "Free" : `${currency(Number(shipping) || 0)}`}</span>
+                            <span>{shippingFee === 0 ? "Free" : `${currency(shippingFee || 0)}`}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-default-600">Tax</span>
+                            <span>{currency(taxTotal(items) || 0)}</span>
                         </div>
                         <div className="flex justify-between font-medium text-base pt-2 border-t">
                             <span>Total</span>
-                            <span>{currency(Number(total) || 0)}</span>
+                            <span>{currency(total(items, shippingFee || 0) || 0)}</span>
                         </div>
-                        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-medium transition-colors mt-4">
+                        <BtnLink
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-medium transition-colors mt-4"
+                            href="/checkout"
+                        >
                             Checkout
-                        </button>
+                        </BtnLink>
                         <button className="w-full text-blue-600 py-2 text-sm hover:underline" onClick={onClose}>
                             Continue Shopping
                         </button>

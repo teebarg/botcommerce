@@ -20,8 +20,8 @@ def tokenData(user: User):
     return {
         "id": user.id,
         "sub": user.email,
-        "firstname": user.firstName,
-        "lastname": user.lastName,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "status": user.status,
         "role": user.role
     }
@@ -35,6 +35,8 @@ async def request_magic_link(
     The link will be sent to the user's email if they have an account.
     """
     email = payload.email
+    callback_url = payload.callback_url
+
     # Check if user exists
     user = await prisma.user.find_first(
         where={
@@ -52,9 +54,11 @@ async def request_magic_link(
 
     # Create magic link URL
     magic_link = f"{settings.FRONTEND_HOST}/verify?token={token}"
+    if callback_url is not None:
+        magic_link += f"&callbackUrl={callback_url}"
 
     # Generate and send email
-    email_data = generate_magic_link_email(email_to=email, magic_link=magic_link, first_name=user.firstName)
+    email_data = generate_magic_link_email(email_to=email, magic_link=magic_link, first_name=user.first_name)
     send_email(
         email_to=email,
         subject=email_data.subject,
@@ -104,8 +108,3 @@ async def verify_magic_link(token: TokenPayload, response: Response) -> Token:
     )
 
     return Token(access_token=access_token)
-
-    # return {
-    #     "access_token": access_token,
-    #     "token_type": "bearer",
-    # }

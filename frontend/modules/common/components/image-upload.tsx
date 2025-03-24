@@ -89,10 +89,9 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                     <Button
                         aria-label="upload"
                         className="min-w-24 mt-2"
-                        color="secondary"
                         disabled={status}
                         isLoading={status}
-                        variant="shadow"
+                        variant="outline"
                         onClick={handleSubmit}
                     >
                         Upload{status ? "ing" : ""}

@@ -21,28 +21,28 @@ reusable_oauth2 = OAuth2PasswordBearer(
 )
 
 
-# def get_db() -> Generator[Session, None, None]:
-#     with Session(engine) as session:
-#         yield session
-
-
 # SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 
 CacheService = Annotated[CacheService, Depends(get_cache_service)]
 
-
-async def get_current_user(access_token: TokenDep, cache: CacheService) -> User:
+async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
     except (InvalidTokenError, ValidationError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        ) from None
+        return None
+
+    return token_data
+
+TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
+
+
+async def get_current_user(token_data: TokenUser, cache: CacheService) -> User:
+    if not token_data:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
 
     # Check if user is in cache
     user = cache.get(f"user:{token_data.sub}")
@@ -78,7 +78,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 def get_current_superuser(current_user: CurrentUser) -> User:
-    if not current_user.is_superuser:
+    if not current_user.role == "ADMIN":
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
         )

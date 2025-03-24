@@ -11,15 +11,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Orders() {
-    const res = await api.order.query();
+    const { data, error } = await api.order.query({ take: 20 });
 
-    if ("error" in res) {
+    if (error) {
         return <ServerError />;
     }
 
-    const { orders } = res;
-
-    if (!orders) {
+    if (!data) {
         notFound();
     }
 
@@ -30,7 +28,7 @@ export default async function Orders() {
                 <p>View your previous orders and their status. You can also create returns or exchanges for your orders if needed.</p>
             </div>
             <div>
-                <OrderOverview orders={orders} />
+                <OrderOverview orders={data.orders} />
             </div>
         </div>
     );

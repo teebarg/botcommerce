@@ -33,14 +33,7 @@ const CheckoutLoginForm: React.FC<Props> = () => {
                     <Input required data-testid="email-input" label="Email" name="email" placeholder="Enter a valid email address." type="email" />
                     <Input required data-testid="password-input" label="Password" name="password" type="password" />
                 </div>
-                <Button
-                    aria-label="sign in"
-                    className="w-full mt-6"
-                    color="primary"
-                    data-testid="sign-in-button"
-                    isLoading={isPending}
-                    type="submit"
-                >
+                <Button aria-label="sign in" className="w-full mt-6" color="primary" data-testid="sign-in-button" isLoading={isPending} type="submit">
                     Sign in
                 </Button>
             </form>

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -30,8 +32,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
     const handleWishlistClick = async () => {
         try {
             const { error } = await api.user.addWishlist(id);
+
             if (error) {
                 toast.error(error);
+
                 return;
             }
             toast.success("Added to favorites");
@@ -43,8 +47,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
     const removeWishlist = async () => {
         try {
             const { error } = await api.user.deleteWishlist(id);
+
             if (error) {
                 toast.error(error);
+
                 return;
             }
             toast.success("Removed from favorites");
@@ -105,8 +111,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                     {showWishlist && (
                         <Button
                             className={cn(
-                                "absolute top-4 right-4 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100",
-                                inWishlist && "bg-rose-500 opacity-100"
+                                "absolute top-4 right-4 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 bg-gray-500",
+                                inWishlist && "bg-gray-400 opacity-100"
                             )}
                             size="icon"
                             variant="ghost"
@@ -122,22 +128,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
                 {/* Content */}
                 <div className="p-4 cursor-pointer" onClick={() => router.push(`/products/${slug}`)}>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-nowrap overflow-hidden gap-1 h-5">
                         {categories.map((category: string, idx: number) => (
-                            <Badge key={idx} variant="secondary">
+                            <Badge key={idx} variant="destructive">
                                 {category}
                             </Badge>
                         ))}
                     </div>
-                    <h3 className="font-medium text-default-900 mb-2 line-clamp-2 hover:text-default-700 transition-colors">{name}</h3>
+                    <h3 className="font-medium text-default-900 my-2 line-clamp-1 hover:text-default-700 transition-colors">{name}</h3>
+                    {old_price > price && (
+                        <div className="absolute top-4 left-4">
+                            <span className="text-sm font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
+                        </div>
+                    )}
                     <div className="flex items-center">
-                        <p className="text-lg font-semibold">{currency(price)}</p>
-                        {old_price && <p className="text-xs">{currency(old_price)}</p>}
+                        <span className="text-lg font-semibold text-danger">{currency(price)}</span>
+                        {old_price > price && <span className="ml-1 text-xs md:text-sm text-default-500 line-through">{currency(old_price)}</span>}
                     </div>
                     <Button
-                        isLoading={loading}
-                        className="w-full"
+                        className="w-full gap-2"
                         disabled={loading || status == "OUT_OF_STOCK"}
+                        isLoading={loading}
                         onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart();

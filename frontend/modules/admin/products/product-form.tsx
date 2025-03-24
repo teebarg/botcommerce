@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useActionState, useRef } from "react";
-import { useSnackbar } from "notistack";
 import { ImageUpload } from "@modules/common/components/image-upload";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
@@ -47,7 +46,6 @@ const ProductForm = forwardRef<ChildRef, Props>(
             setSelectedCollections(selected_collections);
         }, [current.collections]);
 
-        const { enqueueSnackbar } = useSnackbar();
         const [state, formAction, isPending] = useActionState(mutateProduct, {
             success: false,
             message: "",
@@ -57,8 +55,8 @@ const ProductForm = forwardRef<ChildRef, Props>(
         const formRef = useRef<HTMLFormElement>(null);
 
         React.useEffect(() => {
-            if (state.success) {
-                enqueueSnackbar(state.message || "Product created successfully", { variant: "success" });
+            if (state?.success) {
+                toast.success(state.message || "Product created successfully");
                 // Leave the slider open and clear form
                 if (formRef.current) {
                     formRef.current.reset();
@@ -66,7 +64,7 @@ const ProductForm = forwardRef<ChildRef, Props>(
                     onClose?.();
                 }
             }
-        }, [state, enqueueSnackbar]);
+        }, [state]);
 
         const handleUpload = async (formData: FormData) => {
             const res = await api.product.uploadImage({ id: current.id, formData });

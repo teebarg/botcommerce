@@ -2,101 +2,18 @@ from datetime import timedelta
 
 from app.core.utils import generate_id
 from app.models.generic import Message
-from app.models.cart import CartCreate, CartDetails, CartItemCreate, CartItemResponse, CartResponse
+from app.models.cart import CartCreate, CartUpdate, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Response
 from app.prisma_client import prisma as db
+from app.core.deps import CurrentUser, TokenUser
 
 # Create a router for carts
 router = APIRouter()
 
 
-# @router.get("/")
-# async def index(response: Response, cartId: str = Header(default=None)) -> Any:
-#     """
-#     Retrieve cart.
-#     """
-#     if not cartId:
-#         id = generate_id()
-#         cart = cart_handler.create_cart(cart_id=id, customer_id="", email="")
-#         response.set_cookie(
-#             key="_cart_id",
-#             value=id,
-#             max_age=timedelta(days=7),
-#             secure=True,
-#             httponly=True,
-#         )
-#         return cart_handler.get_cart(cart_id=cart.get("cart_id"))
-#     return cart_handler.get_cart(cart_id=cartId)
-
-
-# @router.post("/add")
-# async def add_to_cart(
-#     db: SessionDep,
-#     cart_in: CartItemIn,
-#     cartId: str = Header(default=None),
-# ):
-
-#     doc = db.get(Product, cart_in.product_id)
-#     if not doc:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="Could not find product",
-#         )
-#     id = str(doc.id)
-#     cart_item = CartItem(**doc.dict(), item_id=id, product_id=id, quantity=cart_in.quantity)
-#     try:
-#         return cart_handler.add_to_cart(cart_id=cartId, item=cart_item)
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=400,
-#             detail=f"{e}",
-#         ) from e
-
-
-# @router.post("/create")
-# async def create_cart():
-#     id = generate_id()
-#     try:
-#         return cart_handler.create_cart(cart_id=id, customer_id="", email="")
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=400,
-#             detail=f"{e}",
-#         ) from e
-
-
-# @router.patch("/update")
-# async def update_cart(cart_in: CartItemIn, cache: CacheService, cartId: str = Header(default=None)):
-#     try:
-#         cart = cart_handler.update_cart_quantity(
-#             cart_id=cartId, product_id=cart_in.product_id, quantity=cart_in.quantity
-#         )
-#         return cart
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=400,
-#             detail=f"{e}",
-#         ) from e
-
-
-# @router.patch("/update-cart-details")
-# async def update_cart_details(
-#     cart_in: CartDetails, cache: CacheService, cartId: str = Header(default=None)
-# ):
-#     try:
-#         update_data = cart_in.dict(exclude_unset=True)
-#         return cart_handler.update_cart_details(cart_id=cartId, cart_data=update_data)
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=400,
-#             detail=f"{e}",
-#         ) from e
-
-
-
 # Endpoints
 @router.post("/", response_model=CartResponse)
-async def create_cart(cart: CartCreate):
+async def create_cart(response: Response, cart: CartCreate):
     """Create a new cart for a user"""
     id = generate_id()
     # Check if user exists
@@ -119,7 +36,8 @@ async def create_cart(cart: CartCreate):
         }
     )
     if existing_cart:
-        raise HTTPException(status_code=400, detail="User already has an active cart")
+        raise HTTPException(
+            status_code=400, detail="User already has an active cart")
 
     new_cart = await db.cart.create(
         data={
@@ -134,26 +52,40 @@ async def create_cart(cart: CartCreate):
             }
         }
     )
+    response.set_cookie(
+        key="_cart_id",
+        value=id,
+        max_age=timedelta(days=7),
+        secure=True,
+        httponly=True,
+        samesite="Lax",
+    )
     return new_cart
 
+
 @router.get("/", response_model=CartResponse)
-async def get_cart(response: Response, cartId: str = Header(default=None)):
+async def get_cart(response: Response, cartId: str = Header()):
     """Get a specific cart by ID"""
-    cart = await db.cart.find_unique(
-        where={"cart_number": cartId},
-        include={
-            "items": {
-                "include": {
-                    "variant": True
-                }
+    cart = None
+    if cartId:
+        cart = await db.cart.find_unique(
+            where={"cart_number": cartId},
+            include={
+                "items": {
+                    "include": {
+                        "variant": True
+                    }
+                },
+                "shipping_address": True,
+                "billing_address": True
             }
-        }
-    )
+        )
     if not cart:
-        id = generate_id()
+        print("no cart")
+        # id = generate_id()
         new_cart = await db.cart.create(
             data={
-                "cart_number": id
+                "cart_number": cartId
             },
             include={
                 "items": {
@@ -163,47 +95,90 @@ async def get_cart(response: Response, cartId: str = Header(default=None)):
                 }
             }
         )
-        response.set_cookie(
-            key="_cart_id",
-            value=id,
-            max_age=timedelta(days=7),
-            secure=True,
-            httponly=True,
-        )
+        # response.set_cookie(
+        #     key="_cart_id",
+        #     value=id,
+        #     max_age=timedelta(days=7),
+        #     secure=True,
+        #     httponly=True,
+        #     samesite="Lax",
+        # )
         return new_cart
-        # raise HTTPException(status_code=404, detail="Cart not found")
     return cart
 
-# @router.get("/users/{user_id}/cart", response_model=CartResponse)
-# async def get_user_active_cart(user_id: int, db: PrismaDb):
-#     """Get user's active cart"""
-#     cart = await db.cart.find_first(
-#         where={
-#             "user_id": user_id,
-#             "status": "ACTIVE"
-#         },
-#         include={"items": True}
-#     )
-#     if not cart:
-#         raise HTTPException(status_code=404, detail="No active cart found for user")
-#     return cart
 
 @router.put("/", response_model=CartResponse)
-async def update_cart(cart_update: CartDetails, cartId: str = Header(default=None)):
+async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: str = Header(default=None)):
     """Update cart status"""
     cart = await db.cart.find_unique(where={"cart_number": cartId})
     if not cart:
-        raise HTTPException(status_code=404, detail="Cart not found")
+        cart = await db.cart.create(
+            data={
+                "cart_number": cartId
+            },
+            include={
+                "items": {
+                    "include": {
+                        "variant": True
+                    }
+                }
+            }
+        )
+        # raise HTTPException(status_code=404, detail="Cart not found")
+
+    user = await db.user.find_unique(where={"email": token_data.sub}) if token_data else None
+
+    # update_data = cart_update.dict(exclude_unset=True)
+    # if cart_update.status:
+    #     update_data["status"] = cart_update.status
+
+    update_data = {}
+
+    if cart_update.status:
+        update_data["status"] = cart_update.status
+
+    if cart_update.email:
+        update_data["email"] = cart_update.email
+
+    if cart_update.shipping_address:
+        update_data["shipping_address"] = {"create": {
+            **cart_update.shipping_address.dict(), "user_id": user.id if user else None}}
+
+    if cart_update.billing_address:
+        update_data["billing_address"] = {"create": {
+            **cart_update.billing_address.dict(), "user_id": user.id if user else None}}
+
+    if cart_update.payment_method:
+        update_data["payment_method"] = cart_update.payment_method
+
+    if cart_update.shipping_method:
+        update_data["shipping_method"] = cart_update.shipping_method
+
+    if cart_update.total:
+        update_data["total"] = cart_update.total
+
+    if cart_update.subtotal:
+        update_data["subtotal"] = cart_update.subtotal
+
+    if cart_update.tax:
+        update_data["tax"] = cart_update.tax
+
+    if cart_update.shipping_fee is not None:
+        update_data["shipping_fee"] = cart_update.shipping_fee
+
+    update_data["user"] = {"connect": {"id": user.id}} if user else {"disconnect": True}
 
     updated_cart = await db.cart.update(
-        where={"id": cartId},
-        data={"status": cart_update.status.value if cart_update.status else cart.status},
+        where={"cart_number": cartId},
+        data=update_data,
         include={
             "items": {
                 "include": {
                     "variant": True
                 }
-            }
+            },
+            "shipping_address": True,
+            "billing_address": True,
         }
     )
     return updated_cart
@@ -221,16 +196,6 @@ async def delete(id: str, cartId: str = Header(default=None)) -> Message:
     await db.cart.delete(where={"cart_number": cartId})
     return {"message": "Cart deleted successfully"}
 
-
-# @router.delete("/carts/{cart_id}")
-# async def delete_cart(cart_id: int, db: PrismaDb):
-#     """Delete a cart"""
-#     cart = await db.cart.find_unique(where={"id": cart_id})
-#     if not cart:
-#         raise HTTPException(status_code=404, detail="Cart not found")
-
-#     await db.cart.delete(where={"id": cart_id})
-#     return {"message": "Cart deleted successfully"}
 
 @router.post("/items", response_model=CartItemResponse)
 async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str = Header(default=None)):
@@ -250,6 +215,7 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
             max_age=timedelta(days=7),
             secure=True,
             httponly=True,
+            samesite="Lax",
         )
 
     # Verify product variant exists and is in stock
@@ -291,6 +257,7 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
     )
     return new_item
 
+
 @router.delete("/items/{item_id}")
 async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)):
     """Remove an item from cart"""
@@ -301,6 +268,7 @@ async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)
     await db.cartitem.delete(where={"id": item_id})
     return {"message": "Item removed from cart successfully"}
 
+
 @router.put("/items/{item_id}", response_model=CartItemResponse)
 async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = Header(default=None)):
     """Update quantity of an item in cart"""
@@ -310,7 +278,8 @@ async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = H
         raise HTTPException(status_code=404, detail="Cart item not found")
 
     if quantity <= 0:
-        raise HTTPException(status_code=400, detail="Quantity must be greater than 0")
+        raise HTTPException(
+            status_code=400, detail="Quantity must be greater than 0")
 
     updated_item = await db.cartitem.update(
         where={"id": item_id},

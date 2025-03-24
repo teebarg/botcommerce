@@ -2,16 +2,13 @@ import ItemsPreviewTemplate from "@modules/cart/templates/preview";
 import DiscountCode from "@modules/checkout/components/discount-code";
 import CartTotals from "@modules/common/components/cart-totals";
 
-import { api } from "@/apis";
-import ServerError from "@/components/server-error";
+import { Cart } from "@/lib/models";
 
-const CheckoutSummary = async () => {
-    const cart = await api.cart.get();
+interface CheckoutSummaryProps {
+    cart: Cart;
+}
 
-    if ("error" in cart) {
-        return <ServerError />;
-    }
-
+const CheckoutSummary = async ({ cart }: CheckoutSummaryProps) => {
     if (!cart) {
         return null;
     }

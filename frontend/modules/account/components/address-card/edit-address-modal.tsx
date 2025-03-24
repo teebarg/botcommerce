@@ -1,18 +1,35 @@
 "use client";
 
-import React, { useActionState, useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { PencilSquare as Edit, Trash } from "nui-react-icons";
-import { Modal } from "@modules/common/components/modal";
-import { deleteCustomerShippingAddress, updateCustomerShippingAddress } from "@modules/account/actions";
-import { useSnackbar } from "notistack";
-import { Address } from "types/global";
-import { useOverlayTriggerState } from "react-stately";
 import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/spinner";
+import { Address } from "@/lib/models";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { api } from "@/apis";
+
+const addressSchema = z.object({
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+    address_1: z.string().min(1, "Address is required"),
+    address_2: z.string().optional(),
+    postal_code: z.string().min(1, "Postal code is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    phone: z.string().optional(),
+});
+
+type AddressFormValues = z.infer<typeof addressSchema>;
 
 type EditAddressProps = {
     address: Address;
@@ -20,31 +37,44 @@ type EditAddressProps = {
 };
 
 const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) => {
-    const { enqueueSnackbar } = useSnackbar();
-    const [removing, setRemoving] = useState(false);
-    const modalState = useOverlayTriggerState({});
+    const [removing, setRemoving] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isPending, setIsPending] = useState<boolean>(false);
 
-    const [formState, formAction, isPending] = useActionState(updateCustomerShippingAddress, {
-        success: false,
-        error: null,
-        addressId: address.id,
+    const form = useForm<AddressFormValues>({
+        resolver: zodResolver(addressSchema),
+        defaultValues: {
+            first_name: address.first_name || "",
+            last_name: address.last_name || "",
+            address_1: address.address_1 || "",
+            address_2: address.address_2 || "",
+            postal_code: address.postal_code || "",
+            city: address.city || "",
+            state: address.state || "",
+            phone: address.phone || "",
+        },
     });
 
-    useEffect(() => {
-        if (formState.success) {
-            enqueueSnackbar("Address successfully updated", { variant: "success" });
-            modalState.close();
-
-            return;
+    const onSubmit = async (data: AddressFormValues) => {
+        setIsPending(true);
+        try {
+            await api.address.update(address.id, data);
+            toast.success("Address successfully updated");
+            setIsOpen(false);
+        } catch (error: any) {
+            toast.error(error.toString());
         }
-        if (formState.error) {
-            enqueueSnackbar(formState.error, { variant: "error" });
-        }
-    }, [formState]);
+        setIsPending(false);
+    };
 
     const removeAddress = async () => {
         setRemoving(true);
-        await deleteCustomerShippingAddress(address.id);
+        try {
+            await api.address.delete(address.id);
+            toast.success("Address successfully deleted");
+        } catch (error: any) {
+            toast.error(error.toString());
+        }
         setRemoving(false);
     };
 
@@ -58,7 +88,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
             >
                 <div className="flex flex-col">
                     <h3 className="text-left text-sm" data-testid="address-name">
-                        {address.firstname} {address.lastname}
+                        {address.first_name} {address.last_name}
                     </h3>
                     <p className="flex flex-col text-left text-base mt-2">
                         <span data-testid="address-address">
@@ -76,7 +106,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                         aria-label="edit address"
                         className="text-sm flex items-center gap-x-2"
                         data-testid="address-edit-button"
-                        onClick={modalState.open}
+                        onClick={() => setIsOpen(true)}
                     >
                         <Edit />
                         Edit
@@ -92,105 +122,154 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                     </button>
                 </div>
             </div>
-            {modalState.isOpen && (
-                <Modal data-testid="edit-address-modal" isOpen={modalState.isOpen} onClose={modalState.close}>
-                    <div className="p-5">
-                        <h3 className="mb-2">Edit address</h3>
-                        <form action={formAction}>
-                            <div className="grid grid-cols-1 gap-y-2 w-full py-2">
+
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit address</DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+                            <div className="grid grid-cols-1 gap-y-2">
                                 <div className="grid grid-cols-2 gap-x-2">
-                                    <Input
-                                        required
-                                        autoComplete="given-name"
-                                        data-testid="first-name-input"
-                                        defaultValue={address.firstname || undefined}
-                                        label="First name"
-                                        name="firstname"
+                                    <FormField
+                                        control={form.control}
+                                        name="first_name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>First name</FormLabel>
+                                                <FormControl>
+                                                    <Input required autoComplete="given-name" data-testid="first-name-input" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    <Input
-                                        required
-                                        autoComplete="family-name"
-                                        data-testid="last-name-input"
-                                        defaultValue={address.lastname || undefined}
-                                        label="Last name"
-                                        name="lastname"
+                                    <FormField
+                                        control={form.control}
+                                        name="last_name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Last name</FormLabel>
+                                                <FormControl>
+                                                    <Input required autoComplete="family-name" data-testid="last-name-input" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
                                 </div>
-                                <Input
-                                    required
-                                    autoComplete="address-line1"
-                                    data-testid="address-1-input"
-                                    defaultValue={address.address_1 || undefined}
-                                    label="Address"
+                                <FormField
+                                    control={form.control}
                                     name="address_1"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Address</FormLabel>
+                                            <FormControl>
+                                                <Input required autoComplete="address-line1" data-testid="address-1-input" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                 />
-                                <Input
-                                    autoComplete="address-line2"
-                                    data-testid="address-2-input"
-                                    defaultValue={address.address_2 || undefined}
-                                    label="Apartment, suite, etc."
+                                <FormField
+                                    control={form.control}
                                     name="address_2"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Apartment, suite, etc.</FormLabel>
+                                            <FormControl>
+                                                <Input autoComplete="address-line2" data-testid="address-2-input" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                 />
                                 <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                                    <Input
-                                        required
-                                        autoComplete="postal-code"
-                                        data-testid="postal-code-input"
-                                        defaultValue={address.postal_code || undefined}
-                                        label="Postal code"
+                                    <FormField
+                                        control={form.control}
                                         name="postal_code"
-                                        type="number"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Postal code</FormLabel>
+                                                <FormControl>
+                                                    <Input required autoComplete="postal-code" data-testid="postal-code-input" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                    <Input
-                                        required
-                                        autoComplete="locality"
-                                        data-testid="city-input"
-                                        defaultValue={address.city || undefined}
-                                        label="City"
+                                    <FormField
+                                        control={form.control}
                                         name="city"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>City</FormLabel>
+                                                <FormControl>
+                                                    <Input required autoComplete="locality" data-testid="city-input" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
                                 </div>
-                                <select data-testid="state-input" defaultValue={address.state || undefined} name="state">
-                                    {states.map((state, idx: number) => (
-                                        <option key={idx} value={state.id}>
-                                            {state.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <Input
-                                    autoComplete="phone"
-                                    data-testid="phone-input"
-                                    defaultValue={address.phone || undefined}
-                                    label="Phone"
+                                <FormField
+                                    control={form.control}
+                                    name="state"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>State</FormLabel>
+                                            <Select data-testid="state-input" defaultValue={field.value} onValueChange={field.onChange}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select state" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {states.map((state, idx: number) => (
+                                                        <SelectItem key={idx} value={state.id}>
+                                                            {state.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
                                     name="phone"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Phone</FormLabel>
+                                            <FormControl>
+                                                <Input autoComplete="phone" data-testid="phone-input" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                 />
                             </div>
                             <div className="flex gap-3 mt-6">
                                 <Button
                                     aria-label="cancel"
                                     className="min-w-32"
-                                    color="danger"
                                     data-testid="cancel-button"
-                                    type="reset"
-                                    onClick={modalState.close}
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     Cancel
                                 </Button>
-                                <Button
-                                    aria-label="update"
-                                    className="min-w-32"
-                                    color="primary"
-                                    data-testid="save-button"
-                                    isLoading={isPending}
-                                    type="submit"
-                                >
+                                <Button aria-label="update" className="min-w-32" data-testid="save-button" isLoading={isPending} type="submit">
                                     Update
                                 </Button>
                             </div>
                         </form>
-                    </div>
-                </Modal>
-            )}
+                    </Form>
+                </DialogContent>
+            </Dialog>
         </React.Fragment>
     );
 };

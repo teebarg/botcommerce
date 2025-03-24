@@ -14,6 +14,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
+import SignInPrompt from "@/modules/cart/components/sign-in-prompt";
 
 export const metadata: Metadata = {
     title: `Clothings | ${siteConfig.name} Store | Checkout`,
@@ -27,7 +28,7 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
         <div className="flex flex-col items-center justify-center min-h-screen">
             <div className="bg-content1 p-12 rounded-lg shadow-md text-center max-w-xl">
                 <Cart className="w-24 h-24 text-default-500 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-default-900 mb-2">Your cart is empty</h2>
+                <h1 className="text-2xl font-bold text-default-900 mb-2">Your cart is empty</h1>
                 <p className="text-default-500 mb-12">{`Looks like you haven't added any items to your cart yet.`}</p>
                 <BtnLink color="primary" href="/collections">
                     Continue shopping <ArrowRightOnRectangle className="ml-2 w-4 h-4" />
@@ -38,17 +39,17 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
 };
 
 export default async function Checkout() {
-    const [cart, user] = await Promise.all([api.cart.get(), api.user.me()]);
+    const [cartRes, user] = await Promise.all([api.cart.get(), api.user.me()]);
 
-    if ("error" in cart) {
+    if (cartRes.error) {
         return <ServerError />;
     }
 
-    if (!cart) {
+    if (!cartRes.data) {
         return <EmptyCart />;
     }
 
-    const { total } = cart;
+    const { total } = cartRes.data;
 
     const getAmount = (amount: number | null | undefined) => {
         return currency(Number(amount) || 0);
@@ -78,14 +79,10 @@ export default async function Checkout() {
                         {/* Left Column - Form */}
                         <div className="w-full">
                             <h1 className="text-3xl font-light">Checkout your cart</h1>
-                            <p className="text-default-400 mb-4">
-                                Already have an IBM Cloud account?{" "}
-                                <LocalizedClientLink className="text-blue-400" href="/sign-in">
-                                    Log in
-                                </LocalizedClientLink>
-                            </p>
+                            {/* <SignInPrompt /> */}
+                            {!user && <SignInPrompt />}
                             <nav aria-label="Breadcrumbs" data-slot="base">
-                                <ol className="flex flex-wrap list-none rounded-lg mb-2" data-slot="list">
+                                <ol className="flex flex-wrap list-none rounded-lg mb-2 mt-4" data-slot="list">
                                     <li className="flex items-center" data-slot="base">
                                         <LocalizedClientLink href={"/"}>Home</LocalizedClientLink>
                                         <span aria-hidden="true" className="px-1 text-foreground/50" data-slot="separator">
@@ -98,21 +95,21 @@ export default async function Checkout() {
                                 </ol>
                             </nav>
 
-                            <Wrapper cart={cart}>
-                                <CheckoutForm cart={cart} />
+                            <Wrapper cart={cartRes.data}>
+                                <CheckoutForm cart={cartRes.data} />
                             </Wrapper>
                         </div>
 
                         {/* Right Column Cart summary */}
                         <div>
-                            <CheckoutSummary />
+                            <CheckoutSummary cart={cartRes.data} />
                         </div>
                     </div>
                 </main>
                 {/* Mobile cart summary */}
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
-                        <PaymentButton cart={cart} data-testid="submit-order-button" user={user} />
+                        <PaymentButton cart={cartRes.data} data-testid="submit-order-button" user={user?.data} />
                         <p className="font-semibold text-xl">Total: {getAmount(total)}</p>
                     </div>
                 </div>

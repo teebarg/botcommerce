@@ -45,7 +45,7 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
                     </div>
                     <div>
                         <h1 className="text-xl font-bold">
-                            {user?.firstname} {user?.lastname}
+                            {user?.first_name} {user?.last_name}
                         </h1>
                         <p className="text-blue-100">{user?.email}</p>
                     </div>

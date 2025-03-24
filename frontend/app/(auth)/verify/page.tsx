@@ -15,6 +15,7 @@ export default function VerifyMagicLink() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
+    const callbackUrl = searchParams.get("callbackUrl");
 
     useEffect(() => {
         async function verifyToken() {
@@ -38,7 +39,9 @@ export default function VerifyMagicLink() {
 
             toast.success(result.message);
             setAuthState("success");
-            // router.push("/");
+            setTimeout(() => {
+                router.push(callbackUrl || "/");
+            }, 10000);
         }
 
         verifyToken();
@@ -109,9 +112,9 @@ export default function VerifyMagicLink() {
                         </div>
                         <Button
                             className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-8 rounded-lg transition-all duration-200 transform hover:-translate-y-1 active:translate-y-0 animate-pulse"
-                            onClick={() => router.push("/")}
+                            onClick={() => router.push(callbackUrl || "/")}
                         >
-                            Continue to Shop
+                            Continue
                         </Button>
                     </div>
                 )}

@@ -28,7 +28,7 @@ const CustomItem = ({ option, isSelected, onSelect }: ListboxItemProps) => (
     >
         <div className="flex flex-col">
             <span className="text-left font-semibold">
-                {option.firstname} {option.lastname}
+                {option.first_name} {option.last_name}
             </span>
             {option.company && <span className="text-xs text-default-500">{option.company}</span>}
             <div className="flex flex-col text-left text-xs text-default-500">

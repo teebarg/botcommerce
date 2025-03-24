@@ -55,9 +55,9 @@ async def delete_activity(activity_id: int, user: CurrentUser):
 
     try:
         whereQuery = {"id": activity_id}
-        if not user.is_superuser:
+        if not user.role == "ADMIN":
             whereQuery.update({"user_id" : user.id})
-        await db.collection.delete(where=whereQuery)
+        await db.activitylog.delete(where=whereQuery)
         return Message(message="Activity deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

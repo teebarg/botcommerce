@@ -2,31 +2,36 @@
 
 import { Pencil } from "nui-react-icons";
 import ErrorMessage from "@modules/checkout/components/error-message";
-import { setShippingMethod } from "@modules/checkout/actions";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DeliveryOption } from "types/global";
-import { currency } from "@lib/util/util";
+import { toast } from "sonner";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { Cart } from "@/lib/models";
+import { api } from "@/apis";
+import { currency } from "@/lib/util/util";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
-    availableShippingMethods: any[] | null;
+    availableShippingMethods: DeliveryOption[] | null;
 };
 
 const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const hasShippingMethod = !!cart?.shipping_method?.id;
+    const hasShippingMethod = !!cart?.shipping_method;
 
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+
+    const selectedShippingMethod: DeliveryOption | undefined = availableShippingMethods?.find(
+        (item: DeliveryOption) => item.id == cart?.shipping_method
+    );
 
     const isOpen = searchParams.get("step") === "delivery";
 
@@ -41,18 +46,23 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
 
     const set = async (option: DeliveryOption) => {
         setIsLoading(true);
-        await setShippingMethod(option)
-            .then(() => {
-                setIsLoading(false);
-            })
-            .catch((err) => {
-                setError(err.toString());
-                setIsLoading(false);
-            });
+        const { error } = await api.cart.updateDetails({ shipping_method: option.id, shipping_fee: option.amount });
+
+        if (error) {
+            toast.error(error);
+
+            return;
+        }
+
+        setIsLoading(false);
     };
 
     const handleChange = (value: string) => {
-        const item: DeliveryOption = availableShippingMethods?.find((item: DeliveryOption) => item.id == value);
+        const item: DeliveryOption | undefined = availableShippingMethods?.find((item: DeliveryOption) => item.id == value);
+
+        if (!item) {
+            return;
+        }
 
         set(item);
     };
@@ -76,7 +86,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 </div>
                 <button
                     aria-label="edit"
-                    className={cn("text-blue-500 items-center gap-2 text-sm hidden", !isOpen && cart?.shipping_method?.id && "flex")}
+                    className={cn("text-blue-500 items-center gap-2 text-sm hidden", !isOpen && cart?.shipping_method && "flex")}
                     onClick={handleEdit}
                 >
                     Edit <Pencil />
@@ -88,7 +98,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 <RadioGroup
                     className="grid grid-cols-1 md:grid-cols-3 gap-2"
                     name="shipping-method"
-                    value={cart.shipping_method?.id}
+                    value={cart.shipping_method}
                     onChange={(value: string) => handleChange(value)}
                 >
                     {availableShippingMethods?.map((option) => (
@@ -96,26 +106,24 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                             key={option.id}
                             className={cn(
                                 `flex items-center justify-between px-4 py-4 md:px-3 rounded-lg border-2 cursor-pointer transition-all ${
-                                    option.id === cart.shipping_method?.id
+                                    option.id === cart.shipping_method
                                         ? "border-blue-500 bg-transparent"
                                         : "border-default-300 hover:border-default-400"
-                                }`,
-                                option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
+                                }`
+                                // option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
                             )}
                             value={option.id}
                         >
                             <div>
-                                <h3
-                                    className={`text-sm font-medium ${option.id === cart.shipping_method?.id ? "text-blue-600" : "text-default-700"}`}
-                                >
+                                <h3 className={`text-sm font-medium ${option.id === cart.shipping_method ? "text-blue-600" : "text-default-700"}`}>
                                     {option.name}
                                 </h3>
                                 <p className="text-sm text-default-500">{option.description}</p>
                             </div>
                             <span
-                                className={`text-sm font-semibold ml-2 ${option.id === cart.shipping_method?.id ? "text-blue-600" : "text-default-800"}`}
+                                className={`text-sm font-semibold ml-2 ${option.id === cart.shipping_method ? "text-blue-600" : "text-default-800"}`}
                             >
-                                {option.amount}
+                                {option.amount == 0 ? "Free" : currency(option.amount)}
                             </span>
                         </RadioGroup.Option>
                     ))}
@@ -140,8 +148,8 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 <div className="text-xs md:text-sm mt-6" data-testid="shipping-method-summary">
                     <p className="font-medium mb-1 text-base">Method</p>
                     <p className="font-normal text-default-500 text-xs md:text-sm">
-                        {cart.shipping_method?.name} ({currency(cart.shipping_method.amount)})<br />
-                        {cart.shipping_method.description}
+                        {selectedShippingMethod?.name} ({cart?.shipping_fee == 0 ? "Free" : currency(cart?.shipping_fee)})<br />
+                        {selectedShippingMethod?.description}
                     </p>
                 </div>
             )}

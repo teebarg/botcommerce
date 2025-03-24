@@ -5,19 +5,19 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { CreditCard, Pencil } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
-import { setPaymentMethod } from "@modules/checkout/actions";
 import { paymentInfoMap } from "@lib/constants";
-import { PaymentSession } from "types/global";
+import { toast } from "sonner";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { Cart } from "@/lib/models";
+import { Cart, PaymentMethod } from "@/lib/models";
+import { api } from "@/apis";
 
-const payMethods = [
-    { id: "stripe", provider_id: "stripe" },
-    { id: "manual", provider_id: "manual" },
-    { id: "paystack", provider_id: "paystack" },
+const payMethods: { id: string; provider_id: PaymentMethod }[] = [
+    { id: "credit-card", provider_id: "CREDIT_CARD" },
+    { id: "manual", provider_id: "BANK_TRANSFER" },
+    { id: "paystack", provider_id: "PAYSTACK" },
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
@@ -32,7 +32,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const hasPaymentMethod = !!cart?.payment_session?.id && !!cart?.shipping_method?.id;
+    const hasPaymentMethod = !!cart?.payment_method && !!cart?.shipping_method;
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -45,18 +45,27 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
         [searchParams]
     );
 
-    const set = async (providerId: string) => {
+    const set = async (providerId: PaymentMethod) => {
         setIsLoading(true);
         const method = payMethods.find((item) => item.provider_id == providerId);
 
-        await setPaymentMethod(method as PaymentSession)
-            .catch((err) => setError(err.toString()))
-            .finally(() => {
-                setIsLoading(false);
-            });
+        // await setPaymentMethod(method as PaymentSession)
+        //     .catch((err) => setError(err.toString()))
+        //     .finally(() => {
+        //         setIsLoading(false);
+        //     });
+        const { error } = await api.cart.updateDetails({ payment_method: providerId });
+
+        if (error) {
+            toast.error(error);
+
+            return;
+        }
+
+        setIsLoading(false);
     };
 
-    const handleChange = (providerId: string) => {
+    const handleChange = (providerId: PaymentMethod) => {
         setError(null);
         set(providerId);
     };
@@ -93,7 +102,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                 </div>
                 <button
                     aria-label="edit"
-                    className={cn("text-blue-500 items-center gap-2 text-sm hidden", !isOpen && cart?.shipping_method?.id && "flex")}
+                    className={cn("text-blue-500 items-center gap-2 text-sm hidden", !isOpen && cart?.shipping_method && "flex")}
                     onClick={handleEdit}
                 >
                     Edit <Pencil />
@@ -109,13 +118,13 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     </p>
                 </div>
                 {!paidByGiftcard && (
-                    <RadioGroup name="payment" value={cart?.payment_session?.provider_id || ""} onChange={(value: string) => handleChange(value)}>
-                        {payMethods.map((item) => (
+                    <RadioGroup name="payment" value={cart?.payment_method || ""} onChange={(value: string) => handleChange(value as PaymentMethod)}>
+                        {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => (
                             <PaymentContainer
-                                key={item.id}
+                                key={idx}
                                 paymentInfoMap={paymentInfoMap}
                                 paymentSession={item}
-                                selectedPaymentOptionId={cart?.payment_session?.provider_id || null}
+                                selectedPaymentOptionId={cart?.payment_method || null}
                             />
                         ))}
                     </RadioGroup>
@@ -140,12 +149,12 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                 <div className="text-xs md:text-sm mt-6" data-testid="payment-method-summary">
                     <p className="font-medium mb-1 text-base">Payment method</p>
                     <p className="font-normal text-default-500 text-xs md:text-sm">
-                        {paymentInfoMap[cart.payment_session.id]?.title || cart.payment_session.provider_id}
+                        {paymentInfoMap[cart.payment_method]?.title || cart.payment_method}
                         <br />
-                        {paymentInfoMap[cart.payment_session.id]?.description}
+                        {paymentInfoMap[cart.payment_method]?.description}
                     </p>
                     <div className="shadow-lg rounded-lg flex items-center h-7 w-fit p-2 bg-default-100">
-                        {paymentInfoMap[cart.payment_session.id]?.icon || <CreditCard />}
+                        {paymentInfoMap[cart.payment_method]?.icon || <CreditCard />}
                     </div>
                 </div>
             )}

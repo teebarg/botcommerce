@@ -308,7 +308,7 @@ async def read_reviews(id: str) -> Reviews:
 
 
 @router.put("/{id}")
-async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
+async def update_product(id: int, product: ProductUpdate, cache: CacheService, background_tasks: BackgroundTasks):
     # Check if product exists
     existing_product = await db.product.find_unique(where={"id": id})
     if not existing_product:
@@ -319,6 +319,14 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
 
     if product.name is not None:
         update_data["name"] = product.name
+        update_data["slug"] = slugify(product.name)
+        update_data["sku"] = f"SK{slugify(product.name)}"
+
+    if product.sku is not None:
+        update_data["sku"] = product.sku
+
+    if product.status is not None:
+        update_data["status"] = product.status
 
     if product.description is not None:
         update_data["description"] = product.description
@@ -396,6 +404,7 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
             "images": True
         }
     )
+    cache.invalidate("search")
 
     try:
         # Define the background task

@@ -25,11 +25,7 @@ const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
         count++;
     }
 
-    if (customer.firstname && customer.lastname) {
-        count++;
-    }
-
-    if (customer.phone) {
+    if (customer.first_name && customer.last_name) {
         count++;
     }
 
@@ -41,16 +37,14 @@ const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
 };
 
 export default async function OverviewTemplate() {
-    const customer = await api.user.me();
-    const res = await api.order.query();
+    const { data: customer, error: customerError } = await api.user.me();
+    const { data, error: ordersError } = await api.order.query();
 
-    if ("error" in res) {
+    if (customerError || ordersError) {
         return <ServerError />;
     }
 
-    const { orders } = res;
-
-    if (!customer) {
+    if (!customer || !data?.orders) {
         notFound();
     }
 
@@ -64,8 +58,8 @@ export default async function OverviewTemplate() {
                     title="Big Sale on Top Brands!"
                 />
                 <div className="text-xl hidden md:flex justify-between items-center mt-4">
-                    <span data-testid="welcome-message" data-value={customer?.firstname}>
-                        Hello {customer?.firstname}
+                    <span data-testid="welcome-message" data-value={customer?.first_name}>
+                        Hello {customer?.first_name}
                     </span>
                     <span className="text-sm text-default-900">
                         Signed in as:{" "}
@@ -103,19 +97,19 @@ export default async function OverviewTemplate() {
                                 <h3 className="text-lg">Recent orders</h3>
                             </div>
                             <ul className="flex flex-col gap-y-4" data-testid="orders-wrapper">
-                                {orders && orders.length > 0 ? (
-                                    orders.slice(0, 5).map((order: Order) => {
+                                {data?.orders.length > 0 ? (
+                                    data.orders.slice(0, 5).map((order: Order, idx: number) => {
                                         return (
-                                            <li key={order.order_id} data-testid="order-wrapper" data-value={order.order_id}>
-                                                <LocalizedClientLink href={`/account/orders/details/${order.order_id}`}>
+                                            <li key={idx} data-testid="order-wrapper" data-value={order.order_number}>
+                                                <LocalizedClientLink href={`/account/orders/details/${order.order_number}`}>
                                                     <div className="shadow-lg bg-default-100 flex justify-between items-center p-4">
                                                         <div className="grid grid-cols-3 grid-rows-2 text-sm gap-x-4 flex-1">
                                                             <span className="font-semibold">Date placed</span>
                                                             <span className="font-semibold">Order number</span>
                                                             <span className="font-semibold">Total amount</span>
                                                             <span data-testid="order-created-date">{new Date(order.created_at).toDateString()}</span>
-                                                            <span data-testid="order-id" data-value={order.order_id}>
-                                                                #{order.order_id}
+                                                            <span data-testid="order-id" data-value={order.order_number}>
+                                                                #{order.order_number}
                                                             </span>
                                                             <span data-testid="order-amount">{currency(order.total)}</span>
                                                         </div>

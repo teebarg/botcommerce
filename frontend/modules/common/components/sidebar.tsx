@@ -212,7 +212,7 @@ const SideBar: React.FC = () => {
                 },
                 {
                     label: "Orders",
-                    href: "/orders",
+                    href: "/admin/orders",
                 },
                 {
                     label: "Credit card",

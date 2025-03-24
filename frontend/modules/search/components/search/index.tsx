@@ -5,19 +5,16 @@ import { MagnifyingGlassMini } from "nui-react-icons";
 import SearchInput from "@modules/search/components/search-input";
 import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
+import { toast } from "sonner";
 
 import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import NoProductsFound from "@/modules/products/components/no-products";
-import { buildUrl, debounce } from "@/lib/util/util";
-import { Product, ProductSearch } from "@/lib/models";
+import { debounce } from "@/lib/util/util";
+import { ProductSearch } from "@/lib/models";
 import { api } from "@/apis";
-import { toast } from "sonner";
-// const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
-import ProductCard from "@/components/products/product-card";
+import ProductCard from "@/components/store/products/product-card";
 
 interface Props {
     className?: string;
@@ -53,6 +50,7 @@ const Search: React.FC<Props> = ({ className }) => {
             // const { products } = await response.json();
             if (error) {
                 toast.error(error);
+
                 return;
             }
 

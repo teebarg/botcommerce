@@ -1,44 +1,96 @@
 "use client";
 
-import React, { useActionState, useEffect } from "react";
-import { updateCustomerName } from "@modules/account/actions";
+import React from "react";
 import { Input } from "@components/ui/input";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import AccountInfo from "../account-info";
 
+import { User } from "@/lib/models";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { api } from "@/apis";
+
+const nameSchema = z.object({
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+});
+
+type NameFormValues = z.infer<typeof nameSchema>;
+
 type MyInformationProps = {
-    customer: Omit<any, "password_hash">;
+    customer: Omit<User, "password_hash">;
 };
 
 const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
-    const [successState, setSuccessState] = React.useState(false);
+    const [isPending, setIsPending] = React.useState<boolean>(false);
 
-    const [state, formAction] = useActionState(updateCustomerName, {
-        error: false,
-        success: false,
+    const form = useForm<NameFormValues>({
+        resolver: zodResolver(nameSchema),
+        defaultValues: {
+            first_name: customer.first_name || "",
+            last_name: customer.last_name || "",
+        },
     });
 
     const clearState = () => {
-        setSuccessState(false);
+        form.reset();
     };
 
-    useEffect(() => {
-        setSuccessState(state.success);
-    }, [state]);
+    const onSubmit = async (updateData: NameFormValues) => {
+        setIsPending(true);
+
+        const { error } = await api.user.update(customer.id, updateData);
+
+        if (error) {
+            toast.error(error);
+            setIsPending(false);
+
+            return;
+        }
+
+        setIsPending(false);
+        toast.success("Billing address updated successfully");
+    };
 
     return (
-        <form action={formAction} className="w-full overflow-visible">
+        <form className="w-full overflow-visible" onReset={() => clearState()} onSubmit={form.handleSubmit(onSubmit)}>
             <AccountInfo
                 clearState={clearState}
-                currentInfo={`${customer.firstname} ${customer.lastname}`}
+                currentInfo={`${customer.first_name} ${customer.last_name}`}
                 data-testid="account-name-editor"
-                isError={!!state?.error}
-                isSuccess={successState}
+                isLoading={isPending}
                 label="Name"
             >
                 <div className="grid md:grid-cols-2 gap-4">
-                    <Input required data-testid="first-name-input" defaultValue={customer.firstname} label="First name" name="firstname" />
-                    <Input required data-testid="last-name-input" defaultValue={customer.lastname} label="Last name" name="lastname" />
+                    <FormField
+                        control={form.control}
+                        name="first_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>First name</FormLabel>
+                                <FormControl>
+                                    <Input required data-testid="first-name-input" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="last_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Last name</FormLabel>
+                                <FormControl>
+                                    <Input required data-testid="last-name-input" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
             </AccountInfo>
         </form>

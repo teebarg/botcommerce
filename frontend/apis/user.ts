@@ -1,20 +1,16 @@
-import { ApiResult, tryCatch } from "@/lib/try-catch";
 import { fetcher } from "./fetcher";
 
+import { ApiResult, tryCatch } from "@/lib/try-catch";
 import { Message, User, Wishlist } from "@/lib/models";
 import { revalidate } from "@/actions/revalidate";
 
 // User API methods
 export const userApi = {
-    async me(): Promise<User> {
-        try {
-            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`;
-            const response = await fetcher<User>(url, { next: { tags: ["user"] } });
+    async me(): ApiResult<User> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`;
+        const response = await tryCatch<User>(fetcher(url, { next: { tags: ["user"] } }));
 
-            return response;
-        } catch (error) {
-            return null as unknown as User;
-        }
+        return response;
     },
     async wishlist(): ApiResult<Wishlist> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
@@ -49,17 +45,24 @@ export const userApi = {
 
         return response;
     },
-    async update(id: string, input: User): Promise<User> {
+    async update(id: number, input: any): ApiResult<User> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${id}`;
-        const response = await fetcher<User>(url, { method: "PATCH", body: JSON.stringify(input) });
+        const response = await tryCatch<User>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
+
+        if (!response.error) {
+            revalidate("user");
+        }
 
         return response;
     },
-    async delete(id: string): Promise<{ success: boolean; message: string }> {
+    async delete(id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${id}`;
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
 
-        await fetcher<{ message: string }>(url, { method: "DELETE" });
+        if (!response.error) {
+            revalidate("user");
+        }
 
-        return { success: true, message: "User deleted successfully" };
+        return response;
     },
 };

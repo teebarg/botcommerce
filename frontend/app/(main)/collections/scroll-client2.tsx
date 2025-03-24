@@ -5,6 +5,7 @@ import React from "react";
 import { ChevronRight, Tag } from "nui-react-icons";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 
 import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
@@ -13,10 +14,8 @@ import PromotionalBanner from "@/components/promotion";
 import { Brand, Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/lib/models";
 import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
-import ProductCard from "@/components/products/product-card";
-import { Loader2 } from "lucide-react";
 import NoProductsFound from "@/modules/products/components/no-products";
-// import ProductCard from "@/components/product/product-card";
+import ProductCard from "@/components/store/products/product-card";
 
 interface SearchParams {
     page?: number;
@@ -164,7 +163,6 @@ export default function InfiniteScrollClient({
                                                 }}
                                             >
                                                 <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
-                                                {/* <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} /> */}
                                             </motion.div>
                                         ))}
                                     </div>

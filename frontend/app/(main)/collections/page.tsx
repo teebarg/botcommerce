@@ -71,8 +71,6 @@ export default async function Collections({ searchParams }: Props) {
         return <ServerError />;
     }
 
-    console.log(res)
-
     if (!res.data) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1 w-full">

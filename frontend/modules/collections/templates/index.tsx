@@ -2,7 +2,6 @@ import React from "react";
 import { ChevronRight, Exclamation, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
 import { SortOptions } from "types/global";
-import dynamic from "next/dynamic";
 
 import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
@@ -11,11 +10,10 @@ import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/apis";
-import { Category, Collection, Product, WishItem } from "@/lib/models";
+import { Category, Collection, ProductSearch, WishItem } from "@/lib/models";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/server-error";
-
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
+import ProductCard from "@/components/store/products/product-card";
 
 type SearchParams = Promise<{
     page?: number;
@@ -49,7 +47,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     let wishlist: WishItem[] = [];
 
     if (user) {
-        const res = await api.user.wishlist();
+        const { data: res } = await api.user.wishlist();
 
         wishlist = res ? res.wishlists : [];
     }
@@ -71,7 +69,6 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
         return <ServerError />;
     }
 
-
     if (!res.data) {
         return <>No Products</>;
     }
@@ -81,13 +78,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     return (
         <React.Fragment>
             <div className="hidden md:block">
-                <CollectionsSideBar
-                    brands={brands}
-                    categories={categories}
-                    collections={collections}
-                    facets={facets}
-                    searchParams={{ minPrice, maxPrice }}
-                />
+                <CollectionsSideBar brands={brands} categories={categories} collections={collections} facets={facets} />
             </div>
             <div className="w-full flex-1 flex-col">
                 {/* Mobile banner */}
@@ -159,7 +150,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                     ) : (
                                         <React.Fragment>
                                             <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 pb-4">
-                                                {products.map((product: Product, index: number) => (
+                                                {products.map((product: ProductSearch, index: number) => (
                                                     <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                                 ))}
                                             </div>

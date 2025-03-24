@@ -44,8 +44,8 @@ async def seed_database():
     async def create_user(email, role="CUSTOMER"):
         hashed_password = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         return await db.user.create({
-            "firstName": fake.first_name(),
-            "lastName": fake.last_name(),
+            "first_name": fake.first_name(),
+            "last_name": fake.last_name(),
             "email": email,
             "hashed_password": hashed_password,
             "role": role,
@@ -149,8 +149,8 @@ async def seed_database():
     for customer in customers:
         await db.address.create({
             "user": {"connect": {"id": customer.id}},
-            "first_name": customer.firstName,
-            "last_name": customer.lastName,
+            "first_name": customer.first_name,
+            "last_name": customer.last_name,
             "address_1": fake.street_address(),
             "city": fake.city(),
             "state": fake.state(),

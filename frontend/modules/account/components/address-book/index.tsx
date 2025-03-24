@@ -1,8 +1,9 @@
 import React from "react";
-import { Address } from "types/global";
 
 import AddAddress from "../address-card/add-address";
 import EditAddress from "../address-card/edit-address-modal";
+
+import { Address } from "@/lib/models";
 
 type AddressBookProps = {
     addresses: Address[];

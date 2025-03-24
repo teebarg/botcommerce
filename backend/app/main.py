@@ -62,6 +62,9 @@ class TimingMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(TimingMiddleware)
 
+print("settings.all_cors_origins.....")
+print(settings.all_cors_origins)
+
 # Set all CORS enabled origins
 if settings.all_cors_origins:
     app.add_middleware(

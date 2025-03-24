@@ -4,6 +4,8 @@ import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
+import { signOut } from "./revalidate";
+
 import { api } from "@/apis";
 import { Session } from "@/lib/models";
 
@@ -15,7 +17,9 @@ export async function verifyToken(token: string) {
             throw new Error("JWT_SECRET environment variable is not defined");
         }
 
-        const result = await jwtVerify(token, secret);
+        const result = await jwtVerify(token, secret, {
+            algorithms: ["HS256"],
+        });
 
         if (!result) {
             return null;
@@ -23,7 +27,7 @@ export async function verifyToken(token: string) {
 
         return result.payload;
     } catch (error) {
-        console.error("Token verification failed: ", error);
+        await signOut();
 
         return null;
     }
@@ -66,8 +70,8 @@ export async function auth(): Promise<Session | null> {
         return {
             id: user.id,
             email: user.sub ?? user.email,
-            firstname: user.firstname,
-            lastname: user.lastname,
+            first_name: user.first_name,
+            last_name: user.last_name,
             image: user.image,
             isActive: user.status === "ACTIVE",
             isAdmin: user.role === "ADMIN",
@@ -83,8 +87,8 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     const customer = {
         email: formData.get("email"),
         password: formData.get("password"),
-        firstname: formData.get("first_name"),
-        lastname: formData.get("last_name"),
+        first_name: formData.get("first_name"),
+        last_name: formData.get("last_name"),
         phone: formData.get("phone"),
     } as any;
 
@@ -119,7 +123,7 @@ export async function signIn(_prevState: unknown, formData: FormData) {
     }
 }
 
-export async function googleLogin(customer: { firstname: string; lastname: string; password: string; email: string }) {
+export async function googleLogin(customer: { first_name: string; last_name: string; password: string; email: string }) {
     try {
         const token = await api.auth.social(customer);
 
@@ -133,9 +137,10 @@ export async function googleLogin(customer: { firstname: string; lastname: strin
 
 export async function requestMagicLink(_prevState: unknown, formData: FormData) {
     const email = formData.get("email") as string;
+    const callbackUrl = formData.get("callbackUrl") as string;
 
     try {
-        const { data, error } = await api.auth.requestMagicLink(email);
+        const { data, error } = await api.auth.requestMagicLink(email, callbackUrl);
 
         if (error || !data) {
             return { error: true, message: error?.toString() };

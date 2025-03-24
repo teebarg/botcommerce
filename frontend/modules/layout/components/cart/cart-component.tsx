@@ -3,7 +3,6 @@
 import { Cart as CartIcon } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
-// import { SlideOver } from "@modules/common/components/slideover";
 import { usePathname } from "next/navigation";
 
 import Chip from "@/components/ui/chip";
@@ -21,11 +20,6 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     const totalItems =
         cart?.items?.reduce((acc: number, item: CartItem) => {
             return acc + item.quantity;
-        }, 0) || 0;
-
-    const total =
-        cart?.items?.reduce((acc: number, item: CartItem) => {
-            return acc + item.quantity * item.price;
         }, 0) || 0;
 
     const state = useOverlayTriggerState({});
@@ -80,33 +74,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                         <DrawerHeader>
                             <DrawerTitle>Cart</DrawerTitle>
                         </DrawerHeader>
-                        <CartDetails items={cart?.items || []} onClose={editState.close} />
-                        {/* <div className="max-w-2xl">
-                            <CartItems cartItems={cart?.items} />
-                        </div>
-                        <React.Fragment>
-                            <div className="p-2">
-                                <dl className="flex flex-col gap-4 py-4">
-                                    <div className="flex justify-between">
-                                        <dt className="text-sm text-default-500">Subtotal</dt>
-                                        <dd className="text-sm font-semibold text-default-900">{currency(total)}</dd>
-                                    </div>
-                                </dl>
-                                {cart?.items?.length && (
-                                    <div className="mt-4">
-                                        <BtnLink className="w-full" color="primary" href={"/checkout"}>
-                                            Checkout
-                                        </BtnLink>
-                                    </div>
-                                )}
-                                <div className="mt-6 flex items-center justify-center text-center text-sm">
-                                    <LocalizedClientLink className="font-medium" href={"/collections"}>
-                                        Continue Shopping
-                                        <span aria-hidden="true"> →</span>
-                                    </LocalizedClientLink>
-                                </div>
-                            </div>
-                        </React.Fragment> */}
+                        <CartDetails items={cart?.items || []} shippingFee={cart?.shipping_fee} onClose={editState.close} />
                     </DrawerContent>
                 </Drawer>
                 <div className="flex flex-col items-center justify-center">
@@ -120,41 +88,6 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                     {totalItems.toString()}
                 </span>
             </div>
-            {/* {state.isOpen && (
-                <SlideOver
-                    className="bg-default-100"
-                    footer={
-                        <React.Fragment>
-                            <div className="p-2">
-                                <dl className="flex flex-col gap-4 py-4">
-                                    <div className="flex justify-between">
-                                        <dt className="text-sm text-default-500">Subtotal</dt>
-                                        <dd className="text-sm font-semibold text-default-900">{currency(total)}</dd>
-                                    </div>
-                                </dl>
-                                {cart?.items?.length && (
-                                    <div className="mt-4">
-                                        <BtnLink className="w-full" color="primary" href={"/checkout"}>
-                                            Checkout
-                                        </BtnLink>
-                                    </div>
-                                )}
-                                <div className="mt-6 flex items-center justify-center text-center text-sm">
-                                    <LocalizedClientLink className="font-medium" href={"/collections"}>
-                                        Continue Shopping
-                                        <span aria-hidden="true"> →</span>
-                                    </LocalizedClientLink>
-                                </div>
-                            </div>
-                        </React.Fragment>
-                    }
-                    isOpen={state.isOpen}
-                    title="Cart"
-                    onClose={closeSlideOver}
-                >
-                    <CartItems cartItems={cart?.items} />
-                </SlideOver>
-            )} */}
         </div>
     );
 };

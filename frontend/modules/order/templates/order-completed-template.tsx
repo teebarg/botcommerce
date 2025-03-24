@@ -1,22 +1,17 @@
-import CartTotals from "@modules/common/components/cart-totals";
 import Help from "@modules/order/components/help";
 import OrderDetails from "@modules/order/components/order-details";
 import ShippingDetails from "@modules/order/components/shipping-details";
 import PaymentDetails from "@modules/order/components/payment-details";
-import { notFound } from "next/navigation";
 
-import Items from "@/components/order/cart-details";
 import { Order } from "@/lib/models";
+import OrderItems from "@/components/order/order-details";
+import OrderTotals from "@/components/store/orders/order-totals";
 
 type OrderCompletedTemplateProps = {
     order: Order;
 };
 
 export default function OrderCompletedTemplate({ order }: OrderCompletedTemplateProps) {
-    if (!order) {
-        return notFound();
-    }
-
     return (
         <div className="sm:py-6 min-h-[calc(100vh-64px)]">
             <div className="flex flex-col justify-center items-center gap-y-10 h-full w-full">
@@ -30,8 +25,8 @@ export default function OrderCompletedTemplate({ order }: OrderCompletedTemplate
                     </h1>
                     <OrderDetails order={order} />
                     <h2 className="flex flex-row text-2xl">Summary</h2>
-                    <Items items={order?.line_items} />
-                    <CartTotals data={order} />
+                    <OrderItems items={order?.order_items} />
+                    <OrderTotals data={order} />
                     <ShippingDetails order={order} />
                     <PaymentDetails order={order} />
                     <Help />

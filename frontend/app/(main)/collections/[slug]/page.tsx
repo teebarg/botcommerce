@@ -61,9 +61,9 @@ export default async function CollectionPage({ params, searchParams }: { params:
     let wishlist: WishItem[] = [];
 
     if (user) {
-        const res = await api.user.wishlist();
+        const { data } = await api.user.wishlist();
 
-        wishlist = res ? res.wishlists : [];
+        wishlist = data ? data.wishlists : [];
     }
 
     const queryParams: any = {

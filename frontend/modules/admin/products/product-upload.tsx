@@ -7,7 +7,7 @@ import { Excel } from "../components/file-uploader";
 import { api } from "@/apis";
 
 interface ProductUploadProps {
-    userId: string | number;
+    userId: number;
 }
 
 const ProductUpload: React.FC<ProductUploadProps> = ({ userId }) => {

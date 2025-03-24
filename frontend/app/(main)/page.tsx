@@ -8,11 +8,11 @@ import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
-import { Category, Product, WishItem } from "@/lib/models";
+import { Category, ProductSearch, WishItem } from "@/lib/models";
 import BannerCarousel from "@/components/carousel";
-import ProductCard from "@/components/product/product-card";
 import ContactForm from "@/modules/store/components/contact-form";
 import { auth } from "@/actions/auth";
+import ProductCard from "@/components/store/products/product-card";
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
 
 // Helper function to fetch products
 const fetchProducts = async (collection: string, limit: number = 4) => {
-    const { products } = await api.product.search({ limit, page: 1, collections: collection });
+    const { data } = await api.product.search({ limit, page: 1, collections: collection });
 
-    return products;
+    return data?.products;
 };
 
 export default async function Home() {
@@ -40,9 +40,9 @@ export default async function Home() {
     let wishlist: WishItem[] = [];
 
     if (user) {
-        const res = await api.user.wishlist();
+        const { data } = await api.user.wishlist();
 
-        wishlist = res ? res.wishlists : [];
+        wishlist = data?.wishlists || [];
     }
 
     return (
@@ -170,7 +170,7 @@ export default async function Home() {
                         <div className="col-span-3">
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                                {featured?.map((product: Product, index: number) => (
+                                {featured?.map((product: ProductSearch, index: number) => (
                                     <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                 ))}
                             </div>
@@ -187,7 +187,7 @@ export default async function Home() {
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
-                            {trending?.map((product: Product, index: number) => (
+                            {trending?.map((product: ProductSearch, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
@@ -210,7 +210,7 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
-                            {latest?.map((product: Product, index: number) => (
+                            {latest?.map((product: ProductSearch, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>

@@ -58,7 +58,7 @@ export default function UserDropDown({ user }: { user: Session }) {
                         </span>
                         <div className="inline-flex flex-1 justify-between">
                             <div className="inline-flex flex-col items-start justify-center">
-                                <span className="text-sm text-default-900">{user?.lastname}</span>
+                                <span className="text-sm text-default-900">{user?.last_name}</span>
                                 <span className="text-xs text-default-500">{user?.email}</span>
                             </div>
                             <span
@@ -77,7 +77,7 @@ export default function UserDropDown({ user }: { user: Session }) {
                     <DropdownMenuLabel>
                         <div key="user" className="gap-2 flex min-w-[15rem]">
                             <p className="font-bold">Signed in as</p>
-                            <p className="font-bold">@{user?.firstname}</p>
+                            <p className="font-bold">@{user?.first_name}</p>
                         </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />

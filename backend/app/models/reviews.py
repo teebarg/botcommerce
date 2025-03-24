@@ -11,7 +11,7 @@ class Review(ReviewBase):
 
 
 class ReviewCreate(ReviewBase):
-    product: int
+    product_id: int
 
 
 class ReviewUpdate(ReviewBase):
