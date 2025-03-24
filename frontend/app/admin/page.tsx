@@ -12,7 +12,7 @@ import { Pag } from "@/lib/models";
 const users = [
     {
         id: 1,
-        firstname: "John Doe",
+        first_name: "John Doe",
         email: "john.doe@gmail.com",
         role: "admin",
         status: "active",
@@ -20,7 +20,7 @@ const users = [
     },
     {
         id: 2,
-        firstname: "Jane Doe",
+        first_name: "Jane Doe",
         email: "jane.doe@gmail.com",
         role: "user",
         status: "active",
@@ -28,7 +28,7 @@ const users = [
     },
     {
         id: 3,
-        firstname: "Tom Doe",
+        first_name: "Tom Doe",
         email: "tom.doe@gmail.com",
         role: "user",
         status: "inactive",
@@ -36,7 +36,7 @@ const users = [
     },
     {
         id: 4,
-        firstname: "Jerry Doe",
+        first_name: "Jerry Doe",
         email: "jerry.doe@yahoo.com",
         role: "user",
         status: "active",
@@ -44,7 +44,7 @@ const users = [
     },
     {
         id: 5,
-        firstname: "Anne Doe",
+        first_name: "Anne Doe",
         email: "anne.doe@email.com",
         role: "user",
         status: "active",
@@ -156,7 +156,7 @@ export default async function AdminPage() {
                         .map((item: any, index: number) => (
                             <tr key={item.id} className="even:bg-content2">
                                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{index + 1},</td>
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{item.firstname}</td>
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{item.first_name}</td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">{item.email}</td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">{item.role}</td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">{item.status}</td>

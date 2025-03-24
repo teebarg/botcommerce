@@ -11,7 +11,7 @@ type MyInformationProps = {
 };
 
 const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
-    const [successState, setSuccessState] = React.useState(false);
+    const [, setSuccessState] = React.useState(false);
 
     const [state, formAction] = useActionState(updateCustomerPhone, {
         error: false,
@@ -28,18 +28,10 @@ const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
 
     return (
         <form action={formAction} className="w-full">
-            <AccountInfo
-                clearState={clearState}
-                currentInfo={`${customer.phone}`}
-                data-testid="account-phone-editor"
-                errorMessage={state.error}
-                isError={!!state.error}
-                isSuccess={successState}
-                label="Phone"
-            >
+            <AccountInfo clearState={clearState} currentInfo={`${customer.phone}`} data-testid="account-phone-editor" label="Phone">
                 <div className="grid grid-cols-1 gap-y-2">
                     <Input
-                        isRequired
+                        required
                         autoComplete="phone"
                         data-testid="phone-input"
                         defaultValue={customer.phone}

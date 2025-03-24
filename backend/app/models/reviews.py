@@ -1,22 +1,30 @@
-from pydantic import BaseModel as BM
-from app.models.base import BaseModel
+from app.models.base import BM
+from pydantic import BaseModel, Field
 
 
-class ReviewBase(BaseModel):
+class ReviewBase(BM):
+    comment: str = Field(..., min_length=1, description="Comment is required")
     rating: int = 1
-    comment: str
-    verified: bool = False
+
+class Review(ReviewBase):
+    id: int
+
+
+class ReviewCreate(ReviewBase):
     product_id: int
 
 
-class ReviewCreate(BM):
-    product_id: int
-    rating: int = 1
+class ReviewUpdate(ReviewBase):
     verified: bool = False
-    comment: str
 
 
-class ReviewUpdate(BM):
-    rating: int = 1
-    verified: bool = False
-    comment: str
+class Reviews(BaseModel):
+    reviews: list[Review]
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int
+
+
+class Search(BaseModel):
+    results: list[Review]

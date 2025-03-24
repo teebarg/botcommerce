@@ -25,6 +25,22 @@ import {
     PaginatedSiteConfigSchema,
     PaginatedOrderSchema,
     MessageSchema,
+    ProductVariantSchema,
+    ProductImageSchema,
+    ProductSearchSchema,
+    PaginatedProductSearchSchema,
+    ProductStatusSchema,
+    OrderStatusSchema,
+    CartStatusSchema,
+    DiscountTypeSchema,
+    PaymentMethodSchema,
+    PaymentStatusSchema,
+    RoleSchema,
+    ShippingMethodSchema,
+    StatusSchema,
+    AddressSchema,
+    OrderItemSchema,
+    PaginatedAddressSchema,
 } from "./schema";
 
 export type Facet = z.infer<typeof FacetSchema>;
@@ -35,7 +51,9 @@ export type PaginatedCollection = z.infer<typeof PaginatedCollectionSchema>;
 export type Category = z.infer<typeof CategorySchema>;
 export type PaginatedCategory = z.infer<typeof PaginatedCategorySchema>;
 export type Product = z.infer<typeof ProductSchema>;
+export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
+export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type Wishlist = z.infer<typeof WishlistSchema>;
 export type WishItem = z.infer<typeof WishItemSchema>;
@@ -49,9 +67,49 @@ export type CartItem = z.infer<typeof CartItemSchema>;
 export type Cart = z.infer<typeof CartSchema>;
 
 export type Order = z.infer<typeof OrderSchema>;
+export type OrderItem = z.infer<typeof OrderItemSchema>;
 export type PaginatedOrder = z.infer<typeof PaginatedOrderSchema>;
 
 export type Message = z.infer<typeof MessageSchema>;
 export type SiteConfig = z.infer<typeof SiteConfigSchema>;
 export type PaginatedSiteConfig = z.infer<typeof PaginatedSiteConfigSchema>;
 // export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
+
+export type ProductImage = z.infer<typeof ProductImageSchema>;
+export type Address = z.infer<typeof AddressSchema>;
+export type PaginatedAddress = z.infer<typeof PaginatedAddressSchema>;
+export type ProductVariant = z.infer<typeof ProductVariantSchema>;
+
+// Infer TypeScript types from Zod schemas
+export type OrderStatus = z.infer<typeof OrderStatusSchema>;
+export type DiscountType = z.infer<typeof DiscountTypeSchema>;
+export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
+export type ProductStatus = z.infer<typeof ProductStatusSchema>;
+export type CartStatus = z.infer<typeof CartStatusSchema>;
+export type PaymentStatus = z.infer<typeof PaymentStatusSchema>;
+export type ShippingMethod = z.infer<typeof ShippingMethodSchema>;
+export type Role = z.infer<typeof RoleSchema>;
+export type Status = z.infer<typeof StatusSchema>;
+
+// custom
+export type CartUpdate = {
+    status?: CartStatus;
+    shipping_address?: Omit<Address, "id">;
+    email?: string;
+    billing_address?: Omit<Address, "id">;
+    shipping_method?: ShippingMethod;
+    payment_method?: PaymentMethod;
+    total?: number;
+    subtotal?: number;
+    tax?: number;
+    shipping_fee?: number;
+};
+
+export type CartComplete = {
+    total: number;
+    subtotal: number;
+    tax: number;
+    coupon_id?: number;
+    status?: OrderStatus;
+    payment_status?: PaymentStatus;
+};

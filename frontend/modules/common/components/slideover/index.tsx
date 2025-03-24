@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useOverlay, usePreventScroll, useModal, OverlayContainer } from "@react-aria/overlays";
 import { useDialog } from "@react-aria/dialog";
 import { FocusScope } from "@react-aria/focus";
-import { CancelIcon } from "nui-react-icons";
+import { Cancel } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/util/cn";
@@ -56,7 +56,7 @@ const SlideOver: React.FC<SlideoverProps> = ({ isOpen, onClose, children, title,
                     )}
                 >
                     <button aria-label="close" className="absolute top-4 right-2 bg-transparent z-50" onClick={onClose}>
-                        <CancelIcon size={24} />
+                        <Cancel size={24} />
                     </button>
                     <div className="overflow-y-auto ppp[mask-image:linear-gradient(0deg,#000_calc(100%_-_50px),transparent)] flex flex-col flex-1">
                         <div className="text-2xl mb-4 font-semibold pl-2">{title}</div>

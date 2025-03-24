@@ -7,13 +7,13 @@ import { api } from "@/apis";
 interface ComponentProps {}
 
 const Cart: React.FC<ComponentProps> = async () => {
-    const cart = await api.cart.get();
+    const { data, error } = await api.cart.get();
 
-    if ("error" in cart) {
+    if (error || !data) {
         return;
     }
 
-    return <CartComponent cart={cart} />;
+    return <CartComponent cart={data} />;
 };
 
 export { Cart };

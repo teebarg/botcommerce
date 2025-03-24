@@ -1,24 +1,29 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Input } from "@components/ui/input";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import AddressSelect from "../address-select";
 
-import { Cart } from "@/lib/models";
+import { Cart, CartUpdate } from "@/lib/models";
+import { Button } from "@/components/ui/button";
+import { api } from "@/apis";
+import compareAddresses from "@/lib/util/compare-addresses";
 
 const ShippingAddress = ({
     customer,
     cart,
-    checked,
-    onChange,
 }: {
     customer: Omit<any, "password_hash"> | null;
     cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null;
-    checked: boolean;
-    onChange: () => void;
 }) => {
+    const router = useRouter();
+    const [isPending, setIsPending] = useState<boolean>(false);
     const [formData, setFormData] = useState({
-        "shipping_address.firstname": cart?.shipping_address?.firstname || "",
-        "shipping_address.lastname": cart?.shipping_address?.lastname || "",
+        "shipping_address.first_name": cart?.shipping_address?.first_name || "",
+        "shipping_address.last_name": cart?.shipping_address?.last_name || "",
         "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
         "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
         "shipping_address.city": cart?.shipping_address?.city || "",
@@ -29,8 +34,8 @@ const ShippingAddress = ({
 
     useEffect(() => {
         setFormData({
-            "shipping_address.firstname": cart?.shipping_address?.firstname || "",
-            "shipping_address.lastname": cart?.shipping_address?.lastname || "",
+            "shipping_address.first_name": cart?.shipping_address?.first_name || "",
+            "shipping_address.last_name": cart?.shipping_address?.last_name || "",
             "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
             "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
             "shipping_address.city": cart?.shipping_address?.city || "",
@@ -40,42 +45,93 @@ const ShippingAddress = ({
         });
     }, [cart?.shipping_address, cart?.email]);
 
-    const handleChange = (e: string, name: string) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
         setFormData({
             ...formData,
-            [name]: e,
+            [name]: e.target.value,
         });
+    };
+    // const sameAsBilling = cart?.shipping_address && cart?.billing_address ? compareAddresses(cart?.shipping_address, cart?.billing_address) : true;
+
+    const handleSubmit = async () => {
+        setIsPending(true);
+        const sameAsBilling = true;
+
+        const updateData: CartUpdate = {
+            shipping_address: {
+                first_name: formData["shipping_address.first_name"],
+                last_name: formData["shipping_address.last_name"],
+                address_1: formData["shipping_address.address_1"],
+                address_2: "",
+                postal_code: formData["shipping_address.postal_code"],
+                city: formData["shipping_address.city"],
+                state: formData["shipping_address.state"],
+                phone: formData["shipping_address.phone"],
+                is_billing: false,
+            },
+            email: formData["email"],
+        };
+
+        updateData.billing_address = updateData.shipping_address;
+
+        // if (sameAsBilling === "on") {
+        //     updateData.billing_address = updateData.shipping_address;
+        // } else {
+        //     updateData.billing_address = {
+        //         first_name: formData.get("billing_address.first_name") as string,
+        //         last_name: formData.get("billing_address.last_name") as string,
+        //         address_1: formData.get("billing_address.address_1") as string,
+        //         address_2: "",
+        //         postal_code: formData.get("billing_address.postal_code") as string,
+        //         city: formData.get("billing_address.city") as string,
+        //         state: formData.get("billing_address.state") as string,
+        //         phone: formData.get("billing_address.phone") as string,
+        //         is_billing: true,
+        //     };
+        // }
+
+        const { error } = await api.cart.updateDetails(updateData);
+
+        setIsPending(false);
+
+        if (error) {
+            toast.error(error);
+
+            return;
+        }
+
+        router.push(`/checkout?step=delivery`);
     };
 
     return (
         <React.Fragment>
             {customer && (customer.shipping_addresses?.length || 0) > 0 && (
                 <div className="shadow-md bg-default-100 w-full rounded-lg mb-6 flex flex-col gap-y-4 p-5">
-                    <p className="text-sm">{`Hi ${customer.firstname}, do you want to use one of your saved addresses?`}</p>
+                    <p className="text-sm">{`Hi ${customer.first_name}, do you want to use one of your saved addresses?`}</p>
                     <AddressSelect addresses={customer.shipping_addresses} cart={cart} />
                 </div>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                    isRequired
+                    required
                     autoComplete="given-name"
-                    data-testid="shipping-firstname-input"
+                    data-testid="shipping-first_name-input"
                     label="First name"
-                    name="shipping_address.firstname"
-                    value={formData["shipping_address.firstname"]}
-                    onChange={(e) => handleChange(e, "shipping_address.firstname")}
+                    name="shipping_address.first_name"
+                    value={formData["shipping_address.first_name"]}
+                    onChange={(e) => handleChange(e, "shipping_address.first_name")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="family-name"
-                    data-testid="shipping-lastname-input"
+                    data-testid="shipping-last_name-input"
                     label="Last name"
-                    name="shipping_address.lastname"
-                    value={formData["shipping_address.lastname"]}
-                    onChange={(e) => handleChange(e, "shipping_address.lastname")}
+                    name="shipping_address.last_name"
+                    value={formData["shipping_address.last_name"]}
+                    onChange={(e) => handleChange(e, "shipping_address.last_name")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="address-line1"
                     data-testid="shipping-address-input"
                     label="Address"
@@ -84,7 +140,7 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.address_1")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="postal-code"
                     data-testid="shipping-postal-code-input"
                     label="Postal code"
@@ -93,7 +149,7 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.postal_code")}
                 />
                 <Input
-                    isRequired
+                    required
                     autoComplete="address-level2"
                     data-testid="shipping-city-input"
                     label="City"
@@ -118,9 +174,9 @@ const ShippingAddress = ({
                     onChange={onChange}
                 />
             </div> */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                 <Input
-                    isRequired
+                    required
                     autoComplete="email"
                     data-testid="shipping-email-input"
                     label="Email"
@@ -138,6 +194,16 @@ const ShippingAddress = ({
                     onChange={(e) => handleChange(e, "shipping_address.phone")}
                 />
             </div>
+            <Button
+                aria-label="continue"
+                className="mt-6"
+                data-testid="submit-address-button"
+                isLoading={isPending}
+                type="button"
+                onClick={handleSubmit}
+            >
+                Continue to delivery
+            </Button>
         </React.Fragment>
     );
 };

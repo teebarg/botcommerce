@@ -23,29 +23,6 @@ const getHeaders = async (tags: string[] = []) => {
 };
 
 // Customer actions
-export async function getAdresses() {
-    const headers = await getHeaders(["addresses"]);
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/address/`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                ...headers,
-            },
-            credentials: "include",
-        });
-
-        if (!res.ok) {
-            throw new Error(`${res.statusText}`);
-        }
-
-        return await res.json();
-    } catch (error) {
-        return null;
-    }
-}
-
 export async function updateCustomer(data: any) {
     const headers = await getHeaders(["customer"]);
 

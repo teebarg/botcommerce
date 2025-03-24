@@ -21,13 +21,13 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
 
     return (
         <React.Fragment>
-            <div className="flex min-h-screen">
+            <div className="flex">
                 <span className="hidden sm:block min-w-[20rem] h-screen overflow-y-auto">
                     <SideBar />
                 </span>
                 <div className="flex-1 h-screen overflow-y-auto flex flex-col">
                     <AdminNavbar />
-                    <main className="flex-1">{props.children}</main>
+                    <main className="flex-1 flex flex-col">{props.children}</main>
                 </div>
             </div>
         </React.Fragment>

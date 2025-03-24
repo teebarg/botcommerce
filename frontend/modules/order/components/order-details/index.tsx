@@ -25,15 +25,15 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
                 Order date: <span data-testid="order-date">{new Date(order.created_at).toDateString()}</span>
             </p>
             <p className="mt-2 text-primary-500 font-semibold">
-                Order number: <span data-testid="order-id">{order.order_id}</span>
+                Order number: <span data-testid="order-id">{order.order_number}</span>
             </p>
 
             <div className="flex items-center text-sm gap-x-4 mt-4">
                 {showStatus && (
                     <>
-                        <p>
+                        {/* <p>
                             Order status: <span data-testid="order-status">{formatStatus(order.fulfillment_status)}</span>
-                        </p>
+                        </p> */}
                         <p>
                             Payment status: <span data-testid="order-payment-status">{formatStatus(order.payment_status)}</span>
                         </p>

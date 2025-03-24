@@ -1,5 +1,5 @@
 import { siteConfig } from "@lib/config";
-import { GithubIcon, YoutubeIcon, TwitterIcon, WhatsAppIcon } from "nui-react-icons";
+import { Github, Youtube, Twitter, WhatsApp } from "nui-react-icons";
 import Link from "next/link";
 import NewsletterForm from "@modules/store/components/newsletter";
 
@@ -48,11 +48,13 @@ const legal = [
 
 export default async function Footer() {
     const res = await api.collection.all({ limit: 6 });
+
     if (!res) {
         return <ServerError />;
     }
     const { collections } = res;
-    const { categories: cat } = await api.category.all({ limit: 100 });
+    const catRes = await api.category.all({ limit: 100 });
+    const { categories: cat } = catRes.data ?? {};
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (
@@ -69,16 +71,16 @@ export default async function Footer() {
                         </p>
                         <div className="flex space-x-6">
                             <Link aria-label="Twitter" href={siteConfig.links.twitter}>
-                                <TwitterIcon className="text-default-500" size={34} />
+                                <Twitter className="text-default-500" size={34} />
                             </Link>
                             <Link aria-label="Twitter" href={siteConfig.links.github}>
-                                <GithubIcon className="text-default-500" size={34} />
+                                <Github className="text-default-500" size={34} />
                             </Link>
                             <Link aria-label="Twitter" href={siteConfig.links.youtube}>
-                                <WhatsAppIcon className="text-default-500" size={30} />
+                                <WhatsApp className="text-default-500" size={30} />
                             </Link>
                             <Link aria-label="Twitter" href={siteConfig.links.youtube}>
-                                <YoutubeIcon className="text-default-500" size={34} />
+                                <Youtube className="text-default-500" size={34} />
                             </Link>
                         </div>
                     </div>
@@ -102,17 +104,17 @@ export default async function Footer() {
                                 </div>
                             </div>
                         )}
-                        {categories?.length > 0 && (
+                        {categories && categories?.length > 0 && (
                             <div className="hidden md:block">
                                 <h3 className="text-base font-semibold text-default-500">Categories</h3>
                                 <ul className="mt-2 space-y-2" data-testid="footer-categories">
                                     {categories?.map((c: Category) => {
-                                        const children =
-                                            c.children?.map((child: Category) => ({
-                                                name: child.name,
-                                                slug: child.slug,
-                                                id: child.id,
-                                            })) || null;
+                                        // const children =
+                                        //     c.subcategories?.map((child: Category) => ({
+                                        //         name: child.name,
+                                        //         slug: child.slug,
+                                        //         id: child.id,
+                                        //     })) || null;
 
                                         return (
                                             <li key={c.id}>
@@ -123,7 +125,7 @@ export default async function Footer() {
                                                 >
                                                     {c.name}
                                                 </LocalizedClientLink>
-                                                {children && (
+                                                {/* {children && (
                                                     <ul className="ml-4 space-y-1">
                                                         {children?.map((child: Category) => (
                                                             <li key={child.id}>
@@ -137,7 +139,7 @@ export default async function Footer() {
                                                             </li>
                                                         ))}
                                                     </ul>
-                                                )}
+                                                )} */}
                                             </li>
                                         );
                                     })}

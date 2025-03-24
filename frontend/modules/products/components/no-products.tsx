@@ -38,7 +38,7 @@ const NoProductsFound = ({
                         Clear Search
                     </Button>
 
-                    <Button aria-label="home" variant="bordered" onClick={onGoHome}>
+                    <Button aria-label="home" variant="outline" onClick={onGoHome}>
                         <Home className="w-4 h-4" />
                         Go to Homepage
                     </Button>

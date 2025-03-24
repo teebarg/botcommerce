@@ -2,9 +2,10 @@ import React from "react";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
+import { PaymentMethod } from "@/lib/models";
 
 type PaymentContainerProps = {
-    paymentSession: any;
+    paymentSession: { id: string; provider_id: PaymentMethod };
     selectedPaymentOptionId: string | null;
     disabled?: boolean;
     paymentInfoMap: Record<string, { title: string; description: string; icon: React.JSX.Element | any }>;

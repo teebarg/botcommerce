@@ -1,7 +1,4 @@
-import { useEffect } from "react";
 import useToggleState from "@lib/hooks/use-toggle-state";
-import { useFormStatus } from "react-dom";
-import { useSnackbar } from "notistack";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
@@ -9,45 +6,19 @@ import { cn } from "@/lib/util/cn";
 type AccountInfoProps = {
     label: string;
     currentInfo: string | React.ReactNode;
-    isSuccess?: boolean;
-    isError?: boolean;
-    errorMessage?: string;
+    isLoading?: boolean;
     clearState: () => void;
     children?: React.ReactNode;
     "data-testid"?: string;
 };
 
-const AccountInfo = ({
-    label,
-    currentInfo,
-    isSuccess,
-    isError,
-    clearState,
-    errorMessage = "An error occurred, please try again",
-    children,
-    "data-testid": dataTestid,
-}: AccountInfoProps) => {
-    const { enqueueSnackbar } = useSnackbar();
-    const { state, close, toggle } = useToggleState();
-
-    const { pending } = useFormStatus();
+const AccountInfo = ({ label, currentInfo, isLoading, clearState, children, "data-testid": dataTestid }: AccountInfoProps) => {
+    const { state, toggle } = useToggleState();
 
     const handleToggle = () => {
         clearState();
         setTimeout(() => toggle(), 100);
     };
-
-    useEffect(() => {
-        if (isSuccess) {
-            enqueueSnackbar(`${label} updated successfully`, { variant: "success" });
-            close();
-
-            return;
-        }
-        if (isError) {
-            enqueueSnackbar(errorMessage, { variant: "error" });
-        }
-    }, [isSuccess, isError]);
 
     return (
         <div className="text-sm" data-testid={dataTestid}>
@@ -67,10 +38,9 @@ const AccountInfo = ({
                 <div>
                     <Button
                         className="w-[100px] py-1"
-                        color="secondary"
                         data-testid="edit-button"
                         type={state ? "reset" : "button"}
-                        variant="bordered"
+                        variant="outline"
                         onClick={handleToggle}
                     >
                         {state ? "Cancel" : "Edit"}
@@ -87,7 +57,7 @@ const AccountInfo = ({
                 <div className="flex flex-col gap-y-2 py-4">
                     <div>{children}</div>
                     <div className="flex items-center justify-end mt-2">
-                        <Button aria-label="save" className="w-full sm:max-w-[140px]" data-testid="save-button" isLoading={pending} type="submit">
+                        <Button aria-label="save" className="w-full sm:max-w-[140px]" data-testid="save-button" isLoading={isLoading} type="submit">
                             Save changes
                         </Button>
                     </div>

@@ -1,78 +1,55 @@
-from collections.abc import Generator
 import json
 from typing import Annotated
 
-import firebase_admin
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
-from firebase_admin import credentials, storage
-from google.cloud.storage.bucket import Bucket
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
-from sqlmodel import Session
 
-from app.core import crud, security
+from app.core import security
 from app.core.config import settings
 from app.core.logging import logger
-from app.db.engine import engine
-from app.models.generic import Address, Product, User
-from app.models.token import TokenPayload
+from app.models.user import User
+from app.models.generic import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
+from app.prisma_client import prisma
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
 )
 
 
-def get_db() -> Generator[Session, None, None]:
-    with Session(engine) as session:
-        yield session
-
-
-SessionDep = Annotated[Session, Depends(get_db)]
-# TokenDep = Annotated[str, Depends(reusable_oauth2)]
+# SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 
-
-def get_storage() -> Generator:
-    try:
-        if not firebase_admin._apps:  # Check if the app is not already initialized
-            cred = credentials.Certificate(settings.FIREBASE_CRED)
-            firebase_admin.initialize_app(
-                cred, {"storageBucket": settings.STORAGE_BUCKET}
-            )
-
-        # Get a reference to the bucket
-        yield storage.bucket()
-    except Exception as e:
-        logger.error(f"storage init error, {e}")
-        raise
-    finally:
-        logger.debug("storage closed")
-
-
-Storage = Annotated[Bucket, Depends(get_storage)]
 CacheService = Annotated[CacheService, Depends(get_cache_service)]
 
-
-async def get_current_user(session: SessionDep, access_token: TokenDep, cache: CacheService) -> User:
+async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
     except (InvalidTokenError, ValidationError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        ) from None
+        return None
+
+    return token_data
+
+TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
+
+
+async def get_current_user(token_data: TokenUser, cache: CacheService) -> User:
+    if not token_data:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
 
     # Check if user is in cache
     user = cache.get(f"user:{token_data.sub}")
     if user is None:
-        user = await crud.user.get_by_email(db=session, email=token_data.sub)
+        user = await prisma.user.find_unique(
+            where={"email": token_data.sub}
+        )
         if user:
             cache.set(f"user:{token_data.sub}", user.model_dump_json(), expire=3600)  # Store user in cache
     else:
@@ -80,7 +57,7 @@ async def get_current_user(session: SessionDep, access_token: TokenDep, cache: C
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-    if not user.is_active:
+    if user.status == "inactive":
         raise HTTPException(status_code=400, detail="Inactive user")
     return user
 
@@ -100,27 +77,8 @@ def get_current_active_user(
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
-def get_address_param(id: str, db: SessionDep, current_user: CurrentUser) -> Address:
-    if address := crud.address.get(db=db, id=id):
-        if not current_user.is_superuser and current_user.id != address.user_id:
-            raise HTTPException(
-                status_code=401, detail="Unauthorized to access this address."
-            )
-        return address
-    raise HTTPException(status_code=404, detail="Address not found.")
-
-
-CurrentAddress = Annotated[User, Depends(get_address_param)]
-
-
-def get_product_path_param(id: str, db: SessionDep) -> Product:
-    if product := crud.product.get(db=db, id=id):
-        return product
-    raise HTTPException(status_code=404, detail="Product not found.")
-
-
 def get_current_superuser(current_user: CurrentUser) -> User:
-    if not current_user.is_superuser:
+    if not current_user.role == "ADMIN":
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
         )

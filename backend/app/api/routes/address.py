@@ -4,35 +4,27 @@ from fastapi import (
     HTTPException,
     Query,
 )
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import func, select
 
-from app.core import crud
-from app.core.decorators import cache
-from app.core.deps import (
-    CacheService,
-    CurrentAddress,
-    CurrentUser,
-    SessionDep,
-    get_address_param,
-    get_current_user,
-)
+from app.core.deps import CurrentUser
 from app.core.logging import logger
 from app.models.address import (
     AddressCreate,
     AddressUpdate,
+    BillingAddressCreate
 )
-from app.models.generic import Address, Addresses, AddressPublic
-from app.models.message import Message
+from app.models.address import Address, Addresses
+from app.models.generic import Message
+from app.prisma_client import prisma as db
+from math import ceil
+from prisma.errors import PrismaError
 
 # Create a router for addresses
 router = APIRouter()
 
 
-@router.get("/", dependencies=[Depends(get_current_user)])
-@cache(key="addresses")
+@router.get("/")
+# @cache(key="addresses")
 async def index(
-    db: SessionDep,
     current_user: CurrentUser,
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -40,113 +32,150 @@ async def index(
     """
     Retrieve addresses.
     """
-    query = {}
-    if not current_user.is_superuser:
-        query.update({"user_id": current_user.id})
-    count_statement = select(func.count()).select_from(Address)
-    count_statement = crud.address.generate_statement(
-        statement=count_statement, query=query
+    where_clause = None
+    if not current_user.role == "ADMIN":
+        where_clause = {
+            "user_id": current_user.id
+        }
+    addresses = await db.address.find_many(
+        where=where_clause,
+        skip=(page - 1) * limit,
+        take=limit,
+        order={"created_at": "desc"},
     )
-    total_count = db.exec(count_statement).one()
-
-    addresses = crud.address.get_multi(
-        db=db,
-        query=query,
-        limit=limit,
-        offset=(page - 1) * limit,
-    )
-
-    total_pages = (total_count // limit) + (total_count % limit > 0)
-
-    return Addresses(
-        addresses=addresses,
-        page=page,
-        limit=limit,
-        total_pages=total_pages,
-        total_count=total_count,
-    )
+    total = await db.address.count(where=where_clause)
+    return {
+        "addresses": addresses,
+        "page": page,
+        "limit": limit,
+        "total_pages": ceil(total/limit),
+        "total_count": total,
+    }
 
 
-@router.post("/", dependencies=[Depends(get_current_user)])
+@router.post("/")
 async def create(
-    *, db: SessionDep, current_user: CurrentUser, create_data: AddressCreate, cache: CacheService
-) -> AddressPublic:
+    *, user: CurrentUser, create_data: AddressCreate
+) -> Address:
     """
     Create new address.
     """
-    address = crud.address.create(db=db, obj_in=create_data, user_id=current_user.id)
-    cache.invalidate("addresses")
-    return address
+    try:
+        address = await db.address.create(
+            data={
+                **create_data.model_dump(),
+                "user_id": user.id
+            }
+        )
+        return address
+    except PrismaError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{id}")
-@cache(key="address")
-async def read(address: CurrentAddress) -> AddressPublic:
+# @cache(key="address")
+async def read(id: int, user: CurrentUser) -> Address:
     """
     Get a specific address by id.
     """
+    address = await db.address.find_unique(
+        where={"id": id, "user_id": user.id}
+    )
+    if not address:
+        raise HTTPException(status_code=404, detail="Address not found")
+
     return address
 
 
-@router.post("/billing_address", dependencies=[Depends(get_current_user)])
-async def set_billing_address(db: SessionDep, user: CurrentUser, address: AddressCreate) -> AddressPublic:
-    # Check if the user already has a billing address
-    existing_address = db.exec(
-        select(Address).where(Address.user_id == user.id, Address.is_billing)
-    ).first()
+@router.post("/billing")
+async def set_billing_address(user: CurrentUser, address: BillingAddressCreate) -> Address:
+    # address = await db.address.upsert(
+    #     where={"id": existing_address.id if existing_address else -1},  # Use ID if found
+    #     update={**address.model_dump(exclude={"id", "user"})},  # Update only valid fields
+    #     create={**address.model_dump(), "user_id": user.id, "is_billing": True}  # Create new if not found
+    # )
+    update_data = address.dict(exclude_unset=True)
 
-    if existing_address:
-        # Update the existing billing address with the new data
-        existing_address.is_billing = True
-        db_address = crud.address.update(db=db, db_obj=existing_address, obj_in=address)
-        return db_address
+    try:
+        address = await db.address.find_first(
+            where={"user_id": user.id, "is_billing": True}
+        )
+        if address:
+            update = await db.address.update(
+                where={"id": address.id},
+                data={
+                    **update_data,
+                    "is_billing": True,
+                    "user": {"connect": {"id": user.id}},
+                }
+            )
+            return update
 
-    address.is_billing = True
-    address = crud.address.create(db=db, obj_in=address, user_id=user.id)
-    return address
+        address = await db.address.create(
+            data={
+                **update_data,
+                "user_id": user.id,
+                "is_billing": True
+            }
+        )
+        return address
+    except PrismaError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}", dependencies=[Depends(get_address_param)])
+@router.patch("/{id}")
 async def update(
-    *,
-    db: SessionDep,
-    cache: CacheService,
-    address: CurrentAddress,
-    update_data: AddressUpdate,
-) -> AddressPublic:
+    id: int,
+    user: CurrentUser,
+    update: AddressUpdate,
+) -> Address:
     """
     Update a address.
     """
-    try:
-        address = crud.address.update(db=db, db_obj=address, obj_in=update_data)
-        # Invalidate cache
-        cache.delete(f"address:{id}")
-        cache.invalidate("addresses")
-        return address
-    except IntegrityError as e:
-        logger.error(f"Error updating address, ${e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(e)
+    existing = await db.address.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Address not found")
+
+    update_data = update.dict(exclude_unset=True)
+
+    if not user.role == "ADMIN" and user.id != existing.user_id:
         raise HTTPException(
-            status_code=400,
-            detail=str(e),
-        ) from e
+            status_code=401, detail="Unauthorized to access this address."
+        )
+
+    try:
+        update = await db.address.update(
+            where={"id": id},
+            data={
+                **update_data
+            }
+        )
+        return update
+    except PrismaError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}", dependencies=[Depends(get_address_param)])
-async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
+@router.delete("/{id}")
+async def delete(id: int) -> Message:
     """
     Delete a address.
     """
+    existing = await db.address.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Address not found")
+
     try:
-        crud.address.remove(db=db, id=id)
-        # Invalidate cache
-        cache.delete(f"address:{id}")
-        cache.invalidate("addresses:*")
+        await db.address.delete(
+            where={"id": id}
+        )
         return Message(message="Address deleted successfully")
-    except Exception as e:
+    except PrismaError as e:
         raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        ) from e
+            status_code=500, detail=f"Database error: {str(e)}")

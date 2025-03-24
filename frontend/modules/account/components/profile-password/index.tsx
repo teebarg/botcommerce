@@ -11,7 +11,7 @@ type MyInformationProps = {
 };
 
 const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
-    const [successState, setSuccessState] = React.useState(false);
+    const [, setSuccessState] = React.useState(false);
 
     const [state, formAction] = useActionState(updateCustomerPassword, {
         customer,
@@ -33,15 +33,12 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
                 clearState={clearState}
                 currentInfo={<span>The password is not shown for security reasons</span>}
                 data-testid="account-password-editor"
-                errorMessage={state.error}
-                isError={!!state.error}
-                isSuccess={successState}
                 label="Password"
             >
                 <div className="grid grid-cols-2 gap-4">
-                    <Input isRequired data-testid="old-password-input" label="Old password" name="old_password" type="password" />
-                    <Input isRequired data-testid="new-password-input" label="New password" name="new_password" type="password" />
-                    <Input isRequired data-testid="confirm-password-input" label="Confirm password" name="confirm_password" type="password" />
+                    <Input required data-testid="old-password-input" label="Old password" name="old_password" type="password" />
+                    <Input required data-testid="new-password-input" label="New password" name="new_password" type="password" />
+                    <Input required data-testid="confirm-password-input" label="Confirm password" name="confirm_password" type="password" />
                 </div>
             </AccountInfo>
         </form>

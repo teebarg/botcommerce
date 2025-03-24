@@ -1,56 +1,76 @@
 "use client";
 
-import CartItemSelect from "@modules/cart/components/cart-item-select";
 import { useState } from "react";
-import { useSnackbar } from "notistack";
 import { Spinner } from "@components/spinner";
+import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 
-import CartDeleteButton from "@/modules/common/components/cart-delete-button";
 import { CartItem } from "@/lib/models";
 import { api } from "@/apis";
+import { Button } from "@/components/ui/button";
 
 type ItemsTemplateProps = {
     item: CartItem;
 };
 
 const Control = ({ item }: ItemsTemplateProps) => {
-    const { enqueueSnackbar } = useSnackbar();
-    const [updating, setUpdating] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const changeQuantity = async (id: string, quantity: number) => {
-        setUpdating(true);
+    const handleDelete = async (id: number) => {
+        setLoading(true);
+        try {
+            await api.cart.delete(id);
+        } catch (error) {
+            toast.error(`Error deleting item: ${error}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        const res = await api.cart.update({
-            product_id: id,
-            quantity,
-        });
+    const updateQuantity = async (id: number, quantity: number) => {
+        // if (!isInStock) {
+        //     toast.error("Product out of stock")
+        //     return;
+        // }
 
-        if ("error" in res) {
-            enqueueSnackbar(res.message, { variant: "error" });
+        setLoading(true);
+        try {
+            const response = await api.cart.changeQuantity({
+                item_id: id,
+                quantity,
+            });
+
+            if (response.error) {
+                toast.error(response.error);
+
+                return;
+            }
+
+            toast.success("Cart updated successfully");
+        } catch (error) {
+            toast.error("Failed to add to cart");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="flex gap-2 items-center w-28">
-            <CartDeleteButton data-testid="product-delete-button" id={item.item_id} />
-            <CartItemSelect
-                className="w-14 h-10 p-4"
-                data-testid="product-select-button"
-                value={item.quantity}
-                onChange={(value) => changeQuantity(item.item_id, parseInt(value.target.value))}
-            >
-                {Array.from(
-                    {
-                        length: 10,
-                    },
-                    (_, i) => (
-                        <option key={i} value={i + 1}>
-                            {i + 1}
-                        </option>
-                    )
-                )}
-            </CartItemSelect>
-            {updating && <Spinner key={item.product_id} />}
+        <div className="w-28">
+            <div className="flex gap-1 items-center">
+                <div className="flex items-center border rounded-md">
+                    <Button size="sm" variant="ghost" onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}>
+                        -
+                    </Button>
+                    <span className="px-1">{item.quantity}</span>
+                    <Button size="sm" variant="ghost" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                        +
+                    </Button>
+                </div>
+                <Button disabled={loading} size="sm" variant="ghost" onClick={() => handleDelete(item.id)}>
+                    <Trash2 className="h-6 w-6 text-rose-500" />
+                </Button>
+                {loading && <Spinner key={item.id} />}
+            </div>
         </div>
     );
 };

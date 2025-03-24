@@ -1,13 +1,11 @@
-from pydantic import field_validator
-from sqlmodel import Field
-
-from app.models.base import BaseModel
+from app.models.base import BM
+from pydantic import BaseModel, Field, field_validator
 
 
-class AddressBase(BaseModel):
-    firstname: str = Field(max_length=255)
-    lastname: str | None = Field(default=None, max_length=255)
-    address_1: str = Field(max_length=1255)
+class AddressBase(BM):
+    first_name: str = Field(..., max_length=255)
+    last_name: str | None = Field(default=None, max_length=255)
+    address_1: str = Field(..., max_length=1255)
     address_2: str | None = Field(default=None, max_length=1255)
     city: str = Field(max_length=255)
     postal_code: str | None = Field(default=None, max_length=255)
@@ -15,11 +13,15 @@ class AddressBase(BaseModel):
     phone: str | None = Field(default=None, max_length=255)
     is_billing: bool = Field(default=False)
 
-    @field_validator("address_1", "firstname", "city", mode="before")
+    @field_validator("address_1", "first_name", "city", mode="before")
     def not_empty(cls, v, info):
         if not v or v.strip() == "":
             raise ValueError(f"{info.field_name} cannot be empty")
         return v
+
+
+class Address(AddressBase):
+    id: int
 
 
 class AddressCreate(AddressBase):
@@ -27,4 +29,32 @@ class AddressCreate(AddressBase):
 
 
 class AddressUpdate(AddressBase):
-    pass
+    first_name: str | None = Field(default=None, max_length=255)
+    last_name: str | None = Field(default=None, max_length=255)
+    address_1: str | None = Field(default=None, max_length=1255)
+    address_2: str | None = Field(default=None, max_length=1255)
+    city: str | None = Field(default=None, max_length=255)
+    postal_code: str | None = Field(default=None, max_length=255)
+    state: str | None = Field(default=None, max_length=255)
+    phone: str | None = Field(default=None, max_length=255)
+
+
+class Addresses(BaseModel):
+    addresses: list[Address]
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int
+
+class Search(BaseModel):
+    results: list[Address]
+
+class BillingAddressCreate(BaseModel):
+    first_name: str = Field(..., max_length=255)
+    last_name: str | None = Field(default=None, max_length=255)
+    address_1: str = Field(..., max_length=1255)
+    address_2: str | None = Field(default=None, max_length=1255)
+    city: str = Field(max_length=255)
+    postal_code: str | None = Field(default=None, max_length=255)
+    state: str | None = Field(default=None, max_length=255)
+    phone: str | None = Field(default=None, max_length=255)

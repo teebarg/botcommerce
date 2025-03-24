@@ -1,19 +1,18 @@
 import { Metadata } from "next";
 import React from "react";
-import { Commerce, Deal, LocationIcon, Mail, PhoneCall } from "nui-react-icons";
+import { Commerce, Deal, Location, Mail, PhoneCall } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
-import { imgSrc } from "@lib/util/util";
 import Image from "next/image";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
-import { Category, Product, WishItem } from "@/lib/models";
+import { Category, ProductSearch, WishItem } from "@/lib/models";
 import BannerCarousel from "@/components/carousel";
-import ProductCard from "@/components/product/product-card";
 import ContactForm from "@/modules/store/components/contact-form";
 import { auth } from "@/actions/auth";
+import ProductCard from "@/components/store/products/product-card";
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -22,26 +21,28 @@ export const metadata: Metadata = {
 
 // Helper function to fetch products
 const fetchProducts = async (collection: string, limit: number = 4) => {
-    const { products } = await api.product.search({ limit, page: 1, collections: collection });
+    const { data } = await api.product.search({ limit, page: 1, collections: collection });
 
-    return products;
+    return data?.products;
 };
 
 export default async function Home() {
     const user = await auth();
-    const [trending, latest, featured, { categories }] = await Promise.all([
+    const [trending, latest, featured, catRes] = await Promise.all([
         fetchProducts("trending"),
         fetchProducts("latest"),
         fetchProducts("featured", 6),
         api.category.all({ limit: 100 }),
     ]);
 
+    const { categories } = catRes.data ?? {};
+
     let wishlist: WishItem[] = [];
 
     if (user) {
-        const res = await api.user.wishlist();
+        const { data } = await api.user.wishlist();
 
-        wishlist = res ? res.wishlists : [];
+        wishlist = data?.wishlists || [];
     }
 
     return (
@@ -169,7 +170,7 @@ export default async function Home() {
                         <div className="col-span-3">
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                                {featured?.map((product: Product, index: number) => (
+                                {featured?.map((product: ProductSearch, index: number) => (
                                     <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                 ))}
                             </div>
@@ -186,7 +187,7 @@ export default async function Home() {
                     <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
-                            {trending?.map((product: Product, index: number) => (
+                            {trending?.map((product: ProductSearch, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
@@ -209,13 +210,19 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
-                            {latest?.map((product: Product, index: number) => (
+                            {latest?.map((product: ProductSearch, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
                     </div>
                 </div>
-                <div className="bg-fixed bg-center" style={{ backgroundImage: `url(${imgSrc("banners%2Fhero-contact.jpg")})` }}>
+                <div
+                    className="bg-fixed bg-center"
+                    style={{
+                        backgroundImage:
+                            'url("https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fhero-contact.jpg?alt=media")',
+                    }}
+                >
                     <div className="flex items-center h-full">
                         <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
                             <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/50 text-gray-100 p-4 sm:p-8 rounded-lg">
@@ -236,7 +243,7 @@ export default async function Home() {
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Location</p>
                                     <div className="flex gap-2">
-                                        <LocationIcon className="fill-current" />
+                                        <Location className="fill-current" />
                                         <p className="underline">Lagos, LA NG</p>
                                     </div>
                                     <p className="font-semibold mt-6 text-xl">Opening Hours</p>

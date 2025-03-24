@@ -5,26 +5,25 @@ import { MagnifyingGlassMini } from "nui-react-icons";
 import SearchInput from "@modules/search/components/search-input";
 import { useOverlayTriggerState } from "react-stately";
 import { Modal } from "@modules/common/components/modal";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
+import { toast } from "sonner";
 
 import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import NoProductsFound from "@/modules/products/components/no-products";
-import { buildUrl, debounce } from "@/lib/util/util";
-import { Product } from "@/lib/models";
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
+import { debounce } from "@/lib/util/util";
+import { ProductSearch } from "@/lib/models";
+import { api } from "@/apis";
+import ProductCard from "@/components/store/products/product-card";
 
 interface Props {
     className?: string;
 }
 
 const Search: React.FC<Props> = ({ className }) => {
-    const { enqueueSnackbar } = useSnackbar();
     const router = useRouter();
     const modalState = useOverlayTriggerState({});
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<ProductSearch[]>([]);
     const [value, setValue] = useState("");
 
     const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -35,23 +34,29 @@ const Search: React.FC<Props> = ({ className }) => {
                 limit: 15,
                 page: 1,
             };
-            const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...queryParams });
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    accept: "application/json",
-                },
-            });
+            const { data, error } = await api.product.search({ ...queryParams });
+            // const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...queryParams });
+            // const response = await fetch(url, {
+            //     method: "GET",
+            //     headers: {
+            //         accept: "application/json",
+            //     },
+            // });
 
-            if (!response.ok) {
-                throw new Error(response.statusText);
+            // if (!response.ok) {
+            //     throw new Error(response.statusText);
+            // }
+
+            // const { products } = await response.json();
+            if (error) {
+                toast.error(error);
+
+                return;
             }
 
-            const { products } = await response.json();
-
-            setProducts(products);
+            setProducts(data?.products ?? []);
         } catch (error) {
-            enqueueSnackbar(`Error occurred fetching products - ${error}`, { variant: "error" });
+            toast.error(`Error occurred fetching products - ${error}`);
         }
     };
 
@@ -69,9 +74,9 @@ const Search: React.FC<Props> = ({ className }) => {
         <React.Fragment>
             <Button
                 className={className}
-                color="default"
                 endContent={<Kbd keys={["command"]}>K</Kbd>}
                 startContent={<MagnifyingGlassMini />}
+                variant="outline"
                 onClick={modalState.open}
             >
                 {`I'm looking for...`}
@@ -89,7 +94,7 @@ const Search: React.FC<Props> = ({ className }) => {
                         <div className="max-h-[70vh] min-h-[70vh] overflow-y-auto mt-2">
                             {products.length == 0 && <NoProductsFound />}
                             <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
-                                {products.map((product: Product, index: number) => (
+                                {products.map((product: ProductSearch, index: number) => (
                                     <ProductCard key={index} product={product} />
                                 ))}
                             </div>

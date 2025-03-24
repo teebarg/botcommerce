@@ -26,7 +26,7 @@ const ButtonNav = async ({ className }: { className?: string }) => {
         {
             icon: <Cart />,
             label: "Cart",
-            href: "/cart",
+            href: "/cart-check",
         },
         {
             icon: <User className="h-6 w-6" viewBox="0 0 20 20" />,

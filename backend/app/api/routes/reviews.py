@@ -1,131 +1,117 @@
 
-from app.models.reviews import ReviewCreate, ReviewUpdate
-from app.models.generic import PaginatedReviews, Review, ReviewPublic
+from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
 from fastapi import ( APIRouter, HTTPException, Depends, HTTPException, Query)
 
-from app.core import crud
-from app.core.decorators import cache
 from app.core.deps import (
-    CacheService,
     CurrentUser,
-    SessionDep,
     get_current_superuser,
 )
 from app.core.logging import logger
-from app.models.message import Message
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import func, select
+from app.models.generic import Message
+from app.prisma_client import prisma as db
+from prisma.errors import PrismaError
+from math import ceil
 
 # Create a router for reviews
 router = APIRouter()
 
 @router.get("/")
-@cache(key="reviews")
+# @cache(key="reviews")
 async def index(
-    db: SessionDep,
     product_id: int = None,
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-) -> PaginatedReviews:
+) -> Reviews:
     """
     Retrieve reviews with Redis caching.
     """
-    try:
-        count_statement = select(func.count()).select_from(Review)
-        if product_id:
-            count_statement = count_statement.where(Review.product_id == product_id)
-        count = db.exec(count_statement).one()
+    where_clause = None
+    if product_id:
+        where_clause = {
+            "product_id": product_id
+        }
+    reviews = await db.review.find_many(
+        where=where_clause,
+        skip=(page - 1) * limit,
+        take=limit,
+        order={"created_at": "desc"},
+    )
+    total = await db.review.count(where=where_clause)
+    return {
+        "reviews":reviews,
+        "page":page,
+        "limit":limit,
+        "total_pages":ceil(total/limit),
+        "total_count":total,
+    }
 
-        statement = select(Review).order_by(Review.created_at.desc())
-        if product_id:
-            statement = statement.where(Review.product_id == product_id)
-        reviews = db.exec(statement.offset((page - 1) * limit).limit(limit)).all()
-
-        pages = (count // limit) + (count % limit > 0)
-
-        return PaginatedReviews(
-            reviews=reviews,
-            page=page,
-            limit=limit,
-            total_pages=pages,
-            total_count=count,
-        )
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"{e}") from e
 
 
 @router.get("/{id}")
-@cache(key="review", hash=False)
-async def read(id: int, db: SessionDep) -> ReviewPublic:
+# @cache(key="review", hash=False)
+async def read(id: int) -> Review:
     """
     Get a specific review by id with Redis caching.
     """
-    review = crud.review.get(db=db, id=id)
+    review = await db.review.find_unique(
+        where={"id": id}
+    )
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
 
     return review
 
 @router.post("/")
-async def create(review: ReviewCreate, db: SessionDep, user: CurrentUser, cache: CacheService) -> Review:
-    product = crud.product.get(db=db, id=review.product_id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+async def create(review: ReviewCreate, user: CurrentUser) -> Review:
     try:
-        review = crud.review.create(db=db, obj_in=review, user_id=user.id)
-        # Invalidate cache
-        cache.invalidate("reviews")
-        cache.delete(f"product:{product.slug}")
+        review = await db.review.create(
+            data={
+                **review.model_dump(),
+                "user_id": user.id
+            }
+        )
         return review
-    except IntegrityError as e:
-        logger.error(f"Error creating review, {e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=e,
-        ) from e
-    
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
 # @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 @router.patch("/{id}")
 async def update(
-    *,
-    db: SessionDep,
-    cache: CacheService,
     id: int,
     update_data: ReviewUpdate,
 ) -> Review:
     """
     Update a review and invalidate cache.
     """
-    review = crud.review.get(db=db, id=id)
-    if not review:
-        raise HTTPException(
-            status_code=404,
-            detail="Review not found",
-        )
+    existing = await db.review.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Review not found")
+
     try:
-        review = crud.review.update(db=db, db_obj=review, obj_in=update_data)
-        # Invalidate cache
-        cache.delete(f"review:{id}")
-        cache.invalidate("reviews")
-        return review
-    except IntegrityError as e:
-        logger.error(f"Error updating review, {e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=f"{e}") from e
+        update = await db.review.update(
+            where={"id": id},
+            data=update_data.model_dump()
+        )
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
-async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
-    review = crud.review.get(db=db, id=id)
-    if not review:
+async def delete(id: int) -> Message:
+    existing = await db.review.find_unique(
+        where={"id": id}
+    )
+    if not existing:
         raise HTTPException(status_code=404, detail="Review not found")
-    crud.review.remove(db=db, id=id)
-    cache.delete(f"review:{id}")
-    cache.invalidate("reviews")
-    return Message(message="Review deleted successfully")
+
+    try:
+        await db.review.delete(
+            where={"id": id}
+        )
+        return Message(message="Review deleted successfully")
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

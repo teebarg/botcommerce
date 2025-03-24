@@ -1,51 +1,79 @@
 "use client";
 
-import React, { useActionState, useEffect } from "react";
-import { updateCustomerEmail } from "@modules/account/actions";
+import React from "react";
 import { Input } from "@components/ui/input";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import AccountInfo from "../account-info";
+
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { api } from "@/apis";
+
+const emailSchema = z.object({
+    email: z.string().min(1, "Email is required").email("Invalid email"),
+});
+
+type EmailFormValues = z.infer<typeof emailSchema>;
 
 type MyInformationProps = {
     customer: Omit<any, "password_hash">;
 };
 
 const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
-    const [successState, setSuccessState] = React.useState(false);
+    const [isPending, setIsPending] = React.useState<boolean>(false);
 
-    const [state, formAction] = useActionState(updateCustomerEmail, {
-        error: false,
-        success: false,
+    const form = useForm<EmailFormValues>({
+        resolver: zodResolver(emailSchema),
+        defaultValues: {
+            email: customer.email || "",
+        },
     });
 
     const clearState = () => {
-        setSuccessState(false);
+        form.reset();
     };
 
-    useEffect(() => {
-        setSuccessState(state.success);
-    }, [state]);
+    const onSubmit = async (updateData: EmailFormValues) => {
+        setIsPending(true);
+
+        const { error } = await api.user.update(customer.id, updateData);
+
+        if (error) {
+            toast.error(error);
+            setIsPending(false);
+
+            return;
+        }
+
+        setIsPending(false);
+        toast.success("Billing address updated successfully");
+    };
 
     return (
-        <form action={formAction} className="w-full">
+        <form className="w-full" onReset={() => clearState()} onSubmit={form.handleSubmit(onSubmit)}>
             <AccountInfo
                 clearState={clearState}
                 currentInfo={`${customer.email}`}
                 data-testid="account-email-editor"
-                errorMessage={state.error}
-                isError={!!state.error}
-                isSuccess={successState}
+                isLoading={isPending}
                 label="Email"
             >
                 <div className="grid grid-cols-1 gap-y-2">
-                    <Input
-                        isRequired
-                        autoComplete="email"
-                        data-testid="email-input"
-                        defaultValue={customer.email}
-                        label="Email"
+                    <FormField
+                        control={form.control}
                         name="email"
-                        type="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input required data-testid="email-input" type="email" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
                 </div>
             </AccountInfo>

@@ -10,7 +10,6 @@ type WrapperProps = {
 };
 
 const Wrapper: React.FC<WrapperProps> = ({ children }) => {
-    // const paymentSession = cart.payment_session as PaymentSession;
     return <div>{children}</div>;
 };
 

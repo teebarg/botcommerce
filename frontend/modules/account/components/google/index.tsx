@@ -23,8 +23,8 @@ const GoogleLogin: React.FC<Props> = () => {
                 const res = await googleLogin({
                     email: userInfo.email,
                     password: "password",
-                    firstname: userInfo.given_name,
-                    lastname: userInfo.family_name,
+                    first_name: userInfo.given_name,
+                    last_name: userInfo.family_name,
                 });
 
                 if (res?.error) {
@@ -43,9 +43,9 @@ const GoogleLogin: React.FC<Props> = () => {
         <React.Fragment>
             <Button
                 className="w-full bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600"
-                size="md"
+                size="lg"
                 startContent={<Image alt="Google" className="w-6" src={Google} />}
-                variant="flat"
+                variant="ghost"
                 onClick={() => handleGoogleSignIn()}
             >
                 Sign in with Google

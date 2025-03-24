@@ -1,20 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { EllipsisHorizontal, PencilSquare, Plus, Trash } from "nui-react-icons";
+import { PencilSquare, Plus, Trash } from "nui-react-icons";
 import { useOverlayTriggerState } from "react-stately";
-import { SlideOver } from "@modules/common/components/slideover";
-import { Modal } from "@modules/common/components/modal";
-import { Confirm } from "@modules/common/components/confirm";
 import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
+import { toast } from "sonner";
 
 import { CategoryForm } from "./category-form";
 
-import Dropdown from "@/components/ui/dropdown";
-import { cn } from "@/lib/util/cn";
 import { Category } from "@/lib/models";
 import { deleteCategory } from "@/actions/category";
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Props {
     canAdd?: boolean;
@@ -22,32 +20,25 @@ interface Props {
 }
 
 const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
-    const { enqueueSnackbar } = useSnackbar();
-    const slideOverState = useOverlayTriggerState({});
-    const deleteModalState = useOverlayTriggerState({});
-    const [isNew, setIsNew] = useState<boolean>(true);
+    const deleteState = useOverlayTriggerState({});
+    const state = useOverlayTriggerState({});
+    const editState = useOverlayTriggerState({});
+    const [isPending, setIsPending] = useState<boolean>(false);
     const router = useRouter();
-
-    const editModal = () => {
-        setIsNew(false);
-        slideOverState.open();
-    };
-
-    const openModal = () => {
-        setIsNew(true);
-        slideOverState.open();
-    };
 
     const onConfirmDelete = async () => {
         if (!category) {
             return;
         }
         try {
+            setIsPending(true);
             await deleteCategory(category.id!);
             router.refresh();
-            deleteModalState.close();
+            deleteState.close();
         } catch (error) {
-            enqueueSnackbar("Error deleting category", { variant: "error" });
+            toast.error("Error deleting category");
+        } finally {
+            setIsPending(false);
         }
     };
 
@@ -55,63 +46,53 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
         <React.Fragment>
             <div className="flex items-center gap-2">
                 {canAdd && (
-                    <button aria-label="add categories" onClick={openModal}>
-                        <Plus />
-                    </button>
+                    <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
+                        <DrawerTrigger>
+                            <Plus />
+                        </DrawerTrigger>
+                        <DrawerContent className="px-8">
+                            <DrawerHeader>
+                                <DrawerTitle>Add SubCat to {category?.name}</DrawerTitle>
+                            </DrawerHeader>
+                            <div className="max-w-2xl">
+                                <CategoryForm hasParent parent_id={category?.id} onClose={state.close} />
+                            </div>
+                        </DrawerContent>
+                    </Drawer>
                 )}
-                <Dropdown align="end" trigger={<EllipsisHorizontal />}>
-                    <div>
-                        <div className="bg-default-100 rounded-lg shadow-md p-3 min-w-[100px] text-sm font-medium">
-                            <div className="mb-2">
-                                <button aria-label="edit category" className="flex w-full items-center" onClick={editModal}>
-                                    <span className="mr-2">
-                                        <PencilSquare />
-                                    </span>
-                                    <span>Edit</span>
-                                </button>
-                            </div>
-                            <div>
-                                <button
-                                    aria-label="delete catrgory"
-                                    className={cn("flex w-full items-center text-rose-500", {
-                                        "pointer-events-none select-none opacity-50": category?.children.length > 0,
-                                    })}
-                                    disabled={category?.children.length > 0}
-                                    onClick={deleteModalState.open}
-                                >
-                                    <span className="mr-2">
-                                        <Trash />
-                                    </span>
-                                    <span>Delete</span>
-                                </button>
-                            </div>
+                <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
+                    <DrawerTrigger>
+                        <PencilSquare />
+                    </DrawerTrigger>
+                    <DrawerContent className="px-8">
+                        <DrawerHeader>
+                            <DrawerTitle>Edit {category?.name}</DrawerTitle>
+                        </DrawerHeader>
+                        <div className="max-w-2xl">
+                            <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
                         </div>
-                    </div>
-                </Dropdown>
+                    </DrawerContent>
+                </Drawer>
+                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                    <DialogTrigger>
+                        <Trash className="text-rose-500" />
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Category</DialogTitle>
+                        </DialogHeader>
+                        <p>Are you sure you want to delete this category?</p>
+                        <DialogFooter>
+                            <Button aria-label="close" className="min-w-36" variant="outline" onClick={deleteState.close}>
+                                Close
+                            </Button>
+                            <Button aria-label="delete" className="min-w-36" isLoading={isPending} variant="destructive" onClick={onConfirmDelete}>
+                                Delete
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
-            {slideOverState.isOpen && (
-                <SlideOver
-                    className="bg-default-100"
-                    isOpen={slideOverState.isOpen}
-                    title={isNew ? `Add SubCat to ${category?.name}` : "Edit Category"}
-                    onClose={slideOverState.close}
-                >
-                    {slideOverState.isOpen && (
-                        <CategoryForm
-                            hasParent
-                            current={isNew ? undefined : category}
-                            parent_id={category?.id}
-                            type={isNew ? "create" : "update"}
-                            onClose={slideOverState.close}
-                        />
-                    )}
-                </SlideOver>
-            )}
-            {deleteModalState.isOpen && (
-                <Modal isOpen={deleteModalState.isOpen} onClose={deleteModalState.close}>
-                    <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
-                </Modal>
-            )}
         </React.Fragment>
     );
 };

@@ -33,7 +33,11 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
         return <ServerError />;
     }
     const { collections, ...pagination } = res;
-    const customer = await api.user.me();
+    const { data: customer, error } = await api.user.me();
+
+    if (error || !customer) {
+        return <ServerError />;
+    }
 
     const deleteCollection = async (id: string) => {
         "use server";
@@ -46,7 +50,7 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
                 <div className="max-w-7xl mx-auto p-8">
                     <h1 className="text-2xl font-semibold mb-2">Collections</h1>
                     <div className="py-4">
-                        <ProductUpload userId={customer.id} />
+                        <ProductUpload userId={customer?.id} />
                     </div>
                     <Table
                         canExport

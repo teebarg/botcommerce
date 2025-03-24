@@ -10,95 +10,87 @@ from fastapi import (
     Query,
     UploadFile,
 )
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import func, or_, select
+from math import ceil
+from prisma.errors import PrismaError
 
-from app.core import crud
-from app.core.decorators import cache
-from app.core.deps import (
-    CacheService,
-    CurrentUser,
-    SessionDep,
-    Storage,
-    get_current_user,
-)
+from app.core.deps import get_current_user
 from app.core.logging import logger
-from app.models.generic import Tag
-from app.models.message import Message
+from app.models.generic import Message
 from app.models.tag import (
     Search,
     TagCreate,
-    TagPublic,
     Tags,
+    Tag,
     TagUpdate,
 )
-from app.services.export import export, process_file, validate_file
+from app.services.export import export, validate_file
+from app.prisma_client import prisma as db
+from app.core.utils import slugify
 
 # Create a router for tags
 router = APIRouter()
 
 
 @router.get("/", dependencies=[Depends(get_current_user)])
-@cache(key="tags")
+# @cache(key="tags")
 async def index(
-    db: SessionDep,
-    name: str = "",
+    query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
-) -> Tags:
+):
     """
     Retrieve tags.
     """
-    query = {"name": name}
-    filters = crud.tag.build_query(query)
-
-    count_statement = select(func.count()).select_from(Tag)
-    if filters:
-        count_statement = count_statement.where(or_(*filters))
-    total_count = db.exec(count_statement).one()
-
-    tags = crud.tag.get_multi(
-        db=db,
-        filters=filters,
-        limit=limit,
-        offset=(page - 1) * limit,
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    tags = await db.tag.find_many(
+        where=where_clause,
+        skip=(page - 1) * limit,
+        take=limit,
+        order={"created_at": "desc"},
     )
-
-    total_pages = (total_count // limit) + (total_count % limit > 0)
-
-    return Tags(
-        tags=tags,
-        page=page,
-        limit=limit,
-        total_pages=total_pages,
-        total_count=total_count,
-    )
+    total = await db.tag.count(where=where_clause)
+    return {
+        "tags":tags,
+        "page":page,
+        "limit":limit,
+        "total_pages":ceil(total/limit),
+        "total_count":total,
+    }
 
 
 @router.post("/")
-async def create(*, db: SessionDep, create_data: TagCreate, cache: CacheService) -> TagPublic:
+async def create(*, create_data: TagCreate) -> Tag:
     """
     Create new tag.
     """
-    tag = crud.tag.get_by_key(db=db, value=create_data.name)
-    if tag:
-        raise HTTPException(
-            status_code=400,
-            detail="The tag already exists in the system.",
+    try:
+        tag = await db.tag.create(
+            data={
+                "name": create_data.name,
+                "slug": slugify(create_data.name)
+            }
         )
-
-    tag = crud.tag.create(db=db, obj_in=create_data)
-    cache.invalidate("tags")
-    return tag
+        return tag
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{id}")
-@cache(key="tag")
-async def read(id: int, db: SessionDep) -> TagPublic:
+# @cache(key="tag")
+async def read(id: int) -> Tag:
     """
     Get a specific tag by id.
     """
-    tag = crud.tag.get(db=db, id=id)
+    tag = await db.tag.find_unique(
+        where={"id": id}
+    )
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")
     return tag
@@ -107,57 +99,46 @@ async def read(id: int, db: SessionDep) -> TagPublic:
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])
 async def update(
     *,
-    db: SessionDep,
-    cache: CacheService,
     id: int,
     update_data: TagUpdate,
-) -> TagPublic:
+) -> Tag:
     """
     Update a tag.
     """
-    tag = crud.tag.get(db=db, id=id)
-    if not tag:
-        raise HTTPException(
-            status_code=404,
-            detail="Tag not found",
-        )
+    existing = await db.tag.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Tag not found")
 
     try:
-        tag = crud.tag.update(db=db, db_obj=tag, obj_in=update_data)
-        # Invalidate cache
-        cache.delete(f"tag:{id}")
-        cache.invalidate("tags")
-        return tag
-    except IntegrityError as e:
-        logger.error(f"Error updating tag, {e.orig.pgerror}")
-        raise HTTPException(status_code=422, detail=str(e.orig.pgerror)) from e
-    except Exception as e:
-        logger.error(f"An error occurred: {e}")
-        raise HTTPException(
-            status_code=400,
-            detail=str(e),
-        ) from e
+        update = await db.tag.update(
+            where={"id": id},
+            data=update_data.model_dump()
+        )
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-async def delete(id: int, db: SessionDep, cache: CacheService) -> Message:
+async def delete(id: int) -> Message:
     """
     Delete a tag.
     """
+    existing = await db.tag.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Tag not found")
+
     try:
-        tag = crud.tag.get(db=db, id=id)
-        if not tag:
-            raise HTTPException(status_code=404, detail="Tag not found")
-        crud.tag.remove(db=db, id=id)
-        # Invalidate cache
-        cache.delete(f"tag:{id}")
-        cache.invalidate("tags")
+        await db.tag.delete(
+            where={"id": id}
+        )
         return Message(message="Tag deleted successfully")
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        ) from e
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.post("/excel/{task_id}")
@@ -165,50 +146,33 @@ async def upload_tags(
     file: Annotated[UploadFile, File()],
     batch: Annotated[str, Form()],
     task_id: str,
-    db: SessionDep,
     background_tasks: BackgroundTasks,
 ):
     await validate_file(file=file)
 
     contents = await file.read()
-    background_tasks.add_task(process_file, contents, task_id, db, crud.tag.bulk_upload)
+    background_tasks.add_task(process_file, contents, task_id, db)
     return {"batch": batch, "message": "File upload started"}
 
 
-@router.post("/export")
-async def export_tags(
-    current_user: CurrentUser, db: SessionDep, bucket: Storage
-):
-    try:
-        tags = db.exec(select(Tag))
-        file_url = await export(
-            columns=["name", "slug"],
-            data=tags,
-            name="Tag",
-            bucket=bucket,
-            email=current_user.email,
-        )
-
-        return {"message": "Data Export successful", "file_url": file_url}
-    except Exception as e:
-        logger.error(f"Export tags error: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) from e
-
-
 @router.get("/autocomplete/")
-@cache(key="tags")
+# @cache(key="tags")
 async def autocomplete(
-    db: SessionDep,
     search: str = "",
 ) -> Any:
     """
     Retrieve tags for autocomplete.
     """
-    statement = select(Tag)
+    where_clause = None
     if search:
-        statement = statement.where(
-            or_(Tag.name.like(f"%{search}%"), Tag.slug.like(f"%{search}%"))
-        )
-
-    data = db.exec(statement).all()
-    return Search(results=data)
+        where_clause = {
+            "OR": [
+                {"name": {"contains": search, "mode": "insensitive"}},
+                {"slug": {"contains": search, "mode": "insensitive"}}
+            ]
+        }
+    tags = await db.tag.find_many(
+        where=where_clause,
+        order={"created_at": "desc"},
+    )
+    return Search(results=tags)

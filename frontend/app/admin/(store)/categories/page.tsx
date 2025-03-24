@@ -6,6 +6,7 @@ import AddCategory from "@modules/admin/categories/add-categories";
 import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import { Category } from "@/lib/models";
+import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
@@ -23,7 +24,15 @@ export default async function CategoriesPage(props: { searchParams: SearchParams
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "100", 10);
-    const { categories: cat } = await api.category.all({ search, page, limit });
+    const res = await api.category.all({ search, page, limit });
+
+    if (res.error) {
+        return <ServerError />;
+    }
+    if (!res.data) {
+        return <>No Categories</>;
+    }
+    const { categories: cat } = res.data;
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 
     return (

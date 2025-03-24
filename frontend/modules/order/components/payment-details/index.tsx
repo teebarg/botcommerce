@@ -7,7 +7,7 @@ type PaymentDetailsProps = {
 };
 
 const PaymentDetails = ({ order }: PaymentDetailsProps) => {
-    const payment = order.payment_session;
+    const payment = order.payment_method;
 
     return (
         <div>
@@ -18,13 +18,13 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
                         <div className="flex flex-col">
                             <p className="text-base text-default-900">Payment method</p>
                             <p className="text-xs md:text-base text-default-500" data-testid="payment-method">
-                                {paymentInfoMap[payment.id]?.title}
+                                {order.payment_method}
                             </p>
                         </div>
                         <div className="flex flex-col col-span-2">
                             <p className="text-base text-default-900">Payment details</p>
                             <div className="flex gap-2 txt-medium text-default-900 items-center">
-                                <div className="flex items-center h-7 w-fit p-2 bg-default rounded-md">{paymentInfoMap[payment.id]?.icon}</div>
+                                <div className="flex items-center h-7 w-fit p-2 bg-default rounded-md">{paymentInfoMap[payment]?.icon}</div>
                             </div>
                         </div>
                     </div>

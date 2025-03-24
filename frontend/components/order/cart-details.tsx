@@ -8,77 +8,65 @@ import Image from "next/image";
 import { currency } from "@lib/util/util";
 
 import Control from "@/modules/cart/templates/control";
-import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";
 import { CartItem } from "@/lib/models";
 
 type ItemsTemplateProps = {
     items: CartItem[];
-    isOrder?: boolean;
 };
 
-const Items = ({ items, isOrder = true }: ItemsTemplateProps) => {
+const CartItems = ({ items }: ItemsTemplateProps) => {
     return (
         <div>
             <div className="hidden md:block">
                 <Table isDataOnly columns={["Item", "", "Quantity", "Price", "Total"]}>
-                    {items
-                        ?.sort((a: CartItem, b: CartItem) => (a.created_at > b.created_at ? -1 : 1))
-                        .map((item: CartItem) => (
-                            <tr key={item.product_id} className="even:bg-content2">
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default-900 sm:pl-3">
-                                    <LocalizedClientLink className="flex sm:w-20 w-12" href={`/products/${item?.slug}`}>
-                                        <Thumbnail size="square" thumbnail={item.image} />
-                                    </LocalizedClientLink>
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <p className={cn("font-medium text-default-900", !isOrder && "truncate max-w-72")} data-testid="product-title">
-                                        {item.name}
-                                    </p>
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm">{isOrder ? <p>{item.quantity}</p> : <Control item={item} />}</td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <LineItemUnitPrice item={item} style="tight" />
-                                </td>
-                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
-                                    <span className="!pr-0">
-                                        <LineItemPrice item={item} />
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
+                    {items.map((item: CartItem, idx: number) => (
+                        <tr key={idx} className="even:bg-content2">
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default-900 sm:pl-3">
+                                <LocalizedClientLink className="flex sm:w-20 w-12" href={`/products/${item?.variant.slug}`}>
+                                    <Thumbnail size="square" thumbnail={item.image} />
+                                </LocalizedClientLink>
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                <p className="font-medium text-default-900 truncate max-w-72" data-testid="product-title">
+                                    {item.variant.name}
+                                </p>
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                <Control item={item} />
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                <LineItemUnitPrice item={item} style="tight" />
+                            </td>
+                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
+                                <span className="!pr-0">
+                                    <LineItemPrice item={item} />
+                                </span>
+                            </td>
+                        </tr>
+                    ))}
                 </Table>
             </div>
             <div className="md:hidden">
                 <div className="py-0">
                     <div className="space-y-4">
-                        {items
-                            ?.sort((a: CartItem, b: CartItem) => (a.created_at > b.created_at ? -1 : 1))
-                            .map((item: CartItem, index: number) => (
-                                <div key={index} className="flex items-center space-x-4 py-4 border-b">
-                                    <div className="w-20 h-20 object-cover rounded relative">
-                                        <Image fill alt={item.name} src={item.image as string} />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-sm font-medium line-clamp-1">{item.name}</h3>
-                                        {isOrder ? (
-                                            <span className="text-sm font-medium text-default-900 flex items-center">
-                                                {item.quantity} @ {currency(item.price)}
-                                            </span>
-                                        ) : (
-                                            <Control item={item} />
-                                        )}
-                                    </div>
-                                    <div className="flex flex-col items-end">
-                                        {!isOrder && (
-                                            <span className="text-sm font-medium text-default-900 flex items-center">
-                                                {item.quantity} @ {currency(item.price)}
-                                            </span>
-                                        )}
-                                        <span className="text-xl font-medium">{currency(item.price * item.quantity)}</span>
-                                    </div>
+                        {items.map((item: CartItem, idx: number) => (
+                            <div key={idx} className="flex items-center space-x-4 py-4 border-b">
+                                <div className="w-20 h-20 object-cover rounded relative">
+                                    <Image fill alt={item.variant.name} src={item.image as string} />
                                 </div>
-                            ))}
+                                <div className="flex-1">
+                                    <h3 className="text-sm font-medium line-clamp-1">{item.variant.name}</h3>
+                                    <Control item={item} />
+                                </div>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-sm font-medium text-default-900 flex items-center">
+                                        {item.quantity} @ {currency(item.price)}
+                                    </span>
+                                    <span className="text-xl font-medium">{currency(item.price * item.quantity)}</span>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -86,4 +74,4 @@ const Items = ({ items, isOrder = true }: ItemsTemplateProps) => {
     );
 };
 
-export default Items;
+export default CartItems;

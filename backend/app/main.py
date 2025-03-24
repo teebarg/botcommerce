@@ -1,7 +1,9 @@
 from datetime import datetime
+import logging
+import time
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Request
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -15,12 +17,10 @@ from app.core.utils import (
     send_email,
 )
 from app.models.generic import (
-    Category,
-    Collection,
     ContactFormCreate,
-    NewsletterCreate,
-    Product,
+    NewsletterCreate
 )
+from app.prisma_client import prisma
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
 
@@ -33,8 +33,37 @@ app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
 #         print(f"Client host: {client_host}")  # Log the client IP
 #         return await call_next(request)
 
-# # Add middleware to the app
-# app.add_middleware(ClientHostMiddleware)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("api")
+
+class TimingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Record start time
+        start_time = time.time()
+
+        # Process the request
+        response = await call_next(request)
+
+        # Calculate duration
+        duration = time.time() - start_time
+
+        # Format for pretty printing (milliseconds with 2 decimal places)
+        duration_ms = round(duration * 1000, 2)
+
+        # Log the request method, path, and duration
+        logger.info(f"{request.method} {request.url.path} - {duration_ms}ms")
+
+        return response
+
+# Add the timing middleware only in development
+# if app.debug:  # If you have a way to detect dev environment
+#     app.add_middleware(TimingMiddleware)
+
+app.add_middleware(TimingMiddleware)
+
+print("settings.all_cors_origins.....")
+print(settings.all_cors_origins)
 
 # Set all CORS enabled origins
 if settings.all_cors_origins:
@@ -101,7 +130,7 @@ async def log_error(error: dict, notification: deps.Notification):
 
 
 @app.get("/sitemap.xml", response_class=Response)
-async def generate_sitemap(db: deps.SessionDep, cache: deps.CacheService ):
+async def generate_sitemap(cache: deps.CacheService ):
     base_url = settings.FRONTEND_HOST
 
     # Try to get sitemap from cache first
@@ -110,9 +139,9 @@ async def generate_sitemap(db: deps.SessionDep, cache: deps.CacheService ):
         return Response(content=cached_sitemap, media_type="application/xml")
 
     # If not in cache, fetch from database
-    products = db.query(Product).with_entities(Product.slug).all()
-    categories = db.query(Category).with_entities(Category.slug).all()
-    collections = db.query(Collection).with_entities(Collection.slug).all()
+    products = await prisma.product.find_many()
+    categories = await prisma.category.find_many()
+    collections = await prisma.collection.find_many()
 
     urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
@@ -184,3 +213,13 @@ async def generate_sitemap(db: deps.SessionDep, cache: deps.CacheService ):
 #                 aio_pika.Message(body=order_data.encode()),
 #                 routing_key=product_queue.name,
 #             )
+
+
+@app.on_event("startup")
+async def startup():
+    await prisma.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await prisma.disconnect()
+

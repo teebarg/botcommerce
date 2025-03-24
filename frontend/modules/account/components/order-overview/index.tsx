@@ -5,12 +5,12 @@ import OrderCard from "../order-card";
 import { Order } from "@/lib/models";
 import { BtnLink } from "@/components/ui/btnLink";
 
-const OrderOverview = ({ orders }: { orders: any[] }) => {
+const OrderOverview = ({ orders }: { orders: Order[] }) => {
     if (orders?.length) {
         return (
             <div className="flex flex-col gap-y-8 w-full">
-                {orders?.map((o: Order, i: number) => (
-                    <div key={`order-${i}`} className="border-b border-gray-200 pb-6 last:pb-0 last:border-none">
+                {orders?.map((o: Order, idx: number) => (
+                    <div key={`order-${idx}`} className="border-b border-gray-200 pb-6 last:pb-0 last:border-none">
                         <OrderCard order={o} />
                     </div>
                 ))}

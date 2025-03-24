@@ -1,42 +1,43 @@
 import { fetcher } from "./fetcher";
 
-import { User, Wishlist } from "@/lib/models";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { Message, User, Wishlist } from "@/lib/models";
+import { revalidate } from "@/actions/revalidate";
 
 // User API methods
 export const userApi = {
-    async me(): Promise<User> {
-        try {
-            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`;
-            const response = await fetcher<User>(url, { next: { tags: ["user"] } });
-
-            return response;
-        } catch (error) {
-            return null as unknown as User;
-        }
-    },
-    async wishlist(): Promise<Wishlist | null> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
-
-        try {
-            const response = await fetcher<Wishlist>(url, { next: { tags: ["wishlist"] } });
-
-            return response;
-        } catch (error) {
-            return null;
-        }
-    },
-    async addWishlist(product_id: number): Promise<Wishlist> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
-        const response = await fetcher<Wishlist>(url, { method: "POST", body: JSON.stringify({ product_id }) });
+    async me(): ApiResult<User> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/me`;
+        const response = await tryCatch<User>(fetcher(url, { next: { tags: ["user"] } }));
 
         return response;
     },
-    async deleteWishlist(id: number): Promise<{ success: boolean; message: string }> {
+    async wishlist(): ApiResult<Wishlist> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
+        const response = await tryCatch<Wishlist>(fetcher(url, { next: { tags: ["wishlist"] } }));
+
+        return response;
+    },
+    async addWishlist(product_id: number): ApiResult<Wishlist> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist`;
+        const response = await tryCatch<Wishlist>(fetcher(url, { method: "POST", body: JSON.stringify({ product_id }) }));
+
+        if (!response.error) {
+            revalidate("wishlist");
+        }
+
+        return response;
+    },
+    async deleteWishlist(id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/wishlist/${id}`;
 
-        await fetcher<{ message: string }>(url, { method: "DELETE" });
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
 
-        return { success: true, message: "Wishlist deleted successfully" };
+        if (!response.error) {
+            revalidate("wishlist");
+        }
+
+        return response;
     },
     async create(input: User): Promise<User> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/`;
@@ -44,17 +45,24 @@ export const userApi = {
 
         return response;
     },
-    async update(id: string, input: User): Promise<User> {
+    async update(id: number, input: any): ApiResult<User> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${id}`;
-        const response = await fetcher<User>(url, { method: "PATCH", body: JSON.stringify(input) });
+        const response = await tryCatch<User>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
+
+        if (!response.error) {
+            revalidate("user");
+        }
 
         return response;
     },
-    async delete(id: string): Promise<{ success: boolean; message: string }> {
+    async delete(id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${id}`;
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
 
-        await fetcher<{ message: string }>(url, { method: "DELETE" });
+        if (!response.error) {
+            revalidate("user");
+        }
 
-        return { success: true, message: "User deleted successfully" };
+        return response;
     },
 };

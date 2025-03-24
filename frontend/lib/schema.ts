@@ -1,18 +1,82 @@
 import { z } from "zod";
 
+// Zod Enums
+export const OrderStatusSchema = z.enum(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELED"]);
+
+export const DiscountTypeSchema = z.enum(["PERCENTAGE", "FIXED_AMOUNT"]);
+
+export const PaymentMethodSchema = z.enum(["CREDIT_CARD", "PAYPAL", "CASH_ON_DELIVERY", "BANK_TRANSFER", "PAYSTACK"]);
+
+export const ProductStatusSchema = z.enum(["IN_STOCK", "OUT_OF_STOCK"]);
+
+export const CartStatusSchema = z.enum(["ACTIVE", "ABANDONED", "CONVERTED"]);
+
+export const PaymentStatusSchema = z.enum(["PENDING", "COMPLETED", "FAILED"]);
+
+export const ShippingMethodSchema = z.enum(["STANDARD", "EXPRESS", "PICKUP"]);
+
+export const RoleSchema = z.enum(["admin", "customer"]);
+
+export const StatusSchema = z.enum(["pending", "active", "inactive"]);
+
 export const TokenSchema = z.object({
     access_token: z.string(),
     token_type: z.string().default("bearer"),
 });
 
+export const PagSchema = z.object({
+    page: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
+});
+
+export const AddressSchema = z.object({
+    id: z.number(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional(),
+    first_name: z.string(),
+    last_name: z.string(),
+    address_1: z.string(),
+    address_2: z.string(),
+    city: z.string(),
+    postal_code: z.string(),
+    state: z.string(),
+    phone: z.string(),
+    is_billing: z.boolean().optional(),
+});
+
+export const PaginatedAddressSchema = PagSchema.extend({
+    addresses: z.array(AddressSchema),
+});
+
+export const CategorySchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    is_active: z.boolean(),
+    parent_id: z.number().nullable(),
+    parent: z.null(),
+    subcategories: z.array(z.any()).optional(),
+    products: z.null(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const PaginatedCategorySchema = PagSchema.extend({
+    categories: z.array(CategorySchema),
+});
+
 export const UserSchema = z.object({
     id: z.number(),
-    firstname: z.string(),
-    lastname: z.string().optional(),
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
-    is_active: z.boolean().optional(),
-    is_superuser: z.boolean().optional(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
+    email: z.string().email(),
+    emailVerified: z.string(),
+    status: z.string(),
+    hashed_password: z.string(),
+    image: z.string().optional(),
+    role: z.string(),
     created_at: z.string().optional(),
     billing_addresses: z.array(z.record(z.any())).optional(),
     shipping_addresses: z.array(z.record(z.any())).optional(),
@@ -36,36 +100,39 @@ export const PaginatedReviewSchema = z.object({
     total_pages: z.number(),
 });
 
-export const ProductSchema = z.object({
+export const ProductVariantSchema = z.object({
     id: z.number(),
+    product: z.null(),
+    product_id: z.number(),
     name: z.string(),
     slug: z.string(),
-    description: z.string().optional(),
+    sku: z.string(),
+    status: ProductStatusSchema,
     price: z.number(),
     old_price: z.number(),
-    image: z.string(),
-    images: z.array(z.string()).optional(),
-    is_active: z.boolean().optional(),
-    ratings: z.number().optional(),
-    inventory: z.number().optional(),
-    created_at: z.string().optional(),
-    collections: z.array(z.string()),
-    reviews: z.array(ReviewSchema).optional(),
+    inventory: z.number(),
+    attributes: z.record(z.string()),
+    order_items: z.null(),
+    cart_items: z.null(),
+    created_at: z.string(),
+    updated_at: z.string(),
 });
 
-export const PagSchema = z.object({
-    page: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
+export const ProductImageSchema = z.object({
+    id: z.number(),
+    product_id: z.number(),
+    image: z.string(),
+    created_at: z.string().optional(),
 });
 
 export const BrandSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
-    is_active: z.boolean().optional(),
+    is_active: z.boolean(),
+    products: z.null(),
     created_at: z.string(),
+    updated_at: z.string(),
 });
 
 export const PaginatedBrandSchema = PagSchema.extend({
@@ -76,8 +143,10 @@ export const CollectionSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
-    is_active: z.boolean().optional(),
+    is_active: z.boolean(),
+    products: z.null(),
     created_at: z.string(),
+    updated_at: z.string(),
 });
 
 export const PaginatedCollectionSchema = PagSchema.extend({
@@ -91,12 +160,55 @@ const PaginationSchema = z.object({
     total_pages: z.number(),
 });
 
-export const CartItemSchema = z.object({
-    item_id: z.string(),
-    product_id: z.string(),
-    slug: z.string(),
+export const ProductSearchSchema = z.object({
+    id: z.number(),
     name: z.string(),
-    description: z.string().optional(),
+    slug: z.string(),
+    sku: z.string(),
+    description: z.string(),
+    price: z.number(),
+    old_price: z.number(),
+    image: z.string(),
+    status: ProductStatusSchema,
+    variants: z.array(ProductVariantSchema).nullable(),
+    ratings: z.number(),
+    categories: z.array(z.string()),
+    collections: z.array(z.string()),
+    brands: z.array(z.string()),
+    tags: z.null(),
+    images: z.array(z.string()),
+    reviews: z.array(z.any()).nullable(),
+    favorites: z.null(),
+});
+
+export const ProductSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    sku: z.string(),
+    description: z.string(),
+    price: z.number(),
+    old_price: z.number(),
+    image: z.string(),
+    status: ProductStatusSchema,
+    variants: z.array(ProductVariantSchema),
+    ratings: z.number(),
+    categories: z.array(CategorySchema),
+    collections: z.array(CollectionSchema),
+    brands: z.array(BrandSchema),
+    tags: z.null(),
+    images: z.array(ProductImageSchema),
+    reviews: z.array(ReviewSchema),
+    favorites: z.null(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const CartItemSchema = z.object({
+    id: z.number(),
+    item_id: z.string(),
+    variant_id: z.string(),
+    variant: ProductVariantSchema,
     image: z.string().optional(),
     quantity: z.number(),
     price: z.number(),
@@ -104,20 +216,22 @@ export const CartItemSchema = z.object({
 });
 
 export const CartSchema = z.object({
-    cart_id: z.string(),
-    customer_id: z.string(),
+    id: z.number(),
+    cart_number: z.string(),
+    user_id: z.number(),
     email: z.string().email(),
+    status: z.enum(["pending", "processing", "fulfilled"]).optional(),
     items: z.array(CartItemSchema),
-    checkout_step: z.enum(["address", "delivery", "payment"]).optional(),
+    checkout_step: z.enum(["address", "delivery", "payment"]).default("address").optional(),
     subtotal: z.number(),
-    tax_total: z.number(),
+    tax: z.number(),
+    shipping_fee: z.number(),
     discount_total: z.number(),
-    delivery_fee: z.number(),
     total: z.number(),
-    billing_address: z.record(z.any()),
-    shipping_address: z.record(z.any()),
-    shipping_method: z.any(),
-    payment_session: z.any(),
+    billing_address: AddressSchema,
+    shipping_address: AddressSchema,
+    shipping_method: ShippingMethodSchema,
+    payment_method: PaymentMethodSchema,
     gift_cards: z.any(),
 });
 
@@ -132,59 +246,42 @@ const PaymentSessionSchema = z.object({
     provider_id: z.string(),
 });
 
+export const OrderItemSchema = z.object({
+    id: z.number(),
+    order_id: z.number(),
+    variant_id: z.string(),
+    variant: ProductVariantSchema,
+    image: z.string().optional(),
+    quantity: z.number(),
+    price: z.number(),
+    created_at: z.string(),
+});
+
 export const OrderSchema = z.object({
-    order_id: z.string(),
-    status: z.enum(["pending", "processing", "fulfilled"]).optional(),
-    fulfillment_status: z.enum(["fulfilled", "not_fulfilled"]),
+    id: z.number(),
+    order_number: z.string(),
+    status: OrderStatusSchema,
+    email: z.string(),
     cart_id: z.string(),
-    customer_id: z.string(),
-    email: z.string().email(),
-    line_items: z.array(CartItemSchema),
-    checkout_step: z.enum(["address", "delivery", "payment"]).optional(),
+    user_id: z.number(),
+    user: UserSchema,
+    order_items: z.array(OrderItemSchema),
     subtotal: z.number(),
-    tax_total: z.number(),
-    delivery_fee: z.number(),
+    tax: z.number(),
+    shipping_fee: z.number(),
     total: z.number(),
-    billing_address: z.record(z.any()),
-    shipping_address: z.record(z.any()),
-    shipping_method: z.record(z.any()),
-    payment_session: z.record(z.any()),
-    fulfillments: z.array(z.record(z.any())),
+    coupon: z.number().optional(),
+    billing_address: AddressSchema,
+    shipping_address: AddressSchema,
+    shipping_method: ShippingMethodSchema,
+    payment_method: PaymentMethodSchema,
     payment_status: z.enum(["pending", "paid"]),
     created_at: z.string(),
+    updated_at: z.string(),
 });
 
 export const PaginatedOrderSchema = PagSchema.extend({
     orders: z.array(OrderSchema),
-});
-
-const AddressSchema = z.object({
-    created_at: z.string(),
-    updated_at: z.string(),
-    firstname: z.string(),
-    lastname: z.string(),
-    address_1: z.string(),
-    address_2: z.string(),
-    city: z.string(),
-    postal_code: z.string(),
-    state: z.string(),
-    phone: z.string(),
-    id: z.string(),
-});
-
-export const CategorySchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    slug: z.string().optional(),
-    is_active: z.boolean().default(true),
-    children: z.any().optional(),
-    parent_id: z.number().optional(),
-    created_at: z.string(),
-    updated_at: z.string(),
-});
-
-export const PaginatedCategorySchema = PagSchema.extend({
-    categories: z.array(CategorySchema),
 });
 
 export const WishItemSchema = z.object({
@@ -193,6 +290,7 @@ export const WishItemSchema = z.object({
     description: z.string().optional(),
     user_id: z.number().optional(),
     product_id: z.number().optional(),
+    product: ProductSchema,
     image: z.string(),
     created_at: z.string().optional(),
 });
@@ -219,20 +317,26 @@ export const FacetSchema = z.object({
     collections: z.record(z.string()).optional(),
 });
 
+export const PaginatedProductSearchSchema = PagSchema.extend({
+    products: z.array(ProductSearchSchema),
+    facets: FacetSchema.optional(),
+});
+
 export const PaginatedProductSchema = PagSchema.extend({
     products: z.array(ProductSchema),
-    facets: FacetSchema.optional(),
 });
 
 export const SessionSchema = z.object({
     id: z.number(),
-    firstname: z.string(),
-    lastname: z.string().optional(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
     email: z.string(),
     image: z.string().optional(),
     phone: z.string().optional(),
     isActive: z.boolean(),
     isAdmin: z.boolean(),
+    status: z.string(),
+    role: z.string(),
 });
 
 export const MessageSchema = z.object({

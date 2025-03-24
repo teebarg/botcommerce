@@ -143,7 +143,7 @@ export function Listbox({ options, value, onChange, placeholder = "Select an opt
     const [searchQuery, setSearchQuery] = useState("");
     const selectedOption = options.find((option) => option.id === value);
 
-    const filteredOptions = options.filter((option) => option?.firstname?.toLowerCase().includes(searchQuery?.toLowerCase()));
+    const filteredOptions = options.filter((option) => option?.first_name?.toLowerCase().includes(searchQuery?.toLowerCase()));
 
     const handleSelect = useCallback(
         (optionId: string) => {

@@ -96,7 +96,7 @@ function PushNotificationManager() {
         const permissionGranted = await requestNotificationPermission();
 
         if (!permissionGranted) {
-            enqueueSnackbar("Notification permission not granted", { variant: "error" });
+            // enqueueSnackbar("Notification permission not granted", { variant: "error" });
 
             return;
         }

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import React from "react";
-import { ArrowUpRightMini, ExclamationIcon } from "nui-react-icons";
+import { ArrowUpRightMini, Exclamation } from "nui-react-icons";
 
 import Reload from "@/components/reload";
 import { BtnLink } from "@/components/ui/btnLink";
@@ -14,7 +14,7 @@ const NotFound: React.FC = async () => {
     return (
         <div className="min-h-[50vh] flex items-center justify-center">
             <div className="max-w-2xl mx-auto text-center px-4">
-                <ExclamationIcon className="w-20 h-20 mx-auto text-danger mb-8" />
+                <Exclamation className="w-20 h-20 mx-auto text-danger mb-8" />
                 <h1 className="text-4xl font-bold text-default-900 mb-4">Product Not Found</h1>
                 <p className="text-lg text-default-600 mb-8">
                     {`We couldn't find the product you're looking for. It might have been removed or is temporarily unavailable.`}

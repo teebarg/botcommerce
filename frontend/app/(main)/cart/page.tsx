@@ -7,12 +7,12 @@ import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 import RecommendedProducts from "@/modules/products/components/recommended";
 import { siteConfig } from "@/lib/config";
-import Items from "@/components/order/cart-details";
 import PromotionalBanner from "@/components/promotion";
 import { auth } from "@/actions/auth";
 import { api } from "@/apis";
 import { CartItem } from "@/lib/models";
 import ServerError from "@/components/server-error";
+import CartItems from "@/components/order/cart-details";
 
 export const metadata: Metadata = {
     title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
@@ -20,13 +20,18 @@ export const metadata: Metadata = {
 };
 
 export default async function Cart() {
-    const cart = await api.cart.get();
-    if ("error" in cart) {
+    const { data: cart, error } = await api.cart.get();
+
+    if (error) {
         return <ServerError />;
+    }
+
+    if (!cart) {
+        return <EmptyCartMessage />;
     }
     const user = await auth();
 
-    const product_ids = cart?.items?.map((x: CartItem) => x.product_id);
+    const product_ids = cart?.items?.map((x: CartItem) => x.variant_id);
 
     return (
         <>
@@ -51,7 +56,7 @@ export default async function Cart() {
                                 <div className="pb-1 flex items-center">
                                     <h3 className="text-2xl">Cart</h3>
                                 </div>
-                                <Items isOrder={false} items={cart?.items} />
+                                <CartItems items={cart?.items} />
                             </div>
                             <div className="relative hidden md:block">
                                 <div className="flex flex-col gap-y-8 sticky top-12">

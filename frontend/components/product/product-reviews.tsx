@@ -101,7 +101,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
             <div className="flex justify-between items-start mb-2">
                 <div>
                     <div className="flex items-center">
-                        <span className="font-semibold mr-2">{review?.user?.firstname}</span>
+                        <span className="font-semibold mr-2">{review?.user?.first_name}</span>
                         {review.verified && <Chip color="success" title="Verified" />}
                     </div>
                     <div className="flex">

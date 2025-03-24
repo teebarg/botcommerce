@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { EditIcon } from "nui-react-icons";
+import { Edit } from "nui-react-icons";
 import { DragNDrop } from "@modules/admin/components/drag-drop";
 import { FileTypes } from "types/global";
 import { useSnackbar } from "notistack";
@@ -34,12 +34,6 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
         const formData = new FormData();
 
         formData.append("file", file);
-        console.log("formData");
-        console.log(formData);
-        console.dir(formData);
-        console.dir(formData.get("file"));
-        console.dir("form data end");
-        console.log(file);
 
         try {
             await onUpload(formData);
@@ -78,7 +72,7 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                                 <Image fill alt="Product" src={preview} />
                             </div>
                             <Button aria-label="preview" onClick={() => setPreview(undefined)}>
-                                <EditIcon size={24} />
+                                <Edit size={24} />
                             </Button>
                         </div>
                     </React.Fragment>
@@ -95,10 +89,9 @@ const ImageUpload: React.FC<Props> = ({ onUpload, defaultImage = "" }) => {
                     <Button
                         aria-label="upload"
                         className="min-w-24 mt-2"
-                        color="secondary"
                         disabled={status}
                         isLoading={status}
-                        variant="shadow"
+                        variant="outline"
                         onClick={handleSubmit}
                     >
                         Upload{status ? "ing" : ""}

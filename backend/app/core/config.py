@@ -27,11 +27,10 @@ class Settings(BaseSettings):
         60 * 24 * 8
     )  # 60 minutes * 24 hours * 8 days = 8 days
     API_V1_STR: str = "/api"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = "specialsecret"
 
     PROJECT_NAME: str
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
-    FIREBASE_CRED: dict = {}
     DATABASE_URL: str = ""
 
     POSTGRES_SERVER: str
@@ -39,11 +38,10 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "postgres"
     POSTGRES_PORT: int = 5432
-    STORAGE_BUCKET: str = "bucket"
-    SQLALCHEMY_DATABASE_URI: str | None = None
+    DATABASE_URI: str | None = None
 
     DOMAIN: str = "localhost"
-    FRONTEND_HOST: str = "http://localhost:3000"
+    FRONTEND_HOST: str = "https://localhost:3000"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
     @computed_field  # type: ignore[misc]
@@ -54,7 +52,7 @@ class Settings(BaseSettings):
             return f"http://{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
 
-    @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
+    @field_validator("DATABASE_URI", mode="before")
     def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v

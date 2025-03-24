@@ -24,10 +24,6 @@ const currency = (number: number): string => {
     return number?.toLocaleString("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 });
 };
 
-const imgSrc = (image: string): string => {
-    return `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}?alt=media`;
-};
-
 const capitalize = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
@@ -136,4 +132,4 @@ const handleError = (error: any): Message => {
     return { message: (error as Error).message || "An error occurred", error: true };
 };
 
-export { handleError, imgSrc, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo };
+export { handleError, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo };

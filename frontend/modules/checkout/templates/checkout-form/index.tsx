@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { currency } from "@/lib/util/util";
 import { api } from "@/apis";
 import { Cart } from "@/lib/models";
+import { DeliveryOption } from "@/types/global";
 
 type CheckoutFormProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -22,29 +23,32 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
 
     // cart.checkout_step = cart && getCheckoutStep(cart);
 
-    const availableShippingMethods: any = [
+    const availableShippingMethods: DeliveryOption[] = [
         {
-            id: 1,
+            id: "STANDARD",
             name: "Standard Delivery",
             description: "Delivery within 3-5 business days.",
-            amount: currency(2500),
+            amount: 2500,
+            amount_str: currency(2500),
         },
         {
-            id: 2,
+            id: "EXPRESS",
             name: "Express Delivery",
             description: "Delivery within 1-2 business days.",
-            amount: currency(5000),
+            amount: 5000,
+            amount_str: currency(5000),
         },
         {
-            id: 3,
+            id: "PICKUP",
             name: "Free Pickup",
             description: "Pickup from the nearest store for free.",
-            amount: "Free",
+            amount: 0,
+            amount_str: "Free",
         },
     ];
 
     // get customer if logged in
-    const customer = await api.user.me();
+    const { data: customer } = await api.user.me();
 
     return (
         <div>

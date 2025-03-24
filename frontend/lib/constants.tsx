@@ -18,5 +18,20 @@ export const paymentInfoMap: Record<string, { title: string; description: string
         description: "Secure payments through Paystack.",
         icon: "💳", // Placeholder for an icon
     },
+    PAYSTACK: {
+        title: "Paystack",
+        description: "Secure payments through Paystack.",
+        icon: "🌐", // Placeholder for an icon
+    },
+    BANK_TRANSFER: {
+        title: "Bank Transfer",
+        description: "Transfer into our bank account.",
+        icon: "🏦", // Placeholder for an icon
+    },
+    CREDIT_CARD: {
+        title: "Debit Card",
+        description: "Checkout securely with your Debit card",
+        icon: "💳", // Placeholder for an icon
+    },
     // Add more payment providers here
 };

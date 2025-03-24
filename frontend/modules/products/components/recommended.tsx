@@ -1,27 +1,26 @@
-import dynamic from "next/dynamic";
-
 import { api } from "@/apis";
-import { Product } from "@/lib/models";
-const ProductCard = dynamic(() => import("@/components/product/product-card"), { loading: () => <p>Loading...</p> });
+import ProductCard from "@/components/store/products/product-card";
+import { ProductSearch } from "@/lib/models";
 
 type RecommendedProductsProps = {
     exclude?: Array<string | number>;
 };
 
 export default async function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
-    const { products } = await api.product.search({ limit: 40 });
+    const { data, error } = await api.product.search({ limit: 40 });
 
-    if (!products.length) {
+    if (error || !data) {
         return null;
     }
 
-    const filteredProducts = exclude?.length ? products.filter((product: Product) => !exclude.includes(product.id!.toString())) : products;
+    // const filteredProducts = exclude?.length ? data.products.filter((product: ProductSearch) => !exclude.includes(product.variants[0].id)) : data.products;
+    const filteredProducts = data.products;
 
     return (
         <div>
             <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-4 gap-y-8">
-                {filteredProducts.map((product: Product) => (
-                    <li key={product.id}>
+                {filteredProducts.map((product: ProductSearch, idx: number) => (
+                    <li key={idx}>
                         <ProductCard product={product} wishlist={[]} />
                     </li>
                 ))}
