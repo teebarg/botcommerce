@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Spinner } from "@components/spinner";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Trash } from "nui-react-icons";
 
 import { CartItem } from "@/lib/models";
 import { api } from "@/apis";
@@ -67,7 +67,7 @@ const Control = ({ item }: ItemsTemplateProps) => {
                     </Button>
                 </div>
                 <Button disabled={loading} size="sm" variant="ghost" onClick={() => handleDelete(item.id)}>
-                    <Trash2 className="h-6 w-6 text-rose-500" />
+                    <Trash className="h-6 w-6 text-rose-500" />
                 </Button>
                 {loading && <Spinner key={item.id} />}
             </div>

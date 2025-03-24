@@ -1,9 +1,9 @@
 "use client";
 
-import { Edit, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Edit, Trash } from "nui-react-icons";
 
 import { ProductView } from "../products/product-view";
 
@@ -39,7 +39,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                 <ProductView product={product} onClose={viewState.close} />
             </DrawerUI>
             <Button size="icon" variant="ghost" onClick={() => deleteProduct(product.id)}>
-                <Trash2 className="h-5 w-5 text-rose-500" />
+                <Trash className="h-5 w-5 text-rose-500" />
             </Button>
         </div>
     );

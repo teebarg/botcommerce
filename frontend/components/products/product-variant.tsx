@@ -6,8 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Edit } from "nui-react-icons";
-import { Trash2 } from "lucide-react";
+import { Edit, Trash } from "nui-react-icons";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -120,7 +119,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                         <Edit className="h-4 w-4" />
                                     </Button>
                                     <Button size="icon" variant="ghost" onClick={() => deleteVariant(variant.id)}>
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash className="h-4 w-4" />
                                     </Button>
                                 </td>
                             </tr>

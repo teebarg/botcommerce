@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import React from "react";
-import { Search } from "lucide-react";
-import { ArrowUpDown } from "nui-react-icons";
+import { ArrowUpDown, Search } from "nui-react-icons";
 
 import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";

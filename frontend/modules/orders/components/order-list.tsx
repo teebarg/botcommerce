@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { Search, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { DateRange } from "react-day-picker";
 
@@ -13,14 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-// import { Pagination } from "@/components/ui/pagination";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
-// import { OrderStatus } from "@/types/order";
-// import { orderApi } from "@/apis/order";
 import { api } from "@/apis";
 import { Order, OrderStatus } from "@/lib/models";
 import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/util/util";
+import { Filter, Search } from "nui-react-icons";
 
 interface ProductInventoryProps {
     orders: Order[];

@@ -1,16 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, X, Check } from "lucide-react";
+import { X } from "lucide-react";
+import { Check, ChevronDown } from "nui-react-icons";
 
 // Define the option type
 export interface SelectOption {
     value: string | number;
     label: string;
 }
-
-// export interface SelectOption {
-//     id: string | number;
-//     name: string;
-// }
 
 // Define props interface for the MultiSelect component
 interface MultiSelectProps {

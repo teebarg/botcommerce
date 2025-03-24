@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, Trash2 } from "lucide-react";
+import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Trash } from "nui-react-icons";
 
 import { ProductImage } from "@/lib/models";
 import { api } from "@/apis";
@@ -100,7 +101,7 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
                                 // disabled={deleteMutation.isPending}
                                 onClick={() => deleteImage(image.id)}
                             >
-                                <Trash2 className="w-5 h-5" />
+                                <Trash className="w-5 h-5" />
                             </button>
                         </div>
                         {isDeleting && imageId === image.id && (
