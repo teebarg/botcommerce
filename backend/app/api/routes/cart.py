@@ -5,7 +5,7 @@ from app.models.generic import Message
 from app.models.cart import CartCreate, CartUpdate, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Response
 from app.prisma_client import prisma as db
-from app.core.deps import CurrentUser, TokenUser
+from app.core.deps import TokenUser
 
 # Create a router for carts
 router = APIRouter()
@@ -64,7 +64,7 @@ async def create_cart(response: Response, cart: CartCreate):
 
 
 @router.get("/", response_model=CartResponse)
-async def get_cart(response: Response, cartId: str = Header()):
+async def get_cart(cartId: str = Header()):
     """Get a specific cart by ID"""
     cart = None
     if cartId:
@@ -92,17 +92,12 @@ async def get_cart(response: Response, cartId: str = Header()):
                     "include": {
                         "variant": True
                     }
-                }
+                },
+                "shipping_address": True,
+                "billing_address": True
             }
         )
-        # response.set_cookie(
-        #     key="_cart_id",
-        #     value=id,
-        #     max_age=timedelta(days=7),
-        #     secure=True,
-        #     httponly=True,
-        #     samesite="Lax",
-        # )
+
         return new_cart
     return cart
 
@@ -142,11 +137,11 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
 
     if cart_update.shipping_address:
         update_data["shipping_address"] = {"create": {
-            **cart_update.shipping_address.dict(), "user_id": user.id if user else None}}
+            **cart_update.shipping_address.model_dump(), "user_id": user.id if user else None}}
 
     if cart_update.billing_address:
         update_data["billing_address"] = {"create": {
-            **cart_update.billing_address.dict(), "user_id": user.id if user else None}}
+            **cart_update.billing_address.model_dump(), "user_id": user.id if user else None}}
 
     if cart_update.payment_method:
         update_data["payment_method"] = cart_update.payment_method

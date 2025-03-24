@@ -153,7 +153,7 @@ export default async function Home() {
                     />
                 </div>
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative py-2 md:py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="max-w-8xl mx-auto relative py-2 md:py-8 px-1 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                                 <span className="text-secondary text-3xl font-semibold">{siteConfig.name}</span>
@@ -184,7 +184,7 @@ export default async function Home() {
                     title="Big Sale on Top Brands!"
                 />
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
+                    <div className="max-w-8xl mx-auto relative py-8 px-1 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
                             {trending?.map((product: ProductSearch, index: number) => (
@@ -202,7 +202,7 @@ export default async function Home() {
                     />
                 </div>
                 <div className="bg-content1 py-12">
-                    <div className="max-w-8xl mx-auto px-4">
+                    <div className="max-w-8xl mx-auto px-1 md:px-0">
                         <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
                         <p className="text-default-500">

@@ -27,19 +27,19 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         className
                     )}
                 >
-                    {startContent}
+                    <span className="ml-2">{startContent}</span>
                     <input
                         ref={ref}
                         className={cn(
                             "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground",
-                            "flex h-10 w-full text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 px-1",
+                            "flex h-10 w-full text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 px-1 bg-inherit",
                             className
                         )}
                         id={id}
                         type={type}
                         {...props}
                     />
-                    {endContent}
+                    <span className="mr-2">{endContent}</span>
                 </div>
                 {description && <p className="text-xs text-foreground-500 mt-0.5">{description}</p>}
                 {error && <p className="text-xs text-rose-500 mt-0.5">{error}</p>}

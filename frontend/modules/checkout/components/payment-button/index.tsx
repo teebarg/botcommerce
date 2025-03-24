@@ -7,14 +7,14 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Cart, User } from "@/lib/models";
+import { Cart, Session } from "@/lib/models";
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";
 import { api } from "@/apis";
 import { subtotal, taxTotal, total } from "@/lib/util/store";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
-    user?: User | null;
+    user: Session | null;
     "data-testid": string;
 };
 
@@ -75,7 +75,7 @@ const GiftCardPaymentButton = () => {
     );
 };
 
-const TransferPaymentButton = ({ cart, notReady, user }: { cart: Cart; notReady: boolean; user?: User | null }) => {
+const TransferPaymentButton = ({ cart, notReady, user }: { cart: Cart; notReady: boolean; user?: Session | null }) => {
     const modalState = useOverlayTriggerState({});
     const router = useRouter();
     const pathname = usePathname();
@@ -139,7 +139,7 @@ const TransferPaymentButton = ({ cart, notReady, user }: { cart: Cart; notReady:
     );
 };
 
-const ManualTestPaymentButton = ({ notReady, user, cart }: { notReady: boolean; user?: User | null; cart: Cart }) => {
+const ManualTestPaymentButton = ({ notReady, user, cart }: { notReady: boolean; user?: Session | null; cart: Cart }) => {
     const router = useRouter();
     const modalState = useOverlayTriggerState({});
 

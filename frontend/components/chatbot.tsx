@@ -2,7 +2,7 @@
 
 import { cn } from "@lib/util/cn";
 import React, { useState, useEffect, useRef } from "react";
-import { RefreshCcw, Send, Smiley, XMark } from "nui-react-icons";
+import { Minus, Send, Smiley, X } from "nui-react-icons";
 import { useSnackbar } from "notistack";
 
 interface Props {}
@@ -27,7 +27,7 @@ const ChatBot: React.FC<Props> = () => {
     const [input, setInput] = useState<string>("");
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const [hasBeenClosed, setHasBeenClosed] = useState<boolean>(false);
+    const [hasBeenClosed, setHasBeenClosed] = useState<boolean>(true);
 
     useEffect(() => {
         // Set isOpen after hydration
@@ -135,9 +135,9 @@ const ChatBot: React.FC<Props> = () => {
 
     return (
         <React.Fragment>
-            <div className="fixed right-6 bottom-6 z-50">
+            <div className="fixed right-2 md:right-6 bottom-6 z-[500]">
                 <div
-                    className="max-w-md w-[calc(100%-30px)] sm:w-[400px] h-[600px] bg-gray-900 rounded-lg shadow-xl hidden data-[open=true]:flex flex-col"
+                    className="max-w-md w-[calc(100%-8px)] ml-2 sm:ml-auto sm:w-[400px] h-[600px] bg-gray-900 rounded-lg shadow-xl hidden data-[open=true]:flex flex-col"
                     data-open={isOpen ? "true" : "false"}
                 >
                     {/* Header */}
@@ -145,11 +145,11 @@ const ChatBot: React.FC<Props> = () => {
                         <h1 className="text-white text-lg font-semibold">Virtual Assistant</h1>
                         <div className="flex items-center gap-4">
                             <button aria-label="minimize chat" className="text-gray-400 hover:text-white transition" onClick={minimize}>
-                                <RefreshCcw className="w-5 h-5" />
+                                <Minus className="w-5 h-5" />
                             </button>
                             <button aria-label="close chat" className="text-gray-400 hover:text-white transition" onClick={toggleChat}>
                                 {" "}
-                                <XMark className="w-5 h-5" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                     </div>

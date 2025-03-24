@@ -96,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
     return (
         <motion.div
             animate={{ opacity: 1, y: 0 }}
-            className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-md"
+            className="group relative flex flex-col overflow-hidden rounded-lg bg-content2 shadow-sm transition-all duration-300 hover:shadow-md"
             initial={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.1 }}
         >
@@ -127,8 +127,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                 </div>
 
                 {/* Content */}
-                <div className="p-4 cursor-pointer" onClick={() => router.push(`/products/${slug}`)}>
-                    <div className="flex flex-nowrap overflow-hidden gap-1 h-5">
+                <div className="px-0.5 cursor-pointer" onClick={() => router.push(`/products/${slug}`)}>
+                    <div className="hidden md:flex flex-nowrap overflow-hidden gap-1 h-5">
                         {categories.map((category: string, idx: number) => (
                             <Badge key={idx} variant="destructive">
                                 {category}
@@ -146,7 +146,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                         {old_price > price && <span className="ml-1 text-xs md:text-sm text-default-500 line-through">{currency(old_price)}</span>}
                     </div>
                     <Button
-                        className="w-full gap-2"
+                        className="w-full gap-2 mt-1"
                         disabled={loading || status == "OUT_OF_STOCK"}
                         isLoading={loading}
                         onClick={(e) => {

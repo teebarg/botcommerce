@@ -5,13 +5,12 @@ import dynamic from "next/dynamic";
 
 import { BackButton } from "@/components/back";
 import Search from "@/modules/search/components/search";
+import ChatBot from "@/components/chatbot";
 
 const Banner = dynamic(() => import("@modules/common/components/banner"), { loading: () => <p>Loading...</p> });
 const ButtonNav = dynamic(() => import("@/components/bottom-navbar"));
 const Cookie = dynamic(() => import("@modules/store/components/cookie"));
-const ChatBot = dynamic(() => import("@components/chatbot"));
 const Navbar = dynamic(() => import("@modules/layout/templates/nav"));
-// const Search = dynamic(() => import("@/modules/search/components/search"));
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
 
