@@ -1,5 +1,5 @@
 import React from "react";
-import { Star } from "nui-react-icons";
+import { MessageSquare, Star } from "nui-react-icons";
 
 import ReviewForm from "./review-form";
 
@@ -7,6 +7,8 @@ import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { timeAgo } from "@/lib/util/util";
 import { Product, Review } from "@/lib/models";
+import { PencilLine } from "lucide-react";
+import { auth } from "@/actions/auth";
 
 interface Prop {
     product: Product;
@@ -18,6 +20,12 @@ interface RatingDistribution {
 }
 
 const ReviewsSection: React.FC<Prop> = async ({ product }) => {
+    const user = await auth()
+
+    if (!user) {
+        return
+    }
+
     const reviews: Review[] = product.reviews?.sort(
         (a: Review, b: Review) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     ) as unknown as Review[];
@@ -31,10 +39,10 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                         <Star className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center">
-                        {/* <MessageSquare className="w-12 h-12 text-blue-500" /> */}
+                        <MessageSquare className="w-12 h-12 text-blue-500" />
                     </div>
                     <div className="absolute -bottom-3 -left-3 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        {/* <PencilLine className="w-5 h-5 text-blue-600" /> */}
+                        <PencilLine className="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
 

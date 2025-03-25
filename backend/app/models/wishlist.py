@@ -1,7 +1,7 @@
 from typing import Optional
 from app.models.base import BM
 from pydantic import BaseModel
-from prisma.models import Product
+from prisma.models import Product, ProductVariant
 
 
 class WishlistBase(BM):
@@ -10,6 +10,7 @@ class WishlistBase(BM):
 class Wishlist(WishlistBase):
     id: int
     product: Optional[Product] = None
+    variants: list[ProductVariant] = []
 
 
 class WishlistCreate(BaseModel):

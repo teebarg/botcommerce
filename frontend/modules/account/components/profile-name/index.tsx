@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import AccountInfo from "../account-info";
 
 import { User } from "@/lib/models";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { api } from "@/apis";
 
 const nameSchema = z.object({
@@ -56,44 +56,46 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
     };
 
     return (
-        <form className="w-full overflow-visible" onReset={() => clearState()} onSubmit={form.handleSubmit(onSubmit)}>
-            <AccountInfo
-                clearState={clearState}
-                currentInfo={`${customer.first_name} ${customer.last_name}`}
-                data-testid="account-name-editor"
-                isLoading={isPending}
-                label="Name"
-            >
-                <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="first_name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>First name</FormLabel>
-                                <FormControl>
-                                    <Input required data-testid="first-name-input" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="last_name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Last name</FormLabel>
-                                <FormControl>
-                                    <Input required data-testid="last-name-input" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-            </AccountInfo>
-        </form>
+        <Form {...form}>
+            <form className="w-full overflow-visible" onReset={() => clearState()} onSubmit={form.handleSubmit(onSubmit)}>
+                <AccountInfo
+                    clearState={clearState}
+                    currentInfo={`${customer.first_name} ${customer.last_name}`}
+                    data-testid="account-name-editor"
+                    isLoading={isPending}
+                    label="Name"
+                >
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="first_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>First name</FormLabel>
+                                    <FormControl>
+                                        <Input required data-testid="first-name-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="last_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Last name</FormLabel>
+                                    <FormControl>
+                                        <Input required data-testid="last-name-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </AccountInfo>
+            </form>
+        </Form>
     );
 };
 

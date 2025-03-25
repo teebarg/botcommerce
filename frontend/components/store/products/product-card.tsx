@@ -10,7 +10,6 @@ import { ShoppingCart } from "lucide-react";
 import { ProductSearch, WishItem } from "@/lib/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
 
@@ -85,7 +84,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
             }
 
             toast.success("Added to cart successfully");
-            // router.refresh();
         } catch (error) {
             toast.error("Failed to add to cart");
         } finally {
@@ -111,7 +109,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                     {showWishlist && (
                         <Button
                             className={cn(
-                                "absolute top-4 right-4 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 bg-gray-500",
+                                "absolute top-4 right-2 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 bg-gray-500",
                                 inWishlist && "bg-gray-400 opacity-100"
                             )}
                             size="icon"
@@ -128,22 +126,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
                 {/* Content */}
                 <div className="px-0.5 cursor-pointer" onClick={() => router.push(`/products/${slug}`)}>
-                    <div className="hidden md:flex flex-nowrap overflow-hidden gap-1 h-5">
-                        {categories.map((category: string, idx: number) => (
-                            <Badge key={idx} variant="destructive">
-                                {category}
-                            </Badge>
-                        ))}
-                    </div>
-                    <h3 className="font-medium text-default-900 my-2 line-clamp-1 hover:text-default-700 transition-colors">{name}</h3>
-                    {old_price > price && (
-                        <div className="absolute top-4 left-4">
-                            <span className="text-sm font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
+                    <h3 className="font-medium text-default-900 my-2 line-clamp-1 hover:text-default-700 transition-colors px-1">{name}</h3>
+
+                    <div className="flex items-center justify-between px-1">
+                        <div className="flex items-center">
+                            <span className="text-lg font-semibold text-danger">{currency(price)}</span>
+                            {old_price > price && (
+                                <span className="ml-1 text-xs md:text-sm text-default-500 line-through">{currency(old_price)}</span>
+                            )}
                         </div>
-                    )}
-                    <div className="flex items-center">
-                        <span className="text-lg font-semibold text-danger">{currency(price)}</span>
-                        {old_price > price && <span className="ml-1 text-xs md:text-sm text-default-500 line-through">{currency(old_price)}</span>}
+                        {old_price > price && (
+                            <span className="text-xs font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
+                        )}
                     </div>
                     <Button
                         className="w-full gap-2 mt-1"

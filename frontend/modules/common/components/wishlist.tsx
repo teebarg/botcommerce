@@ -8,15 +8,17 @@ import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { toast } from "sonner";
+import { ProductVariant } from "@/lib/models";
 
 interface WishlistItemProps {
     id: number;
     name: string;
     image: string;
     price: number;
+    variants: ProductVariant[];
 }
 
-const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image }) => {
+const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, variants }) => {
     const [isAdding, setIsAdding] = useState<boolean>(false);
 
     const onRemove = async () => {
@@ -38,19 +40,26 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image }) => {
 
     // add the selected variant to the cart
     const handleAddToCart = async () => {
+        if (variants.length == 0) {
+            toast.error("Invalid variant");
+        }
         setIsAdding(true);
 
-        // await api.cart.add({
-        //     variant_id: variants[0].id,
-        //     quantity: 1,
-        // });
+        const { error } = await api.cart.add({
+            variant_id: variants[0].id,
+            quantity: 1,
+        });
+
+        if (error) {
+            toast.error(error);
+        }
 
         setIsAdding(false);
     };
 
     return (
         <>
-            <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-content1 w-full snap-start h-full" id={`${id}`}>
+            <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-inherit w-full snap-start h-full" id={`${id}`}>
                 <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl bg-content2 h-[16rem] md:h-[20rem] justify-between">
                     <div className="relative md:rounded-1xl z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
                         <Image fill alt={name} className="hover:scale-95" src={image as string} />

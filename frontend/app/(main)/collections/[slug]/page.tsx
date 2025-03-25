@@ -98,8 +98,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Products</h1>
+        <div className="container mx-auto py-4 px-2">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
                 <InfiniteScrollClient
                     brands={brands}

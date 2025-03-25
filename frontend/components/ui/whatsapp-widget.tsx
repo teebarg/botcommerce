@@ -1,10 +1,11 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./button";
 import { formatDate } from "@/lib/util/util";
 import { siteConfig } from "@/lib/config";
+// import { Send } from "nui-react-icons";
 
 const WhatsAppWidget: React.FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -33,7 +34,7 @@ const WhatsAppWidget: React.FC = () => {
 
             {/* Chat Widget */}
             {isOpen && (
-                <div className="fixed bottom-24 right-6 w-[350px] bg-white rounded-lg shadow-xl z-50 overflow-hidden">
+                <div className="fixed bottom-24 right-6 w-[calc(100%-48px)] md:w-[400px] bg-white rounded-lg shadow-xl z-50 overflow-hidden">
                     {/* Header */}
                     <div className="bg-[#075E54] p-4 flex justify-between items-center">
                         <div className="flex items-center gap-3">
@@ -47,9 +48,9 @@ const WhatsAppWidget: React.FC = () => {
                                 <p className="text-sm opacity-90">Typically replies within 10 minutes</p>
                             </div>
                         </div>
-                        <button onClick={() => setIsOpen(false)} className="text-white hover:opacity-80">
+                        <Button onClick={() => setIsOpen(false)} size="icon" variant="ghost">
                             <X size={24} />
-                        </button>
+                        </Button>
                     </div>
 
                     {/* Chat Content */}
@@ -70,8 +71,8 @@ const WhatsAppWidget: React.FC = () => {
                                 placeholder="Type a message.."
                                 className="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:border-[#075E54]"
                             />
-                            <Button type="submit" className="bg-[#075E54] hover:bg-[#128C7E] rounded-full px-6">
-                                Send
+                            <Button size="icon" variant="ghost" type="submit" className="bg-[#075E54] hover:bg-[#128C7E] rounded-full">
+                                <Send className="h-5 w-5" />
                             </Button>
                         </div>
                     </form>

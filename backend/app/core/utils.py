@@ -258,3 +258,34 @@ def generate_magic_link_email(email_to: str, magic_link: str, first_name: str) -
         },
     )
     return EmailData(html_content=html_content, subject=subject)
+
+
+def generate_welcome_email(email_to: str, first_name: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"Welcome to {project_name}, {first_name}!"
+    html_content = render_email_template(
+        template_name="welcome.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "first_name": first_name,
+            "email": email_to,
+            "login_url": f"{settings.FRONTEND_HOST}/login",
+            "current_year": datetime.now().year,
+        },
+    )
+    return EmailData(html_content=html_content, subject=subject)
+
+
+def generate_verification_email(email_to: str, first_name: str, verification_link: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Verify Your Email"
+    html_content = render_email_template(
+        template_name="verify_email.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "first_name": first_name,
+            "verification_link": verification_link,
+            "current_year": datetime.now().year,
+        },
+    )
+    return EmailData(html_content=html_content, subject=subject)

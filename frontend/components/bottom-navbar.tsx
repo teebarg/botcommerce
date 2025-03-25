@@ -4,8 +4,13 @@ import { HeartFilled, Home, Search, User } from "nui-react-icons";
 
 import { Cart } from "@/modules/layout/components/cart";
 import LocalizedClientLink from "@/components/ui/link";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { auth } from "@/actions/auth";
+import Menu from "./menu";
 
 const ButtonNav = async ({ className }: { className?: string }) => {
+    // const editState = useOverlayTriggerState({});
+    const user = await auth();
     interface NavLink {
         icon: React.ReactNode;
         label: string;
@@ -53,6 +58,17 @@ const ButtonNav = async ({ className }: { className?: string }) => {
                     <p className="text-sm font-semibold">{item.label}</p>
                 </LocalizedClientLink>
             ))}
+            <Drawer>
+                <DrawerTrigger>
+                    <HeartFilled className="h-6 w-6" />
+                </DrawerTrigger>
+                <DrawerContent className="px-8">
+                    <DrawerHeader>
+                        <DrawerTitle className="sr-only">Cart</DrawerTitle>
+                    </DrawerHeader>
+                    <Menu user={user} />
+                </DrawerContent>
+            </Drawer>
         </nav>
     );
 };

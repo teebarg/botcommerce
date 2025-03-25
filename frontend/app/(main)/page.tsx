@@ -216,45 +216,37 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div
-                    className="bg-fixed bg-center"
-                    style={{
-                        backgroundImage:
-                            'url("https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fhero-contact.jpg?alt=media")',
-                    }}
-                >
-                    <div className="flex items-center h-full">
-                        <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
-                            <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/50 text-gray-100 p-4 sm:p-8 rounded-lg">
-                                <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
-                                <p className="text-xl font-semibold">Reach out to us for more information</p>
-                                <p className="font-medium">
-                                    For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have
-                                    about our products and services.
-                                </p>
-                                <ContactForm />
-                            </div>
-                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 px-4 py-12 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
+                <div className="">
+                    <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
+                        <div className="sm:w-1/2 sm:pr-10 p-4 sm:p-8 rounded-lg">
+                            <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
+                            <p className="text-xl font-medium text-default-800">Reach out to us for more information</p>
+                            <p className="font-semibold text-default-600">
+                                For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have about
+                                our products and services.
+                            </p>
+                            <ContactForm />
+                        </div>
+                        <div className="sm:w-1/2 px-4 py-12 sm:p-8 rounded-lg mt-6 sm:mt-0">
+                            <div>
+                                <p className="font-semibold text-md text-default-500">Our Contacts</p>
+                                <div className="flex gap-2 text-default-800">
+                                    <Mail />
+                                    <p>{siteConfig.contactEmail}</p>
+                                </div>
+                                <p className="font-semibold mt-6 text-md text-default-500">Location</p>
+                                <div className="flex gap-2 text-default-800">
+                                    <Location className="fill-current" />
+                                    <p className="underline">Lagos, LA NG</p>
+                                </div>
+                                <p className="font-semibold mt-6 text-md text-default-500">Opening Hours</p>
                                 <div>
-                                    <p className="font-semibold text-xl">Our Contacts</p>
-                                    <div className="flex gap-2">
-                                        <Mail />
-                                        <p>{siteConfig.contactEmail}</p>
-                                    </div>
-                                    <p className="font-semibold mt-6 text-xl">Location</p>
-                                    <div className="flex gap-2">
-                                        <Location className="fill-current" />
-                                        <p className="underline">Lagos, LA NG</p>
-                                    </div>
-                                    <p className="font-semibold mt-6 text-xl">Opening Hours</p>
-                                    <div>
-                                        {openingHours?.map((hour, index) => (
-                                            <div key={index} className="grid grid-cols-3">
-                                                <p>{hour.day}</p>
-                                                <p className="col-span-2">{hour.time}</p>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    {openingHours?.map((hour, index) => (
+                                        <div key={index} className="grid grid-cols-3">
+                                            <p>{hour.day}</p>
+                                            <p className="col-span-2">{hour.time}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>

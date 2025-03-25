@@ -8,14 +8,15 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     description?: string;
     endContent?: React.ReactNode;
     startContent?: React.ReactNode;
+    wrapperClass?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, error, label, description, startContent, endContent, ...props }, ref) => {
+    ({ className, type, error, label, description, startContent, endContent, wrapperClass, ...props }, ref) => {
         const id = React.useId();
 
         return (
-            <div>
+            <div className={wrapperClass}>
                 {label && (
                     <label className="text-sm font-medium text-default-500 mb-0.5 block" htmlFor={id}>
                         {label}

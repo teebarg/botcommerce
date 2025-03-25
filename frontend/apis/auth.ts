@@ -22,11 +22,12 @@ export const authApi = {
 
         return response;
     },
-    async signUp(input: { email: string; password: string; first_name: string; last_name: string }): Promise<string> {
-        const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/logout`;
-        const { access_token } = await fetcher<Token>(url, { method: "POST", body: JSON.stringify(input) });
+    async signUp(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<{ access_token: string }> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/signup`;
+        const res = await tryCatch<{ access_token: string }>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
+        revalidate("user");
 
-        return access_token;
+        return res;
     },
     async social(input: { email: string; password: string; first_name: string; last_name: string }): Promise<string> {
         const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/social`;

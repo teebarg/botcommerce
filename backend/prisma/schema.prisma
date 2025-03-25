@@ -377,24 +377,26 @@ model CartItem {
 
 // User Model
 model User {
-    id            Int         @id @default(autoincrement())
-    first_name     String?
-    last_name      String?
-    email         String?   @unique
-    emailVerified DateTime?
-    status        Status    @default(PENDING)
-    hashed_password      String
-    image         String?
-    role          Role @default(CUSTOMER)
-    addresses     Address[]
-    orders        Order[]
-    reviews       Review[]
-    favorites     Favorite[]
-    carts         Cart[]    // Added relation to Cart
-    activity_logs ActivityLog[]
+    id                      Int       @id @default(autoincrement())
+    email                   String    @unique
+    hashed_password         String
+    first_name             String?
+    last_name              String?
+    status                 Status    @default(PENDING)
+    role                   Role    @default(CUSTOMER)
+    image                  String?
+    email_verified         DateTime?
+    email_verification_token String?
+    email_verification_expires DateTime?
+    orders                 Order[]
+    addresses              Address[]
+    reviews                Review[]
+    favorites              Favorite[]
+    carts                  Cart[]    // Added relation to Cart
+    activity_logs          ActivityLog[]
 
-    createdAt     DateTime? @default(now()) @map("created_at")
-    updatedAt     DateTime? @updatedAt @map("updated_at")
+    createdAt              DateTime? @default(now()) @map("created_at")
+    updatedAt              DateTime? @updatedAt @map("updated_at")
 
     @@index([first_name, last_name, email])
 

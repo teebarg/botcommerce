@@ -1,14 +1,14 @@
 "use client";
 
-import { Cart as CartIcon } from "nui-react-icons";
+import { Cart as CartIcon, ShoppingCart } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import Chip from "@/components/ui/chip";
 import { Cart, CartItem } from "@/lib/models";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import CartDetails from "@/components/cart/cart-details";
+import { Button } from "@/components/ui/button";
 
 interface ComponentProps {
     cart: Omit<Cart, "beforeInsert" | "afterLoad"> | null;
@@ -63,24 +63,22 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     return (
         <div>
             <div className="hidden md:flex items-center">
-                {/* <button aria-label="cart" className="h-full w-full flex items-center justify-center text-default-500" onClick={state.open}>
-                    <CartIcon className="h-8 w-8" />
-                </button> */}
                 <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
-                    <DrawerTrigger>
-                        <CartIcon className="h-8 w-8" />
+                    <DrawerTrigger asChild>
+                        <Button size="icon" variant="ghost">
+                            <ShoppingCart className="w-6 h-6" />
+                            <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                                {totalItems.toString()}
+                            </span>
+                        </Button>
                     </DrawerTrigger>
                     <DrawerContent className="px-8">
                         <DrawerHeader>
-                            <DrawerTitle>Cart</DrawerTitle>
+                            <DrawerTitle className="sr-only">Cart</DrawerTitle>
                         </DrawerHeader>
                         <CartDetails items={cart?.items || []} shippingFee={cart?.shipping_fee} onClose={editState.close} />
                     </DrawerContent>
                 </Drawer>
-                <div className="flex flex-col items-center justify-center">
-                    <Chip size="sm" title={totalItems.toString()} />
-                    <p className="font-semibold text-sm mt-0">Cart</p>
-                </div>
             </div>
             <div className="md:hidden relative">
                 <CartIcon className="h-6 w-6" />
