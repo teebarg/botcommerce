@@ -1,6 +1,6 @@
 "use client";
 
-import { Cart as CartIcon, ShoppingCart } from "nui-react-icons";
+import { ShoppingCart } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -61,32 +61,22 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
     }, [totalItems, itemRef.current]);
 
     return (
-        <div>
-            <div className="hidden md:flex items-center">
-                <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
-                    <DrawerTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                            <ShoppingCart className="w-6 h-6" />
-                            <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                                {totalItems.toString()}
-                            </span>
-                        </Button>
-                    </DrawerTrigger>
-                    <DrawerContent className="px-8">
-                        <DrawerHeader>
-                            <DrawerTitle className="sr-only">Cart</DrawerTitle>
-                        </DrawerHeader>
-                        <CartDetails items={cart?.items || []} shippingFee={cart?.shipping_fee} onClose={editState.close} />
-                    </DrawerContent>
-                </Drawer>
-            </div>
-            <div className="md:hidden relative">
-                <CartIcon className="h-6 w-6" />
-                <span className="absolute -top-2 -right-4 h-5 w-5 bg-primary text-white rounded-full flex items-center justify-center p-2 text-xs">
-                    {totalItems.toString()}
-                </span>
-            </div>
-        </div>
+        <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
+            <DrawerTrigger asChild>
+                <Button className="w-7 h-7" size="icon" variant="ghost">
+                    <ShoppingCart className="w-7 h-7" />
+                    <span className="absolute -top-2 -right-2 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        {totalItems.toString()}
+                    </span>
+                </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+                <DrawerHeader>
+                    <DrawerTitle className="sr-only">Cart</DrawerTitle>
+                </DrawerHeader>
+                <CartDetails items={cart?.items || []} shippingFee={cart?.shipping_fee} onClose={editState.close} />
+            </DrawerContent>
+        </Drawer>
     );
 };
 

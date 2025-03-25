@@ -9,9 +9,10 @@ interface Props {
     icon?: React.ReactNode;
     outerClass?: string;
     btnClass?: string;
+    href?: string;
 }
 
-const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass, btnClass }) => {
+const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass, btnClass, href = "/" }) => {
     return (
         <div
             className={cn(
@@ -27,7 +28,7 @@ const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass,
                 </div>
             </div>
             {/* CTA Button */}
-            <BtnLink className={cn("bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold", btnClass)} href="/">
+            <BtnLink className={cn("bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold", btnClass)} href={href}>
                 <span>Shop Now</span>
             </BtnLink>
         </div>

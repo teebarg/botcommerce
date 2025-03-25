@@ -1,7 +1,6 @@
 "use client";
 
-import { ArrowRight, Clock, RefreshCcw } from "nui-react-icons";
-import { useEffect, useState } from "react";
+import { ArrowRight, Clock } from "nui-react-icons";
 
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
@@ -19,23 +18,23 @@ type OrderConfirmationProps = {
 
 // Pending Payment Component
 const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
-    const [countdown, setCountdown] = useState(3600 * 24); // 1 hour in seconds
+    // const [countdown, setCountdown] = useState(3600 * 24); // 1 hour in seconds
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    //     }, 1000);
 
-        return () => clearInterval(timer);
-    }, []);
+    //     return () => clearInterval(timer);
+    // }, []);
 
-    const formatTime = (seconds: number): string => {
-        const hrs = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
+    // const formatTime = (seconds: number): string => {
+    //     const hrs = Math.floor(seconds / 3600);
+    //     const mins = Math.floor((seconds % 3600) / 60);
+    //     const secs = seconds % 60;
 
-        return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    };
+    //     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    // };
 
     return (
         <div className="w-full max-w-2xl mx-auto">
@@ -47,12 +46,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
                     <h2 className="text-2xl font-bold text-default-900 mb-2">Payment Pending</h2>
 
-                    <p className="text-default-600">{`We're waiting for your bank transfer. Please complete the payment within:`}</p>
-
-                    <div className="mt-4 py-3 px-6 bg-yellow-50 inline-flex items-center rounded-full">
-                        <RefreshCcw className="w-5 h-5 text-yellow-600 animate-spin mr-2" />
-                        <span className="text-xl font-mono font-bold text-yellow-700">{formatTime(countdown)}</span>
-                    </div>
+                    <p className="text-default-600">{`We're waiting for your bank transfer. Please complete the payment with the details below:`}</p>
                 </div>
             </FadeInComponent>
 

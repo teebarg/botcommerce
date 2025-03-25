@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, X } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash, X } from "lucide-react";
 import { toast } from "sonner";
-import { Minus, Plus, Trash } from "nui-react-icons";
+// import { Minus, Plus, Trash } from "nui-react-icons";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import { CartItem } from "@/lib/models";
