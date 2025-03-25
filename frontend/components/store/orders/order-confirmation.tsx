@@ -22,7 +22,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
             {status === "COMPLETED" && <SuccessConfirmation {...props} />}
             {status === "PENDING" && <PendingPayment {...props} />}
             {status === "FAILED" && <FailedPayment {...props} />}
-            <Help />
+            {/* <Help /> */}
         </div>
     );
 };
