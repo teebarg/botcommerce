@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { DateRange } from "react-day-picker";
+import { Filter, Search } from "nui-react-icons";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,6 @@ import { api } from "@/apis";
 import { Order, OrderStatus } from "@/lib/models";
 import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/util/util";
-import { Filter, Search } from "nui-react-icons";
 
 interface ProductInventoryProps {
     orders: Order[];

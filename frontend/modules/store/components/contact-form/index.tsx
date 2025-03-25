@@ -16,7 +16,7 @@ export default function ContactForm() {
     useEffect(() => {
         if (state?.message) {
             formRef?.current?.reset(); // Reset the form fields
-            toast.success(state.message)
+            toast.success(state.message);
         }
     }, [state]);
 

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
 
-import OrderList from "@/modules/orders/components/order-list";
+import OrderList from "@/components/order/order-list";
 import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";

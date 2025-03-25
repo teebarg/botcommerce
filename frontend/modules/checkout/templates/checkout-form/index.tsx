@@ -5,9 +5,9 @@ import Shipping from "@modules/checkout/components/shipping";
 import { cookies } from "next/headers";
 
 import { currency } from "@/lib/util/util";
-import { api } from "@/apis";
 import { Cart } from "@/lib/models";
 import { DeliveryOption } from "@/types/global";
+import { auth } from "@/actions/auth";
 
 type CheckoutFormProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -48,7 +48,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
     ];
 
     // get customer if logged in
-    const { data: customer } = await api.user.me();
+    const customer = await auth();
 
     return (
         <div>
