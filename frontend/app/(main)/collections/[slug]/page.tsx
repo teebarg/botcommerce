@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { SortOptions } from "types/global";
+import { SortOptions, WishItem } from "types/models";
 import React, { Suspense } from "react";
 import { Exclamation } from "nui-react-icons";
 
@@ -10,7 +10,6 @@ import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
-import { WishItem } from "@/lib/models";
 import { auth } from "@/actions/auth";
 import { BtnLink } from "@/components/ui/btnLink";
 

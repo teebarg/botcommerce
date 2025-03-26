@@ -10,7 +10,7 @@ import { ProductView } from "../products/product-view";
 import DrawerUI from "@/components/drawer";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { Product } from "@/lib/models";
+import { Product } from "@/types/models";
 
 interface ProductActionsProps {
     product: Product;

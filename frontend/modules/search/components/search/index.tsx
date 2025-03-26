@@ -12,7 +12,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import NoProductsFound from "@/modules/products/components/no-products";
 import { debounce } from "@/lib/util/util";
-import { ProductSearch } from "@/lib/models";
+import { ProductSearch } from "@/types/models";
 import { api } from "@/apis";
 import ProductCard from "@/components/store/products/product-card";
 

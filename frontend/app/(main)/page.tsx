@@ -8,11 +8,12 @@ import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
-import { Category, ProductSearch, WishItem } from "@/lib/models";
+import { Category, ProductSearch, WishItem } from "@/types/models";
 import BannerCarousel from "@/components/carousel";
 import ContactForm from "@/modules/store/components/contact-form";
 import { auth } from "@/actions/auth";
 import ProductCard from "@/components/store/products/product-card";
+import Paystack from "@/components/payment/paystack";
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -48,6 +49,7 @@ export default async function Home() {
     return (
         <React.Fragment>
             <div>
+                <Paystack />
                 <div className="bg-content1">
                     <div className="max-w-8xl mx-auto relative hidden md:grid grid-cols-5 gap-4 rounded-xl py-6">
                         <div className="hidden md:block">

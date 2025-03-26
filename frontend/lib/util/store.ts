@@ -1,4 +1,4 @@
-import { CartItem } from "../models";
+import { CartItem } from "@/types/models";
 
 const subtotal = (items: CartItem[]) => items?.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0);
 const taxTotal = (items: CartItem[]) => items?.reduce((total: number, item: CartItem) => total + item.price * item.quantity * 0.05, 0);

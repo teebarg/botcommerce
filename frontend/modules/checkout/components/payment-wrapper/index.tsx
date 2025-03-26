@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { Cart } from "@/lib/models";
+import { Cart } from "@/types/models";
 
 type WrapperProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;

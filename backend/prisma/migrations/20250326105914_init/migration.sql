@@ -14,7 +14,7 @@ CREATE TYPE "ProductStatus" AS ENUM ('IN_STOCK', 'OUT_OF_STOCK');
 CREATE TYPE "CartStatus" AS ENUM ('ACTIVE', 'ABANDONED', 'CONVERTED');
 
 -- CreateEnum
-CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED');
+CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'FAILED', 'SUCCESS', 'REFUNDED');
 
 -- CreateEnum
 CREATE TYPE "ShippingMethod" AS ENUM ('STANDARD', 'EXPRESS', 'PICKUP');
@@ -102,6 +102,7 @@ CREATE TABLE "products" (
     "slug" VARCHAR(255) NOT NULL,
     "sku" TEXT NOT NULL,
     "description" TEXT,
+    "features" TEXT[],
     "price" DOUBLE PRECISION NOT NULL,
     "old_price" DOUBLE PRECISION NOT NULL,
     "image" VARCHAR(255),
@@ -185,10 +186,12 @@ CREATE TABLE "orders" (
     "user_id" INTEGER NOT NULL,
     "shipping_address_id" INTEGER NOT NULL,
     "billing_address_id" INTEGER NOT NULL,
+    "email" TEXT,
     "total" DOUBLE PRECISION NOT NULL,
     "subtotal" DOUBLE PRECISION NOT NULL,
     "tax" DOUBLE PRECISION NOT NULL,
     "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
+    "payment_method" "PaymentMethod" NOT NULL,
     "payment_status" "PaymentStatus" DEFAULT 'PENDING',
     "shipping_method" "ShippingMethod",
     "shipping_fee" DOUBLE PRECISION NOT NULL,
@@ -205,6 +208,7 @@ CREATE TABLE "order_items" (
     "id" SERIAL NOT NULL,
     "order_id" INTEGER NOT NULL,
     "variant_id" INTEGER NOT NULL,
+    "image" TEXT,
     "quantity" INTEGER NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -219,6 +223,8 @@ CREATE TABLE "payments" (
     "order_id" INTEGER NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
     "payment_method" "PaymentMethod" NOT NULL,
+    "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
+    "reference" TEXT NOT NULL,
     "transaction_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -245,8 +251,17 @@ CREATE TABLE "carts" (
     "cart_number" TEXT NOT NULL,
     "user_id" INTEGER,
     "status" "CartStatus" NOT NULL DEFAULT 'ACTIVE',
+    "email" TEXT,
+    "total" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "subtotal" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "tax" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "shipping_fee" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "payment_method" "PaymentMethod",
+    "shipping_method" "ShippingMethod",
+    "shipping_address_id" INTEGER,
+    "billing_address_id" INTEGER,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "last_updated" TIMESTAMP(3) NOT NULL,
+    "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "carts_pkey" PRIMARY KEY ("id")
 );
@@ -268,14 +283,16 @@ CREATE TABLE "cart_items" (
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "hashed_password" TEXT NOT NULL,
     "first_name" TEXT,
     "last_name" TEXT,
-    "email" TEXT,
-    "emailVerified" TIMESTAMP(3),
     "status" "statuses" NOT NULL DEFAULT 'pending',
-    "hashed_password" TEXT NOT NULL,
-    "image" TEXT,
     "role" "roles" NOT NULL DEFAULT 'customer',
+    "image" TEXT,
+    "email_verified" TIMESTAMP(3),
+    "email_verification_token" TEXT,
+    "email_verification_expires" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
 
@@ -387,6 +404,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE INDEX "users_first_name_last_name_email_idx" ON "users"("first_name", "last_name", "email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "favorites_user_id_product_id_key" ON "favorites"("user_id", "product_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_ProductBrands_AB_unique" ON "_ProductBrands"("A", "B");
 
 -- CreateIndex
@@ -459,10 +479,16 @@ ALTER TABLE "payments" ADD CONSTRAINT "payments_order_id_fkey" FOREIGN KEY ("ord
 ALTER TABLE "carts" ADD CONSTRAINT "carts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "carts" ADD CONSTRAINT "carts_shipping_address_id_fkey" FOREIGN KEY ("shipping_address_id") REFERENCES "addresses"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "carts" ADD CONSTRAINT "carts_billing_address_id_fkey" FOREIGN KEY ("billing_address_id") REFERENCES "addresses"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "cart_items" ADD CONSTRAINT "cart_items_cart_id_fkey" FOREIGN KEY ("cart_id") REFERENCES "carts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "cart_items" ADD CONSTRAINT "cart_items_variant_id_fkey" FOREIGN KEY ("variant_id") REFERENCES "product_variants"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "cart_items" ADD CONSTRAINT "cart_items_variant_id_fkey" FOREIGN KEY ("variant_id") REFERENCES "product_variants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "favorites" ADD CONSTRAINT "favorites_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

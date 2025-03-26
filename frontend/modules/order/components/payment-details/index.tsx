@@ -1,6 +1,6 @@
 import { paymentInfoMap } from "@lib/constants";
 
-import { Order } from "@/lib/models";
+import { Order } from "@/types/models";
 
 type PaymentDetailsProps = {
     order: Order;

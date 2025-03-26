@@ -153,7 +153,7 @@ export const PaginatedCollectionSchema = PagSchema.extend({
     collections: z.array(CollectionSchema),
 });
 
-const PaginationSchema = z.object({
+export const PaginationSchema = z.object({
     page: z.number(),
     limit: z.number(),
     total_count: z.number(),
@@ -174,7 +174,7 @@ export const ProductSearchSchema = z.object({
     ratings: z.number(),
     categories: z.array(z.string()),
     collections: z.array(z.string()),
-    brands: z.array(z.string()),
+    brand: z.string(),
     tags: z.null(),
     images: z.array(z.string()),
     reviews: z.array(z.any()).nullable(),
@@ -195,7 +195,7 @@ export const ProductSchema = z.object({
     ratings: z.number(),
     categories: z.array(CategorySchema),
     collections: z.array(CollectionSchema),
-    brands: z.array(BrandSchema),
+    brand: BrandSchema,
     tags: z.null(),
     images: z.array(ProductImageSchema),
     reviews: z.array(ReviewSchema),
@@ -235,15 +235,12 @@ export const CartSchema = z.object({
     gift_cards: z.any(),
 });
 
-const DeliveryOptionSchema = z.object({
-    id: z.string(),
+export const DeliveryOptionSchema = z.object({
+    id: ShippingMethodSchema,
     name: z.string(),
     amount: z.number(),
-});
-
-const PaymentSessionSchema = z.object({
-    id: z.string(),
-    provider_id: z.string(),
+    amount_str: z.string(),
+    description: z.string(),
 });
 
 export const OrderItemSchema = z.object({
@@ -312,7 +309,7 @@ export const PaginatedSiteConfigSchema = PagSchema.extend({
 });
 
 export const FacetSchema = z.object({
-    brands: z.record(z.string()).optional(),
+    brand: z.record(z.string()).optional(),
     categories: z.record(z.string()).optional(),
     collections: z.record(z.string()).optional(),
 });
@@ -342,4 +339,14 @@ export const SessionSchema = z.object({
 export const MessageSchema = z.object({
     message: z.string(),
     error: z.boolean().default(false),
+});
+
+export const PaystackResponseSchema = z.object({
+    message: z.string(),
+    redirecturl: z.string(),
+    reference: z.string(),
+    status: z.string(),
+    trans: z.string(),
+    transaction: z.string(),
+    trxref: z.string(),
 });

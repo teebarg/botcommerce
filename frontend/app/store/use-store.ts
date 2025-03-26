@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Category, Collection, Product, Brand } from "@/lib/models";
+import { Category, Collection, Product, Brand } from "@/types/models";
 
 interface StoreState {
     count: number;

@@ -13,7 +13,7 @@ import PaginationUI from "@/components/pagination";
 import DrawerUI from "@/components/drawer";
 import { ProductView } from "@/components/products/product-view";
 import { ProductActions } from "@/components/products/product-actions";
-import { Brand, Category, Collection, Product } from "@/lib/models";
+import { Brand, Category, Collection, Product } from "@/types/models";
 import { useStore } from "@/app/store/use-store";
 
 interface ProductInventoryProps {

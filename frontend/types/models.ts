@@ -41,6 +41,9 @@ import {
     AddressSchema,
     OrderItemSchema,
     PaginatedAddressSchema,
+    DeliveryOptionSchema,
+    PaginationSchema,
+    PaystackResponseSchema,
 } from "./schema";
 
 export type Facet = z.infer<typeof FacetSchema>;
@@ -62,6 +65,9 @@ export type PaginatedReview = z.infer<typeof PaginatedReviewSchema>;
 export type Token = z.infer<typeof TokenSchema>;
 export type Session = z.infer<typeof SessionSchema>;
 export type Pag = z.infer<typeof PagSchema>;
+export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
+export type Pagination = z.infer<typeof PaginationSchema>;
+
 // cart
 export type CartItem = z.infer<typeof CartItemSchema>;
 export type Cart = z.infer<typeof CartSchema>;
@@ -91,6 +97,8 @@ export type ShippingMethod = z.infer<typeof ShippingMethodSchema>;
 export type Role = z.infer<typeof RoleSchema>;
 export type Status = z.infer<typeof StatusSchema>;
 
+export type PaystackResponse = z.infer<typeof PaystackResponseSchema>;
+
 // custom
 export type CartUpdate = {
     status?: CartStatus;
@@ -113,3 +121,20 @@ export type CartComplete = {
     status?: OrderStatus;
     payment_status?: PaymentStatus;
 };
+
+export enum FileTypes {
+    png = "image/png",
+    jpeg = "image/jpeg",
+    jpg = "image/jpg",
+    avif = "image/avif",
+    csv = "text/csv",
+    xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    xls = "application/vnd.ms-excel",
+}
+
+export type SortOptions = "price_asc" | "price_desc" | "created_at";
+
+export type IconProps = {
+    color?: string;
+    size?: string | number;
+} & React.SVGAttributes<SVGElement>;

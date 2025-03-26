@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/util/util";
-import { Message, PaginatedReview, Review } from "@/lib/models";
+import { Message, PaginatedReview, Review } from "@/types/models";
 import { revalidate } from "@/actions/revalidate";
 
 // Review API methods

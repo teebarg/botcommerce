@@ -8,7 +8,7 @@ import OrderSummary from "@modules/order/components/order-summary";
 import ShippingDetails from "@modules/order/components/shipping-details";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { Order } from "@/lib/models";
+import { Order } from "@/types/models";
 import OrderItems from "@/components/order/order-details";
 
 type OrderDetailsTemplateProps = {

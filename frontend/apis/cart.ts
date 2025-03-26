@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { revalidate } from "@/actions/revalidate";
-import { Cart, CartComplete, CartItem, CartUpdate, Message, Order } from "@/lib/models";
+import { Cart, CartComplete, CartItem, CartUpdate, Message, Order } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Cart API methods

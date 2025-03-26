@@ -9,7 +9,7 @@ import { currency } from "@lib/util/util";
 
 import Control from "@/modules/cart/templates/control";
 import LocalizedClientLink from "@/components/ui/link";
-import { CartItem } from "@/lib/models";
+import { CartItem } from "@/types/models";
 
 type ItemsTemplateProps = {
     items: CartItem[];

@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl, handleError } from "@/lib/util/util";
-import { Message, PaginatedProduct, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/lib/models";
+import { Message, PaginatedProduct, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/types/models";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { IconProps } from "@/types/global";
+import { IconProps } from "@/types/models";
 
 const Logo: React.FC<IconProps> = ({ width = "20", height = "18.75", color = "currentColor", ...attributes }) => {
     return (

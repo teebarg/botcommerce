@@ -6,7 +6,7 @@ import { Pencil } from "nui-react-icons";
 import ShippingAddress from "../shipping-address";
 
 import { cn } from "@/lib/util/cn";
-import { Cart } from "@/lib/models";
+import { Cart } from "@/types/models";
 
 const Addresses = ({
     cart,

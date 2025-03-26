@@ -7,7 +7,7 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config";
-import { Pag } from "@/lib/models";
+import { Pag } from "@/types/models";
 
 const users = [
     {

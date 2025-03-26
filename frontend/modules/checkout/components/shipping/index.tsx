@@ -4,15 +4,14 @@ import { Pencil } from "nui-react-icons";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { DeliveryOption } from "types/global";
 import { toast } from "sonner";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { Cart } from "@/lib/models";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";
+import { Cart, DeliveryOption } from "@/types/models";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;

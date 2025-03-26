@@ -1,4 +1,4 @@
-import { Order } from "@/lib/models";
+import { Order } from "@/types/models";
 
 const OrderInfo: React.FC<{ order: Order }> = ({ order }) => {
     return (

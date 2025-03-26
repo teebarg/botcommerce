@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { CollectionTemplate } from "@modules/collections/templates";
-import { SortOptions } from "types/global";
+import { SortOptions } from "types/models";
 import { Suspense } from "react";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";

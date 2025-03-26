@@ -5,9 +5,8 @@ import Shipping from "@modules/checkout/components/shipping";
 import { cookies } from "next/headers";
 
 import { currency } from "@/lib/util/util";
-import { Cart } from "@/lib/models";
-import { DeliveryOption } from "@/types/global";
 import { auth } from "@/actions/auth";
+import { Cart, DeliveryOption } from "@/types/models";
 
 type CheckoutFormProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;

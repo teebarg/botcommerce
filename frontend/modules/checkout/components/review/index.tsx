@@ -6,7 +6,7 @@ import { siteConfig } from "@lib/config";
 import PaymentButton from "../payment-button";
 
 import { cn } from "@/lib/util/cn";
-import { Cart, Session } from "@/lib/models";
+import { Cart, Session } from "@/types/models";
 
 const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">; customer: Session | null }) => {
     const searchParams = useSearchParams();

@@ -10,9 +10,9 @@ import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
 
 import { Button } from "@/components/ui/button";
-import { Brand, Category, Collection } from "@/lib/models";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Brand, Category, Collection } from "@/types/models";
 
 interface ComponentProps {
     count: any;
@@ -39,7 +39,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                     <div className="flex flex-row gap-2">
                         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
                             <DrawerTrigger asChild>
-                                <Button size="sm" aria-label="filters" className="md:hidden" onClick={state.open}>
+                                <Button aria-label="filters" className="md:hidden" size="sm" onClick={state.open}>
                                     <FunnelIcon className="text-default-500 mr-1" focusable="false" role="img" size={16} />
                                     Filters ({count})
                                 </Button>
@@ -49,7 +49,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                                     <DrawerTitle>
                                         <div className="flex items-center justify-between p-4 border-b">
                                             <h2 className="text-lg font-semibold">Filters</h2>
-                                            <button onClick={() => state.close()} className="p-2">
+                                            <button className="p-2" onClick={() => state.close()}>
                                                 <X size={24} />
                                             </button>
                                         </div>

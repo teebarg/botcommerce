@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/util/util";
-import { PaginatedCategory, Category, Message } from "@/lib/models";
+import { PaginatedCategory, Category, Message } from "@/types/models";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 

@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { revalidate, signOut } from "@/actions/revalidate";
-import { Message, Token } from "@/lib/models";
+import { Message, Token } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Product API methods

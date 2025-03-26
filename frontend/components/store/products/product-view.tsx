@@ -10,7 +10,7 @@ import ProductDetails from "@/modules/products/templates/details";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import ProductShare from "@/components/product/product-share";
-import { Product, ProductImage } from "@/lib/models";
+import { Product, ProductImage } from "@/types/models";
 import { Button } from "@/components/ui/button";
 
 interface Props {

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 // import { Minus, Plus, Trash } from "nui-react-icons";
 
 import { BtnLink } from "@/components/ui/btnLink";
-import { CartItem } from "@/lib/models";
+import { CartItem } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";

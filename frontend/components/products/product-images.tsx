@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Trash } from "nui-react-icons";
 
-import { ProductImage } from "@/lib/models";
+import { ProductImage } from "@/types/models";
 import { api } from "@/apis";
 
 interface ProductImageManagerProps {

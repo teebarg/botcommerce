@@ -5,7 +5,7 @@ import NewsletterForm from "@modules/store/components/newsletter";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 import ServerError from "@/components/server-error";
 
 const about = [

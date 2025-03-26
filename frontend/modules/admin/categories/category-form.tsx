@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 import { mutateCategory } from "@/actions/category";
 
 interface Props {

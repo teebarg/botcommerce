@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { CategoryForm } from "./category-form";
 
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 import { deleteCategory } from "@/actions/category";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";

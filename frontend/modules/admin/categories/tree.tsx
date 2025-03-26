@@ -7,7 +7,7 @@ import CategoryAction from "./categories-control";
 
 import { cn } from "@/lib/util/cn";
 import Chip from "@/components/ui/chip";
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 
 interface Props {
     categories: Category[];

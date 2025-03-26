@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import AddressSelect from "../address-select";
 
-import { Cart, CartUpdate } from "@/lib/models";
+import { Cart, CartUpdate } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import compareAddresses from "@/lib/util/compare-addresses";

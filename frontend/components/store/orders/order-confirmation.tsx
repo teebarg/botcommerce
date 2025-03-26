@@ -4,7 +4,7 @@ import FailedPayment from "./order-failed";
 import PendingPayment from "./order-pending";
 import SuccessConfirmation from "./order-success";
 
-import { Order, PaymentStatus } from "@/lib/models";
+import { Order, PaymentStatus } from "@/types/models";
 
 type OrderConfirmationProps = {
     status: PaymentStatus;

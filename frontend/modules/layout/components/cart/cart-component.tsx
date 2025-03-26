@@ -5,7 +5,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { Cart, CartItem } from "@/lib/models";
+import { Cart, CartItem } from "@/types/models";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import CartDetails from "@/components/cart/cart-details";
 import { Button } from "@/components/ui/button";

@@ -44,8 +44,9 @@ enum CartStatus {
 
 enum PaymentStatus {
   PENDING
-  COMPLETED
   FAILED
+  SUCCESS
+  REFUNDED
 }
 
 enum ShippingMethod {
@@ -115,7 +116,7 @@ model Brand {
   name         String         @unique @db.VarChar(255)
   slug         String         @unique @db.VarChar(255)
   is_active    Boolean
-  products     Product[]      @relation("ProductBrands")
+  products     Product[]
 
   created_at    DateTime        @default(now())
   updated_at    DateTime        @updatedAt
@@ -168,7 +169,8 @@ model Product {
   ratings            Float?               @default(0)
   categories         Category[]           @relation("ProductCategories")
   collections        Collection[]         @relation("ProductCollections")
-  brands             Brand[]              @relation("ProductBrands")
+  brand              Brand?               @relation(fields: [brand_id], references: [id], onDelete: SetNull)
+  brand_id           Int?
   tags               Tag[]                @relation("ProductTags")
   images             ProductImage[]
   reviews            Review[]
@@ -309,6 +311,8 @@ model Payment {
   order_id       Int           @unique
   amount         Float         @db.DoublePrecision
   payment_method PaymentMethod
+  status         PaymentStatus @default(PENDING)
+  reference      String
   transaction_id String
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt

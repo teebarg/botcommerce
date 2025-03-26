@@ -7,8 +7,8 @@ import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
 import { ReviewForm } from "@/modules/admin/reviews/reviews-form";
 import { timeAgo } from "@/lib/util/util";
-import { Review } from "@/lib/models";
 import { api } from "@/apis";
+import { Review } from "@/types/models";
 
 export const metadata: Metadata = {
     title: `Reviews Page | Children clothing | ${siteConfig.name} Store`,
@@ -68,7 +68,7 @@ export default async function ReviewsPage(props: { searchParams: SearchParams })
                         ))}
                         {reviews?.length === 0 && (
                             <tr>
-                                <td className="text-center py-4 text-lg text-default-500" colSpan={5}>
+                                <td className="text-center py-4 text-lg text-default-500" colSpan={6}>
                                     No Reviews found.
                                 </td>
                             </tr>

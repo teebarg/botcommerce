@@ -11,7 +11,7 @@ import { Pagination } from "../pagination";
 import { SlideOver } from "../slideover";
 
 import { Button } from "@/components/ui/button";
-import { Pag } from "@/lib/models";
+import { Pag } from "@/types/models";
 import { api } from "@/apis";
 import { X } from "lucide-react";
 

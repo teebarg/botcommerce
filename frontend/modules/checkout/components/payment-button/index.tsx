@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Cart, Session } from "@/lib/models";
+import { Cart, Session } from "@/types/models";
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";
 import { api } from "@/apis";
 import { subtotal, taxTotal, total } from "@/lib/util/store";

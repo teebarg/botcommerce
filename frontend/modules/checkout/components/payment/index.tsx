@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { Cart, PaymentMethod } from "@/lib/models";
+import { Cart, PaymentMethod } from "@/types/models";
 import { api } from "@/apis";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
@@ -49,11 +49,6 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
         setIsLoading(true);
         const method = payMethods.find((item) => item.provider_id == providerId);
 
-        // await setPaymentMethod(method as PaymentSession)
-        //     .catch((err) => setError(err.toString()))
-        //     .finally(() => {
-        //         setIsLoading(false);
-        //     });
         const { error } = await api.cart.updateDetails({ payment_method: providerId });
 
         if (error) {

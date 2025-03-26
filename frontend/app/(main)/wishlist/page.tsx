@@ -7,7 +7,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
-import { WishItem } from "@/lib/models";
+import { WishItem } from "@/types/models";
 
 export const revalidate = 3;
 

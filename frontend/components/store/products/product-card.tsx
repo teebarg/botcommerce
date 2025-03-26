@@ -7,7 +7,7 @@ import { Heart } from "nui-react-icons";
 import { toast } from "sonner";
 import { ShoppingCart } from "lucide-react";
 
-import { ProductSearch, WishItem } from "@/lib/models";
+import { ProductSearch, WishItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";

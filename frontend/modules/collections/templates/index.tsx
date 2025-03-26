@@ -1,7 +1,6 @@
 import React from "react";
 import { ChevronRight, Exclamation, Tag } from "nui-react-icons";
 import { Pagination } from "@modules/common/components/pagination";
-import { SortOptions } from "types/global";
 
 import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
@@ -10,10 +9,10 @@ import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/apis";
-import { Category, Collection, ProductSearch, WishItem } from "@/lib/models";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/server-error";
 import ProductCard from "@/components/store/products/product-card";
+import { Category, Collection, ProductSearch, SortOptions, WishItem } from "@/types/models";
 
 type SearchParams = Promise<{
     page?: number;

@@ -5,7 +5,7 @@ import React from "react";
 import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
 
-import { Order, OrderItem } from "@/lib/models";
+import { Order, OrderItem } from "@/types/models";
 
 type OrderTotalsProps = {
     data: Order;
