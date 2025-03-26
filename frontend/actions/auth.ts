@@ -100,7 +100,7 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     const { access_token } = data;
     await setSession(access_token);
 
-    return {error: false, message: "Successful"}
+    return { error: false, message: "Successful" };
 }
 
 export async function googleLogin(customer: { first_name: string; last_name: string; password: string; email: string }) {

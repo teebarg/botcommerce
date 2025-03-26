@@ -20,10 +20,7 @@ export default function SignUp() {
 
             <SignUpForm />
             <p className="mt-6 text-xs text-default-500 text-center font-medium">
-                Already have an account?{" "}
-                <LocalizedClientLink href="/sign-in">
-                    Sign in
-                </LocalizedClientLink>
+                Already have an account? <LocalizedClientLink href="/sign-in">Sign in</LocalizedClientLink>
             </p>
         </>
     );

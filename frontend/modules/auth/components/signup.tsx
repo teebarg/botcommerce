@@ -24,7 +24,7 @@ const SignUpForm: React.FC<Props> = () => {
             toast.error(state.message);
             return;
         }
-        toast.success("Please check your email to verify your account")
+        toast.success("Please check your email to verify your account");
         window.location.href = "/";
     }, [state]);
 

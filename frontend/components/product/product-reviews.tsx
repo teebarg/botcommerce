@@ -1,5 +1,6 @@
 import React from "react";
 import { MessageSquare, Star } from "nui-react-icons";
+import { PencilLine } from "lucide-react";
 
 import ReviewForm from "./review-form";
 
@@ -7,7 +8,6 @@ import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { timeAgo } from "@/lib/util/util";
 import { Product, Review } from "@/lib/models";
-import { PencilLine } from "lucide-react";
 import { auth } from "@/actions/auth";
 
 interface Prop {
@@ -20,10 +20,10 @@ interface RatingDistribution {
 }
 
 const ReviewsSection: React.FC<Prop> = async ({ product }) => {
-    const user = await auth()
+    const user = await auth();
 
     if (!user) {
-        return
+        return;
     }
 
     const reviews: Review[] = product.reviews?.sort(
