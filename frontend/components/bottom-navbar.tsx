@@ -1,11 +1,18 @@
 import { cn } from "@lib/util/cn";
 import React from "react";
-import { HeartFilled, Home, Search, User } from "nui-react-icons";
+import { Home, Search } from "nui-react-icons";
+import { MenuIcon, User } from "lucide-react";
+
+import Menu from "./menu";
 
 import { Cart } from "@/modules/layout/components/cart";
 import LocalizedClientLink from "@/components/ui/link";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { auth } from "@/actions/auth";
 
 const ButtonNav = async ({ className }: { className?: string }) => {
+    const user = await auth();
+
     interface NavLink {
         icon: React.ReactNode;
         label: string;
@@ -14,29 +21,19 @@ const ButtonNav = async ({ className }: { className?: string }) => {
 
     const nav: NavLink[] = [
         {
-            icon: <Home className="h-6 w-6" />,
+            icon: <Home className="h-7 w-7" />,
             label: "Home",
             href: "/",
         },
         {
-            icon: <Search className="h-6 w-6" />,
+            icon: <Search className="h-7 w-7" />,
             label: "Shop",
             href: "/collections",
         },
         {
-            icon: <Cart />,
-            label: "Cart",
-            href: "/cart-check",
-        },
-        {
-            icon: <User className="h-6 w-6" viewBox="0 0 20 20" />,
+            icon: <User className="h-7 w-7" />,
             label: "Account",
             href: "/account",
-        },
-        {
-            icon: <HeartFilled className="h-6 w-6" />,
-            label: "Menu",
-            href: "/menu",
         },
     ];
 
@@ -50,9 +47,29 @@ const ButtonNav = async ({ className }: { className?: string }) => {
             {nav.map((item: NavLink, index: number) => (
                 <LocalizedClientLink key={index} active="text-rose-600" className={cn("flex flex-col items-center")} href={item.href}>
                     {item.icon}
-                    <p className="text-sm font-semibold">{item.label}</p>
+                    {item.label}
+                    {/* <p className="font-semibold">{item.label}</p> */}
                 </LocalizedClientLink>
             ))}
+            <span className="flex flex-col items-center">
+                <Cart />
+                Cart
+            </span>
+
+            <Drawer>
+                <DrawerTrigger>
+                    <span className="flex flex-col items-center">
+                        <MenuIcon className="h-8 w-8" />
+                        Menu
+                    </span>
+                </DrawerTrigger>
+                <DrawerContent>
+                    <DrawerHeader>
+                        <DrawerTitle className="sr-only">Menu</DrawerTitle>
+                    </DrawerHeader>
+                    <Menu user={user} />
+                </DrawerContent>
+            </Drawer>
         </nav>
     );
 };

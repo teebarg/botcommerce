@@ -275,7 +275,7 @@ export const OrderSchema = z.object({
     shipping_address: AddressSchema,
     shipping_method: ShippingMethodSchema,
     payment_method: PaymentMethodSchema,
-    payment_status: z.enum(["pending", "paid"]),
+    payment_status: PaymentStatusSchema,
     created_at: z.string(),
     updated_at: z.string(),
 });

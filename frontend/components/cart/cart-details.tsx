@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash, X } from "lucide-react";
 import { toast } from "sonner";
+// import { Minus, Plus, Trash } from "nui-react-icons";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import { CartItem } from "@/lib/models";
@@ -143,7 +144,7 @@ const CartDetails: React.FC<Props> = ({ onClose, items, shippingFee }) => {
                                             className="text-red-500 hover:text-red-700 text-sm flex items-center"
                                             onClick={() => removeItem(item.id)}
                                         >
-                                            <Trash2 className="h-3 w-3 mr-1" />
+                                            <Trash className="h-3 w-3 mr-1" />
                                             Remove
                                         </button>
                                     </div>

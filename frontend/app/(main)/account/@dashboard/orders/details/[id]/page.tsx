@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import OrderDetailsTemplate from "@modules/order/templates/order-details-template";
 
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
+import OrderConfirmation from "@/components/store/orders/order-confirmation";
 
 type Params = Promise<{ id: string }>;
 
@@ -32,5 +32,5 @@ export default async function OrderDetailPage({ params }: { params: Params }) {
         notFound();
     }
 
-    return <OrderDetailsTemplate order={order} />;
+    return <OrderConfirmation order={order} status={order.payment_status} />;
 }

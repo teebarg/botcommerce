@@ -4,7 +4,7 @@ import type { FileDropItem } from "@react-aria/dnd";
 
 import { DropZone } from "react-aria-components";
 import React from "react";
-import { Cancel, UploadIcon } from "nui-react-icons";
+import { Cancel, Upload } from "nui-react-icons";
 import { FileTrigger } from "@modules/common/components/file-trigger";
 import useWatch from "@lib/hooks/use-watch";
 import { FileTypes } from "types/global";
@@ -77,7 +77,7 @@ const DragNDrop: React.FC<DragNDropProps> = ({ onSelect, onError, maxFileSize = 
                 }}
             >
                 <div className="text-center space-y-2">
-                    <UploadIcon className="h-16 w-16 inline" fill="#007bff" />
+                    <Upload className="h-16 w-16 inline" fill="#007bff" />
                     <p>
                         Drop your files here or{" "}
                         <button aria-label="browse" className="link">

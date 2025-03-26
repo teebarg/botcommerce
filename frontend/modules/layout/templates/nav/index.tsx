@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Cart } from "@modules/layout/components/cart";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { HeartFilled, Heart, Home, UserGroup, User, Checkout, Collection } from "nui-react-icons";
+import { HeartFilled, Heart, Home, UserGroup, User, Checkout, Collection, ShoppingCart } from "nui-react-icons";
 import dynamic from "next/dynamic";
 
 import Search from "@/modules/search/components/search";
@@ -56,13 +56,7 @@ const Navbar = async () => {
                     <Search className="w-full justify-between" />
                 </NavbarItem>
                 <NavbarItem className="md:w-[25vw] flex gap-3 justify-end items-center">
-                    <Suspense
-                        fallback={
-                            <div className="hover:text-default-900" data-testid="nav-cart-link">
-                                Cart (0)
-                            </div>
-                        }
-                    >
+                    <Suspense fallback={<ShoppingCart className="w-6 h-6" />}>
                         <Cart />
                     </Suspense>
                     <ThemeButton />

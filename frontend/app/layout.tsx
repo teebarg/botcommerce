@@ -10,6 +10,7 @@ import { cn } from "@/lib/util/cn";
 import { siteConfig } from "@/lib/config";
 import { auth } from "@/actions/auth";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import WhatsAppWidget from "@/components/ui/whatsapp-widget";
 
 const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
 
@@ -68,6 +69,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     </div>
                     {/* {!user && <Google />} */}
                 </ProgressBar>
+                <WhatsAppWidget />
             </body>
         </html>
     );

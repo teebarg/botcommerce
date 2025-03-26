@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import React from "react";
-import { ChevronRight, Tag } from "nui-react-icons";
+import { ChevronRight, Loader, Tag } from "nui-react-icons";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
 
 import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
@@ -174,7 +173,7 @@ export default function InfiniteScrollClient({
                 <div className="w-full">
                     {hasNext && (
                         <div ref={scrollTrigger} className="mt-8 flex flex-col items-center justify-center text-blue-600">
-                            <Loader2 className="h-8 w-8 animate-spin mb-2" />
+                            <Loader className="h-8 w-8 animate-spin mb-2" />
                             <p className="text-sm font-medium text-gray-500">Loading more products...</p>
                         </div>
                     )}

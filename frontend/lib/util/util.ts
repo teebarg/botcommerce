@@ -128,8 +128,12 @@ const timeAgo = (timestamp: string) => {
     else return `${Math.floor(diff / 86400)} days ago`;
 };
 
+const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+};
+
 const handleError = (error: any): Message => {
     return { message: (error as Error).message || "An error occurred", error: true };
 };
 
-export { handleError, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo };
+export { handleError, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo, formatDate };

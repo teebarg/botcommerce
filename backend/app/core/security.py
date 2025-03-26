@@ -40,3 +40,19 @@ def verify_magic_link_token(token: str) -> Union[str, None]:
         return None
     except jwt.JWTError:
         return None
+
+def create_email_verification_token(email: str) -> str:
+    """Create a token for email verification"""
+    to_encode = {"sub": email, "type": "email_verification"}
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verify_email_token(token: str) -> str | None:
+    """Verify an email verification token and return the email if valid"""
+    try:
+        decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+        if decoded_token.get("type") != "email_verification":
+            return None
+        return decoded_token.get("sub")
+    except jwt.JWTError:
+        return None

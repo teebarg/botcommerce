@@ -1,4 +1,4 @@
-import OrderDetail from "@/modules/orders/components/order-detail";
+import OrderDetail from "@/components/order/order-detail";
 
 export default function OrderDetailPage() {
     return (

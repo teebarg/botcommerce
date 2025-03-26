@@ -3,20 +3,19 @@
 import { newsletterForm } from "@modules/account/actions";
 import { useActionState, useEffect, useRef } from "react";
 import { Mail } from "nui-react-icons";
-import { useSnackbar } from "notistack";
 import { Input } from "@components/ui/input";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function NewsletterForm() {
-    const { enqueueSnackbar } = useSnackbar();
     const [state, formAction, isPending] = useActionState(newsletterForm, { success: false, message: "" });
     const formRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
         if (state?.message) {
             formRef?.current?.reset(); // Reset the form fields
-            enqueueSnackbar(state.message, { variant: state.success ? "success" : "error" });
+            toast.success(state.message);
         }
     }, [state]);
 

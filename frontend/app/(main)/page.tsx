@@ -144,16 +144,14 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative py-2">
-                    <PromotionalBanner
-                        btnClass="text-purple-600"
-                        outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
-                        subtitle="Get up to 50% OFF on select products."
-                        title="Big Sale on Top Brands!"
-                    />
-                </div>
+                <PromotionalBanner
+                    btnClass="text-purple-600"
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
+                    subtitle="Get up to 50% OFF on select products."
+                    title="Big Sale on Top Brands!"
+                />
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative py-2 md:py-8 px-4 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="max-w-8xl mx-auto relative px-1 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                                 <span className="text-secondary text-3xl font-semibold">{siteConfig.name}</span>
@@ -179,12 +177,12 @@ export default async function Home() {
                 </div>
                 <PromotionalBanner
                     btnClass="text-purple-600"
-                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
                     subtitle="Get up to 50% OFF on select products."
                     title="Big Sale on Top Brands!"
                 />
                 <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative py-8 px-4 md:px-0">
+                    <div className="max-w-8xl mx-auto relative px-1 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
                             {trending?.map((product: ProductSearch, index: number) => (
@@ -193,16 +191,14 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="relative">
-                    <PromotionalBanner
-                        btnClass="text-purple-600"
-                        outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl"
-                        subtitle="Get up to 50% OFF on select products."
-                        title="Big Sale on Top Brands!"
-                    />
-                </div>
-                <div className="bg-content1 py-12">
-                    <div className="max-w-8xl mx-auto px-4">
+                <PromotionalBanner
+                    btnClass="text-purple-600"
+                    outerClass="rom-purple-500 to-pink-500 md:mx-auto max-w-8xl my-4"
+                    subtitle="Get up to 50% OFF on select products."
+                    title="Big Sale on Top Brands!"
+                />
+                <div className="bg-content1">
+                    <div className="max-w-8xl mx-auto px-1 md:px-0">
                         <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
                         <p className="text-default-500">
@@ -216,45 +212,37 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div
-                    className="bg-fixed bg-center"
-                    style={{
-                        backgroundImage:
-                            'url("https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fhero-contact.jpg?alt=media")',
-                    }}
-                >
-                    <div className="flex items-center h-full">
-                        <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
-                            <div className="sm:w-1/2 sm:pr-10 backdrop-blur-sm bg-black/50 text-gray-100 p-4 sm:p-8 rounded-lg">
-                                <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
-                                <p className="text-xl font-semibold">Reach out to us for more information</p>
-                                <p className="font-medium">
-                                    For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have
-                                    about our products and services.
-                                </p>
-                                <ContactForm />
-                            </div>
-                            <div className="sm:w-1/2 backdrop-blur-sm bg-black/50 px-4 py-12 sm:p-8 rounded-lg text-gray-100 mt-6 sm:mt-0">
+                <div className="">
+                    <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
+                        <div className="sm:w-1/2 sm:pr-10 p-4 sm:p-8 rounded-lg">
+                            <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
+                            <p className="text-xl font-medium text-default-800">Reach out to us for more information</p>
+                            <p className="font-semibold text-default-600">
+                                For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have about
+                                our products and services.
+                            </p>
+                            <ContactForm />
+                        </div>
+                        <div className="sm:w-1/2 px-4 py-12 sm:p-8 rounded-lg mt-6 sm:mt-0">
+                            <div>
+                                <p className="font-semibold text-md text-default-500">Our Contacts</p>
+                                <div className="flex gap-2 text-default-800">
+                                    <Mail />
+                                    <p>{siteConfig.contactEmail}</p>
+                                </div>
+                                <p className="font-semibold mt-6 text-md text-default-500">Location</p>
+                                <div className="flex gap-2 text-default-800">
+                                    <Location className="fill-current" />
+                                    <p className="underline">Lagos, LA NG</p>
+                                </div>
+                                <p className="font-semibold mt-6 text-md text-default-500">Opening Hours</p>
                                 <div>
-                                    <p className="font-semibold text-xl">Our Contacts</p>
-                                    <div className="flex gap-2">
-                                        <Mail />
-                                        <p>{siteConfig.contactEmail}</p>
-                                    </div>
-                                    <p className="font-semibold mt-6 text-xl">Location</p>
-                                    <div className="flex gap-2">
-                                        <Location className="fill-current" />
-                                        <p className="underline">Lagos, LA NG</p>
-                                    </div>
-                                    <p className="font-semibold mt-6 text-xl">Opening Hours</p>
-                                    <div>
-                                        {openingHours?.map((hour, index) => (
-                                            <div key={index} className="grid grid-cols-3">
-                                                <p>{hour.day}</p>
-                                                <p className="col-span-2">{hour.time}</p>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    {openingHours?.map((hour, index) => (
+                                        <div key={index} className="grid grid-cols-3">
+                                            <p>{hour.day}</p>
+                                            <p className="col-span-2">{hour.time}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>

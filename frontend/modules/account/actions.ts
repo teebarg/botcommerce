@@ -2,8 +2,6 @@
 
 import { addShippingAddress, deleteActivities, deleteShippingAddress, updateBillingAddress, updateCustomer, updateShippingAddress } from "@lib/data";
 import { revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 
 export async function updateCustomerName(_currentState: Record<string, unknown>, formData: FormData) {
     const customer = {

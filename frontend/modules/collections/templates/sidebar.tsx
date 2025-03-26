@@ -50,7 +50,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
     };
 
     return (
-        <div className="h-full min-w-[20rem] max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-default-100 rounded-xl">
+        <div className="h-full min-w-[20rem] md:max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-content1 rounded-xl">
             <div className="w-full max-w-sm p-6">
                 <div>
                     <span className="text-sm">Collections</span>

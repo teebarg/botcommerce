@@ -2,29 +2,21 @@
 
 import { submitContactForm } from "@modules/account/actions";
 import { useActionState, useEffect, useRef } from "react";
-import { useSnackbar } from "notistack";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
 
 import { Button } from "@/components/ui/button";
-
-const inputClass = {
-    inputWrapper: "bg-white/70",
-    label: "!text-gray-700",
-    input: "!text-gray-800 bg-transparent placeholder:text-gray-500",
-    description: "text-gray-100 text-xs",
-};
+import { toast } from "sonner";
 
 export default function ContactForm() {
-    const { enqueueSnackbar } = useSnackbar();
     const [state, formAction, isPending] = useActionState(submitContactForm, { success: false, message: "" });
     const formRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
         if (state?.message) {
             formRef?.current?.reset(); // Reset the form fields
-            enqueueSnackbar(state.message, { variant: state.success ? "success" : "error" });
+            toast.success(state.message);
         }
     }, [state]);
 
@@ -35,7 +27,7 @@ export default function ContactForm() {
                 <Input required className="" label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
                 <Input className="" label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
                 <Textarea required className="" label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
-                <div className="text-gray-100">
+                <div className="text-default-600">
                     <Checkbox defaultSelected color="danger" label="I allow this website to store my submission." name="agreement" />
                 </div>
                 <Button aria-label="submit" className="min-w-32" color="danger" isLoading={isPending} type="submit">

@@ -1,5 +1,6 @@
 import * as React from "react";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "nui-react-icons";
 
 import { ButtonProps, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";

@@ -7,7 +7,9 @@ import { jwtVerify } from "jose";
 import { signOut } from "./revalidate";
 
 import { api } from "@/apis";
-import { Session } from "@/lib/models";
+import { Session, User } from "@/lib/models";
+import { tryCatch } from "@/lib/try-catch";
+import { fetcher } from "@/apis/fetcher";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -92,35 +94,13 @@ export async function signUp(_currentState: unknown, formData: FormData) {
         phone: formData.get("phone"),
     } as any;
 
-    try {
-        const token = await api.auth.signUp(customer);
+    const { data, error } = await api.auth.signUp(customer);
+    if (error || !data) return { error: true, message: error };
 
-        // await api.auth.login({ email: customer.email, password: customer.password })
-        if (token) {
-            await setSession(token);
-        }
-        revalidateTag("customer");
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
-    }
-}
+    const { access_token } = data;
+    await setSession(access_token);
 
-export async function signIn(_prevState: unknown, formData: FormData) {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    try {
-        const token = await api.auth.login({ email, password });
-
-        if (token) {
-            await setSession(token);
-        }
-        revalidateTag("customer");
-
-        return { error: false, message: "Authentication successful" };
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
-    }
+    return { error: false, message: "Successful" };
 }
 
 export async function googleLogin(customer: { first_name: string; last_name: string; password: string; email: string }) {

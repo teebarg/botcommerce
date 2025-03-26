@@ -15,6 +15,8 @@ import ThemeButton from "@/lib/theme/theme-button";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import SignInPrompt from "@/modules/cart/components/sign-in-prompt";
+import { auth } from "@/actions/auth";
+import { total } from "@/lib/util/store";
 
 export const metadata: Metadata = {
     title: `Clothings | ${siteConfig.name} Store | Checkout`,
@@ -39,21 +41,18 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
 };
 
 export default async function Checkout() {
-    const [cartRes, user] = await Promise.all([api.cart.get(), api.user.me()]);
+    const { data, error } = await api.cart.get();
+    const user = await auth();
 
-    if (cartRes.error) {
+    if (error) {
         return <ServerError />;
     }
 
-    if (!cartRes.data) {
+    if (!data) {
         return <EmptyCart />;
     }
 
-    const { total } = cartRes.data;
-
-    const getAmount = (amount: number | null | undefined) => {
-        return currency(Number(amount) || 0);
-    };
+    const totalAmount = total(data.items, data.shipping_fee);
 
     return (
         <>
@@ -74,8 +73,8 @@ export default async function Checkout() {
                     <ThemeButton />
                 </header>{" "}
                 {/* Main Content */}
-                <main className="max-w-7xl mx-auto p-8">
-                    <div className="flex gap-8">
+                <main className="max-w-7xl mx-auto px-4 md:px-8 md:py-8">
+                    <div className="flex flex-col md:flex-row md:gap-8">
                         {/* Left Column - Form */}
                         <div className="w-full">
                             <h1 className="text-3xl font-light">Checkout your cart</h1>
@@ -95,22 +94,22 @@ export default async function Checkout() {
                                 </ol>
                             </nav>
 
-                            <Wrapper cart={cartRes.data}>
-                                <CheckoutForm cart={cartRes.data} />
+                            <Wrapper cart={data}>
+                                <CheckoutForm cart={data} />
                             </Wrapper>
                         </div>
 
                         {/* Right Column Cart summary */}
-                        <div>
-                            <CheckoutSummary cart={cartRes.data} />
+                        <div className="mb-24 md:mb-0">
+                            <CheckoutSummary cart={data} />
                         </div>
                     </div>
                 </main>
                 {/* Mobile cart summary */}
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
-                        <PaymentButton cart={cartRes.data} data-testid="submit-order-button" user={user?.data} />
-                        <p className="font-semibold text-xl">Total: {getAmount(total)}</p>
+                        <PaymentButton cart={data} data-testid="submit-order-button" user={user} />
+                        <p className="font-semibold text-xl">Total: {currency(totalAmount)}</p>
                     </div>
                 </div>
             </div>
