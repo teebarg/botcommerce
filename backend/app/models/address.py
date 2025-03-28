@@ -1,5 +1,6 @@
 from app.models.base import BM
 from pydantic import BaseModel, Field, field_validator
+from prisma.enums import AddressType
 
 
 class AddressBase(BM):
@@ -7,6 +8,8 @@ class AddressBase(BM):
     last_name: str | None = Field(default=None, max_length=255)
     address_1: str = Field(..., max_length=1255)
     address_2: str | None = Field(default=None, max_length=1255)
+    address_type: AddressType | None = Field(default=None, max_length=255)
+    label: str | None = Field(default=None, max_length=255)
     city: str = Field(max_length=255)
     postal_code: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)
@@ -33,6 +36,8 @@ class AddressUpdate(AddressBase):
     last_name: str | None = Field(default=None, max_length=255)
     address_1: str | None = Field(default=None, max_length=1255)
     address_2: str | None = Field(default=None, max_length=1255)
+    address_type: AddressType | None = Field(default=None, max_length=255)
+    label: str | None = Field(default=None, max_length=255)
     city: str | None = Field(default=None, max_length=255)
     postal_code: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)
@@ -54,6 +59,8 @@ class BillingAddressCreate(BaseModel):
     last_name: str | None = Field(default=None, max_length=255)
     address_1: str = Field(..., max_length=1255)
     address_2: str | None = Field(default=None, max_length=1255)
+    address_type: AddressType | None = Field(default=None, max_length=255)
+    label: str | None = Field(default=None, max_length=255)
     city: str = Field(max_length=255)
     postal_code: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)

@@ -1,8 +1,9 @@
 from datetime import timedelta
+from typing import Optional
 
 from app.core.utils import generate_id
 from app.models.generic import Message
-from app.models.cart import CartCreate, CartUpdate, CartItemCreate, CartItemResponse, CartResponse
+from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Response
 from app.prisma_client import prisma as db
 from app.core.deps import TokenUser
@@ -12,99 +13,33 @@ router = APIRouter()
 
 
 # Endpoints
-@router.post("/", response_model=CartResponse)
-async def create_cart(response: Response, cart: CartCreate):
-    """Create a new cart for a user"""
-    id = generate_id()
-    # Check if user exists
-    user = await db.user.find_unique(where={"id": cart.cart_number})
-    # if not user:
-    #     raise HTTPException(status_code=404, detail="User not found")
-
-    # Check if user already has an active cart
-    existing_cart = await db.cart.find_first(
-        where={
-            "cart_number": cart.cart_number,
-            "status": "ACTIVE"
-        },
-        include={
-            "items": {
-                "include": {
-                    "variant": True
-                }
-            }
-        }
-    )
-    if existing_cart:
-        raise HTTPException(
-            status_code=400, detail="User already has an active cart")
-
-    new_cart = await db.cart.create(
-        data={
-            "user_id": user or None,
-            "cart_number": id
-        },
-        include={
-            "items": {
-                "include": {
-                    "variant": True
-                }
-            }
-        }
-    )
-    response.set_cookie(
-        key="_cart_id",
-        value=id,
-        max_age=timedelta(days=7),
-        secure=True,
-        httponly=True,
-        samesite="Lax",
-    )
-    return new_cart
-
-
-@router.get("/", response_model=CartResponse)
+@router.get("/", response_model=Optional[CartResponse])
 async def get_cart(cartId: str = Header()):
     """Get a specific cart by ID"""
     cart = None
-    if cartId:
-        cart = await db.cart.find_unique(
-            where={"cart_number": cartId},
-            include={
-                "items": {
-                    "include": {
-                        "variant": True
-                    }
-                },
-                "shipping_address": True,
-                "billing_address": True
-            }
-        )
-    if not cart:
-        print("no cart")
-        # id = generate_id()
-        new_cart = await db.cart.create(
-            data={
-                "cart_number": cartId
-            },
-            include={
-                "items": {
-                    "include": {
-                        "variant": True
-                    }
-                },
-                "shipping_address": True,
-                "billing_address": True
-            }
-        )
 
-        return new_cart
+    if not cartId:
+        return None
+
+    cart = await db.cart.find_unique(
+        where={"cart_number": cartId},
+        include={
+            "items": {
+                "include": {
+                    "variant": True
+                }
+            },
+            "shipping_address": True,
+            "billing_address": True
+        }
+    )
     return cart
 
 
 @router.put("/", response_model=CartResponse)
 async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: str = Header(default=None)):
     """Update cart status"""
+    print("🚀 ~ cart_update:", cart_update)
     cart = await db.cart.find_unique(where={"cart_number": cartId})
     if not cart:
         cart = await db.cart.create(
@@ -123,6 +58,28 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
 
     user = await db.user.find_unique(where={"email": token_data.sub}) if token_data else None
 
+    if cart_update.shipping_address:
+        if cart_update.shipping_address.id:
+            address = await db.address.upsert(
+                where={"id": cart_update.shipping_address.id},
+                data={
+                    "create": {
+                        **cart_update.shipping_address.model_dump(exclude={"id"}),
+                        "user_id": user.id if user else None
+                    },
+                    "update": {
+                        **cart_update.shipping_address.model_dump(exclude={"id", "user_id"}),
+                    }
+                }
+            )
+        else:
+            address = await db.address.create(
+                data={
+                    **cart_update.shipping_address.model_dump(exclude={"id"}),
+                    "user": {"connect": {"id": user.id}} if user else None
+                }
+            )
+
     # update_data = cart_update.dict(exclude_unset=True)
     # if cart_update.status:
     #     update_data["status"] = cart_update.status
@@ -136,12 +93,12 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
         update_data["email"] = cart_update.email
 
     if cart_update.shipping_address:
-        update_data["shipping_address"] = {"create": {
-            **cart_update.shipping_address.model_dump(), "user_id": user.id if user else None}}
+        update_data["shipping_address"] = {"connect": {"id": address.id}}
+        update_data["billing_address"] = {"connect": {"id": address.id}}
 
-    if cart_update.billing_address:
-        update_data["billing_address"] = {"create": {
-            **cart_update.billing_address.model_dump(), "user_id": user.id if user else None}}
+    # if cart_update.billing_address:
+    #     update_data["billing_address"] = {"create": {
+    #         **cart_update.billing_address.model_dump(), "user_id": user.id if user else None}}
 
     if cart_update.payment_method:
         update_data["payment_method"] = cart_update.payment_method
@@ -192,8 +149,8 @@ async def delete(id: str, cartId: str = Header(default=None)) -> Message:
     return {"message": "Cart deleted successfully"}
 
 
-@router.post("/items", response_model=CartItemResponse)
-async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str = Header(default=None)):
+@router.post("/items")
+async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=None)) -> CartResponse:
     """Add an item to cart"""
     # Verify cart exists
     cart = await db.cart.find_unique(where={"cart_number": cartId})
@@ -203,14 +160,6 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
             data={
                 "cart_number": id
             },
-        )
-        response.set_cookie(
-            key="_cart_id",
-            value=id,
-            max_age=timedelta(days=7),
-            secure=True,
-            httponly=True,
-            samesite="Lax",
         )
 
     # Verify product variant exists and is in stock
@@ -238,7 +187,7 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
         return updated_item
 
     # Create new cart item
-    new_item = await db.cartitem.create(
+    await db.cartitem.create(
         data={
             "cart_id": cart.id,
             "variant_id": item.variant_id,
@@ -250,7 +199,7 @@ async def add_item_to_cart(response: Response, item: CartItemCreate, cartId: str
             "variant": True
         }
     )
-    return new_item
+    return cart
 
 
 @router.delete("/items/{item_id}")

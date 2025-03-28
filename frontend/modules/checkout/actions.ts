@@ -3,20 +3,10 @@
 import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
 
-import { api } from "@/apis";
-
 async function cartId() {
     const cookieStore = await cookies();
 
     return cookieStore.get("_cart_id")?.value;
-}
-
-export async function cartUpdate(data: any) {
-    try {
-        await api.cart.updateDetails(data);
-    } catch (error: any) {
-        return error.toString();
-    }
 }
 
 export async function removeDiscount(code: string) {

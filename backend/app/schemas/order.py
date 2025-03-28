@@ -31,9 +31,6 @@ class OrderBase(BaseModel):
     total: float
     notes: Optional[str] = None
 
-class OrderCreate(OrderBase):
-    pass
-
 class OrderUpdate(BaseModel):
     status: Optional[OrderStatus] = None
     notes: Optional[str] = None

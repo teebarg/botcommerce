@@ -66,6 +66,8 @@ const OrderDetail = () => {
             ["SHIPPED"]: "secondary",
             ["CANCELED"]: "destructive",
             ["DELIVERED"]: "default",
+            ["PAID"]: "default",
+            ["REFUNDED"]: "destructive",
         };
 
         return <Badge variant={variants[status ?? "PENDING"]}>{status}</Badge>;

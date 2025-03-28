@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Category, Collection, Product, Brand } from "@/types/models";
+import { Category, Collection, Product, Brand, User } from "@/types/models";
 
 interface StoreState {
     count: number;
@@ -25,6 +25,9 @@ interface StoreState {
 
     brands: Brand[];
     setBrands: (brands: Brand[]) => void;
+
+    user: User | null;
+    setUser: (user: User | null) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -50,4 +53,7 @@ export const useStore = create<StoreState>((set) => ({
 
     brands: [],
     setBrands: (brands) => set(() => ({ brands })),
+
+    user: null,
+    setUser: (user: User | null) => set(() => ({ user })),
 }));

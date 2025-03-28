@@ -29,7 +29,7 @@ const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
         count++;
     }
 
-    if (customer.billing_addresses) {
+    if (customer.addresses?.length) {
         count++;
     }
 
@@ -84,8 +84,8 @@ export default async function OverviewTemplate() {
                             <div className="flex flex-col bg-yellow-100 rounded-lg py-2 px-4 text-gray-800">
                                 <h3 className="font-semibold">Addresses</h3>
                                 <div className="flex items-center gap-x-2">
-                                    <span data-testid="addresses-count" data-value={customer?.shipping_addresses?.length || 0}>
-                                        {customer?.shipping_addresses?.length || 0}
+                                    <span data-testid="addresses-count" data-value={customer?.addresses?.length || 0}>
+                                        {customer?.addresses?.length || 0}
                                     </span>
                                     <span className="uppercase">Saved</span>
                                 </div>

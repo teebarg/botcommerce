@@ -17,16 +17,19 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/apis";
+import { AddressTypeSchema } from "@/types/schema";
 
 const addressSchema = z.object({
+    address_type: AddressTypeSchema,
+    label: z.string().optional(),
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
     address_2: z.string().optional(),
-    postal_code: z.string().min(1, "Postal code is required"),
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
-    phone: z.string().optional(),
+    postal_code: z.string().min(1, "Postal code is required"),
+    phone: z.string().min(1, "Phone number is required"),
 });
 
 type AddressFormValues = z.infer<typeof addressSchema>;
@@ -52,13 +55,15 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
             city: address.city || "",
             state: address.state || "",
             phone: address.phone || "",
+            address_type: address.address_type || "HOME",
+            label: address.label || "",
         },
     });
 
     const onSubmit = async (data: AddressFormValues) => {
         setIsPending(true);
         try {
-            await api.address.update(address.id, data);
+            await api.address.update(address.id!, data);
             toast.success("Address successfully updated");
             setIsOpen(false);
         } catch (error: any) {
@@ -126,10 +131,47 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit address</DialogTitle>
+                        <DialogTitle>Edit Address</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
                         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+                            <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="address_type"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Address Type</FormLabel>
+                                            <Select value={field.value} onValueChange={field.onChange}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select type" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="HOME">Home</SelectItem>
+                                                    <SelectItem value="WORK">Work</SelectItem>
+                                                    <SelectItem value="BILLING">Billing</SelectItem>
+                                                    <SelectItem value="SHIPPING">Shipping</SelectItem>
+                                                    <SelectItem value="OTHER">Other</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="label"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Label (Optional)</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="e.g., Home, Office" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                             <div className="grid grid-cols-1 gap-y-2">
                                 <div className="grid grid-cols-2 gap-x-2">
                                     <FormField

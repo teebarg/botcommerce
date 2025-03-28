@@ -11,11 +11,20 @@ from app.models.user import User
 import httpx
 from datetime import datetime
 from app.prisma_client import prisma as db
+from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
+from prisma.errors import PrismaError
+from pydantic import BaseModel
 
 router = APIRouter()
 
 PAYSTACK_SECRET_KEY = settings.PAYSTACK_SECRET_KEY
 PAYSTACK_BASE_URL = "https://api.paystack.co"
+
+class PaymentCreate(BaseModel):
+    order_id: int
+    amount: float
+    reference: str
+    transaction_id: str
 
 async def initialize_payment(order: Order, user: User) -> PaymentInitialize:
     """Initialize a Paystack payment"""
@@ -88,7 +97,7 @@ async def verify_payment(reference: str):
                 raise HTTPException(status_code=404, detail="Order not found")
             await db.order.update(
                 where={"id": order_id},
-                data={"status": OrderStatus.PROCESSING}
+                data={"status": OrderStatus.PAID}
             )
 
             # Create payment record
@@ -97,7 +106,7 @@ async def verify_payment(reference: str):
                     "order_id": order_id,
                     "amount": data["data"]["amount"] / 100,  # Convert from kobo
                     "reference": data["data"]["reference"],
-                    "status": PaymentStatus.success,
+                    "status": PaymentStatus.SUCCESS,
                     "payment_method": "paystack",
                     "metadata": data["data"],
                 }
@@ -113,6 +122,36 @@ async def verify_payment(reference: str):
                 status="failed",
                 message="Payment verification failed",
             )
+
+
+@router.post("/")
+async def create(*, create: PaymentCreate, user: CurrentUser):
+    """
+    Create new payment.
+    """
+    try:
+        order = await db.order.find_unique(where={"id": create.order_id})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        await db.order.update(
+            where={"id": create.order_id},
+            data={"status": OrderStatus.PAID}
+        )
+
+        # Create payment record
+        payment = await db.payment.create(
+            data={
+                "order": {"connect": {"id": create.order_id}},
+                "amount": create.amount,
+                "reference": create.reference,
+                "transaction_id": create.transaction_id,
+                "status": PaymentStatus.SUCCESS,
+                "payment_method": PaymentMethod.PAYSTACK,
+            }
+        )
+        return payment
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @router.get("/list", response_model=PaymentListResponse)
 async def list_payments(

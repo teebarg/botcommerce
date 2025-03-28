@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil } from "nui-react-icons";
+import { Delivery, Pencil } from "nui-react-icons";
 import ErrorMessage from "@modules/checkout/components/error-message";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -82,6 +82,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 <div className="flex items-center gap-2">
                     <div className={cn("w-2 h-2 bg-default-500 rounded-full", { "bg-blue-500": isOpen || hasShippingMethod })} />
                     <span className="font-medium">Delivery Option</span>
+                    <Delivery className="w-5 h-5 text-blue-500" />
                 </div>
                 <button
                     aria-label="edit"

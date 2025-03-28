@@ -1,5 +1,6 @@
 "use server";
 
+import { getCookie } from "@/lib/util/server-utils";
 import { addShippingAddress, deleteActivities, deleteShippingAddress, updateBillingAddress, updateCustomer, updateShippingAddress } from "@lib/data";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
@@ -259,8 +260,7 @@ export async function deleteActivity(id: string | number) {
 }
 
 export async function bulkUpload(formData: FormData) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
+    const accessToken = await getCookie("access_token");
 
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {

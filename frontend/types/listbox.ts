@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 
 export interface ListboxOption {
     id: string;
-    label: string;
+    label?: string;
     description?: string;
     icon?: React.ComponentType<{ className?: string }>;
     [key: string]: any; // Allow additional custom properties

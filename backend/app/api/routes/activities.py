@@ -3,8 +3,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.api.routes.websocket import manager
 from app.core.deps import CurrentUser
-from app.core.logging import logger
-from app.models.activities import Activities, ActivityCreate, Activity
+from app.models.activities import ActivityCreate, Activity
 from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db

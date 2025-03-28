@@ -1,17 +1,19 @@
 import { z } from "zod";
 
 // Zod Enums
-export const OrderStatusSchema = z.enum(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELED"]);
+export const AddressTypeSchema = z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]);
+
+export const OrderStatusSchema = z.enum(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELED", "PAID", "REFUNDED"]);
 
 export const DiscountTypeSchema = z.enum(["PERCENTAGE", "FIXED_AMOUNT"]);
 
-export const PaymentMethodSchema = z.enum(["CREDIT_CARD", "PAYPAL", "CASH_ON_DELIVERY", "BANK_TRANSFER", "PAYSTACK"]);
+export const PaymentMethodSchema = z.enum(["CREDIT_CARD", "CASH_ON_DELIVERY", "BANK_TRANSFER", "PAYSTACK"]);
 
 export const ProductStatusSchema = z.enum(["IN_STOCK", "OUT_OF_STOCK"]);
 
 export const CartStatusSchema = z.enum(["ACTIVE", "ABANDONED", "CONVERTED"]);
 
-export const PaymentStatusSchema = z.enum(["PENDING", "COMPLETED", "FAILED"]);
+export const PaymentStatusSchema = z.enum(["PENDING", "SUCCESS", "FAILED", "REFUNDED"]);
 
 export const ShippingMethodSchema = z.enum(["STANDARD", "EXPRESS", "PICKUP"]);
 
@@ -33,10 +35,10 @@ export const PagSchema = z.object({
 
 export const AddressSchema = z.object({
     id: z.number(),
-    created_at: z.string().optional(),
-    updated_at: z.string().optional(),
     first_name: z.string(),
     last_name: z.string(),
+    address_type: AddressTypeSchema,
+    label: z.string().optional(),
     address_1: z.string(),
     address_2: z.string(),
     city: z.string(),
@@ -44,6 +46,8 @@ export const AddressSchema = z.object({
     state: z.string(),
     phone: z.string(),
     is_billing: z.boolean().optional(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional(),
 });
 
 export const PaginatedAddressSchema = PagSchema.extend({
@@ -78,8 +82,7 @@ export const UserSchema = z.object({
     image: z.string().optional(),
     role: z.string(),
     created_at: z.string().optional(),
-    billing_addresses: z.array(z.record(z.any())).optional(),
-    shipping_addresses: z.array(z.record(z.any())).optional(),
+    addresses: z.array(AddressSchema).optional(),
 });
 
 export const ReviewSchema = z.object({

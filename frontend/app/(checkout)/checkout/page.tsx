@@ -77,7 +77,7 @@ export default async function Checkout() {
                     <div className="flex flex-col md:flex-row md:gap-8">
                         {/* Left Column - Form */}
                         <div className="w-full">
-                            <h1 className="text-3xl font-light">Checkout your cart</h1>
+                            <h1 className="text-xl font-light">Checkout your cart</h1>
                             {/* <SignInPrompt /> */}
                             {!user && <SignInPrompt />}
                             <nav aria-label="Breadcrumbs" data-slot="base">
@@ -106,10 +106,12 @@ export default async function Checkout() {
                     </div>
                 </main>
                 {/* Mobile cart summary */}
-                <div className="fixed md:hidden bottom-0 z-20 w-full py-4 px-4 bg-content1 shadow-2xl">
+                <div className="fixed md:hidden bottom-0 z-20 w-full py-5 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
-                        <PaymentButton cart={data} data-testid="submit-order-button" user={user} />
-                        <p className="font-semibold text-xl">Total: {currency(totalAmount)}</p>
+                        <PaymentButton cart={data} data-testid="submit-order-button" isLoggedIn={!!user} />
+                        <p className="font-semibold text-sm">
+                            Total: <span className="text-lg ml-1">{currency(totalAmount)}</span>
+                        </p>
                     </div>
                 </div>
             </div>

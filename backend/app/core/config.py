@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     DATABASE_URL: str = ""
 
+    PAYSTACK_SECRET_KEY: str = "Pk_test_5029925955255255"
+
     POSTGRES_SERVER: str
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"

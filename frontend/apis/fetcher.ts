@@ -1,11 +1,10 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { getCookie } from "@/lib/util/server-utils";
 
 export async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
-    let cartId = cookieStore.get("_cart_id")?.value;
+    const accessToken = await getCookie("access_token");
+    const cartId = await getCookie("_cart_id");
 
     const res = await fetch(url, {
         ...options,

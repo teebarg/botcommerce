@@ -1,12 +1,21 @@
-import { ApiResult, tryCatch } from "@/lib/try-catch";
-import { api } from "./base";
 import type { PaymentInitialize, PaymentVerify, PaymentListResponse } from "@/types/payment";
+
 import { fetcher } from "./fetcher";
 
+import { ApiResult, tryCatch } from "@/lib/try-catch";
+
 export const paymentApi = {
+    create: async (data: { order_id: number; amount: number; reference: string; transaction_id: string }): ApiResult<PaymentInitialize> => {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payment/`;
+        const response = await tryCatch<PaymentInitialize>(fetcher(url, { method: "POST", body: JSON.stringify(data) }));
+
+        // const response = await api.post<{ data: PaymentInitialize }>(`/payments/initialize/${orderId}`);
+        return response;
+    },
     initialize: async (orderId: number): ApiResult<PaymentInitialize> => {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/initialize/${orderId}`;
         const response = await tryCatch<PaymentInitialize>(fetcher(url, { method: "POST" }));
+
         // const response = await api.post<{ data: PaymentInitialize }>(`/payments/initialize/${orderId}`);
         return response;
     },
@@ -21,6 +30,7 @@ export const paymentApi = {
 
     list: async (params?: { page?: number; limit?: number }): ApiResult<PaymentListResponse> => {
         const queryParams: Record<string, string> = {};
+
         if (params?.page) queryParams.page = params.page.toString();
         if (params?.limit) queryParams.limit = params.limit.toString();
 

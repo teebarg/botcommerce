@@ -44,6 +44,7 @@ import {
     DeliveryOptionSchema,
     PaginationSchema,
     PaystackResponseSchema,
+    AddressTypeSchema,
 } from "./schema";
 
 export type Facet = z.infer<typeof FacetSchema>;
@@ -96,13 +97,14 @@ export type PaymentStatus = z.infer<typeof PaymentStatusSchema>;
 export type ShippingMethod = z.infer<typeof ShippingMethodSchema>;
 export type Role = z.infer<typeof RoleSchema>;
 export type Status = z.infer<typeof StatusSchema>;
+export type AddressType = z.infer<typeof AddressTypeSchema>;
 
 export type PaystackResponse = z.infer<typeof PaystackResponseSchema>;
 
 // custom
 export type CartUpdate = {
     status?: CartStatus;
-    shipping_address?: Omit<Address, "id">;
+    shipping_address?: Omit<Address, "id"> & { id?: number };
     email?: string;
     billing_address?: Omit<Address, "id">;
     shipping_method?: ShippingMethod;

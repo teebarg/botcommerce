@@ -1,8 +1,10 @@
 import { fetcher } from "./fetcher";
 
 import { revalidate } from "@/actions/revalidate";
-import { Cart, CartComplete, CartItem, CartUpdate, Message, Order } from "@/types/models";
+import { Cart, CartComplete, CartUpdate, Message, Order } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { deleteCookie, setCookie } from "@/lib/util/cookie";
+import { getCookie } from "@/lib/util/server-utils";
 
 // Cart API methods
 export const cartApi = {
@@ -13,21 +15,18 @@ export const cartApi = {
 
         return response;
     },
-    async create(input: Cart): ApiResult<Cart> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
-        const response = await tryCatch<Cart>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
-
-        if (!response.error) {
-            revalidate("cart");
-        }
-
-        return response;
-    },
-    async add({ variant_id, quantity }: { variant_id: number; quantity: number }): ApiResult<CartItem> {
+    async add({ variant_id, quantity }: { variant_id: number; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items`;
-        const response = await tryCatch<CartItem>(fetcher(url, { method: "POST", body: JSON.stringify({ variant_id, quantity }) }));
+        const response = await tryCatch<Cart>(
+            fetcher(url, { method: "POST", credentials: "include", body: JSON.stringify({ variant_id, quantity }) })
+        );
 
-        if (!response.error) {
+        if (!response.error && response.data) {
+            const id = await getCookie("_cart_id");
+
+            if (!id) {
+                await setCookie("_cart_id", response.data?.cart_number);
+            }
             revalidate("cart");
         }
 
@@ -61,6 +60,7 @@ export const cartApi = {
 
         if (!response.error) {
             revalidate("cart");
+            revalidate("user");
             revalidate("orders");
         }
 
@@ -82,8 +82,7 @@ export const cartApi = {
         const response = await tryCatch<Order>(fetcher(url, { method: "POST", body: JSON.stringify({ ...complete }) }));
 
         if (!response.error) {
-            console.log("deleting cookie");
-            document.cookie = "_cart_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            await deleteCookie("_cart_id");
 
             revalidate("cart");
             revalidate("orders");

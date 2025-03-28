@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from datetime import datetime
-from app.models.payment import PaymentStatus
+from prisma.enums import PaymentStatus
 
 class PaymentBase(BaseModel):
     amount: float

@@ -9,6 +9,7 @@ import { userApi } from "./user";
 import { reviewsApi } from "./review";
 import { configApi } from "./config";
 import { addressApi } from "./address";
+import { paymentApi } from "./payment";
 
 export const api = {
     address: addressApi,
@@ -19,6 +20,7 @@ export const api = {
     config: configApi,
     category: categoryApi,
     order: orderApi,
+    payment: paymentApi,
     product: productApi,
     review: reviewsApi,
     user: userApi,

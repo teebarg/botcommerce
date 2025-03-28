@@ -18,7 +18,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
 
     return (
         <div className="min-h-screen flex items-center justify-center py-12 px-2">
-            {status === "COMPLETED" && <SuccessConfirmation {...props} />}
+            {status === "SUCCESS" && <SuccessConfirmation {...props} />}
             {status === "PENDING" && <PendingPayment {...props} />}
             {status === "FAILED" && <FailedPayment {...props} />}
         </div>

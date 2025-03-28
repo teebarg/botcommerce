@@ -3,26 +3,40 @@
 import React, { useEffect, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Cart, Session } from "@/types/models";
+import { Cart } from "@/types/models";
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";
 import { api } from "@/apis";
 import { subtotal, taxTotal, total } from "@/lib/util/store";
+import Paystack from "@/components/payment/paystack";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
-    user: Session | null;
+    isLoggedIn: boolean;
     "data-testid": string;
 };
 
-const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, user, "data-testid": dataTestId }) => {
+type PaymentProps = {
+    cart: Omit<Cart, "refundable_amount" | "refunded_total">;
+    isLoggedIn: boolean;
+    notReady: boolean;
+};
+
+const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, isLoggedIn, "data-testid": dataTestId }) => {
+    const searchParams = useSearchParams();
+
+    const isOpen = searchParams.get("step") === "review";
     // check user
-    const notReady = !cart || !cart.shipping_address || !cart.billing_address || !cart.email || !cart.shipping_method || !user;
+    const notReady = !cart || !cart.shipping_address || !cart.billing_address || !cart.email || !cart.shipping_method || !isLoggedIn || !isOpen;
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
+
+    if (notReady) {
+        return null;
+    }
 
     if (paidByGiftcard) {
         return <GiftCardPaymentButton />;
@@ -30,11 +44,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, user, "data-testid"
 
     switch (cart.payment_method) {
         case "CREDIT_CARD":
-        case "PAYSTACK":
-        case "PAYPAL":
-            return <ManualTestPaymentButton cart={cart} data-testid={dataTestId} notReady={notReady} user={user} />;
+            return <ManualTestPaymentButton cart={cart} data-testid={dataTestId} isLoggedIn={isLoggedIn} notReady={notReady} />;
         case "BANK_TRANSFER":
-            return <TransferPaymentButton cart={cart} notReady={notReady} user={user} />;
+            return <TransferPaymentButton cart={cart} isLoggedIn={isLoggedIn} notReady={notReady} />;
+        case "PAYSTACK":
+            return <Paystack cart={cart} isLoggedIn={isLoggedIn} />;
         default:
             return (
                 <Button disabled aria-label="default">
@@ -54,8 +68,8 @@ const GiftCardPaymentButton = () => {
             total: 0,
             subtotal: 0,
             tax: 0,
-            payment_status: "COMPLETED",
-            status: "PENDING",
+            payment_status: "SUCCESS",
+            status: "PAID",
         });
 
         if (error) {
@@ -75,7 +89,7 @@ const GiftCardPaymentButton = () => {
     );
 };
 
-const TransferPaymentButton = ({ cart, notReady, user }: { cart: Cart; notReady: boolean; user?: Session | null }) => {
+const TransferPaymentButton: React.FC<PaymentProps> = ({ cart, notReady, isLoggedIn }) => {
     const modalState = useOverlayTriggerState({});
     const router = useRouter();
     const pathname = usePathname();
@@ -104,7 +118,7 @@ const TransferPaymentButton = ({ cart, notReady, user }: { cart: Cart; notReady:
     };
 
     const completeOrder = () => {
-        if (user) {
+        if (isLoggedIn) {
             setSubmitting(true);
             onPaymentCompleted();
 
@@ -139,25 +153,25 @@ const TransferPaymentButton = ({ cart, notReady, user }: { cart: Cart; notReady:
     );
 };
 
-const ManualTestPaymentButton = ({ notReady, user, cart }: { notReady: boolean; user?: Session | null; cart: Cart }) => {
+const ManualTestPaymentButton: React.FC<PaymentProps> = ({ notReady, cart, isLoggedIn }) => {
     const router = useRouter();
     const modalState = useOverlayTriggerState({});
 
     const [submitting, setSubmitting] = useState<boolean>(false);
 
     useEffect(() => {
-        if (submitting && user) {
+        if (submitting && isLoggedIn) {
             modalState.close();
             onPaymentCompleted();
         }
-    }, [user]);
+    }, [isLoggedIn]);
 
     const onPaymentCompleted = async () => {
         const { data, error } = await api.cart.complete({
             total: total(cart.items, cart.shipping_fee),
             subtotal: subtotal(cart.items),
             tax: taxTotal(cart.items),
-            payment_status: "COMPLETED",
+            payment_status: "SUCCESS",
             status: "PENDING",
         });
 
@@ -172,7 +186,7 @@ const ManualTestPaymentButton = ({ notReady, user, cart }: { notReady: boolean; 
     };
 
     const handlePayment = () => {
-        if (user) {
+        if (isLoggedIn) {
             setSubmitting(true);
             onPaymentCompleted();
 
