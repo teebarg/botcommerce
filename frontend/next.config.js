@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    experimental: {
+        serverActions: {
+            bodySizeLimit: "2mb",
+        },
+    },
     reactStrictMode: true,
     bundlePagesRouterDependencies: true,
     images: {
@@ -19,6 +24,14 @@ const nextConfig = {
             {
                 protocol: "https",
                 hostname: "bzjitsvxyblegrvtzvef.supabase.co",
+            },
+            {
+                protocol: "https",
+                hostname: "hvddfokeceaoanzpioou.supabase.co",
+            },
+            {
+                protocol: "https",
+                hostname: "images.unsplash.com",
             },
         ],
     },

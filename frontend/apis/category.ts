@@ -48,4 +48,30 @@ export const categoryApi = {
 
         return response;
     },
+    async uploadImage({ id, data }: { id: number; data: any }): ApiResult<Message> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}/image`;
+
+        const response = await tryCatch<Message>(fetcher(url, { method: "PATCH", body: JSON.stringify(data) }));
+
+        if (!response.error) {
+            revalidate("products");
+            revalidate("search");
+            revalidate("categories");
+        }
+
+        return response;
+    },
+    async deleteImage(id: number): ApiResult<Message> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}/image`;
+
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
+
+        if (!response.error) {
+            revalidate("products");
+            revalidate("search");
+            revalidate("categories");
+        }
+
+        return response;
+    },
 };

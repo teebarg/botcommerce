@@ -58,6 +58,7 @@ export const CategorySchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
+    image: z.string().optional(),
     is_active: z.boolean(),
     parent_id: z.number().nullable(),
     parent: z.null(),

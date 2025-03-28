@@ -139,6 +139,7 @@ model Category {
   id           Int      @id @default(autoincrement())
   name         String   @unique
   slug         String   @unique
+  image        String?
   is_active    Boolean  @default(true)
   parent_id    Int?     // Nullable for top-level categories
   parent        Category?   @relation("CategoryToSubcategory", fields: [parent_id], references: [id], onDelete: Cascade)
