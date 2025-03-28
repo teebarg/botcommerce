@@ -1,5 +1,5 @@
 import { api } from "@/apis";
-import { Product, ProductSearch } from "@/lib/models";
+import { Product, ProductSearch } from "@/types/models";
 import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/server-error";
 

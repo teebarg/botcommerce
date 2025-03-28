@@ -5,7 +5,7 @@ import { Spinner } from "@components/spinner";
 import { toast } from "sonner";
 import { Trash } from "nui-react-icons";
 
-import { CartItem } from "@/lib/models";
+import { CartItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 

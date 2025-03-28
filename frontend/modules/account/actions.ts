@@ -1,7 +1,9 @@
 "use server";
 
+import { getCookie } from "@/lib/util/server-utils";
 import { addShippingAddress, deleteActivities, deleteShippingAddress, updateBillingAddress, updateCustomer, updateShippingAddress } from "@lib/data";
 import { revalidateTag } from "next/cache";
+import { cookies } from "next/headers";
 
 export async function updateCustomerName(_currentState: Record<string, unknown>, formData: FormData) {
     const customer = {
@@ -252,6 +254,29 @@ export async function deleteActivity(id: string | number) {
         revalidateTag("activities");
 
         return { success: true, error: null };
+    } catch (error: any) {
+        return { success: false, error: error.toString() };
+    }
+}
+
+export async function bulkUpload(formData: FormData) {
+    const accessToken = await getCookie("access_token");
+
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {
+            method: "POST",
+            body: formData,
+            headers: { "X-Auth": accessToken ?? "" },
+        });
+
+        if (response.ok) {
+            revalidateTag("products");
+            revalidateTag("search");
+
+            return { success: true, message: "Products uploaded successfully" };
+        } else {
+            return { success: false, message: "Failed to upload products" };
+        }
     } catch (error: any) {
         return { success: false, error: error.toString() };
     }

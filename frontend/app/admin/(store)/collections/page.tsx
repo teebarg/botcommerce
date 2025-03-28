@@ -1,14 +1,13 @@
 import { Metadata } from "next";
 import React from "react";
 import { Table } from "@modules/common/components/table";
-import ProductUpload from "@modules/admin/products/product-upload";
 import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
 
 import { siteConfig } from "@/lib/config";
 import Chip from "@/components/ui/chip";
 import { api } from "@/apis";
-import { Collection } from "@/lib/models";
+import { Collection } from "@/types/models";
 import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
@@ -49,9 +48,6 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
             <div>
                 <div className="max-w-7xl mx-auto p-8">
                     <h1 className="text-2xl font-semibold mb-2">Collections</h1>
-                    <div className="py-4">
-                        <ProductUpload userId={customer?.id} />
-                    </div>
                     <Table
                         canExport
                         columns={["S/N", "Name", "Status", "Created At", "Actions"]}

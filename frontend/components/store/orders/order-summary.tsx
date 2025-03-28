@@ -1,7 +1,7 @@
 import { MapPin } from "lucide-react";
 import { Truck } from "nui-react-icons";
 
-import { Order } from "@/lib/models";
+import { Order } from "@/types/models";
 import { currency } from "@/lib/util/util";
 
 // Address & Payment Summary Component

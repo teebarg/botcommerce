@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Response, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 
 from app.core.deps import (
     CurrentUser,
     Notification,
-    get_current_superuser,
-    get_current_user,
+    get_current_superuser
 )
 from app.core.logging import logger
 from app.core.utils import generate_invoice_email
@@ -12,8 +11,9 @@ from app.services.export import export
 from typing import Optional
 import uuid
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderStatus, OrderUpdate, OrderCreate, Orders
+from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from math import ceil
+from prisma.enums import OrderStatus
 
 # Create a router for orders
 router = APIRouter()

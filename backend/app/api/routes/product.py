@@ -84,9 +84,7 @@ async def export_products(
 @router.get("/")
 async def index(
     query: str = "",
-    brands: str = Query(default=""),
-    categories: str = Query(default=""),
-    collections: str = Query(default=""),
+    brand: str = Query(default=""),
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
 ) -> Products:
@@ -94,6 +92,10 @@ async def index(
     Retrieve products with Redis caching.
     """
     where_clause = None
+    if brand:
+        where_clause = {
+            "brand": {"name": {"contains": brand, "mode": "insensitive"}}
+        }
     if query:
         where_clause = {
             "OR": [
@@ -101,6 +103,7 @@ async def index(
                 {"slug": {"contains": query, "mode": "insensitive"}},
                 {"description": {"contains": query, "mode": "insensitive"}},
                 {"sku": {"contains": query, "mode": "insensitive"}},
+                {"brand": {"name": {"contains": query, "mode": "insensitive"}}},
             ]
         }
     products = await db.product.find_many(
@@ -111,7 +114,7 @@ async def index(
         include={
             "categories": True,
             "collections": True,
-            "brands": True,
+            "brand": True,
             "tags": True,
             "variants": True,
             "images": True,
@@ -130,11 +133,10 @@ async def index(
 
 
 @router.get("/search")
-@cache(key="search")
+# @cache(key="search")
 async def search(
     search: str = "",
     sort: str = "created_at:desc",
-    brands: str = Query(default=""),
     categories: str = Query(default=""),
     collections: str = Query(default=""),
     maxPrice: int = Query(default=1000000, gt=0),
@@ -148,8 +150,6 @@ async def search(
     filters = []
     # if tag:
     #     filters.append(f"tag = '{tag}'")
-    if brands:
-        filters.append(f"brands IN {url_to_list(brands)}")
     if categories:
         filters.append(f"categories IN {url_to_list(categories)}")
     if collections:
@@ -161,7 +161,7 @@ async def search(
         "limit": limit,
         "offset": (page - 1) * limit,
         "sort": [sort],
-        "facets": ["brands", "categories", "collections"],
+        "facets": ["brand", "categories", "collections"],
     }
 
     if filters:
@@ -201,17 +201,13 @@ async def create_product(product: ProductCreate, cache: CacheService):
         "price": product.price or 0,
         "old_price": product.old_price or 0,
         "status": product.status or ProductStatus.IN_STOCK,
+        "brand": {"connect": {"id": product.brand_id}},
     };
 
     # Prepare category connections if provided
     if product.category_ids:
         category_connect = [{"id": id} for id in product.category_ids]
         data["categories"] = {"connect": category_connect}
-
-    # Prepare brand connections if provided
-    if product.brand_ids:
-        brand_connect = [{"id": id} for id in product.brand_ids]
-        data["brands"] = {"connect": brand_connect}
 
     # Prepare collection connections if provided
     if product.collection_ids:
@@ -251,7 +247,7 @@ async def create_product(product: ProductCreate, cache: CacheService):
         data=data,
         include={
             "categories": True,
-            "brands": True,
+            "brand": True,
             "collections": True,
             "tags": True,
             "variants": True,
@@ -281,6 +277,7 @@ async def read(slug: str) -> Product:
     product = await db.product.find_unique(
         where={"slug": slug},
         include={
+            "brand": True,
             "variants": True,
             # "categories": True,
             "images": True,
@@ -342,9 +339,8 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
         update_data["collections"] = {"set": collection_ids}
 
     # Handle brand updates if provided
-    if product.brand_ids is not None:
-        brand_ids = [{"id": id} for id in product.brand_ids]
-        update_data["brands"] = {"set": brand_ids}
+    if product.brand_id is not None:
+        update_data["brand"] = {"connect": {"id": product.brand_id}}
 
     # Handle variant updates if provided
     if product.variants is not None:
@@ -611,7 +607,7 @@ async def upload_products(
                     # "variants": True,
                     "categories": True,
                     "collections": True,
-                    "brands": True,
+                    "brand": True,
                     "images": True,
                     # "reviews": { "include": { "user": True } },
                 }
@@ -646,7 +642,7 @@ async def reindex_products(cache: CacheService, background_tasks: BackgroundTask
                 "variants": True,
                 "categories": True,
                 "collections": True,
-                "brands": True,
+                "brand": True,
                 "images": True,
                 # "reviews": { "include": { "user": True } },
             }
@@ -674,7 +670,7 @@ async def configure_filterable_attributes(
         index = get_or_create_index("products")
         # Update the filterable attributes
         index.update_filterable_attributes(
-            ["brands", "categories", "collections", "name", "price", "slug"]
+            ["brand", "categories", "collections", "name", "price", "slug"]
         )
         # Update the sortable attributes
         index.update_sortable_attributes(["created_at", "price"])
@@ -726,7 +722,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["collections"] = [
         collection.name for collection in product.collections
     ]
-    product_dict["brands"] = [brand.name for brand in product.brands]
+    if product.brand:
+        product_dict["brand"] = product.brand.name
     product_dict["categories"] = [category.name for category in product.categories]
     product_dict["images"] = [image.image for image in product.images]
     product_dict["variants"] = [variant.dict() for variant in product.variants]

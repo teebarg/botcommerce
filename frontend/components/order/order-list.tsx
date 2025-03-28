@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { api } from "@/apis";
-import { Order, OrderStatus } from "@/lib/models";
+import { Order, OrderStatus } from "@/types/models";
 import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/util/util";
 
@@ -94,6 +94,8 @@ const OrderList: React.FC<ProductInventoryProps> = ({ orders, pagination }) => {
             ["SHIPPED"]: "secondary",
             ["CANCELED"]: "destructive",
             ["DELIVERED"]: "default",
+            ["PAID"]: "default",
+            ["REFUNDED"]: "destructive",
         };
 
         return <Badge variant={variants[status ?? "PENDING"]}>{status}</Badge>;

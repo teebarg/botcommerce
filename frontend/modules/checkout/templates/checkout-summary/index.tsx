@@ -2,7 +2,7 @@ import ItemsPreviewTemplate from "@modules/cart/templates/preview";
 import DiscountCode from "@modules/checkout/components/discount-code";
 import CartTotals from "@modules/common/components/cart-totals";
 
-import { Cart } from "@/lib/models";
+import { Cart } from "@/types/models";
 
 interface CheckoutSummaryProps {
     cart: Cart;

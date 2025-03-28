@@ -4,7 +4,7 @@ import ProductVariants from "@/components/products/product-variant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductForm from "@/components/products/product-form";
 import ProductImageManager from "@/components/products/product-images";
-import { Product } from "@/lib/models";
+import { Product } from "@/types/models";
 
 export function ProductView({ product, onClose }: { product?: Product; onClose: () => void }) {
     return (

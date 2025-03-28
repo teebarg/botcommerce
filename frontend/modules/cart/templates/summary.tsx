@@ -4,7 +4,7 @@ import CartTotals from "@modules/common/components/cart-totals";
 import DiscountCode from "@modules/checkout/components/discount-code";
 
 import { BtnLink } from "@/components/ui/btnLink";
-import { Cart } from "@/lib/models";
+import { Cart } from "@/types/models";
 
 type SummaryProps = {
     cart: Cart;

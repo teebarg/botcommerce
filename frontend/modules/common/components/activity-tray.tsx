@@ -5,7 +5,6 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useOverlay, OverlayContainer } from "@react-aria/overlays";
 import { useButton } from "@react-aria/button";
 import { Bell } from "nui-react-icons";
-import { fetchWithAuth } from "@lib/util/api";
 import { useSnackbar } from "notistack";
 import { useWebSocket } from "@lib/hooks/use-websocket";
 import useWatch from "@lib/hooks/use-watch";
@@ -72,13 +71,7 @@ const ActivityTray: React.FC<Props> = ({ userId }) => {
 
     const fetchActivities = async () => {
         setLoading(true);
-        const { data, error } = await fetchWithAuth<any>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/`);
-
-        if (error) {
-            enqueueSnackbar(`Error: ${error}`, { variant: "error" });
-        } else if (data) {
-            setActivities(data);
-        }
+        // const { data, error } = await fetch<any>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/`);
 
         setLoading(false);
     };

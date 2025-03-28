@@ -1,6 +1,6 @@
 import React from "react";
 
-import { IconProps } from "@/types/global";
+import { IconProps } from "@/types/models";
 
 const PlaceholderImage: React.FC<IconProps> = ({ size = "20", color = "currentColor", ...attributes }) => {
     return (

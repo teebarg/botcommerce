@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
 import { BtnLink } from "@/components/ui/btnLink";
-import { Cart, CartItem } from "@/lib/models";
+import { Cart, CartItem } from "@/types/models";
 import { subtotal, taxTotal, total } from "@/lib/util/store";
 
 type SummaryProps = {

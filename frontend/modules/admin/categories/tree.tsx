@@ -2,12 +2,13 @@
 
 import React, { useState } from "react";
 import { ChevronRight, DotsSix, Folder, Tag } from "nui-react-icons";
+import Image from "next/image";
 
 import CategoryAction from "./categories-control";
 
 import { cn } from "@/lib/util/cn";
 import Chip from "@/components/ui/chip";
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 
 interface Props {
     categories: Category[];
@@ -52,6 +53,11 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                     </button>
                                     <Folder />
                                     <span className="select-none text-sm font-medium capitalize flex-1">{item.name}</span>
+                                    {item.image && (
+                                        <div className="relative h-8 w-8">
+                                            <Image fill alt={item.name} src={item.image} />
+                                        </div>
+                                    )}
                                     <Chip
                                         className="mr-2"
                                         color={item.is_active ? "success" : "danger"}

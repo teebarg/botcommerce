@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { SortOptions } from "types/global";
+import { SortOptions, WishItem } from "types/models";
 import { Suspense } from "react";
 import { Exclamation } from "nui-react-icons";
 
@@ -10,7 +10,6 @@ import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/server-error";
-import { WishItem } from "@/lib/models";
 import { BtnLink } from "@/components/ui/btnLink";
 
 type SearchParams = Promise<{

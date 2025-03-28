@@ -21,7 +21,6 @@ function InstallPrompt() {
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
 
         // setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
-        // console.log(window.matchMedia("(display-mode: standalone)").matches);
 
         // Capture the install prompt event
         const handleBeforeInstallPrompt = (e: Event) => {

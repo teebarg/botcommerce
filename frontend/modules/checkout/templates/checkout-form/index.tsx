@@ -2,20 +2,18 @@ import Addresses from "@modules/checkout/components/addresses";
 import Payment from "@modules/checkout/components/payment";
 import Review from "@modules/checkout/components/review";
 import Shipping from "@modules/checkout/components/shipping";
-import { cookies } from "next/headers";
 
 import { currency } from "@/lib/util/util";
-import { Cart } from "@/lib/models";
-import { DeliveryOption } from "@/types/global";
-import { auth } from "@/actions/auth";
+import { Cart, DeliveryOption } from "@/types/models";
+import { getCookie } from "@/lib/util/server-utils";
+import { api } from "@/apis";
 
 type CheckoutFormProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
 };
 
 const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
-    const cookieStore = await cookies();
-    const cartId = cookieStore.get("_cart_id")?.value;
+    const cartId = await getCookie("_cart_id");
 
     if (!cartId) {
         return null;
@@ -48,12 +46,12 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
     ];
 
     // get customer if logged in
-    const customer = await auth();
+    const { data: customer } = await api.user.me();
 
     return (
         <div>
             <div className="w-full grid grid-cols-1 gap-y-4">
-                <Addresses cart={cart} customer={customer} />
+                <Addresses cart={cart} user={customer} />
                 <Shipping availableShippingMethods={availableShippingMethods} cart={cart} />
                 <Payment cart={cart} />
                 <div className="hidden md:block">

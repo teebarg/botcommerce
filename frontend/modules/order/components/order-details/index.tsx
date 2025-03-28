@@ -1,4 +1,4 @@
-import { Order } from "@/lib/models";
+import { Order } from "@/types/models";
 
 type OrderDetailsProps = {
     order: Order;

@@ -122,6 +122,7 @@ class Variant(BaseModel):
 class Product(BM):
     id: int
     name: str
+    sku: Optional[str] = None
     slug: str
     description: str
     price: float
@@ -130,16 +131,17 @@ class Product(BM):
     status: str
     variants: Optional[List[ProductVariant]] = None
     ratings: float
-    categories: Optional[List[Category]] = None
-    collections: Optional[List[Collection]] = None
-    brands: Optional[List[Brand]] = None
-    tags: Optional[List[Tag]] = None
-    images: Optional[List[ProductImage]] = None
-    reviews: Optional[List[Review]] = None
+    categories: Optional[List[Category]] = []
+    collections: Optional[List[Collection]] = []
+    brand: Optional[Brand] = None
+    tags: Optional[List[Tag]] = []
+    images: Optional[List[ProductImage]] = []
+    reviews: Optional[List[Review]] = []
 
 class SearchProduct(BaseModel):
     id: int
     name: str
+    sku: Optional[str] = None
     slug: str
     description: str
     price: float
@@ -149,15 +151,15 @@ class SearchProduct(BaseModel):
     ratings: float
     categories: List[str]
     collections: List[str]
-    brands: List[str]
-    tags: Optional[List[str]] = None
-    images: Optional[List[str]] = None
-    reviews: Optional[List[str]] = None
-    favorites: Optional[List[str]] = None
-    variants: Optional[List[Variant]] = None
+    brand: Optional[str] = None
+    tags: Optional[List[str]] = []
+    images: Optional[List[str]] = []
+    reviews: Optional[List[str]] = []
+    favorites: Optional[List[str]] = []
+    variants: Optional[List[Variant]] = []
 
 class Facets(BaseModel):
-    brands: dict[str, int]
+    brand: dict[str, int]
     categories: dict[str, int]
     collections: dict[str, int]
 

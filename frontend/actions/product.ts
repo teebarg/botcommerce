@@ -15,7 +15,7 @@ export async function mutateProduct(currentState: unknown, formData: FormData) {
         // image: formData.get("image") as string,
         is_active: Boolean(formData.get("is_active")) ?? false,
         description: formData.get("description") as string,
-        brands: JSON.parse(formData.get("brands") as string) ?? [],
+        brand_id: formData.get("brand_id") as string,
         categories: JSON.parse(formData.get("categories") as string) ?? [],
         collections: JSON.parse(formData.get("collections") as string) ?? [],
         price: Number(formData.get("price")) ?? 0,

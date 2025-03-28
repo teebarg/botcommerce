@@ -1,6 +1,6 @@
 import { api } from "@/apis";
 import ProductCard from "@/components/store/products/product-card";
-import { ProductSearch } from "@/lib/models";
+import { ProductSearch } from "@/types/models";
 
 type RecommendedProductsProps = {
     exclude?: Array<string | number>;

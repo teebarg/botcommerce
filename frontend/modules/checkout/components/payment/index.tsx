@@ -7,11 +7,12 @@ import { CreditCard, Pencil } from "nui-react-icons";
 import PaymentContainer from "@modules/checkout/components/payment-container";
 import { paymentInfoMap } from "@lib/constants";
 import { toast } from "sonner";
+import { CreditCardIcon } from "lucide-react";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { Cart, PaymentMethod } from "@/lib/models";
+import { Cart, PaymentMethod } from "@/types/models";
 import { api } from "@/apis";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
@@ -47,13 +48,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
     const set = async (providerId: PaymentMethod) => {
         setIsLoading(true);
-        const method = payMethods.find((item) => item.provider_id == providerId);
 
-        // await setPaymentMethod(method as PaymentSession)
-        //     .catch((err) => setError(err.toString()))
-        //     .finally(() => {
-        //         setIsLoading(false);
-        //     });
         const { error } = await api.cart.updateDetails({ payment_method: providerId });
 
         if (error) {
@@ -99,6 +94,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                 <div className="flex items-center gap-2">
                     <div className={cn("w-2 h-2 bg-gray-500 rounded-full", { "bg-blue-500": isOpen || hasPaymentMethod })} />
                     <span className="font-medium">Payment Method</span>
+                    <CreditCardIcon className="w-5 h-5 text-blue-500" />
                 </div>
                 <button
                     aria-label="edit"

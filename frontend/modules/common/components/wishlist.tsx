@@ -8,7 +8,7 @@ import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { toast } from "sonner";
-import { ProductVariant } from "@/lib/models";
+import { ProductVariant } from "@/types/models";
 
 interface WishlistItemProps {
     id: number;

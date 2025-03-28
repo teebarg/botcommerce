@@ -6,6 +6,8 @@ from typing import Optional
 class CategoryBase(BM):
     name: str = Field(..., min_length=1, description="Name is required")
     is_active: bool = True
+    parent_id: Optional[int] = None
+    image: Optional[str] = None
 
 
 class Category(CategoryBase):
@@ -17,11 +19,13 @@ class Category(CategoryBase):
 
 
 class CategoryCreate(CategoryBase):
-    parent_id: int = None
-
-
-class CategoryUpdate(CategoryBase):
     pass
+
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    parent_id: Optional[int] = None
+    image: Optional[str] = None
 
 
 class Categories(BaseModel):

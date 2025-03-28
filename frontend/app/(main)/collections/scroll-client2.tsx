@@ -10,7 +10,7 @@ import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { Brand, Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/lib/models";
+import { Brand, Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/types/models";
 import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
 import NoProductsFound from "@/modules/products/components/no-products";

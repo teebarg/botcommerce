@@ -1,6 +1,6 @@
 import React from "react";
 
-import { IconProps } from "@/types/global";
+import { IconProps } from "@/types/models";
 
 const FastDelivery: React.FC<IconProps> = ({ size = "16", color = "currentColor", ...attributes }) => {
     return (

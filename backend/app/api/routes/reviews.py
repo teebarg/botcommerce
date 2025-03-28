@@ -6,7 +6,6 @@ from app.core.deps import (
     CurrentUser,
     get_current_superuser,
 )
-from app.core.logging import logger
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError

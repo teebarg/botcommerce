@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { CategoryForm } from "./category-form";
 
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 import { deleteCategory } from "@/actions/category";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                         <DrawerHeader>
                             <DrawerTitle>Edit {category?.name}</DrawerTitle>
                         </DrawerHeader>
-                        <div className="max-w-2xl">
+                        <div className="max-w-lg">
                             <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
                         </div>
                     </DrawerContent>
@@ -77,7 +77,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                     <DialogTrigger>
                         <Trash className="text-rose-500" />
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="bg-content1">
                         <DialogHeader>
                             <DialogTitle>Delete Category</DialogTitle>
                         </DialogHeader>

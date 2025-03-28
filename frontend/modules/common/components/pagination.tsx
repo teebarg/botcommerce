@@ -5,7 +5,7 @@ import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { cn } from "@lib/util/cn";
 
 import { Button } from "@/components/ui/button";
-import { Pag } from "@/lib/models";
+import { Pag } from "@/types/models";
 
 interface Props {
     pagination: Pag;

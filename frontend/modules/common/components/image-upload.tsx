@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Edit } from "nui-react-icons";
 import { DragNDrop } from "@modules/admin/components/drag-drop";
-import { FileTypes } from "types/global";
+import { FileTypes } from "types/models";
 import { useSnackbar } from "notistack";
 import Image from "next/image";
 

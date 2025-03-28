@@ -10,7 +10,7 @@ import { siteConfig } from "@/lib/config";
 import PromotionalBanner from "@/components/promotion";
 import { auth } from "@/actions/auth";
 import { api } from "@/apis";
-import { CartItem } from "@/lib/models";
+import { CartItem } from "@/types/models";
 import ServerError from "@/components/server-error";
 import CartItems from "@/components/order/cart-details";
 

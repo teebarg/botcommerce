@@ -4,25 +4,17 @@ from datetime import datetime
 
 from enum import Enum
 from prisma.models import Address, Payment, OrderItem, User
-from prisma.enums import PaymentMethod, ShippingMethod
+from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
 
 # Pydantic models for request/response validation
-class OrderStatus(str, Enum):
-    PENDING = "PENDING"
-    PROCESSING = "PROCESSING"
-    SHIPPED = "SHIPPED"
-    DELIVERED = "DELIVERED"
-    CANCELED = "CANCELED"
-
-class PaymentStatus(str, Enum):
-    PENDING = "PENDING"
-    COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
-
-class ShippingMethod(str, Enum):
-    STANDARD = "STANDARD"
-    EXPRESS = "EXPRESS"
-    PICKUP = "PICKUP"
+# class OrderStatus(str, Enum):
+#     PENDING = "PENDING"
+#     PAID = "PAID"
+#     PROCESSING = "PROCESSING"
+#     SHIPPED = "SHIPPED"
+#     DELIVERED = "DELIVERED"
+#     CANCELED = "CANCELED"
+#     REFUNDED = "REFUNDED"
 
 class OrderItemCreate(BaseModel):
     variant_id: int

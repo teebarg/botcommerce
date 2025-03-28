@@ -1,4 +1,4 @@
-import { Cart } from "../models";
+import { Cart } from "@/types/models";
 
 export function getCheckoutStep(cart: Omit<Cart, "beforeInsert" | "beforeUpdate" | "afterUpdateOrLoad">) {
     if (!cart?.shipping_address?.address_1 || !cart.email) {

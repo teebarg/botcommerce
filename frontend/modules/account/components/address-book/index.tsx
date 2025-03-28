@@ -3,7 +3,7 @@ import React from "react";
 import AddAddress from "../address-card/add-address";
 import EditAddress from "../address-card/edit-address-modal";
 
-import { Address } from "@/lib/models";
+import { Address } from "@/types/models";
 
 type AddressBookProps = {
     addresses: Address[];

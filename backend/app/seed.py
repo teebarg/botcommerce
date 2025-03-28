@@ -123,7 +123,7 @@ async def seed_database():
         await db.product.update(
             where={"id": product.id},
             data={
-                "brands": {"connect": [{"id": random.choice(brands).id}]},
+                "brand": {"connect": {"id": random.choice(brands).id}},
                 "categories": {"connect": [{"id": random.choice(categories).id}]},
                 "collections": {"connect": [{"id": random.choice(collections).id}]}
             }

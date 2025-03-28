@@ -12,9 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { Brand, Product } from "@/lib/models";
 import MultiSelect from "@/components/ui/multi-select";
 import { useStore } from "@/app/store/use-store";
+import { Category, Collection, Product } from "@/types/models";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -29,7 +29,7 @@ const formSchema = z.object({
     collections: z.array(z.any()).min(1, {
         message: "Please select at least one collection.",
     }),
-    brands: z.array(z.any()).min(1, {
+    brand: z.number().min(1, {
         message: "Please select at least one brand.",
     }),
     // tags: z.array(z.any()).min(1, {
@@ -56,9 +56,9 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
             description: product?.description || "",
             sku: product?.sku || "",
             status: product?.status || "",
-            brands: product?.brands?.map((brand) => ({ value: brand.id, label: brand.name })) || [],
-            categories: product?.categories?.map((category) => ({ value: category.id, label: category.name })) || [],
-            collections: product?.collections?.map((collection) => ({ value: collection.id, label: collection.name })) || [],
+            brand: product?.brand?.id || 0,
+            categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
+            collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],
             // tags: product?.tags?.map((tag) => ({ value: tag.id, label: tag.name })) || [],
             price: product?.price || 0,
             old_price: product?.old_price || 0,
@@ -66,10 +66,9 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        const { categories, collections, brands, ...data } = values;
+        const { brand, categories, collections, ...data } = values;
         const categoryIds = categories.map((category) => category.value);
         const collectionIds = collections.map((collection) => collection.value);
-        const brandIds = brands.map((brand) => brand.value);
 
         setIsPending(true);
 
@@ -82,7 +81,7 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
                         ...data,
                         category_ids: categoryIds,
                         collection_ids: collectionIds,
-                        brand_ids: brandIds,
+                        brand_id: brand,
                         tags_ids: [],
                     });
                 } else {
@@ -90,7 +89,7 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
                         ...data,
                         category_ids: categoryIds,
                         collection_ids: collectionIds,
-                        brand_ids: brandIds,
+                        brand_id: brand,
                         tags_ids: [],
                     });
                 }
@@ -252,17 +251,23 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
                             />
                             <FormField
                                 control={form.control}
-                                name="brands"
+                                name="brand"
                                 render={({ field }) => (
                                     <FormItem className="md:col-span-2">
-                                        <FormLabel>Brands</FormLabel>
+                                        <FormLabel>Brand</FormLabel>
                                         <FormControl>
-                                            <MultiSelect
-                                                name={field.name}
-                                                options={brands?.map((brand: Brand) => ({ value: brand.id, label: brand.name }))}
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                            />
+                                            <Select defaultValue={field.value.toString()} onValueChange={field.onChange}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select brand" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {brands?.map((brand) => (
+                                                        <SelectItem key={brand.id} value={brand.id.toString()}>
+                                                            {brand.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

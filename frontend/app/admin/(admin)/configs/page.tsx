@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { SiteConfig } from "types/global";
+import { SiteConfig } from "types/models";
 import React from "react";
 import { Table } from "@modules/common/components/table";
 import { Actions } from "@modules/admin/components/actions";

@@ -4,7 +4,8 @@ import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-import { api } from "@/apis";
+// import { api } from "@/apis";
+import { bulkUpload } from "@/modules/account/actions";
 
 interface ProductUploadProps {}
 
@@ -30,7 +31,8 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
 
             void (async () => {
                 try {
-                    await api.product.bulkUpload(formData);
+                    // await api.product.bulkUpload(formData);
+                    await bulkUpload(formData);
                     toast.success("Product uploaded successfully");
                     router.refresh();
                 } catch (error) {

@@ -7,7 +7,7 @@ import ReviewForm from "./review-form";
 import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { timeAgo } from "@/lib/util/util";
-import { Product, Review } from "@/lib/models";
+import { Product, Review } from "@/types/models";
 import { auth } from "@/actions/auth";
 
 interface Prop {

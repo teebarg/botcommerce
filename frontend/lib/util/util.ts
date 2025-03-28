@@ -1,4 +1,4 @@
-import { Message } from "../models";
+import { Message } from "@/types/models";
 
 const buildUrl = (baseUrl: string, queryParams: Record<string, string | number | Date | undefined | null>): string => {
     let url = baseUrl;

@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { revalidate, signOut } from "@/actions/revalidate";
-import { Message, Token } from "@/lib/models";
+import { Message, Token } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Product API methods
@@ -25,6 +25,7 @@ export const authApi = {
     async signUp(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<{ access_token: string }> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/signup`;
         const res = await tryCatch<{ access_token: string }>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
+
         revalidate("user");
 
         return res;

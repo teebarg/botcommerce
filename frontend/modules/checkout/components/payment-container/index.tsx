@@ -2,7 +2,7 @@ import React from "react";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/util/cn";
-import { PaymentMethod } from "@/lib/models";
+import { PaymentMethod } from "@/types/models";
 
 type PaymentContainerProps = {
     paymentSession: { id: string; provider_id: PaymentMethod };

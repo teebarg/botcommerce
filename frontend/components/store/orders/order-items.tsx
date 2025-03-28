@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "nui-react-icons";
 
-import { OrderItem } from "@/lib/models";
+import { OrderItem } from "@/types/models";
 import { currency } from "@/lib/util/util";
 
 // Order Items Component

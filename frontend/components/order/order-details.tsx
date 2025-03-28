@@ -8,7 +8,7 @@ import Image from "next/image";
 import { currency } from "@lib/util/util";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { OrderItem } from "@/lib/models";
+import { OrderItem } from "@/types/models";
 
 type ItemsTemplateProps = {
     items: OrderItem[];

@@ -8,7 +8,7 @@ import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import LocalizedClientLink from "@/components/ui/link";
-import { Brand, Category, Collection, Facet } from "@/lib/models";
+import { Brand, Category, Collection, Facet } from "@/types/models";
 
 interface ComponentProps {
     brands?: Brand[];
@@ -84,7 +84,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     {brands?.map((item: Brand, index: number) => (
                         <div key={`brand-${index}`} className="flex justify-between mt-2">
                             <Checkbox color="warning" label={item.name} onChange={(e) => onBrandChange(e, item.slug)} />
-                            {facets?.brands && <span>({facets["brands"][item.name] ?? 0})</span>}
+                            {facets?.brand && <span>({facets["brand"][item.name] ?? 0})</span>}
                         </div>
                     ))}
                 </div>

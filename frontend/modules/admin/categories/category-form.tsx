@@ -7,8 +7,9 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 import { mutateCategory } from "@/actions/category";
+import CategoryImageManager from "@/components/categories/category-image";
 
 interface Props {
     current?: Category;
@@ -54,6 +55,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(
                         <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll">
                             <div className="relative flex-1">
                                 <div className="space-y-8 ">
+                                    {current.id && <CategoryImageManager categoryId={current.id} initialImage={current.image} />}
                                     <input readOnly className="hidden" name="type" type="text" value={type} />
                                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                     {hasParent && parent_id && <input readOnly className="hidden" name="parent_id" type="text" value={parent_id} />}

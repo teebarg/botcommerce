@@ -7,7 +7,7 @@ import React from "react";
 import { Cancel, Upload } from "nui-react-icons";
 import { FileTrigger } from "@modules/common/components/file-trigger";
 import useWatch from "@lib/hooks/use-watch";
-import { FileTypes } from "types/global";
+import { FileTypes } from "types/models";
 
 import { Button } from "@/components/ui/button";
 

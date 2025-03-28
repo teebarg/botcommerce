@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { type Pagination as PaginationType } from "@/types/global";
+import { type Pagination as PaginationType } from "@/types/models";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 

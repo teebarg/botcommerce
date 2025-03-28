@@ -7,6 +7,7 @@ from app.models.generic import Message
 from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException, Query)
 from pydantic import BaseModel
+from app.core.storage import upload, delete_Image
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
@@ -109,7 +110,6 @@ async def get_by_slug(slug: str) -> Category:
 @router.patch("/{id}", dependencies=[Depends(get_current_user)])
 async def update(
     *,
-    # db: PrismaDb,
     id: int,
     update_data: CategoryUpdate,
 ) -> Category:
@@ -153,10 +153,7 @@ async def delete(id: int) -> Message:
 
 
 @router.get("/autocomplete/")
-async def autocomplete(
-    # db: PrismaDb,
-    query: str = "",
-) -> Any:
+async def autocomplete(query: str = "") -> Any:
     """
     Retrieve categories for autocomplete.
     """
@@ -174,3 +171,73 @@ async def autocomplete(
         order={"created_at": "desc"},
     )
     return Search(results=categories)
+
+
+class ImageUpload(BaseModel):
+    file: str  # Base64 encoded file
+    file_name: str
+    content_type: str
+
+
+@router.patch("/{id}/image")
+async def add_image(id: int, image_data: ImageUpload) -> Category:
+    """
+    Add an image to a category.
+    """
+    category = await db.category.find_unique(
+        where={"id": id}
+    )
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    try:
+        image_url = upload(bucket="images", data=image_data)
+
+        # Update category with new image URL
+        updated_category = await db.category.update(
+            where={"id": id},
+            data={"image": image_url}
+        )
+        return updated_category
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to upload image: {str(e)}"
+        )
+
+
+@router.delete("/{id}/image")
+async def delete_image(
+    id: int,
+    current_user = Depends(get_current_user)
+) -> Message:
+    """
+    Delete the image of a category.
+    """
+    category = await db.category.find_unique(
+        where={"id": id}
+    )
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    if not category.image:
+        raise HTTPException(status_code=404, detail="Category has no image")
+
+    try:
+        # Extract file path from URL
+        file_path = category.image.split("/storage/v1/object/public/images/")[1]
+        delete_Image(bucket="images", file_path=file_path)
+
+        # Update category to remove image URL
+        await db.category.update(
+            where={"id": id},
+            data={"image": None}
+        )
+        return Message(message="Category image deleted successfully")
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete image: {str(e)}"
+        )

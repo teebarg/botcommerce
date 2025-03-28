@@ -9,7 +9,7 @@ import { cn } from "@lib/util/cn";
 import Control from "./control";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { CartItem } from "@/lib/models";
+import { CartItem } from "@/types/models";
 
 type ItemsTemplateProps = {
     className?: string;

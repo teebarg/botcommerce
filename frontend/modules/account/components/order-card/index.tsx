@@ -3,7 +3,7 @@ import { currency } from "@lib/util/util";
 import Image from "next/image";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { Order, OrderItem } from "@/lib/models";
+import { Order, OrderItem } from "@/types/models";
 
 type OrderCardProps = {
     order: Omit<Order, "beforeInsert">;

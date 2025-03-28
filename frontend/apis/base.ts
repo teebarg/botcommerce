@@ -9,6 +9,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     // Add query parameters if they exist
     const url = new URL(endpoint, baseURL);
+
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
             url.searchParams.append(key, value);

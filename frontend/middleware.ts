@@ -89,18 +89,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { cartMiddleware } from "./middlewares/cartMiddleware";
 import { authMiddleware } from "./middlewares/authMiddleware";
 
 /**
  * Main middleware handler
  */
 export async function middleware(request: NextRequest) {
-    // Run cartMiddleware for all requests
-    const cartResponse = await cartMiddleware(request);
-
-    if (cartResponse) return cartResponse;
-
     // Run authMiddleware only for protected routes
     const protectedRoutes = ["/sign-in", "/sign-up", "/account", "/admin", "/wishlist"];
 

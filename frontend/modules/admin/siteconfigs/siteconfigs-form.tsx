@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 
 import { Button } from "@/components/ui/button";
-import { SiteConfig } from "@/types/global";
+import { SiteConfig } from "@/types/models";
 import { mutateSiteConfig } from "@/actions/product";
 
 interface Props {

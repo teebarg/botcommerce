@@ -1,15 +1,12 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
 import { signOut } from "./revalidate";
 
 import { api } from "@/apis";
-import { Session, User } from "@/lib/models";
-import { tryCatch } from "@/lib/try-catch";
-import { fetcher } from "@/apis/fetcher";
+import { Session } from "@/types/models";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -95,9 +92,11 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     } as any;
 
     const { data, error } = await api.auth.signUp(customer);
+
     if (error || !data) return { error: true, message: error };
 
     const { access_token } = data;
+
     await setSession(access_token);
 
     return { error: false, message: "Successful" };

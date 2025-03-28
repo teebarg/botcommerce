@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Order, OrderItem, OrderStatus } from "@/lib/models";
+import { Order, OrderItem, OrderStatus } from "@/types/models";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";
 
@@ -66,6 +66,8 @@ const OrderDetail = () => {
             ["SHIPPED"]: "secondary",
             ["CANCELED"]: "destructive",
             ["DELIVERED"]: "default",
+            ["PAID"]: "default",
+            ["REFUNDED"]: "destructive",
         };
 
         return <Badge variant={variants[status ?? "PENDING"]}>{status}</Badge>;

@@ -5,7 +5,7 @@ import { Home } from "lucide-react";
 
 import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";
-import { Session } from "@/lib/models";
+import { Session } from "@/types/models";
 
 interface NavLinkProp {
     href: string;

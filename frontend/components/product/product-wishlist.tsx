@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
 import { addWish, removeWish } from "@/actions/user";
-import { Product } from "@/lib/models";
+import { Product } from "@/types/models";
 
 interface ComponentProps {
     product: Product;

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 import AccountInfo from "../account-info";
 
-import { User } from "@/lib/models";
+import { User } from "@/types/models";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { api } from "@/apis";
 

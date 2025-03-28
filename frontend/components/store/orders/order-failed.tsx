@@ -6,7 +6,7 @@ import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 
-import { Order, PaymentStatus } from "@/lib/models";
+import { Order, PaymentStatus } from "@/types/models";
 import FadeInComponent from "@/components/fade-in-component";
 
 type OrderConfirmationProps = {

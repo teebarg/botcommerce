@@ -10,12 +10,22 @@ datasource db {
 }
 
 // Enums for consistent data values
+enum AddressType {
+  HOME
+  WORK
+  BILLING
+  SHIPPING
+  OTHER
+}
+
 enum OrderStatus {
   PENDING
+  PAID
   PROCESSING
   SHIPPED
   DELIVERED
   CANCELED
+  REFUNDED
 }
 
 enum DiscountType {
@@ -25,7 +35,6 @@ enum DiscountType {
 
 enum PaymentMethod {
   CREDIT_CARD
-  PAYPAL
   CASH_ON_DELIVERY
   BANK_TRANSFER
   PAYSTACK
@@ -44,8 +53,9 @@ enum CartStatus {
 
 enum PaymentStatus {
   PENDING
-  COMPLETED
   FAILED
+  SUCCESS
+  REFUNDED
 }
 
 enum ShippingMethod {
@@ -89,6 +99,8 @@ model Address {
   id              Int       @id @default(autoincrement())
   user            User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id         Int
+  label           String?
+  address_type    AddressType @default(HOME)
   first_name      String?
   last_name       String?
   address_1       String
@@ -115,7 +127,7 @@ model Brand {
   name         String         @unique @db.VarChar(255)
   slug         String         @unique @db.VarChar(255)
   is_active    Boolean
-  products     Product[]      @relation("ProductBrands")
+  products     Product[]
 
   created_at    DateTime        @default(now())
   updated_at    DateTime        @updatedAt
@@ -127,6 +139,7 @@ model Category {
   id           Int      @id @default(autoincrement())
   name         String   @unique
   slug         String   @unique
+  image        String?
   is_active    Boolean  @default(true)
   parent_id    Int?     // Nullable for top-level categories
   parent        Category?   @relation("CategoryToSubcategory", fields: [parent_id], references: [id], onDelete: Cascade)
@@ -168,7 +181,8 @@ model Product {
   ratings            Float?               @default(0)
   categories         Category[]           @relation("ProductCategories")
   collections        Collection[]         @relation("ProductCollections")
-  brands             Brand[]              @relation("ProductBrands")
+  brand              Brand?               @relation(fields: [brand_id], references: [id], onDelete: SetNull)
+  brand_id           Int?
   tags               Tag[]                @relation("ProductTags")
   images             ProductImage[]
   reviews            Review[]
@@ -260,10 +274,10 @@ model Order {
   user            User         @relation(fields: [user_id], references: [id], onDelete: NoAction)
   user_id         Int
 
-  shipping_address    Address     @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: NoAction)
-  shipping_address_id Int
-  billing_address     Address     @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: NoAction)
-  billing_address_id  Int
+  shipping_address    Address?     @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
+  shipping_address_id Int?
+  billing_address     Address?     @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
+  billing_address_id  Int?
 
   email        String?
   order_items     OrderItem[]
@@ -309,6 +323,8 @@ model Payment {
   order_id       Int           @unique
   amount         Float         @db.DoublePrecision
   payment_method PaymentMethod
+  status         PaymentStatus @default(PENDING)
+  reference      String
   transaction_id String
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
@@ -347,9 +363,9 @@ model Cart {
   payment_method PaymentMethod?
   shipping_method ShippingMethod?
 
-  shipping_address    Address?     @relation("ShippingCartAddress", fields: [shipping_address_id], references: [id], onDelete: NoAction)
+  shipping_address    Address?     @relation("ShippingCartAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
   shipping_address_id Int?
-  billing_address     Address?     @relation("BillingCartAddress", fields: [billing_address_id], references: [id], onDelete: NoAction)
+  billing_address     Address?     @relation("BillingCartAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
   billing_address_id  Int?
 
   created_at   DateTime    @default(now())

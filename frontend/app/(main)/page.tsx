@@ -1,18 +1,52 @@
 import { Metadata } from "next";
 import React from "react";
-import { Commerce, Deal, Location, Mail, PhoneCall } from "nui-react-icons";
+import { Location, Mail } from "nui-react-icons";
 import { openingHours, siteConfig } from "@lib/config";
 import Image from "next/image";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
-import { Category, ProductSearch, WishItem } from "@/lib/models";
-import BannerCarousel from "@/components/carousel";
+import { Category, ProductSearch, WishItem } from "@/types/models";
 import ContactForm from "@/modules/store/components/contact-form";
 import { auth } from "@/actions/auth";
 import ProductCard from "@/components/store/products/product-card";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+
+// Mock banners
+const banners = [
+    {
+        id: 1,
+        title: "Summer Sale",
+        subtitle: "Up to 50% off",
+        description: "On selected electronics and accessories",
+        buttonText: "Shop Now",
+        image: "https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fbanner2.jpg?alt=media",
+        link: "/collections",
+    },
+    {
+        id: 2,
+        title: "New Arrivals",
+        subtitle: "The Latest Tech",
+        description: "Discover the newest gadgets and innovations",
+        buttonText: "Explore",
+        image: "https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-2.avif",
+        link: "/collections",
+    },
+    {
+        id: 3,
+        title: "Home Essentials",
+        subtitle: "Create Your Space",
+        description: "Everything you need for a comfortable home",
+        buttonText: "View Collection",
+        image: "https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fbanner1.jpg?alt=media",
+        link: "/collections",
+    },
+];
 
 export const metadata: Metadata = {
     title: `Children clothings | ${siteConfig.name}`,
@@ -32,7 +66,7 @@ export default async function Home() {
         fetchProducts("trending"),
         fetchProducts("latest"),
         fetchProducts("featured", 6),
-        api.category.all({ limit: 100 }),
+        api.category.all({ limit: 4 }),
     ]);
 
     const { categories } = catRes.data ?? {};
@@ -47,103 +81,61 @@ export default async function Home() {
 
     return (
         <React.Fragment>
-            <div>
-                <div className="bg-content1">
-                    <div className="max-w-8xl mx-auto relative hidden md:grid grid-cols-5 gap-4 rounded-xl py-6">
-                        <div className="hidden md:block">
-                            <span className="text-lg font-semibold block bg-primary text-primary-foreground px-4 py-3 rounded-t-lg">Categories</span>
-                            <ul className="bg-primary/10">
-                                {categories?.map((item: Category, index: number) => (
-                                    <li key={index}>
-                                        <LocalizedClientLink
-                                            className="font-medium border border-primary/20 p-3 block hover:bg-primary/20"
-                                            href={`/collections?cat_ids=${item.slug}`}
-                                        >
-                                            {item.name}
-                                        </LocalizedClientLink>
-                                    </li>
-                                ))}
-                            </ul>
-                            <LocalizedClientLink className="px-4 pt-4 block hover:text-primary underline underline-offset-4" href="/collections">
-                                All Products
-                            </LocalizedClientLink>
-                        </div>
-                        <div className="col-span-3">
-                            <BannerCarousel />
-                        </div>
-                        <div className="w-full hidden md:flex flex-col">
-                            <div className="bg-warning/15 p-4 rounded-lg hidden md:block space-y-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="rounded-50 ring-1 ring-warning p-2">
-                                        <PhoneCall className="h-6 w-6" />
+            <div className="pb-16">
+                {/* Hero Banner Carousel */}
+                <section className="relative">
+                    <Carousel className="w-full">
+                        <CarouselContent>
+                            {banners.map((banner, idx: number) => (
+                                <CarouselItem key={idx}>
+                                    <div className="relative h-[60vh] w-full overflow-hidden">
+                                        <img alt={banner.title} className="object-cover w-full h-full" src={banner.image} />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
+                                            <div className="container mx-auto px-4 md:px-8 lg:px-12">
+                                                <div className="max-w-xl text-white">
+                                                    <h2 className="text-xl md:text-2xl font-medium mb-2">{banner.subtitle}</h2>
+                                                    <h1 className="text-3xl md:text-5xl font-bold mb-4">{banner.title}</h1>
+                                                    <p className="text-lg mb-6 text-white/80">{banner.description}</p>
+                                                    <Button asChild className="bg-commerce-secondary hover:bg-commerce-secondary/90">
+                                                        <Link href={banner.link}>{banner.buttonText}</Link>
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-semibold">Call to Order</p>
-                                        <p className="text-xs font-medium">{siteConfig.contactPhone}</p>
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                        <CarouselPrevious className="left-4" />
+                        <CarouselNext className="right-4" />
+                    </Carousel>
+                </section>
+
+                {/* Category Sections */}
+                <section className="pt-12 bg-gray-50">
+                    <div className="container mx-auto px-4">
+                        <h2 className="text-2xl md:text-3xl font-bold text-commerce-primary mb-8 text-center">Shop by Category</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {categories?.map((category: Category, idx: number) => (
+                                <Link key={idx} className="group" href={`/category/${category.name.toLowerCase()}`}>
+                                    <div className="relative h-48 rounded-lg overflow-hidden">
+                                        <img
+                                            alt={category.name}
+                                            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+                                            src={category.image}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                                            <div className="w-full flex items-center justify-between">
+                                                <h3 className="text-xl font-semibold text-white">{category.name}</h3>
+                                                <ChevronRight className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="rounded-50 ring-1 ring-warning p-2">
-                                        <Commerce className="h-6 w-6" />
-                                    </div>
-                                    <p className="text-sm font-semibold">Sell on {siteConfig.name}</p>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="rounded-50 ring-1 ring-warning p-2">
-                                        <Deal className="h-6 w-6" />
-                                    </div>
-                                    <p className="text-sm font-semibold">Best Deals</p>
-                                </div>
-                            </div>
-                            <div className="py-20 text-center block md:hidden">
-                                <span className="text-secondary text-4xl font-bold block">{siteConfig.name}!</span>
-                                <span className="text-secondary text-xl block mt-2">Luxury online shopping.</span>
-                            </div>
-                            <div className="block md:hidden mt-0 md:mt-5">search component</div>
-                            <div className="flex items-center bg-secondary text-secondary-foreground p-4 rounded-lg mt-8 md:mt-4 flex-1">
-                                <div>
-                                    <span className="block">Prime Store</span>
-                                    <span className="block text-2xl mt-2 font-bold">Looking Originals?</span>
-                                    <span className="block my-2">Explore the latest premium quality branded products.</span>
-                                    <BtnLink color="secondary" href="/collections">
-                                        Visit Shop!
-                                    </BtnLink>
-                                </div>
-                            </div>
-                            <div className="bg-warning/15 p-4 rounded-lg mt-8 md:mt-4 text-default-900/80">
-                                <span className="font-semibold text-lg">Need Help?</span>
-                                <span className="block">
-                                    Visit{" "}
-                                    <LocalizedClientLink className="font-semibold hover:text-default-900" href="/support">
-                                        Support Center
-                                    </LocalizedClientLink>
-                                </span>
-                            </div>
+                                </Link>
+                            ))}
                         </div>
                     </div>
-                    {/* Mobile Hero Section */}
-                    <div
-                        className="relative h-[50vh] md:hidden bg-cover"
-                        style={{
-                            backgroundImage: `url("https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-2.avif")`,
-                        }}
-                    >
-                        <div className="absolute inset-0 flex flex-col items-center justify-end p-6 bg-gradient-to-b from-transparent via-transparent to-secondary/90">
-                            <div className="flex overflow-x-auto gap-3 py-2 w-full no-scrollbar">
-                                {categories?.map((category: Category, index: number) => (
-                                    <BtnLink
-                                        key={index}
-                                        className="flex-none h-24 min-w-24 rounded-full text-lg"
-                                        color="secondary"
-                                        href={`/collections?cat_ids=${category.slug}`}
-                                    >
-                                        {category.name}
-                                    </BtnLink>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </section>
                 <PromotionalBanner
                     btnClass="text-purple-600"
                     outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"

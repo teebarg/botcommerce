@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
 from enum import Enum
 from prisma.models import ProductVariant, Address
-from prisma.enums import PaymentMethod, ShippingMethod
+from prisma.enums import PaymentMethod, ShippingMethod, AddressType
 
 # Enums
 class CartStatus(str, Enum):
@@ -32,17 +32,13 @@ class CartItemResponse(CartItemBase):
     class Config:
         from_attributes = True
 
-class CartCreate(BaseModel):
-    cart_number: str
-    status: Optional[CartStatus] = CartStatus.ACTIVE
-
 class CartResponse(BaseModel):
     id: int
-    user_id: int | None = None
-    cart_number: str
+    user_id: Optional[int] = None
+    cart_number: Optional[str] = None
     email: Optional[str] = None
-    status: CartStatus
-    items: List[CartItemResponse]
+    status: Optional[CartStatus] = None
+    items: Optional[list[CartItemResponse]] = []
     payment_method: Optional[PaymentMethod] = None
     shipping_method: Optional[ShippingMethod] = None
     shipping_address: Optional[Address] = None
@@ -51,18 +47,16 @@ class CartResponse(BaseModel):
     subtotal: Optional[float] = 0
     tax: Optional[float] = 0
     shipping_fee: Optional[float] = 0
-    created_at: datetime
+    created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
 
-class CartItemIn(BaseModel):
-    product_id: str
-    quantity: int
-
-
 class CartAddress(BaseModel):
+    id: Optional[int] = None
     first_name: str
     last_name: str
+    address_type: AddressType | None = Field(default=None, max_length=255)
+    label: str | None = Field(default=None, max_length=255)
     address_1: str
     address_2: Optional[str] = None
     city: Optional[str] = None

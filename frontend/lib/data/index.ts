@@ -1,5 +1,6 @@
 import { cache } from "react";
-import { cookies } from "next/headers";
+
+import { getCookie } from "../util/server-utils";
 
 /**
  * Function for getting custom headers for API requests, including the JWT token and cache revalidation tags.
@@ -14,8 +15,7 @@ const getHeaders = async (tags: string[] = []) => {
         },
     } as Record<string, any>;
 
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
+    const token = await getCookie("access_token");
 
     headers["X-Auth"] = token ?? "";
 

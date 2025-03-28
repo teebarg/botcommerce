@@ -5,7 +5,7 @@ import AddCategory from "@modules/admin/categories/add-categories";
 
 import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
-import { Category } from "@/lib/models";
+import { Category } from "@/types/models";
 import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
