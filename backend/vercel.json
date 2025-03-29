@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "pip install -r requirements.txt",
-  "devCommand": "fastapi run app/main.py",
+  "buildCommand": "pip install -r requirements.txt && prisma generate",
+  "devCommand": "prisma generate && fastapi run app/main.py",
   "builds": [
     {
       "src": "app/main.py",
