@@ -89,4 +89,5 @@ RUN prisma generate
 
 EXPOSE 8000
 
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+CMD ["sh", "-c", "fastapi run app/main.py --host 0.0.0.0 --reload"]
+# CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
