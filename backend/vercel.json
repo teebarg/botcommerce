@@ -13,5 +13,8 @@
       "src": "/(.*)",
       "dest": "app/main.py"
     }
-  ]
+  ],
+  "scripts": {
+    "postinstall": "prisma generate"
+  }
 }
