@@ -1,1 +1,3 @@
 -r requirements.base.txt
+
+prisma==0.15.0
