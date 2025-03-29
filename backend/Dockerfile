@@ -87,4 +87,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 RUN prisma generate
 
+EXPOSE 8000
+
 CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
