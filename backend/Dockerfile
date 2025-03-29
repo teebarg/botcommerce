@@ -76,6 +76,8 @@ COPY ./scripts /app/scripts
 
 COPY ./pyproject.toml ./uv.lock /app/
 
+COPY ./prisma /app/prisma
+
 COPY ./app /app/app
 
 # Sync the project
