@@ -1,7 +1,7 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "botmerce-cache-v3"; // Increment this value for new versions
+const CACHE_NAME = "botmerce-cache-v4"; // Increment this value for new versions
 const ASSETS_TO_CACHE = [
-    "/", // Root URL
+    // "/", // Root URL
     "/career-opportunities",
     "/claim",
     "/latest-news",
@@ -75,18 +75,18 @@ self.addEventListener("fetch", (event) => {
     }
 
     // Default caching strategy for other requests
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            return (
-                cachedResponse ||
-                fetch(event.request).catch(() => {
-                    if (event.request.mode === "navigate") {
-                        return caches.match("/offline"); // Serve the offline page
-                    }
-                })
-            );
-        })
-    );
+    // event.respondWith(
+    //     caches.match(event.request).then((cachedResponse) => {
+    //         return (
+    //             cachedResponse ||
+    //             fetch(event.request).catch(() => {
+    //                 if (event.request.mode === "navigate") {
+    //                     return caches.match("/offline"); // Serve the offline page
+    //                 }
+    //             })
+    //         );
+    //     })
+    // );
 });
 
 self.addEventListener("push", function (event) {
