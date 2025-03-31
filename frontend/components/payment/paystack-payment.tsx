@@ -1,29 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { paymentApi } from "@/apis/payment";
+import { api } from "@/apis/base";
+import { PaymentInitialize } from "@/types/payment";
 
 interface PaystackPaymentProps {
-    orderId: number;
+    cartNumber: string;
     amount: number;
     onSuccess?: () => void;
 }
 
-export function PaystackPayment({ orderId, amount, onSuccess }: PaystackPaymentProps) {
+export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     const handlePayment = async () => {
         try {
             setLoading(true);
-            const response = await paymentApi.initialize(orderId);
+            const { data, error } = await api.post<PaymentInitialize>(`/payment/initialize/${cartNumber}`);
 
+            if (error || !data) {
+                toast.error(error || "Failed to initialize payment");
+
+                return;
+            }
             // Redirect to Paystack payment page
-            window.location.href = response.data?.authorization_url ?? "/";
+            window.location.href = data?.authorization_url ?? "/";
         } catch (error) {
             toast.error("Failed to initialize payment");
             console.error(error);

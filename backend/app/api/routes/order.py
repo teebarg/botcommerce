@@ -6,113 +6,33 @@ from app.core.deps import (
     get_current_superuser
 )
 from app.core.logging import logger
-from app.core.utils import generate_invoice_email
-from app.services.export import export
 from typing import Optional
-import uuid
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
-from math import ceil
 from prisma.enums import OrderStatus
+from app.services.order import OrderService
 
 # Create a router for orders
 router = APIRouter()
 
+def get_order_service(notification: Notification) -> OrderService:
+    return OrderService(notification)
 
 @router.post("/", response_model=OrderResponse)
-async def create_order(notification: Notification, order_in: OrderCreate, user: CurrentUser, cartId: str = Header(default=None)):
-    # Generate unique order number
-    order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
-
-    cart = await db.cart.find_unique(where={"cart_number": cartId}, include={"items": True})
-    if not cart:
-        raise HTTPException(status_code=404, detail="Cart not found")
-
-    # Create order with items
-    new_order = await db.order.create(
-        data={
-            "order_number": order_number,
-            "email": cart.email,
-            "total": order_in.total,
-            "subtotal": order_in.subtotal,
-            "tax": order_in.tax,
-            "shipping_fee": cart.shipping_fee,
-            "status": order_in.status,
-            "payment_status": order_in.payment_status,
-            "shipping_method": cart.shipping_method,
-            # "coupon_id": order_in.coupon_id,
-            "payment_method": cart.payment_method,
-            "cart": {"connect": {"id": cart.id}},
-            "user": {"connect": {"id": user.id}},
-            "billing_address": {"connect": {"id": cart.billing_address_id}},
-            "shipping_address": {"connect": {"id": cart.shipping_address_id}},
-            "order_items": {
-                "create": [
-                    {
-                        "image": item.image,
-                        "variant": {"connect": {"id": item.variant_id}},
-                        "quantity": item.quantity,
-                        "price": item.price
-                    } for item in cart.items
-                ]
-            }
-        },
-        include={
-            "order_items": {"include": {"variant": True}},
-            "user": True,
-            "shipping_address": True,
-            "billing_address": True
-        }
-    )
-
-    # Send invoice email
-    email_data = generate_invoice_email(order=new_order, user=user)
-    notification.send_notification(
-        channel_name="email",
-        recipient="neyostica2000@yahoo.com",
-        subject=email_data.subject,
-        message=email_data.html_content
-    )
-
-    # Send to slack
-    slack_message = {
-        "text": f"🛍️ *New Order Created* 🛍️\n"
-                f"*Order ID:* {new_order.order_number}\n"
-                f"*Customer:* {user.first_name} {user.last_name}\n"
-                f"*Email:* {user.email}\n"
-                f"*Amount:* {new_order.total}\n"
-                f"*Payment Status:* {new_order.payment_status}"
-    }
-
-    notification.send_notification(
-        channel_name="slack",
-        slack_message=slack_message
-    )
-    return new_order
-
+async def create_order(
+    order_in: OrderCreate,
+    user: CurrentUser,
+    cartId: str = Header(default=None),
+    order_service: OrderService = Depends(get_order_service)
+):
+    return await order_service.create_order(order_in, user.id, cartId)
 
 @router.get("/{order_id}", response_model=OrderResponse)
-async def get_order(order_id: str):
-    """
-    Get a specific order by order_number.
-    """
-    order = await db.order.find_unique(
-        where={"order_number": order_id},
-        include={
-            "order_items": {
-                "include": {
-                    "variant": True
-                }
-            },
-            "user": True,
-            "shipping_address": True,
-            "billing_address": True
-        }
-    )
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-    return order
-
+async def get_order(
+    order_id: str,
+    order_service: OrderService = Depends(get_order_service)
+):
+    return await order_service.get_order(order_id)
 
 @router.get("/")
 async def get_orders(
@@ -124,38 +44,19 @@ async def get_orders(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
+    order_service: OrderService = Depends(get_order_service)
 ) -> Orders:
-    """List orders with filtering and pagination"""
-    where = {}
-    if status:
-        where["status"] = status
-    if customer_id:
-        where["user_id"] = customer_id
-    if search:
-        where["order_number"] = search
-    if user.role == "CUSTOMER":
-        where["user_id"] = user.id
-    if start_date:
-        where["created_at"] = {"gte": start_date}
-    if end_date:
-        where["created_at"] = {"lte": end_date}
-
-    orders = await db.order.find_many(
-        where=where,
+    return await order_service.list_orders(
+        user_id=user.id,
         skip=skip,
         take=take,
-        order={"created_at": "desc"},
-        include={"order_items": True, "user": True, "shipping_address": True, "billing_address": True}
+        status=status,
+        search=search,
+        start_date=start_date,
+        end_date=end_date,
+        customer_id=customer_id,
+        user_role=user.role
     )
-    total = await db.order.count(where=where)
-    return {
-        "orders":orders,
-        "page":skip,
-        "limit":take,
-        "total_pages":ceil(total/take),
-        "total_count":total,
-    }
-
 
 @router.put("/orders/{order_id}", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
 async def update_order(order_id: int, order_update: OrderUpdate):
@@ -183,7 +84,6 @@ async def update_order(order_id: int, order_update: OrderUpdate):
     )
     return updated_order
 
-
 @router.delete("/{order_id}")
 async def delete_order(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
@@ -192,7 +92,6 @@ async def delete_order(order_id: int):
 
     await db.order.delete(where={"id": order_id})
     return {"message": "Order deleted successfully"}
-
 
 @router.post("/export")
 async def export_orders(current_user: CurrentUser):
@@ -206,7 +105,6 @@ async def export_orders(current_user: CurrentUser):
     except Exception as e:
         logger.error(f"Export orders error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
-
 
 @router.post("/{order_id}/cancel", response_model=OrderResponse)
 async def cancel_order(order_id: int):

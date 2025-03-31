@@ -6,7 +6,7 @@ import { omit } from "@lib/util/util";
 import { Loader } from "nui-react-icons";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Plus, ChevronRight, Check, Home, Pencil } from "lucide-react";
+import { Search, Plus, ChevronRight, Check, Home, Pencil, MapPin } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { useStore } from "@/app/store/use-store";
@@ -116,6 +116,20 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, selectedAddress, idx 
     );
 };
 
+const EmptyState = () => {
+    return (
+        <div className="flex flex-col items-center justify-center py-8 px-4">
+            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                <MapPin className="w-8 h-8 text-blue-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Addresses Found</h3>
+            <p className="text-gray-500 text-center mb-6">
+                {`You haven't added any addresses yet. Add your first address to get started with your order.`}
+            </p>
+        </div>
+    );
+};
+
 const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
     const { user } = useStore();
     const addresses = user?.addresses?.sort((a, b) => (a.created_at! > b.created_at! ? -1 : 1)) ?? [];
@@ -132,25 +146,37 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
     }, [addresses, cart?.shipping_address]);
 
     return (
-        // <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex items-center justify-center p-4">
         <div className="w-auto shadow-xlp overflow-hidden bg-content1">
             <div className="border-b border-gray-100">
-                <div className="relative mb-6">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                        placeholder="Search addresses..."
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
+                {filteredAddresses.length > 0 && (
+                    <div className="relative mb-6">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                            placeholder="Search addresses..."
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                )}
 
                 <div className="space-y-3 max-h-[30vh] overflow-y-auto">
                     <AnimatePresence>
-                        {filteredAddresses.map((address: Address, idx: number) => (
-                            <AddressItem key={idx} address={address} idx={idx} selectedAddress={selectedAddress} />
-                        ))}
+                        {filteredAddresses.length === 0 ? (
+                            <motion.div
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <EmptyState />
+                            </motion.div>
+                        ) : (
+                            filteredAddresses.map((address: Address, idx: number) => (
+                                <AddressItem key={idx} address={address} idx={idx} selectedAddress={selectedAddress} />
+                            ))
+                        )}
                     </AnimatePresence>
                 </div>
             </div>
@@ -158,7 +184,7 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
             <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
                 <DrawerTrigger asChild>
                     <Button className="w-full mt-6" variant="default">
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-5 h-5 mr-2" />
                         <span>Add New Address</span>
                     </Button>
                 </DrawerTrigger>
@@ -172,7 +198,6 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
                 </DrawerContent>
             </Drawer>
         </div>
-        // </div>
     );
 };
 

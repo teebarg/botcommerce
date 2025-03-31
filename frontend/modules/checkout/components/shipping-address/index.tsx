@@ -91,12 +91,12 @@ const ShippingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "ref
 
     return (
         <React.Fragment>
-            {user && (user.addresses?.length || 0) > 0 && (
-                <div className="shadow-xlp w-full rounded-lg mb-6">
-                    {/* <p className="text-sm">{`Hi ${user.first_name}, do you want to use one of your saved addresses?`}</p> */}
-                    <AddressSelect cart={cart} />
-                </div>
-            )}
+            {/* {user && (user.addresses?.length || 0) > 0 && ( */}
+            <div className="shadow-xlp w-full rounded-lg mb-6">
+                {/* <p className="text-sm">{`Hi ${user.first_name}, do you want to use one of your saved addresses?`}</p> */}
+                <AddressSelect cart={cart} />
+            </div>
+            {/* )} */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                 <Input
                     required

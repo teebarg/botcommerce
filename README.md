@@ -9,7 +9,7 @@ Botcommerce is an e-commerce platform that leverages modern web technologies to 
 - User authentication and authorization
 - Shopping cart functionality
 - Order management
-- Payment integration (stripe, paystack)
+- Payment integration (paystack)
 
 ## Tech Stack
 

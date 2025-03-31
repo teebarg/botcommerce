@@ -11,7 +11,7 @@ import { Cart } from "@/types/models";
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";
 import { api } from "@/apis";
 import { subtotal, taxTotal, total } from "@/lib/util/store";
-import Paystack from "@/components/payment/paystack";
+import { PaystackPayment } from "@/components/payment/paystack-payment";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -48,7 +48,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, isLoggedIn, "data-t
         case "BANK_TRANSFER":
             return <TransferPaymentButton cart={cart} isLoggedIn={isLoggedIn} notReady={notReady} />;
         case "PAYSTACK":
-            return <Paystack cart={cart} isLoggedIn={isLoggedIn} />;
+            return (
+                <>
+                    <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} />
+                </>
+            );
         default:
             return (
                 <Button disabled aria-label="default">
