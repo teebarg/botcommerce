@@ -1,13 +1,12 @@
 "use client";
 
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import { GoogleLogin } from "@modules/account/components/google";
 import React, { useState } from "react";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
+import SocialLoginButtons from "@/components/auth/social-login-buttons";
 
 type Props = {
     callbackUrl?: string;
@@ -64,9 +63,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                 </Button>
             </div>
             <hr className="tb-divider my-6" />
-            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
-                <GoogleLogin />
-            </GoogleOAuthProvider>
+            <SocialLoginButtons />
         </React.Fragment>
     );
 };

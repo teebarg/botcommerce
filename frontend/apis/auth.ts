@@ -1,8 +1,9 @@
 import { fetcher } from "./fetcher";
 
-import { revalidate, signOut } from "@/actions/revalidate";
+import { revalidate } from "@/actions/revalidate";
 import { Message, Token } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { deleteCookie } from "@/lib/util/cookie";
 
 // Product API methods
 export const authApi = {
@@ -14,12 +15,13 @@ export const authApi = {
 
         return access_token;
     },
-    async logOut(): Promise<{ message: string }> {
+    async logOut(): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/logout`;
-        const response = await fetcher<{ message: string }>(url, { method: "POST" });
+        const response = await tryCatch<Message>(fetcher(url, { method: "POST" }));
 
-        await signOut();
-
+        if (!response.error) {
+            await deleteCookie("access_token");
+        }
         return response;
     },
     async signUp(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<{ access_token: string }> {
@@ -30,11 +32,11 @@ export const authApi = {
 
         return res;
     },
-    async social(input: { email: string; password: string; first_name: string; last_name: string }): Promise<string> {
+    async social(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<Token> {
         const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/social`;
-        const { access_token } = await fetcher<Token>(url, { method: "POST", body: JSON.stringify(input) });
+        const data = await tryCatch<Token>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
 
-        return access_token;
+        return data;
     },
     async requestMagicLink(email: string, callbackUrl?: string): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/magic-link`;

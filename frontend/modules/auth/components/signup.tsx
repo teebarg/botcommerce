@@ -1,7 +1,5 @@
 "use client";
 
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import { GoogleLogin } from "@modules/account/components/google";
 import React, { useActionState, useEffect, useState } from "react";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
@@ -11,6 +9,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import { signUp } from "@/actions/auth";
 import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
+import SocialLoginButtons from "@/components/auth/social-login-buttons";
 
 type Props = {};
 
@@ -87,9 +86,7 @@ const SignUpForm: React.FC<Props> = () => {
                 </Button>
             </form>
             <hr className="tb-divider my-6" />
-            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
-                <GoogleLogin />
-            </GoogleOAuthProvider>
+            <SocialLoginButtons />
         </React.Fragment>
     );
 };

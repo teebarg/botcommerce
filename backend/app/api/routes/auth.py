@@ -12,6 +12,9 @@ from app.models.generic import Token, MagicLinkPayload
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 
+import httpx
+from typing import Optional
+
 router = APIRouter()
 
 class TokenPayload(BaseModel):
@@ -26,6 +29,17 @@ class SignUpPayload(BaseModel):
 class VerifyEmailPayload(BaseModel):
     token: str
 
+# OAuth Models
+class OAuthCallback(BaseModel):
+    code: str
+    state: Optional[str] = None
+
+class OAuthUserInfo(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+    image: Optional[str] = None
+    oauth_id: str
 
 def tokenData(user: User):
     return {
@@ -237,3 +251,81 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
     )
 
     return Token(access_token=access_token)
+
+
+@router.get("/oauth/google")
+async def google_oauth_url():
+    """Generate Google OAuth URL"""
+    auth_url = (
+        "https://accounts.google.com/o/oauth2/v2/auth"
+        f"?client_id={settings.GOOGLE_CLIENT_ID}"
+        f"&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
+        "&response_type=code"
+        "&scope=email profile"
+        "&access_type=offline"
+        "&prompt=consent"
+    )
+    return {"url": auth_url}
+
+
+@router.post("/oauth/google/callback")
+async def google_oauth_callback(payload: OAuthCallback) -> Token:
+    """Handle Google OAuth callback"""
+    # Exchange code for tokens
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "client_id": settings.GOOGLE_CLIENT_ID,
+                "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                "code": payload.code,
+                "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+                "grant_type": "authorization_code",
+            }
+        )
+
+        if token_response.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to get access token"
+            )
+
+        token_data = token_response.json()
+
+        # Get user info
+        user_response = await client.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {token_data['access_token']}"}
+        )
+
+        if user_response.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to get user info"
+            )
+
+        user_info = user_response.json()
+
+        # Create or update user
+        user = await prisma.user.upsert(
+            where={"email": user_info["email"]},
+            data={
+                "create": {
+                   "email": user_info["email"],
+                    "first_name": user_info.get("given_name", ""),
+                    "last_name": user_info.get("family_name", ""),
+                    "image": user_info.get("picture"),
+                    "status": "ACTIVE",
+                    "hashed_password": "password"
+                },
+                "update": {}
+            }
+        )
+
+        # Generate access token
+        access_token = security.create_access_token(
+            data=tokenData(user=user),
+            expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        )
+
+        return Token(access_token=access_token)

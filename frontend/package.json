@@ -59,7 +59,6 @@
         "@react-aria/ssr": "3.9.4",
         "@react-aria/textfield": "^3.14.10",
         "@react-aria/visually-hidden": "3.8.12",
-        "@react-oauth/google": "^0.12.1",
         "@react-stately/collections": "^3.11.0",
         "@react-stately/combobox": "^3.9.2",
         "@react-stately/overlays": "^3.6.11",

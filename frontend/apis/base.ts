@@ -1,3 +1,7 @@
+import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { deleteCookie } from "@/lib/util/cookie";
+import { getCookie } from "@/lib/util/server-utils";
+
 const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 type RequestOptions = RequestInit & {
@@ -8,7 +12,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     const { params, ...restOptions } = options;
 
     // Add query parameters if they exist
-    const url = new URL(endpoint, baseURL);
+    const url = new URL(`/api${endpoint}`, baseURL);
 
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
@@ -16,11 +20,14 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
+    const token = await getCookie("access_token");
+    const cartId = await getCookie("_cart_id");
+
     // Get auth token
-    const token = localStorage.getItem("token");
     const headers = {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(token && { "X-Auth": token }),
+        cartId: cartId ?? "",
         ...options.headers,
     };
 
@@ -32,24 +39,28 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     if (!response.ok) {
         if (response.status === 401) {
             // Handle unauthorized access
-            localStorage.removeItem("token");
-            window.location.href = "/login";
+            deleteCookie("access_token");
+            window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         }
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const error = await response.json();
+
+        throw new Error(error.detail || error.message || `API Error: ${response.statusText}`);
     }
 
     return response.json();
 }
 
 export const api = {
-    get: <T>(endpoint: string, options?: RequestOptions) => request<T>(endpoint, { ...options, method: "GET" }),
+    get: <T>(endpoint: string, options?: RequestOptions): ApiResult<T> => tryCatch<T>(request<T>(endpoint, { ...options, method: "GET" })),
 
-    post: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
-        request<T>(endpoint, {
-            ...options,
-            method: "POST",
-            body: JSON.stringify(data),
-        }),
+    post: <T>(endpoint: string, data?: unknown, options?: RequestOptions): ApiResult<T> =>
+        tryCatch<T>(
+            request<T>(endpoint, {
+                ...options,
+                method: "POST",
+                body: JSON.stringify(data),
+            })
+        ),
 
     put: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
         request<T>(endpoint, {

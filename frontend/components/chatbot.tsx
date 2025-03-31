@@ -60,14 +60,14 @@ const ChatBot: React.FC<Props> = () => {
 
         setHasBeenClosed(hasBeenClosedThisSession);
 
-        if (!hasBeenClosedThisSession) {
-            const timer = setTimeout(() => {
-                setIsOpen(true);
-                localStorage.setItem("chatbotOpen", "true");
-            }, 2000);
+        // if (!hasBeenClosedThisSession) {
+        //     const timer = setTimeout(() => {
+        //         setIsOpen(true);
+        //         localStorage.setItem("chatbotOpen", "true");
+        //     }, 2000);
 
-            return () => clearTimeout(timer);
-        }
+        //     return () => clearTimeout(timer);
+        // }
     }, []); // Empty dependency array means this runs once on mount
 
     const scrollToBottom = () => {

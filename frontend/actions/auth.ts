@@ -3,10 +3,9 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
-import { signOut } from "./revalidate";
-
 import { api } from "@/apis";
 import { Session } from "@/types/models";
+import { deleteCookie } from "@/lib/util/cookie";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -26,7 +25,7 @@ export async function verifyToken(token: string) {
 
         return result.payload;
     } catch (error) {
-        await signOut();
+        await deleteCookie("access_token");
 
         return null;
     }
@@ -103,15 +102,15 @@ export async function signUp(_currentState: unknown, formData: FormData) {
 }
 
 export async function googleLogin(customer: { first_name: string; last_name: string; password: string; email: string }) {
-    try {
-        const token = await api.auth.social(customer);
+    const { data, error } = await api.auth.social(customer);
 
-        if (token) {
-            await setSession(token);
-        }
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
+    if (error || !data) {
+        return { error: true, message: error?.toString() };
     }
+
+    await setSession(data.access_token);
+
+    return { error: false, message: "Successfully signed in" };
 }
 
 export async function requestMagicLink(_prevState: unknown, formData: FormData) {
@@ -132,17 +131,13 @@ export async function requestMagicLink(_prevState: unknown, formData: FormData) 
 }
 
 export async function verifyMagicLink(token: string) {
-    try {
-        const { data, error } = await api.auth.verifyMagicLink(token);
+    const { data, error } = await api.auth.verifyMagicLink(token);
 
-        if (error || !data) {
-            return { error: true, message: error?.toString() };
-        }
-
-        await setSession(data.access_token);
-
-        return { error: false, message: "Successfully signed in" };
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
+    if (error || !data) {
+        return { error: true, message: error?.toString() };
     }
+
+    await setSession(data.access_token);
+
+    return { error: false, message: "Successfully signed in" };
 }
