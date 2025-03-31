@@ -2,12 +2,11 @@
 
 import { useEffect } from "react";
 import authTap from "auth-tap";
-import { useSnackbar } from "notistack";
+import { toast } from "sonner";
 
 import { googleLogin } from "@/actions/auth";
 
 export default function Google() {
-    const { enqueueSnackbar } = useSnackbar();
     const options: any = {
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!, // required
         auto_select: false, // optional
@@ -28,10 +27,10 @@ export default function Google() {
                 });
 
                 if (res?.error) {
-                    enqueueSnackbar(`Google Login request failed: ${res.message}`, { variant: "error" });
+                    toast.error(res.message);
                 }
             } catch (error: any) {
-                enqueueSnackbar(`Google Login request failed: ${error.toString()}`, { variant: "error" });
+                toast.error(error.toString());
             }
         });
     }, []);

@@ -5,10 +5,11 @@ import { Modal } from "@modules/common/components/modal";
 import { Delete, Edit, Eye } from "nui-react-icons";
 import React, { cloneElement, isValidElement, useState } from "react";
 import { useOverlayTriggerState } from "react-stately";
-import { useSnackbar } from "notistack";
-import { SlideOver } from "@modules/common/components/slideover";
 import { useRouter } from "next/navigation";
 import { Tooltip } from "@components/ui/tooltip";
+import { toast } from "sonner";
+
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 interface Props {
     label?: string;
@@ -19,11 +20,10 @@ interface Props {
 }
 
 const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, deleteAction }) => {
-    const { enqueueSnackbar } = useSnackbar();
     const [current, setCurrent] = useState<any>({ is_active: true });
     const deleteModalState = useOverlayTriggerState({});
-    const slideOverState = useOverlayTriggerState({});
-    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: slideOverState.close }) : form;
+    const state = useOverlayTriggerState({});
+    const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: state.close }) : form;
     const router = useRouter();
 
     const onDelete = (value: any) => {
@@ -35,9 +35,10 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
         try {
             await deleteAction(current.id);
             router.refresh();
+            toast.success(`Deleted ${label}`);
             deleteModalState.close();
         } catch (error) {
-            enqueueSnackbar(`Error deleting ${label}`, { variant: "error" });
+            toast.error(`Error deleting ${label}`);
         }
     };
 
@@ -51,11 +52,17 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                         </span>
                     </Tooltip>
                 )}
-                <Tooltip content={`Edit ${label}`}>
-                    <span className="text-lg text-default-500 cursor-pointer active:opacity-50">
-                        <Edit onClick={() => slideOverState.open()} />
-                    </span>
-                </Tooltip>
+                <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
+                    <DrawerTrigger>
+                        <Edit onClick={() => state.open()} />
+                    </DrawerTrigger>
+                    <DrawerContent>
+                        <DrawerHeader>
+                            <DrawerTitle className="sr-only">Address</DrawerTitle>
+                        </DrawerHeader>
+                        <div className="p-6">{formWithHandler}</div>
+                    </DrawerContent>
+                </Drawer>
                 <Tooltip color="danger" content={`Delete ${label}`}>
                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
                         <Delete onClick={() => onDelete(item)} />
@@ -67,11 +74,6 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                 <Modal isOpen={deleteModalState.isOpen} onClose={deleteModalState.close}>
                     <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
                 </Modal>
-            )}
-            {slideOverState.isOpen && (
-                <SlideOver className="bg-content1" isOpen={slideOverState.isOpen} title={`Edit ${label}`} onClose={slideOverState.close}>
-                    {slideOverState.isOpen && formWithHandler}
-                </SlideOver>
             )}
         </React.Fragment>
     );

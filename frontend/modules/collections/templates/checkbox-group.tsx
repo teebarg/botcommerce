@@ -69,15 +69,19 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
     return (
         <React.Fragment>
             <div style={{ marginBottom: "16px" }}>
-                <Checkbox color="warning" isSelected={dataSet.has(item.slug)} label={groupName} onChange={handleParentChange} />
+                <div>
+                    <label>{groupName}</label>
+                    <Checkbox
+                        defaultChecked={dataSet.has(item.slug)}
+                        onCheckedChange={(checked) => handleParentChange(checked == "indeterminate" ? false : checked)}
+                    />
+                </div>
                 <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
                     {checkboxes?.map((checkbox) => (
                         <div key={`sub-${checkbox.slug}`} className="flex justify-between">
                             <Checkbox
-                                color="warning"
-                                isSelected={dataSet.has(checkbox.slug)}
-                                label={checkbox.name}
-                                onChange={(e) => handleChildChange(e, checkbox.slug)}
+                                defaultChecked={dataSet.has(checkbox.slug)}
+                                onCheckedChange={(checked) => handleChildChange(checked == "indeterminate" ? false : checked, checkbox.slug)}
                             />
                             {facets?.categories && <span>({facets["categories"][checkbox.name] ?? 0})</span>}
                         </div>

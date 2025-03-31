@@ -1,8 +1,8 @@
 "use client";
 
 import { HeartFilled, Heart } from "nui-react-icons";
-import { useSnackbar } from "notistack";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
@@ -17,7 +17,6 @@ interface ComponentProps {
 
 const ProductWishList: React.FC<ComponentProps> = ({ product, inWishlist, className }) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { enqueueSnackbar } = useSnackbar();
     const handleClick = async () => {
         setIsLoading(true);
         try {
@@ -30,14 +29,14 @@ const ProductWishList: React.FC<ComponentProps> = ({ product, inWishlist, classN
             }
 
             if (!res.success) {
-                enqueueSnackbar(res.error, { variant: "error" });
+                toast.error(res.error as string);
 
                 return;
             }
 
-            enqueueSnackbar(`Product Successfully ${inWishlist ? "removed" : "added"} to wishlist`, { variant: "success" });
+            toast.success(`Product Successfully ${inWishlist ? "removed" : "added"} to wishlist`);
         } catch (error: any) {
-            enqueueSnackbar("An error occurred, please contact support", { variant: "error" });
+            toast.error("An error occurred, please contact support");
         } finally {
             setIsLoading(false);
         }

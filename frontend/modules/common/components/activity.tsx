@@ -1,8 +1,8 @@
 import { Bell, Cancel, Excel, Trash } from "nui-react-icons";
 import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { useSnackbar } from "notistack";
 import { deleteActivity } from "@modules/account/actions";
+import { toast } from "sonner";
 
 import Logo from "../icons/logo";
 
@@ -23,8 +23,6 @@ interface Activity {
 }
 
 const Activity: React.FC<Props> = ({ activities, onRemove }) => {
-    const { enqueueSnackbar } = useSnackbar();
-
     const [removing, setRemoving] = useState<number | string | null>(null);
 
     const removeActivity = async (id: string | number) => {
@@ -36,7 +34,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                 onRemove(id); // Remove from UI
             }
         } catch (error) {
-            enqueueSnackbar(`Error: ${error}`, { variant: "error" });
+            toast.error(`Error: ${error}`);
         } finally {
             setRemoving(null);
         }

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { forwardRef, useActionState, useRef } from "react";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { SiteConfig } from "@/types/models";
@@ -23,7 +23,6 @@ const SiteConfigForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     const router = useRouter();
     const isCreate = type === "create";
 
-    const { enqueueSnackbar } = useSnackbar();
     const [state, formAction, isPending] = useActionState(mutateSiteConfig, {
         error: true,
         message: "",
@@ -33,7 +32,7 @@ const SiteConfigForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
 
     React.useEffect(() => {
         if (!("error" in state)) {
-            enqueueSnackbar("Action successful", { variant: "success" });
+            toast.success("Action successful");
             // Leave the slider open and clear form
             if (formRef.current) {
                 formRef.current.reset();
@@ -41,7 +40,7 @@ const SiteConfigForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                 onClose?.();
             }
         }
-    }, [enqueueSnackbar]);
+    }, [state]);
 
     return (
         <React.Fragment>

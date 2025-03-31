@@ -83,7 +83,10 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     <span className="mb-2">Brands</span>
                     {brands?.map((item: Brand, index: number) => (
                         <div key={`brand-${index}`} className="flex justify-between mt-2">
-                            <Checkbox color="warning" label={item.name} onChange={(e) => onBrandChange(e, item.slug)} />
+                            <div>
+                                <label>{item.name}</label>
+                                <Checkbox onCheckedChange={(checked) => onBrandChange(checked == "indeterminate" ? false : checked, item.slug)} />
+                            </div>
                             {facets?.brand && <span>({facets["brand"][item.name] ?? 0})</span>}
                         </div>
                     ))}

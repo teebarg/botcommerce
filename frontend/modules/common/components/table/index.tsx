@@ -3,17 +3,17 @@
 import React, { cloneElement, isValidElement, useState } from "react";
 import { Plus, Search } from "nui-react-icons";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
-import { useSnackbar } from "notistack";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Input } from "@components/ui/input";
+import { X } from "lucide-react";
+import { toast } from "sonner";
 
 import { Pagination } from "../pagination";
-import { SlideOver } from "../slideover";
 
 import { Button } from "@/components/ui/button";
 import { Pag } from "@/types/models";
 import { api } from "@/apis";
-import { X } from "lucide-react";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 interface Props {
     children: React.ReactNode;
@@ -41,7 +41,6 @@ const Table: React.FC<Props> = ({
     isDataOnly = false,
 }) => {
     const { updateQuery } = useUpdateQuery();
-    const { enqueueSnackbar } = useSnackbar();
     const [isExporting, setIsExporting] = useState(false);
     const [isIndexing, setIsIndexing] = useState(false);
     const state = useOverlayTriggerState({});
@@ -64,7 +63,7 @@ const Table: React.FC<Props> = ({
         setIsIndexing(true);
         const res = await api.product.reIndex();
 
-        enqueueSnackbar(res.message, { variant: res.error ? "error" : "success" });
+        toast.success(res.message);
         setIsIndexing(false);
     };
 
@@ -73,9 +72,9 @@ const Table: React.FC<Props> = ({
             setIsExporting(true);
             const res = await api.product.export();
 
-            enqueueSnackbar(res.message, { variant: "success" });
+            toast.success(res.message);
         } catch (error) {
-            enqueueSnackbar("Error exporting products", { variant: "error" });
+            toast.error("Error exporting products");
         } finally {
             setIsExporting(false);
         }
@@ -90,18 +89,28 @@ const Table: React.FC<Props> = ({
                             {canSearch && (
                                 <Input
                                     defaultValue={searchQuery}
+                                    endContent={searchQuery && <Button aria-label="clear search" endContent={<X />} onClick={onClear} />}
                                     placeholder="Search by name..."
                                     startContent={<Search className="text-default-500" />}
                                     onChange={(e) => onSearchChange(e.target.value)}
-                                    endContent={searchQuery && <Button aria-label="clear search" endContent={<X />} onClick={onClear} />}
                                 />
                             )}
                         </div>
                         <div className="flex items-center gap-3">
                             {canAdd && (
-                                <Button aria-label="add new" color="primary" endContent={<Plus />} onClick={() => state.open()}>
-                                    Add New
-                                </Button>
+                                <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
+                                    <DrawerTrigger asChild>
+                                        <Button aria-label="add new" color="primary" endContent={<Plus />} onClick={() => state.open()}>
+                                            Add New
+                                        </Button>
+                                    </DrawerTrigger>
+                                    <DrawerContent>
+                                        <DrawerHeader>
+                                            <DrawerTitle className="sr-only">Address</DrawerTitle>
+                                        </DrawerHeader>
+                                        <div className="p-6">{formWithHandler}</div>
+                                    </DrawerContent>
+                                </Drawer>
                             )}
                             {canExport && (
                                 <Button
@@ -155,11 +164,6 @@ const Table: React.FC<Props> = ({
                 </div>
             </div>
             {pagination && pagination?.total_pages > 1 && <Pagination pagination={pagination} />}
-            {state.isOpen && (
-                <SlideOver className="bg-default-100" isOpen={state.isOpen} title="Add New" onClose={closeSlideOver}>
-                    {state.isOpen && formWithHandler}
-                </SlideOver>
-            )}
         </React.Fragment>
     );
 };
