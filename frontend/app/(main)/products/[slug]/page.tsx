@@ -6,10 +6,10 @@ import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-relat
 import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
-import { auth } from "@/actions/auth";
 import ProductView from "@/components/store/products/product-view";
 import { Skeleton } from "@/components/skeleton";
 import ReviewsSection from "@/components/product/product-reviews";
+import { Product } from "@/types/models";
 
 type Params = Promise<{ slug: string }>;
 
@@ -32,9 +32,20 @@ export async function generateMetadata({ params }: { params: Params }) {
     };
 }
 
+export async function generateStaticParams() {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/?limit=100`).then((res) => res.json());
+
+    if (!res) {
+        return [];
+    }
+
+    return res.products.map((product: Product) => ({
+        slug: product.slug,
+    }));
+}
+
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
-    const user = await auth();
 
     const { data: product, error } = await api.product.get(slug);
 

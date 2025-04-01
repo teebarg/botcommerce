@@ -1,6 +1,6 @@
 "use client";
 
-import { useOverlayTriggerState } from "react-stately";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Edit, Trash } from "nui-react-icons";

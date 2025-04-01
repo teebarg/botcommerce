@@ -1,77 +1,100 @@
-import type { AriaSliderProps, AriaSliderThumbProps } from "@react-types/slider";
+"use client";
 
-import React from "react";
-import { useSliderState } from "react-stately";
-import { mergeProps, useFocusRing, useNumberFormatter, useSlider, useSliderThumb, VisuallyHidden } from "react-aria";
+import React, { useState, useRef } from "react";
 
 import { cn } from "@/lib/util/cn";
 
-interface SliderProps extends AriaSliderProps {
+interface SliderProps {
     label?: string;
-    formatOptions?: Intl.NumberFormatOptions;
     defaultValue?: number[];
-    color?: "primary" | "secondary" | "default" | "danger" | "warning" | "success";
+    min?: number;
+    max?: number;
+    step?: number;
+    onChange?: (values: number[]) => void;
 }
 
-interface ThumbProps extends AriaSliderThumbProps {
-    state: any;
-    trackRef: React.RefObject<HTMLDivElement>;
-    name?: string;
-    cssClass?: string;
-}
+const RangeSlider: React.FC<SliderProps> = ({ label, defaultValue = [0, 1000], min = 0, max = 1000, step = 10, onChange }) => {
+    const [values, setValues] = useState(defaultValue);
+    const trackRef = useRef<HTMLDivElement>(null);
 
-const RangeSlider: React.FC<SliderProps> = ({ color = "primary", ...props }) => {
-    let trackRef = React.useRef(null);
+    const updateValue = (index: number, newValue: number) => {
+        setValues((prev) => {
+            const updated = [...prev];
 
-    let numberFormatter = useNumberFormatter(props.formatOptions);
-    let state = useSliderState({ ...props, numberFormatter });
-    let { groupProps, trackProps, labelProps, outputProps } = useSlider(props, state, trackRef);
+            updated[index] = Math.min(Math.max(newValue, min), max);
+            if (index === 0 && updated[0] > updated[1]) updated[0] = updated[1];
+            if (index === 1 && updated[1] < updated[0]) updated[1] = updated[0];
+            onChange?.(updated);
 
-    const cssClass = {
-        default: "bg-default",
-        primary: "bg-primary",
-        secondary: "bg-secondary",
-        danger: "bg-danger",
-        warning: "bg-warning",
-        success: "bg-success",
+            return updated;
+        });
+    };
+
+    const handleDrag = (index: number, event: React.MouseEvent | React.TouchEvent) => {
+        event.preventDefault();
+        const startX = "touches" in event ? event.touches[0].clientX : event.clientX;
+        const track = trackRef.current;
+
+        if (!track) return;
+
+        const trackRect = track.getBoundingClientRect();
+        const startValue = values[index];
+
+        const handleMove = (moveEvent: MouseEvent | TouchEvent) => {
+            const clientX = "touches" in moveEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
+            const ratio = (clientX - trackRect.left) / trackRect.width;
+            const newValue = Math.round(min + ratio * (max - min));
+
+            updateValue(index, newValue);
+        };
+
+        const handleEnd = () => {
+            document.removeEventListener("mousemove", handleMove);
+            document.removeEventListener("mouseup", handleEnd);
+            document.removeEventListener("touchmove", handleMove);
+            document.removeEventListener("touchend", handleEnd);
+        };
+
+        document.addEventListener("mousemove", handleMove);
+        document.addEventListener("mouseup", handleEnd);
+        document.addEventListener("touchmove", handleMove);
+        document.addEventListener("touchend", handleEnd);
     };
 
     return (
-        <div {...groupProps} className="flex flex-col">
-            {props.label && (
-                <div className="flex justify-between text-sm">
-                    <label {...labelProps}>{props.label}</label>
-                    <output {...outputProps}>{`${state.getThumbValueLabel(0)} - ${state.getThumbValueLabel(1)}`}</output>
+        <div className="flex flex-col w-full max-w-md mx-auto">
+            {label && (
+                <div className="flex justify-between text-sm mb-2">
+                    <label className="text-default-600 font-medium">{label}</label>
+                    <output className="text-default-800 font-semibold">
+                        ₦{values[0]} - ₦{values[1]}
+                    </output>
                 </div>
             )}
-            <div {...trackProps} ref={trackRef} className={cn("track h-8", state.isDisabled && "disabled opacity-40")}>
-                <Thumb cssClass={cssClass[color]} index={0} state={state} trackRef={trackRef} />
-                <Thumb cssClass={cssClass[color]} index={1} state={state} trackRef={trackRef} />
+            <div ref={trackRef} className="relative h-2 bg-gray-200 rounded-full mt-2">
+                <div
+                    className="absolute bg-primary h-full rounded-full"
+                    style={{
+                        left: `${((values[0] - min) / (max - min)) * 100}%`,
+                        right: `${100 - ((values[1] - min) / (max - min)) * 100}%`,
+                    }}
+                />
+                {[0, 1].map((index) => (
+                    <div
+                        key={index}
+                        className={cn(
+                            "absolute w-6 h-6 bg-white border-2 border-primary rounded-full shadow-md -top-2 cursor-pointer transition-transform transform hover:scale-110"
+                        )}
+                        style={{
+                            left: `${((values[index] - min) / (max - min)) * 100}%`,
+                            transform: "translateX(-50%)",
+                        }}
+                        tabIndex={0}
+                        onMouseDown={(e) => handleDrag(index, e)}
+                        onTouchStart={(e) => handleDrag(index, e)}
+                    />
+                ))}
             </div>
-        </div>
-    );
-};
-
-const Thumb: React.FC<ThumbProps> = ({ cssClass, ...props }) => {
-    let { state, trackRef, index, name } = props;
-    let inputRef = React.useRef(null);
-    let { thumbProps, inputProps, isDragging } = useSliderThumb(
-        {
-            index,
-            trackRef,
-            inputRef,
-            name,
-        },
-        state
-    );
-
-    let { focusProps, isFocusVisible } = useFocusRing();
-
-    return (
-        <div {...thumbProps} className={cn("thumb top-1/2 rounded-50 w-5 h-5", cssClass, isFocusVisible && "focus", isDragging && "dragging")}>
-            <VisuallyHidden>
-                <input ref={inputRef} {...mergeProps(inputProps, focusProps)} />
-            </VisuallyHidden>
         </div>
     );
 };

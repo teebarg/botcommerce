@@ -5,7 +5,7 @@
     "author": "Adeniyi <neyostica2000@yahoo.com> (https://www.niyi.com.ng)",
     "description": "A robust e-commerce storefront built with Next.js 14",
     "keywords": [
-        "botcommerce",
+        "commerce",
         "nextjs",
         "react"
     ],
@@ -52,7 +52,6 @@
         "@radix-ui/react-toggle": "^1.1.0",
         "@radix-ui/react-toggle-group": "^1.1.0",
         "@radix-ui/react-tooltip": "^1.1.2",
-        "@react-aria/overlays": "^3.23.4",
         "@react-stately/overlays": "^3.6.11",
         "auth-tap": "^0.0.2",
         "class-variance-authority": "^0.7.1",
@@ -65,7 +64,6 @@
         "next": "15.1.7",
         "nui-react-icons": "^0.0.23",
         "react": "18.3.1",
-        "react-aria-components": "^1.2.1",
         "react-day-picker": "^9.6.3",
         "react-dom": "18.3.1",
         "react-dropzone": "^14.3.8",

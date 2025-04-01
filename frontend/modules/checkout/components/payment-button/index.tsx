@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useOverlayTriggerState } from "react-stately";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 import { toast } from "sonner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 

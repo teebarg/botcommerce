@@ -34,12 +34,12 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
     const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
 
     // Early returns for error handling
-    if (!brandRes || !collectionsRes || !catRes) {
+    if (!brandRes || !collectionsRes.data || !catRes) {
         return <ServerError />;
     }
 
     const { brands } = brandRes;
-    const { collections } = collectionsRes;
+    const { collections } = collectionsRes.data;
     const { categories: cat } = catRes.data ?? {};
     const categories = cat?.filter((cat: Category) => !cat.parent_id);
 

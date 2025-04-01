@@ -1,6 +1,6 @@
 "use client";
 
-import { useOverlayTriggerState } from "react-stately";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";

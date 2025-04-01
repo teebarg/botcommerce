@@ -7,21 +7,17 @@ import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Collection API methods
 export const collectionApi = {
-    async all(input?: { search?: string; page?: number; limit?: number }): Promise<PaginatedCollection | null> {
+    async all(input?: { search?: string; page?: number; limit?: number }): ApiResult<PaginatedCollection> {
         const searchParams = { search: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, searchParams);
 
-        try {
-            const response = await fetcher<PaginatedCollection>(url, { next: { tags: ["collections"] } });
+        const response = await tryCatch<PaginatedCollection>(fetcher(url, { next: { tags: ["collections"] } }));
 
-            return response;
-        } catch (error) {
-            return null;
-        }
+        return response;
     },
-    async get(id: string): Promise<Collection> {
+    async get(id: string): ApiResult<Collection> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}`;
-        const response = await fetcher<Collection>(url);
+        const response = await tryCatch<Collection>(fetcher(url));
 
         return response;
     },

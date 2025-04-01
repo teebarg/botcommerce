@@ -67,28 +67,26 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
     }, [searchParams, checkboxes]);
 
     return (
-        <React.Fragment>
-            <div style={{ marginBottom: "16px" }}>
-                <div>
-                    <label>{groupName}</label>
-                    <Checkbox
-                        defaultChecked={dataSet.has(item.slug)}
-                        onCheckedChange={(checked) => handleParentChange(checked == "indeterminate" ? false : checked)}
-                    />
-                </div>
-                <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
-                    {checkboxes?.map((checkbox) => (
-                        <div key={`sub-${checkbox.slug}`} className="flex justify-between">
-                            <Checkbox
-                                defaultChecked={dataSet.has(checkbox.slug)}
-                                onCheckedChange={(checked) => handleChildChange(checked == "indeterminate" ? false : checked, checkbox.slug)}
-                            />
-                            {facets?.categories && <span>({facets["categories"][checkbox.name] ?? 0})</span>}
-                        </div>
-                    ))}
-                </div>
+        <div>
+            <div className="flex items-center gap-1">
+                <Checkbox
+                    defaultChecked={dataSet.has(item.slug)}
+                    onCheckedChange={(checked) => handleParentChange(checked == "indeterminate" ? false : checked)}
+                />
+                <label className="capitalize">{groupName}</label>
             </div>
-        </React.Fragment>
+            <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
+                {checkboxes?.map((checkbox) => (
+                    <div key={`sub-${checkbox.slug}`} className="flex justify-between">
+                        <Checkbox
+                            defaultChecked={dataSet.has(checkbox.slug)}
+                            onCheckedChange={(checked) => handleChildChange(checked == "indeterminate" ? false : checked, checkbox.slug)}
+                        />
+                        {facets?.categories && <span>({facets["categories"][checkbox.name] ?? 0})</span>}
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
 

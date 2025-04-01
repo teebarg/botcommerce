@@ -1,15 +1,15 @@
 "use client";
 
 import { Confirm } from "@modules/common/components/confirm";
-import { Modal } from "@modules/common/components/modal";
 import { Delete, Edit, Eye } from "nui-react-icons";
-import React, { cloneElement, isValidElement, useState } from "react";
-import { useOverlayTriggerState } from "react-stately";
+import React, { cloneElement, isValidElement } from "react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { Tooltip } from "@components/ui/tooltip";
 import { toast } from "sonner";
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Props {
     label?: string;
@@ -20,20 +20,14 @@ interface Props {
 }
 
 const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, deleteAction }) => {
-    const [current, setCurrent] = useState<any>({ is_active: true });
     const deleteModalState = useOverlayTriggerState({});
     const state = useOverlayTriggerState({});
     const formWithHandler = isValidElement(form) ? cloneElement(form as React.ReactElement, { onClose: state.close }) : form;
     const router = useRouter();
 
-    const onDelete = (value: any) => {
-        setCurrent((prev: any) => ({ ...prev, ...value }));
-        deleteModalState.open();
-    };
-
     const onConfirmDelete = async () => {
         try {
-            await deleteAction(current.id);
+            await deleteAction(item.id);
             router.refresh();
             toast.success(`Deleted ${label}`);
             deleteModalState.close();
@@ -58,23 +52,25 @@ const Actions: React.FC<Props> = ({ label, item, form, showDetails = true, delet
                     </DrawerTrigger>
                     <DrawerContent>
                         <DrawerHeader>
-                            <DrawerTitle className="sr-only">Address</DrawerTitle>
+                            <DrawerTitle className="sr-only">Edit</DrawerTitle>
                         </DrawerHeader>
                         <div className="p-6">{formWithHandler}</div>
                     </DrawerContent>
                 </Drawer>
-                <Tooltip color="danger" content={`Delete ${label}`}>
-                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <Delete onClick={() => onDelete(item)} />
-                    </span>
-                </Tooltip>
+                <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
+                    <DialogTrigger>
+                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                            <Delete />
+                        </span>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="sr-only">Delete</DialogTitle>
+                        </DialogHeader>
+                        <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
+                    </DialogContent>
+                </Dialog>
             </div>
-            {/* Delete Modal */}
-            {deleteModalState.isOpen && (
-                <Modal isOpen={deleteModalState.isOpen} onClose={deleteModalState.close}>
-                    <Confirm onClose={deleteModalState.close} onConfirm={onConfirmDelete} />
-                </Modal>
-            )}
         </React.Fragment>
     );
 };

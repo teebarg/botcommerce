@@ -2,10 +2,10 @@
 
 import { PencilSquare } from "nui-react-icons";
 import React, { useState } from "react";
-import { useOverlayTriggerState } from "react-stately";
 import { useRouter } from "next/navigation";
 import { Trash } from "nui-react-icons";
 import { toast } from "sonner";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";

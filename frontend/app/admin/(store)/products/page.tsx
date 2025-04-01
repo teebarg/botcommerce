@@ -26,16 +26,15 @@ export default async function ProductsPage({ searchParams }: ProductPageProps) {
     const page = parseInt(pageStr, 10);
     const limit = parseInt(limitStr, 10);
 
-    const [productsResponse, brandRes, collectionsRes, catRes, customer] = await Promise.all([
+    const [productsResponse, brandRes, collectionsRes, catRes] = await Promise.all([
         api.product.all({ query: search, limit, page }),
         api.brand.all(),
         api.collection.all({ page: 1, limit: 100 }),
         api.category.all(),
-        api.user.me(),
     ]);
 
     // Early returns for error handling
-    if (!brandRes || !collectionsRes || !catRes || productsResponse.error) {
+    if (!brandRes || !collectionsRes.data || !catRes || productsResponse.error) {
         return <ServerError />;
     }
 
@@ -45,7 +44,7 @@ export default async function ProductsPage({ searchParams }: ProductPageProps) {
 
     const { products, ...pagination } = productsResponse.data;
     const { brands } = brandRes;
-    const { collections } = collectionsRes;
+    const { collections } = collectionsRes.data;
     const { categories } = catRes.data ?? {};
 
     return (

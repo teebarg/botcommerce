@@ -1,11 +1,7 @@
 "use client";
 
 import { cn } from "@lib/util/cn";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useOverlay, OverlayContainer, usePreventScroll } from "@react-aria/overlays";
-import { XMark } from "nui-react-icons";
-import { usePathname } from "next/navigation";
-import { useMediaQuery } from "@lib/hooks/use-media-query";
+import React, { createContext, useState } from "react";
 
 type NavbarContextType = {
     expanded: boolean;
@@ -68,88 +64,5 @@ export const NavbarItem = ({ children, className, active }: { children: React.Re
         <li className={cn("text-lg data-[active=true]:font-semibold", className)} data-active={active}>
             {children}
         </li>
-    );
-};
-
-export const NavbarMenu = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-    const context = useContext(NavbarContext);
-
-    if (!context) throw new Error("NavbarTrigger must be used within NavbarItem");
-
-    const { isMobile } = useMediaQuery();
-
-    if (!isMobile) {
-        return;
-    }
-
-    return <NavbarMenuOverlay className={className}>{children}</NavbarMenuOverlay>;
-};
-
-export const NavbarMenuOverlay = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-    const context = useContext(NavbarContext);
-
-    if (!context) throw new Error("NavbarTrigger must be used within NavbarItem");
-
-    const currentPath = usePathname();
-
-    usePreventScroll({ isDisabled: !context.expanded });
-
-    const overlayRef = React.useRef(null);
-
-    const { overlayProps } = useOverlay(
-        {
-            isOpen: context.expanded,
-            shouldCloseOnBlur: true,
-            isDismissable: true,
-        },
-        overlayRef
-    );
-
-    useEffect(() => {
-        if (context.expanded) {
-            // Close modal on path change
-            context.setExpanded(false);
-        }
-    }, [currentPath]);
-
-    return (
-        <React.Fragment>
-            {context.expanded && (
-                <OverlayContainer>
-                    <ul
-                        {...overlayProps}
-                        ref={overlayRef}
-                        className={cn(
-                            "z-50 px-4 pt-12 fixed flex max-w-full top-0 inset-x-0 bottom-0 w-screen flex-col overflow-y-auto backdrop-blur-xl backdrop-saturate-150 bg-background/70",
-                            className
-                        )}
-                        data-open={context.expanded}
-                    >
-                        <button aria-label="cancel" className="absolute top-4 right-4 block" onClick={() => context.setExpanded(!context.expanded)}>
-                            <XMark size={32} />
-                        </button>
-                        {children}
-                    </ul>
-                </OverlayContainer>
-            )}
-        </React.Fragment>
-    );
-};
-
-export const NavbarMenuToggle = ({ className }: { children?: React.ReactNode; className?: string }) => {
-    const context = useContext(NavbarContext);
-
-    if (!context) throw new Error("NavbarTrigger must be used within NavbarItem");
-
-    const isExpanded = context.expanded;
-
-    const handleClick = () => {
-        context.setExpanded(!isExpanded);
-    };
-
-    return (
-        <button aria-label="navbar" aria-pressed={isExpanded} className={cn(className)} data-open={isExpanded} type="button" onClick={handleClick}>
-            <span className="pointer-events-none flex flex-col transition-opacity before:h-px before:w-6 before:bg-current before:transition-transform before:duration-150 before:-translate-y-1 after:h-px after:w-6 after:bg-current after:transition-transform after:duration-150 after:translate-y-1" />
-        </button>
     );
 };

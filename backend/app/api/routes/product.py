@@ -748,7 +748,7 @@ async def index_products(products, cache: CacheService):
         add_documents_to_index(index_name="products", documents=documents)
 
         # Clear all product-related cache
-        # cache.invalidate("product")
+        cache.invalidate("search")
         # cache.invalidate("products")
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
