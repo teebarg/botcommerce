@@ -109,9 +109,6 @@ export default async function Checkout() {
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-5 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
                         <PaymentButton cart={data} data-testid="submit-order-button" isLoggedIn={!!user} />
-                        <p className="font-semibold text-sm">
-                            Total: <span className="text-lg ml-1">{currency(totalAmount)}</span>
-                        </p>
                     </div>
                 </div>
             </div>

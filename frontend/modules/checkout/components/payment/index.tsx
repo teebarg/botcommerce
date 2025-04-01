@@ -16,7 +16,7 @@ import { Cart, PaymentMethod } from "@/types/models";
 import { api } from "@/apis";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
-    { id: "credit-card", provider_id: "CREDIT_CARD" },
+    { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
     { id: "manual", provider_id: "BANK_TRANSFER" },
     { id: "paystack", provider_id: "PAYSTACK" },
 ];

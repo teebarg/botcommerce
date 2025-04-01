@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Plus, ChevronRight, Check, Home, Pencil, MapPin } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { usePathname } from "next/navigation";
 
 import { useStore } from "@/app/store/use-store";
 import { Address } from "@/types/models";
@@ -16,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import ShippingAddressForm from "@/components/checkout/address-form";
 import ShippingAddressFormEdit from "@/components/checkout/address-form-edit";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { MagicLinkForm } from "@/modules/auth/components/magic-link";
+import ClientOnly from "@/components/client-only";
 
 type AddressSelectProps = {
     cart: Omit<any, "refundable_amount" | "refunded_total"> | null;
@@ -66,7 +70,6 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, selectedAddress, idx 
                             {address.address_type || "Home"}
                             {address.label && <span>({address.label})</span>}
                         </h3>
-                        {idx == 0 && <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">Default</span>}
                     </div>
                     <p className="text-gray-600 text-sm mt-1">
                         {address.address_1}
@@ -130,6 +133,65 @@ const EmptyState = () => {
     );
 };
 
+const CheckoutLoginPrompt: React.FC = () => {
+    const pathname = usePathname();
+
+    return (
+        <ClientOnly>
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden md:max-w-2xl my-8">
+                <div className="p-8">
+                    <div className="flex justify-center mb-6">
+                        <div className="bg-indigo-100 p-3 rounded-full">
+                            <svg
+                                className="w-8 h-8 text-indigo-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div className="text-center mb-8">
+                        <h2 className="text-2xl font-bold text-gray-800">Sign in required</h2>
+                        <p className="mt-3 text-gray-600">Please sign in to your account to continue with your checkout process</p>
+                    </div>
+
+                    <div className="flex items-center justify-center">
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button className="mx-auto">Sign in to continue</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Log in</DialogTitle>
+                                </DialogHeader>
+                                <MagicLinkForm callbackUrl={pathname} />
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+
+                    <div className="mt-6 text-center text-sm text-gray-500">
+                        <p>
+                            {`Don't have an account?`}
+                            <a className="font-medium text-indigo-600 hover:text-indigo-500" href="#">
+                                Create one now
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </ClientOnly>
+    );
+};
+
 const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
     const { user } = useStore();
     const addresses = user?.addresses?.sort((a, b) => (a.created_at! > b.created_at! ? -1 : 1)) ?? [];
@@ -145,8 +207,12 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
         return addresses.find((a) => compareAddresses(a, cart?.shipping_address));
     }, [addresses, cart?.shipping_address]);
 
+    if (!user) {
+        return <CheckoutLoginPrompt />;
+    }
+
     return (
-        <div className="w-auto shadow-xlp overflow-hidden bg-content1">
+        <div className="w-auto overflow-hidden bg-content1">
             <div className="border-b border-gray-100">
                 {filteredAddresses.length > 0 && (
                     <div className="relative mb-6">

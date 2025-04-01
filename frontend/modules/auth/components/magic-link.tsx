@@ -13,7 +13,7 @@ type Props = {
 };
 
 const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
-    const [email, setEmail] = useState<string>();
+    const [email, setEmail] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
     const sendLink = async () => {
@@ -25,8 +25,6 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
         setLoading(true);
         const { data, error } = await api.auth.requestMagicLink(email, callbackUrl);
 
-        setLoading(false);
-
         if (error) {
             toast.error(error);
 
@@ -34,6 +32,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
         }
 
         toast.success(data?.message);
+        setLoading(false);
     };
 
     return (

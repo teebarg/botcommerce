@@ -49,10 +49,9 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
             <div className="w-full max-w-sm p-6">
                 <div>
                     <span className="text-sm">Collections</span>
-                    <hr className="shrink-0 border-none w-full h-[1px] my-1 bg-default-100" />
-                    <div className="block mb-6 space-y-1">
+                    <div className="block mb-6 space-y-0.5">
                         {collections?.map((item: Collection, index: number) => (
-                            <LocalizedClientLink key={index} className="text-base flex justify-between" href={`/collections/${item.slug}`}>
+                            <LocalizedClientLink key={index} className="flex justify-between" href={`/collections/${item.slug}`}>
                                 {item.name} {facets?.collections && <span>({facets["collections"][item.name] ?? 0})</span>}
                             </LocalizedClientLink>
                         ))}
@@ -68,14 +67,6 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     step={500}
                     onChange={onPriceChange}
                 />
-                {/* <RangeSlider
-                    defaultValue={[Number(searchParams?.get("minPrice") ?? 500), Number(searchParams?.get("maxPrice") ?? 50000)]}
-                    formatOptions={{ style: "currency", currency: "NGN" }}
-                    label="Price"
-                    maxValue={100000}
-                    step={500}
-                    onChange={onPriceChange}
-                /> */}
                 <div className="flex flex-col mt-2">
                     <span className="mb-2 text-sm">Categories</span>
                     {categories?.map((item: Category, index: number) => (

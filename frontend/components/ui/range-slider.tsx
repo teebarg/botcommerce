@@ -62,7 +62,7 @@ const RangeSlider: React.FC<SliderProps> = ({ label, defaultValue = [0, 1000], m
     };
 
     return (
-        <div className="flex flex-col w-full max-w-md mx-auto">
+        <div className="flex flex-col w-full max-w-md mx-auto mb-4">
             {label && (
                 <div className="flex justify-between text-sm mb-2">
                     <label className="text-default-600 font-medium">{label}</label>

@@ -85,7 +85,7 @@ const Search: React.FC<Props> = ({ className }) => {
                         {`I'm looking for...`}
                     </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent size="lg">
                     <DialogHeader>
                         <DialogTitle className="sr-only">Search</DialogTitle>
                     </DialogHeader>

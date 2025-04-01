@@ -38,7 +38,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
         },
         {
             id: "PICKUP",
-            name: "Free Pickup",
+            name: "Pickup",
             description: "Pickup from the nearest store for free.",
             amount: 0,
             amount_str: "Free",

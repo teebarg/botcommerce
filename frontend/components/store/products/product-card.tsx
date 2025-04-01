@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Heart } from "nui-react-icons";
+import React, { useState } from "react";
 import { toast } from "sonner";
-import { ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
+import { HeartFilled } from "nui-react-icons";
 
 import { ProductSearch, WishItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
+import { currency } from "@/lib/util/util";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -23,9 +24,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const { id, slug, name, price, old_price, image, categories, variants, status } = product;
-    const discountedPrice = old_price ? price - (price * (old_price - price)) / 100 : price;
+    // const discountedPrice = old_price ? price - (price * (old_price - price)) / 100 : price;
 
-    const discount = old_price ? Math.round((1 - price / old_price) * 100) : 0;
+    // const discount = old_price ? Math.round((1 - price / old_price) * 100) : 0;
     const inWishlist = !!wishlist?.find((wishlist) => wishlist.product_id === product.id);
 
     const handleWishlistClick = async () => {
@@ -93,24 +94,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
     return (
         <motion.div
-            animate={{ opacity: 1, y: 0 }}
-            className="group relative flex flex-col overflow-hidden rounded-lg bg-content2 shadow-sm transition-all duration-300 hover:shadow-md"
-            initial={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="col-span-1 cursor-pointer group"
+            initial={{ opacity: 0, scale: 0.5 }}
+            transition={{
+                duration: 0.8,
+                delay: 0.5,
+                ease: [0, 0.71, 0.2, 1.01],
+            }}
+            onClick={() => router.push(`/products/${slug}`)}
         >
-            <div className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
-                {/* Image Container */}
-                <div className="relative aspect-square overflow-hidden cursor-pointer" onClick={() => router.push(`/products/${slug}`)}>
-                    <img
-                        alt={name}
-                        className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
-                        src={image}
-                    />
+            <div className="flex flex-col gap-2 w-full">
+                <div className="aspect-square w-full relative overflow-hidden rounded-xl">
+                    <Image fill alt={name} className="object-cover h-full w-full group-hover:scale-110 transition" src={image} />
                     {showWishlist && (
                         <Button
                             className={cn(
-                                "absolute top-4 right-2 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 bg-gray-500",
-                                inWishlist && "bg-gray-400 opacity-100"
+                                "absolute top-3 right-3 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100",
+                                inWishlist && "opacity-100"
                             )}
                             size="icon"
                             variant="ghost"
@@ -119,45 +120,39 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                                 inWishlist ? removeWishlist() : handleWishlistClick();
                             }}
                         >
-                            <Heart className="w-5 h-5" />
+                            {inWishlist ? <HeartFilled className="w-7 h-7 text-rose-400" /> : <Heart className="w-7 h-7" />}
                         </Button>
                     )}
                 </div>
-
-                {/* Content */}
-                <div className="px-0.5 cursor-pointer" onClick={() => router.push(`/products/${slug}`)}>
-                    <h3 className="font-medium text-default-900 my-2 line-clamp-1 hover:text-default-700 transition-colors px-1">{name}</h3>
-
-                    <div className="flex items-center justify-between px-1">
-                        <div className="flex items-center">
-                            <span className="text-lg font-semibold text-danger">{currency(price)}</span>
-                            {old_price > price && (
-                                <span className="ml-1 text-xs md:text-sm text-default-500 line-through">{currency(old_price)}</span>
-                            )}
-                        </div>
-                        {old_price > price && (
-                            <span className="text-xs font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
-                        )}
+                <div className="font-semibold text-default-900 my-2 line-clamp-1 hover:text-default-700 transition-colors px-1">{name}</div>
+                <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center">
+                        <span className="text-lg font-semibold text-danger">{currency(price)}</span>
+                        {old_price > price && <span className="ml-1 text-xs md:text-sm text-default-500 line-through">{currency(old_price)}</span>}
                     </div>
-                    <Button
-                        className="w-full gap-2 mt-1"
-                        disabled={loading || status == "OUT_OF_STOCK"}
-                        isLoading={loading}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddToCart();
-                        }}
-                    >
-                        {status == "OUT_OF_STOCK" ? (
-                            <span>Out of stock</span>
-                        ) : (
-                            <>
-                                <ShoppingCart className="w-4 h-4" />
-                                <span>Add</span>
-                            </>
-                        )}
-                    </Button>
+                    {old_price > price && (
+                        <span className="text-xs font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
+                    )}
                 </div>
+                <Button
+                    className="w-full gap-2 mt-1"
+                    disabled={loading || status == "OUT_OF_STOCK"}
+                    isLoading={loading}
+                    size="lg"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart();
+                    }}
+                >
+                    {status == "OUT_OF_STOCK" ? (
+                        <span>Out of stock</span>
+                    ) : (
+                        <>
+                            <ShoppingCart className="w-4 h-4" />
+                            <span>Add</span>
+                        </>
+                    )}
+                </Button>
             </div>
         </motion.div>
     );

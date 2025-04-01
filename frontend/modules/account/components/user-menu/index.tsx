@@ -15,14 +15,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
 
 export default function UserDropDown({ user }: { user: Session }) {
-    const router = useRouter();
-
     const handleLogout = async () => {
         await api.auth.logOut();
-        router.push("/");
+        window.location.href = "/";
     };
 
     const links = [

@@ -41,7 +41,7 @@ export default function VerifyMagicLink() {
             setAuthState("success");
             setTimeout(() => {
                 router.push(callbackUrl || "/");
-            }, 10000);
+            }, 1000);
         }
 
         verifyToken();
@@ -49,8 +49,6 @@ export default function VerifyMagicLink() {
 
     return (
         <>
-            {/* <div className="min-h-screen bg-slate-100 flex justify-center items-center p-4">
-                <div className="w-full max-w-md bg-white rounded-2xl shadow-md overflow-hidden animate-fade-in"> */}
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-center text-white">
                 <div className="text-2xl font-bold mb-2">{siteConfig.name}</div>
                 <h2 className="text-lg font-medium mb-1 opacity-90">Magic Link Authentication</h2>
@@ -159,8 +157,6 @@ export default function VerifyMagicLink() {
                     <p className="mt-1">&copy; 2025 {siteConfig.name}. All rights reserved.</p>
                 </div>
             </div>
-            {/* </div>
-            </div> */}
         </>
     );
 }
