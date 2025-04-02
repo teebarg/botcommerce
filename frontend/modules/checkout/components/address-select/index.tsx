@@ -20,6 +20,7 @@ import ShippingAddressFormEdit from "@/components/checkout/address-form-edit";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";
 import ClientOnly from "@/components/client-only";
+import { SignUpForm } from "@/modules/auth/components/signup";
 
 type AddressSelectProps = {
     cart: Omit<any, "refundable_amount" | "refunded_total"> | null;
@@ -54,7 +55,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, selectedAddress, idx 
             key={address.id}
             animate={{ opacity: 1, y: 0 }}
             className={`relative cursor-pointer group ${
-                selectedAddress?.id === address.id ? "bg-blue-50" : "hover:bg-gray-50"
+                selectedAddress?.id === address.id ? "bg-content2" : "hover:bg-content2"
             } rounded-xl p-4 transition-all`}
             exit={{ opacity: 0, y: -20 }}
             initial={{ opacity: 0, y: 20 }}
@@ -66,21 +67,21 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, selectedAddress, idx 
                 </div>
                 <div className="flex-grow">
                     <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-gray-900">
+                        <h3 className="font-medium text-default-900">
                             {address.address_type || "Home"}
                             {address.label && <span>({address.label})</span>}
                         </h3>
                     </div>
-                    <p className="text-gray-600 text-sm mt-1">
+                    <p className="text-default-600 text-sm mt-1">
                         {address.address_1}
                         {address.address_2 && <span>, {address.address_2}</span>}
                         {address.postal_code && <span>, {address.postal_code}</span>}
                     </p>
-                    <p className="text-gray-500 text-sm capitalize">
+                    <p className="text-default-500 text-sm capitalize">
                         {address.city}
                         {address.state && <span>, {address.state}</span>}
                     </p>
-                    <p className="text-gray-500 text-sm capitalize">{address.phone}</p>
+                    <p className="text-default-500 text-sm capitalize">{address.phone}</p>
                 </div>
                 <div className="flex items-center flex-shrink-0">
                     <Button
@@ -125,8 +126,8 @@ const EmptyState = () => {
             <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                 <MapPin className="w-8 h-8 text-blue-500" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Addresses Found</h3>
-            <p className="text-gray-500 text-center mb-6">
+            <h3 className="text-lg font-semibold text-default-900 mb-2">No Addresses Found</h3>
+            <p className="text-default-500 text-center mb-6">
                 {`You haven't added any addresses yet. Add your first address to get started with your order.`}
             </p>
         </div>
@@ -138,7 +139,7 @@ const CheckoutLoginPrompt: React.FC = () => {
 
     return (
         <ClientOnly>
-            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden md:max-w-2xl my-8">
+            <div className="max-w-md mx-auto overflow-hidden md:max-w-2xl my-8">
                 <div className="p-8">
                     <div className="flex justify-center mb-6">
                         <div className="bg-indigo-100 p-3 rounded-full">
@@ -160,31 +161,39 @@ const CheckoutLoginPrompt: React.FC = () => {
                     </div>
 
                     <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800">Sign in required</h2>
-                        <p className="mt-3 text-gray-600">Please sign in to your account to continue with your checkout process</p>
+                        <h2 className="text-2xl font-bold text-default-800">Sign in required</h2>
+                        <p className="mt-3 text-default-600">Please sign in to your account to continue with your checkout process</p>
                     </div>
 
                     <div className="flex items-center justify-center">
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button className="mx-auto">Sign in to continue</Button>
+                                <Button>Sign in to continue</Button>
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Log in</DialogTitle>
+                                    <DialogTitle className="sr-only">Log in</DialogTitle>
                                 </DialogHeader>
                                 <MagicLinkForm callbackUrl={pathname} />
                             </DialogContent>
                         </Dialog>
                     </div>
 
-                    <div className="mt-6 text-center text-sm text-gray-500">
-                        <p>
-                            {`Don't have an account?`}
-                            <a className="font-medium text-indigo-600 hover:text-indigo-500" href="#">
-                                Create one now
-                            </a>
-                        </p>
+                    <div className="mt-6 text-center text-sm text-default-500">
+                        <Dialog>
+                            <DialogTrigger>
+                                <p>
+                                    {`Don't have an account?`}
+                                    <span className="font-medium text-indigo-600 hover:text-indigo-500">Create one now</span>
+                                </p>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle className="sr-only">Sign Up</DialogTitle>
+                                </DialogHeader>
+                                <SignUpForm />
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             </div>
@@ -214,11 +223,11 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
     return (
         <div className="w-auto overflow-hidden bg-content1">
             <div className="border-b border-gray-100">
-                {filteredAddresses.length > 0 && (
+                {(filteredAddresses.length > 0 || searchQuery) && (
                     <div className="relative mb-6">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <input
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 outline-none transition-all"
                             placeholder="Search addresses..."
                             type="text"
                             value={searchQuery}

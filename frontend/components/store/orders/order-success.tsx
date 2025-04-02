@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
+import OrderAddress from "./order-address";
 
 import { Order, PaymentStatus } from "@/types/models";
 import FadeInComponent from "@/components/fade-in-component";
@@ -42,10 +43,14 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
             </FadeInComponent>
 
             <FadeInComponent delay="400ms">
-                <OrderSummary order={order} />
+                <OrderAddress order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="500ms">
+                <OrderSummary order={order} />
+            </FadeInComponent>
+
+            <FadeInComponent delay="600ms">
                 <div className="mt-6 space-y-3">
                     <button
                         className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center"

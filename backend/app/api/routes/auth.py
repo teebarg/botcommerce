@@ -1,5 +1,5 @@
 from app.models.generic import Message
-from fastapi import APIRouter, HTTPException, status, Response, Depends, Request
+from fastapi import APIRouter, HTTPException, status
 from pydantic import EmailStr, BaseModel, Field
 from app.core.config import settings
 
@@ -99,7 +99,7 @@ async def request_magic_link(
     return {"message": "If an account exists with this email, you will receive a magic link"}
 
 @router.post("/verify-magic-link")
-async def verify_magic_link(token: TokenPayload, response: Response) -> Token:
+async def verify_magic_link(token: TokenPayload) -> Token:
     """
     Verify a magic link token and return an access token if valid.
     """
@@ -128,14 +128,6 @@ async def verify_magic_link(token: TokenPayload, response: Response) -> Token:
     access_token = security.create_access_token(
         data=tokenData(user=user),
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
-
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        max_age=timedelta(days=30),
-        secure=True,
-        httponly=True,
     )
 
     return Token(access_token=access_token)

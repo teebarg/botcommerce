@@ -1,9 +1,9 @@
 "use server";
 
-import { getCookie } from "@/lib/util/server-utils";
 import { addShippingAddress, deleteActivities, deleteShippingAddress, updateBillingAddress, updateCustomer, updateShippingAddress } from "@lib/data";
 import { revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
+
+import { getCookie } from "@/lib/util/server-utils";
 
 export async function updateCustomerName(_currentState: Record<string, unknown>, formData: FormData) {
     const customer = {

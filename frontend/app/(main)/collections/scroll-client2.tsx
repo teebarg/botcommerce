@@ -174,7 +174,7 @@ export default function InfiniteScrollClient({
                     {hasNext && (
                         <div ref={scrollTrigger} className="mt-8 flex flex-col items-center justify-center text-blue-600">
                             <Loader className="h-8 w-8 animate-spin mb-2" />
-                            <p className="text-sm font-medium text-gray-500">Loading more products...</p>
+                            <p className="text-sm font-medium text-default-500">Loading more products...</p>
                         </div>
                     )}
                 </div>
