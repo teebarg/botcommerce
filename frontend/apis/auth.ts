@@ -1,60 +1,49 @@
-import { fetcher } from "./fetcher";
+import { api } from "./base";
 
 import { revalidate } from "@/actions/revalidate";
 import { Message, Token } from "@/types/models";
-import { ApiResult, tryCatch } from "@/lib/try-catch";
-import { deleteCookie } from "@/lib/util/cookie";
+import { ApiResult } from "@/lib/try-catch";
+import { deleteCookie, setCookie } from "@/lib/util/cookie";
 
 // Product API methods
 export const authApi = {
-    async login(input: { email: string; password: string }): Promise<string> {
-        const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/login`;
-        const { access_token } = await fetcher<Token>(url, { method: "POST", body: JSON.stringify(input) });
-
-        revalidate("user");
-
-        return access_token;
-    },
     async logOut(): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/logout`;
-        const response = await tryCatch<Message>(fetcher(url, { method: "POST" }));
+        const response = await api.post<Message>("/auth/logout");
 
         if (!response.error) {
             await deleteCookie("access_token");
         }
+
         return response;
     },
-    async signUp(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<{ access_token: string }> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/signup`;
-        const res = await tryCatch<{ access_token: string }>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
+    async signUp(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<Token> {
+        const response = await api.post<Token>("/auth/signup", input);
 
         revalidate("user");
 
-        return res;
+        return response;
     },
-    async social(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<Token> {
-        const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/social`;
-        const data = await tryCatch<Token>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
+    async social(input: { email: string; first_name: string; last_name: string; image: string }): ApiResult<Token> {
+        const response = await api.post<Token>("/auth/google", input);
 
-        return data;
+        if (!response.error && response.data) {
+            await setCookie("access_token", response.data.access_token);
+            revalidate("user");
+        }
+
+        return response;
     },
     async requestMagicLink(email: string, callbackUrl?: string): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/magic-link`;
-        const response = await tryCatch<Message>(
-            fetcher(url, {
-                method: "POST",
-                body: JSON.stringify({ email, callback_url: callbackUrl }),
-            })
-        );
+        const response = await api.post<Message>("/auth/magic-link", { email, callback_url: callbackUrl });
 
         return response;
     },
     async verifyMagicLink(token: string): ApiResult<Token> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/verify-magic-link`;
-        const response = await tryCatch<Token>(fetcher(url, { method: "POST", body: JSON.stringify({ token }) }));
+        const response = await api.post<Token>("/auth/verify-magic-link", { token });
 
-        if (!response.error) {
-            revalidate("customer");
+        if (!response.error && response.data) {
+            await setCookie("access_token", response.data.access_token);
+            revalidate("user");
         }
 
         return response;

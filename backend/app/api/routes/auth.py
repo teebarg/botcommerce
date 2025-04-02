@@ -41,6 +41,12 @@ class OAuthUserInfo(BaseModel):
     image: Optional[str] = None
     oauth_id: str
 
+class GooglePayload(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+    image: Optional[str] = None
+
 def tokenData(user: User):
     return {
         "id": user.id,
@@ -329,3 +335,36 @@ async def google_oauth_callback(payload: OAuthCallback) -> Token:
         )
 
         return Token(access_token=access_token)
+
+
+@router.post("/google")
+async def google(payload: GooglePayload) -> Token:
+    """Handle Google OAuth callback"""
+    # Create or update user
+    user = await prisma.user.upsert(
+        where={"email": payload.email},
+        data={
+            "create": {
+                "email": payload.email,
+                "first_name": payload.first_name,
+                "last_name": payload.last_name,
+                "image": payload.image,
+                "status": "ACTIVE",
+                "hashed_password": "password"
+            },
+            "update": {}
+        }
+    )
+
+    # Generate access token
+    access_token = security.create_access_token(
+        data=tokenData(user=user),
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+
+    return Token(access_token=access_token)
+
+@router.post("/logout")
+async def logout():
+    return Message(message="Logout successful")
+

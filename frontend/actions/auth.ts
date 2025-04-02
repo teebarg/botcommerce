@@ -101,18 +101,6 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     return { error: false, message: "Successful" };
 }
 
-export async function googleLogin(customer: { first_name: string; last_name: string; password: string; email: string }) {
-    const { data, error } = await api.auth.social(customer);
-
-    if (error || !data) {
-        return { error: true, message: error?.toString() };
-    }
-
-    await setSession(data.access_token);
-
-    return { error: false, message: "Successfully signed in" };
-}
-
 export async function requestMagicLink(_prevState: unknown, formData: FormData) {
     const email = formData.get("email") as string;
     const callbackUrl = formData.get("callbackUrl") as string;
