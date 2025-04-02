@@ -74,7 +74,7 @@ const CartComponent: React.FC<ComponentProps> = ({ cart }) => {
                 <DrawerHeader>
                     <DrawerTitle className="sr-only">Cart</DrawerTitle>
                 </DrawerHeader>
-                <CartDetails items={cart?.items || []} shippingFee={cart?.shipping_fee} onClose={editState.close} />
+                <CartDetails cart={cart} items={cart?.items || []} shippingFee={cart?.shipping_fee} onClose={editState.close} />
             </DrawerContent>
         </Drawer>
     );

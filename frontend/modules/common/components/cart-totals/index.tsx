@@ -6,18 +6,13 @@ import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
 
 import { Cart } from "@/types/models";
-import { subtotal, taxTotal, total } from "@/lib/util/store";
 
 type CartTotalsProps = {
     data: Omit<Cart, "refundable_amount" | "refunded_total">;
 };
 
 const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
-    const { discount_total } = data;
-
-    const subTotal = subtotal(data.items);
-    const tax = taxTotal(data.items);
-    const totalAmount = total(data.items, data.shipping_fee);
+    const { discount_total, tax, total, subtotal } = data;
 
     return (
         <>
@@ -35,8 +30,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                             </span>
                         </dt>
                         <dd className="text-sm font-semibold text-default-900">
-                            <span data-testid="cart-subtotal" data-value={subTotal || 0}>
-                                {currency(subTotal)}
+                            <span data-testid="cart-subtotal" data-value={subtotal || 0}>
+                                {currency(subtotal || 0)}
                             </span>
                         </dd>
                     </div>
@@ -71,8 +66,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                     <div className="flex justify-between">
                         <dt className="text-sm font-semibold text-default-500">Total</dt>
                         <dd className="text-sm font-semibold text-default-900">
-                            <span className="text-lg" data-testid="cart-total" data-value={totalAmount}>
-                                {currency(totalAmount)}
+                            <span className="text-lg" data-testid="cart-total" data-value={total}>
+                                {currency(total)}
                             </span>
                         </dd>
                     </div>
