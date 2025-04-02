@@ -5,7 +5,6 @@ import { siteConfig } from "@lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/types/models";
-import BannerCarousel from "@/components/carousel";
 
 interface Props {
     categories: Category[];
@@ -33,9 +32,7 @@ const StoreHero: React.FC<Props> = ({ categories }) => {
                         All Products
                     </LocalizedClientLink>
                 </div>
-                <div className="col-span-3">
-                    <BannerCarousel />
-                </div>
+                <div className="col-span-3">{/* <BannerCarousel /> */}</div>
                 <div className="w-full hidden md:flex flex-col">
                     <div className="bg-warning/15 p-4 rounded-lg hidden md:block space-y-4">
                         <div className="flex items-center gap-4">

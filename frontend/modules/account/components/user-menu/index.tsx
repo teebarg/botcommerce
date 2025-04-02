@@ -19,6 +19,7 @@ import {
 export default function UserDropDown({ user }: { user: Session }) {
     const handleLogout = async () => {
         await api.auth.logOut();
+        window.location.href = "/";
     };
 
     const links = [

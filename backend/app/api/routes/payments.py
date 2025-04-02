@@ -1,12 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.core.config import settings
 from app.schemas.payment import (
     PaymentInitialize,
-    PaymentVerify,
     PaymentListResponse,
 )
-from app.models.order import Order
-from app.core.deps import CurrentUser
+from app.models.order import OrderCreate, OrderResponse
+from app.core.deps import CurrentUser, Notification
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -14,6 +13,8 @@ from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from prisma.errors import PrismaError
 from pydantic import BaseModel
+from prisma.models import Cart
+from app.services.order import OrderService
 
 router = APIRouter()
 
@@ -26,19 +27,24 @@ class PaymentCreate(BaseModel):
     reference: str
     transaction_id: str
 
-async def initialize_payment(order: Order, user: User) -> PaymentInitialize:
+def get_order_service(notification: Notification) -> OrderService:
+    return OrderService(notification)
+
+async def initialize_payment(cart: Cart, user: User) -> PaymentInitialize:
     """Initialize a Paystack payment"""
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{PAYSTACK_BASE_URL}/transaction/initialize",
             json={
                 "email": user.email,
-                "amount": int(order.total * 100),  # Convert to kobo
-                "reference": f"ORDER-{order.id}-{datetime.now().timestamp()}",
-                "callback_url": f"{settings.FRONTEND_URL}/payment/verify",
+                # "amount": int(cart.total * 100),  # Convert to kobo
+                "amount": 500,  # Convert to kobo
+                "reference": f"CART-{cart.id}-{datetime.now().timestamp()}",
+                "callback_url": f"{settings.FRONTEND_HOST}/payment/verify",
                 "metadata": {
-                    "order_id": order.id,
+                    "cart_number": cart.cart_number,
                     "user_id": user.id,
+                    "cart_id": cart.id,
                 }
             },
             headers={
@@ -57,24 +63,24 @@ async def initialize_payment(order: Order, user: User) -> PaymentInitialize:
             access_code=data["data"]["access_code"],
         )
 
-@router.post("/initialize/{order_id}", response_model=PaymentInitialize)
+@router.post("/initialize/{cart_number}", response_model=PaymentInitialize)
 async def create_payment(
-    order_id: int,
+    cart_number: str,
     current_user: CurrentUser
 ):
     """Initialize a new payment"""
-    order = await db.order.find_unique(where={"id": order_id})
+    cart = await db.cart.find_unique(where={"cart_number": cart_number})
 
-    if order.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to pay for this order")
+    if cart.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to pay for this cart")
 
-    if order.status in ["CANCELLED", "REFUNDED"]:
-        raise HTTPException(status_code=400, detail="Cannot pay for cancelled or refunded order")
+    # if order.status in ["CANCELLED", "REFUNDED"]:
+    #     raise HTTPException(status_code=400, detail="Cannot pay for cancelled or refunded order")
 
-    return await initialize_payment(order, current_user)
+    return await initialize_payment(cart, current_user)
 
-@router.get("/verify/{reference}", response_model=PaymentVerify)
-async def verify_payment(reference: str):
+@router.get("/verify/{reference}", response_model=OrderResponse)
+async def verify_payment(reference: str, user: CurrentUser, order_service: OrderService = Depends(get_order_service)):
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -89,39 +95,28 @@ async def verify_payment(reference: str):
 
         data = response.json()
 
+        order_in = OrderCreate(status=OrderStatus.PAID, payment_status=PaymentStatus.SUCCESS)
+
         if data["data"]["status"] == "success":
-            # Update order status
-            order_id = data["data"]["metadata"]["order_id"]
-            order = await db.order.find_unique(where={"id": order_id})
-            if not order:
-                raise HTTPException(status_code=404, detail="Order not found")
-            await db.order.update(
-                where={"id": order_id},
-                data={"status": OrderStatus.PAID}
-            )
+            cart_number = data["data"]["metadata"]["cart_number"]
+
+            order = await order_service.create_order(order_in=order_in, user_id=user.id, cart_number=cart_number)
 
             # Create payment record
-            payment = await db.payment.create(
+            await db.payment.create(
                 data={
-                    "order_id": order_id,
+                    "order": {"connect": {"id": order.id}},
                     "amount": data["data"]["amount"] / 100,  # Convert from kobo
                     "reference": data["data"]["reference"],
+                    "transaction_id": data["data"]["reference"],
                     "status": PaymentStatus.SUCCESS,
-                    "payment_method": "paystack",
-                    "metadata": data["data"],
+                    "payment_method": PaymentMethod.PAYSTACK,
                 }
             )
 
-            return PaymentVerify(
-                status="success",
-                message="Payment verified successfully",
-                payment_id=payment.id,
-            )
+            return order
         else:
-            return PaymentVerify(
-                status="failed",
-                message="Payment verification failed",
-            )
+            raise HTTPException(status_code=500, detail="Payment verification failed")
 
 
 @router.post("/")

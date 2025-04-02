@@ -116,9 +116,6 @@ export type CartUpdate = {
 };
 
 export type CartComplete = {
-    total: number;
-    subtotal: number;
-    tax: number;
     coupon_id?: number;
     status?: OrderStatus;
     payment_status?: PaymentStatus;

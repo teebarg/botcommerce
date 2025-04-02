@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSnackbar } from "notistack";
+import { toast } from "sonner";
 
 import { saveSubscription } from "./actions";
 
@@ -30,7 +30,6 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 function PushNotificationManager() {
-    const { enqueueSnackbar } = useSnackbar();
     const [isSupported, setIsSupported] = useState<boolean>(true);
     const [newContent, setNewContent] = useState<boolean>(false);
     const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
@@ -83,7 +82,7 @@ function PushNotificationManager() {
     // Add a new function to handle user opt-in
     async function handleNotificationOptIn() {
         if (!isSupported) {
-            enqueueSnackbar("Push notifications are not supported in your browser", { variant: "error" });
+            toast.error("Push notifications are not supported in your browser");
 
             return;
         }
@@ -116,7 +115,7 @@ function PushNotificationManager() {
         const res = await saveSubscription(subscriptionData);
 
         if (!res.success) {
-            enqueueSnackbar(res.message as string, { variant: "error" });
+            toast.error(res.message as string);
 
             return;
         }

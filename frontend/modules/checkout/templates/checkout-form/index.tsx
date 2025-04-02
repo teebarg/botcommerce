@@ -5,7 +5,6 @@ import Shipping from "@modules/checkout/components/shipping";
 
 import { currency } from "@/lib/util/util";
 import { Cart, DeliveryOption } from "@/types/models";
-import { getCookie } from "@/lib/util/server-utils";
 import { api } from "@/apis";
 
 type CheckoutFormProps = {
@@ -13,14 +12,6 @@ type CheckoutFormProps = {
 };
 
 const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
-    const cartId = await getCookie("_cart_id");
-
-    if (!cartId) {
-        return null;
-    }
-
-    // cart.checkout_step = cart && getCheckoutStep(cart);
-
     const availableShippingMethods: DeliveryOption[] = [
         {
             id: "STANDARD",
@@ -38,7 +29,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
         },
         {
             id: "PICKUP",
-            name: "Free Pickup",
+            name: "Pickup",
             description: "Pickup from the nearest store for free.",
             amount: 0,
             amount_str: "Free",

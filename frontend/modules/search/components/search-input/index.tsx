@@ -42,10 +42,10 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
                 <div className="flex items-center justify-between">
                     <input
                         ref={inputRef}
-                        aria-label="click"
                         aria-autocomplete="list"
                         aria-controls="list"
                         aria-expanded="true"
+                        aria-label="click"
                         autoComplete="off"
                         autoCorrect="off"
                         className="w-full px-2 h-14 text-lg focus-visible:outline-none rounded-none bg-transparent text-default-900 placeholder-default-500"

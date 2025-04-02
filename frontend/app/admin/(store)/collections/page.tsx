@@ -26,17 +26,12 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "1", 10);
     const limit = parseInt(searchParams.limit || "10", 10);
-    const res = await api.collection.all({ search, page, limit });
+    const { data: collectionResponse, error: collectionError } = await api.collection.all({ search, page, limit });
 
-    if (!res) {
+    if (collectionError || !collectionResponse) {
         return <ServerError />;
     }
-    const { collections, ...pagination } = res;
-    const { data: customer, error } = await api.user.me();
-
-    if (error || !customer) {
-        return <ServerError />;
-    }
+    const { collections, ...pagination } = collectionResponse;
 
     const deleteCollection = async (id: string) => {
         "use server";

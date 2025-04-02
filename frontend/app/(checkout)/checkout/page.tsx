@@ -1,13 +1,11 @@
 import React from "react";
 import { Metadata } from "next";
-import Wrapper from "@modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
 import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 
 import PaymentButton from "@/modules/checkout/components/payment-button";
 import { BackButton } from "@/components/back";
-import { currency } from "@/lib/util/util";
 import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
@@ -16,7 +14,7 @@ import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import SignInPrompt from "@/modules/cart/components/sign-in-prompt";
 import { auth } from "@/actions/auth";
-import { total } from "@/lib/util/store";
+import ClientOnly from "@/components/client-only";
 
 export const metadata: Metadata = {
     title: `Clothings | ${siteConfig.name} Store | Checkout`,
@@ -51,8 +49,6 @@ export default async function Checkout() {
     if (!data) {
         return <EmptyCart />;
     }
-
-    const totalAmount = total(data.items, data.shipping_fee);
 
     return (
         <>
@@ -94,9 +90,9 @@ export default async function Checkout() {
                                 </ol>
                             </nav>
 
-                            <Wrapper cart={data}>
+                            <ClientOnly>
                                 <CheckoutForm cart={data} />
-                            </Wrapper>
+                            </ClientOnly>
                         </div>
 
                         {/* Right Column Cart summary */}
@@ -109,9 +105,6 @@ export default async function Checkout() {
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-5 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
                         <PaymentButton cart={data} data-testid="submit-order-button" isLoggedIn={!!user} />
-                        <p className="font-semibold text-sm">
-                            Total: <span className="text-lg ml-1">{currency(totalAmount)}</span>
-                        </p>
                     </div>
                 </div>
             </div>

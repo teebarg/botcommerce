@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { PencilSquare, Plus, Trash } from "nui-react-icons";
-import { useOverlayTriggerState } from "react-stately";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 

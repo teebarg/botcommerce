@@ -8,7 +8,6 @@ import { currency } from "@/lib/util/util";
 import { cn } from "@/lib/util/cn";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Cart, CartItem } from "@/types/models";
-import { subtotal, taxTotal, total } from "@/lib/util/store";
 
 type SummaryProps = {
     cart: Cart;
@@ -18,7 +17,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     if (!cart) return;
-    const { shipping_fee, discount_total } = cart;
+    const { shipping_fee, discount_total, subtotal, tax, total } = cart;
 
     const toggleSummary = () => {
         setIsExpanded(!isExpanded);
@@ -40,7 +39,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                 </div>
                 <div className="flex items-center justify-between text-sm font-medium">
                     <p>Subtotal</p>
-                    <p>{currency(subtotal(cart.items))}</p>
+                    <p>{currency(subtotal || 0)}</p>
                 </div>
                 <div className="flex items-center justify-between text-sm font-medium">
                     <p>Shipping Fee</p>
@@ -48,7 +47,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                 </div>
                 <div className="flex items-center justify-between text-sm font-medium">
                     <p>Taxes</p>
-                    <p>{currency(taxTotal(cart.items))}</p>
+                    <p>{currency(tax)}</p>
                 </div>
                 {!!discount_total && (
                     <div className="flex items-center justify-between text-sm font-medium">
@@ -60,7 +59,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                 )}
                 <div className="flex items-center justify-between text-lg font-medium mt-2">
                     <p>Total</p>
-                    <p>{currency(total(cart.items, shipping_fee))}</p>
+                    <p>{currency(total || 0)}</p>
                 </div>
             </div>
             <div className="flex flex-row-reverse gap-2 p-2">
@@ -72,7 +71,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                     endContent={<ChevronDown className={cn("transition-all duration-500 rotate-180", isExpanded && "rotate-0")} />}
                     onClick={toggleSummary}
                 >
-                    <span className="text-2xl font-semibold">{currency(total(cart.items, shipping_fee))}</span>
+                    <span className="text-2xl font-semibold">{currency(total || 0)}</span>
                 </Button>
             </div>
         </div>

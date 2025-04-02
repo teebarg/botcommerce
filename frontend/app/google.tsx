@@ -2,12 +2,11 @@
 
 import { useEffect } from "react";
 import authTap from "auth-tap";
-import { useSnackbar } from "notistack";
+import { toast } from "sonner";
 
-import { googleLogin } from "@/actions/auth";
+import { api } from "@/apis";
 
 export default function Google() {
-    const { enqueueSnackbar } = useSnackbar();
     const options: any = {
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!, // required
         auto_select: false, // optional
@@ -17,24 +16,22 @@ export default function Google() {
     useEffect(() => {
         authTap(options, async (response: any) => {
             // Send response to server
-            const { email, given_name, family_name } = response;
+            const { email, given_name, family_name, picture } = response;
 
-            try {
-                const res = await googleLogin({
-                    email: email,
-                    password: "password",
-                    first_name: given_name,
-                    last_name: family_name,
-                });
+            const { error } = await api.auth.social({
+                email,
+                first_name: given_name,
+                last_name: family_name,
+                image: picture,
+            });
 
-                if (res?.error) {
-                    enqueueSnackbar(`Google Login request failed: ${res.message}`, { variant: "error" });
-                }
-            } catch (error: any) {
-                enqueueSnackbar(`Google Login request failed: ${error.toString()}`, { variant: "error" });
+            if (error) {
+                toast.error(error);
+
+                return;
             }
         });
     }, []);
 
-    return <></>;
+    return null;
 }

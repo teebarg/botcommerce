@@ -5,9 +5,9 @@ import { useActionState, useEffect, useRef } from "react";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 export default function ContactForm() {
     const [state, formAction, isPending] = useActionState(submitContactForm, { success: false, message: "" });
@@ -28,7 +28,8 @@ export default function ContactForm() {
                 <Input className="" label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
                 <Textarea required className="" label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
                 <div className="text-default-600">
-                    <Checkbox defaultSelected color="danger" label="I allow this website to store my submission." name="agreement" />
+                    <label>I allow this website to store my submission.</label>
+                    <Checkbox defaultChecked={true} name="agreement" />
                 </div>
                 <Button aria-label="submit" className="min-w-32" color="danger" isLoading={isPending} type="submit">
                     Submit

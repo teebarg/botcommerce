@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useOverlayTriggerState } from "react-stately";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { CategoryForm } from "./category-form";
 

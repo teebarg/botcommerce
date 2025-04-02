@@ -47,12 +47,12 @@ const legal = [
 ];
 
 export default async function Footer() {
-    const res = await api.collection.all({ limit: 6 });
+    const collectionResponse = await api.collection.all({ limit: 6 });
 
-    if (!res) {
+    if (!collectionResponse.data) {
         return <ServerError />;
     }
-    const { collections } = res;
+    const { collections } = collectionResponse.data;
     const catRes = await api.category.all({ limit: 100 });
     const { categories: cat } = catRes.data ?? {};
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);

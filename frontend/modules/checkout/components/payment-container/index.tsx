@@ -1,7 +1,6 @@
 import React from "react";
 
 import { RadioGroup } from "@/components/ui/radio-group";
-import { cn } from "@/lib/util/cn";
 import { PaymentMethod } from "@/types/models";
 
 type PaymentContainerProps = {
@@ -12,50 +11,36 @@ type PaymentContainerProps = {
 };
 
 const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, selectedPaymentOptionId, paymentInfoMap, disabled = false }) => {
+    const isSelected = selectedPaymentOptionId === paymentSession.provider_id;
+    const provider = paymentInfoMap[paymentSession.provider_id];
+
     return (
-        <>
-            <RadioGroup.Option
-                key={paymentSession.id}
-                className={cn(
-                    "flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all max-w-md",
-                    selectedPaymentOptionId === paymentSession.provider_id
-                        ? "border-green-400 bg-transparent"
-                        : "border-default-300 hover:border-default-400"
-                )}
-                value={paymentSession.provider_id}
-            >
-                {/* Icon */}
-                <div
-                    className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-full text-lg",
-                        selectedPaymentOptionId === paymentSession.provider_id ? "bg-green-400 text-white" : "bg-default-200 text-default-600"
-                    )}
-                >
-                    {paymentInfoMap[paymentSession.provider_id]?.icon}
+        <RadioGroup.Option
+            key={paymentSession.id}
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all max-w-md ${
+                isSelected ? "border-indigo-600" : "border-gray-200 hover:border-gray-300"
+            }`}
+            value={paymentSession.provider_id}
+        >
+            <div className="flex items-start">
+                <div className="flex-shrink-0 mt-0.5">{provider?.icon}</div>
+
+                <div className="ml-3">
+                    <h3 className="font-medium text-default-900">{provider?.title || paymentSession.provider_id}</h3>
+                    <p className="text-sm text-default-500">{provider?.description}</p>
                 </div>
 
-                {/* Text Content */}
-                <div className="flex-1">
-                    <h3
-                        className={cn(
-                            "text-sm font-medium",
-                            selectedPaymentOptionId === paymentSession.provider_id ? "text-green-500" : "text-default-800"
-                        )}
+                <div className="absolute right-4 top-4">
+                    <div
+                        className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                            isSelected ? "border-indigo-600 bg-indigo-600" : "border-gray-300"
+                        }`}
                     >
-                        {paymentInfoMap[paymentSession.provider_id]?.title || paymentSession.provider_id}
-                    </h3>
-                    <p className="text-sm text-default-600">{paymentInfoMap[paymentSession.provider_id]?.description}</p>
+                        {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                    </div>
                 </div>
-
-                {/* Radio Indicator */}
-                <div
-                    className={cn(
-                        "h-5 w-5 rounded-full border-2",
-                        selectedPaymentOptionId === paymentSession.provider_id ? "border-green-500 bg-green-500" : "border-default-300"
-                    )}
-                />
-            </RadioGroup.Option>
-        </>
+            </div>
+        </RadioGroup.Option>
     );
 };
 

@@ -3,7 +3,7 @@
 import { cn } from "@lib/util/cn";
 import React, { useState, useEffect, useRef } from "react";
 import { Minus, Send, Smiley, X } from "nui-react-icons";
-import { useSnackbar } from "notistack";
+import { toast } from "sonner";
 
 interface Props {}
 
@@ -21,7 +21,6 @@ const TypingIndicator = () => (
 );
 
 const ChatBot: React.FC<Props> = () => {
-    const { enqueueSnackbar } = useSnackbar();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [input, setInput] = useState<string>("");
@@ -60,14 +59,14 @@ const ChatBot: React.FC<Props> = () => {
 
         setHasBeenClosed(hasBeenClosedThisSession);
 
-        if (!hasBeenClosedThisSession) {
-            const timer = setTimeout(() => {
-                setIsOpen(true);
-                localStorage.setItem("chatbotOpen", "true");
-            }, 2000);
+        // if (!hasBeenClosedThisSession) {
+        //     const timer = setTimeout(() => {
+        //         setIsOpen(true);
+        //         localStorage.setItem("chatbotOpen", "true");
+        //     }, 2000);
 
-            return () => clearTimeout(timer);
-        }
+        //     return () => clearTimeout(timer);
+        // }
     }, []); // Empty dependency array means this runs once on mount
 
     const scrollToBottom = () => {
@@ -92,7 +91,7 @@ const ChatBot: React.FC<Props> = () => {
 
             return data[0]?.text || "Sorry, I couldn't understand that.";
         } catch (error) {
-            enqueueSnackbar("Error communicating with Rasa:", { variant: "error" });
+            toast.error("Error communicating with Rasa");
         }
     };
 

@@ -1,7 +1,6 @@
 import UserDropDown from "@modules/account/components/user-menu";
 import ActivityTray from "@modules/common/components/activity-tray";
-import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarMenuToggle, NavbarItem, NavbarMenu } from "@components/navbar";
-import { Home } from "nui-react-icons";
+import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
 import dynamic from "next/dynamic";
 
 import { siteConfig } from "@/lib/config";
@@ -45,16 +44,7 @@ const AdminNavbar = async () => {
                         </LocalizedClientLink>
                     )}
                 </NavbarItem>
-                <NavbarMenuToggle className="sm:hidden" />
             </NavbarContent>
-            <NavbarMenu>
-                <div className="mx-4 mt-2 flex flex-col gap-2">
-                    <NavbarItem className="flex items-center gap-2">
-                        <Home className="h-8 w-8" />
-                        <LocalizedClientLink href="/">Home</LocalizedClientLink>
-                    </NavbarItem>
-                </div>
-            </NavbarMenu>
         </NavigationBar>
     );
 };

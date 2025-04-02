@@ -139,8 +139,8 @@ async def search(
     sort: str = "created_at:desc",
     categories: str = Query(default=""),
     collections: str = Query(default=""),
-    maxPrice: int = Query(default=1000000, gt=0),
-    minPrice: int = Query(default=1, gt=0),
+    max_price: int = Query(default=1000000, gt=0),
+    min_price: int = Query(default=1, gt=0),
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
 ) -> SearchProducts:
@@ -154,8 +154,8 @@ async def search(
         filters.append(f"categories IN {url_to_list(categories)}")
     if collections:
         filters.append(f"collections IN [{collections}]")
-    if minPrice and maxPrice:
-        filters.append(f"price >= {minPrice} AND price <= {maxPrice}")
+    if min_price and max_price:
+        filters.append(f"price >= {min_price} AND price <= {max_price}")
 
     search_params = {
         "limit": limit,
@@ -748,7 +748,7 @@ async def index_products(products, cache: CacheService):
         add_documents_to_index(index_name="products", documents=documents)
 
         # Clear all product-related cache
-        # cache.invalidate("product")
+        cache.invalidate("search")
         # cache.invalidate("products")
 
         logger.info(f"Reindexed {len(documents)} products successfully.")

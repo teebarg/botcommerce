@@ -27,17 +27,6 @@ body {
     .tb-divider {
         @apply shrink-0 bg-divider border-none w-full h-[1px];
     }
-
-    /* track line */
-    .track:before {
-        content: attr(x);
-        position: absolute;
-        background: gray;
-        height: 3px;
-        width: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-    }
 }
 
 @layer base {

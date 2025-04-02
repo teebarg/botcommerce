@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
@@ -44,6 +46,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
             if (!file) return;
 
             const reader = new FileReader();
+
             reader.onload = (e) => {
                 const base64 = reader.result as string;
                 const fileName = `images/${Date.now()}-${file.name}`;

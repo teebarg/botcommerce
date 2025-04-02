@@ -1,10 +1,9 @@
-from datetime import timedelta
 from typing import Optional
 
 from app.core.utils import generate_id
 from app.models.generic import Message
 from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
-from fastapi import APIRouter, Header, HTTPException, Response
+from fastapi import APIRouter, Header, HTTPException
 from app.prisma_client import prisma as db
 from app.core.deps import TokenUser
 
@@ -39,7 +38,6 @@ async def get_cart(cartId: str = Header()):
 @router.put("/", response_model=CartResponse)
 async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: str = Header(default=None)):
     """Update cart status"""
-    print("🚀 ~ cart_update:", cart_update)
     cart = await db.cart.find_unique(where={"cart_number": cartId})
     if not cart:
         cart = await db.cart.create(
@@ -54,7 +52,6 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
                 }
             }
         )
-        # raise HTTPException(status_code=404, detail="Cart not found")
 
     user = await db.user.find_unique(where={"email": token_data.sub}) if token_data else None
 
@@ -106,17 +103,9 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
     if cart_update.shipping_method:
         update_data["shipping_method"] = cart_update.shipping_method
 
-    if cart_update.total:
-        update_data["total"] = cart_update.total
-
-    if cart_update.subtotal:
-        update_data["subtotal"] = cart_update.subtotal
-
-    if cart_update.tax:
-        update_data["tax"] = cart_update.tax
-
     if cart_update.shipping_fee is not None:
         update_data["shipping_fee"] = cart_update.shipping_fee
+        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"]
 
     update_data["user"] = {"connect": {"id": user.id}} if user else {"disconnect": True}
 
@@ -180,8 +169,23 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
         updated_item = await db.cartitem.update(
             where={"id": existing_item.id},
             data={"quantity": existing_item.quantity + item.quantity},
-            include={
-                "variant": True
+        )
+        # Calculate cart totals
+        cart_items = await db.cartitem.find_many(
+            where={"cart_id": cart.id},
+        )
+
+        subtotal = sum(item.price * item.quantity for item in cart_items)
+        tax = subtotal * 0.05  # 5% tax rate
+        total = subtotal + tax + (cart.shipping_fee or 0)
+
+        # Update cart with new totals
+        await db.cart.update(
+            where={"id": cart.id},
+            data={
+                "subtotal": subtotal,
+                "tax": tax,
+                "total": total
             }
         )
         return updated_item
@@ -195,8 +199,23 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
             "price": variant.price,
             "image": variant.product.image
         },
-        include={
-            "variant": True
+    )
+    # Calculate cart totals
+    cart_items = await db.cartitem.find_many(
+        where={"cart_id": cart.id}
+    )
+
+    subtotal = sum(item.price * item.quantity for item in cart_items)
+    tax = subtotal * 0.05  # 5% tax rate
+    total = subtotal + tax + (cart.shipping_fee or 0)
+
+    # Update cart with new totals
+    await db.cart.update(
+        where={"id": cart.id},
+        data={
+            "subtotal": subtotal,
+            "tax": tax,
+            "total": total
         }
     )
     return cart
@@ -230,6 +249,24 @@ async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = H
         data={"quantity": quantity},
         include={
             "variant": True
+        }
+    )
+    # Calculate cart totals
+    cart_items = await db.cartitem.find_many(
+        where={"cart_id": cart_item.cart_id}
+    )
+
+    subtotal = sum(item.price * item.quantity for item in cart_items)
+    tax = subtotal * 0.05  # 5% tax rate
+    total = subtotal + tax + (cart_item.cart.shipping_fee or 0)
+
+    # Update cart with new totals
+    updated_cart = await db.cart.update(
+        where={"id": cart_item.cart.id},
+        data={
+            "subtotal": subtotal,
+            "tax": tax,
+            "total": total
         }
     )
     return updated_item

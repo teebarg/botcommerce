@@ -3,8 +3,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { MagnifyingGlassMini } from "nui-react-icons";
 import SearchInput from "@modules/search/components/search-input";
-import { useOverlayTriggerState } from "react-stately";
-import { Modal } from "@modules/common/components/modal";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -15,6 +14,7 @@ import { debounce } from "@/lib/util/util";
 import { ProductSearch } from "@/types/models";
 import { api } from "@/apis";
 import ProductCard from "@/components/store/products/product-card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Props {
     className?: string;
@@ -22,6 +22,7 @@ interface Props {
 
 const Search: React.FC<Props> = ({ className }) => {
     const router = useRouter();
+    const state = useOverlayTriggerState({});
     const modalState = useOverlayTriggerState({});
     const [products, setProducts] = useState<ProductSearch[]>([]);
     const [value, setValue] = useState("");
@@ -35,19 +36,7 @@ const Search: React.FC<Props> = ({ className }) => {
                 page: 1,
             };
             const { data, error } = await api.product.search({ ...queryParams });
-            // const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...queryParams });
-            // const response = await fetch(url, {
-            //     method: "GET",
-            //     headers: {
-            //         accept: "application/json",
-            //     },
-            // });
 
-            // if (!response.ok) {
-            //     throw new Error(response.statusText);
-            // }
-
-            // const { products } = await response.json();
             if (error) {
                 toast.error(error);
 
@@ -72,17 +61,22 @@ const Search: React.FC<Props> = ({ className }) => {
 
     return (
         <React.Fragment>
-            <Button
-                className={className}
-                endContent={<Kbd keys={["command"]}>K</Kbd>}
-                startContent={<MagnifyingGlassMini />}
-                variant="outline"
-                onClick={modalState.open}
-            >
-                {`I'm looking for...`}
-            </Button>
-            {modalState.isOpen && (
-                <Modal hasX={false} isOpen={modalState.isOpen} size="lg" onClose={modalState.close}>
+            <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
+                <DialogTrigger asChild>
+                    <Button
+                        className={className}
+                        endContent={<Kbd keys={["command"]}>K</Kbd>}
+                        startContent={<MagnifyingGlassMini />}
+                        variant="outline"
+                        onClick={modalState.open}
+                    >
+                        {`I'm looking for...`}
+                    </Button>
+                </DialogTrigger>
+                <DialogContent size="lg">
+                    <DialogHeader>
+                        <DialogTitle className="sr-only">Search</DialogTitle>
+                    </DialogHeader>
                     <div>
                         <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
                             <MagnifyingGlassMini />
@@ -100,8 +94,8 @@ const Search: React.FC<Props> = ({ className }) => {
                             </div>
                         </div>
                     </div>
-                </Modal>
-            )}
+                </DialogContent>
+            </Dialog>
         </React.Fragment>
     );
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useOverlayTriggerState } from "react-stately";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { BrandForm } from "@/modules/admin/brands/brand-form";

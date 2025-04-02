@@ -113,6 +113,11 @@ class Settings(BaseSettings):
 
     SLACK_WEBHOOK_URL: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
+    # OAuth Settings
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GOOGLE_REDIRECT_URI: str = f"{FRONTEND_HOST}/auth/google/callback"
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",

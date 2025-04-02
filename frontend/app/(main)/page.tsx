@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
@@ -15,7 +14,6 @@ import ContactForm from "@/modules/store/components/contact-form";
 import { auth } from "@/actions/auth";
 import ProductCard from "@/components/store/products/product-card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
 
 // Mock banners
 const banners = [
@@ -35,7 +33,7 @@ const banners = [
         description: "Discover the newest gadgets and innovations",
         buttonText: "Explore",
         image: "https://bzjitsvxyblegrvtzvef.supabase.co/storage/v1/object/public/banners/tbo-banner-2.avif",
-        link: "/collections",
+        link: "/collections/featured",
     },
     {
         id: 3,
@@ -44,7 +42,7 @@ const banners = [
         description: "Everything you need for a comfortable home",
         buttonText: "View Collection",
         image: "https://firebasestorage.googleapis.com/v0/b/shopit-ebc60.appspot.com/o/banners%2Fbanner1.jpg?alt=media",
-        link: "/collections",
+        link: "/collections/latest",
     },
 ];
 
@@ -96,9 +94,9 @@ export default async function Home() {
                                                     <h2 className="text-xl md:text-2xl font-medium mb-2">{banner.subtitle}</h2>
                                                     <h1 className="text-3xl md:text-5xl font-bold mb-4">{banner.title}</h1>
                                                     <p className="text-lg mb-6 text-white/80">{banner.description}</p>
-                                                    <Button asChild className="bg-commerce-secondary hover:bg-commerce-secondary/90">
+                                                    {/* <Button asChild className="bg-commerce-secondary hover:bg-commerce-secondary/90">
                                                         <Link href={banner.link}>{banner.buttonText}</Link>
-                                                    </Button>
+                                                    </Button> */}
                                                 </div>
                                             </div>
                                         </div>
@@ -112,12 +110,12 @@ export default async function Home() {
                 </section>
 
                 {/* Category Sections */}
-                <section className="pt-12 bg-gray-50">
+                <section className="pt-6 md:pt-10 bg-gray-50">
                     <div className="container mx-auto px-4">
-                        <h2 className="text-2xl md:text-3xl font-bold text-commerce-primary mb-8 text-center">Shop by Category</h2>
+                        <h2 className="text-2xl font-bold text-commerce-primary mb-4 text-center">Shop by Category</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {categories?.map((category: Category, idx: number) => (
-                                <Link key={idx} className="group" href={`/category/${category.name.toLowerCase()}`}>
+                                <Link key={idx} className="group" href={`collections?cat_ids=${category.slug}`}>
                                     <div className="relative h-48 rounded-lg overflow-hidden">
                                         <img
                                             alt={category.name}
