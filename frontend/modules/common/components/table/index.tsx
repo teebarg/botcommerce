@@ -8,12 +8,11 @@ import { Input } from "@components/ui/input";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
-import { Pagination } from "../pagination";
-
 import { Button } from "@/components/ui/button";
 import { Pag } from "@/types/models";
 import { api } from "@/apis";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import PaginationUI from "@/components/pagination";
 
 interface Props {
     children: React.ReactNode;
@@ -163,7 +162,7 @@ const Table: React.FC<Props> = ({
                     </div>
                 </div>
             </div>
-            {pagination && pagination?.total_pages > 1 && <Pagination pagination={pagination} />}
+            {pagination && pagination?.total_pages > 1 && <PaginationUI pagination={pagination} />}
         </React.Fragment>
     );
 };

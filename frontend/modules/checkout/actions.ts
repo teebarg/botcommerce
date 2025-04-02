@@ -1,19 +1,8 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
 
-async function cartId() {
-    const cookieStore = await cookies();
-
-    return cookieStore.get("_cart_id")?.value;
-}
-
 export async function removeDiscount(code: string) {
-    const id = await cartId();
-
-    if (!id) return "No cartId cookie found";
-
     try {
         // TODO: implement removeDiscount
         revalidateTag("cart");

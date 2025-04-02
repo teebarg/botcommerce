@@ -1,8 +1,8 @@
 import { Package, User } from "nui-react-icons";
+import { MapPin } from "lucide-react";
 
 import RecommendedProducts from "@/modules/products/components/recommended";
 import AccountNav from "@/modules/account/components/account-nav";
-import MapPin from "@/modules/common/icons/map-pin";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 

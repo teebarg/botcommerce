@@ -1,6 +1,5 @@
 import React from "react";
 import { ChevronRight, Exclamation, Tag } from "nui-react-icons";
-import { Pagination } from "@modules/common/components/pagination";
 
 import { CollectionsTopBar } from "./topbar";
 import { CollectionsSideBar } from "./sidebar";
@@ -13,6 +12,7 @@ import { auth } from "@/actions/auth";
 import ServerError from "@/components/server-error";
 import ProductCard from "@/components/store/products/product-card";
 import { Category, Collection, ProductSearch, SortOptions, WishItem } from "@/types/models";
+import PaginationUI from "@/components/pagination";
 
 type SearchParams = Promise<{
     page?: number;
@@ -153,7 +153,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                                                     <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                                 ))}
                                             </div>
-                                            {pagination.total_pages > 1 && <Pagination pagination={pagination} />}
+                                            {pagination.total_pages > 1 && <PaginationUI pagination={pagination} />}
                                         </React.Fragment>
                                     )}
                                 </div>

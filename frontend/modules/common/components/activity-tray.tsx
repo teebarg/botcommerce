@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Bell } from "nui-react-icons";
 import { useWebSocket } from "@lib/hooks/use-websocket";
 import useWatch from "@lib/hooks/use-watch";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 import Activity from "./activity";
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface Props {
     userId: string | number;

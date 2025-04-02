@@ -3,11 +3,11 @@
 import { Cart, HeartFilled } from "nui-react-icons";
 import React, { useState } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { toast } from "sonner";
 import { ProductVariant } from "@/types/models";
 
 interface WishlistItemProps {

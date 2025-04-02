@@ -36,19 +36,7 @@ const Search: React.FC<Props> = ({ className }) => {
                 page: 1,
             };
             const { data, error } = await api.product.search({ ...queryParams });
-            // const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...queryParams });
-            // const response = await fetch(url, {
-            //     method: "GET",
-            //     headers: {
-            //         accept: "application/json",
-            //     },
-            // });
 
-            // if (!response.ok) {
-            //     throw new Error(response.statusText);
-            // }
-
-            // const { products } = await response.json();
             if (error) {
                 toast.error(error);
 

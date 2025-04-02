@@ -3,8 +3,7 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import FastDelivery from "@modules/common/icons/fast-delivery";
-import Refresh from "@modules/common/icons/refresh";
-// import Back from "@modules/common/icons/back";
+import { RefreshCw } from "lucide-react";
 
 import { Product } from "@/types/models";
 
@@ -31,7 +30,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                         </div>
                     </div>
                     <div className="flex items-start gap-x-2">
-                        <Refresh />
+                        <RefreshCw />
                         <div>
                             <span className="font-semibold">Simple exchanges</span>
                             <p className="max-w-sm">Is the fit not quite right? No worries - we&apos;ll exchange your product for a new one.</p>

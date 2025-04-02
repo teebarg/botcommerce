@@ -1,7 +1,8 @@
 "use client";
 
-import { Skeleton } from "@/components/skeleton";
 import React from "react";
+
+import { Skeleton } from "@/components/skeleton";
 
 const SkeletonOrderConfirmed: React.FC = () => {
     return (
