@@ -118,6 +118,9 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = f"{FRONTEND_HOST}/auth/google/callback"
 
+    FACEBOOK: str = ""
+    INSTAGRAM: str = ""
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",

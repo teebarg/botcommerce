@@ -9,7 +9,7 @@ from app.core.deps import (
 from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists
 from app.models.generic import Message
-from app.models.user import UserUpdateMe, User
+from app.models.user import UserUpdateMe
 from app.models.wishlist import WishlistCreate
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
