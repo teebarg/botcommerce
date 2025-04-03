@@ -1,0 +1,23 @@
+{% include "partials/header.html" %}
+<!-- Content -->
+<!-- <tr>
+    <td style="padding: 10px">
+        <h1>ORDER PENDING</h1>
+        <p style="color: #4B5563">Thank you for your order. Your order is currently pending.</p>
+    </td>
+</tr> -->
+
+<!-- Product Section -->
+<tr>
+    <td style="padding: 20px">
+        <h2>Thank you for your order!</h2>
+        <p>Hi {{user.first_name}},</p>
+        <p>We've received your order, please make the payment.</p>
+
+        {% include "partials/order-details.html" %}
+
+        <p>We'll send you another email once your payment is confirmed. If you have any questions about your order, please don't hesitate to contact our customer support.</p>
+        <a href="{{ frontend_host }}/order/confirmed/{{order.order_number}}" class="action-button">View Order Status</a>
+    </td>
+</tr>
+{% include "partials/footer.html" %}

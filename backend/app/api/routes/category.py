@@ -8,6 +8,7 @@ from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException, Query)
 from pydantic import BaseModel
 from app.core.storage import upload, delete_Image
+from app.core.decorators import cache
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
@@ -23,7 +24,6 @@ class Search(BaseModel):
 @router.get("/", dependencies=[])
 # @cache(key="categories")
 async def index(
-    # db: PrismaDb,
     query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -45,7 +45,7 @@ async def index(
         skip=(page - 1) * limit,
         take=limit,
         order={"created_at": "desc"},
-        include={"subcategories": True}
+        # include={"subcategories": True}
     )
     total = await db.category.count(where=where_clause)
     return {

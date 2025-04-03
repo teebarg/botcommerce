@@ -5,15 +5,14 @@ import unicodedata
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import emails  # type: ignore
-from jinja2 import Environment, FileSystemLoader, Template
-
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.user import User
 from app.models.order import OrderResponse
+from app.models.user import User
+from jinja2 import Environment, FileSystemLoader, Template
 
 
 @dataclass
@@ -80,6 +79,16 @@ def slugify(text) -> str:
 
     return slug
 
+def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, Any]:
+    return {
+        "project_name": settings.PROJECT_NAME,
+        "description": "Exclusive offers just for you",
+        "frontend_host": settings.FRONTEND_HOST,
+        "facebook": settings.FACEBOOK,
+        "instagram": settings.INSTAGRAM,
+        **metadata
+    }
+
 
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
     # Set up Jinja2 environment and add the custom filter
@@ -131,22 +140,30 @@ def generate_test_email(email_to: str) -> EmailData:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Test email"
     html_content = render_email_template(
-        template_name="test_email.html",
-        context={"project_name": settings.PROJECT_NAME, "email": email_to},
+        template_name="test.html",
+        context={"email": email_to, **merge_metadata({})},
     )
     return EmailData(html_content=html_content, subject=subject)
 
 
 def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - Order Confirmation"
+    # Determine the template based on payment status
+    template_name = "paid_invoice.html"
+    if order.payment_method == "CASH_ON_DELIVERY":
+        template_name = "pickup_invoice.html"
+    elif order.payment_status == "PENDING":
+        template_name = "pending_invoice.html"
+    elif order.payment_status == "FAILED":
+        template_name = "failed_invoice.html"
+
+    subject = f"{settings.PROJECT_NAME} - Order Confirmation"
     html_content = render_email_template(
-        template_name="invoice.html",
+        template_name=template_name,
         context={
-            "project_name": settings.PROJECT_NAME,
             "order": order,
             "user": user,
             "current_year": datetime.now().year,
+            **merge_metadata({"description": "Your order has been processed"})
         },
     )
     return EmailData(html_content=html_content, subject=subject)

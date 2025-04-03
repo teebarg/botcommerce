@@ -4,11 +4,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { verifyMagicLink } from "@/actions/auth";
 import LocalizedClientLink from "@/components/ui/link";
 import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
+import { api } from "@/apis";
 
 export default function VerifyMagicLink() {
     const [authState, setAuthState] = useState<"loading" | "success" | "expired">("loading");
@@ -27,17 +27,16 @@ export default function VerifyMagicLink() {
                 return;
             }
 
-            const result = await verifyMagicLink(token);
+            const { error } = await api.auth.verifyMagicLink(token);
 
-            if (result.error) {
-                toast.error(result.message);
+            if (error) {
+                toast.error(error);
                 setAuthState("expired");
                 // router.push("/sign-in");
 
                 return;
             }
 
-            toast.success(result.message);
             setAuthState("success");
             setTimeout(() => {
                 router.push(callbackUrl || "/");

@@ -5,7 +5,7 @@ import { jwtVerify } from "jose";
 
 import { api } from "@/apis";
 import { Session } from "@/types/models";
-import { deleteCookie } from "@/lib/util/cookie";
+import { deleteCookie, setCookie } from "@/lib/util/cookie";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -29,18 +29,6 @@ export async function verifyToken(token: string) {
 
         return null;
     }
-}
-
-export async function setSession(token: string) {
-    const cookieStore = await cookies();
-
-    cookieStore.set("access_token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-        // sameSite: "strict",
-    });
 }
 
 export async function getSession() {
@@ -96,7 +84,7 @@ export async function signUp(_currentState: unknown, formData: FormData) {
 
     const { access_token } = data;
 
-    await setSession(access_token);
+    await setCookie("access_token", access_token);
 
     return { error: false, message: "Successful" };
 }
@@ -125,7 +113,7 @@ export async function verifyMagicLink(token: string) {
         return { error: true, message: error?.toString() };
     }
 
-    await setSession(data.access_token);
+    await setCookie("access_token", data.access_token);
 
     return { error: false, message: "Successfully signed in" };
 }

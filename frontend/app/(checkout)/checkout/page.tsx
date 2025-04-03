@@ -62,7 +62,7 @@ export default async function Checkout() {
                     </div>
                 </div>
                 {/* Header */}
-                <header className="flex justify-between items-center p-4">
+                <header className="flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
                     <LocalizedClientLink className="text-xl font-semibold" href="/">
                         {siteConfig.name}
                     </LocalizedClientLink>

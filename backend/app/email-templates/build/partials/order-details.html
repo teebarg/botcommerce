@@ -1,0 +1,43 @@
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px">
+    <tr style="background-color: #007bff; color: white">
+        <th style="padding: 10px; text-align: left">Item</th>
+        <th style="padding: 10px; text-align: center">Image</th>
+        <th style="padding: 10px; text-align: right">Quantity</th>
+        <th style="padding: 10px; text-align: right">Price</th>
+    </tr>
+    {% for item in order.order_items %}
+    <tr>
+        <td style="padding: 10px; border-bottom: 1px solid #dee2e6">{{ item.variant.name }}</td>
+        <td style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6">
+            <img src="{{item.image }}" alt="Product 1" style="max-width: 70px; height: auto" />
+        </td>
+        <td style="padding: 10px; text-align: right; border-bottom: 1px solid #dee2e6">{{ item.quantity }}</td>
+        <td style="padding: 10px; text-align: right; border-bottom: 1px solid #dee2e6">{{ item.price | naira }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Subtotal:</td>
+        <td style="padding: 10px; text-align: right">{{ order.subtotal | naira }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Tax:</td>
+        <td style="padding: 10px; text-align: right">{{ order.tax | naira }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Delivery Fee:</td>
+        <td style="padding: 10px; text-align: right">{{ order.shipping_fee | naira }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Total:</td>
+        <td style="padding: 10px; text-align: right; font-weight: bold; color: #007bff">{{ order.total | naira }}</td>
+    </tr>
+</table>
+
+<p>Payment Method: {{order.payment_method}}</p>
+<p>Shipping Address:</p>
+<p style="margin-left: 20px">
+    {{order.user.first_name}} {{order.user.last_name}}<br />
+    {{order.shipping_address.address_1}}<br />
+    {{order.shipping_address.city}}, {{order.shipping_address.state}} {{order.shipping_address.postal_code}}<br />
+    Nigeria
+</p>

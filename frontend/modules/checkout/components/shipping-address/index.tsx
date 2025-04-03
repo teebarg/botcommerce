@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import AddressSelect from "../address-select";
 
-import { Cart, CartUpdate } from "@/types/models";
+import { Cart } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
@@ -25,11 +25,9 @@ const ShippingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "ref
     const handleSubmit = async () => {
         setIsPending(true);
 
-        const updateData: CartUpdate = {
+        const { error } = await api.cart.updateDetails({
             email,
-        };
-
-        const { error } = await api.cart.updateDetails(updateData);
+        });
 
         setIsPending(false);
 

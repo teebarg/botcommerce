@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { GitBranch } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -39,17 +38,6 @@ export default function SocialLoginButtons() {
                     <>
                         <img alt="Google" className="w-5 h-5 mr-2" src="/google.svg" />
                         Continue with Google
-                    </>
-                )}
-            </Button>
-
-            <Button className="w-full" disabled={isLoading !== null} variant="outline" onClick={() => handleSocialLogin("github")}>
-                {isLoading === "github" ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900" />
-                ) : (
-                    <>
-                        <GitBranch className="w-5 h-5 mr-2" />
-                        Continue with GitHub
                     </>
                 )}
             </Button>

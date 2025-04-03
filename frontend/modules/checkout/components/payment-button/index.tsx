@@ -24,7 +24,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, isLoggedIn, "data-t
     const searchParams = useSearchParams();
 
     const isOpen = searchParams.get("step") === "review";
-    const notReady = !cart || !cart.shipping_address || !cart.billing_address || !cart.email || !cart.shipping_method || !isOpen;
+    const notReady = !cart || !cart.shipping_address || !cart.email || !cart.shipping_method || !isOpen;
 
     const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 

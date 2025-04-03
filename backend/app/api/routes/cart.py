@@ -10,6 +10,80 @@ from app.core.deps import TokenUser
 # Create a router for carts
 router = APIRouter()
 
+async def calculate_cart_totals(cart_id: str):
+    """Helper function to calculate cart totals"""
+    cart_items = await db.cartitem.find_many(where={"cart_id": cart_id})
+
+    subtotal = sum(item.price * item.quantity for item in cart_items)
+    tax = subtotal * 0.05  # 5% tax rate
+
+    cart = await db.cart.find_unique(where={"id": cart_id})
+    shipping_fee = cart.shipping_fee if cart else 0  # Default to 0 if cart not found
+
+    total = subtotal + tax + shipping_fee
+
+    await db.cart.update(
+        where={"id": cart_id},
+        data={"subtotal": subtotal, "tax": tax, "total": total}
+    )
+
+
+async def get_or_create_cart(cartId: Optional[str]):
+    """Retrieve an existing cart or create a new one if it doesn't exist"""
+    if cartId:
+        cart = await db.cart.find_unique(where={"cart_number": cartId})
+        if cart:
+            return cart
+
+    new_cart_id = generate_id()
+    cart = await db.cart.create(data={"cart_number": new_cart_id})
+    return cart
+
+@router.post("/items")
+async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=None)) -> CartResponse:
+    """Add an item to cart"""
+    cart = await get_or_create_cart(cartId)
+    cart_id = cart.id
+
+    # Verify product variant exists and is in stock
+    variant = await db.productvariant.find_unique(
+        where={"id": item.variant_id},
+        include={"product": True}
+    )
+
+    if not variant:
+        raise HTTPException(status_code=400, detail="Variant does not exist")
+    if variant.status != "IN_STOCK":
+        raise HTTPException(status_code=400, detail="Variant is out of stock")
+
+    # Check if item already exists in cart
+    existing_item = await db.cartitem.find_first(
+        where={"cart_id": cart_id, "variant_id": item.variant_id}
+    )
+
+    if existing_item:
+        # Update quantity if item exists
+        await db.cartitem.update(
+            where={"id": existing_item.id},
+            data={"quantity": existing_item.quantity + item.quantity},
+        )
+    else:
+        # Create new cart item
+        await db.cartitem.create(
+            data={
+                "cart_id": cart_id,
+                "variant_id": item.variant_id,
+                "quantity": item.quantity,
+                "price": variant.price,
+                "image": variant.product.image
+            },
+        )
+
+    # Update cart totals
+    await calculate_cart_totals(cart_id)
+
+    return cart
+
 
 # Endpoints
 @router.get("/", response_model=Optional[CartResponse])
@@ -28,8 +102,7 @@ async def get_cart(cartId: str = Header()):
                     "variant": True
                 }
             },
-            "shipping_address": True,
-            "billing_address": True
+            "shipping_address": True
         }
     )
     return cart
@@ -93,10 +166,6 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
         update_data["shipping_address"] = {"connect": {"id": address.id}}
         update_data["billing_address"] = {"connect": {"id": address.id}}
 
-    # if cart_update.billing_address:
-    #     update_data["billing_address"] = {"create": {
-    #         **cart_update.billing_address.model_dump(), "user_id": user.id if user else None}}
-
     if cart_update.payment_method:
         update_data["payment_method"] = cart_update.payment_method
 
@@ -138,89 +207,6 @@ async def delete(id: str, cartId: str = Header(default=None)) -> Message:
     return {"message": "Cart deleted successfully"}
 
 
-@router.post("/items")
-async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=None)) -> CartResponse:
-    """Add an item to cart"""
-    # Verify cart exists
-    cart = await db.cart.find_unique(where={"cart_number": cartId})
-    if not cart:
-        id = generate_id()
-        cart = await db.cart.create(
-            data={
-                "cart_number": id
-            },
-        )
-
-    # Verify product variant exists and is in stock
-    variant = await db.productvariant.find_unique(where={"id": item.variant_id}, include={"product": True})
-    if not variant or variant.status != "IN_STOCK":
-        raise HTTPException(status_code=400, detail="Variant not available")
-
-    # Check if item already exists in cart
-    existing_item = await db.cartitem.find_first(
-        where={
-            "cart_id": cart.id,
-            "variant_id": item.variant_id
-        }
-    )
-
-    if existing_item:
-        # Update quantity if item exists
-        updated_item = await db.cartitem.update(
-            where={"id": existing_item.id},
-            data={"quantity": existing_item.quantity + item.quantity},
-        )
-        # Calculate cart totals
-        cart_items = await db.cartitem.find_many(
-            where={"cart_id": cart.id},
-        )
-
-        subtotal = sum(item.price * item.quantity for item in cart_items)
-        tax = subtotal * 0.05  # 5% tax rate
-        total = subtotal + tax + (cart.shipping_fee or 0)
-
-        # Update cart with new totals
-        await db.cart.update(
-            where={"id": cart.id},
-            data={
-                "subtotal": subtotal,
-                "tax": tax,
-                "total": total
-            }
-        )
-        return updated_item
-
-    # Create new cart item
-    await db.cartitem.create(
-        data={
-            "cart_id": cart.id,
-            "variant_id": item.variant_id,
-            "quantity": item.quantity,
-            "price": variant.price,
-            "image": variant.product.image
-        },
-    )
-    # Calculate cart totals
-    cart_items = await db.cartitem.find_many(
-        where={"cart_id": cart.id}
-    )
-
-    subtotal = sum(item.price * item.quantity for item in cart_items)
-    tax = subtotal * 0.05  # 5% tax rate
-    total = subtotal + tax + (cart.shipping_fee or 0)
-
-    # Update cart with new totals
-    await db.cart.update(
-        where={"id": cart.id},
-        data={
-            "subtotal": subtotal,
-            "tax": tax,
-            "total": total
-        }
-    )
-    return cart
-
-
 @router.delete("/items/{item_id}")
 async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)):
     """Remove an item from cart"""
@@ -247,9 +233,9 @@ async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = H
     updated_item = await db.cartitem.update(
         where={"id": item_id},
         data={"quantity": quantity},
-        include={
-            "variant": True
-        }
+        # include={
+        #     "variant": True
+        # }
     )
     # Calculate cart totals
     cart_items = await db.cartitem.find_many(
@@ -261,7 +247,7 @@ async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = H
     total = subtotal + tax + (cart_item.cart.shipping_fee or 0)
 
     # Update cart with new totals
-    updated_cart = await db.cart.update(
+    await db.cart.update(
         where={"id": cart_item.cart.id},
         data={
             "subtotal": subtotal,

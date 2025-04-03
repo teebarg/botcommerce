@@ -133,7 +133,7 @@ async def index(
 
 
 @router.get("/search")
-# @cache(key="search")
+@cache(key="search")
 async def search(
     search: str = "",
     sort: str = "created_at:desc",

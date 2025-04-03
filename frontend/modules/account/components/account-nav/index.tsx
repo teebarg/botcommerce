@@ -1,7 +1,7 @@
 "use client";
 
 import { User as UserIcon } from "nui-react-icons";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@lib/util/cn";
 import { MapPin, Package } from "lucide-react";
 
@@ -10,11 +10,10 @@ import { api } from "@/apis";
 
 const AccountNav = () => {
     const route = usePathname();
-    const router = useRouter();
 
     const handleLogout = async () => {
         await api.auth.logOut();
-        router.push("/");
+        window.location.href = "/";
     };
 
     const navLinks = [

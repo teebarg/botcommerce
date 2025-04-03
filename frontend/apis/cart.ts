@@ -60,8 +60,9 @@ export const cartApi = {
 
         if (!response.error) {
             revalidate("cart");
-            revalidate("user");
-            revalidate("orders");
+            if (update.shipping_address) {
+                revalidate("user");
+            }
         }
 
         return response;
@@ -83,8 +84,6 @@ export const cartApi = {
 
         if (!response.error) {
             await deleteCookie("_cart_id");
-
-            revalidate("cart");
             revalidate("orders");
         }
 
