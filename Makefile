@@ -74,7 +74,7 @@ prep-docker: ## Prepare postges database
 	docker exec botcommerce-backend ./scripts/prestart.sh
 
 serve-backend: ## Serve the backend in terminal
-	@cd backend; fastapi dev app/main.py --host 0.0.0.0 --reload
+	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
 
 serve-frontend: ## Serve the frontend in terminal
 	@cd frontend; npm run dev

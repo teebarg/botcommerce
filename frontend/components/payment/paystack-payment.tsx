@@ -30,8 +30,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
             // Redirect to Paystack payment page
             window.location.href = data?.authorization_url ?? "/";
         } catch (error) {
-            toast.error("Failed to initialize payment");
-            console.error(error);
+            toast.error(`${error} ?? "Failed to initialize payment"`);
         } finally {
             setLoading(false);
         }

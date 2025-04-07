@@ -7,11 +7,12 @@ import ReviewForm from "./review-form";
 import Progress from "@/components/ui/progress";
 import Chip from "@/components/ui/chip";
 import { timeAgo } from "@/lib/util/util";
-import { Product, Review } from "@/types/models";
+import { Review } from "@/types/models";
 import { auth } from "@/actions/auth";
+import { api } from "@/apis";
 
 interface Prop {
-    product: Product;
+    product_id: number;
 }
 
 interface RatingDistribution {
@@ -19,16 +20,14 @@ interface RatingDistribution {
     percentage: number;
 }
 
-const ReviewsSection: React.FC<Prop> = async ({ product }) => {
+const ReviewsSection: React.FC<Prop> = async ({ product_id }) => {
     const user = await auth();
 
     if (!user) {
         return;
     }
 
-    const reviews: Review[] = product.reviews?.sort(
-        (a: Review, b: Review) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    ) as unknown as Review[];
+    const { data: reviews } = await api.product.productReviews({ product_id });
 
     if (!reviews || reviews?.length == 0) {
         return (
@@ -50,7 +49,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                 <p className="text-default-600 mb-6 max-w-sm">
                     Be the first to share your experience with this product and help others make informed decisions!
                 </p>
-                {product.id && <ReviewForm product_id={product.id} />}
+                {product_id && <ReviewForm product_id={product_id} />}
             </div>
         );
     }
@@ -133,7 +132,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product }) => {
                 </h2>
                 <RatingBreakdown />
                 <div className="mb-8">{reviews?.slice(0, 5).map((review: Review, index: number) => <ReviewCard key={index} review={review} />)}</div>
-                {product.id && <ReviewForm product_id={product.id} />}
+                {product_id && <ReviewForm product_id={product_id} />}
                 {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews
             </Button> */}

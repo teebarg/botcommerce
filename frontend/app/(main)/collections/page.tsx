@@ -15,6 +15,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 type SearchParams = Promise<{
     page?: number;
     sortBy?: SortOptions;
+    brand_id?: string;
     cat_ids?: string;
     maxPrice?: string;
     minPrice?: string;
@@ -34,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Collections({ searchParams }: Props) {
-    const { minPrice, maxPrice, cat_ids, page, sortBy } = (await searchParams) || {};
+    const { minPrice, maxPrice, brand_id, cat_ids, page, sortBy } = (await searchParams) || {};
     const user = await auth();
     const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
 
@@ -62,6 +63,7 @@ export default async function Collections({ searchParams }: Props) {
         max_price: maxPrice ?? 100000000,
         min_price: minPrice ?? 0,
         categories: cat_ids,
+        brand_id: brand_id,
     };
 
     const res = await api.product.search(queryParams);

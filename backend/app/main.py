@@ -3,6 +3,7 @@ import logging
 import time
 from xml.etree.ElementTree import Element, SubElement, tostring
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Response, Request
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -21,8 +22,31 @@ from app.models.generic import (
     NewsletterCreate
 )
 from app.prisma_client import prisma
+from meilisearch import Client as MeilisearchClient
+from app.services.cache import get_cache_service
 
-app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # app.state.meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
+    # app.state.redis_client = Redis(
+    #     host=settings.REDIS_HOST,
+    #     port=settings.REDIS_PORT,
+    #     password=settings.REDIS_PASSWORD,
+    #     ssl=True,
+    #     decode_responses=True,
+    # )
+    # app.state.redis_client.ping()
+    print("🚀 ~ pinging redis......:")
+    app.state.cache_service = await get_cache_service()
+    app.state.cache_service.get("test")
+    print("🚀 ~ pinging redis......: done")
+    print("🚀 ~ connecting to prisma......:")
+    await prisma.connect()
+    print("🚀 ~ connecting to prisma......: done")
+    yield
+    await prisma.disconnect()
+
+app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json", lifespan=lifespan)
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):
@@ -61,9 +85,6 @@ class TimingMiddleware(BaseHTTPMiddleware):
 #     app.add_middleware(TimingMiddleware)
 
 app.add_middleware(TimingMiddleware)
-
-print("settings.all_cors_origins.....")
-print(settings.all_cors_origins)
 
 # Set all CORS enabled origins
 if settings.all_cors_origins:
@@ -213,13 +234,3 @@ async def generate_sitemap(cache: deps.CacheService ):
 #                 aio_pika.Message(body=order_data.encode()),
 #                 routing_key=product_queue.name,
 #             )
-
-
-@app.on_event("startup")
-async def startup():
-    await prisma.connect()
-
-@app.on_event("shutdown")
-async def shutdown():
-    await prisma.disconnect()
-

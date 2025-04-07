@@ -14,12 +14,11 @@ from app.core.utils import generate_data_export_email, send_email, slugify
 
 from app.core.config import settings
 
-import asyncio
-from prisma import Prisma
 from typing import List
 from datetime import datetime
 
 from supabase import create_client, Client
+from app.prisma_client import prisma as db
 
 
 async def broadcast_channel(data, user_id: int):
@@ -33,10 +32,8 @@ async def broadcast_channel(data, user_id: int):
 # Export products
 async def generate_excel_file(email: str):
     logger.debug("Products export started.......")
-    prisma = Prisma()
-    await prisma.connect()
 
-    products = await prisma.product.find_many(
+    products = await db.product.find_many(
         include={
             "categories": True,
             "collections": True,
@@ -155,13 +152,13 @@ async def parse_images(images_str: str) -> List[str]:
     return [img.strip() for img in images_str.split("|") if img.strip()]
 
 
-async def upsert_brand(prisma: Prisma, brand_name: str) -> int:
+async def upsert_brand(brand_name: str) -> int:
     """Upsert a brand and return its ID."""
     if not brand_name or not brand_name.strip():
         return None
 
     slug = brand_name.lower().replace(" ", "-")
-    brand = await prisma.brand.upsert(
+    brand = await db.brand.upsert(
         where={"slug": slug},
         data={
             "create": {
@@ -175,10 +172,10 @@ async def upsert_brand(prisma: Prisma, brand_name: str) -> int:
     return brand.id
 
 
-async def upsert_category(prisma: Prisma, category_name: str) -> int:
+async def upsert_category(category_name: str) -> int:
     """Upsert a category and return its ID."""
     slug = category_name.lower().replace(" ", "-")
-    category = await prisma.category.upsert(
+    category = await db.category.upsert(
         where={"slug": slug},
         data={
             "create": {
@@ -192,10 +189,10 @@ async def upsert_category(prisma: Prisma, category_name: str) -> int:
     return category.id
 
 
-async def upsert_collection(prisma: Prisma, collection_name: str) -> int:
+async def upsert_collection(collection_name: str) -> int:
     """Upsert a collection and return its ID."""
     slug = collection_name.lower().replace(" ", "-")
-    collection = await prisma.collection.upsert(
+    collection = await db.collection.upsert(
         where={"slug": slug},
         data={
             "create": {
@@ -210,9 +207,6 @@ async def upsert_collection(prisma: Prisma, collection_name: str) -> int:
 
 
 async def bulk_upload_products(products: list[dict]):
-    prisma = Prisma()
-    await prisma.connect()
-
     try:
         # Process each product
         for product_data in products:
@@ -220,19 +214,19 @@ async def bulk_upload_products(products: list[dict]):
             category_names = await parse_categories(product_data.get("categories", ""))
             category_ids = []
             for cat_name in category_names:
-                cat_id = await upsert_category(prisma, cat_name)
+                cat_id = await upsert_category(cat_name)
                 category_ids.append(cat_id)
 
             # Handle collections
             collection_names = await parse_collections(product_data.get("collections", ""))
             collection_ids = []
             for coll_name in collection_names:
-                coll_id = await upsert_collection(prisma, coll_name)
+                coll_id = await upsert_collection(coll_name)
                 collection_ids.append(coll_id)
 
             # Handle brand
             brand_name = product_data.get("brand", "")
-            brand_id = await upsert_brand(prisma, brand_name)
+            brand_id = await upsert_brand(brand_name)
 
             # Handle additional images
             image_urls = await parse_images(product_data.get("images", ""))
@@ -259,7 +253,7 @@ async def bulk_upload_products(products: list[dict]):
                 create_data["brand"] = {"connect": {"id": brand_id}}
 
             # Upsert product
-            product = await prisma.product.upsert(
+            product = await db.product.upsert(
                 where={"slug": product_data["slug"]},
                 data={
                     "create": create_data,
@@ -279,7 +273,7 @@ async def bulk_upload_products(products: list[dict]):
             )
 
             # Handle product variants (assuming one variant per product for this data)
-            await prisma.productvariant.upsert(
+            await db.productvariant.upsert(
                 where={"sku": f"{product_data['slug']}-default"},
                 data={
                     "create": {
@@ -304,9 +298,9 @@ async def bulk_upload_products(products: list[dict]):
             # Handle additional images
             if image_urls:
                 # Clear existing images
-                await prisma.productimage.delete_many(where={"product_id": product.id})
+                await db.productimage.delete_many(where={"product_id": product.id})
                 # Add new images
-                await prisma.productimage.create_many(
+                await db.productimage.create_many(
                     data=[
                         {"product_id": product.id, "image": url}
                         for url in image_urls
@@ -315,14 +309,14 @@ async def bulk_upload_products(products: list[dict]):
 
             print(f"Processed product: {product_data['name']}")
 
-        # await prisma.tx.commit()
+        # await db.tx.commit()
         print("Bulk upload completed successfully")
 
     except Exception as e:
-        # await prisma.tx.rollback()
+        # await db.tx.rollback()
         print(f"Error during bulk upload: {str(e)}")
     finally:
-        await prisma.disconnect()
+        await db.disconnect()
 
 
 async def process_products(file_content, content_type: str, user_id: int) -> list[dict]:

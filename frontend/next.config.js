@@ -5,7 +5,7 @@ const nextConfig = {
             bodySizeLimit: "2mb",
         },
     },
-    reactStrictMode: true,
+    reactStrictMode: process.env.NODE_ENV === "production",
     bundlePagesRouterDependencies: true,
     images: {
         remotePatterns: [

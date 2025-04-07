@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
 
@@ -41,8 +41,16 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
         }
 
         setDataSet(newSet);
-        updateQuery([{ key: "cat_ids", value: Array.from(newSet).join(",") }]);
+        updateQuery([{ key: "brand_id", value: Array.from(newSet).join(",") }]);
     };
+
+    useEffect(() => {
+        const brandIdsFromURL = searchParams.get("brand_id")?.split(",") || [];
+
+        const newSet = new Set(brandIdsFromURL);
+
+        setDataSet(newSet);
+    }, [searchParams]);
 
     return (
         <div className="h-full min-w-[20rem] md:max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-content1 rounded-xl">
@@ -78,7 +86,10 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     {brands?.map((item: Brand, index: number) => (
                         <div key={`brand-${index}`} className="flex justify-between mt-2">
                             <div className="flex items-center gap-1">
-                                <Checkbox onCheckedChange={(checked) => onBrandChange(checked == "indeterminate" ? false : checked, item.slug)} />
+                                <Checkbox
+                                    checked={dataSet.has(item.slug)}
+                                    onCheckedChange={(checked) => onBrandChange(checked == "indeterminate" ? false : checked, item.slug)}
+                                />
                                 <label>{item.name}</label>
                             </div>
                             {facets?.brand && <span>({facets["brand"][item.name] ?? 0})</span>}

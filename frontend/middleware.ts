@@ -1,7 +1,5 @@
 // import { NextRequest, NextResponse } from "next/server";
 
-// import { verifyToken } from "./actions/auth";
-// import { generateId } from "./lib/util/util";
 // /**
 //  * Middleware to handle onboarding status.
 //  */
@@ -41,28 +39,6 @@
 //         url.searchParams.set("callbackUrl", pathname);
 
 //         return NextResponse.redirect(url);
-//     }
-
-//     // If cartId does not exist, generate one and set it in cookies
-//     if (!cartIdCookie) {
-//         const newCartId = generateId(); // Format similar to original Python function
-
-//         console.log("🛒 Generating new cartId:", newCartId);
-
-//         const response = NextResponse.next();
-
-//         response.cookies.set("_cart_id", newCartId, {
-//             maxAge: 60 * 60 * 24 * 7, // 7 days
-//             httpOnly: true,
-//             secure: process.env.NODE_ENV === "production", // Secure in production
-//             sameSite: "lax",
-//         });
-
-//         return response;
-//     }
-
-//     if (cartIdCookie) {
-//         return NextResponse.next();
 //     }
 
 //     const redirectPath = request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname;

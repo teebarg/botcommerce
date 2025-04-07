@@ -20,6 +20,13 @@ class CacheService:
     def __init__(self, redis: Redis):
         self.redis = redis
 
+    def ping(self) -> bool:
+        try:
+            return self.redis.ping()
+        except Exception as e:
+            logger.error(f"Error pinging Redis: {str(e)}")
+            return False
+
     def set(
         self,
         key: str,

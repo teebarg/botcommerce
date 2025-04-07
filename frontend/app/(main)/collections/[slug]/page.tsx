@@ -18,6 +18,7 @@ type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{
     page?: number;
     sortBy?: SortOptions;
+    brand_id?: string;
     cat_ids?: string;
     maxPrice?: string;
     minPrice?: string;
@@ -51,7 +52,7 @@ export async function generateStaticParams() {
 
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
     const user = await auth();
-    const { minPrice, maxPrice, cat_ids, page, sortBy } = (await searchParams) || {};
+    const { minPrice, maxPrice, brand_id, cat_ids, page, sortBy } = (await searchParams) || {};
     const { slug } = await params;
     const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
     const { data: collection } = await api.collection.getBySlug(slug).then((collection) => collection);
@@ -85,6 +86,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
         min_price: minPrice ?? 0,
         collections: collection?.slug,
         categories: cat_ids,
+        brand_id: brand_id,
     };
 
     const res = await api.product.search(queryParams);

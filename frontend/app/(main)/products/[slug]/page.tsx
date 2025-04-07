@@ -9,7 +9,6 @@ import ServerError from "@/components/server-error";
 import ProductView from "@/components/store/products/product-view";
 import { Skeleton } from "@/components/skeleton";
 import ReviewsSection from "@/components/product/product-reviews";
-import { Product } from "@/types/models";
 
 type Params = Promise<{ slug: string }>;
 
@@ -32,18 +31,6 @@ export async function generateMetadata({ params }: { params: Params }) {
     };
 }
 
-export async function generateStaticParams() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/?limit=100`).then((res) => res.json());
-
-    if (!res) {
-        return [];
-    }
-
-    return res.products.map((product: Product) => ({
-        slug: product.slug,
-    }));
-}
-
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
 
@@ -62,8 +49,8 @@ export default async function ProductPage({ params }: { params: Params }) {
             <ProductView product={product} />
 
             {/* ReviewSection */}
-            <Suspense fallback={<Skeleton className="h-44" />}>
-                <ReviewsSection product={product} />
+            <Suspense fallback={<Skeleton className="h-48" />}>
+                <ReviewsSection product_id={product.id} />
             </Suspense>
 
             <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products-container">

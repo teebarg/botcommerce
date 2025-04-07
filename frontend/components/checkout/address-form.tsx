@@ -32,7 +32,6 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
 
     const handleSubmit = async () => {
         setIsPending(true);
-        console.log(formData);
 
         const updateData: CartUpdate = {
             shipping_address: {
