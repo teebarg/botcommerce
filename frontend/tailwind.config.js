@@ -1,6 +1,6 @@
 const generateColorScale = (baseName) => {
     const scale = {};
-    const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+    const steps = [100, 500, 900];
 
     // Dynamically generate color scales
     steps.forEach((step) => {

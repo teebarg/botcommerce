@@ -5,10 +5,10 @@ import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
 
 import { siteConfig } from "@/lib/config";
-import Chip from "@/components/ui/chip";
 import { api } from "@/apis";
 import { Collection } from "@/types/models";
 import ServerError from "@/components/server-error";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
     title: `Children clothing | ${siteConfig.name} Store`,
@@ -57,7 +57,7 @@ export default async function CollectionsPage(props: { searchParams: SearchParam
                                     <div className="font-bold truncate max-w-32">{item?.name}</div>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <Chip color={item.is_active ? "success" : "danger"} title={item.is_active ? "Active" : "Inactive"} />
+                                    <Badge variant={item.is_active ? "success" : "destructive"}>{item.is_active ? "Active" : "Inactive"}</Badge>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">{new Date(item.created_at as string).toLocaleDateString()}</td>
                                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">

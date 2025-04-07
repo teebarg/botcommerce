@@ -7,8 +7,8 @@ import Image from "next/image";
 import CategoryAction from "./categories-control";
 
 import { cn } from "@/lib/util/cn";
-import Chip from "@/components/ui/chip";
 import { Category } from "@/types/models";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
     categories: Category[];
@@ -58,11 +58,9 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                             <Image fill alt={item.name} src={item.image} />
                                         </div>
                                     )}
-                                    <Chip
-                                        className="mr-2"
-                                        color={item.is_active ? "success" : "danger"}
-                                        title={item.is_active ? "active" : "inactive"}
-                                    />
+                                    <Badge className="mr-2" variant={item.is_active ? "success" : "destructive"}>
+                                        {item.is_active ? "active" : "inactive"}
+                                    </Badge>
                                 </div>
                                 <CategoryAction category={item} />
                             </div>
