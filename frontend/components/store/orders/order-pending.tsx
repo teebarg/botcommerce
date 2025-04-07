@@ -5,6 +5,7 @@ import { ArrowRight, Clock } from "nui-react-icons";
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
+import OrderAddress from "./order-address";
 
 import FadeInComponent from "@/components/fade-in-component";
 import { Order, PaymentStatus } from "@/types/models";
@@ -56,7 +57,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
                     <div className="space-y-3">
                         <div className="flex justify-between">
                             <span className="text-default-500">Bank Name</span>
-                            <span className="font-medium">GTBank Bank</span>
+                            <span className="font-medium">GTBank</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-default-500">Account Name</span>
@@ -83,10 +84,14 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
             </FadeInComponent>
 
             <FadeInComponent delay="500ms">
-                <OrderSummary order={order} />
+                <OrderAddress order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="600ms">
+                <OrderSummary order={order} />
+            </FadeInComponent>
+
+            <FadeInComponent delay="700ms">
                 <div className="mt-6">
                     <button
                         className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center"

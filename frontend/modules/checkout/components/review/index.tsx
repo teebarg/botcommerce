@@ -17,6 +17,10 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
 
     const previousStepsCompleted = cart?.shipping_address && cart?.shipping_method && cart?.payment_method;
 
+    if (!previousStepsCompleted || !isOpen) {
+        return null;
+    }
+
     return (
         <div>
             <h2
@@ -26,17 +30,13 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
             >
                 Review
             </h2>
-            {isOpen && previousStepsCompleted && (
-                <>
-                    <div className="w-full mt-1 mb-4">
-                        <p className="font-medium text-sm mb-1">
-                            By clicking the Place Order button, you confirm that you have read, understand and accept our Terms of Use, Terms of Sale
-                            and Returns Policy and acknowledge that you have read {siteConfig.name}&apos;s Privacy Policy.
-                        </p>
-                    </div>
-                    <PaymentButton cart={cart} data-testid="submit-order-button" isLoggedIn={!!customer} />
-                </>
-            )}
+            <div className="w-full mt-1 mb-4">
+                <p className="font-medium text-sm mb-1 text-default-600">
+                    By clicking the Place Order button, you confirm that you have read, understand and accept our Terms of Use, Terms of Sale and
+                    Returns Policy and acknowledge that you have read {siteConfig.name}&apos;s Privacy Policy.
+                </p>
+            </div>
+            <PaymentButton cart={cart} data-testid="submit-order-button" isLoggedIn={!!customer} />
         </div>
     );
 };

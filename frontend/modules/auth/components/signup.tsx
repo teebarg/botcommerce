@@ -3,12 +3,12 @@
 import React, { useActionState, useEffect, useState } from "react";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 
 import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import { signUp } from "@/actions/auth";
-import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 import SocialLoginButtons from "@/components/auth/social-login-buttons";
 
 type Props = {};
@@ -21,6 +21,7 @@ const SignUpForm: React.FC<Props> = () => {
         if (!state) return;
         if (state?.error) {
             toast.error(state.message);
+
             return;
         }
         toast.success("Please check your email to verify your account");
@@ -34,13 +35,13 @@ const SignUpForm: React.FC<Props> = () => {
                     <Input required autoComplete="given-name" data-testid="first-name-input" label="First name" name="first_name" />
                     <Input required autoComplete="family-name" data-testid="last-name-input" label="Last name" name="last_name" />
                     <Input
-                        wrapperClass="col-span-2"
                         required
                         autoComplete="email"
                         data-testid="email-input"
                         label="Email"
                         name="email"
                         type="email"
+                        wrapperClass="col-span-2"
                     />
                     <Input autoComplete="tel" data-testid="phone-input" label="Phone" name="phone" type="tel" />
                     <Input

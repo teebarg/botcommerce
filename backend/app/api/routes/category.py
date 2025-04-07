@@ -5,9 +5,10 @@ from app.core.deps import (get_current_user)
 from app.models.category import Categories, Category, CategoryCreate, CategoryUpdate
 from app.models.generic import Message
 from app.core.utils import slugify
-from fastapi import (APIRouter, Depends, HTTPException, Query)
+from fastapi import (APIRouter, Depends, HTTPException, Query, Request)
 from pydantic import BaseModel
 from app.core.storage import upload, delete_Image
+from app.core.decorators import cache
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
@@ -23,7 +24,7 @@ class Search(BaseModel):
 @router.get("/", dependencies=[])
 # @cache(key="categories")
 async def index(
-    # db: PrismaDb,
+    # request: Request,
     query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -32,7 +33,7 @@ async def index(
     Retrieve categories with Redis caching.
     """
     # Define the where clause based on query parameter
-    where_clause = None
+    where_clause = {"parent_id": None}
     if query:
         where_clause = {
             "OR": [

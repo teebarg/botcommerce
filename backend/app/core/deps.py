@@ -15,10 +15,14 @@ from app.models.generic import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
 from app.prisma_client import prisma
+from meilisearch import Client as MeilisearchClient
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
 )
+
+# Create once at startup
+meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
 
 
 # SessionDep = Annotated[Session, Depends(get_db)]

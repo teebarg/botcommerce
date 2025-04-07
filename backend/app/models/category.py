@@ -18,12 +18,16 @@ class Category(CategoryBase):
     subcategories: Optional[list["Category"]] = None
 
 
-class CategoryCreate(CategoryBase):
-    pass
+class CategoryCreate(BaseModel):
+    name: str = Field(..., min_length=1, description="Name is required")
+    is_active: bool = True
+    parent_id: Optional[int] = None
+    image: Optional[str] = None
 
 
 class CategoryUpdate(BaseModel):
     name: Optional[str] = None
+    is_active: Optional[bool] = None
     parent_id: Optional[int] = None
     image: Optional[str] = None
 

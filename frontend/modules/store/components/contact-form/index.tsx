@@ -29,7 +29,7 @@ export default function ContactForm() {
                 <Textarea required className="" label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
                 <div className="text-default-600">
                     <label>I allow this website to store my submission.</label>
-                    <Checkbox defaultChecked={true} name="agreement" />
+                    <Checkbox checked={true} name="agreement" />
                 </div>
                 <Button aria-label="submit" className="min-w-32" color="danger" isLoading={isPending} type="submit">
                     Submit

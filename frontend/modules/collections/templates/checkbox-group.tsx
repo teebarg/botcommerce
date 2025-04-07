@@ -68,20 +68,26 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
 
     return (
         <div>
-            <div className="flex items-center gap-1">
-                <Checkbox
-                    defaultChecked={dataSet.has(item.slug)}
-                    onCheckedChange={(checked) => handleParentChange(checked == "indeterminate" ? false : checked)}
-                />
-                <label className="capitalize">{groupName}</label>
+            <div className="flex items-center justify-between">
+                <div>
+                    <Checkbox
+                        checked={dataSet.has(item.slug)}
+                        onCheckedChange={(checked) => handleParentChange(checked == "indeterminate" ? false : checked)}
+                    />
+                    <label className="capitalize ml-1">{groupName}</label>
+                </div>
+                {facets?.categories && <span>({facets["categories"][groupName] ?? 0})</span>}
             </div>
             <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
                 {checkboxes?.map((checkbox) => (
                     <div key={`sub-${checkbox.slug}`} className="flex justify-between">
-                        <Checkbox
-                            defaultChecked={dataSet.has(checkbox.slug)}
-                            onCheckedChange={(checked) => handleChildChange(checked == "indeterminate" ? false : checked, checkbox.slug)}
-                        />
+                        <div>
+                            <Checkbox
+                                checked={dataSet.has(checkbox.slug)}
+                                onCheckedChange={(checked) => handleChildChange(checked == "indeterminate" ? false : checked, checkbox.slug)}
+                            />
+                            <label className="capitalize ml-1">{checkbox.name}</label>
+                        </div>
                         {facets?.categories && <span>({facets["categories"][checkbox.name] ?? 0})</span>}
                     </div>
                 ))}

@@ -125,9 +125,9 @@ export default async function Footer() {
                                                 >
                                                     {c.name}
                                                 </LocalizedClientLink>
-                                                {/* {children && (
+                                                {c.subcategories && c.subcategories?.length > 0 && (
                                                     <ul className="ml-4 space-y-1">
-                                                        {children?.map((child: Category) => (
+                                                        {c.subcategories?.map((child: Category) => (
                                                             <li key={child.id}>
                                                                 <LocalizedClientLink
                                                                     className="text-sm hover:opacity-80 transition-opacity text-default-500"
@@ -139,7 +139,7 @@ export default async function Footer() {
                                                             </li>
                                                         ))}
                                                     </ul>
-                                                )} */}
+                                                )}
                                             </li>
                                         );
                                     })}

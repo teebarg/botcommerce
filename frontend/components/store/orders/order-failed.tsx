@@ -5,6 +5,7 @@ import { AlertCircle, CreditCard } from "nui-react-icons";
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
+import OrderAddress from "./order-address";
 
 import { Order, PaymentStatus } from "@/types/models";
 import FadeInComponent from "@/components/fade-in-component";
@@ -65,10 +66,14 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
             </FadeInComponent>
 
             <FadeInComponent delay="500ms">
-                <OrderSummary order={order} />
+                <OrderAddress order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="600ms">
+                <OrderSummary order={order} />
+            </FadeInComponent>
+
+            <FadeInComponent delay="700ms">
                 <div className="mt-6 space-y-3">
                     <button
                         className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center"

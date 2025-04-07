@@ -9,6 +9,7 @@ import { ChevronRight } from "lucide-react";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
+import { api as baseApi } from "@/apis/base";
 import { Category, ProductSearch, WishItem } from "@/types/models";
 import ContactForm from "@/modules/store/components/contact-form";
 import { auth } from "@/actions/auth";
@@ -51,21 +52,13 @@ export const metadata: Metadata = {
     description: siteConfig.description,
 };
 
-// Helper function to fetch products
-const fetchProducts = async (collection: string, limit: number = 4) => {
-    const { data } = await api.product.search({ limit, page: 1, collections: collection });
-
-    return data?.products;
-};
-
 export default async function Home() {
     const user = await auth();
-    const [trending, latest, featured, catRes] = await Promise.all([
-        fetchProducts("trending"),
-        fetchProducts("latest"),
-        fetchProducts("featured", 6),
-        api.category.all({ limit: 4 }),
-    ]);
+    const { data } = await baseApi.get<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
+        "/product/landing-products",
+        { next: { tags: ["featured"] } }
+    );
+    const [catRes] = await Promise.all([api.category.all({ limit: 4 })]);
 
     const { categories } = catRes.data ?? {};
 
@@ -158,7 +151,7 @@ export default async function Home() {
                         <div className="col-span-3">
                             <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                                {featured?.map((product: ProductSearch, index: number) => (
+                                {data?.featured?.map((product: ProductSearch, index: number) => (
                                     <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                                 ))}
                             </div>
@@ -175,7 +168,7 @@ export default async function Home() {
                     <div className="max-w-8xl mx-auto relative px-1 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
-                            {trending?.map((product: ProductSearch, index: number) => (
+                            {data?.trending?.map((product: ProductSearch, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>
@@ -196,7 +189,7 @@ export default async function Home() {
                             items including clothes, shoes, and accessories for your little ones.`}
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
-                            {latest?.map((product: ProductSearch, index: number) => (
+                            {data?.latest?.map((product: ProductSearch, index: number) => (
                                 <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
                             ))}
                         </div>

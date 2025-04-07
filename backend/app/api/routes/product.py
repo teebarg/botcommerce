@@ -11,17 +11,19 @@ from fastapi import (
     HTTPException,
     Query,
     UploadFile,
+    Request
 )
 from app.core.decorators import cache
 from app.core.deps import (
     CacheService,
     CurrentUser,
     get_current_user,
+    meilisearch_client
 )
 from app.core.logging import logger
 from app.core.utils import slugify, url_to_list
 from app.models.product import Product, Products, SearchProducts
-from app.models.reviews import  Reviews
+from app.models.reviews import Reviews
 from app.models.generic import Message
 from app.models.product import (
     ImageUpload,
@@ -53,6 +55,40 @@ supabase: Client = create_client(supabase_url, supabase_key)
 
 # Create a router for products
 router = APIRouter()
+
+
+@router.get("/landing-products")
+@cache(key="featured")
+async def get_landing_products(request: Request):
+    """
+    Retrieve multiple product categories in a single request.
+    """
+    result = {}
+
+    for product_type in ["trending", "latest", "featured"]:
+        filters = [f"collections IN [{product_type}]"]
+        search_params = {
+            "limit": 6 if product_type == "featured" else 4,
+            "offset": 0,
+            "sort": ["created_at:desc"],
+            "filter": " AND ".join(filters) if filters else None,
+        }
+
+        try:
+            search_results = meilisearch_client.index('products').search(
+                "",
+                {
+                    **search_params
+                }
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Error searching products: {str(e)}"
+            )
+        result[product_type] = search_results["hits"]
+
+    return result
 
 
 @router.post("/export")
@@ -101,9 +137,7 @@ async def index(
             "OR": [
                 {"name": {"contains": query, "mode": "insensitive"}},
                 {"slug": {"contains": query, "mode": "insensitive"}},
-                {"description": {"contains": query, "mode": "insensitive"}},
-                {"sku": {"contains": query, "mode": "insensitive"}},
-                {"brand": {"name": {"contains": query, "mode": "insensitive"}}},
+                {"description": {"contains": query, "mode": "insensitive"}}
             ]
         }
     products = await db.product.find_many(
@@ -118,25 +152,26 @@ async def index(
             "tags": True,
             "variants": True,
             "images": True,
-            "reviews": { "include": { "user": True } },
+            # "reviews": {"include": {"user": True}},
         }
     )
     total = await db.product.count(where=where_clause)
     return {
-        "products":products,
-        "page":page,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
+        "products": products,
+        "page": page,
+        "limit": limit,
+        "total_pages": ceil(total/limit),
+        "total_count": total,
     }
 
 
-
 @router.get("/search")
-# @cache(key="search")
+@cache(key="search")
 async def search(
+    request: Request,
     search: str = "",
     sort: str = "created_at:desc",
+    brand_id: str = Query(default=""),
     categories: str = Query(default=""),
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
@@ -148,8 +183,9 @@ async def search(
     Retrieve products using Meilisearch, sorted by latest.
     """
     filters = []
-    # if tag:
-    #     filters.append(f"tag = '{tag}'")
+    if brand_id:
+        brands = brand_id.split(",")
+        filters.append(" OR ".join([f'brand = "{brand}"' for brand in brands]))
     if categories:
         filters.append(f"categories IN {url_to_list(categories)}")
     if collections:
@@ -168,7 +204,12 @@ async def search(
         search_params["filter"] = " AND ".join(filters)
 
     try:
-        search_results = search_documents(index_name="products", query=search, **search_params)
+        search_results = meilisearch_client.index('products').search(
+            search,
+            {
+                **search_params
+            }
+        )
     except Exception as e:
         raise HTTPException(
             status_code=400,
@@ -193,7 +234,7 @@ async def create_product(product: ProductCreate, cache: CacheService):
     slugified_name = slugify(product.name)
     sku = product.sku or f"SK{slugified_name}"
 
-    data={
+    data = {
         "name": product.name,
         "slug": slugified_name,
         "sku": sku,
@@ -202,7 +243,7 @@ async def create_product(product: ProductCreate, cache: CacheService):
         "old_price": product.old_price or 0,
         "status": product.status or ProductStatus.IN_STOCK,
         "brand": {"connect": {"id": product.brand_id}},
-    };
+    }
 
     # Prepare category connections if provided
     if product.category_ids:
@@ -240,8 +281,6 @@ async def create_product(product: ProductCreate, cache: CacheService):
         images_create = [{"url": str(url)} for url in product.images]
         data["images"] = {"create": images_create}
 
-
-
     # Create product with all related data
     created_product = await db.product.create(
         data=data,
@@ -269,19 +308,19 @@ async def create_product(product: ProductCreate, cache: CacheService):
 
 
 @router.get("/{slug}")
-# @cache(key="product", hash=False)
-async def read(slug: str) -> Product:
+@cache(key="product", hash=False)
+async def read(request: Request, slug: str):
     """
     Get a specific product by slug with Redis caching.
     """
     product = await db.product.find_unique(
         where={"slug": slug},
         include={
-            "brand": True,
+            # "brand": True,
             "variants": True,
             # "categories": True,
             "images": True,
-            "reviews": { "include": { "user": True } },
+            # "reviews": {"include": {"user": True}},
         }
     )
     if not product:
@@ -291,17 +330,14 @@ async def read(slug: str) -> Product:
 
 
 @router.get("/{id}/reviews")
-@cache(key="reviews", hash=False)
-async def read_reviews(id: str) -> Reviews:
+# @cache(key="reviews", hash=False)
+async def read_reviews(id: int):
     """
     Get a specific product reviews with Redis caching.
     """
-    review = await db.review.find_unique(where={"product_id": id})
-    if not review:
-        raise HTTPException(status_code=404, detail="Reviews not found")
+    reviews = await db.review.find_many(where={"product_id": id})
 
-    return review
-
+    return reviews
 
 
 @router.put("/{id}")
@@ -386,7 +422,8 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
         await db.product_image.delete_many(where={"product_id": id})
 
         # Create new images
-        image_creates = [{"url": str(url), "product_id": id} for url in product.images]
+        image_creates = [{"url": str(url), "product_id": id}
+                         for url in product.images]
         for image_data in image_creates:
             await db.product_image.create(data=image_data)
 
@@ -421,8 +458,8 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
         ) from e
 
 
-@router.delete("/{id}")
-async def delete_product(id: int, user=Depends(get_current_user))-> Message:
+@router.delete("/{id}", dependencies=[Depends(get_current_user)])
+async def delete_product(id: int) -> Message:
     """
     Delete a product.
     """
@@ -466,6 +503,7 @@ async def create_variant(id: int, variant: VariantWithStatus):
 
     return created_variant
 
+
 @router.put("/variants/{variant_id}")
 async def update_variant(variant_id: int, variant: VariantWithStatus):
     # Check if variant exists
@@ -498,12 +536,14 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
 
     return updated_variant
 
+
 @router.delete("/variants/{variant_id}")
 async def delete_variant(variant_id: int):
     # Delete the variant
     deleted_variant = await db.product_variant.delete(where={"id": variant_id})
 
     return deleted_variant
+
 
 @router.post("/upload-image")
 async def upload_image(image_data: ImageUpload):
@@ -533,7 +573,8 @@ async def upload_image(image_data: ImageUpload):
         )
 
     # Get public URL
-    public_url = supabase.storage.from_("product-images").get_public_url(unique_filename)
+    public_url = supabase.storage.from_(
+        "product-images").get_public_url(unique_filename)
 
     # Create image record in database
     image = await db.product_image.create(
@@ -544,6 +585,7 @@ async def upload_image(image_data: ImageUpload):
     )
 
     return image
+
 
 @router.delete("/images/{image_id}")
 async def delete_image(image_id: int):
@@ -599,7 +641,8 @@ async def upload_products(
         logger.info("Starting product upload processing...")
         try:
             asyncio.run(
-                process_products(file_content=contents, content_type=content_type, user_id=user.id)
+                process_products(file_content=contents,
+                                 content_type=content_type, user_id=user.id)
             )
 
             products = asyncio.run(db.product.find_many(
@@ -619,7 +662,6 @@ async def upload_products(
             )
         except Exception as e:
             logger.error(f"Error processing data from file: {e}")
-
 
         # crud.activities.create_product_upload_activity(
         #     db=db, user_id=user.id, filename=file.filename
@@ -670,7 +712,7 @@ async def configure_filterable_attributes(
         index = get_or_create_index("products")
         # Update the filterable attributes
         index.update_filterable_attributes(
-            ["brand", "categories", "collections", "name", "price", "slug"]
+            ["brand", "categories", "collections", "name", "price"]
         )
         # Update the sortable attributes
         index.update_sortable_attributes(["created_at", "price"])
@@ -724,11 +766,13 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     ]
     if product.brand:
         product_dict["brand"] = product.brand.name
-    product_dict["categories"] = [category.name for category in product.categories]
+    product_dict["categories"] = [
+        category.name for category in product.categories]
     product_dict["images"] = [image.image for image in product.images]
     product_dict["variants"] = [variant.dict() for variant in product.variants]
 
     return product_dict
+
 
 async def index_products(products, cache: CacheService):
     """
@@ -753,4 +797,4 @@ async def index_products(products, cache: CacheService):
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
     except Exception as e:
-        logger.error(f"Error during product reindexing: {e}")
+        logger.error(f"Error during product re-indexing: {e}")
