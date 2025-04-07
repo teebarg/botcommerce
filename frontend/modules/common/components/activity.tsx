@@ -137,7 +137,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                             {item.is_success && item.activity_type == "product_export" && (
                                                 <a
                                                     download
-                                                    className="flex items-center whitespace-nowrap font-normal overflow-hidden bg-success text-success-foreground ml-2 px-3 min-w-16 h-8 text-xs rounded-lg"
+                                                    className="flex items-center whitespace-nowrap font-normal overflow-hidden bg-success text-white ml-2 px-3 min-w-16 h-8 text-xs rounded-lg"
                                                     href={item.action_download_url}
                                                 >
                                                     Download

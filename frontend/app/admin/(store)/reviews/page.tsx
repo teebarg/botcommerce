@@ -4,11 +4,11 @@ import { Table } from "@modules/common/components/table";
 import { Actions } from "@modules/admin/components/actions";
 
 import { siteConfig } from "@/lib/config";
-import Chip from "@/components/ui/chip";
 import { ReviewForm } from "@/modules/admin/reviews/reviews-form";
 import { timeAgo } from "@/lib/util/util";
 import { api } from "@/apis";
 import { Review } from "@/types/models";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
     title: `Reviews Page | Children clothing | ${siteConfig.name} Store`,
@@ -52,7 +52,7 @@ export default async function ReviewsPage(props: { searchParams: SearchParams })
                                     <div className="font-bold truncate w-8">{item?.rating}</div>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <Chip color={item.verified ? "success" : "danger"} title={item.verified ? "verified" : "un-verified"} />
+                                    <Badge variant={item.verified ? "success" : "destructive"}>{item.verified ? "Verified" : "Un-verified"}</Badge>
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-4 text-sm">{timeAgo(item.created_at)}</td>
                                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">

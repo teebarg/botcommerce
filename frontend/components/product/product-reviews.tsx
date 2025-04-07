@@ -2,10 +2,11 @@ import React from "react";
 import { MessageSquare, Star } from "nui-react-icons";
 import { PencilLine } from "lucide-react";
 
+import { Badge } from "../ui/badge";
+
 import ReviewForm from "./review-form";
 
 import Progress from "@/components/ui/progress";
-import Chip from "@/components/ui/chip";
 import { timeAgo } from "@/lib/util/util";
 import { Review } from "@/types/models";
 import { auth } from "@/actions/auth";
@@ -109,7 +110,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product_id }) => {
                 <div>
                     <div className="flex items-center">
                         <span className="font-semibold mr-2">{review?.user?.first_name}</span>
-                        {review.verified && <Chip color="success" title="Verified" />}
+                        {review.verified && <Badge variant="success">Verified</Badge>}
                     </div>
                     <div className="flex">
                         {[...Array(5)].map((_, i) => (
@@ -128,7 +129,7 @@ const ReviewsSection: React.FC<Prop> = async ({ product_id }) => {
         <div className="bg-content1">
             <div className="px-4 py-8 max-w-7xl mx-auto w-full">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    Customer Reviews <Chip color="success" title="All from verified purchases" />
+                    Customer Reviews <Badge variant="success">All from verified purchases</Badge>
                 </h2>
                 <RatingBreakdown />
                 <div className="mb-8">{reviews?.slice(0, 5).map((review: Review, index: number) => <ReviewCard key={index} review={review} />)}</div>
