@@ -1,9 +1,10 @@
 import React from "react";
-import { siteConfig } from "@lib/config";
+import { getSiteConfig } from "@lib/config";
 
 import { BtnLink } from "@/components/ui/btnLink";
 
-const CareerOpportunities = () => {
+const CareerOpportunities = async () => {
+    const siteConfig = await getSiteConfig();
     const jobOpenings: { title: string; location: string }[] = [
         // { title: "Store Manager", location: "New York, NY" },
         // { title: "Sales Associate", location: "Los Angeles, CA" },

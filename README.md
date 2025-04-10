@@ -1,6 +1,6 @@
-# Botcommerce
+# Shop
 
-Botcommerce is an e-commerce platform that leverages modern web technologies to provide a seamless shopping experience. This project uses Next.js for the frontend and FastAPI for the backend.
+Shop is an e-commerce platform that leverages modern web technologies to provide a seamless shopping experience. This project uses Next.js for the frontend and FastAPI for the backend.
 
 ## Features
 
@@ -75,7 +75,7 @@ Botcommerce is an e-commerce platform that leverages modern web technologies to 
 
 ## Contributing
 
-We welcome contributions to Botcommerce! Please see our [Contributing Guide](CONTRIBUTING.md) for more details.
+We welcome contributions to Shop! Please see our [Contributing Guide](CONTRIBUTING.md) for more details.
 
 ## License
 

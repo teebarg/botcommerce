@@ -1,15 +1,16 @@
 import { Metadata } from "next";
 
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";
 
 export const metadata: Metadata = {
-    title: `Login In | ${siteConfig.name}`,
-    description: `Sign in to ${siteConfig.name} account`,
+    title: "Login In",
 };
 
-export default function Login() {
+export default async function Login() {
+    const siteConfig = await getSiteConfig();
+
     return (
         <>
             <h2 className="text-3xl font-semibold text-default-900 mb-2 text-center">{siteConfig.name}</h2>

@@ -5,13 +5,11 @@ import { Table } from "@modules/common/components/table";
 import { Actions } from "@modules/admin/components/actions";
 
 import { SiteConfigForm } from "@/modules/admin/siteconfigs/siteconfigs-form";
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
-    title: `SiteConfigs | ${siteConfig.name} Store`,
-    description: siteConfig.description,
+    title: "SiteConfigs",
 };
 
 export default async function SiteConfigsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {

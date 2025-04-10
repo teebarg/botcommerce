@@ -3,7 +3,6 @@ import React from "react";
 import { Table } from "@modules/common/components/table";
 import { Actions } from "@modules/admin/components/actions";
 
-import { siteConfig } from "@/lib/config";
 import { ReviewForm } from "@/modules/admin/reviews/reviews-form";
 import { timeAgo } from "@/lib/util/util";
 import { api } from "@/apis";
@@ -11,8 +10,7 @@ import { Review } from "@/types/models";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-    title: `Reviews Page | Children clothing | ${siteConfig.name} Store`,
-    description: siteConfig.description,
+    title: "Reviews",
 };
 
 type SearchParams = Promise<{

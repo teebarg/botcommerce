@@ -1,22 +1,15 @@
-import { Metadata } from "next";
 import Footer from "@modules/layout/templates/footer";
 import React from "react";
 import dynamic from "next/dynamic";
 
 import { BackButton } from "@/components/back";
 import Search from "@/modules/search/components/search";
-import ChatBot from "@/components/chatbot";
-import Navbar from "@/modules/layout/templates/nav";
 import ButtonNav from "@/components/bottom-navbar";
+import ChatBotWrapper from "@/components/chatbot";
+import Navbar from "@/modules/layout/templates/nav";
 
-const Banner = dynamic(() => import("@modules/common/components/banner"), { loading: () => <p>Loading...</p> });
+// const Banner = dynamic(() => import("@modules/common/components/banner"), { loading: () => <p>Loading...</p> });
 const Cookie = dynamic(() => import("@modules/store/components/cookie"));
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
-
-export const metadata: Metadata = {
-    metadataBase: new URL(BASE_URL),
-};
 
 export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
@@ -29,7 +22,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
             </div>
             <main className="flex-1 flex flex-col">{props.children}</main>
             <Cookie />
-            <ChatBot />
+            <ChatBotWrapper />
             <Footer />
             <ButtonNav />
         </div>

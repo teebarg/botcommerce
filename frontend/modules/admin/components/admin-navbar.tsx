@@ -3,7 +3,7 @@ import ActivityTray from "@modules/common/components/activity-tray";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
 import dynamic from "next/dynamic";
 
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 
@@ -13,6 +13,7 @@ const getThemeToggler = () =>
     });
 
 const AdminNavbar = async () => {
+    const siteConfig = await getSiteConfig();
     const user = await auth();
     const ThemeButton = getThemeToggler();
 

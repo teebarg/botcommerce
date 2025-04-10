@@ -24,14 +24,14 @@ services:
       - traefik.http.routers.traefik-dashboard.service=api@internal
 
   backend:
-    image: 'botcommerce-backend:${TAG-latest}'
-    container_name: botcommerce-backend
+    image: 'shop-backend:${TAG-latest}'
+    container_name: shop-backend
     labels:
       - traefik.enable=true
       # Route traffic on port 8000 to the backend service
-      - traefik.http.routers.botcommerce-backend-router.entrypoints=http
-      - traefik.http.routers.botcommerce-backend-router.rule=Host(`api.localhost`)
-      - traefik.http.services.botcommerce-backend-service.loadbalancer.server.port=8000
+      - traefik.http.routers.shop-backend-router.entrypoints=http
+      - traefik.http.routers.shop-backend-router.rule=Host(`api.localhost`)
+      - traefik.http.services.shop-backend-service.loadbalancer.server.port=8000
     networks:
       - traefik-network
     env_file:
@@ -46,14 +46,14 @@ services:
 
 
   frontend:
-    image: 'botcommerce-frontend:${TAG-latest}'
-    container_name: botcommerce-frontend
+    image: 'shop-frontend:${TAG-latest}'
+    container_name: shop-frontend
     labels:
       - traefik.enable=true
       # Route traffic on port 3000 to the frontend service
-      - traefik.http.routers.botcommerce-frontend-router.entrypoints=http
-      - traefik.http.routers.botcommerce-frontend-router.rule=Host(`store.localhost`)
-      - traefik.http.services.botcommerce-frontend-service.loadbalancer.server.port=3000
+      - traefik.http.routers.shop-frontend-router.entrypoints=http
+      - traefik.http.routers.shop-frontend-router.rule=Host(`store.localhost`)
+      - traefik.http.services.shop-frontend-service.loadbalancer.server.port=3000
     networks:
       - traefik-network
     depends_on:
@@ -71,7 +71,7 @@ services:
 
   meilisearch:
     image: getmeili/meilisearch:v1.5
-    container_name: botcommerce-meilisearch
+    container_name: shop-meilisearch
     environment:
       - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-masterKey}
       - MEILI_NO_ANALYTICS=true

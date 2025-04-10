@@ -5,17 +5,18 @@ import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 
-import { siteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import { signUp } from "@/actions/auth";
 import SocialLoginButtons from "@/components/auth/social-login-buttons";
+import { useStore } from "@/app/store/use-store";
 
 type Props = {};
 
 const SignUpForm: React.FC<Props> = () => {
     const [state, formAction, isPending] = useActionState(signUp, null);
     const [show, setShow] = useState<boolean>(false);
+    const { shopSettings } = useStore();
 
     useEffect(() => {
         if (!state) return;
@@ -64,7 +65,7 @@ const SignUpForm: React.FC<Props> = () => {
                     />
                 </div>
                 <span className="text-center text-default-500 text-xs mt-6">
-                    By creating an account, you agree to {siteConfig.name} Store&apos;s{" "}
+                    By creating an account, you agree to {shopSettings.shop_name} Store&apos;s{" "}
                     <LocalizedClientLink className="underline" href="/content/privacy-policy">
                         Privacy Policy
                     </LocalizedClientLink>{" "}

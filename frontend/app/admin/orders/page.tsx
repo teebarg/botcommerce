@@ -2,13 +2,11 @@ import { Metadata } from "next";
 import React from "react";
 
 import OrderList from "@/components/order/order-list";
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
-    title: `Children clothing | ${siteConfig.name} Store`,
-    description: siteConfig.description,
+    title: "Children clothing",
 };
 
 type SearchParams = Promise<{

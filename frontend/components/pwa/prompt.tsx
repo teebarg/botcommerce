@@ -16,6 +16,21 @@ function InstallPrompt() {
     const [isIOS, setIsIOS] = useState<boolean>(false);
     // const [isStandalone, setIsStandalone] = useState<boolean>(false);
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+    const [hasDismissed, setHasDismissed] = useState<boolean>(false);
+
+    const handleClose = () => {
+        setDeferredPrompt(null);
+        // do not show modal again until a new session
+        sessionStorage.setItem("deferredPrompt", "true");
+        setHasDismissed(true);
+    };
+
+    useEffect(() => {
+        // Set isOpen after hydration
+        const savedIsOpen = sessionStorage.getItem("deferredPrompt") === "true";
+
+        setHasDismissed(savedIsOpen);
+    }, []);
 
     useEffect(() => {
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
@@ -54,7 +69,7 @@ function InstallPrompt() {
         }
     };
 
-    if (!deferredPrompt) {
+    if (hasDismissed || !deferredPrompt) {
         return null; // Don't show install button if already installed
     }
 
@@ -63,11 +78,7 @@ function InstallPrompt() {
             <div className="fixed bottom-4 left-4 right-4 md:max-w-[25rem] z-50">
                 <div className="bg-content2 rounded-lg shadow-xl p-8">
                     {/* Close button */}
-                    <button
-                        aria-label="cancel"
-                        className="absolute top-2 right-2 text-default-500 hover:text-default-500/50"
-                        onClick={() => setDeferredPrompt(null)}
-                    >
+                    <button aria-label="cancel" className="absolute top-2 right-2 text-default-500 hover:text-default-500/50" onClick={handleClose}>
                         <Cancel className="h-6 w-6" />
                     </button>
 

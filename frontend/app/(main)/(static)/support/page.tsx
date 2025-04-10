@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { ChevronDown, Clock, Headphones, Mail, PhoneCall } from "nui-react-icons";
 
 import { cn } from "@/lib/util/cn";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 
-const SupportPage = () => {
+const FAQSection: React.FC = () => {
     const [activeSection, setActiveSection] = useState<number | null>(null);
 
     const faqSections = [
@@ -39,6 +39,39 @@ const SupportPage = () => {
         },
     ];
 
+    return (
+        <div className="max-w-4xl mx-auto w-full">
+            <h2 className="text-3xl font-serif font-bold text-center mb-8">Frequently Asked Questions</h2>
+
+            {faqSections.map((section, index: number) => (
+                <div key={index} className="mb-4">
+                    <button
+                        aria-label="open faq"
+                        className="w-full bg-default p-4 rounded-lg shadow-sm flex justify-between items-center hover:bg-default-100 transition"
+                        onClick={() => setActiveSection(activeSection === index ? null : index)}
+                    >
+                        <span className="text-xl font-semibold">{section.title}</span>
+                        <ChevronDown className={cn("transform transition-transform", { "rotate-180": activeSection === index })} />
+                    </button>
+
+                    {activeSection === index && (
+                        <div className="bg-default p-6 rounded-b-lg shadow-md">
+                            {section.questions.map((item, qIndex: number) => (
+                                <div key={qIndex} className="mb-4 last:mb-0">
+                                    <h4 className="font-semibold text-lg mb-2">{item.q}</h4>
+                                    <p className="text-default-500">{item.a}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const SupportPage = async () => {
+    const siteConfig = await getSiteConfig();
     const details = [
         {
             label: "Email Support",
@@ -76,33 +109,7 @@ const SupportPage = () => {
                 ))}
             </div>
 
-            <div className="max-w-4xl mx-auto w-full">
-                <h2 className="text-3xl font-serif font-bold text-center mb-8">Frequently Asked Questions</h2>
-
-                {faqSections.map((section, index: number) => (
-                    <div key={index} className="mb-4">
-                        <button
-                            aria-label="open faq"
-                            className="w-full bg-default p-4 rounded-lg shadow-sm flex justify-between items-center hover:bg-default-100 transition"
-                            onClick={() => setActiveSection(activeSection === index ? null : index)}
-                        >
-                            <span className="text-xl font-semibold">{section.title}</span>
-                            <ChevronDown className={cn("transform transition-transform", { "rotate-180": activeSection === index })} />
-                        </button>
-
-                        {activeSection === index && (
-                            <div className="bg-default p-6 rounded-b-lg shadow-md">
-                                {section.questions.map((item, qIndex: number) => (
-                                    <div key={qIndex} className="mb-4 last:mb-0">
-                                        <h4 className="font-semibold text-lg mb-2">{item.q}</h4>
-                                        <p className="text-default-500">{item.a}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
+            <FAQSection />
 
             <div className="bg-default mt-12 py-16 rounded-xl shadow-lg text-center">
                 <Headphones className="mx-auto mb-2 text-warning h-12 w-12" />

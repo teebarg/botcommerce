@@ -6,7 +6,7 @@ import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
 
 import PaymentButton from "@/modules/checkout/components/payment-button";
 import { BackButton } from "@/components/back";
-import { siteConfig } from "@/lib/config";
+import { getSiteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
@@ -17,8 +17,7 @@ import { auth } from "@/actions/auth";
 import ClientOnly from "@/components/client-only";
 
 export const metadata: Metadata = {
-    title: `Clothings | ${siteConfig.name} Store | Checkout`,
-    description: siteConfig.description,
+    title: "Checkout",
 };
 
 interface EmptyCartProps {}
@@ -39,6 +38,7 @@ const EmptyCart: React.FC<EmptyCartProps> = () => {
 };
 
 export default async function Checkout() {
+    const siteConfig = await getSiteConfig();
     const { data, error } = await api.cart.get();
     const user = await auth();
 
@@ -62,7 +62,7 @@ export default async function Checkout() {
                     </div>
                 </div>
                 {/* Header */}
-                <header className="flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
+                <header className="hidden md:flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
                     <LocalizedClientLink className="text-xl font-semibold" href="/">
                         {siteConfig.name}
                     </LocalizedClientLink>

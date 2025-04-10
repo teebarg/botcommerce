@@ -3,7 +3,7 @@
 
 .EXPORT_ALL_VARIABLES:
 
-PROJECT_SLUG := "botcommerce"
+PROJECT_SLUG := "shop"
 APP_NAME := $(PROJECT_SLUG)-backend
 DOCKER_HUB := beafdocker
 
@@ -71,7 +71,7 @@ prep: ## Prepare postges database
 
 prep-docker: ## Prepare postges database
 	@echo "$(YELLOW)Preparing docker database...$(RESET)"
-	docker exec botcommerce-backend ./scripts/prestart.sh
+	docker exec shop-backend ./scripts/prestart.sh
 
 serve-backend: ## Serve the backend in terminal
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
@@ -108,8 +108,8 @@ pre-commit:
 pre-commit-docker:
 	npx concurrently --kill-others-on-fail --prefix "[{name}]" --names "frontend:lint,frontend:test,frontend:build,backend:lint,backend:test" \
 	--prefix-colors "bgRed.bold.white,bgGreen.bold.white,bgBlue.bold.white,bgMagenta.bold.white" \
-    "docker exec botcommerce-frontend-1 npm run lint:check" \
-    "docker exec botcommerce-frontend-1 npm run test:unit" \
-    "docker exec botcommerce-frontend-1 npm run build" \
-	"docker exec botcommerce-backend-1 ./scripts/lint.sh" \
-	"docker exec botcommerce-backend-1 ./scripts/test.sh"
+    "docker exec shop-frontend-1 npm run lint:check" \
+    "docker exec shop-frontend-1 npm run test:unit" \
+    "docker exec shop-frontend-1 npm run build" \
+	"docker exec shop-backend-1 ./scripts/lint.sh" \
+	"docker exec shop-backend-1 ./scripts/test.sh"

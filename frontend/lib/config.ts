@@ -1,19 +1,37 @@
-export type SiteConfig = typeof siteConfig;
+// export type SiteConfig = typeof siteConfig;
 
-export const siteConfig = {
-    name: process.env.NEXT_PUBLIC_NAME,
-    description:
-        "Discover a wide range of high-quality products at unbeatable prices. Shop now for exclusive deals and fast shipping, ensuring a seamless shopping experience tailored just for you.",
-    contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
-    contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE,
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
-    links: {
-        github: "https://github.com/teebarg",
-        twitter: "https://twitter.com",
-        docs: "",
-        youtube: "https://youtube.com",
-        whatsapp: "https://youtube.com",
-    },
+import { getCookie } from "@/lib/util/server-utils";
+
+export const getSiteConfig = async () => {
+    let shopSettings: Record<string, string> = {};
+
+    try {
+        const cookie = (await getCookie("configs")) ?? "{}";
+
+        shopSettings = JSON.parse(cookie);
+    } catch {
+        shopSettings = {};
+    }
+
+    const siteConfig = {
+        name: shopSettings.shop_name || "E-Shop",
+        description:
+            "Discover a wide range of high-quality products at unbeatable prices. Shop now for exclusive deals and fast shipping, ensuring a seamless shopping experience tailored just for you.",
+        contactEmail: shopSettings.contact_email || "",
+        contactPhone: shopSettings.contact_phone || "",
+        shopEmail: shopSettings.shop_email || "",
+        baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+        links: {
+            facebook: `https://web.facebook.com/profile.php?id=${shopSettings.facebook}`,
+            instagram: `https://www.instagram.com/${shopSettings.instagram}`,
+            twitter: `https://twitter.com/${shopSettings.twitter}`,
+            x: `https://x.com/${shopSettings.x}`,
+            tiktok: `https://www.tiktok.com/@${shopSettings.tiktok}`,
+            whatsapp: `https://wa.me/${shopSettings.whatsapp}`,
+        },
+    };
+
+    return siteConfig;
 };
 
 export const openingHours = [

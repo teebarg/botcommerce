@@ -1,7 +1,8 @@
-import { siteConfig } from "@lib/config";
-import { Github, Youtube, Twitter, WhatsApp } from "nui-react-icons";
+import { getSiteConfig } from "@lib/config";
+import { Facebook, Twitter, WhatsApp } from "nui-react-icons";
 import Link from "next/link";
 import NewsletterForm from "@modules/store/components/newsletter";
+import { Instagram } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
@@ -47,6 +48,7 @@ const legal = [
 ];
 
 export default async function Footer() {
+    const siteConfig = await getSiteConfig();
     const collectionResponse = await api.collection.all({ limit: 6 });
 
     if (!collectionResponse.data) {
@@ -63,24 +65,24 @@ export default async function Footer() {
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="space-y-4 md:pr-8">
                         <div className="flex items-center justify-start">
-                            <span className="text-3xl font-semibold">{siteConfig.name}</span>
+                            <span className="text-3xl font-semibold">{siteConfig?.name}</span>
                         </div>
                         <p className="text-sm text-default-500">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
                         </p>
                         <div className="flex space-x-6">
-                            <Link aria-label="Twitter" href={siteConfig.links.twitter}>
-                                <Twitter className="text-default-500" size={34} />
+                            <Link aria-label="Twitter" href={siteConfig?.links?.facebook}>
+                                <Facebook className="text-default-500" size={34} />
                             </Link>
-                            <Link aria-label="Twitter" href={siteConfig.links.github}>
-                                <Github className="text-default-500" size={34} />
+                            <Link aria-label="Twitter" href={siteConfig?.links?.instagram}>
+                                <Instagram className="text-default-500" size={34} />
                             </Link>
-                            <Link aria-label="Twitter" href={siteConfig.links.youtube}>
+                            <Link aria-label="Twitter" href={siteConfig?.links?.tiktok}>
                                 <WhatsApp className="text-default-500" size={30} />
                             </Link>
-                            <Link aria-label="Twitter" href={siteConfig.links.youtube}>
-                                <Youtube className="text-default-500" size={34} />
+                            <Link aria-label="Twitter" href={siteConfig?.links?.x}>
+                                <Twitter className="text-default-500" size={34} />
                             </Link>
                         </div>
                     </div>
@@ -90,7 +92,7 @@ export default async function Footer() {
                                 <div>
                                     <h3 className="text-base font-semibold text-default-500">Collections</h3>
                                     <ul className="mt-2 space-y-1">
-                                        {collections?.slice(0, 6).map((c: any, index: any) => (
+                                        {collections?.slice(0, 6).map((c: any, index: number) => (
                                             <li key={index}>
                                                 <LocalizedClientLink
                                                     className="text-sm hover:opacity-80 transition-opacity text-default-500"
@@ -108,16 +110,9 @@ export default async function Footer() {
                             <div className="hidden md:block">
                                 <h3 className="text-base font-semibold text-default-500">Categories</h3>
                                 <ul className="mt-2 space-y-2" data-testid="footer-categories">
-                                    {categories?.map((c: Category) => {
-                                        // const children =
-                                        //     c.subcategories?.map((child: Category) => ({
-                                        //         name: child.name,
-                                        //         slug: child.slug,
-                                        //         id: child.id,
-                                        //     })) || null;
-
+                                    {categories?.map((c: Category, index: number) => {
                                         return (
-                                            <li key={c.id}>
+                                            <li key={index}>
                                                 <LocalizedClientLink
                                                     className="text-sm hover:opacity-80 transition-opacity text-default-500"
                                                     data-testid="category-link"
@@ -149,7 +144,7 @@ export default async function Footer() {
                         <div>
                             <h3 className="text-base font-semibold text-default-500">About Us</h3>
                             <ul className="mt-2 space-y-2">
-                                {about.map((item, index) => (
+                                {about.map((item, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink className="text-sm hover:opacity-80 transition-opacity text-default-500" href={item.to}>
                                             {item.label}
@@ -161,7 +156,7 @@ export default async function Footer() {
                         <div>
                             <h3 className="text-base font-semibold text-default-500">Legal</h3>
                             <ul className="mt-2 space-y-2">
-                                {legal.map((item, index) => (
+                                {legal.map((item, index: number) => (
                                     <li key={index}>
                                         <LocalizedClientLink className="text-sm hover:opacity-80 transition-opacity text-default-500" href={item.to}>
                                             {item.label}
@@ -183,7 +178,7 @@ export default async function Footer() {
                 </div>
                 <div className="flex flex-wrap justify-between gap-2 md:pt-8">
                     <p className="text-sm text-default-500">
-                        &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+                        &copy; {new Date().getFullYear()} {siteConfig?.name}. All rights reserved.
                     </p>
                 </div>
             </div>

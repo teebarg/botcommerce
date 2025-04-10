@@ -6,7 +6,6 @@ import { Exclamation } from "nui-react-icons";
 import InfiniteScrollClient from "./scroll-client2";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/server-error";
@@ -26,10 +25,7 @@ type Props = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-    const metadata = {
-        title: `Collections | ${siteConfig.name} Store`,
-        description: siteConfig.description,
-    } as Metadata;
+    const metadata = { title: "Collections" } as Metadata;
 
     return metadata;
 }

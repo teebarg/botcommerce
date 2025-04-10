@@ -5,7 +5,7 @@ import { getCookie } from "@/lib/util/server-utils";
 const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 type RequestOptions = RequestInit & {
-    params?: Record<string, string>;
+    params?: Record<string, string | number>;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
@@ -16,7 +16,8 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
-            url.searchParams.append(key, value);
+            if (!value || value === undefined) return;
+            url.searchParams.append(key, value.toString());
         });
     }
 
@@ -31,9 +32,11 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         ...options.headers,
     };
 
-    const response = await fetch(url.toString(), {
+    const response = await fetch(url, {
         ...restOptions,
         headers,
+        cache: options?.method == null || options?.method === "GET" ? "force-cache" : "no-store",
+        credentials: "include",
     });
 
     if (!response.ok) {
@@ -62,14 +65,25 @@ export const api = {
             })
         ),
 
-    put: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
-        request<T>(endpoint, {
-            ...options,
-            method: "PUT",
-            body: JSON.stringify(data),
-        }),
+    patch: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
+        tryCatch<T>(
+            request<T>(endpoint, {
+                ...options,
+                method: "PATCH",
+                body: JSON.stringify(data),
+            })
+        ),
 
-    delete: <T>(endpoint: string, options?: RequestOptions) => request<T>(endpoint, { ...options, method: "DELETE" }),
+    put: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
+        tryCatch<T>(
+            request<T>(endpoint, {
+                ...options,
+                method: "PUT",
+                body: JSON.stringify(data),
+            })
+        ),
+
+    delete: <T>(endpoint: string, options?: RequestOptions) => tryCatch<T>(request<T>(endpoint, { ...options, method: "DELETE" })),
 };
 
 // import axios from "axios";
