@@ -6,7 +6,6 @@ import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
 import SummaryMobile from "@/modules/cart/templates/summary-mobile";
 import RecommendedProducts from "@/modules/products/components/recommended";
-import { siteConfig } from "@/lib/config";
 import PromotionalBanner from "@/components/promotion";
 import { auth } from "@/actions/auth";
 import { api } from "@/apis";
@@ -15,8 +14,7 @@ import ServerError from "@/components/server-error";
 import CartItems from "@/components/order/cart-details";
 
 export const metadata: Metadata = {
-    title: `Cart | ${process.env.NEXT_PUBLIC_NAME} Store`,
-    description: siteConfig.description,
+    title: "Cart",
 };
 
 export default async function Cart() {

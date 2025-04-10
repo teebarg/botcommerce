@@ -257,7 +257,7 @@ async def google_oauth_url():
     auth_url = (
         "https://accounts.google.com/o/oauth2/v2/auth"
         f"?client_id={settings.GOOGLE_CLIENT_ID}"
-        f"&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
+        f"&redirect_uri={settings.FRONTEND_HOST}/auth/google/callback"
         "&response_type=code"
         "&scope=email profile"
         "&access_type=offline"
@@ -277,7 +277,7 @@ async def google_oauth_callback(payload: OAuthCallback) -> Token:
                 "client_id": settings.GOOGLE_CLIENT_ID,
                 "client_secret": settings.GOOGLE_CLIENT_SECRET,
                 "code": payload.code,
-                "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+                "redirect_uri": f"{settings.FRONTEND_HOST}/auth/google/callback",
                 "grant_type": "authorization_code",
             }
         )

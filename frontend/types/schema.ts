@@ -21,6 +21,8 @@ export const RoleSchema = z.enum(["admin", "customer"]);
 
 export const StatusSchema = z.enum(["pending", "active", "inactive"]);
 
+export const ShopSettingsTypeSchema = z.enum(["FEATURE", "SHOP_DETAIL", "CUSTOM"]);
+
 export const TokenSchema = z.object({
     access_token: z.string(),
     token_type: z.string().default("bearer"),
@@ -353,4 +355,16 @@ export const PaystackResponseSchema = z.object({
     trans: z.string(),
     transaction: z.string(),
     trxref: z.string(),
+});
+
+export const ShopSettingsSchema = z.object({
+    id: z.number(),
+    key: z.string(),
+    value: z.string().nullable(),
+    type: ShopSettingsTypeSchema,
+    category: z.string().nullable(),
+    description: z.string().nullable(),
+    is_public: z.boolean(),
+    created_at: z.string(),
+    updated_at: z.string(),
 });

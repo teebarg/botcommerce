@@ -4,15 +4,13 @@ import { Table } from "@modules/common/components/table";
 import { Actions } from "@modules/admin/components/actions";
 import { CollectionForm } from "@modules/admin/collections/collection-form";
 
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import { Collection } from "@/types/models";
 import ServerError from "@/components/server-error";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-    title: `Children clothing | ${siteConfig.name} Store`,
-    description: siteConfig.description,
+    title: "Collections",
 };
 
 type SearchParams = Promise<{

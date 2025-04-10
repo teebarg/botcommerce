@@ -24,7 +24,7 @@ jobs:
               id: meta
               uses: docker/metadata-action@v5
               with:
-                images: ${{ secrets.DOCKER_USERNAME }}/botcommerce-backend
+                images: ${{ secrets.DOCKER_USERNAME }}/shop-backend
                 tags: |
                   type=raw,value=latest
                   type=sha

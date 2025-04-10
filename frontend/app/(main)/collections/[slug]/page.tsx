@@ -7,7 +7,6 @@ import { Exclamation } from "nui-react-icons";
 import InfiniteScrollClient from "../scroll-client2";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import { auth } from "@/actions/auth";
@@ -32,10 +31,7 @@ export async function generateMetadata({ params }: { params: Params }) {
         notFound();
     }
 
-    return {
-        title: `${collection.name} | ${siteConfig.name} Store`,
-        description: `${collection.name} collection`,
-    } as Metadata;
+    return { title: collection.name } as Metadata;
 }
 
 export async function generateStaticParams() {

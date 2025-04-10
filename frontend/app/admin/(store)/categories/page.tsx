@@ -3,14 +3,12 @@ import { Metadata } from "next";
 import CategoryTree from "@modules/admin/categories/tree";
 import AddCategory from "@modules/admin/categories/add-categories";
 
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import { Category } from "@/types/models";
 import ServerError from "@/components/server-error";
 
 export const metadata: Metadata = {
-    title: `Children clothing | ${siteConfig.name} Store`,
-    description: siteConfig.description,
+    title: "Categories",
 };
 
 type SearchParams = Promise<{

@@ -3,7 +3,6 @@ import React, { Suspense } from "react";
 import RelatedProducts from "@modules/products/components/related-products";
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
 
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import ProductView from "@/components/store/products/product-view";
@@ -21,11 +20,11 @@ export async function generateMetadata({ params }: { params: Params }) {
     }
 
     return {
-        title: `${product.name} | ${siteConfig.name} Store`,
-        description: `${product.description}`,
+        title: product.name,
+        description: product.description,
         openGraph: {
-            title: `${product.name} | ${siteConfig.name} Store`,
-            description: `${product.description}`,
+            title: product.name,
+            description: product.description,
             images: product.image ? [product.image] : [],
         },
     };

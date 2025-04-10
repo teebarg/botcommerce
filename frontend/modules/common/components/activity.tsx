@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import Logo from "../icons/logo";
 
 import { Spinner } from "@/components/spinner";
+import { useStore } from "@/app/store/use-store";
 
 interface Props {
     activities: Activity[];
@@ -24,6 +25,7 @@ interface Activity {
 
 const Activity: React.FC<Props> = ({ activities, onRemove }) => {
     const [removing, setRemoving] = useState<number | string | null>(null);
+    const { shopSettings } = useStore();
 
     const removeActivity = async (id: string | number) => {
         setRemoving(id);
@@ -95,7 +97,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                 <div className="text-default-500 flex justify-between">
                                     <div className="flex items-center">
                                         <Logo className="mr-3" />
-                                        <span className="text-sm font-semibold">BotCommerce Store</span>
+                                        <span className="text-sm font-semibold">{shopSettings?.shop_name}</span>
                                     </div>
                                     <span>
                                         <div className="flex text-sm font-semibold">

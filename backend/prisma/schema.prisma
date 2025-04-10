@@ -432,3 +432,23 @@ model Favorite {
 
   @@map("favorites")
 }
+
+enum ShopSettingsType {
+  FEATURE
+  SHOP_DETAIL
+  CUSTOM
+}
+
+model ShopSettings {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique @db.VarChar(255)
+  value       String?  @db.Text
+  type        ShopSettingsType @default(FEATURE)
+  category    String?  @db.VarChar(100) // 'general', 'appearance', 'payment', etc.
+  description String?  @db.Text
+  is_public   Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("shop_settings")
+}

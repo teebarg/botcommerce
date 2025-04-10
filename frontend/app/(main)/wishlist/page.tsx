@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { Heart } from "nui-react-icons";
 
 import WishlistItem from "@/modules/common/components/wishlist";
-import { siteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/apis";
@@ -12,10 +11,7 @@ import { WishItem } from "@/types/models";
 export const revalidate = 3;
 
 export async function generateMetadata(): Promise<Metadata> {
-    const metadata = {
-        title: `Wishlist | ${siteConfig.name} Store`,
-        description: siteConfig.description,
-    } as Metadata;
+    const metadata = { title: "Wishlist" } as Metadata;
 
     return metadata;
 }

@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import React from "react";
 import { ArrowUpDown, Search } from "nui-react-icons";
 
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import { Brand } from "@/types/models";
@@ -15,8 +14,7 @@ import { Actions } from "@/components/brand/brand-actions";
 import { CreateBrand } from "@/components/brand/create-brand";
 
 export const metadata: Metadata = {
-    title: `Brands Page | Children clothing | ${siteConfig.name} Store`,
-    description: siteConfig.description,
+    title: "Brands",
 };
 
 type SearchParams = Promise<{

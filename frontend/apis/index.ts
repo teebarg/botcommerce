@@ -10,6 +10,7 @@ import { reviewsApi } from "./review";
 import { configApi } from "./config";
 import { addressApi } from "./address";
 import { paymentApi } from "./payment";
+import { shopSettingsApi } from "./shop-settings";
 
 export const api = {
     address: addressApi,
@@ -24,4 +25,5 @@ export const api = {
     product: productApi,
     review: reviewsApi,
     user: userApi,
+    shopSettings: shopSettingsApi,
 };

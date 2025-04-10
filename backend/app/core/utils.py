@@ -123,7 +123,7 @@ def send_email(
         html=html_content,
         mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
     )
-    smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT}
+    smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT, "debug": 1}
     if settings.SMTP_TLS:
         smtp_options["tls"] = True
     elif settings.SMTP_SSL:
@@ -203,17 +203,27 @@ def generate_data_export_email(download_link: str) -> EmailData:
 def generate_contact_form_email(
     name: str, email: str, phone: str, message: str
 ) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - New Contact Email"
+    subject = f"{settings.PROJECT_NAME} - New Contact Email"
+    # html_content = render_email_template(
+    #     template_name="contact_form.html",
+    #     context={
+    #         "project_name": settings.PROJECT_NAME,
+    #         "name": name,
+    #         "email": email,
+    #         "phone": phone,
+    #         "message": message,
+    #         "current_year": datetime.now().year,
+    #     },
+    # )
     html_content = render_email_template(
         template_name="contact_form.html",
         context={
-            "project_name": settings.PROJECT_NAME,
             "name": name,
             "email": email,
             "phone": phone,
             "message": message,
             "current_year": datetime.now().year,
+            **merge_metadata({"description": "New Contact Email"})
         },
     )
     return EmailData(html_content=html_content, subject=subject)

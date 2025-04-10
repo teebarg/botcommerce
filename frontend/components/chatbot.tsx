@@ -5,6 +5,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Minus, Send, Smiley, X } from "nui-react-icons";
 import { toast } from "sonner";
 
+import { useStore } from "@/app/store/use-store";
+
 interface Props {}
 
 interface Message {
@@ -19,6 +21,16 @@ const TypingIndicator = () => (
         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
     </div>
 );
+
+const ChatBotWrapper: React.FC = () => {
+    const { shopSettings } = useStore();
+
+    if (shopSettings?.feature_chatbot == "false") {
+        return null;
+    }
+
+    return <ChatBot />;
+};
 
 const ChatBot: React.FC<Props> = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -227,4 +239,4 @@ const ChatBot: React.FC<Props> = () => {
     );
 };
 
-export default ChatBot;
+export default ChatBotWrapper;

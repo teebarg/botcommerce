@@ -6,18 +6,23 @@ import { useState } from "react";
 import { Button } from "./button";
 
 import { formatDate } from "@/lib/util/util";
-import { siteConfig } from "@/lib/config";
+import { useStore } from "@/app/store/use-store";
 
 const WhatsAppWidget: React.FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
-    const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP;
+
+    const { shopSettings } = useStore();
+
+    if (!shopSettings?.whatsapp) {
+        return null;
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const encodedMessage = encodeURIComponent(message);
 
-        window.open(`https://api.whatsapp.com/send/?phone=${phoneNumber}&text=${encodedMessage}`, "_blank");
+        window.open(`https://api.whatsapp.com/send/?phone=${shopSettings?.whatsapp}&text=${encodedMessage}`, "_blank");
         setMessage("");
         setIsOpen(false);
     };
@@ -46,11 +51,11 @@ const WhatsAppWidget: React.FC = () => {
                                 </svg>
                             </div>
                             <div className="text-white">
-                                <h3 className="font-semibold text-lg">{siteConfig.name}</h3>
+                                <h3 className="font-semibold text-lg">{shopSettings?.shop_name}</h3>
                                 <p className="text-sm opacity-90">Typically replies within 10 minutes</p>
                             </div>
                         </div>
-                        <Button size="icon" variant="ghost" onClick={() => setIsOpen(false)}>
+                        <Button className="text-white" size="icon" variant="ghost" onClick={() => setIsOpen(false)}>
                             <X size={24} />
                         </Button>
                     </div>
@@ -58,7 +63,7 @@ const WhatsAppWidget: React.FC = () => {
                     {/* Chat Content */}
                     <div className="p-4 bg-[#E5DDD5]">
                         <div className="bg-white rounded-lg p-3 inline-block max-w-[80%]">
-                            <p className="text-gray-800">Hi, welcome to {siteConfig.name}, how can we help you today 😊</p>
+                            <p className="text-gray-800">Hi, welcome to {shopSettings?.shop_name}, how can we help you today 😊</p>
                             <p className="text-xs text-gray-500 text-right mt-1">{formatDate(new Date())}</p>
                         </div>
                     </div>
@@ -73,7 +78,7 @@ const WhatsAppWidget: React.FC = () => {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                             />
-                            <Button className="bg-[#075E54] hover:bg-[#128C7E] rounded-full" size="icon" type="submit" variant="ghost">
+                            <Button className="bg-[#075E54] hover:bg-[#128C7E] rounded-full text-white" size="icon" type="submit" variant="ghost">
                                 <Send className="h-5 w-5" />
                             </Button>
                         </div>
