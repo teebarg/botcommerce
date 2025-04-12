@@ -10,11 +10,12 @@ export const metadata: Metadata = {
 
 export default async function AdminSettingsPage() {
     const { data, error } = await api.shopSettings.all();
+    const { data: bankDetails } = await api.bank.getBankDetails();
 
     if (error) {
         console.error(error);
     }
     const settings = data || [];
 
-    return <SettingsPage settings={settings} />;
+    return <SettingsPage bankDetails={bankDetails || []} settings={settings} />;
 }

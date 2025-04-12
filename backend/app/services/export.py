@@ -70,7 +70,7 @@ async def export(data: list, name: str, email: str, columns: list) -> str:
         # download_url = blob.public_url
 
         # # Send email with download link
-        # email_data = generate_data_export_email(download_link=download_url)
+        # email_data = await generate_data_export_email(download_link=download_url)
         # send_email(
         #     email_to=email,
         #     subject=f"{name} Export Ready",

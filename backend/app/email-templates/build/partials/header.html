@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
     <head>
-        <title>Your E-Shop Email</title>
+        <title>{{ project_name }}</title>
         <!--[if !mso]><!-- -->
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <!--<![endif]-->
@@ -42,37 +42,39 @@
             }
             p {
                 display: block;
-                margin: 13px 0;
+                margin: 0;
             }
         </style>
         <style>
             /* Global Styles */
-            body,
+            /* body,
             table,
             td,
             a {
                 font-family: Arial, sans-serif;
-            }
+            } */
 
             body {
                 width: 100% !important;
-                color: #333
+                margin: 0;
+                padding: 0;
+                font-family: Arial, Helvetica, sans-serif;
+                color: #333333;
             }
 
             .container {
                 width: 100%;
                 max-width: 600px;
                 margin: auto;
-                /* background-color: black; */
-                background-color: #fafbfc;
+                /* background-color: #fafbfc; */
+                background-color: #f8fafc;
                 border-radius: 5px;
                 overflow: hidden;
             }
 
             /* Header */
             .header {
-                /* background-color: #1a1a1a; */
-                padding: 20px;
+                padding: 15px 20px 0;
                 text-align: center;
             }
 
@@ -83,7 +85,7 @@
             }
 
             .blue-bar {
-                height: 8px;
+                height: 10px;
                 background-color: #4285f4;
                 width: 100%;
                 display: block;
@@ -177,7 +179,7 @@
             <!-- Header -->
             <tr>
                 <td class="header">
-                    <a href="#" class="logo" style="color: #333">{{ project_name }}</a>
-                    <p style="color: #4B5563; margin-top: 10px">{{ description }}</p>
+                    <a href="{{ frontend_host }}" class="logo" style="color: #333">{{ project_name }}</a>
+                    <p style="color: #4B5563;">{{ description }}</p>
                 </td>
             </tr>

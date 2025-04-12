@@ -19,7 +19,7 @@ interface Props {
 
 const ProductView: React.FC<Props> = ({ product }) => {
     const [quantity, setQuantity] = useState<number>(1);
-    const [selectedImageId, setSelectedImageId] = useState<number>(product.images[0].id);
+    const [selectedImageId, setSelectedImageId] = useState<number>(product.images[0]?.id || 0);
     const [loading, setLoading] = useState<boolean>(false);
 
     // Find the selected image
@@ -105,7 +105,14 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </div>
                         <div className="flex-1">
                             <div className="h-[60vh] flex items-center justify-center p-4 relative">
-                                <Image fill alt={selectedImage.image} className="object-contain h-full w-full rounded" src={selectedImage.image} />
+                                {selectedImage && (
+                                    <Image
+                                        fill
+                                        alt={selectedImage.image}
+                                        className="object-contain h-full w-full rounded"
+                                        src={selectedImage.image}
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>

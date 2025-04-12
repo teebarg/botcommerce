@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { api } from "@/apis/base";
 import { Order } from "@/types/models";
 import PaymentLoading from "@/components/payment/payment-loading";
+import { deleteCookie } from "@/lib/util/cookie";
 
 export default function PaymentVerifyPage() {
     const router = useRouter();
@@ -30,6 +31,7 @@ export default function PaymentVerifyPage() {
 
                 return;
             }
+            await deleteCookie("_cart_id");
 
             toast.success("Payment verified successfully");
 

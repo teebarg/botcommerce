@@ -7,7 +7,7 @@
     </tr>
     {% for item in order.order_items %}
     <tr>
-        <td style="padding: 10px; border-bottom: 1px solid #dee2e6">{{ item.variant.name }}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #dee2e6">{{ item.name }}</td>
         <td style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6">
             <img src="{{item.image }}" alt="Product 1" style="max-width: 70px; height: auto" />
         </td>
@@ -16,16 +16,16 @@
     </tr>
     {% endfor %}
     <tr>
-        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Subtotal:</td>
-        <td style="padding: 10px; text-align: right">{{ order.subtotal | naira }}</td>
+        <td colspan="3" style="padding: 10px 10px 5px; text-align: right; font-weight: bold">Subtotal:</td>
+        <td style="padding: 10px 10px 5px; text-align: right">{{ order.subtotal | naira }}</td>
     </tr>
     <tr>
-        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Tax:</td>
-        <td style="padding: 10px; text-align: right">{{ order.tax | naira }}</td>
+        <td colspan="3" style="padding: 5px 10px; text-align: right; font-weight: bold">Tax:</td>
+        <td style="padding: 5px 10px; text-align: right">{{ order.tax | naira }}</td>
     </tr>
     <tr>
-        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Delivery Fee:</td>
-        <td style="padding: 10px; text-align: right">{{ order.shipping_fee | naira }}</td>
+        <td colspan="3" style="padding: 5px 10px; text-align: right; font-weight: bold">Delivery Fee:</td>
+        <td style="padding: 5px 10px; text-align: right">{{ order.shipping_fee | naira }}</td>
     </tr>
     <tr>
         <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Total:</td>

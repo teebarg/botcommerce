@@ -138,7 +138,7 @@ export async function updateBillingAddress(updateData: any) {
     }
 }
 
-export const getActivites = cache(async function (limit: number = 10) {
+export const getActivities = cache(async function (limit: number = 10) {
     const headers = await getHeaders(["activities"]);
 
     try {

@@ -323,7 +323,7 @@ const SideBar: React.FC = () => {
                         "!opacity-0 w-0": isCollapsed,
                     })}
                 >
-                    {shopSettings.shop_name}
+                    {shopSettings?.shop_name}
                 </h1>
                 <button
                     aria-label="open"

@@ -6,6 +6,8 @@ import * as z from "zod";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import ProductImageManager from "./product-image";
+
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -109,6 +111,7 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
 
     return (
         <div className="overflow-y-auto flex-1 flex flex-col">
+            {product?.id && <ProductImageManager initialImage={product?.image || ""} productId={product?.id || 0} />}
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="rounded-lg shadow-xl w-full h-full">
@@ -256,7 +259,7 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
                                     <FormItem className="md:col-span-2">
                                         <FormLabel>Brand</FormLabel>
                                         <FormControl>
-                                            <Select defaultValue={field.value.toString()} onValueChange={field.onChange}>
+                                            <Select defaultValue={field.value.toString()} onValueChange={(e) => field.onChange(Number(e))}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select brand" />
                                                 </SelectTrigger>

@@ -1,123 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Botcommerce Magic Link</title>
-    <!--[if mso]>
-    <style type="text/css">
-        table {border-collapse: collapse;}
-        .container {width: 600px;}
-    </style>
-    <![endif]-->
-</head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: Arial, Helvetica, sans-serif; color: #333333;">
-    <!-- Email Container -->
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="min-width: 100%; background-color: #f8fafc;">
-        <tr>
-            <td align="center" style="padding: 40px 0;">
-                <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);">
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #4a6cf7 0%, #3e5cd9 100%); padding: 30px 40px; text-align: center;">
-                            <h1 style="color: white; margin: 0; font-size: 26px; font-weight: 600;">Botcommerce</h1>
-                            <p style="color: white; margin: 10px 0 0 0; opacity: 0.9; font-size: 16px;">Your One-Click Magic Link</p>
-                        </td>
-                    </tr>
+{% include "partials/header.html" %}
+<tr>
+    <td style="padding: 20px">
+        <table>
+            <tr>
+                <td>
+                    <h2 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600">Hello {{first_name}},</h2>
 
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 40px;">
-                            <h2 style="margin: 0 0 20px 0; color: #1e293b; font-size: 22px; font-weight: 600;">Hello {{first_name}},</h2>
+                    <p style="margin: 0 0 10px 0; color: #475569; font-size: 16px; line-height: 1.6">
+                        You requested a secure login link for your {{project_name}} account. Click the button below to sign in immediately — no password
+                        needed!
+                    </p>
 
-                            <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px; line-height: 1.6;">You requested a secure login link for your Botcommerce account. Click the button below to sign in immediately — no password needed!</p>
+                    <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px; line-height: 1.6">
+                        This link will expire in <strong>10 minutes</strong> and can only be used once.
+                    </p>
 
-                            <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px; line-height: 1.6;">This link will expire in <strong>10 minutes</strong> and can only be used once.</p>
+                    <!-- Magic Link Button -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0">
+                        <tr>
+                            <td align="center">
+                                <table cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td style="background-color: #4a6cf7; border-radius: 8px; padding: 2px">
+                                            <a
+                                                href="{{magic_link}}"
+                                                target="_blank"
+                                                style="
+                                                    display: inline-block;
+                                                    min-width: 160px;
+                                                    font-family: Arial, sans-serif;
+                                                    font-size: 16px;
+                                                    font-weight: 600;
+                                                    color: #ffffff;
+                                                    text-align: center;
+                                                    text-decoration: none;
+                                                    background-color: #4a6cf7;
+                                                    border-radius: 6px;
+                                                    padding: 12px 30px;
+                                                    border: 2px solid #4a6cf7;
+                                                "
+                                                >Sign In Securely</a
+                                            >
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
 
-                            <!-- Magic Link Button -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <table cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td style="background-color: #4a6cf7; border-radius: 8px; padding: 2px;">
-                                                    <a href="{{magic_link}}" target="_blank" style="display: inline-block; min-width: 160px; font-family: Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-align: center; text-decoration: none; background-color: #4a6cf7; border-radius: 6px; padding: 12px 30px; border: 2px solid #4a6cf7;">Sign In Securely</a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
+                    <!-- Alternative Link -->
+                    <p style="margin: 30px 0 15px 0; color: #475569; font-size: 15px; line-height: 1.6">
+                        If the button doesn't work, copy and paste this link into your browser:
+                    </p>
 
-                            <!-- Alternative Link -->
-                            <p style="margin: 30px 0 15px 0; color: #475569; font-size: 15px; line-height: 1.6;">If the button doesn't work, copy and paste this link into your browser:</p>
+                    <p
+                        style="
+                            margin: 0 0 30px 0;
+                            padding: 12px 15px;
+                            background-color: #f1f5f9;
+                            border-radius: 6px;
+                            word-break: break-all;
+                            font-size: 14px;
+                            color: #6b7280;
+                            line-height: 1.4;
+                            font-family: monospace;
+                        "
+                    >
+                        {{magic_link}}
+                    </p>
 
-                            <p style="margin: 0 0 30px 0; padding: 12px 15px; background-color: #f1f5f9; border-radius: 6px; word-break: break-all; font-size: 14px; color: #6b7280; line-height: 1.4; font-family: monospace;">{{magic_link}}</p>
-
-                            <p style="margin: 0 0 10px 0; color: #475569; font-size: 16px; line-height: 1.6;">Not expecting this email? You can safely ignore it. Someone may have entered your email address by mistake.</p>
-                        </td>
-                    </tr>
-
-                    <!-- Divider -->
-                    <tr>
-                        <td>
-                            <hr style="height: 1px; border: none; background-color: #e2e8f0; margin: 0;">
-                        </td>
-                    </tr>
-
-                    <!-- Customer Support Section -->
-                    <tr>
-                        <td style="padding: 30px 40px; text-align: center;">
-                            <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 600;">Need Help?</h3>
-                            <p style="margin: 0 0 20px 0; color: #64748b; font-size: 15px; line-height: 1.5;">Our support team is ready to assist you with any questions.</p>
-                            <a href="mailto:support@botcommerce.com" style="color: #4a6cf7; text-decoration: none; font-weight: 600;">support@botcommerce.com</a>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #f8fafc; padding: 30px 40px; text-align: center;">
-                            <img src="https://via.placeholder.com/100x40" alt="Botcommerce Logo" style="max-width: 100px; height: auto; margin-bottom: 20px;">
-
-                            <p style="margin: 0 0 15px 0; color: #64748b; font-size: 14px; line-height: 1.5;">You're receiving this email because you requested a magic link to sign in to your Botcommerce account.</p>
-
-                            <!-- Social Media Icons -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <table cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td style="padding: 0 8px;">
-                                                    <a href="#" target="_blank" style="display: inline-block; width: 32px; height: 32px; background-color: #f1f5f9; border-radius: 50%; text-align: center; line-height: 32px;">
-                                                        <!-- Twitter/X Icon -->
-                                                        <img src="https://via.placeholder.com/20" alt="Twitter" style="width: 16px; height: 16px; margin-top: 8px;">
-                                                    </a>
-                                                </td>
-                                                <td style="padding: 0 8px;">
-                                                    <a href="#" target="_blank" style="display: inline-block; width: 32px; height: 32px; background-color: #f1f5f9; border-radius: 50%; text-align: center; line-height: 32px;">
-                                                        <!-- Facebook Icon -->
-                                                        <img src="https://via.placeholder.com/20" alt="Facebook" style="width: 16px; height: 16px; margin-top: 8px;">
-                                                    </a>
-                                                </td>
-                                                <td style="padding: 0 8px;">
-                                                    <a href="#" target="_blank" style="display: inline-block; width: 32px; height: 32px; background-color: #f1f5f9; border-radius: 50%; text-align: center; line-height: 32px;">
-                                                        <!-- Instagram Icon -->
-                                                        <img src="https://via.placeholder.com/20" alt="Instagram" style="width: 16px; height: 16px; margin-top: 8px;">
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin: 0; color: #94a3b8; font-size: 13px; line-height: 1.5;">&copy; 2025 Botcommerce. All rights reserved.</p>
-                            <p style="margin: 10px 0 0 0; color: #94a3b8; font-size: 13px; line-height: 1.5;">123 Commerce St, Shopping City, SC 12345</p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+                    <p style="margin: 0 0 10px 0; color: #475569; font-size: 16px; line-height: 1.6">
+                        Not expecting this email? You can safely ignore it. Someone may have entered your email address by mistake.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+{% include "partials/footer.html" %}

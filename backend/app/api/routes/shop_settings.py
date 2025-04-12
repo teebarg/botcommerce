@@ -92,9 +92,7 @@ async def sync_shop_details(form_data: dict[str, Any]):
                     "create": {
                         "key": key,
                         "value": str(value),
-                        "category": "general",
                         "type": "SHOP_DETAIL",  # or whatever fits
-                        "is_public": True,
                     },
                     "update": {
                         "value": value

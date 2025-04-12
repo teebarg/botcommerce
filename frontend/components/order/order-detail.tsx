@@ -168,11 +168,11 @@ const OrderDetail = () => {
                         <div key={idx} className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                                 <div className="h-12 w-12 relative rounded-md">
-                                    <Image fill alt={item.variant.name} src={item.image ?? ""} />
+                                    <Image fill alt={item.name} src={item.image ?? ""} />
                                 </div>
                                 <div>
-                                    <p className="font-medium">{item.variant.name}</p>
-                                    <p className="text-sm text-muted-foreground">SKU: {item.variant.sku}</p>
+                                    <p className="font-medium">{item.name}</p>
+                                    {/* <p className="text-sm text-muted-foreground">SKU: {item.variant.sku}</p> */}
                                 </div>
                             </div>
                             <div className="text-right">

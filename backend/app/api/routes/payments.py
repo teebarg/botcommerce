@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from app.core.config import settings
 from app.schemas.payment import (
     PaymentInitialize,
@@ -80,7 +80,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}", response_model=OrderResponse)
-async def verify_payment(reference: str, user: CurrentUser, order_service: OrderService = Depends(get_order_service)):
+async def verify_payment(background_tasks: BackgroundTasks, reference: str, user: CurrentUser, order_service: OrderService = Depends(get_order_service)):
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -100,7 +100,7 @@ async def verify_payment(reference: str, user: CurrentUser, order_service: Order
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await order_service.create_order(order_in=order_in, user_id=user.id, cart_number=cart_number)
+            order = await order_service.create_order(order_in=order_in, user_id=user.id, cart_number=cart_number, background_tasks=background_tasks)
 
             # Create payment record
             await db.payment.create(

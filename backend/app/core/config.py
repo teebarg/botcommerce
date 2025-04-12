@@ -27,7 +27,6 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     SECRET_KEY: str = "specialsecret"
 
-    PROJECT_NAME: str
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     DATABASE_URL: str = ""
 
@@ -114,9 +113,6 @@ class Settings(BaseSettings):
     # OAuth Settings
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
-
-    FACEBOOK: str = ""
-    INSTAGRAM: str = ""
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

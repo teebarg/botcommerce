@@ -6,9 +6,6 @@ class ShopSettingsBase(BaseModel):
     key: str = Field(..., min_length=1, max_length=255)
     value: Optional[str] = None
     type: Literal["FEATURE", "SHOP_DETAIL", "CUSTOM"] = "CUSTOM"
-    category: Optional[str] = Field(None, max_length=100)
-    description: Optional[str] = None
-    is_public: bool = False
 
 class ShopSettingsCreate(ShopSettingsBase):
     pass

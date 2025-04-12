@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
@@ -15,6 +16,7 @@ type Props = {
 const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
     const [email, setEmail] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const searchParams = useSearchParams();
 
     const sendLink = async () => {
         if (!email) {
@@ -23,7 +25,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
             return;
         }
         setLoading(true);
-        const { data, error } = await api.auth.requestMagicLink(email, callbackUrl);
+        const { data, error } = await api.auth.requestMagicLink(email, (callbackUrl || searchParams.get("callbackUrl")) ?? "/");
 
         if (error) {
             toast.error(error);
@@ -62,7 +64,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                 </Button>
             </div>
             <hr className="tb-divider my-6" />
-            <SocialLoginButtons />
+            <SocialLoginButtons callbackUrl={callbackUrl} />
         </React.Fragment>
     );
 };

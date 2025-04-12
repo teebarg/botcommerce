@@ -60,49 +60,27 @@ export function FeatureToggles({ toggles }: FeatureTogglesProps) {
     const handleToggle = async (featureKey: string, checked: boolean) => {
         setIsLoading((prev) => ({ ...prev, [featureKey]: true }));
 
-        // Check if the feature already exists
-        const existingToggle = toggles.find((t) => t.key === featureKey);
+        const { error } = await api.shopSettings.syncShopDetails({
+            [featureKey]: checked.toString(),
+        });
 
-        if (existingToggle) {
-            // Update existing toggle
-            const { error } = await api.shopSettings.update(existingToggle.id, {
-                key: featureKey,
-                value: checked.toString(),
-                is_public: checked,
-            });
-
-            if (error) {
-                toast.error("Failed to update feature");
-            } else {
-                toast.success("Feature updated successfully");
-            }
+        if (error) {
+            toast.error("Failed to update feature");
         } else {
-            // Create new toggle
-            const { error } = await api.shopSettings.create({
-                key: featureKey,
-                value: checked.toString(),
-                type: "FEATURE",
-                is_public: true,
-            });
-
-            if (error) {
-                toast.error("Failed to update feature");
-            } else {
-                toast.success("Feature updated successfully");
-            }
+            toast.success("Feature updated successfully");
         }
+
         setIsLoading((prev) => ({ ...prev, [featureKey]: false }));
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 py-4">
             {defaultFeatures.map((feature) => {
                 const existingToggle = toggles.find((t) => t.key === feature.key);
-                // const isEnabled = existingToggle ? existingToggle.value === "true" : false;
-                const isEnabled = existingToggle ? existingToggle.is_public : false;
+                const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
                 return (
-                    <div key={feature.key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div key={feature.key} className="flex items-center justify-between p-4 bg-background rounded-lg">
                         <div>
                             <h3 className="font-medium">{feature.label}</h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400">{feature.description}</p>

@@ -47,6 +47,7 @@ import {
     AddressTypeSchema,
     ShopSettingsTypeSchema,
     ShopSettingsSchema,
+    BankDetailsSchema,
 } from "./schema";
 
 export type Facet = z.infer<typeof FacetSchema>;
@@ -102,6 +103,7 @@ export type Status = z.infer<typeof StatusSchema>;
 export type AddressType = z.infer<typeof AddressTypeSchema>;
 export type ShopSettingsType = z.infer<typeof ShopSettingsTypeSchema>;
 export type ShopSettings = z.infer<typeof ShopSettingsSchema>;
+export type BankDetails = z.infer<typeof BankDetailsSchema>;
 
 export type PaystackResponse = z.infer<typeof PaystackResponseSchema>;
 

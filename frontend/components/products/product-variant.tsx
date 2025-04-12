@@ -19,6 +19,7 @@ import { api } from "@/apis";
 interface ProductVariantsProps {
     variants: ProductVariant[];
     productId: number;
+    productImage: string;
 }
 
 const variantFormSchema = z.object({
@@ -35,7 +36,7 @@ const variantFormSchema = z.object({
     }),
 });
 
-const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants = [] }) => {
+const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, productId, variants = [] }) => {
     const router = useRouter();
     const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
     const [showForm, setShowForm] = useState<boolean>(false);
@@ -58,13 +59,14 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
             if (editingVariant?.id) {
                 api.product.updateVariant({ ...values, id: editingVariant.id });
             } else {
-                api.product.createVariant({ productId, ...values });
+                api.product.createVariant({ productId, image: productImage, ...values });
             }
-            setShowForm(false);
         } catch (error) {
             toast.error(`Error - ${error as string}`);
         } finally {
+            setShowForm(false);
             setLoading(false);
+            form.reset();
         }
     }
 

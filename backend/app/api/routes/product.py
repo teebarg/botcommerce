@@ -38,7 +38,6 @@ from app.services.meilisearch import (
     delete_document,
     delete_index,
     get_or_create_index,
-    search_documents,
     update_document,
 )
 from app.services.run_sheet import generate_excel_file, process_products
@@ -47,6 +46,8 @@ from app.core.config import settings
 from app.prisma_client import prisma as db
 from math import ceil
 from prisma.enums import ProductStatus
+from pydantic import BaseModel
+from app.core.storage import upload, delete_Image
 
 # Initialize Supabase client
 supabase_url = settings.SUPABASE_URL
@@ -269,6 +270,7 @@ async def create_product(product: ProductCreate, cache: CacheService):
             variants_create.append({
                 "name": variant.name,
                 "slug": variant_slug,
+                "image": variant.image,
                 "sku": f"SK{variant_slug}",
                 "price": variant.price,
                 "inventory": variant.inventory
@@ -388,6 +390,8 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
                     variant_data["name"] = variant.name
                     variant_data["slug"] = slugify(variant.name)
                     variant_data["sku"] = f"SK{slugify(variant.name)}"
+                if variant.image:
+                    variant_data["image"] = variant.image
                 if variant.price:
                     variant_data["price"] = variant.price
                 if variant.inventory is not None:
@@ -406,6 +410,7 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
                         "create": {
                             "name": variant.name,
                             "slug": slug,
+                            "image": variant.image,
                             "sku": f"SK{slug}",
                             "price": variant.price or 0,
                             "inventory": variant.inventory or 0
@@ -489,11 +494,12 @@ async def create_variant(id: int, variant: VariantWithStatus):
     slug = slugify(variant.name)
 
     # Create the variant
-    created_variant = await db.product_variant.create(
+    created_variant = await db.productvariant.create(
         data={
             "name": variant.name,
             "slug": slug,
             "sku": variant.sku or f"SK{slug}",
+            "image": variant.image,
             "price": variant.price,
             "inventory": variant.inventory,
             "product_id": id,
@@ -543,6 +549,39 @@ async def delete_variant(variant_id: int):
     deleted_variant = await db.product_variant.delete(where={"id": variant_id})
 
     return deleted_variant
+
+
+class ImageUpload(BaseModel):
+    file: str  # Base64 encoded file
+    file_name: str
+    content_type: str
+
+
+@router.patch("/{id}/image")
+async def add_image(id: int, image_data: ImageUpload) -> Product:
+    """
+    Add an image to a product.
+    """
+    product = await db.product.find_unique(
+        where={"id": id}
+    )
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    try:
+        image_url = upload(bucket="product-images", data=image_data)
+
+        # Update product with new image URL
+        return await db.product.update(
+            where={"id": id},
+            data={"image": image_url}
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to upload image: {str(e)}"
+        )
 
 
 @router.post("/upload-image")
@@ -637,15 +676,12 @@ async def upload_products(
     contents = await file.read()
 
     # Define the background task
-    def update_task():
+    async def update_task():
         logger.info("Starting product upload processing...")
         try:
-            asyncio.run(
-                process_products(file_content=contents,
-                                 content_type=content_type, user_id=user.id)
-            )
+            await process_products(file_content=contents, content_type=content_type, user_id=user.id)
 
-            products = asyncio.run(db.product.find_many(
+            products = await db.product.find_many(
                 include={
                     # "variants": True,
                     "categories": True,
@@ -654,12 +690,10 @@ async def upload_products(
                     "images": True,
                     # "reviews": { "include": { "user": True } },
                 }
-            ))
+            )
 
             # Re-index
-            asyncio.run(
-                index_products(products=products, cache=cache)
-            )
+            await index_products(products=products, cache=cache)
         except Exception as e:
             logger.error(f"Error processing data from file: {e}")
 

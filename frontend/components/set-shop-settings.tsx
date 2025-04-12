@@ -13,7 +13,7 @@ const SetShopSettings = ({ shopSettings }: SetShopSettingsProps) => {
     const { setShopSettings } = useStore();
 
     useEffect(() => {
-        setShopSettings(shopSettings);
+        setShopSettings(shopSettings ?? {});
         setCookie("configs", JSON.stringify(shopSettings));
     }, [shopSettings]);
 

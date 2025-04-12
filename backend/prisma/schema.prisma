@@ -202,6 +202,7 @@ model ProductVariant {
   product_id  Int
   name        String   @unique
   slug        String   @unique
+  image       String?
   sku         String   @unique
   status      ProductStatus   @default(IN_STOCK)
   price       Float     @db.DoublePrecision
@@ -303,6 +304,7 @@ model Order {
 // OrderItem Model
 model OrderItem {
   id           Int            @id @default(autoincrement())
+  name         String?
   order        Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
   order_id     Int
   variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
@@ -377,6 +379,8 @@ model Cart {
 // CartItem Model (New)
 model CartItem {
   id           Int            @id @default(autoincrement())
+  name         String?
+  slug         String?
   cart         Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
   cart_id      Int
   variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: Cascade)
@@ -444,11 +448,20 @@ model ShopSettings {
   key         String   @unique @db.VarChar(255)
   value       String?  @db.Text
   type        ShopSettingsType @default(FEATURE)
-  category    String?  @db.VarChar(100) // 'general', 'appearance', 'payment', etc.
-  description String?  @db.Text
-  is_public   Boolean  @default(false)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
   @@map("shop_settings")
+}
+
+model BankDetails {
+  id              Int       @id @default(autoincrement())
+  bank_name       String    @db.VarChar(255)
+  account_name    String    @db.VarChar(255)
+  account_number  String    @db.VarChar(255) @unique
+  is_active       Boolean   @default(true)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@map("bank_details")
 }

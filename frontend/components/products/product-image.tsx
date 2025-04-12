@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
@@ -5,26 +7,23 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Trash } from "nui-react-icons";
 
-import { ProductImage } from "@/types/models";
 import { api } from "@/apis";
 
 interface ProductImageManagerProps {
     productId: number;
-    initialImages?: ProductImage[];
+    initialImage?: string;
 }
 
-const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, initialImages = [] }) => {
+const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, initialImage = "" }) => {
     const router = useRouter();
-    const [imageId, setImageId] = useState<number>();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isUploading, setIsUploading] = useState<boolean>(false);
 
-    const deleteImage = (id: number) => {
+    const deleteImage = () => {
         setIsDeleting(true);
-        setImageId(id);
         void (async () => {
             try {
-                await api.product.deleteImage(id);
+                await api.product.deleteImage(productId);
                 toast.success("Image deleted successfully");
                 router.refresh();
             } catch (error) {
@@ -46,27 +45,35 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
 
             if (!file) return;
 
-            const formData = new FormData();
+            const reader = new FileReader();
 
-            formData.append("file", file);
-            formData.append("batch", "batch1");
+            reader.onload = (e) => {
+                const base64 = reader.result as string;
+                const fileName = `images/${Date.now()}-${file.name}`;
 
-            void (async () => {
-                try {
-                    await api.product.uploadImages({ id: productId, formData });
-                    toast.success("Image uploaded successfully");
-                    router.refresh();
-                } catch (error) {
-                    toast.error(`Error - ${error as string}`);
-                } finally {
-                    setIsUploading(false);
-                }
-            })();
+                void (async () => {
+                    try {
+                        await api.product.uploadImage({
+                            id: productId,
+                            data: {
+                                file: base64.split(",")[1]!, // Remove the data URL prefix
+                                file_name: fileName,
+                                content_type: file.type,
+                            },
+                        });
+
+                        toast.success("Image uploaded successfully");
+                    } catch (error) {
+                        toast.error(`Error - ${error as string}`);
+                    }
+                })();
+            };
+            reader.readAsDataURL(file);
         },
     });
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-md">
             {/* Upload Area */}
             <div
                 {...getRootProps()}
@@ -90,34 +97,30 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
                 </div>
             </div>
 
-            {/* Image Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {initialImages.map((image: ProductImage, idx: number) => (
-                    <div key={idx} className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                        <img alt={`Product image ${image.id}`} className="w-full h-48 object-cover" src={image.image} />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
-                            <button
-                                className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                                // disabled={deleteMutation.isPending}
-                                onClick={() => deleteImage(image.id)}
-                            >
-                                <Trash className="w-5 h-5" />
-                            </button>
-                        </div>
-                        {isDeleting && imageId === image.id && (
-                            <div className="absolute inset-0 bg-default-500 bg-opacity-50 flex items-center justify-center">
-                                <span className="text-white">Deleting...</span>
-                            </div>
-                        )}
+            {/* Image */}
+            {initialImage && (
+                <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                    <img alt={`Category image`} className="w-full h-48 object-cover" src={initialImage} />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                        <button
+                            className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            onClick={deleteImage}
+                        >
+                            <Trash className="w-5 h-5" />
+                        </button>
                     </div>
-                ))}
-            </div>
+                    {isDeleting && (
+                        <div className="absolute inset-0 bg-default-500 bg-opacity-50 flex items-center justify-center">
+                            <span className="text-white">Deleting...</span>
+                        </div>
+                    )}
+                </div>
+            )}
 
-            {initialImages.length === 0 && <p className="text-center text-default-500">No images uploaded yet</p>}
+            {!initialImage && <p className="text-center text-default-500">No image uploaded yet</p>}
 
             {/* Help text */}
             <div className="text-xs text-default-500">
-                <p>• The primary image will be displayed first in the product listing</p>
                 <p>• Recommended image size: 1000 x 1000 pixels</p>
             </div>
         </div>

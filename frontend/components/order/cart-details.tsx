@@ -23,13 +23,13 @@ const CartItems = ({ items }: ItemsTemplateProps) => {
                     {items.map((item: CartItem, idx: number) => (
                         <tr key={idx} className="even:bg-content2">
                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-default-900 sm:pl-3">
-                                <LocalizedClientLink className="flex sm:w-20 w-12" href={`/products/${item?.variant.slug}`}>
+                                <LocalizedClientLink className="flex sm:w-20 w-12" href={`/products/${item?.slug}`}>
                                     <Thumbnail size="square" thumbnail={item.image} />
                                 </LocalizedClientLink>
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm">
                                 <p className="font-medium text-default-900 truncate max-w-72" data-testid="product-title">
-                                    {item.variant.name}
+                                    {item.name}
                                 </p>
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm">
@@ -53,10 +53,10 @@ const CartItems = ({ items }: ItemsTemplateProps) => {
                         {items.map((item: CartItem, idx: number) => (
                             <div key={idx} className="flex items-center space-x-4 py-4 border-b">
                                 <div className="w-20 h-20 object-cover rounded relative">
-                                    <Image fill alt={item.variant.name} src={item.image as string} />
+                                    <Image fill alt={item.name} src={item.image as string} />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-sm font-medium line-clamp-1">{item.variant.name}</h3>
+                                    <h3 className="text-sm font-medium line-clamp-1">{item.name}</h3>
                                     <Control item={item} />
                                 </div>
                                 <div className="flex flex-col items-end">

@@ -115,10 +115,10 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                                     transition={{ duration: 0.3 }}
                                 >
                                     <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-default-100">
-                                        <img alt={item.variant.name} className="h-full w-full object-cover object-center" src={item.image} />
+                                        <img alt={item.name} className="h-full w-full object-cover object-center" src={item.image} />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="text-sm font-medium">{item.variant.name}</h3>
+                                        <h3 className="text-sm font-medium">{item.name}</h3>
                                         <p className="mt-1 text-sm font-semibold">{currency(Number(item.price) || 0)}</p>
                                     </div>
                                     <div className="flex flex-col items-end space-y-2">

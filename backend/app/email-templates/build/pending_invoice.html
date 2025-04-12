@@ -12,12 +12,12 @@
     <td style="padding: 20px">
         <h2>Thank you for your order!</h2>
         <p>Hi {{user.first_name}},</p>
-        <p>We've received your order, please make the payment.</p>
+        <p>Your order is currently pending, please make the payment.</p>
 
         {% include "partials/order-details.html" %}
 
-        <p>We'll send you another email once your payment is confirmed. If you have any questions about your order, please don't hesitate to contact our customer support.</p>
-        <a href="{{ frontend_host }}/order/confirmed/{{order.order_number}}" class="action-button">View Order Status</a>
+        <p style="margin-top: 10px">We'll send you another email once your payment is confirmed. If you have any questions about your order, please don't hesitate to contact our customer support.</p>
+        <a href="{{ frontend_host }}/order/confirmed/{{order.order_number}}" style="margin-top: 10px; display: inline-block;" class="action-button">View Order Status</a>
     </td>
 </tr>
 {% include "partials/footer.html" %}

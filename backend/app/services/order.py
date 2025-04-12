@@ -1,16 +1,17 @@
 from typing import Optional
 import uuid
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderCreate
 from app.core.utils import generate_invoice_email
 from app.services.notification import NotificationService
+from app.core.logging import logger
 
 class OrderService:
     def __init__(self, notification_service: NotificationService):
         self.notification_service = notification_service
 
-    async def create_order(self, order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
+    async def create_order(self, order_in: OrderCreate, user_id: int, cart_number: str, background_tasks: BackgroundTasks) -> OrderResponse:
         """
         Create a new order from a cart
         """
@@ -46,6 +47,7 @@ class OrderService:
                 "order_items": {
                     "create": [
                         {
+                            "name": item.name,
                             "image": item.image,
                             "variant": {"connect": {"id": item.variant_id}},
                             "quantity": item.quantity,
@@ -55,41 +57,51 @@ class OrderService:
                 }
             },
             include={
-                "order_items": {"include": {"variant": True}},
+                # "order_items": {"include": {"variant": True}},
+                "order_items": True,
                 "user": True,
                 "shipping_address": True,
-                "billing_address": True
+                # "billing_address": True
             }
         )
 
-        # Get user for notifications
-        user = await db.user.find_unique(where={"id": user_id})
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        async def send_notification(new_order, user_id: int):
+            # Get user for notifications
+            user = await db.user.find_unique(where={"id": user_id})
+            if not user:
+                logger.error(f"User not found for ID: {user_id}")
+                return
 
-        # Send invoice email
-        email_data = generate_invoice_email(order=new_order, user=user)
-        self.notification_service.send_notification(
-            channel_name="email",
-            recipient="neyostica2000@yahoo.com",
-            subject=email_data.subject,
-            message=email_data.html_content
-        )
+            # Send invoice email
+            try:
+                email_data = await generate_invoice_email(order=new_order, user=user)
+            except Exception as e:
+                logger.error(f"Failed to generate invoice email: {e}")
+                return
 
-        # Send to slack
-        slack_message = {
-            "text": f"🛍️ *New Order Created* 🛍️\n"
-                    f"*Order ID:* {new_order.order_number}\n"
-                    f"*Customer:* {user.first_name} {user.last_name}\n"
-                    f"*Email:* {user.email}\n"
-                    f"*Amount:* {new_order.total}\n"
-                    f"*Payment Status:* {new_order.payment_status}"
-        }
+            self.notification_service.send_notification(
+                channel_name="email",
+                recipient=user.email,
+                subject=email_data.subject,
+                message=email_data.html_content
+            )
 
-        self.notification_service.send_notification(
-            channel_name="slack",
-            slack_message=slack_message
-        )
+            # Send to slack
+            slack_message = {
+                "text": f"🛍️ *New Order Created* 🛍️\n"
+                        f"*Order ID:* {new_order.order_number}\n"
+                        f"*Customer:* {user.first_name} {user.last_name}\n"
+                        f"*Email:* {user.email}\n"
+                        f"*Amount:* {new_order.total}\n"
+                        f"*Payment Status:* {new_order.payment_status}"
+            }
+
+            self.notification_service.send_notification(
+                channel_name="slack",
+                slack_message=slack_message
+            )
+
+        background_tasks.add_task(send_notification, new_order=new_order, user_id=user_id)
 
         return new_order
 
@@ -100,11 +112,7 @@ class OrderService:
         order = await db.order.find_unique(
             where={"order_number": order_id},
             include={
-                "order_items": {
-                    "include": {
-                        "variant": True
-                    }
-                },
+                "order_items": True,
                 "user": True,
                 "shipping_address": True,
                 "billing_address": True

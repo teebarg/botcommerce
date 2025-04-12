@@ -113,6 +113,7 @@ export const ProductVariantSchema = z.object({
     name: z.string(),
     slug: z.string(),
     sku: z.string(),
+    image: z.string().optional(),
     status: ProductStatusSchema,
     price: z.number(),
     old_price: z.number(),
@@ -212,6 +213,8 @@ export const ProductSchema = z.object({
 
 export const CartItemSchema = z.object({
     id: z.number(),
+    name: z.string(),
+    slug: z.string(),
     item_id: z.string(),
     variant_id: z.string(),
     variant: ProductVariantSchema,
@@ -251,6 +254,7 @@ export const DeliveryOptionSchema = z.object({
 
 export const OrderItemSchema = z.object({
     id: z.number(),
+    name: z.string(),
     order_id: z.number(),
     variant_id: z.string(),
     variant: ProductVariantSchema,
@@ -362,9 +366,16 @@ export const ShopSettingsSchema = z.object({
     key: z.string(),
     value: z.string().nullable(),
     type: ShopSettingsTypeSchema,
-    category: z.string().nullable(),
-    description: z.string().nullable(),
-    is_public: z.boolean(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const BankDetailsSchema = z.object({
+    id: z.number(),
+    bank_name: z.string(),
+    account_name: z.string(),
+    account_number: z.string(),
+    is_active: z.boolean(),
     created_at: z.string(),
     updated_at: z.string(),
 });

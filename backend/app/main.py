@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
     yield
     await prisma.disconnect()
 
-app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json", lifespan=lifespan)
+app = FastAPI(title="E-Shop", openapi_url="/api/openapi.json", lifespan=lifespan)
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):
@@ -99,7 +99,7 @@ async def root():
 @app.post("/api/contact-form")
 async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreate):
     async def send_email_task():
-        email_data = generate_contact_form_email(
+        email_data = await generate_contact_form_email(
             name=data.name, email=data.email, phone=data.phone, message=data.message
         )
 
@@ -117,7 +117,7 @@ async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreat
 @app.post("/api/newsletter")
 async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
     async def send_email_task():
-        email_data = generate_newsletter_email(
+        email_data = await generate_newsletter_email(
             email=data.email,
         )
         shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})

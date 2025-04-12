@@ -8,7 +8,7 @@ export const getSiteConfig = async () => {
     try {
         const cookie = (await getCookie("configs")) ?? "{}";
 
-        shopSettings = JSON.parse(cookie);
+        shopSettings = JSON.parse(cookie) || {};
     } catch {
         shopSettings = {};
     }

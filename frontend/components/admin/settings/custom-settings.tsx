@@ -20,22 +20,12 @@ const settingTypes = [
     { label: "Custom", value: "CUSTOM" },
 ];
 
-const categories = [
-    { label: "General", value: "general" },
-    { label: "Appearance", value: "appearance" },
-    { label: "Payment", value: "payment" },
-    { label: "Shipping", value: "shipping" },
-];
-
 export function CustomSettings({ settings }: CustomSettingsProps) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [newSetting, setNewSetting] = useState({
         key: "",
         value: "",
         type: "CUSTOM",
-        category: "general",
-        description: "",
-        is_public: false,
     });
 
     const handleCreate = async () => {
@@ -61,9 +51,6 @@ export function CustomSettings({ settings }: CustomSettingsProps) {
             key: "",
             value: "",
             type: "CUSTOM",
-            category: "general",
-            description: "",
-            is_public: false,
         });
         setIsLoading(false);
     };
@@ -100,31 +87,6 @@ export function CustomSettings({ settings }: CustomSettingsProps) {
                     </div>
 
                     <div>
-                        <label className="text-sm text-default-500" htmlFor="category">
-                            Category
-                        </label>
-                        <Select value={newSetting.category} onValueChange={(value) => setNewSetting((prev) => ({ ...prev, category: value }))}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {categories.map((category) => (
-                                    <SelectItem key={category.value} value={category.value}>
-                                        {category.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <Input
-                        label="Description"
-                        placeholder="Describe what this setting controls"
-                        value={newSetting.description}
-                        onChange={(e) => setNewSetting((prev) => ({ ...prev, description: e.target.value }))}
-                    />
-
-                    <div>
                         <Textarea
                             label="Value"
                             placeholder="Enter the setting value"
@@ -147,10 +109,7 @@ export function CustomSettings({ settings }: CustomSettingsProps) {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h4 className="font-medium">{setting.key}</h4>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{setting.description || "No description"}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Type: {setting.type} | Category: {setting.category}
-                                    </p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Type: {setting.type}</p>
                                 </div>
                                 <Button
                                     color="danger"
