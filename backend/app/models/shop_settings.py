@@ -13,14 +13,6 @@ class ShopSettingsCreate(ShopSettingsBase):
 class ShopSettingsUpdate(ShopSettingsBase):
     key: Optional[str] = None
 
-# class ShopSettings(ShopSettingsBase):
-#     id: int
-#     created_at: str
-#     updated_at: str
-
-#     class Config:
-#         from_attributes = True
-
 class ShopSettingsList(BaseModel):
     settings: list[ShopSettings]
     page: int

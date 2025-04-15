@@ -57,11 +57,9 @@ class OrderService:
                 }
             },
             include={
-                # "order_items": {"include": {"variant": True}},
                 "order_items": True,
                 "user": True,
                 "shipping_address": True,
-                # "billing_address": True
             }
         )
 
