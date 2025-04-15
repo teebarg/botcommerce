@@ -1,47 +1,31 @@
-import React, { Suspense } from "react";
+import React from "react";
 import UserDropDown from "@modules/account/components/user-menu";
-import { Cart } from "@modules/layout/components/cart";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
-import { HeartFilled, Heart, ShoppingCart } from "nui-react-icons";
+import { HeartFilled, Heart } from "nui-react-icons";
 import dynamic from "next/dynamic";
 
+import { CartComponent } from "@/modules/layout/components/cart";
 import Search from "@/modules/search/components/search";
-import { siteConfig } from "@/lib/config";
-import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
+import { getSiteConfig } from "@/lib/config";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
         loading: () => <div className="w-6 h-6" />,
     });
 
-interface NavLinkProp {
-    href: string;
-    title: string;
-    icon?: React.ReactNode;
-    className?: string;
-}
-
-const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) => {
-    return (
-        <NavbarItem className={cn("flex items-center gap-2", className)}>
-            {icon}
-            <LocalizedClientLink href={href}>{title}</LocalizedClientLink>
-        </NavbarItem>
-    );
-};
-
 const Navbar = async () => {
     const user = await auth();
     const ThemeButton = getThemeToggler();
+    const siteConfig = await getSiteConfig();
 
     return (
         <NavigationBar className="my-2 hidden md:flex">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center flex-1 md:w-[25vw] font-semibold">
                     <LocalizedClientLink className="text-3xl block" href="/">
-                        {siteConfig.name}
+                        {siteConfig?.name}
                     </LocalizedClientLink>
                     <LocalizedClientLink className="hidden md:block" href={"/collections"}>
                         Collections
@@ -56,9 +40,7 @@ const Navbar = async () => {
                     <Search className="w-full justify-between" />
                 </NavbarItem>
                 <NavbarItem className="md:w-[25vw] flex gap-3 justify-end items-center">
-                    <Suspense fallback={<ShoppingCart className="w-6 h-6" />}>
-                        <Cart />
-                    </Suspense>
+                    <CartComponent />
                     <ThemeButton />
                     <div className="hidden md:flex">
                         {user ? (

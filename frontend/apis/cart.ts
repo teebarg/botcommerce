@@ -1,6 +1,5 @@
 import { fetcher } from "./fetcher";
 
-import { revalidate } from "@/actions/revalidate";
 import { Cart, CartComplete, CartUpdate, Message, Order } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
@@ -27,7 +26,6 @@ export const cartApi = {
             if (!id) {
                 await setCookie("_cart_id", response.data?.cart_number);
             }
-            revalidate("cart");
         }
 
         return response;
@@ -35,48 +33,22 @@ export const cartApi = {
     async changeQuantity({ item_id, quantity }: { item_id: number; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items/${item_id}?quantity=${quantity}`;
 
-        const response = await tryCatch<Cart>(fetcher(url, { method: "PUT" }));
-
-        if (!response.error) {
-            revalidate("cart");
-        }
-
-        return response;
+        return await tryCatch<Cart>(fetcher(url, { method: "PUT" }));
     },
     async update({ product_id, quantity }: { product_id: number; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/update`;
 
-        const response = await tryCatch<Cart>(fetcher(url, { method: "PATCH", body: JSON.stringify({ product_id, quantity }) }));
-
-        if (!response.error) {
-            revalidate("cart");
-        }
-
-        return response;
+        return await tryCatch<Cart>(fetcher(url, { method: "PATCH", body: JSON.stringify({ product_id, quantity }) }));
     },
     async updateDetails(update: CartUpdate): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
-        const response = await tryCatch<Cart>(fetcher(url, { method: "PUT", body: JSON.stringify({ ...update }) }));
 
-        if (!response.error) {
-            revalidate("cart");
-            if (update.shipping_address) {
-                revalidate("user");
-            }
-        }
-
-        return response;
+        return await tryCatch<Cart>(fetcher(url, { method: "PUT", body: JSON.stringify({ ...update }) }));
     },
     async delete(item_id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items/${item_id}`;
 
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("cart");
-        }
-
-        return response;
+        return await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
     },
     async complete(complete: CartComplete): ApiResult<Order> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/`;
@@ -84,7 +56,6 @@ export const cartApi = {
 
         if (!response.error) {
             await deleteCookie("_cart_id");
-            revalidate("orders");
         }
 
         return response;

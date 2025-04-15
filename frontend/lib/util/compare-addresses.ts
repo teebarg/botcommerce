@@ -12,6 +12,11 @@ export default function compareAddresses(address1: any, address2: any) {
         "address_2",
         "is_billing",
         "company",
+        "billing_carts",
+        "billing_orders",
+        "user",
+        "shipping_carts",
+        "shipping_orders",
     ]);
     const sanitizedAddress2 = omit(address2, [
         "id",
@@ -24,6 +29,11 @@ export default function compareAddresses(address1: any, address2: any) {
         "address_2",
         "is_billing",
         "company",
+        "billing_carts",
+        "billing_orders",
+        "user",
+        "shipping_carts",
+        "shipping_orders",
     ]);
 
     return isEqual(sanitizedAddress1, sanitizedAddress2);

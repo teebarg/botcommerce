@@ -1,9 +1,11 @@
 import React from "react";
-import { siteConfig } from "@lib/config";
+import { getSiteConfig } from "@lib/config";
 
 import { BtnLink } from "@/components/ui/btnLink";
 
-const Privacy = () => {
+const Privacy = async () => {
+    const siteConfig = await getSiteConfig();
+
     return (
         <div className="max-w-6xl mx-auto px-4 py-12">
             <h1 className="text-3xl font-bold mb-8 text-center text-foreground">Privacy Policy</h1>

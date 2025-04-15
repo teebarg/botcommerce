@@ -205,7 +205,6 @@ export async function submitContactForm(_currentState: resType, formData: FormDa
                 accept: "application/json",
             },
             body: JSON.stringify({
-                to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
                 name,
                 email,
                 message,
@@ -233,7 +232,6 @@ export async function newsletterForm(_currentState: resType, formData: FormData)
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
                 email,
             }),
         });

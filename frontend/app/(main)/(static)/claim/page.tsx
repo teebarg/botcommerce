@@ -1,9 +1,16 @@
 import React from "react";
-import { siteConfig } from "@lib/config";
+import { getSiteConfig } from "@lib/config";
+import { Metadata } from "next";
 
 import { BtnLink } from "@/components/ui/btnLink";
 
-const Claim = () => {
+export const metadata: Metadata = {
+    title: "Claims",
+};
+
+const Claim: React.FC = async () => {
+    const siteConfig = await getSiteConfig();
+
     return (
         <div className="max-w-5xl mx-auto px-4 py-12">
             <h1 className="text-3xl font-bold mb-8 text-center text-foreground">{siteConfig.name} Claims Process</h1>

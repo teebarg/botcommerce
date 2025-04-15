@@ -4,9 +4,11 @@ import React from "react";
 
 import Reload from "./reload";
 
-import { siteConfig } from "@/lib/config";
+import { useStore } from "@/app/store/use-store";
 
 const ServerError = () => {
+    const { shopSettings } = useStore();
+
     return (
         <div className="flex items-center justify-center bg-content1 px-4 flex-1 py-24">
             <div className="max-w-lg w-full bg-content2 rounded-lg shadow-lg p-12 animate-fade-in">
@@ -35,8 +37,8 @@ const ServerError = () => {
                 {/* Optional Support Link */}
                 <p className="mt-8 text-sm text-default-500 text-center">
                     If this issue persists, please contact our support team at{" "}
-                    <a className="text-indigo-600 hover:text-indigo-500" href={`mailto:${siteConfig.contactEmail}`}>
-                        {siteConfig.contactEmail}
+                    <a className="text-indigo-600 hover:text-indigo-500" href={`mailto:${shopSettings.contact_email}`}>
+                        {shopSettings.contact_email}
                     </a>
                 </p>
             </div>

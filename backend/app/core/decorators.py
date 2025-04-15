@@ -4,12 +4,13 @@ import re
 from collections.abc import Callable
 from functools import wraps
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 
 from app.services.cache import get_cache_service
 import time
 from typing import Callable, TypeVar, ParamSpec
 import logging
+from app.services.cache import get_cache_service
 
 # Type variables for generic function signatures
 T = TypeVar('T')
@@ -103,9 +104,9 @@ def cache(expire: int = 86400, key: str | None = None, hash: bool = True):
 
     def decorator(func: Callable):
         @wraps(func)
-        async def wrapped(request: Request, *args, **kwargs):
+        async def wrapped(*args, **kwargs):
             # Initialize cache service
-            cache_service = request.app.state.cache_service
+            cache_service = await get_cache_service()
 
             # Use the provided key or generate one
             cache_key = generate_cache_key(key=key, func_name=func.__name__, args=args, kwargs=kwargs)
@@ -116,11 +117,11 @@ def cache(expire: int = 86400, key: str | None = None, hash: bool = True):
                 return json.loads(cached_result)
 
             # Compute the result, cache it, and return it
-            result = await func(request, *args, **kwargs)
+            result = await func(*args, **kwargs)
 
             try:
                 if isinstance(result, dict):
-                    serialized_result = json.dumps(result)
+                    serialized_result = json.dumps(result, default=str)
                 elif hasattr(result, "model_dump_json"):
                     serialized_result = result.model_dump_json()  # For Pydantic v2.x
                 elif hasattr(result, "json"):

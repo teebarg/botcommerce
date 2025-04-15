@@ -13,6 +13,7 @@ import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
 import { currency } from "@/lib/util/util";
+import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -21,42 +22,36 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishlist = false }) => {
+    const invalidateCart = useInvalidateCart();
+    const invalidateCartItems = useInvalidateCartItem();
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
-    const { id, slug, name, price, old_price, image, categories, variants, status } = product;
+    const { id, slug, name, price, old_price, image, variants, status } = product;
     // const discountedPrice = old_price ? price - (price * (old_price - price)) / 100 : price;
 
     // const discount = old_price ? Math.round((1 - price / old_price) * 100) : 0;
     const inWishlist = !!wishlist?.find((wishlist) => wishlist.product_id === product.id);
 
     const handleWishlistClick = async () => {
-        try {
-            const { error } = await api.user.addWishlist(id);
+        const { error } = await api.user.addWishlist(id);
 
-            if (error) {
-                toast.error(error);
+        if (error) {
+            toast.error(error);
 
-                return;
-            }
-            toast.success("Added to favorites");
-        } catch (error) {
-            toast.error("An error occurred!");
+            return;
         }
+        toast.success("Added to favorites");
     };
 
     const removeWishlist = async () => {
-        try {
-            const { error } = await api.user.deleteWishlist(id);
+        const { error } = await api.user.deleteWishlist(id);
 
-            if (error) {
-                toast.error(error);
+        if (error) {
+            toast.error(error);
 
-                return;
-            }
-            toast.success("Removed from favorites");
-        } catch (error) {
-            toast.error("An error occurred!");
+            return;
         }
+        toast.success("Removed from favorites");
     };
 
     const handleAddToCart = async () => {
@@ -72,24 +67,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
         }
 
         setLoading(true);
-        try {
-            const response = await api.cart.add({
-                variant_id: variants[0].id,
-                quantity: 1,
-            });
+        const response = await api.cart.add({
+            variant_id: variants[0].id,
+            quantity: 1,
+        });
 
-            if (response.error) {
-                toast.error(response.error);
+        if (response.error) {
+            toast.error(response.error);
 
-                return;
-            }
-
-            toast.success("Added to cart successfully");
-        } catch (error) {
-            toast.error("Failed to add to cart");
-        } finally {
-            setLoading(false);
+            return;
         }
+        invalidateCart();
+        invalidateCartItems();
+        toast.success("Added to cart successfully");
+        setLoading(false);
     };
 
     return (
@@ -106,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
         >
             <div className="flex flex-col gap-2 w-full">
                 <div className="aspect-square w-full relative overflow-hidden rounded-xl">
-                    <Image fill alt={name} className="object-cover h-full w-full group-hover:scale-110 transition" src={image} />
+                    {image && <Image fill alt={name} className="object-cover h-full w-full group-hover:scale-110 transition" src={image} />}
                     {showWishlist && (
                         <Button
                             className={cn(

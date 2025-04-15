@@ -6,7 +6,6 @@ import { Activity, CreditCard, Users } from "nui-react-icons";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/config";
 import { Pag } from "@/types/models";
 
 const users = [
@@ -87,8 +86,8 @@ const pagination: Pag = {
 };
 
 export const metadata: Metadata = {
-    title: `Children clothing | ${siteConfig.name} Store`,
-    description: siteConfig.description,
+    title: "Admin",
+    description: "Admin dashboard",
 };
 
 export default async function AdminPage() {

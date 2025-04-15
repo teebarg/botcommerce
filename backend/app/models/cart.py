@@ -13,6 +13,8 @@ class CartStatus(str, Enum):
 
 # Pydantic models for request/response validation
 class CartItemBase(BaseModel):
+    slug: Optional[str] = None
+    name: Optional[str] = None
     variant_id: int
     quantity: int
     price: float
@@ -25,7 +27,8 @@ class CartItemCreate(BaseModel):
 class CartItemResponse(CartItemBase):
     id: int
     cart_id: int
-    variant: ProductVariant
+    cart_number: str
+    # variant: ProductVariant
     created_at: datetime
     updated_at: datetime
 
@@ -41,6 +44,7 @@ class CartResponse(BaseModel):
     items: Optional[list[CartItemResponse]] = []
     payment_method: Optional[PaymentMethod] = None
     shipping_method: Optional[ShippingMethod] = None
+    shipping_address_id: Optional[int] = None
     shipping_address: Optional[Address] = None
     billing_address: Optional[Address] = None
     total: Optional[float] = 0

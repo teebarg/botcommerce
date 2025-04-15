@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
 import { Location, Mail } from "nui-react-icons";
-import { openingHours, siteConfig } from "@lib/config";
+import { getSiteConfig, openingHours } from "@lib/config";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
@@ -48,12 +48,12 @@ const banners = [
 ];
 
 export const metadata: Metadata = {
-    title: `Children clothings | ${siteConfig.name}`,
-    description: siteConfig.description,
+    title: "Children clothings",
 };
 
 export default async function Home() {
     const user = await auth();
+    const siteConfig = await getSiteConfig();
     const { data } = await baseApi.get<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
         "/product/landing-products",
         { next: { tags: ["featured"] } }

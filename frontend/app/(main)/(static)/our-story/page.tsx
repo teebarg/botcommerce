@@ -1,7 +1,9 @@
-import { siteConfig } from "@lib/config";
+import { getSiteConfig } from "@lib/config";
 import React from "react";
 
-const OurStory = () => {
+const OurStory = async () => {
+    const siteConfig = await getSiteConfig();
+
     return (
         <div className="max-w-6xl mx-auto bg-content1 p-8 rounded-lg shadow-lg">
             <div className="mb-12">

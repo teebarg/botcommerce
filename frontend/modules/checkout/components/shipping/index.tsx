@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";
 import { Cart, DeliveryOption } from "@/types/models";
+import { useInvalidateCart } from "@/lib/hooks/useCart";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -19,6 +20,7 @@ type ShippingProps = {
 };
 
 const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) => {
+    const invalidateCart = useInvalidateCart();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -52,6 +54,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
 
             return;
         }
+        invalidateCart();
 
         setIsLoading(false);
     };

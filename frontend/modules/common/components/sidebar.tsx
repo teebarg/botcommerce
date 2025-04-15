@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@lib/util/cn";
 
-import { siteConfig } from "@/lib/config";
+import { useStore } from "@/app/store/use-store";
 
 interface MenuItem {
     label: string;
@@ -154,7 +154,8 @@ const MenuItemComponent: React.FC<{
 };
 
 const SideBar: React.FC = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const { shopSettings } = useStore();
+    const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
     const navItems: (MenuItem | SubMenuItem)[] = [
         {
             subMenu: "Admin",
@@ -322,7 +323,7 @@ const SideBar: React.FC = () => {
                         "!opacity-0 w-0": isCollapsed,
                     })}
                 >
-                    {siteConfig.name}
+                    {shopSettings?.shop_name}
                 </h1>
                 <button
                     aria-label="open"

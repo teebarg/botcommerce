@@ -1,4 +1,3 @@
-import secrets
 from typing import Annotated, Any, Literal
 
 from pydantic import (
@@ -22,14 +21,12 @@ def parse_cors(v: Any) -> list[str] | str:
 
 
 class Settings(BaseSettings):
-    ADMIN_EMAIL: str = "neyostica2000@yahoo.com"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = (
         60 * 24 * 8
     )  # 60 minutes * 24 hours * 8 days = 8 days
     API_V1_STR: str = "/api"
     SECRET_KEY: str = "specialsecret"
 
-    PROJECT_NAME: str
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     DATABASE_URL: str = ""
 
@@ -116,10 +113,6 @@ class Settings(BaseSettings):
     # OAuth Settings
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
-    GOOGLE_REDIRECT_URI: str = f"{FRONTEND_HOST}/auth/google/callback"
-
-    FACEBOOK: str = ""
-    INSTAGRAM: str = ""
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

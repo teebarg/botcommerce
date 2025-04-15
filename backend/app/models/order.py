@@ -38,7 +38,7 @@ class OrderResponse(BaseModel):
     email: Optional[EmailStr] = None
     order_number: str
     user_id: int
-    user: User
+    user: Optional[User]
     billing_address: Optional[Address]
     shipping_address: Optional[Address]
     total: float
@@ -52,7 +52,7 @@ class OrderResponse(BaseModel):
     shipping_fee: float
     coupon_id: Optional[int]
     cart_id: Optional[int]
-    order_items: list[OrderItem]
+    order_items: Optional[list[OrderItem]]
     created_at: datetime
     updated_at: datetime
 

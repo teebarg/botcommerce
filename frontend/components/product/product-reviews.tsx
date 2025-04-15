@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { MessageSquare, Star } from "nui-react-icons";
 import { PencilLine } from "lucide-react";
@@ -9,8 +11,7 @@ import ReviewForm from "./review-form";
 import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/util/util";
 import { Review } from "@/types/models";
-import { auth } from "@/actions/auth";
-import { api } from "@/apis";
+import { useProductReviews } from "@/lib/hooks/useCart";
 
 interface Prop {
     product_id: number;
@@ -21,14 +22,13 @@ interface RatingDistribution {
     percentage: number;
 }
 
-const ReviewsSection: React.FC<Prop> = async ({ product_id }) => {
-    const user = await auth();
+const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
+    const { data, isLoading } = useProductReviews(product_id);
+    const reviews = data?.data;
 
-    if (!user) {
-        return;
+    if (isLoading) {
+        return <div className="flex items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">Loading........</div>;
     }
-
-    const { data: reviews } = await api.product.productReviews({ product_id });
 
     if (!reviews || reviews?.length == 0) {
         return (

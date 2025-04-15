@@ -7,26 +7,26 @@ import { toast } from "sonner";
 
 import AddressSelect from "../address-select";
 
-import { Cart } from "@/types/models";
+import { Address } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { useStore } from "@/app/store/use-store";
+import { useMe } from "@/lib/hooks/useCart";
 
-const ShippingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
+const ShippingAddress = ({ address, email }: { address: Address | null; email: string }) => {
     const router = useRouter();
     const [isPending, setIsPending] = useState<boolean>(false);
-    const [email, setEmail] = useState<string>(cart?.email ?? "");
-    const { user } = useStore();
+    const [cartEmail, setCartEmail] = useState<string>(email);
+    const { data, isLoading: meLoading } = useMe();
 
     useEffect(() => {
-        setEmail(cart?.email ?? "");
-    }, [cart?.email]);
+        setCartEmail(email);
+    }, [email]);
 
     const handleSubmit = async () => {
         setIsPending(true);
 
         const { error } = await api.cart.updateDetails({
-            email,
+            email: cartEmail,
         });
 
         setIsPending(false);
@@ -40,12 +40,16 @@ const ShippingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "ref
         router.push(`/checkout?step=delivery`);
     };
 
+    if (meLoading) {
+        return null;
+    }
+
     return (
         <React.Fragment>
             <div className="w-full rounded-lg mb-6">
-                <AddressSelect cart={cart} />
+                <AddressSelect address={address} user={data?.data!} />
             </div>
-            {user && (
+            {data?.data && (
                 <React.Fragment>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                         <Input
@@ -55,8 +59,8 @@ const ShippingAddress = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "ref
                             label="Email"
                             name="email"
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={cartEmail}
+                            onChange={(e) => setCartEmail(e.target.value)}
                         />
                     </div>
                     <Button

@@ -1,99 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to {{ project_name }}</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            background-color: #f8f9fa;
-            padding: 30px 0;
-            text-align: center;
-        }
-        .content {
-            padding: 30px 0;
-        }
-        .button {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px 0;
-            color: #6c757d;
-            font-size: 14px;
-        }
-        .welcome-text {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        .features {
-            margin: 30px 0;
-        }
-        .feature-item {
-            margin: 15px 0;
-            padding-left: 25px;
-            position: relative;
-        }
-        .feature-item:before {
-            content: "✓";
-            color: #28a745;
-            position: absolute;
-            left: 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Welcome to {{ project_name }}!</h1>
-    </div>
-    
-    <div class="container">
+{% include "partials/header.html" %}
+<tr>
+    <td style="padding: 20px">
         <div class="content">
             <div class="welcome-text">Hi {{ first_name }},</div>
-            
+
             <p>Thank you for joining {{ project_name }}! We're excited to have you as part of our community.</p>
-            
+
             <p>Your account has been successfully created. Here's what you can do now:</p>
-            
+
             <div class="features">
                 <div class="feature-item">Browse our extensive collection of products</div>
                 <div class="feature-item">Create your wishlist</div>
                 <div class="feature-item">Track your orders</div>
                 <div class="feature-item">Save your favorite items</div>
             </div>
-            
+
             <p>Ready to start shopping? Click the button below to log in to your account:</p>
-            
-            <div style="text-align: center;">
-                <a href="{{ login_url }}" class="button">Log In to Your Account</a>
+
+            <div style="text-align: center">
+                <a href="{{ frontend_host }}/login" class="button">Log In to Your Account</a>
             </div>
-            
+
             <p>If you have any questions or need assistance, our customer support team is here to help!</p>
         </div>
-        
-        <div class="footer">
-            <p>© {{ current_year }} {{ project_name }}. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html> 
+    </td>
+</tr>
+{% include "partials/footer.html" %}

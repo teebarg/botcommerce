@@ -9,9 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Plus, ChevronRight, Check, Home, Pencil, MapPin } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
-import { useStore } from "@/app/store/use-store";
-import { Address } from "@/types/models";
+import { Address, User } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
@@ -21,21 +21,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { MagicLinkForm } from "@/modules/auth/components/magic-link";
 import ClientOnly from "@/components/client-only";
 import { SignUpForm } from "@/modules/auth/components/signup";
+import { useInvalidateCart, useUserAddresses } from "@/lib/hooks/useCart";
 
 type AddressSelectProps = {
-    cart: Omit<any, "refundable_amount" | "refunded_total"> | null;
+    address: Address | null;
+    user: User | null;
 };
 
 interface AddressItemProp {
     address: Address;
+    addresses: Address[];
     selectedAddress?: Address;
-    idx: number;
 }
 
-const AddressItem: React.FC<AddressItemProp> = ({ address, selectedAddress, idx }) => {
-    const { user } = useStore();
-    const addresses = user?.addresses?.sort((a, b) => (a.created_at! > b.created_at! ? -1 : 1)) ?? [];
+const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAddress }) => {
     const state = useOverlayTriggerState({});
+    const invalidateCart = useInvalidateCart();
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleSelect = async (id: number) => {
@@ -43,10 +44,18 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, selectedAddress, idx 
         const savedAddress = addresses.find((a) => a.id === id);
 
         if (savedAddress) {
-            await api.cart.updateDetails({
+            const res = await api.cart.updateDetails({
                 shipping_address: omit(savedAddress, ["created_at", "updated_at"]) as any,
             });
+
+            if (res.error) {
+                toast.error(res.error);
+
+                return;
+            }
+            invalidateCart();
         }
+
         setLoading(false);
     };
 
@@ -201,9 +210,10 @@ const CheckoutLoginPrompt: React.FC = () => {
     );
 };
 
-const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
-    const { user } = useStore();
-    const addresses = user?.addresses?.sort((a, b) => (a.created_at! > b.created_at! ? -1 : 1)) ?? [];
+const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
+    const { data, isLoading } = useUserAddresses();
+    const addresses = data?.data?.addresses ?? [];
+
     const state = useOverlayTriggerState({});
     const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -213,8 +223,12 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
     );
 
     const selectedAddress = useMemo(() => {
-        return addresses.find((a) => compareAddresses(a, cart?.shipping_address));
-    }, [addresses, cart?.shipping_address]);
+        return addresses.find((a) => compareAddresses(a, address));
+    }, [addresses, address]);
+
+    if (isLoading) {
+        return <div className="h-24" />;
+    }
 
     if (!user) {
         return <CheckoutLoginPrompt />;
@@ -248,8 +262,8 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ cart }) => {
                                 <EmptyState />
                             </motion.div>
                         ) : (
-                            filteredAddresses.map((address: Address, idx: number) => (
-                                <AddressItem key={idx} address={address} idx={idx} selectedAddress={selectedAddress} />
+                            filteredAddresses.map((address: Address) => (
+                                <AddressItem key={address.id} address={address} addresses={addresses} selectedAddress={selectedAddress} />
                             ))
                         )}
                     </AnimatePresence>

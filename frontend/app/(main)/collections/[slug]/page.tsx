@@ -1,13 +1,12 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Collection, SortOptions, WishItem } from "types/models";
+import { SortOptions, WishItem } from "types/models";
 import React, { Suspense } from "react";
 import { Exclamation } from "nui-react-icons";
 
 import InfiniteScrollClient from "../scroll-client2";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
-import { siteConfig } from "@/lib/config";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import { auth } from "@/actions/auth";
@@ -32,22 +31,7 @@ export async function generateMetadata({ params }: { params: Params }) {
         notFound();
     }
 
-    return {
-        title: `${collection.name} | ${siteConfig.name} Store`,
-        description: `${collection.name} collection`,
-    } as Metadata;
-}
-
-export async function generateStaticParams() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/?limit=100`).then((res) => res.json());
-
-    if (!res) {
-        return [];
-    }
-
-    return res.collections.map((collection: Collection) => ({
-        slug: collection.slug,
-    }));
+    return { title: collection.name } as Metadata;
 }
 
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {

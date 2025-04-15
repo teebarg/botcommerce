@@ -10,10 +10,13 @@ import { reviewsApi } from "./review";
 import { configApi } from "./config";
 import { addressApi } from "./address";
 import { paymentApi } from "./payment";
+import { shopSettingsApi } from "./shop-settings";
+import { bankSettingsApi } from "./bank-details";
 
 export const api = {
     address: addressApi,
     auth: authApi,
+    bank: bankSettingsApi,
     brand: brandApi,
     cart: cartApi,
     collection: collectionApi,
@@ -24,4 +27,5 @@ export const api = {
     product: productApi,
     review: reviewsApi,
     user: userApi,
+    shopSettings: shopSettingsApi,
 };

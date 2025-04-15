@@ -79,13 +79,21 @@ def slugify(text) -> str:
 
     return slug
 
-def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, Any]:
+async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, Any]:
+    from app.prisma_client import prisma as db
+
+    shop_settings = await db.shopsettings.find_many(where={"type": "SHOP_DETAIL"})
+    config = {setting.key: setting.value for setting in shop_settings}
+
     return {
-        "project_name": settings.PROJECT_NAME,
+        "project_name": config.get("shop_name"),
+        "address": config.get("address"),
         "description": "Exclusive offers just for you",
         "frontend_host": settings.FRONTEND_HOST,
-        "facebook": settings.FACEBOOK,
-        "instagram": settings.INSTAGRAM,
+        "facebook": config.get("facebook"),
+        "instagram": config.get("instagram"),
+        "tiktok": config.get("tiktok"),
+        "support_email": config.get("shop_email"),
         **metadata
     }
 
@@ -137,16 +145,14 @@ def send_email(
 
 
 def generate_test_email(email_to: str) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - Test email"
     html_content = render_email_template(
         template_name="test.html",
         context={"email": email_to, **merge_metadata({})},
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="Test email")
 
 
-def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
+async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
     # Determine the template based on payment status
     template_name = "paid_invoice.html"
     if order.payment_method == "CASH_ON_DELIVERY":
@@ -156,83 +162,73 @@ def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
     elif order.payment_status == "FAILED":
         template_name = "failed_invoice.html"
 
-    subject = f"{settings.PROJECT_NAME} - Order Confirmation"
     html_content = render_email_template(
         template_name=template_name,
         context={
             "order": order,
             "user": user,
             "current_year": datetime.now().year,
-            **merge_metadata({"description": "Your order has been processed"})
+            **(await merge_metadata({"description": "Your order has been processed"}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="Order Confirmation")
 
 
-def generate_new_account_email(
+async def generate_new_account_email(
     email_to: str, username: str, password: str
 ) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - New account for user {username}"
     html_content = render_email_template(
         template_name="new_account.html",
         context={
-            "project_name": settings.PROJECT_NAME,
             "username": username,
             "password": password,
             "email": email_to,
             "link": settings.server_host,
+            **(await merge_metadata({"description": ""}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject=f"New account for user {username}")
 
 
-def generate_data_export_email(download_link: str) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - Your Data Export is Ready"
+async def generate_data_export_email(download_link: str) -> EmailData:
     html_content = render_email_template(
         template_name="data_export.html",
         context={
-            "project_name": settings.PROJECT_NAME,
             "download_link": download_link,
+            **(await merge_metadata({"description": ""}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="Your Data Export is Ready")
 
 
-def generate_contact_form_email(
+async def generate_contact_form_email(
     name: str, email: str, phone: str, message: str
 ) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - New Contact Email"
     html_content = render_email_template(
         template_name="contact_form.html",
         context={
-            "project_name": settings.PROJECT_NAME,
             "name": name,
             "email": email,
             "phone": phone,
             "message": message,
             "current_year": datetime.now().year,
+            **(await merge_metadata({"description": "New Contact Email"}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="New Contact Email")
 
 
-def generate_newsletter_email(email: str) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - New Newsletter Email"
+async def generate_newsletter_email(email: str) -> EmailData:
     html_content = render_email_template(
         template_name="newsletter.html",
         context={
-            "project_name": settings.PROJECT_NAME,
             "email": email,
-            "project_website": settings.DOMAIN,
             "unsubscribe_link": "",
             "current_year": datetime.now().year,
+            **(await merge_metadata({"description": "Welcome to our newsletter"}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="Welcome to our newsletter")
 
 
 def generate_slug(name: str) -> str:
@@ -263,46 +259,41 @@ def generate_id(prefix="cart_", length=25):
     return prefix + unique_part
 
 
-def generate_magic_link_email(email_to: str, magic_link: str, first_name: str) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - Sign in to your account"
+async def generate_magic_link_email(email_to: str, magic_link: str, first_name: str) -> EmailData:
     html_content = render_email_template(
         template_name="magic_link.html",
         context={
-            "project_name": settings.PROJECT_NAME,
+            "email": email_to,
             "magic_link": magic_link,
-            "first_name": first_name
+            "first_name": first_name,
+            **(await merge_metadata({"description": "Magic Link to sign in to your account"}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="Sign in to your account")
 
 
-def generate_welcome_email(email_to: str, first_name: str) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"Welcome to {project_name}, {first_name}!"
+async def generate_welcome_email(email_to: str, first_name: str) -> EmailData:
     html_content = render_email_template(
         template_name="welcome.html",
         context={
-            "project_name": settings.PROJECT_NAME,
             "first_name": first_name,
             "email": email_to,
-            "login_url": f"{settings.FRONTEND_HOST}/login",
             "current_year": datetime.now().year,
+            **(await merge_metadata({"description": ""}))
         },
     )
     return EmailData(html_content=html_content, subject=subject)
 
 
-def generate_verification_email(email_to: str, first_name: str, verification_link: str) -> EmailData:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - Verify Your Email"
+async def generate_verification_email(email_to: str, first_name: str, verification_link: str) -> EmailData:
     html_content = render_email_template(
         template_name="verify_email.html",
         context={
-            "project_name": settings.PROJECT_NAME,
             "first_name": first_name,
+            "email": email_to,
             "verification_link": verification_link,
             "current_year": datetime.now().year,
+            **(await merge_metadata({}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="Verify Your Email")

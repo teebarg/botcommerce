@@ -7,6 +7,7 @@ import { MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
+import { useStore } from "@/app/store/use-store";
 
 interface PickupProps {
     amount: number;
@@ -16,6 +17,7 @@ interface PickupProps {
 const Pickup: React.FC<PickupProps> = ({ amount }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
+    const { shopSettings } = useStore();
 
     const onPaymentCompleted = async () => {
         setLoading(true);
@@ -41,7 +43,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                     <MapPin className="text-indigo-600 w-5 h-5 mt-0.5 flex-shrink-0" />
                     <div className="ml-2">
                         <p className="text-sm font-medium text-default-700">Collection Point</p>
-                        <p className="text-sm text-default-600">123 Shopping Street, Main City</p>
+                        <p className="text-sm text-default-600">{shopSettings?.address}</p>
                         <p className="text-sm text-default-600">Open Mon-Sat: 9am - 6pm</p>
                     </div>
                 </div>
@@ -56,8 +58,8 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                 </div>
             </div>
 
-            <Button className="w-full" disabled={loading} onClick={onPaymentCompleted}>
-                {loading ? "Processing..." : "Confirm Order for Pickup"}
+            <Button className="w-full" disabled={loading} isLoading={loading} onClick={onPaymentCompleted}>
+                Confirm Order for Pickup
             </Button>
             {/* Security message */}
             <div className="mt-4 flex items-center justify-center text-xs text-default-500">

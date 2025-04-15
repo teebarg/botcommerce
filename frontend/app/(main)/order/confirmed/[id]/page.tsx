@@ -2,13 +2,11 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { api } from "@/apis";
-import { siteConfig } from "@/lib/config";
 import ServerError from "@/components/server-error";
 import OrderConfirmation from "@/components/store/orders/order-confirmation";
 
 export const metadata: Metadata = {
-    title: `Order Confirmation | ${siteConfig.name}`,
-    description: "View your order confirmation details",
+    title: "Order Confirmation",
 };
 
 type Params = Promise<{ id: string }>;

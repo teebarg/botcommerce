@@ -120,7 +120,7 @@ async def generate_excel_file(email: str):
     public_url = client.storage.from_("exports").get_public_url(filename)
 
     # Send email with download link
-    email_data = generate_data_export_email(download_link=public_url)
+    email_data = await generate_data_export_email(download_link=public_url)
     send_email(
         email_to=email,
         subject="Product Export Ready",
@@ -280,6 +280,7 @@ async def bulk_upload_products(products: list[dict]):
                         "product": {"connect": {"id": product.id}},
                         "name": f"{product_data['name']} Default",
                         "slug": f"{product_data['slug']}-default",
+                        "image": product_data["image"],
                         "sku": f"{product_data['slug']}-default",
                         "status": status,
                         "price": float(product_data["price"]),

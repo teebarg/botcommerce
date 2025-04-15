@@ -36,7 +36,6 @@ export const addressApi = {
 
         if (!response.error) {
             revalidate("addresses");
-            revalidate("user");
             revalidate("cart");
             revalidate("orders");
         }
@@ -59,7 +58,6 @@ export const addressApi = {
 
         if (!response.error) {
             revalidate("addresses");
-            revalidate("user");
         }
 
         return response;

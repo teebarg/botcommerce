@@ -53,7 +53,7 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
 
             void (async () => {
                 try {
-                    await api.product.uploadImage({ id: productId, formData });
+                    await api.product.uploadImages({ id: productId, formData });
                     toast.success("Image uploaded successfully");
                     router.refresh();
                 } catch (error) {

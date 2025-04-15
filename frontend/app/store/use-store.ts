@@ -28,6 +28,9 @@ interface StoreState {
 
     user: User | null;
     setUser: (user: User | null) => void;
+
+    shopSettings: Record<string, string>;
+    setShopSettings: (settings: Record<string, string>) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -56,4 +59,7 @@ export const useStore = create<StoreState>((set) => ({
 
     user: null,
     setUser: (user: User | null) => set(() => ({ user })),
+
+    shopSettings: {},
+    setShopSettings: (settings) => set(() => ({ shopSettings: settings })),
 }));

@@ -1,5 +1,5 @@
 from app.models.generic import Message
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, BackgroundTasks
 from pydantic import EmailStr, BaseModel, Field
 from app.core.config import settings
 
@@ -59,6 +59,7 @@ def tokenData(user: User):
 
 @router.post("/magic-link")
 async def request_magic_link(
+    background_tasks: BackgroundTasks,
     payload: MagicLinkPayload,
 ) -> Message:
     """
@@ -72,7 +73,6 @@ async def request_magic_link(
     user = await prisma.user.find_first(
         where={
             "email": email,
-            # "is_active": True,
         }
     )
 
@@ -80,21 +80,24 @@ async def request_magic_link(
         # Don't reveal if user exists or not
         return {"message": "If an account exists with this email, you will receive a magic link"}
 
-    # Generate magic link token
-    token = security.create_magic_link_token(email)
+    async def send_magic_link_email(user: User, email: str, callback_url: Optional[str] = None):
+        # Generate magic link token
+        token = security.create_magic_link_token(email)
 
-    # Create magic link URL
-    magic_link = f"{settings.FRONTEND_HOST}/verify?token={token}"
-    if callback_url is not None:
-        magic_link += f"&callbackUrl={callback_url}"
+        # Create magic link URL
+        magic_link = f"{settings.FRONTEND_HOST}/verify?token={token}"
+        if callback_url is not None:
+            magic_link += f"&callbackUrl={callback_url}"
 
-    # Generate and send email
-    email_data = generate_magic_link_email(email_to=email, magic_link=magic_link, first_name=user.first_name)
-    send_email(
-        email_to=email,
-        subject=email_data.subject,
-        html_content=email_data.html_content,
-    )
+        # Generate and send email
+        email_data = await generate_magic_link_email(email_to=email, magic_link=magic_link, first_name=user.first_name)
+        send_email(
+            email_to=email,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
+
+    background_tasks.add_task(send_magic_link_email, user, email, callback_url)
 
     return {"message": "If an account exists with this email, you will receive a magic link"}
 
@@ -133,7 +136,7 @@ async def verify_magic_link(token: TokenPayload) -> Token:
     return Token(access_token=access_token)
 
 @router.post("/signup")
-async def signup(payload: SignUpPayload) -> Token:
+async def signup(payload: SignUpPayload, background_tasks: BackgroundTasks) -> Token:
     """
     Register a new user with email and password.
     Requires CAPTCHA verification and email verification.
@@ -172,17 +175,19 @@ async def signup(payload: SignUpPayload) -> Token:
         }
     )
 
-    # Send verification email
-    verification_email = generate_verification_email(
-        email_to=payload.email,
-        first_name=payload.first_name,
-        verification_link=f"{settings.FRONTEND_HOST}/verify-email?token={verification_token}"
-    )
-    send_email(
-        email_to=payload.email,
-        subject=verification_email.subject,
-        html_content=verification_email.html_content,
-    )
+    async def send_verification_email():
+        verification_email = await generate_verification_email(
+            email_to=payload.email,
+            first_name=payload.first_name,
+            verification_link=f"{settings.FRONTEND_HOST}/verify-email?token={verification_token}"
+        )
+        send_email(
+            email_to=payload.email,
+            subject=verification_email.subject,
+            html_content=verification_email.html_content,
+        )
+
+    background_tasks.add_task(send_verification_email)
 
     # Generate access token
     access_token = security.create_access_token(
@@ -232,7 +237,7 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
     )
 
     # Send welcome email
-    welcome_email = generate_welcome_email(
+    welcome_email = await generate_welcome_email(
         email_to=user.email,
         first_name=user.first_name
     )
@@ -257,7 +262,7 @@ async def google_oauth_url():
     auth_url = (
         "https://accounts.google.com/o/oauth2/v2/auth"
         f"?client_id={settings.GOOGLE_CLIENT_ID}"
-        f"&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
+        f"&redirect_uri={settings.FRONTEND_HOST}/auth/google/callback"
         "&response_type=code"
         "&scope=email profile"
         "&access_type=offline"
@@ -277,7 +282,7 @@ async def google_oauth_callback(payload: OAuthCallback) -> Token:
                 "client_id": settings.GOOGLE_CLIENT_ID,
                 "client_secret": settings.GOOGLE_CLIENT_SECRET,
                 "code": payload.code,
-                "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+                "redirect_uri": f"{settings.FRONTEND_HOST}/auth/google/callback",
                 "grant_type": "authorization_code",
             }
         )

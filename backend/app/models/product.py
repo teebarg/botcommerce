@@ -20,6 +20,7 @@ class VariantUpdate(BaseModel):
 
 class VariantWithStatus(BaseModel):
     name: str = Field(..., min_length=1, description="Variant name is required")
+    image: Optional[str] = None
     sku: Optional[str] = None
     price: float = Field(..., gt=0, description="Price must be positive")
     inventory: int = Field(..., ge=0, description="Inventory cannot be negative")
@@ -43,7 +44,7 @@ class ProductCreate(BaseModel):
     description: str = Field(..., min_length=1, description="Description is required")
     price: float = Field(..., gt=0, description="Price must be positive")
     old_price: float = Field(..., ge=0, description="Old price must be positive")
-    brand_ids: Optional[List[int]] = None
+    brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
@@ -113,6 +114,7 @@ class Variant(BaseModel):
     name: str = Field(..., min_length=1, description="Variant name is required")
     sku: Optional[str] = None
     slug: str = Field(..., min_length=1, description="Variant slug is required")
+    image: Optional[str] = None
     price: float = Field(..., gt=0, description="Price must be positive")
     old_price: float = Field(..., ge=0, description="Old price must be positive")
     inventory: int = Field(..., ge=0, description="Inventory cannot be negative")

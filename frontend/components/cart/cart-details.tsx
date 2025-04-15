@@ -8,6 +8,7 @@ import { Cart, CartItem } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";
+import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 
 interface Props {
     onClose: () => void;
@@ -17,6 +18,8 @@ interface Props {
 }
 
 const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => {
+    const invalidateCart = useInvalidateCart();
+    const invalidateCartItems = useInvalidateCartItem();
     const [mounted, setMounted] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -33,43 +36,37 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
         // }
 
         setLoading(true);
-        try {
-            const response = await api.cart.changeQuantity({
-                item_id: id,
-                quantity,
-            });
+        const response = await api.cart.changeQuantity({
+            item_id: id,
+            quantity,
+        });
 
-            if (response.error) {
-                toast.error(response.error);
+        if (response.error) {
+            toast.error(response.error);
 
-                return;
-            }
-
-            toast.success("Added to cart successfully");
-        } catch (error) {
-            toast.error("Failed to add to cart");
-        } finally {
-            setLoading(false);
+            return;
         }
+
+        toast.success("Added to cart successfully");
+        invalidateCart();
+        invalidateCartItems();
+        setLoading(false);
     };
 
     const removeItem = async (id: number) => {
         setLoading(true);
-        try {
-            const response = await api.cart.delete(id);
+        const response = await api.cart.delete(id);
 
-            if (response.error) {
-                toast.error(response.error);
+        if (response.error) {
+            toast.error(response.error);
 
-                return;
-            }
-
-            toast.success("Item removed from cart successfully");
-        } catch (error) {
-            toast.error("Failed to remove item from cart");
-        } finally {
-            setLoading(false);
+            return;
         }
+
+        toast.success("Item removed from cart successfully");
+        invalidateCart();
+        invalidateCartItems();
+        setLoading(false);
     };
 
     return (
@@ -115,10 +112,10 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                                     transition={{ duration: 0.3 }}
                                 >
                                     <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-default-100">
-                                        <img alt={item.variant.name} className="h-full w-full object-cover object-center" src={item.image} />
+                                        <img alt={item.name} className="h-full w-full object-cover object-center" src={item.image} />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="text-sm font-medium">{item.variant.name}</h3>
+                                        <h3 className="text-sm font-medium">{item.name}</h3>
                                         <p className="mt-1 text-sm font-semibold">{currency(Number(item.price) || 0)}</p>
                                     </div>
                                     <div className="flex flex-col items-end space-y-2">

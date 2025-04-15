@@ -27,9 +27,9 @@ export default function ContactForm() {
                 <Input required className="" label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
                 <Input className="" label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
                 <Textarea required className="" label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
-                <div className="text-default-600">
-                    <label>I allow this website to store my submission.</label>
+                <div className="text-default-600 flex items-center">
                     <Checkbox checked={true} name="agreement" />
+                    <label className="ml-2 text-sm">I allow this website to store my submission.</label>
                 </div>
                 <Button aria-label="submit" className="min-w-32" color="danger" isLoading={isPending} type="submit">
                     Submit

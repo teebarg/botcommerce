@@ -23,12 +23,12 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
                 {items?.map((item: CartItem, key: number) => (
                     <li key={key} className="flex items-center gap-x-4 border-b-sm border-divider py-4">
                         <div className="relative flex h-16 w-14 flex-shrink-0 items-center justify-center rounded-md overflow-hidden">
-                            {item.image && <Image fill alt={item.variant.name} src={item.image} />}
+                            {item.image && <Image fill alt={item.name} src={item.image} />}
                         </div>
                         <div className="flex flex-1 flex-col">
                             <div className="text-sm">
-                                <LocalizedClientLink href={`/products/${item.variant.slug}`}>
-                                    <p className="font-semibold text-default-900 truncate max-w-40">{item.variant.name}</p>
+                                <LocalizedClientLink href={`/products/${item.slug}`}>
+                                    <p className="font-semibold text-default-900 truncate">{item.name}</p>
                                 </LocalizedClientLink>
                             </div>
                             <div className="flex gap-2 items-center">

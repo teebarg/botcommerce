@@ -78,13 +78,8 @@ export const productApi = {
     },
     async addReview(input: { product_id: number; rating: number; comment: string }): ApiResult<Review> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`;
-        const response = await tryCatch<Review>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
 
-        if (!response.error) {
-            revalidate("reviews");
-        }
-
-        return response;
+        return await tryCatch<Review>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
     },
     async productReviews({ product_id }: { product_id?: number }): ApiResult<Review[]> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${product_id}/reviews`;
@@ -103,7 +98,31 @@ export const productApi = {
             return handleError(error);
         }
     },
-    async uploadImage({ id, formData }: { id: number; formData: FormData }): ApiResult<Message> {
+    async uploadImage({ id, data }: { id: number; data: any }): ApiResult<Message> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/image`;
+
+        const response = await tryCatch<Message>(fetcher(url, { method: "PATCH", body: JSON.stringify(data) }));
+
+        if (!response.error) {
+            revalidate("products");
+            revalidate("search");
+        }
+
+        return response;
+    },
+    async deleteImage(id: number): ApiResult<Message> {
+        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/image`;
+
+        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
+
+        if (!response.error) {
+            revalidate("products");
+            revalidate("search");
+        }
+
+        return response;
+    },
+    async uploadImages({ id, formData }: { id: number; formData: FormData }): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/image`;
 
         const response = await tryCatch<Message>(fetcher(url, { method: "PATCH", body: formData }));
@@ -115,7 +134,7 @@ export const productApi = {
 
         return response;
     },
-    async deleteImage(id: number): ApiResult<Message> {
+    async deleteImages(id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/images/${id}`;
 
         const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
@@ -156,6 +175,7 @@ export const productApi = {
         productId: number;
         name: string;
         sku?: string;
+        image?: string;
         price: number;
         inventory: number;
         status: "IN_STOCK" | "OUT_OF_STOCK";

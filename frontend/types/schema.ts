@@ -21,6 +21,8 @@ export const RoleSchema = z.enum(["admin", "customer"]);
 
 export const StatusSchema = z.enum(["pending", "active", "inactive"]);
 
+export const ShopSettingsTypeSchema = z.enum(["FEATURE", "SHOP_DETAIL", "CUSTOM"]);
+
 export const TokenSchema = z.object({
     access_token: z.string(),
     token_type: z.string().default("bearer"),
@@ -111,6 +113,7 @@ export const ProductVariantSchema = z.object({
     name: z.string(),
     slug: z.string(),
     sku: z.string(),
+    image: z.string().optional(),
     status: ProductStatusSchema,
     price: z.number(),
     old_price: z.number(),
@@ -210,6 +213,8 @@ export const ProductSchema = z.object({
 
 export const CartItemSchema = z.object({
     id: z.number(),
+    name: z.string(),
+    slug: z.string(),
     item_id: z.string(),
     variant_id: z.string(),
     variant: ProductVariantSchema,
@@ -233,6 +238,7 @@ export const CartSchema = z.object({
     discount_total: z.number(),
     total: z.number(),
     billing_address: AddressSchema,
+    shipping_address_id: z.number(),
     shipping_address: AddressSchema,
     shipping_method: ShippingMethodSchema,
     payment_method: PaymentMethodSchema,
@@ -249,6 +255,7 @@ export const DeliveryOptionSchema = z.object({
 
 export const OrderItemSchema = z.object({
     id: z.number(),
+    name: z.string(),
     order_id: z.number(),
     variant_id: z.string(),
     variant: ProductVariantSchema,
@@ -264,6 +271,7 @@ export const OrderSchema = z.object({
     status: OrderStatusSchema,
     email: z.string(),
     cart_id: z.string(),
+    cart_number: z.string(),
     user_id: z.number(),
     user: UserSchema,
     order_items: z.array(OrderItemSchema),
@@ -353,4 +361,23 @@ export const PaystackResponseSchema = z.object({
     trans: z.string(),
     transaction: z.string(),
     trxref: z.string(),
+});
+
+export const ShopSettingsSchema = z.object({
+    id: z.number(),
+    key: z.string(),
+    value: z.string().nullable(),
+    type: ShopSettingsTypeSchema,
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const BankDetailsSchema = z.object({
+    id: z.number(),
+    bank_name: z.string(),
+    account_name: z.string(),
+    account_number: z.string(),
+    is_active: z.boolean(),
+    created_at: z.string(),
+    updated_at: z.string(),
 });

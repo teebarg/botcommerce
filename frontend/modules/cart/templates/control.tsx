@@ -8,23 +8,23 @@ import { Trash } from "nui-react-icons";
 import { CartItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
+import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 
 type ItemsTemplateProps = {
     item: CartItem;
 };
 
 const Control = ({ item }: ItemsTemplateProps) => {
+    const invalidateCart = useInvalidateCart();
+    const invalidateCartItems = useInvalidateCartItem();
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleDelete = async (id: number) => {
         setLoading(true);
-        try {
-            await api.cart.delete(id);
-        } catch (error) {
-            toast.error(`Error deleting item: ${error}`);
-        } finally {
-            setLoading(false);
-        }
+        await api.cart.delete(id);
+        invalidateCart();
+        invalidateCartItems();
+        setLoading(false);
     };
 
     const updateQuantity = async (id: number, quantity: number) => {
@@ -34,24 +34,21 @@ const Control = ({ item }: ItemsTemplateProps) => {
         // }
 
         setLoading(true);
-        try {
-            const response = await api.cart.changeQuantity({
-                item_id: id,
-                quantity,
-            });
+        const response = await api.cart.changeQuantity({
+            item_id: id,
+            quantity,
+        });
 
-            if (response.error) {
-                toast.error(response.error);
+        if (response.error) {
+            toast.error(response.error);
 
-                return;
-            }
-
-            toast.success("Cart updated successfully");
-        } catch (error) {
-            toast.error("Failed to add to cart");
-        } finally {
-            setLoading(false);
+            return;
         }
+
+        toast.success("Cart updated successfully");
+        invalidateCart();
+        invalidateCartItems();
+        setLoading(false);
     };
 
     return (

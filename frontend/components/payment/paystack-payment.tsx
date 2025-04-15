@@ -15,7 +15,7 @@ interface PaystackPaymentProps {
 }
 
 export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handlePayment = async () => {
         try {
@@ -39,34 +39,21 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
     return (
         <div className="space-y-4">
             {/* Details based on selected method */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-700 mb-2">{`You'll be redirected to Paystack to complete your payment securely.`}</p>
+            <div className="bg-content1 p-4 rounded-lg">
+                <p className="text-sm text-default-700 mb-2">{`You'll be redirected to Paystack to complete your payment securely.`}</p>
                 <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
+                    <div className="w-8 h-8 bg-content2 rounded-full flex items-center justify-center mr-2">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24">
                             <path d="M19.8657 9.24313H18.0925V14.2204H19.8657V9.24313Z" fill="#00C3F7" />
                             <path d="M9.93359 9.24313V14.2204H11.8373V16.5547H13.7068V14.2204H15.5139V9.24313H9.93359Z" fill="#00C3F7" />
                             <path d="M6.08594 9.24313V14.2204H7.98969V16.5547H9.85914V14.2204H11.6663V9.24313H6.08594Z" fill="#00C3F7" />
                         </svg>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Secured by Paystack</span>
+                    <span className="text-sm font-medium text-default-500">Secured by Paystack</span>
                 </div>
             </div>
-            <div className="rounded-lg border p-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-lg font-medium">Pay with Paystack</h3>
-                        <p className="text-sm text-muted-foreground">You will be redirected to Paystack to complete your payment</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-2xl font-bold">{currency(amount)}</p>
-                        <p className="text-sm text-muted-foreground">Total amount</p>
-                    </div>
-                </div>
-            </div>
-
-            <Button className="w-full" disabled={loading} onClick={handlePayment}>
-                {loading ? "Processing..." : `Pay ${currency(amount)} Now`}
+            <Button className="w-full" disabled={loading} isLoading={loading} onClick={handlePayment}>
+                Pay ${currency(amount)} Now
             </Button>
             {/* Security message */}
             <div className="mt-4 flex items-center justify-center text-xs text-gray-500">

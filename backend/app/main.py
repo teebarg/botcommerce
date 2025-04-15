@@ -4,7 +4,7 @@ import time
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Response, Request
+from fastapi import FastAPI, Response, Request, BackgroundTasks
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -22,31 +22,18 @@ from app.models.generic import (
     NewsletterCreate
 )
 from app.prisma_client import prisma
-from meilisearch import Client as MeilisearchClient
-from app.services.cache import get_cache_service
+from app.prisma_client import prisma as db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # app.state.meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
-    # app.state.redis_client = Redis(
-    #     host=settings.REDIS_HOST,
-    #     port=settings.REDIS_PORT,
-    #     password=settings.REDIS_PASSWORD,
-    #     ssl=True,
-    #     decode_responses=True,
-    # )
     # app.state.redis_client.ping()
-    print("🚀 ~ pinging redis......:")
-    app.state.cache_service = await get_cache_service()
-    app.state.cache_service.get("test")
-    print("🚀 ~ pinging redis......: done")
     print("🚀 ~ connecting to prisma......:")
     await prisma.connect()
     print("🚀 ~ connecting to prisma......: done")
     yield
     await prisma.disconnect()
 
-app = FastAPI(title=settings.PROJECT_NAME, openapi_url="/api/openapi.json", lifespan=lifespan)
+app = FastAPI(title="E-Shop", openapi_url="/api/openapi.json", lifespan=lifespan)
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):
@@ -104,32 +91,37 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 async def root():
     return {"message": "Server is running"}
 
-
 @app.post("/api/contact-form")
-async def contact_form(data: ContactFormCreate):
-    # Send download link
-    email_data = generate_contact_form_email(
-        name=data.name, email=data.email, phone=data.phone, message=data.message
-    )
-    send_email(
-        email_to=settings.ADMIN_EMAIL,
-        subject=email_data.subject,
-        html_content=email_data.html_content,
-    )
+async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreate):
+    async def send_email_task():
+        email_data = await generate_contact_form_email(
+            name=data.name, email=data.email, phone=data.phone, message=data.message
+        )
+
+        shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
+        send_email(
+            email_to=shop_email.value,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
+
+    background_tasks.add_task(send_email_task)
     return {"message": "Message sent successfully"}
 
 
 @app.post("/api/newsletter")
-async def newsletter(data: NewsletterCreate):
-    # Send download link
-    email_data = generate_newsletter_email(
-        email=data.email,
-    )
-    send_email(
-        email_to=settings.ADMIN_EMAIL,
-        subject=email_data.subject,
-        html_content=email_data.html_content,
-    )
+async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
+    async def send_email_task():
+        email_data = await generate_newsletter_email(
+            email=data.email,
+        )
+        shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
+        send_email(
+            email_to=shop_email.value,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
+    background_tasks.add_task(send_email_task)
     return {"message": "Email sent successfully"}
 
 
