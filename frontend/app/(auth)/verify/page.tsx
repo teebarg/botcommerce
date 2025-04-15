@@ -9,6 +9,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
+import { useInvalidate } from "@/lib/hooks/useCart";
 
 export default function VerifyMagicLink() {
     const [authState, setAuthState] = useState<"loading" | "success" | "expired">("loading");
@@ -16,6 +17,7 @@ export default function VerifyMagicLink() {
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
     const callbackUrl = searchParams.get("callbackUrl");
+    const invalidate = useInvalidate("me");
 
     const { shopSettings } = useStore();
 
@@ -38,6 +40,8 @@ export default function VerifyMagicLink() {
 
                 return;
             }
+
+            invalidate();
 
             setAuthState("success");
             setTimeout(() => {

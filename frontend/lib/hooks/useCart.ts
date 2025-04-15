@@ -10,7 +10,7 @@ export const useMe = () => {
     return useQuery({
         queryKey: ["me"],
         queryFn: async () => {
-            return await api.get<User>("/users/me");
+            return await api.get<User>("/users/me", { cache: "default" });
         },
         enabled: typeof window !== "undefined", // prevent server fetch
     });
@@ -147,4 +147,14 @@ export const useInvalidateProductReviews = () => {
     };
 
     return invalidateProductReviews;
+};
+
+export const useInvalidate = (key: string) => {
+    const queryClient = useQueryClient();
+
+    const invalidate = () => {
+        queryClient.invalidateQueries({ queryKey: [key] });
+    };
+
+    return invalidate;
 };

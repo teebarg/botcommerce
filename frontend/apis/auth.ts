@@ -1,6 +1,5 @@
 import { api } from "./base";
 
-import { revalidate } from "@/actions/revalidate";
 import { Message, Token } from "@/types/models";
 import { ApiResult } from "@/lib/try-catch";
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
@@ -17,18 +16,13 @@ export const authApi = {
         return response;
     },
     async signUp(input: { email: string; password: string; first_name: string; last_name: string }): ApiResult<Token> {
-        const response = await api.post<Token>("/auth/signup", input);
-
-        revalidate("user");
-
-        return response;
+        return await api.post<Token>("/auth/signup", input);
     },
     async social(input: { email: string; first_name: string; last_name: string; image: string }): ApiResult<Token> {
         const response = await api.post<Token>("/auth/google", input);
 
         if (!response.error && response.data) {
             await setCookie("access_token", response.data.access_token);
-            revalidate("user");
         }
 
         return response;
@@ -43,7 +37,6 @@ export const authApi = {
 
         if (!response.error && response.data) {
             await setCookie("access_token", response.data.access_token);
-            revalidate("user");
         }
 
         return response;
