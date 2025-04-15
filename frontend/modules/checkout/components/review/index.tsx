@@ -5,10 +5,10 @@ import { useSearchParams } from "next/navigation";
 import PaymentButton from "../payment-button";
 
 import { cn } from "@/lib/util/cn";
-import { Cart, User } from "@/types/models";
+import { Cart } from "@/types/models";
 import { useStore } from "@/app/store/use-store";
 
-const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "refunded_total">; customer: User | null }) => {
+const Review = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> }) => {
     const searchParams = useSearchParams();
     const { shopSettings } = useStore();
 
@@ -16,7 +16,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
 
     // const paidByGiftcard = cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0;
 
-    const previousStepsCompleted = cart?.shipping_address && cart?.shipping_method && cart?.payment_method;
+    const previousStepsCompleted = cart?.shipping_address_id && cart?.shipping_method && cart?.payment_method;
 
     if (!previousStepsCompleted || !isOpen) {
         return null;
@@ -37,7 +37,7 @@ const Review = ({ cart, customer }: { cart: Omit<Cart, "refundable_amount" | "re
                     Returns Policy and acknowledge that you have read {shopSettings.shop_name}&apos;s Privacy Policy.
                 </p>
             </div>
-            <PaymentButton cart={cart} data-testid="submit-order-button" isLoggedIn={!!customer} />
+            <PaymentButton cart={cart} data-testid="submit-order-button" isLoggedIn={true} />
         </div>
     );
 };

@@ -8,6 +8,7 @@ import { Cart, CartItem } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";
+import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 
 interface Props {
     onClose: () => void;
@@ -17,6 +18,8 @@ interface Props {
 }
 
 const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => {
+    const invalidateCart = useInvalidateCart();
+    const invalidateCartItems = useInvalidateCartItem();
     const [mounted, setMounted] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -33,43 +36,37 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
         // }
 
         setLoading(true);
-        try {
-            const response = await api.cart.changeQuantity({
-                item_id: id,
-                quantity,
-            });
+        const response = await api.cart.changeQuantity({
+            item_id: id,
+            quantity,
+        });
 
-            if (response.error) {
-                toast.error(response.error);
+        if (response.error) {
+            toast.error(response.error);
 
-                return;
-            }
-
-            toast.success("Added to cart successfully");
-        } catch (error) {
-            toast.error("Failed to add to cart");
-        } finally {
-            setLoading(false);
+            return;
         }
+
+        toast.success("Added to cart successfully");
+        invalidateCart();
+        invalidateCartItems();
+        setLoading(false);
     };
 
     const removeItem = async (id: number) => {
         setLoading(true);
-        try {
-            const response = await api.cart.delete(id);
+        const response = await api.cart.delete(id);
 
-            if (response.error) {
-                toast.error(response.error);
+        if (response.error) {
+            toast.error(response.error);
 
-                return;
-            }
-
-            toast.success("Item removed from cart successfully");
-        } catch (error) {
-            toast.error("Failed to remove item from cart");
-        } finally {
-            setLoading(false);
+            return;
         }
+
+        toast.success("Item removed from cart successfully");
+        invalidateCart();
+        invalidateCartItems();
+        setLoading(false);
     };
 
     return (

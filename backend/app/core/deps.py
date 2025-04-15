@@ -10,12 +10,12 @@ from pydantic import ValidationError
 from app.core import security
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.user import User
 from app.models.generic import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
+from prisma.models import User
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"

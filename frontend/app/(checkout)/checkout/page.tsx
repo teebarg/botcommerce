@@ -1,54 +1,44 @@
+"use client";
+
 import React from "react";
-import { Metadata } from "next";
 import CheckoutForm from "@modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
-import { ArrowRightOnRectangle, Cart, ChevronRight } from "nui-react-icons";
+import { ChevronRight } from "nui-react-icons";
 
 import PaymentButton from "@/modules/checkout/components/payment-button";
 import { BackButton } from "@/components/back";
-import { getSiteConfig } from "@/lib/config";
-import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
-import { api } from "@/apis";
 import ServerError from "@/components/server-error";
-import SignInPrompt from "@/modules/cart/components/sign-in-prompt";
-import { auth } from "@/actions/auth";
 import ClientOnly from "@/components/client-only";
+import { useCart } from "@/lib/hooks/useCart";
+import { useStore } from "@/app/store/use-store";
+import EmptyCartMessage from "@/modules/cart/components/empty-cart-message";
+import CheckoutSkeleton from "@/components/checkout/checkout-skeleton";
 
-export const metadata: Metadata = {
-    title: "Checkout",
-};
+export default function Checkout() {
+    const { user } = useStore();
+    const { shopSettings } = useStore();
 
-interface EmptyCartProps {}
+    const { data, error, isLoading } = useCart();
 
-const EmptyCart: React.FC<EmptyCartProps> = () => {
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="bg-content1 p-12 rounded-lg shadow-md text-center max-w-xl">
-                <Cart className="w-24 h-24 text-default-500 mx-auto mb-4" />
-                <h1 className="text-2xl font-bold text-default-900 mb-2">Your cart is empty</h1>
-                <p className="text-default-500 mb-12">{`Looks like you haven't added any items to your cart yet.`}</p>
-                <BtnLink color="primary" href="/collections">
-                    Continue shopping <ArrowRightOnRectangle className="ml-2 w-4 h-4" />
-                </BtnLink>
-            </div>
-        </div>
-    );
-};
-
-export default async function Checkout() {
-    const siteConfig = await getSiteConfig();
-    const { data, error } = await api.cart.get();
-    const user = await auth();
+    if (isLoading) {
+        return <CheckoutSkeleton />;
+    }
 
     if (error) {
         return <ServerError />;
     }
 
-    if (!data) {
-        return <EmptyCart />;
+    if (!data || !data.data) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <EmptyCartMessage />
+            </div>
+        );
     }
+
+    const cart = data?.data;
 
     return (
         <>
@@ -64,7 +54,7 @@ export default async function Checkout() {
                 {/* Header */}
                 <header className="hidden md:flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
                     <LocalizedClientLink className="text-xl font-semibold" href="/">
-                        {siteConfig.name}
+                        {shopSettings.shop_name}
                     </LocalizedClientLink>
                     <ThemeButton />
                 </header>{" "}
@@ -74,8 +64,6 @@ export default async function Checkout() {
                         {/* Left Column - Form */}
                         <div className="w-full">
                             <h1 className="text-xl font-light">Checkout your cart</h1>
-                            {/* <SignInPrompt /> */}
-                            {!user && <SignInPrompt />}
                             <nav aria-label="Breadcrumbs" data-slot="base">
                                 <ol className="flex flex-wrap list-none rounded-lg mb-2 mt-4" data-slot="list">
                                     <li className="flex items-center" data-slot="base">
@@ -91,20 +79,20 @@ export default async function Checkout() {
                             </nav>
 
                             <ClientOnly>
-                                <CheckoutForm cart={data} />
+                                <CheckoutForm cart={cart} />
                             </ClientOnly>
                         </div>
 
                         {/* Right Column Cart summary */}
                         <div className="mb-24 md:mb-0">
-                            <CheckoutSummary cart={data} />
+                            <CheckoutSummary cart={cart} />
                         </div>
                     </div>
                 </main>
                 {/* Mobile cart summary */}
                 <div className="fixed md:hidden bottom-0 z-20 w-full py-5 px-4 bg-content1 shadow-2xl">
                     <div className="flex flex-row-reverse justify-between items-center">
-                        <PaymentButton cart={data} data-testid="submit-order-button" isLoggedIn={!!user} />
+                        <PaymentButton cart={cart} data-testid="submit-order-button" isLoggedIn={!!user} />
                     </div>
                 </div>
             </div>

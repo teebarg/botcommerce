@@ -33,7 +33,6 @@ async def create_order(
 @router.get("/{order_id}", response_model=OrderResponse)
 @cache(key="order")
 async def get_order(
-    request: Request,
     order_id: str,
     order_service: OrderService = Depends(get_order_service)
 ):

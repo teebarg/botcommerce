@@ -24,7 +24,6 @@ class Search(BaseModel):
 @router.get("/", dependencies=[])
 # @cache(key="categories")
 async def index(
-    # request: Request,
     query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),

@@ -1,3 +1,5 @@
+"use client";
+
 import Addresses from "@modules/checkout/components/addresses";
 import Payment from "@modules/checkout/components/payment";
 import Review from "@modules/checkout/components/review";
@@ -5,13 +7,12 @@ import Shipping from "@modules/checkout/components/shipping";
 
 import { currency } from "@/lib/util/util";
 import { Cart, DeliveryOption } from "@/types/models";
-import { api } from "@/apis";
 
 type CheckoutFormProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
 };
 
-const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
+const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart }) => {
     const availableShippingMethods: DeliveryOption[] = [
         {
             id: "STANDARD",
@@ -36,17 +37,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = async ({ cart }) => {
         },
     ];
 
-    // get customer if logged in
-    const { data: customer } = await api.user.me();
-
     return (
         <div>
             <div className="w-full grid grid-cols-1 gap-y-4">
-                <Addresses cart={cart} user={customer} />
+                <Addresses cart={cart} />
                 <Shipping availableShippingMethods={availableShippingMethods} cart={cart} />
                 <Payment cart={cart} />
                 <div className="hidden md:block">
-                    <Review cart={cart} customer={customer} />
+                    <Review cart={cart} />
                 </div>
             </div>
         </div>

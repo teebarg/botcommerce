@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";
 import { api } from "@/apis";
-import { BankDetails } from "@/types/models";
+import { useBank } from "@/lib/hooks/useCart";
 
 interface BankTransferProps {
     amount: number;
@@ -15,21 +15,24 @@ interface BankTransferProps {
 }
 
 const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
-    const [bankDetails, setBankDetails] = useState<BankDetails[]>([]);
+    // const [bankDetails, setBankDetails] = useState<BankDetails[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
 
-    useEffect(() => {
-        const fetchBankDetails = async () => {
-            const { data, error } = await api.bank.getBankDetails("no-cache");
+    const { data: bankDetailsData } = useBank();
+    const bankDetails = bankDetailsData?.data;
 
-            if (!error) {
-                setBankDetails(data || []);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchBankDetails = async () => {
+    //         const { data, error } = await api.bank.getBankDetails("no-cache");
 
-        fetchBankDetails();
-    }, []);
+    //         if (!error) {
+    //             setBankDetails(data || []);
+    //         }
+    //     };
+
+    //     fetchBankDetails();
+    // }, []);
 
     const onPaymentCompleted = async () => {
         setLoading(true);
@@ -53,15 +56,15 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
             <div className="bg-content1 p-4 rounded-lg space-y-3">
                 <div>
                     <p className="text-sm font-medium text-default-700">Bank Name</p>
-                    <p className="text-sm text-default-600">{bankDetails[0]?.bank_name}</p>
+                    <p className="text-sm text-default-600">{bankDetails?.[0]?.bank_name}</p>
                 </div>
                 <div>
                     <p className="text-sm font-medium text-default-700">Account Number</p>
-                    <p className="text-sm text-default-600">{bankDetails[0]?.account_number}</p>
+                    <p className="text-sm text-default-600">{bankDetails?.[0]?.account_number}</p>
                 </div>
                 <div>
                     <p className="text-sm font-medium text-default-700">Account Name</p>
-                    <p className="text-sm text-default-600">{bankDetails[0]?.account_name}</p>
+                    <p className="text-sm text-default-600">{bankDetails?.[0]?.account_name}</p>
                 </div>
                 <p className="text-xs text-default-500 mt-2">Please use your order number as reference when making the transfer.</p>
             </div>

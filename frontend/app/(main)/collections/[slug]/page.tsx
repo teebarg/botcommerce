@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Collection, SortOptions, WishItem } from "types/models";
+import { SortOptions, WishItem } from "types/models";
 import React, { Suspense } from "react";
 import { Exclamation } from "nui-react-icons";
 
@@ -32,18 +32,6 @@ export async function generateMetadata({ params }: { params: Params }) {
     }
 
     return { title: collection.name } as Metadata;
-}
-
-export async function generateStaticParams() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/?limit=100`).then((res) => res.json());
-
-    if (!res) {
-        return [];
-    }
-
-    return res.collections.map((collection: Collection) => ({
-        slug: collection.slug,
-    }));
 }
 
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {

@@ -10,12 +10,16 @@ import { currency } from "@lib/util/util";
 import Control from "@/modules/cart/templates/control";
 import LocalizedClientLink from "@/components/ui/link";
 import { CartItem } from "@/types/models";
+import { useCartItem } from "@/lib/hooks/useCart";
 
-type ItemsTemplateProps = {
-    items: CartItem[];
-};
+const CartItems = () => {
+    const { data, isLoading } = useCartItem();
 
-const CartItems = ({ items }: ItemsTemplateProps) => {
+    const items = data?.data ?? [];
+
+    if (isLoading) return <div>Loading cart...</div>;
+    if (!items.length) return <div>No items in cart</div>;
+
     return (
         <div>
             <div className="hidden md:block">

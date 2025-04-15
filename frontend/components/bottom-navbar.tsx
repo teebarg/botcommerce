@@ -5,7 +5,7 @@ import { MenuIcon, User } from "lucide-react";
 
 import Menu from "./menu";
 
-import { Cart } from "@/modules/layout/components/cart";
+import { CartComponent } from "@/modules/layout/components/cart";
 import LocalizedClientLink from "@/components/ui/link";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { auth } from "@/actions/auth";
@@ -52,7 +52,7 @@ const ButtonNav = async ({ className }: { className?: string }) => {
                 </LocalizedClientLink>
             ))}
             <span className="flex flex-col items-center">
-                <Cart />
+                <CartComponent />
                 Cart
             </span>
 

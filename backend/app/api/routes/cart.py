@@ -47,7 +47,7 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
     # Verify product variant exists and is in stock
     variant = await db.productvariant.find_unique(
         where={"id": item.variant_id},
-        # include={"product": True}
+        include={"product": True}
     )
 
     if not variant:
@@ -71,12 +71,13 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
         await db.cartitem.create(
             data={
                 "cart_id": cart.id,
+                "cart_number": cart.cart_number,
                 "name": variant.name,
                 "slug": variant.slug,
                 "variant_id": item.variant_id,
                 "quantity": item.quantity,
                 "price": variant.price,
-                "image": variant.image
+                "image": variant.product.image
             },
         )
 
@@ -90,19 +91,10 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
 @router.get("/", response_model=Optional[CartResponse])
 async def get_cart(cartId: str = Header()):
     """Get a specific cart by ID"""
-    cart = None
-
     if not cartId:
         return None
 
-    cart = await db.cart.find_unique(
-        where={"cart_number": cartId},
-        include={
-            "items": True,
-            "shipping_address": True
-        }
-    )
-    return cart
+    return await db.cart.find_unique(where={"cart_number": cartId})
 
 
 @router.get("/items", response_model=list[CartItemResponse])
@@ -110,7 +102,7 @@ async def get_cart_items(cartId: str = Header()):
     """Get all items in a specific cart"""
     if not cartId:
         return None
-    cart_items = await db.cartitem.find_many(where={"cart_id": cartId})
+    cart_items = await db.cartitem.find_many(where={"cart_number": cartId})
     return cart_items
 
 
@@ -201,10 +193,15 @@ async def delete(cartId: str = Header(default=None)) -> Message:
 async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)):
     """Remove an item from cart"""
     cart_item = await db.cartitem.find_unique(where={"id": item_id}, include={"cart": True})
-    if not cart_item or cart_item.cart.cart_number != cartId:
+    if not cart_item or cart_item.cart_number != cartId:
         raise HTTPException(status_code=404, detail="Cart item not found")
 
-    await db.cartitem.delete(where={"id": item_id})
+    try:
+        await db.cartitem.delete(where={"id": item_id})
+        await calculate_cart_totals(cart=cart_item.cart)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     return {"message": "Item removed from cart successfully"}
 
 

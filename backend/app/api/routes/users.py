@@ -24,20 +24,21 @@ async def read_user_me(
     user: CurrentUser
 ):
     """Get current user with caching."""
-    user = await db.user.find_unique(
-        where={"id": user.id},
-        include={"addresses": True}
-    )
     return user
-    # shipping_addresses = db.exec(
-    #     select(Address).where(Address.user_id == user.id, Address.is_billing.is_(False))
-    # ).all()
 
-    # billing_address = db.exec(
-    #     select(Address).where(Address.user_id == user.id, Address.is_billing)
-    # ).first()
 
-    # return User(**user.model_dump(), shipping_addresses=shipping_addresses, billing_address=billing_address)
+
+@router.get("/address")
+async def read_user_address(
+    user: CurrentUser
+):
+    """Get current user addresses."""
+    addresses = await db.address.find_many(
+        where={"user_id": user.id},
+        order={"created_at": "desc"}
+    )
+    address_dicts = [address.dict() for address in addresses]
+    return {"addresses": address_dicts}
 
 
 @router.patch("/me")

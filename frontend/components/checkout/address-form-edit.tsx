@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Address, AddressType } from "@/types/models";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { api } from "@/apis";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onClose?: () => void }) => {
+    const queryClient = useQueryClient();
     const [isPending, setIsPending] = useState<boolean>(false);
     const [formData, setFormData] = useState({
         label: address?.label || "",
@@ -70,6 +72,8 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
 
             return;
         }
+        queryClient.invalidateQueries({ queryKey: ["user-address"] });
+        queryClient.invalidateQueries({ queryKey: ["cart-address", address?.id] });
         onClose?.();
     };
 

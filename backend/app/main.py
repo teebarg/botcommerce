@@ -22,16 +22,11 @@ from app.models.generic import (
     NewsletterCreate
 )
 from app.prisma_client import prisma
-from app.services.cache import get_cache_service
 from app.prisma_client import prisma as db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # app.state.redis_client.ping()
-    print("🚀 ~ pinging redis......:")
-    app.state.cache_service = await get_cache_service()
-    app.state.cache_service.get("test")
-    print("🚀 ~ pinging redis......: done")
     print("🚀 ~ connecting to prisma......:")
     await prisma.connect()
     print("🚀 ~ connecting to prisma......: done")

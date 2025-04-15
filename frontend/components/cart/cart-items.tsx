@@ -6,17 +6,23 @@ import LineItemPrice from "@modules/common/components/line-item-price";
 import Image from "next/image";
 import { cn } from "@lib/util/cn";
 
-import Control from "./control";
-
-import LocalizedClientLink from "@/components/ui/link";
 import { CartItem } from "@/types/models";
+import { useCartItem } from "@/lib/hooks/useCart";
+import LocalizedClientLink from "@/components/ui/link";
+import Control from "@/modules/cart/templates/control";
 
 type ItemsTemplateProps = {
     className?: string;
-    items?: CartItem[];
 };
 
-const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
+const CartClient = ({ className }: ItemsTemplateProps) => {
+    const { data, isLoading } = useCartItem();
+
+    const items = data?.data ?? [];
+
+    if (isLoading) return <div>Loading cart...</div>;
+    if (!items.length) return <div>No items in cart</div>;
+
     return (
         <React.Fragment>
             <ul className={cn("max-h-[40vh] overflow-y-auto", className)}>
@@ -28,7 +34,7 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
                         <div className="flex flex-1 flex-col">
                             <div className="text-sm">
                                 <LocalizedClientLink href={`/products/${item.slug}`}>
-                                    <p className="font-semibold text-default-900 truncate">{item.name}</p>
+                                    <p className="font-semibold text-default-900 truncate max-w-40">{item.name}</p>
                                 </LocalizedClientLink>
                             </div>
                             <div className="flex gap-2 items-center">
@@ -53,4 +59,4 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
     );
 };
 
-export default ItemsPreviewTemplate;
+export default CartClient;

@@ -1,10 +1,10 @@
-import React, { Suspense } from "react";
+import React from "react";
 import UserDropDown from "@modules/account/components/user-menu";
-import { Cart } from "@modules/layout/components/cart";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
-import { HeartFilled, Heart, ShoppingCart } from "nui-react-icons";
+import { HeartFilled, Heart } from "nui-react-icons";
 import dynamic from "next/dynamic";
 
+import { CartComponent } from "@/modules/layout/components/cart";
 import Search from "@/modules/search/components/search";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
@@ -40,9 +40,7 @@ const Navbar = async () => {
                     <Search className="w-full justify-between" />
                 </NavbarItem>
                 <NavbarItem className="md:w-[25vw] flex gap-3 justify-end items-center">
-                    <Suspense fallback={<ShoppingCart className="w-6 h-6" />}>
-                        <Cart />
-                    </Suspense>
+                    <CartComponent />
                     <ThemeButton />
                     <div className="hidden md:flex">
                         {user ? (

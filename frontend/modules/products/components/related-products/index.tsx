@@ -1,13 +1,15 @@
-import { api } from "@/apis";
+"use client";
+
 import { Product, ProductSearch } from "@/types/models";
 import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/server-error";
+import { useProductSearch } from "@/lib/hooks/useCart";
 
 type RelatedProductsProps = {
     product: Product;
 };
 
-export default async function RelatedProducts({ product }: RelatedProductsProps) {
+export default function RelatedProducts({ product }: RelatedProductsProps) {
     // edit this function to define your related products logic
     const setQueryParams = (): any => {
         const params: any = {};
@@ -22,7 +24,13 @@ export default async function RelatedProducts({ product }: RelatedProductsProps)
     };
 
     const queryParams = setQueryParams();
-    const { data, error } = await api.product.search(queryParams);
+    const { data: response, isLoading } = useProductSearch(queryParams);
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">Loading........</div>;
+    }
+
+    const { data, error } = response || {};
 
     if (error || !data) {
         return <ServerError />;

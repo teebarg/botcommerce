@@ -383,6 +383,7 @@ model CartItem {
   slug         String?
   cart         Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
   cart_id      Int
+  cart_number  String?
   variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: Cascade)
   variant_id   Int
   quantity     Int

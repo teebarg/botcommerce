@@ -3,6 +3,8 @@ import { Lexend, Outfit } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
 
+import TanstackProviders from "./query-provider";
+
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
@@ -72,7 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <PushNotificationManager />
                         <InstallPrompt />
                         <Toaster closeButton richColors duration={10000} expand={false} position="top-right" />
-                        {children}
+                        <TanstackProviders>{children}</TanstackProviders>
                     </div>
                     {/* {!user && <Google />} */}
                 </ProgressBar>

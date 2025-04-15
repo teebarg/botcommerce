@@ -60,7 +60,7 @@ router = APIRouter()
 
 @router.get("/landing-products")
 @cache(key="featured")
-async def get_landing_products(request: Request):
+async def get_landing_products():
     """
     Retrieve multiple product categories in a single request.
     """
@@ -169,7 +169,6 @@ async def index(
 @router.get("/search")
 @cache(key="search")
 async def search(
-    request: Request,
     search: str = "",
     sort: str = "created_at:desc",
     brand_id: str = Query(default=""),
@@ -311,18 +310,15 @@ async def create_product(product: ProductCreate, cache: CacheService):
 
 @router.get("/{slug}")
 @cache(key="product", hash=False)
-async def read(request: Request, slug: str):
+async def read(slug: str):
     """
     Get a specific product by slug with Redis caching.
     """
     product = await db.product.find_unique(
         where={"slug": slug},
         include={
-            # "brand": True,
             "variants": True,
-            # "categories": True,
             "images": True,
-            # "reviews": {"include": {"user": True}},
         }
     )
     if not product:

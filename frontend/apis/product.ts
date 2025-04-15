@@ -78,13 +78,8 @@ export const productApi = {
     },
     async addReview(input: { product_id: number; rating: number; comment: string }): ApiResult<Review> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`;
-        const response = await tryCatch<Review>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
 
-        if (!response.error) {
-            revalidate("reviews");
-        }
-
-        return response;
+        return await tryCatch<Review>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
     },
     async productReviews({ product_id }: { product_id?: number }): ApiResult<Review[]> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${product_id}/reviews`;

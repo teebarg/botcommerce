@@ -1,14 +1,14 @@
-import ItemsPreviewTemplate from "@modules/cart/templates/preview";
 import DiscountCode from "@modules/checkout/components/discount-code";
 import CartTotals from "@modules/common/components/cart-totals";
 
 import { Cart } from "@/types/models";
+import CartClient from "@/components/cart/cart-items";
 
 interface CheckoutSummaryProps {
     cart: Cart;
 }
 
-const CheckoutSummary = async ({ cart }: CheckoutSummaryProps) => {
+const CheckoutSummary = ({ cart }: CheckoutSummaryProps) => {
     if (!cart) {
         return null;
     }
@@ -19,7 +19,7 @@ const CheckoutSummary = async ({ cart }: CheckoutSummaryProps) => {
                 <h2 className="font-medium text-default-500">Cart Summary</h2>
                 <hr className="tb-divider mt-4" />
                 <CartTotals data={cart} />
-                <ItemsPreviewTemplate items={cart?.items} />
+                <CartClient />
                 <div className="my-6">
                     <DiscountCode cart={cart} />
                 </div>

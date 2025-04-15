@@ -12,12 +12,15 @@ import { api } from "@/apis";
 import ProductShare from "@/components/product/product-share";
 import { Product, ProductImage } from "@/types/models";
 import { Button } from "@/components/ui/button";
+import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 
 interface Props {
     product: Product;
 }
 
 const ProductView: React.FC<Props> = ({ product }) => {
+    const invalidateCart = useInvalidateCart();
+    const invalidateCartItems = useInvalidateCartItem();
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedImageId, setSelectedImageId] = useState<number>(product.images[0]?.id || 0);
     const [loading, setLoading] = useState<boolean>(false);
@@ -42,25 +45,21 @@ const ProductView: React.FC<Props> = ({ product }) => {
         // }
 
         setLoading(true);
-        try {
-            const response = await api.cart.add({
-                variant_id: product.variants[0].id,
-                quantity,
-            });
+        const response = await api.cart.add({
+            variant_id: product.variants[0].id,
+            quantity,
+        });
 
-            if (response.error) {
-                toast.error(response.error);
+        if (response.error) {
+            toast.error(response.error);
 
-                return;
-            }
-
-            toast.success("Added to cart successfully");
-            // router.refresh();
-        } catch (error) {
-            toast.error("Failed to add to cart");
-        } finally {
-            setLoading(false);
+            return;
         }
+        invalidateCartItems();
+        invalidateCart();
+
+        toast.success("Added to cart successfully");
+        setLoading(false);
     };
 
     return (

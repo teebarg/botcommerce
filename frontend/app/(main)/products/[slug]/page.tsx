@@ -1,13 +1,12 @@
 import { notFound } from "next/navigation";
-import React, { Suspense } from "react";
+import React from "react";
 import RelatedProducts from "@modules/products/components/related-products";
-import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products";
 
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import ProductView from "@/components/store/products/product-view";
-import { Skeleton } from "@/components/skeleton";
 import ReviewsSection from "@/components/product/product-reviews";
+import { auth } from "@/actions/auth";
 
 type Params = Promise<{ slug: string }>;
 
@@ -32,6 +31,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
+    const user = await auth();
 
     const { data: product, error } = await api.product.get(slug);
 
@@ -46,16 +46,10 @@ export default async function ProductPage({ params }: { params: Params }) {
     return (
         <div className="flex flex-col gap-y-8">
             <ProductView product={product} />
-
-            {/* ReviewSection */}
-            <Suspense fallback={<Skeleton className="h-48" />}>
-                <ReviewsSection product_id={product.id} />
-            </Suspense>
+            {user && <ReviewsSection product_id={product.id} />}
 
             <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products-container">
-                <Suspense fallback={<SkeletonRelatedProducts />}>
-                    <RelatedProducts product={product} />
-                </Suspense>
+                <RelatedProducts product={product} />
             </div>
         </div>
     );
