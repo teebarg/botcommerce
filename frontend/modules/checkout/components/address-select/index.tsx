@@ -1,12 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import compareAddresses from "@lib/util/compare-addresses";
 import { omit } from "@lib/util/util";
 import { Loader } from "nui-react-icons";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Plus, ChevronRight, Check, Home, Pencil, MapPin } from "lucide-react";
+import { Search, Plus, Home, Pencil, MapPin } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -64,7 +63,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
             key={address.id}
             animate={{ opacity: 1, y: 0 }}
             className={`relative cursor-pointer group ${
-                selectedAddress?.id === address.id ? "bg-content2" : "hover:bg-content2"
+                selectedAddress?.id === address.id ? "bg-content2 border-1 border-primary" : "hover:bg-content2"
             } rounded-xl p-4 transition-all`}
             exit={{ opacity: 0, y: -20 }}
             initial={{ opacity: 0, y: 20 }}
@@ -103,11 +102,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
                     >
                         <Pencil className="w-4 h-4" />
                     </Button>
-                    {selectedAddress?.id === address.id ? (
-                        <Check className="w-5 h-5 text-blue-500" />
-                    ) : (
-                        <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-gray-400" />
-                    )}
+                    {/* {selectedAddress?.id === address.id && <Check className="w-5 h-5 text-blue-500" />} */}
                 </div>
             </div>
             {loading && (
@@ -212,7 +207,7 @@ const CheckoutLoginPrompt: React.FC = () => {
 
 const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
     const { data, isLoading } = useUserAddresses();
-    const addresses = data?.data?.addresses ?? [];
+    const addresses = data?.addresses ?? [];
 
     const state = useOverlayTriggerState({});
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -222,9 +217,7 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
             address.address_1.toLowerCase().includes(searchQuery.toLowerCase()) || address.city.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const selectedAddress = useMemo(() => {
-        return addresses.find((a) => compareAddresses(a, address));
-    }, [addresses, address]);
+    const selectedAddress = useMemo(() => addresses.find((a) => a.id === address?.id), [addresses, address]);
 
     if (isLoading) {
         return <div className="h-24" />;

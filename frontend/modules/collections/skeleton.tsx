@@ -46,7 +46,7 @@ const CollectionTemplateSkeleton = () => {
                         </ol>
                     </nav>
 
-                    <div className="flex gap-6 mt-0 md:mt-6">
+                    <div>
                         <div className="w-full flex-1 flex-col">
                             {/* TopBar skeleton */}
                             <Skeleton className="h-14 w-full rounded" />

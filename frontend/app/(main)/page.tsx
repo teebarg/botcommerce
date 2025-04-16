@@ -103,7 +103,7 @@ export default async function Home() {
                 </section>
 
                 {/* Category Sections */}
-                <section className="pt-6 md:pt-10 bg-gray-50">
+                <section className="pt-6 md:pt-10">
                     <div className="container mx-auto px-4">
                         <h2 className="text-2xl font-bold text-commerce-primary mb-4 text-center">Shop by Category</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -133,7 +133,7 @@ export default async function Home() {
                     subtitle="Get up to 50% OFF on select products."
                     title="Big Sale on Top Brands!"
                 />
-                <div className="bg-content1">
+                <div>
                     <div className="max-w-8xl mx-auto relative px-1 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
@@ -164,7 +164,7 @@ export default async function Home() {
                     subtitle="Get up to 50% OFF on select products."
                     title="Big Sale on Top Brands!"
                 />
-                <div className="bg-content1">
+                <div>
                     <div className="max-w-8xl mx-auto relative px-1 md:px-0">
                         <p className="text-lg text-primary mb-2 font-semibold">Trending</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
@@ -180,7 +180,7 @@ export default async function Home() {
                     subtitle="Get up to 50% OFF on select products."
                     title="Big Sale on Top Brands!"
                 />
-                <div className="bg-content1">
+                <div>
                     <div className="max-w-8xl mx-auto px-1 md:px-0">
                         <p className="text-primary font-semibold">New Arrivals</p>
                         <p className="text-2xl font-semibold">Find the best thrifts for your kids</p>
@@ -231,7 +231,7 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white/90">
+                <div>
                     <div className="max-w-7xl mx-auto py-6">
                         <p className="text-lg font-semibold text-gray-800 mb-2 ml-2 sm:ml-0">OUR LOCATION</p>
                         <iframe

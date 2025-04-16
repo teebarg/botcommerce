@@ -17,7 +17,7 @@ export default function VerifyMagicLink() {
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
     const callbackUrl = searchParams.get("callbackUrl");
-    const invalidate = useInvalidate("me");
+    const invalidate = useInvalidate();
 
     const { shopSettings } = useStore();
 
@@ -41,7 +41,7 @@ export default function VerifyMagicLink() {
                 return;
             }
 
-            invalidate();
+            invalidate("me");
 
             setAuthState("success");
             setTimeout(() => {

@@ -13,7 +13,7 @@ import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/util/cn";
 import { currency } from "@/lib/util/util";
-import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
+import { useInvalidate, useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -24,6 +24,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishlist = false }) => {
     const invalidateCart = useInvalidateCart();
     const invalidateCartItems = useInvalidateCartItem();
+    const invalidate = useInvalidate();
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const { id, slug, name, price, old_price, image, variants, status } = product;
@@ -40,6 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
             return;
         }
+        invalidate("wishlist");
         toast.success("Added to favorites");
     };
 
@@ -51,6 +53,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
             return;
         }
+        invalidate("wishlist");
         toast.success("Removed from favorites");
     };
 
@@ -96,8 +99,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
             onClick={() => router.push(`/products/${slug}`)}
         >
             <div className="flex flex-col gap-2 w-full">
-                <div className="aspect-square w-full relative overflow-hidden rounded-xl">
-                    {image && <Image fill alt={name} className="object-cover h-full w-full group-hover:scale-110 transition" src={image} />}
+                <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
+                    {image && <Image fill alt={name} className="object-cover h-full w-full group-hover:scale-110 transition p-4" src={image} />}
                     {showWishlist && (
                         <Button
                             className={cn(

@@ -23,28 +23,15 @@ module.exports = {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
             },
-            backgroundColor: {
-                content1: "hsl(var( --content1))",
-                content2: "hsl(var( --content2))",
-                content3: "hsl(var( --content3))",
-                content4: "hsl(var( --content4))",
-                "content1-foreground": "hsl(var( --content1-foreground))",
-                "content2-foreground": "hsl(var( --content2-foreground))",
-                "content3-foreground": "hsl(var( --content3-foreground))",
-                "content4-foreground": "hsl(var( --content4-foreground))",
-                divider: "hsl(var(--divider) / 0.15)",
-            },
             borderColor: {
                 divider: "hsl(var(--divider))",
                 content1: "hsl(var(--content1))",
-                content2: "hsl(var(--content2))",
-                content3: "hsl(var(--content3))",
-                content4: "hsl(var(--content4))",
             },
             borderRadius: {
                 50: "50%",
                 "1xl": "0.875rem",
                 "top-corners": "5px 5px 0 0",
+                "bottom-corners": "0 0 5px 5px",
             },
             borderWidth: {
                 1: "1px",
@@ -67,22 +54,16 @@ module.exports = {
             },
             colors: {
                 background: {
-                    DEFAULT: "hsl(var(--background))",
-                    100: "hsl(var(--background-100))",
-                    500: "hsl(var(--background-500))",
-                    900: "hsl(var(--background-900))",
+                    // DEFAULT: "hsl(var(--background))",
+                    DEFAULT: "var(--background)",
                 },
                 foreground: {
                     DEFAULT: "hsl(var(--foreground))",
-                    100: "hsl(var(--foreground-100))",
-                    500: "hsl(var(--foreground-500))",
-                    900: "hsl(var(--foreground-900))",
                 },
                 default: generateColorScale("default"),
                 danger: generateColorScale("danger"),
                 success: generateColorScale("success"), // Add other color names as needed
                 warning: generateColorScale("warning"),
-                divider: "hsl(var(--divider))",
                 divider: "hsl(var(--divider))",
                 card: {
                     DEFAULT: "hsl(var(--card))",
@@ -108,20 +89,14 @@ module.exports = {
                     DEFAULT: "hsl(var(--accent))",
                     foreground: "hsl(var(--accent-foreground))",
                 },
-                destructive: {
-                    DEFAULT: "hsl(var(--destructive))",
-                    foreground: "hsl(var(--destructive-foreground))",
-                },
                 border: "hsl(var(--border))",
-                input: "hsl(var(--input))",
+                input: "var(--input)",
                 ring: "hsl(var(--ring))",
-                chart: {
-                    1: "hsl(var(--chart-1))",
-                    2: "hsl(var(--chart-2))",
-                    3: "hsl(var(--chart-3))",
-                    4: "hsl(var(--chart-4))",
-                    5: "hsl(var(--chart-5))",
-                },
+                content1: "var(--content1)",
+                // content1: "hsl(var( --content1))",
+                content2: "hsl(var( --content2))",
+                content3: "hsl(var( --content3))",
+                content4: "hsl(var( --content4))",
             },
             keyframes: {
                 blob: {

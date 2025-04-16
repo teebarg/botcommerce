@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Minus, Plus, ShoppingCart, Trash, X } from "lucide-react";
 import { toast } from "sonner";
+import { usePathname } from "next/navigation";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import { Cart, CartItem } from "@/types/models";
@@ -22,6 +23,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
     const invalidateCartItems = useInvalidateCartItem();
     const [mounted, setMounted] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const path = usePathname();
 
     useEffect(() => {
         setMounted(true);
@@ -169,12 +171,14 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                             <span>Total</span>
                             <span>{currency(cart?.total || 0)}</span>
                         </div>
-                        <BtnLink
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-medium transition-colors mt-4"
-                            href="/checkout"
-                        >
-                            Checkout
-                        </BtnLink>
+                        {path !== "/checkout" && (
+                            <BtnLink
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full font-medium transition-colors mt-4"
+                                href="/checkout"
+                            >
+                                Checkout
+                            </BtnLink>
+                        )}
                         <button className="w-full text-blue-600 py-2 text-sm hover:underline" onClick={onClose}>
                             Continue Shopping
                         </button>

@@ -2,10 +2,13 @@ import UserDropDown from "@modules/account/components/user-menu";
 import ActivityTray from "@modules/common/components/activity-tray";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
 import dynamic from "next/dynamic";
+import { MenuIcon } from "lucide-react";
 
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import AdminMobileMenu from "@/components/admin/layouts/mobile-menu";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
@@ -20,11 +23,22 @@ const AdminNavbar = async () => {
     return (
         <NavigationBar>
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-                <NavbarBrand className="gap-3 max-w-fit">
+                <NavbarBrand className="gap-3 max-w-fit hidden sm:block">
                     <LocalizedClientLink href="/admin">
                         <p className="font-bold text-inherit">{siteConfig.name}</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
+                <Drawer>
+                    <DrawerTrigger className="md:hidden">
+                        <MenuIcon className="h-8 w-8" />
+                    </DrawerTrigger>
+                    <DrawerContent>
+                        <DrawerHeader>
+                            <DrawerTitle className="sr-only">Menu</DrawerTitle>
+                        </DrawerHeader>
+                        <AdminMobileMenu />
+                    </DrawerContent>
+                </Drawer>
             </NavbarContent>
 
             <NavbarContent className="flex basis-1/5 sm:basis-full" justify="end">
@@ -38,7 +52,7 @@ const AdminNavbar = async () => {
                 </NavbarItem>
                 <NavbarItem className="flex">
                     {user ? (
-                        <UserDropDown user={user} />
+                        <UserDropDown size="sm" user={user} />
                     ) : (
                         <LocalizedClientLink href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>

@@ -23,10 +23,10 @@ export default function ContactForm() {
     return (
         <form ref={formRef} action={formAction}>
             <div className="mt-10 space-y-4">
-                <Input required className="" label="Name" name="name" placeholder="Ex. John....." />
-                <Input required className="" label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
-                <Input className="" label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
-                <Textarea required className="" label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
+                <Input required label="Name" name="name" placeholder="Ex. John....." />
+                <Input required label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
+                <Input label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
+                <Textarea required label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
                 <div className="text-default-600 flex items-center">
                     <Checkbox checked={true} name="agreement" />
                     <label className="ml-2 text-sm">I allow this website to store my submission.</label>

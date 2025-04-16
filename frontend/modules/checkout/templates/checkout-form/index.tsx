@@ -43,9 +43,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart }) => {
                 <Addresses cart={cart} />
                 <Shipping availableShippingMethods={availableShippingMethods} cart={cart} />
                 <Payment cart={cart} />
-                <div className="hidden md:block">
-                    <Review cart={cart} />
-                </div>
+                <Review cart={cart} />
             </div>
         </div>
     );

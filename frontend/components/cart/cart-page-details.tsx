@@ -27,9 +27,7 @@ const CartPageDetails: React.FC<Props> = ({ cart }) => {
         setMounted(true);
     }, []);
 
-    const { data, isLoading } = useCartItem();
-
-    const items = data?.data ?? [];
+    const { data: items, isLoading } = useCartItem();
 
     if (!mounted) return null;
 
@@ -40,7 +38,7 @@ const CartPageDetails: React.FC<Props> = ({ cart }) => {
     return (
         <AnimatePresence>
             <motion.div animate={{ y: 0 }} exit={{ y: "100%" }} initial={{ y: "100%" }} transition={{ type: "spring", damping: 25, stiffness: 300 }}>
-                {items.length === 0 ? (
+                {items?.length === 0 ? (
                     <EmptyCartMessage />
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8 pt-4">

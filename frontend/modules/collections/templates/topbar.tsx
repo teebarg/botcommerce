@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { FunnelIcon, X } from "nui-react-icons";
 import useWatch from "@lib/hooks/use-watch";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Filter, X } from "lucide-react";
 
 import { filters } from "./data";
 import { CollectionsSideBar } from "./sidebar";
@@ -34,13 +34,13 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
 
     return (
         <React.Fragment>
-            <header className="relative z-20 flex flex-col sm:gap-2 rounded-xl bg-content1 px-4 pb-3 pt-2 md:pt-3">
+            <header className="relative z-20 flex flex-col sm:gap-2 rounded-xl px-1">
                 <div className="flex items-center justify-between gap-2 ">
                     <div className="flex flex-row gap-2">
                         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
                             <DrawerTrigger asChild>
                                 <Button aria-label="filters" className="md:hidden" size="sm" onClick={state.open}>
-                                    <FunnelIcon className="text-default-500 mr-1" focusable="false" role="img" size={16} />
+                                    <Filter className="text-white mr-1 w-4 h-4" />
                                     Filters ({count})
                                 </Button>
                             </DrawerTrigger>
@@ -50,7 +50,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                                         <div className="flex items-center justify-between p-4 border-b">
                                             <h2 className="text-lg font-semibold">Filters</h2>
                                             <button className="p-2" onClick={() => state.close()}>
-                                                <X size={24} />
+                                                <X />
                                             </button>
                                         </div>
                                     </DrawerTitle>

@@ -90,7 +90,6 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                 />
                 {/* Categories */}
                 <div className="px-4 my-6 md:hidden">
-                    <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
                         {cat?.map((category: Category, index: number) => (
                             <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
@@ -121,7 +120,7 @@ const CollectionTemplate: React.FC<ComponentProps> = async ({ query = "", collec
                             )}
                         </ol>
                     </nav>
-                    <div className="flex gap-6 mt-0 md:mt-6">
+                    <div className="flex gap-6">
                         <div className="w-full flex-1 flex-col">
                             <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10">
                                 <CollectionsTopBar

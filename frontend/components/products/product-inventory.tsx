@@ -54,7 +54,7 @@ export function ProductInventory({ brands, categories, collections, products, pa
                 <AnimatePresence>
                     {isVisible && (
                         <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-                            <div className="w-[30rem] mb-8">
+                            <div className="max-w-[30rem] mb-8">
                                 <ProductUpload />
                             </div>
                             <DrawerUI

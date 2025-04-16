@@ -9,15 +9,14 @@ import ShippingAddress from "../shipping-address";
 import { cn } from "@/lib/util/cn";
 import { Cart } from "@/types/models";
 import { useAddress } from "@/lib/hooks/useCart";
+import { Skeleton } from "@/components/skeleton";
 
 const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
 
-    const { data, isLoading } = useAddress(cart?.shipping_address_id ?? 0);
-
-    const address = data?.data ?? null;
+    const { data: address, isLoading } = useAddress(cart?.shipping_address_id ?? 0);
 
     if (isLoading)
         return (
@@ -29,12 +28,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                         <MapPin className="w-5 h-5 text-blue-500" />
                     </div>
                 </div>
-                <div className="space-y-4">
-                    <div className="text-xs md:text-sm" data-testid="shipping-address-summary">
-                        <p className="font-medium mb-1 text-base">Shipping Address</p>
-                        <p className="font-normal text-default-500">Loading...</p>
-                    </div>
-                </div>
+                <Skeleton className="h-36" />
             </div>
         );
 
@@ -62,7 +56,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                 </div>
 
                 <div className={cn("hidden", isOpen && "block")}>
-                    <ShippingAddress address={address} email={cart?.email ?? ""} />
+                    <ShippingAddress address={address ?? null} email={cart?.email ?? ""} />
                 </div>
                 {/* Account Information Section */}
                 {!isOpen && address?.address_1 && (

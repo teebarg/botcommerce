@@ -1,7 +1,6 @@
 import { cn } from "@lib/util/cn";
 import React from "react";
-import { Home, Search } from "nui-react-icons";
-import { MenuIcon, User } from "lucide-react";
+import { Home, MenuIcon, Search, User } from "lucide-react";
 
 import Menu from "./menu";
 

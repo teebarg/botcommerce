@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { useInvalidateProductReviews } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useCart";
 
 interface ReviewFormProps {
     className?: string;
@@ -18,7 +18,7 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
     const [rating, setRating] = useState<number>(1);
     const [comment, setComment] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
-    const invalidateProductReviews = useInvalidateProductReviews();
+    const invalidate = useInvalidate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,7 +31,7 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
 
             return;
         }
-        invalidateProductReviews();
+        invalidate("product-reviews");
         // Reset form
         setRating(1);
         setComment("");

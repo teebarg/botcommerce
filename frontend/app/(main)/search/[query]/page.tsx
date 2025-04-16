@@ -35,7 +35,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
                 </LocalizedClientLink>
             </div>
             <div className="w-full py-0 md:py-4">
-                <div className="flex gap-6 mt-0 md:mt-6">
+                <div>
                     <Suspense fallback={<CollectionTemplateSkeleton />}>
                         <CollectionTemplate query={query} searchParams={searchParams} />
                     </Suspense>
