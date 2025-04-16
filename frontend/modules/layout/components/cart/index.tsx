@@ -2,8 +2,7 @@
 
 import { ShoppingCart } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import React, { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import React from "react";
 
 import { CartItem } from "@/types/models";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
@@ -12,13 +11,8 @@ import { Button } from "@/components/ui/button";
 import { useCart, useCartItem } from "@/lib/hooks/useCart";
 
 const CartComponent: React.FC = () => {
-    const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(undefined);
-    const { data } = useCartItem();
-    const { data: cartRes, isLoading } = useCart();
-
-    const cart = cartRes?.data;
-
-    const items = data?.data ?? [];
+    const { data: items } = useCartItem();
+    const { data: cart } = useCart();
 
     const totalItems =
         items?.reduce((acc: number, item: CartItem) => {
@@ -26,45 +20,9 @@ const CartComponent: React.FC = () => {
         }, 0) || 0;
 
     const state = useOverlayTriggerState({});
-    const editState = useOverlayTriggerState({});
-    const closeSlideOver = () => {
-        if (activeTimer) {
-            clearTimeout(activeTimer as unknown as number);
-        }
-        state.close();
-    };
-
-    const itemRef = useRef<number>(totalItems || 0);
-
-    const timedOpen = () => {
-        state.open();
-
-        const timer = setTimeout(closeSlideOver, 60000);
-
-        setActiveTimer(timer);
-    };
-
-    // Clean up the timer when the component unmounts
-    useEffect(() => {
-        return () => {
-            if (activeTimer) {
-                clearTimeout(activeTimer as unknown as number);
-            }
-        };
-    }, [activeTimer]);
-
-    const pathname = usePathname();
-
-    // open cart dropdown when modifying the cart items, but only if we're not on the cart page
-    useEffect(() => {
-        if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
-            timedOpen();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [totalItems, itemRef.current]);
 
     return (
-        <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
+        <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
             <DrawerTrigger asChild>
                 <Button className="w-7 h-7" size="icon" variant="ghost">
                     <ShoppingCart className="w-7 h-7" />
@@ -77,7 +35,7 @@ const CartComponent: React.FC = () => {
                 <DrawerHeader>
                     <DrawerTitle className="sr-only">Cart</DrawerTitle>
                 </DrawerHeader>
-                <CartDetails cart={cart!} items={items} shippingFee={cart?.shipping_fee} onClose={editState.close} />
+                <CartDetails cart={cart!} items={items ?? []} shippingFee={cart?.shipping_fee} onClose={state.close} />
             </DrawerContent>
         </Drawer>
     );

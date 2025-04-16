@@ -22,7 +22,7 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
     const customSettings = settings.filter((s) => s.type === "CUSTOM");
 
     return (
-        <div className="p-8">
+        <div className="py-8 px-2 md:px-8">
             <h1 className="text-2xl font-semibold mb-8">Store Settings</h1>
             <Tabs defaultValue="shop-details">
                 <TabsList className="mb-4">

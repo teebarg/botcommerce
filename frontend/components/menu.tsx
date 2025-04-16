@@ -1,7 +1,7 @@
 import React from "react";
 import UserDropDown from "@modules/account/components/user-menu";
-import { Heart, UserGroup, User, Collection, Checkout } from "nui-react-icons";
-import { Home } from "lucide-react";
+import { UserGroup, Collection, Checkout } from "nui-react-icons";
+import { Heart, Home, User } from "lucide-react";
 
 import { cn } from "@/lib/util/cn";
 import LocalizedClientLink from "@/components/ui/link";

@@ -42,7 +42,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     />
                     <span className="mr-2">{endContent}</span>
                 </div>
-                {description && <p className="text-xs text-foreground-500 mt-0.5">{description}</p>}
+                {description && <p className="text-xs text-default-500 mt-0.5">{description}</p>}
                 {error && <p className="text-xs text-rose-500 mt-0.5">{error}</p>}
             </div>
         );

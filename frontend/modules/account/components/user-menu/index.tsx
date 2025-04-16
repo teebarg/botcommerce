@@ -15,8 +15,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/util/cn";
 
-export default function UserDropDown({ user }: { user: Session }) {
+export default function UserDropDown({ user, size = "lg" }: { user: Session; size?: "sm" | "lg" }) {
     const handleLogout = async () => {
         await api.auth.logOut();
         window.location.href = "/";
@@ -60,17 +61,10 @@ export default function UserDropDown({ user }: { user: Session }) {
                         <div className="inline-flex flex-1 justify-between">
                             <div className="inline-flex flex-col items-start justify-center">
                                 <span className="text-sm text-default-900">{user?.last_name}</span>
-                                <span className="text-xs text-default-500">{user?.email}</span>
+                                <span className={cn("text-xs text-default-500 text-ellipsis overflow-hidden", size === "sm" && "max-w-12")}>
+                                    {user?.email}
+                                </span>
                             </div>
-                            <span
-                                aria-label="logout"
-                                className="md:hidden border-2 border-primary text-primary px-4 rounded-full flex items-center"
-                                data-testid="logout-button"
-                                role="button"
-                                onClick={handleLogout}
-                            >
-                                Log out
-                            </span>
                         </div>
                     </div>
                 </DropdownMenuTrigger>

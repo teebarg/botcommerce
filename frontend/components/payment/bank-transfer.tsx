@@ -15,24 +15,10 @@ interface BankTransferProps {
 }
 
 const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
-    // const [bankDetails, setBankDetails] = useState<BankDetails[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
 
-    const { data: bankDetailsData } = useBank();
-    const bankDetails = bankDetailsData?.data;
-
-    // useEffect(() => {
-    //     const fetchBankDetails = async () => {
-    //         const { data, error } = await api.bank.getBankDetails("no-cache");
-
-    //         if (!error) {
-    //             setBankDetails(data || []);
-    //         }
-    //     };
-
-    //     fetchBankDetails();
-    // }, []);
+    const { data: bankDetails } = useBank();
 
     const onPaymentCompleted = async () => {
         setLoading(true);

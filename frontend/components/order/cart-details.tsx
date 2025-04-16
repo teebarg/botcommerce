@@ -13,12 +13,10 @@ import { CartItem } from "@/types/models";
 import { useCartItem } from "@/lib/hooks/useCart";
 
 const CartItems = () => {
-    const { data, isLoading } = useCartItem();
-
-    const items = data?.data ?? [];
+    const { data: items, isLoading } = useCartItem();
 
     if (isLoading) return <div>Loading cart...</div>;
-    if (!items.length) return <div>No items in cart</div>;
+    if (!items?.length) return <div>No items in cart</div>;
 
     return (
         <div>

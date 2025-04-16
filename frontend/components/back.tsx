@@ -2,8 +2,8 @@
 
 import { cn } from "@lib/util/cn";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLongLeft } from "nui-react-icons";
 import React from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { Button } from "./ui/button";
 
@@ -32,16 +32,12 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
     return (
         <Button
             aria-label="back button"
-            className={cn(
-                className,
-                "bg-transparent md:bg-indigo-700 md:hover:indigo-800 px-0 md:px-8 min-w-2 md:text-white py-3",
-                pathname == "/" && "hidden"
-            )}
-            size="lg"
+            className={cn(className, "text-foreground w-auto md:hidden", pathname == "/" && "hidden")}
+            size="icon"
+            variant="ghost"
             onClick={handleGoBack}
         >
-            <ArrowLongLeft className="h-6 w-6" viewBox="0 0 15 15" />
-            <span className="hidden md:block">Go back</span>
+            <ArrowLeft className="h-8 w-8" />
         </Button>
     );
 };

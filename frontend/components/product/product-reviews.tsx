@@ -23,8 +23,7 @@ interface RatingDistribution {
 }
 
 const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
-    const { data, isLoading } = useProductReviews(product_id);
-    const reviews = data?.data;
+    const { data: reviews, isLoading } = useProductReviews(product_id);
 
     if (isLoading) {
         return <div className="flex items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">Loading........</div>;

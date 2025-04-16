@@ -16,7 +16,7 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
     const router = useRouter();
     const [isPending, setIsPending] = useState<boolean>(false);
     const [cartEmail, setCartEmail] = useState<string>(email);
-    const { data, isLoading: meLoading } = useMe();
+    const { data: user, isLoading: meLoading } = useMe();
 
     useEffect(() => {
         setCartEmail(email);
@@ -47,9 +47,9 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
     return (
         <React.Fragment>
             <div className="w-full rounded-lg mb-6">
-                <AddressSelect address={address} user={data?.data!} />
+                <AddressSelect address={address} user={user!} />
             </div>
-            {data?.data && (
+            {user && (
                 <React.Fragment>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                         <Input
@@ -67,6 +67,7 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
                         aria-label="continue"
                         className="mt-6"
                         data-testid="submit-address-button"
+                        disabled={isPending || cartEmail === ""}
                         isLoading={isPending}
                         type="button"
                         onClick={handleSubmit}

@@ -80,7 +80,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, variants }
                         <span>Add to Cart</span>
                     </Button>
 
-                    <button aria-label="remove from sihslist" className={cn("transition-colors text-secondary")} onClick={onRemove}>
+                    <button aria-label="remove from wishlist" className={cn("transition-colors text-secondary")} onClick={onRemove}>
                         <HeartFilled className="w-10 h-10" />
                     </button>
                 </div>

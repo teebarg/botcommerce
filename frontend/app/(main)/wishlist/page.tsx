@@ -1,34 +1,32 @@
-import { Metadata } from "next";
-import { Heart } from "nui-react-icons";
+"use client";
+
+import { Heart } from "lucide-react";
 
 import WishlistItem from "@/modules/common/components/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
-import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import { WishItem } from "@/types/models";
+import { useUserWishlist } from "@/lib/hooks/useCart";
 
-export const revalidate = 3;
+export default function Wishlist() {
+    const { data, isLoading, error } = useUserWishlist();
 
-export async function generateMetadata(): Promise<Metadata> {
-    const metadata = { title: "Wishlist" } as Metadata;
-
-    return metadata;
-}
-
-export default async function Wishlist() {
-    const { data, error } = await api.user.wishlist();
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     if (error) {
         return <ServerError />;
     }
-    const wishlists = data ? data.wishlists : null;
 
-    if (!wishlists) {
+    const wishlists = data ? data.wishlists : [];
+
+    if (wishlists.length === 0) {
         return (
             <div className="h-[55vh] flex flex-col justify-center items-center gap-4">
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-warning">
-                    <Heart className="w-10 h-10 text-white" />
+                    <Heart className="w-12 h-12 text-white" />
                 </div>
 
                 <div className="space-y-2 text-center">
@@ -44,7 +42,7 @@ export default async function Wishlist() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto mt-4">
+        <div className="max-w-5xl mx-auto mt-2 mb-4">
             <PromotionalBanner
                 btnClass="text-purple-600"
                 outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
@@ -53,7 +51,7 @@ export default async function Wishlist() {
             />
             <h1 className="text-3xl font-bold text-center text-default-900 mt-4">Your Wishlist</h1>
             <p className="text-center text-default-500">Curate your luxury collection.</p>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-8 mt-10 px-1">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-8 mt-6 px-1">
                 {wishlists?.map((item: WishItem, idx: number) => <WishlistItem key={idx} {...item.product} />)}
             </div>
         </div>

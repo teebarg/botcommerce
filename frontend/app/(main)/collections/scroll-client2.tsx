@@ -5,6 +5,7 @@ import React from "react";
 import { ChevronRight, Loader, Tag } from "nui-react-icons";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 
 import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
@@ -15,6 +16,7 @@ import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
 import NoProductsFound from "@/modules/products/components/no-products";
 import ProductCard from "@/components/store/products/product-card";
+import { cn } from "@/lib/util/cn";
 
 interface SearchParams {
     page?: number;
@@ -50,6 +52,7 @@ export default function InfiniteScrollClient({
     // const [loading, setLoading] = useState<boolean>(false);
     // const observerRef = useRef<IntersectionObserver | null>(null);
     const [scrollTrigger, isInView] = useInView();
+    const searchParams = useSearchParams();
 
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
 
@@ -84,7 +87,7 @@ export default function InfiniteScrollClient({
     }, [isInView, hasNext]);
 
     return (
-        <div className="flex gap-6 mt-0 md:mt-6">
+        <div className="flex gap-6">
             <div className="hidden md:block">
                 <CollectionsSideBar brands={brands} categories={filteredCategories} collections={collections} facets={facets} />
             </div>
@@ -99,10 +102,25 @@ export default function InfiniteScrollClient({
                 />
                 {/* Categories */}
                 <div className="px-4 my-6 md:hidden">
-                    <h2 className="text-lg font-semibold mb-2">Categories</h2>
                     <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
+                        <BtnLink
+                            className={cn(
+                                "flex-none rounded-full bg-content1 text-foreground font-semibold text-base py-2 min-w-min px-6",
+                                searchParams.get("cat_ids") === null && "border-1 border-foreground"
+                            )}
+                            href="/collections"
+                        >
+                            All
+                        </BtnLink>
                         {categories?.map((category: Category, index: number) => (
-                            <BtnLink key={index} className="flex-none rounded-full" color="secondary" href={`/collections?cat_ids=${category.slug}`}>
+                            <BtnLink
+                                key={index}
+                                className={cn(
+                                    "flex-none rounded-full bg-content1 text-foreground font-semibold text-base py-2 min-w-min",
+                                    searchParams.get("cat_ids") === category.slug && "border-1 border-foreground"
+                                )}
+                                href={`/collections?cat_ids=${category.slug}`}
+                            >
                                 {category.name}
                             </BtnLink>
                         ))}
@@ -130,7 +148,7 @@ export default function InfiniteScrollClient({
                             )}
                         </ol>
                     </nav>
-                    <div className="flex gap-6 mt-0 md:mt-6">
+                    <div className="flex gap-6">
                         <div className="w-full flex-1 flex-col">
                             <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10">
                                 <CollectionsTopBar
@@ -142,8 +160,8 @@ export default function InfiniteScrollClient({
                                     sortBy={"created_at:desc"}
                                 />
                             </div>
-                            <main className="mt-4 w-full overflow-visible px-1">
-                                <div className="block md:rounded-xl md:border-2 border-dashed border-divider md:px-2 py-4 min-h-[50vh]">
+                            <main className="w-full overflow-visible px-1">
+                                <div className="block md:rounded-xl py-4 min-h-[50vh]">
                                     <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 pb-4">
                                         {products.length == 0 && (
                                             <div className="col-span-2 md:col-span-3">

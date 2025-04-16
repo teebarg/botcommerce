@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import ProfileBillingAddress from "@modules/account/components/profile-billing-address";
 import ProfileEmail from "@modules/account/components/profile-email";
 import ProfileName from "@modules/account/components/profile-name";
 import ProfilePassword from "@modules/account/components/profile-password";
@@ -39,8 +38,6 @@ export default async function Profile() {
                 <ProfileEmail customer={customer} />
                 <hr className="tb-divider" />
                 <ProfilePassword customer={customer} />
-                <hr className="tb-divider" />
-                <ProfileBillingAddress customer={customer} />
             </div>
         </div>
     );

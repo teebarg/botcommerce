@@ -1,8 +1,8 @@
 // lib/hooks/useCart.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { api } from "@/apis/base";
-import { Address, BankDetails, Cart, CartItem, PaginatedProductSearch, Review, User } from "@/types/models";
+import { api } from "@/apis/client";
+import { Address, BankDetails, Cart, CartItem, PaginatedProductSearch, Review, User, Wishlist } from "@/types/models";
 
 const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
@@ -20,7 +20,7 @@ export const useBank = () => {
     return useQuery({
         queryKey: ["bank"],
         queryFn: async () => {
-            return await api.get<BankDetails[]>("/bank-details/", { cache: "default" });
+            return await api.get<BankDetails[]>("/bank-details/");
         },
         enabled: typeof window !== "undefined", // prevent server fetch
         // enabled: !!cartId, // prevents running when cartId is null
@@ -31,7 +31,7 @@ export const useCart = () => {
     return useQuery({
         queryKey: ["cart"],
         queryFn: async () => {
-            return await api.get<Cart>("/cart/", { cache: "default" });
+            return await api.get<Cart>("/cart/");
         },
         // enabled: !!cartId, // prevents running when cartId is null
     });
@@ -41,7 +41,7 @@ export const useCartItem = () => {
     return useQuery({
         queryKey: ["cart-items"],
         queryFn: async () => {
-            return await api.get<CartItem[]>("/cart/items", { cache: "default" });
+            return await api.get<CartItem[]>("/cart/items");
         },
         // enabled: !!cartId, // prevents running when cartId is null
     });
@@ -50,11 +50,7 @@ export const useCartItem = () => {
 export const useAddress = (addressId: number) => {
     return useQuery({
         queryKey: ["cart-address", addressId],
-        queryFn: async () => {
-            const res = await api.get<Address>(`/address/${addressId}`, { cache: "default" });
-
-            return res;
-        },
+        queryFn: async () => await api.get<Address>(`/address/${addressId}`),
         enabled: !!addressId, // prevents running when addressId is null
     });
 };
@@ -63,7 +59,7 @@ export const useUserAddresses = () => {
     return useQuery({
         queryKey: ["user-address"],
         queryFn: async () => {
-            const res = await api.get<{ addresses: Address[] }>(`/users/address`, { cache: "default" });
+            const res = await api.get<{ addresses: Address[] }>(`/users/address`);
 
             return res;
         },
@@ -73,8 +69,15 @@ export const useUserAddresses = () => {
 export const useProductReviews = (productId: number) => {
     return useQuery({
         queryKey: ["product-reviews", productId],
-        queryFn: async () => await api.get<Review[]>(`/product/${productId}/reviews`, { cache: "default" }),
+        queryFn: async () => await api.get<Review[]>(`/product/${productId}/reviews`),
         enabled: !!productId, // prevents running when productId is null
+    });
+};
+
+export const useUserWishlist = () => {
+    return useQuery({
+        queryKey: ["user-wishlist"],
+        queryFn: async () => await api.get<Wishlist>(`/users/wishlist`),
     });
 };
 
@@ -92,7 +95,7 @@ interface SearchParams {
 export const useProductSearch = (searchParams: SearchParams) => {
     return useQuery({
         queryKey: ["product-search", searchParams],
-        queryFn: async () => await api.get<PaginatedProductSearch>(`/product/search`, { cache: "default" }),
+        queryFn: async () => await api.get<PaginatedProductSearch>(`/product/search`),
         enabled: !!searchParams, // prevents running when searchParams is null
     });
 };
@@ -139,12 +142,12 @@ export const useInvalidateCartItem = () => {
     return invalidateCart;
 };
 
-export const useInvalidateProductReviews = () => {
+export const useInvalidate = () => {
     const queryClient = useQueryClient();
 
-    const invalidateProductReviews = () => {
-        queryClient.invalidateQueries({ queryKey: ["product-reviews"] });
+    const invalidate = (key: string) => {
+        queryClient.invalidateQueries({ queryKey: [key] });
     };
 
-    return invalidateProductReviews;
+    return invalidate;
 };
