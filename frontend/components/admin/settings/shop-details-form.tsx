@@ -97,7 +97,7 @@ export function ShopDetailsForm({ settings }: ShopDetailsProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {defaultShopDetails.map((detail) => {
                     return (
-                        <div key={detail.key} className={cn("", detail.type === "textarea" ? "col-span-2" : "")}>
+                        <div key={detail.key} className={cn("", detail.type === "textarea" ? "md:col-span-2" : "")}>
                             <label className="text-sm text-default-500">{detail.label}</label>
                             {detail.type === "textarea" ? (
                                 <Textarea

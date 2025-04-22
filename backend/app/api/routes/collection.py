@@ -23,10 +23,26 @@ from app.services.export import export
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
+from typing import Optional
 from math import ceil
 
 # Create a router for collections
 router = APIRouter()
+
+@router.get("/all")
+async def all_collections(query: str = "") -> Optional[list[Collection]]:
+    """
+    Retrieve collections with Redis caching.
+    """
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    return await db.collection.find_many(where=where_clause)
 
 
 @router.get("/")

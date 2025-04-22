@@ -33,8 +33,8 @@ const DrawerUI: React.FC<Props> = ({ action, children, direction, trigger, title
             <DrawerTrigger> {trigger} </DrawerTrigger>
             <DrawerContent className="p-4" direction={direction}>
                 <DrawerHeader>
-                    <DrawerTitle>{title}</DrawerTitle>
-                    <DrawerDescription>{description}</DrawerDescription>
+                    <DrawerTitle className="pl-8">{title}</DrawerTitle>
+                    <DrawerDescription className="pl-8">{description}</DrawerDescription>
                 </DrawerHeader>
                 {children}
                 {action && (

@@ -19,7 +19,7 @@ import { Order, OrderStatus } from "@/types/models";
 import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/util/util";
 
-interface ProductInventoryProps {
+interface OrderListProps {
     orders: Order[];
     pagination: {
         page: number;
@@ -29,7 +29,7 @@ interface ProductInventoryProps {
     };
 }
 
-const OrderList: React.FC<ProductInventoryProps> = ({ orders, pagination }) => {
+const OrderList: React.FC<OrderListProps> = ({ orders, pagination }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -88,13 +88,13 @@ const OrderList: React.FC<ProductInventoryProps> = ({ orders, pagination }) => {
     };
 
     const getStatusBadge = (status?: OrderStatus) => {
-        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary"> = {
-            ["PENDING"]: "outline",
+        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "success" | "warning"> = {
+            ["PENDING"]: "warning",
             ["PROCESSING"]: "default",
             ["SHIPPED"]: "secondary",
             ["CANCELED"]: "destructive",
             ["DELIVERED"]: "default",
-            ["PAID"]: "default",
+            ["PAID"]: "success",
             ["REFUNDED"]: "destructive",
         };
 

@@ -71,7 +71,7 @@ export default async function OverviewTemplate() {
                 <div className="flex flex-col py-2 border-t border-gray-200 mt-2">
                     <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
                         <div className="grid grid-cols-2 gap-x-2 max-w-xl">
-                            <div className="flex flex-col bg-pink-100 rounded-lg py-2 px-4 text-gray-800 ">
+                            <div className="flex flex-col bg-pink-100 rounded-lg py-2 px-4 text-default-900 ">
                                 <h3 className="font-semibold">Profile</h3>
                                 <div className="flex items-center gap-x-2">
                                     <span data-testid="customer-profile-completion" data-value={getProfileCompletion(customer)}>
@@ -81,7 +81,7 @@ export default async function OverviewTemplate() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col bg-yellow-100 rounded-lg py-2 px-4 text-gray-800">
+                            <div className="flex flex-col bg-yellow-100 rounded-lg py-2 px-4 text-default-900">
                                 <h3 className="font-semibold">Addresses</h3>
                                 <div className="flex items-center gap-x-2">
                                     <span data-testid="addresses-count" data-value={customer?.addresses?.length || 0}>

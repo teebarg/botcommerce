@@ -333,9 +333,7 @@ async def read_reviews(id: int):
     """
     Get a specific product reviews with Redis caching.
     """
-    reviews = await db.review.find_many(where={"product_id": id})
-
-    return reviews
+    return await db.review.find_many(where={"product_id": id})
 
 
 @router.put("/{id}")
@@ -438,7 +436,8 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
             "images": True
         }
     )
-    cache.invalidate("search")
+    cache.invalidate("featured")
+    cache.invalidate("product")
 
     try:
         # Define the background task

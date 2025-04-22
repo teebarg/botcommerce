@@ -19,7 +19,7 @@ export const ShippingMethodSchema = z.enum(["STANDARD", "EXPRESS", "PICKUP"]);
 
 export const RoleSchema = z.enum(["admin", "customer"]);
 
-export const StatusSchema = z.enum(["pending", "active", "inactive"]);
+export const StatusSchema = z.enum(["PENDING", "ACTIVE", "INACTIVE"]);
 
 export const ShopSettingsTypeSchema = z.enum(["FEATURE", "SHOP_DETAIL", "CUSTOM"]);
 
@@ -80,12 +80,17 @@ export const UserSchema = z.object({
     last_name: z.string().optional(),
     email: z.string().email(),
     emailVerified: z.string(),
-    status: z.string(),
+    status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
     hashed_password: z.string(),
     image: z.string().optional(),
-    role: z.string(),
+    role: z.enum(["ADMIN", "CUSTOMER"]),
     created_at: z.string().optional(),
     addresses: z.array(AddressSchema).optional(),
+    orders: z.array(z.any()).optional(),
+});
+
+export const PaginatedUserSchema = PagSchema.extend({
+    users: z.array(UserSchema),
 });
 
 export const ReviewSchema = z.object({

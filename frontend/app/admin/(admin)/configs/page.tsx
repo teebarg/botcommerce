@@ -12,7 +12,14 @@ export const metadata: Metadata = {
     title: "SiteConfigs",
 };
 
-export default async function SiteConfigsPage({ searchParams }: { searchParams: { search?: string; page?: string; limit?: string } }) {
+type SearchParams = Promise<{
+    page?: string;
+    limit?: string;
+    search?: string;
+}>;
+
+export default async function SiteConfigsPage(props: { searchParams: SearchParams }) {
+    const searchParams = await props.searchParams;
     const search = searchParams.search || "";
     const page = parseInt(searchParams.page || "0", 10);
     const limit = parseInt(searchParams.limit || "20", 10);

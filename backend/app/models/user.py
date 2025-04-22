@@ -6,8 +6,8 @@ from app.models.base import BM
 
 # Shared properties
 class UserBase(BM):
-    email: EmailStr | None = Field(unique=True, index=True, max_length=255)
-    status: str = "pending"
+    # email: EmailStr | None = Field(unique=True, index=True, max_length=255)
+    status: Literal["PENDING", "ACTIVE", "INACTIVE"] = "PENDING"
     first_name: str | None = Field(default=None, max_length=255)
     last_name: str | None = Field(default=None, max_length=255)
     image: Optional[str] = None
@@ -16,8 +16,7 @@ class UserBase(BM):
 
 # Properties to receive via API on update, all are optional
 class UserUpdate(UserBase):
-    email: EmailStr | None = Field(default=None, max_length=255)  # type: ignore
-    password: str | None = Field(default=None, min_length=8, max_length=40)
+    pass
 
 
 class UserUpdateMe(BaseModel):

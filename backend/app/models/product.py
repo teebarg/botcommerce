@@ -61,7 +61,7 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = Field(None, min_length=1)
     sku: Optional[str] = None
     status: Optional[Literal["IN_STOCK", "OUT_OF_STOCK"]] = None
-    brand_ids: Optional[List[int]] = None
+    brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None

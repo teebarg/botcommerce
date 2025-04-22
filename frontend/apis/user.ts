@@ -39,30 +39,14 @@ export const userApi = {
 
         return response;
     },
-    async create(input: User): Promise<User> {
+    async create(input: any): ApiResult<User> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/`;
-        const response = await fetcher<User>(url, { method: "POST", body: JSON.stringify(input) });
 
-        return response;
+        return await tryCatch<User>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
     },
     async update(id: number, input: any): ApiResult<User> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${id}`;
-        const response = await tryCatch<User>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
 
-        if (!response.error) {
-            revalidate("user");
-        }
-
-        return response;
-    },
-    async delete(id: number): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${id}`;
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("user");
-        }
-
-        return response;
+        return await tryCatch<User>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
     },
 };

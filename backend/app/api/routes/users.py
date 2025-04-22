@@ -1,18 +1,21 @@
-from typing import Any
+from typing import Any, Optional
 
-from app.core.decorators import cache
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query, Depends
 
 from app.core.deps import (
     CurrentUser,
+    get_current_superuser
 )
 from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists
 from app.models.generic import Message
-from app.models.user import UserUpdateMe
+from app.models.user import UserUpdateMe, UserUpdate
 from app.models.wishlist import WishlistCreate
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
+from prisma.enums import Role, Status
+from prisma.models import User
+from math import ceil
 
 # Create a router for users
 router = APIRouter()
@@ -25,6 +28,96 @@ async def read_user_me(
 ):
     """Get current user with caching."""
     return user
+
+
+@router.get("/")
+# @cache(key="collections")
+async def index(
+    query: str = "",
+    role: Optional[Role] = None,
+    status: Optional[Status] = None,
+    sort: Optional[str] = "desc",
+    page: int = Query(default=1, gt=0),
+    limit: int = Query(default=20, le=100),
+):
+    """
+    Retrieve users with Redis caching.
+    """
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"first_name": {"contains": query, "mode": "insensitive"}},
+                {"last_name": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    if role:
+        where_clause = where_clause or {}
+        where_clause["role"] = role
+    if status:
+        where_clause = where_clause or {}
+        where_clause["status"] = status
+
+    users = await db.user.find_many(
+        where=where_clause,
+        skip=(page - 1) * limit,
+        take=limit,
+        order={"createdAt": sort},
+        include={"orders": True}
+    )
+    total = await db.user.count(where=where_clause)
+    return {
+        "users":users,
+        "page":page,
+        "limit":limit,
+        "total_pages":ceil(total/limit),
+        "total_count":total,
+    }
+
+
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+async def update(
+    *,
+    id: int,
+    update_data: UserUpdate,
+) -> User:
+    """
+    Update a user and invalidate cache.
+    """
+    existing = await db.user.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    try:
+        update = await db.user.update(
+            where={"id": id},
+            data=update_data.model_dump(exclude_unset=True)
+        )
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+async def delete(id: int) -> Message:
+    """
+    Delete a user.
+    """
+    existing = await db.user.find_unique(
+        where={"id": id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    try:
+        await db.user.delete(
+            where={"id": id}
+        )
+        return Message(message="User deleted successfully")
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 

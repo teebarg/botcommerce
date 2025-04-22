@@ -2,6 +2,7 @@
 
 import { Send, X } from "lucide-react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { Button } from "./button";
 
@@ -11,10 +12,11 @@ import { useStore } from "@/app/store/use-store";
 const WhatsAppWidget: React.FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
+    const path = usePathname();
 
     const { shopSettings } = useStore();
 
-    if (!shopSettings?.whatsapp) {
+    if (!shopSettings?.whatsapp || path.includes("/admin")) {
         return null;
     }
 

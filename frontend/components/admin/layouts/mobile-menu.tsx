@@ -17,7 +17,7 @@ const AdminMobileMenu: React.FC = () => {
     ];
 
     return (
-        <div className="h-full bg-white rounded-[inherit] overflow-hidden">
+        <div className="h-full bg-content1 rounded-[inherit] overflow-hidden">
             {/* User Profile Section */}
             <div className="p-4 bg-blue-600 text-white">
                 <div className="flex items-center space-x-3">

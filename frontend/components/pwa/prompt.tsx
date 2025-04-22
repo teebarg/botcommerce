@@ -20,14 +20,14 @@ function InstallPrompt() {
 
     const handleClose = () => {
         setDeferredPrompt(null);
-        // do not show modal again until a new session
-        sessionStorage.setItem("deferredPrompt", "true");
+        localStorage.setItem("deferredPrompt", "true");
+
         setHasDismissed(true);
     };
 
     useEffect(() => {
         // Set isOpen after hydration
-        const savedIsOpen = sessionStorage.getItem("deferredPrompt") === "true";
+        const savedIsOpen = localStorage.getItem("deferredPrompt") === "true";
 
         setHasDismissed(savedIsOpen);
     }, []);

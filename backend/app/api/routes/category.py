@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Any
+from typing import Any, Optional
 
 from app.core.deps import (get_current_user)
 from app.models.category import Categories, Category, CategoryCreate, CategoryUpdate
@@ -19,6 +19,24 @@ router = APIRouter()
 
 class Search(BaseModel):
     results: list[Category]
+
+@router.get("/all")
+async def all_categories(
+    query: str = "",
+) -> Optional[list[Category]]:
+    """
+    Retrieve all categories.
+    """
+    # Define the where clause based on query parameter
+    where_clause = {"parent_id": None}
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    return await db.category.find_many(where=where_clause)
 
 
 @router.get("/", dependencies=[])

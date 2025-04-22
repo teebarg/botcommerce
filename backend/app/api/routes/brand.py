@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import (
     APIRouter,
     Depends,
@@ -9,7 +10,6 @@ from app.core.deps import get_current_user
 from app.core.logging import logger
 from app.models.brand import (
     BrandCreate,
-    Brand,
     Brands,
     BrandUpdate,
 )
@@ -18,9 +18,27 @@ from app.prisma_client import prisma as db
 from math import ceil
 from app.core.utils import slugify
 from prisma.errors import PrismaError
+# from app.core.decorators import cache
+from prisma.models import Brand
 
 # Create a router for brands
 router = APIRouter()
+
+@router.get("/all")
+async def all_brands(query: str = "") -> Optional[list[Brand]]:
+    """
+    Retrieve brands with Redis caching.
+    """
+    # Define the where clause based on query parameter
+    where_clause = None
+    if query:
+        where_clause = {
+            "OR": [
+                {"name": {"contains": query, "mode": "insensitive"}},
+                {"slug": {"contains": query, "mode": "insensitive"}}
+            ]
+        }
+    return await db.brand.find_many(where=where_clause)
 
 
 @router.get("/")
