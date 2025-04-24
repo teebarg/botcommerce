@@ -1,40 +1,27 @@
-import { Edit, Trash2 } from "lucide-react";
+import { CollectionActions } from "./collection-actions";
 
-import { Button } from "@/components/ui/button";
-
-export interface Collection {
-    id: string;
-    name: string;
-    description: string;
-    imageUrl: string;
-    productCount: number;
-}
+import { Badge } from "@/components/ui/badge";
+import { Collection } from "@/types/models";
 
 interface CollectionItemProps {
     collection: Collection;
-    onEdit: (id: string) => void;
-    onDelete: (id: string) => void;
+    deleteAction: (id: number) => void;
 }
 
-const CollectionItem = ({ collection, onEdit, onDelete }: CollectionItemProps) => {
+const CollectionItem = ({ collection, deleteAction }: CollectionItemProps) => {
     return (
         <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
             <div className="aspect-video w-full bg-gray-100 relative">
-                <img alt={collection.name} className="w-full h-full object-cover" src={collection.imageUrl || "/placeholder.svg"} />
+                <img alt={collection.name} className="w-full h-full object-cover" src="/placeholder.svg" />
             </div>
             <div className="p-3">
-                <h3 className="font-medium text-default-900 mb-1">{collection.name}</h3>
-                <p className="text-sm text-default-500 mb-2 line-clamp-2">{collection.description}</p>
+                <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-default-900 mb-1">{collection.name}</h3>
+                    <Badge variant={collection.is_active ? "success" : "destructive"}>{collection.is_active ? "Active" : "Inactive"}</Badge>
+                </div>
+                <p className="text-sm text-default-500 mb-2 line-clamp-2">{collection.slug}</p>
                 <div className="flex justify-between items-center">
-                    <span className="text-xs text-default-500">{collection.productCount} products</span>
-                    <div className="flex gap-1">
-                        <Button size="icon" onClick={() => onEdit(collection.id)}>
-                            <Edit size={16} />
-                        </Button>
-                        <Button size="icon" onClick={() => onDelete(collection.id)}>
-                            <Trash2 size={16} />
-                        </Button>
-                    </div>
+                    <CollectionActions collection={collection} deleteAction={deleteAction} />
                 </div>
             </div>
         </div>

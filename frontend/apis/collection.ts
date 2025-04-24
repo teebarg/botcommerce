@@ -1,12 +1,16 @@
 import { fetcher } from "./fetcher";
+import { api } from "./base";
 
 import { buildUrl } from "@/lib/util/util";
-import { PaginatedCollection, Collection } from "@/types/models";
+import { PaginatedCollection, Collection, Message } from "@/types/models";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 
 // Collection API methods
 export const collectionApi = {
+    async getAll(search?: string): ApiResult<Collection[]> {
+        return await api.get<Collection[]>("/collection/all", { params: { search: search || "" }, next: { tags: ["collections"] } });
+    },
     async all(input?: { search?: string; page?: number; limit?: number }): ApiResult<PaginatedCollection> {
         const searchParams = { search: input?.search || "", page: input?.page || 1, limit: input?.limit || 20 };
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/`, searchParams);
@@ -47,13 +51,13 @@ export const collectionApi = {
 
         return response;
     },
-    async delete(id: string): Promise<{ success: boolean; message: string }> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/collection/${id}`;
+    async delete(id: number): ApiResult<Message> {
+        const response = await api.delete<Message>(`/collection/${id}`);
 
-        await fetcher<Collection>(url, { method: "DELETE" });
+        if (!response.error) {
+            revalidate("collections");
+        }
 
-        revalidate("collections");
-
-        return { success: true, message: "Collection deleted successfully" };
+        return response;
     },
 };

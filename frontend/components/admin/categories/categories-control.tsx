@@ -6,13 +6,13 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { CategoryForm } from "./category-form";
-
 import { Category } from "@/types/models";
-import { deleteCategory } from "@/actions/category";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useInvalidate } from "@/lib/hooks/useCart";
+import { api } from "@/apis";
+import { CategoryForm } from "@/components/admin/categories/category-form";
 
 interface Props {
     canAdd?: boolean;
@@ -23,6 +23,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
     const deleteState = useOverlayTriggerState({});
     const state = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
+    const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
     const router = useRouter();
 
@@ -30,16 +31,20 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
         if (!category) {
             return;
         }
-        try {
-            setIsPending(true);
-            await deleteCategory(category.id!);
-            router.refresh();
-            deleteState.close();
-        } catch (error) {
-            toast.error("Error deleting category");
-        } finally {
+        setIsPending(true);
+        const res = await api.category.delete(category.id!);
+
+        if (res.error) {
+            toast.error(res.error);
             setIsPending(false);
+
+            return;
         }
+
+        invalidate("categories");
+        router.refresh();
+        setIsPending(false);
+        deleteState.close();
     };
 
     return (
@@ -50,7 +55,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                         <DrawerTrigger>
                             <Plus />
                         </DrawerTrigger>
-                        <DrawerContent className="px-8">
+                        <DrawerContent>
                             <DrawerHeader>
                                 <DrawerTitle>Add SubCat to {category?.name}</DrawerTitle>
                             </DrawerHeader>
@@ -64,7 +69,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                     <DrawerTrigger>
                         <PencilSquare />
                     </DrawerTrigger>
-                    <DrawerContent className="px-8">
+                    <DrawerContent>
                         <DrawerHeader>
                             <DrawerTitle>Edit {category?.name}</DrawerTitle>
                         </DrawerHeader>
@@ -82,7 +87,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                             <DialogTitle>Delete Category</DialogTitle>
                         </DialogHeader>
                         <p>Are you sure you want to delete this category?</p>
-                        <DialogFooter>
+                        <DialogFooter className="flex flex-row items-center justify-end gap-2">
                             <Button aria-label="close" className="min-w-36" variant="outline" onClick={deleteState.close}>
                                 Close
                             </Button>

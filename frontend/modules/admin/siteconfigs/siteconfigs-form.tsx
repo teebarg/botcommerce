@@ -46,11 +46,11 @@ const SiteConfigForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
         <React.Fragment>
             <div className="mx-auto w-full pb-8">
                 <form ref={formRef} action={formAction} className="h-full flex flex-col">
+                    <input readOnly className="hidden" name="type" type="text" value={type} />
+                    <input readOnly className="hidden" name="id" type="text" value={current.id} />
                     <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll py-6">
                         <div className="relative flex-1">
                             <div className="space-y-8 ">
-                                <input readOnly className="hidden" name="type" type="text" value={type} />
-                                <input readOnly className="hidden" name="id" type="text" value={current.id} />
                                 <Input required defaultValue={current.key} label="Key" name="key" placeholder="Sitename" />
                                 <Input required defaultValue={current.value} label="Value" name="value" placeholder="NetFlix" />
                             </div>

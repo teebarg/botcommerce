@@ -11,7 +11,7 @@ import { Category } from "@/types/models";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {
-    categories: Category[];
+    categories?: Category[];
 }
 
 const CategoryTree: React.FC<Props> = ({ categories }) => {
@@ -54,7 +54,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                     <Folder />
                                     <span className="select-none text-sm font-medium capitalize flex-1">{item.name}</span>
                                     {item.image && (
-                                        <div className="relative h-8 w-8">
+                                        <div className="relative h-8 w-8 hidden md:block">
                                             <Image fill alt={item.name} src={item.image} />
                                         </div>
                                     )}

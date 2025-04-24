@@ -1,5 +1,5 @@
 
-from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
+from app.models.reviews import Reviews, ReviewCreate, ReviewUpdate
 from fastapi import ( APIRouter, HTTPException, Depends, HTTPException, Query)
 
 from app.core.deps import (
@@ -10,6 +10,7 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from math import ceil
+from prisma.models import Review
 
 # Create a router for reviews
 router = APIRouter()
@@ -92,7 +93,7 @@ async def update(
     try:
         update = await db.review.update(
             where={"id": id},
-            data=update_data.model_dump()
+            data=update_data.model_dump(exclude_unset=True)
         )
         return update
     except PrismaError as e:

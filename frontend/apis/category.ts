@@ -18,25 +18,15 @@ export const categoryApi = {
 
         return await tryCatch<Category>(fetcher(url));
     },
-    async create(input: Category): ApiResult<Category> {
+    async create(input: any): ApiResult<Category> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`;
-        const response = await tryCatch<Category>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
 
-        if (!response.error) {
-            revalidate("categories");
-        }
-
-        return response;
+        return await tryCatch<Category>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
     },
-    async update(id: string, input: Category): ApiResult<Category> {
+    async update(id: number, input: any): ApiResult<Category> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
-        const response = await tryCatch<Category>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
 
-        if (!response.error) {
-            revalidate("categories");
-        }
-
-        return response;
+        return await tryCatch<Category>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
     },
     async delete(id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;

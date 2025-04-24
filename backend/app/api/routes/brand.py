@@ -38,7 +38,7 @@ async def all_brands(query: str = "") -> Optional[list[Brand]]:
                 {"slug": {"contains": query, "mode": "insensitive"}}
             ]
         }
-    return await db.brand.find_many(where=where_clause)
+    return await db.brand.find_many(where=where_clause, order={"created_at": "desc"})
 
 
 @router.get("/")

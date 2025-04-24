@@ -1,6 +1,6 @@
 from app.models.base import BM
 from pydantic import BaseModel, Field
-
+from typing import Optional
 
 class ReviewBase(BM):
     comment: str = Field(..., min_length=1, description="Comment is required")
@@ -8,13 +8,16 @@ class ReviewBase(BM):
 
 class Review(ReviewBase):
     id: int
+    verified: bool
 
 
 class ReviewCreate(ReviewBase):
     product_id: int
 
 
-class ReviewUpdate(ReviewBase):
+class ReviewUpdate(BaseModel):
+    comment: Optional[str] = ""
+    rating: Optional[int] = 1
     verified: bool = False
 
 

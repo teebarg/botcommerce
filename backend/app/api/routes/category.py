@@ -36,7 +36,7 @@ async def all_categories(
                 {"slug": {"contains": query, "mode": "insensitive"}}
             ]
         }
-    return await db.category.find_many(where=where_clause)
+    return await db.category.find_many(where=where_clause, order={"created_at": "desc"},include={"subcategories": True})
 
 
 @router.get("/", dependencies=[])

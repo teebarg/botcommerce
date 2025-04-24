@@ -42,7 +42,7 @@ async def all_collections(query: str = "") -> Optional[list[Collection]]:
                 {"slug": {"contains": query, "mode": "insensitive"}}
             ]
         }
-    return await db.collection.find_many(where=where_clause)
+    return await db.collection.find_many(where=where_clause, order={"created_at": "desc"})
 
 
 @router.get("/")
