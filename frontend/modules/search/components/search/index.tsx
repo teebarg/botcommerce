@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
-import NoProductsFound from "@/modules/products/components/no-products";
+import NoProductsFound from "@/components/store/products/no-products";
 import { debounce } from "@/lib/util/util";
 import { ProductSearch } from "@/types/models";
 import { api } from "@/apis";

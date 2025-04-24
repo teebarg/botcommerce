@@ -1,15 +1,15 @@
-import Footer from "@modules/layout/templates/footer";
 import React from "react";
-import dynamic from "next/dynamic";
 
+import Footer from "@/components/generic/layout/templates/footer";
 import { BackButton } from "@/components/back";
 import Search from "@/modules/search/components/search";
 import ButtonNav from "@/components/bottom-navbar";
 import ChatBotWrapper from "@/components/chatbot";
-import Navbar from "@/modules/layout/templates/nav";
+import Navbar from "@/components/generic/layout/templates/nav";
+import Cookie from "@/components/store/cookie";
 
 // const Banner = dynamic(() => import("@modules/common/components/banner"), { loading: () => <p>Loading...</p> });
-const Cookie = dynamic(() => import("@modules/store/components/cookie"));
+// const Cookie = dynamic(() => import("@modules/store/components/cookie"));
 
 export default async function PageLayout(props: { children: React.ReactNode }) {
     return (

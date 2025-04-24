@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 import { currency } from "@/lib/util/util";
-import ProductDetails from "@/modules/products/templates/details";
+import ProductDetails from "@/components/store/products/product-details";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import ProductShare from "@/components/product/product-share";

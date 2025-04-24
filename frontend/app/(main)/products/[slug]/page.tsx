@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import React from "react";
-import RelatedProducts from "@modules/products/components/related-products";
 
+import RelatedProducts from "@/components/store/products/related-products";
 import { api } from "@/apis";
 import ServerError from "@/components/server-error";
 import ProductView from "@/components/store/products/product-view";

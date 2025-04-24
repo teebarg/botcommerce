@@ -11,10 +11,10 @@ import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import { api as baseApi } from "@/apis/base";
 import { Category, ProductSearch, WishItem } from "@/types/models";
-import ContactForm from "@/modules/store/components/contact-form";
 import { auth } from "@/actions/auth";
 import ProductCard from "@/components/store/products/product-card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import ContactForm from "@/components/store/contact-form";
 
 // Mock banners
 const banners = [

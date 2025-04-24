@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
-import { MagicLinkForm } from "@/modules/auth/components/magic-link";
+import { MagicLinkForm } from "@/components/generic/auth/magic-link";
 
 export const metadata: Metadata = {
     title: "Login In",

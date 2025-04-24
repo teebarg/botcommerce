@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import CheckoutForm from "@modules/checkout/templates/checkout-form";
-import CheckoutSummary from "@modules/checkout/templates/checkout-summary";
 import { ChevronRight } from "nui-react-icons";
 
 import { BackButton } from "@/components/back";
@@ -12,9 +10,11 @@ import ServerError from "@/components/server-error";
 import ClientOnly from "@/components/client-only";
 import { useCart } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
-import EmptyCartMessage from "@/modules/cart/components/empty-cart-message";
+import EmptyCartMessage from "@/components/store/cart/empty-message";
 import CheckoutSkeleton from "@/components/checkout/checkout-skeleton";
-import { CartComponent } from "@/modules/layout/components/cart";
+import { CartComponent } from "@/components/generic/layout/components/cart";
+import CheckoutForm from "@/components/checkout/checkout-form";
+import CheckoutSummary from "@/components/checkout/checkout-summary";
 
 export default function Checkout() {
     const { shopSettings } = useStore();

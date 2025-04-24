@@ -1,6 +1,5 @@
 "use client";
 
-import { Confirm } from "@modules/common/components/confirm";
 import { Edit } from "nui-react-icons";
 import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
@@ -8,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
+import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import DrawerUI from "@/components/drawer";
 import { CollectionForm } from "@/components/admin/collections/collection-form";

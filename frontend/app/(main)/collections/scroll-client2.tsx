@@ -14,7 +14,7 @@ import PromotionalBanner from "@/components/promotion";
 import { Brand, Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/types/models";
 import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
 import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
-import NoProductsFound from "@/modules/products/components/no-products";
+import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
 import { cn } from "@/lib/util/cn";
 

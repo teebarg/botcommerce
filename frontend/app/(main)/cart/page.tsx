@@ -1,14 +1,14 @@
 import { Metadata } from "next";
 import { Shield } from "nui-react-icons";
-import EmptyCartMessage from "@modules/cart/components/empty-cart-message";
 
-import SummaryMobile from "@/modules/cart/templates/summary-mobile";
-import RecommendedProducts from "@/modules/products/components/recommended";
+import SummaryMobile from "@/components/store/cart/summary-mobile";
+import RecommendedProducts from "@/components/store/products/recommended";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/apis";
 import { CartItem } from "@/types/models";
 import ServerError from "@/components/server-error";
-import CartPageDetails from "@/components/cart/cart-page-details";
+import CartPageDetails from "@/components/store/cart/cart-page-details";
+import EmptyCartMessage from "@/components/store/cart/empty-message";
 
 export const metadata: Metadata = {
     title: "Cart",
