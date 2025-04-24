@@ -3,7 +3,7 @@ import React from "react";
 
 import SkeletonProductPreview from "../skeletons/components/skeleton-product-preview";
 
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 
 const CollectionTemplateSkeleton = () => {
     return (

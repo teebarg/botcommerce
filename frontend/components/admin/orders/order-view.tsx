@@ -18,7 +18,7 @@ import { useOrders } from "@/lib/hooks/useAdmin";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import PaginationUI from "@/components/pagination";
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 
 const LIMIT = 10;
 

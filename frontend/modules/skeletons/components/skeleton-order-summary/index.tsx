@@ -1,6 +1,6 @@
 import SkeletonCartTotals from "@modules/skeletons/components/skeleton-cart-totals";
 
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 
 const SkeletonOrderSummary = () => {
     return (

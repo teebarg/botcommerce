@@ -1,20 +1,26 @@
-import { api } from "@/apis";
+import { Skeleton } from "@/components/generic/skeleton";
 import ProductCard from "@/components/store/products/product-card";
+import { useProductSearch } from "@/lib/hooks/useCart";
 import { ProductSearch } from "@/types/models";
 
 type RecommendedProductsProps = {
-    exclude?: Array<string | number>;
+    exclude?: number[];
 };
 
-export default async function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
-    const { data, error } = await api.product.search({ limit: 40 });
+export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
+    const { data, isLoading, error } = useProductSearch({ limit: 40 });
 
     if (error || !data) {
         return null;
     }
 
-    // const filteredProducts = exclude?.length ? data.products.filter((product: ProductSearch) => !exclude.includes(product.variants[0].id)) : data.products;
-    const filteredProducts = data.products;
+    if (isLoading) {
+        return <Skeleton className="h-[400px]" />;
+    }
+
+    const filteredProducts = exclude?.length
+        ? data.products.filter((product: ProductSearch) => !exclude.includes(product.variants?.[0].id!))
+        : data.products;
 
     return (
         <div>

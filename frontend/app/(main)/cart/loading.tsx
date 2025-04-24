@@ -1,7 +1,7 @@
 import repeat from "@lib/util/repeat";
 import SkeletonOrderSummary from "@modules/skeletons/components/skeleton-order-summary";
 
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 
 export default function Loading() {
     return (

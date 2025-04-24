@@ -4,7 +4,7 @@ import Footer from "@/components/generic/layout/templates/footer";
 import { BackButton } from "@/components/back";
 import Search from "@/modules/search/components/search";
 import ButtonNav from "@/components/bottom-navbar";
-import ChatBotWrapper from "@/components/chatbot";
+import ChatBotWrapper from "@/components/generic/chatbot";
 import Navbar from "@/components/generic/layout/templates/nav";
 import Cookie from "@/components/store/cookie";
 

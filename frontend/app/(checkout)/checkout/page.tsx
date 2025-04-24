@@ -7,14 +7,14 @@ import { BackButton } from "@/components/back";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import ServerError from "@/components/server-error";
-import ClientOnly from "@/components/client-only";
+import ClientOnly from "@/components/generic/client-only";
 import { useCart } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import CheckoutSkeleton from "@/components/checkout/checkout-skeleton";
-import { CartComponent } from "@/components/generic/layout/components/cart";
 import CheckoutForm from "@/components/checkout/checkout-form";
 import CheckoutSummary from "@/components/checkout/checkout-summary";
+import { CartComponent } from "@/components/store/cart/cart-component";
 
 export default function Checkout() {
     const { shopSettings } = useStore();

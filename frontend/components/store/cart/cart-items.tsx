@@ -32,7 +32,7 @@ const CartClient = ({ className }: ItemsTemplateProps) => {
                         <div className="flex flex-1 flex-col">
                             <div className="text-sm">
                                 <LocalizedClientLink href={`/products/${item.slug}`}>
-                                    <p className="font-semibold text-default-900 truncate max-w-40">{item.name}</p>
+                                    <p className="font-semibold text-default-900 truncate max-w-40 md:max-w-max">{item.name}</p>
                                 </LocalizedClientLink>
                             </div>
                             <div className="flex gap-2 items-center">

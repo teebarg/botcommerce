@@ -15,7 +15,7 @@ import { Brand, Category, Collection, Product } from "@/types/models";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useBrands, useCollections, useProducts } from "@/lib/hooks/useAdmin";
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 
 const LIMIT = 10;

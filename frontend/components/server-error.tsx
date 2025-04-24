@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import Reload from "./reload";
+import Reload from "./generic/reload";
 
 import { useStore } from "@/app/store/use-store";
 

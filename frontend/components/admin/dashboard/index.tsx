@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useOrders } from "@/lib/hooks/useAdmin";
 import { Order } from "@/types/models";
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 import { currency } from "@/lib/util/util";
 import { Badge } from "@/components/ui/badge";
 

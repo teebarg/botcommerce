@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import React from "react";
 
 import BrandView from "@/components/admin/brands/brand-view";
-import ClientOnly from "@/components/client-only";
+import ClientOnly from "@/components/generic/client-only";
 
 export const metadata: Metadata = {
     title: "Brands",

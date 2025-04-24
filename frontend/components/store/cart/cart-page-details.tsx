@@ -5,12 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 import CartSkeleton from "./cart-skeleton";
+import CartItems from "./cart-items";
 
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { Cart } from "@/types/models";
 import { useCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
-import { CartItems } from "@/components/generic/layout/components/cart-items";
 import Summary from "@/components/store/cart/summary";
 import SignInPrompt from "@/components/generic/auth/sign-in-prompt";
 
@@ -44,7 +44,7 @@ const CartPageDetails: React.FC<Props> = ({ cart }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8 pt-4">
                         <div className="flex flex-col bg-content1 p-4 gap-y-6 rounded-md">
                             {!user && <SignInPrompt callbackUrl={pathname} />}
-                            <CartItems items={items!} />
+                            <CartItems />
                         </div>
                         <div className="relative hidden md:block">
                             <div className="flex flex-col gap-y-8 sticky top-12">

@@ -18,7 +18,7 @@ import ShippingAddressForm from "@/components/checkout/address-form";
 import ShippingAddressFormEdit from "@/components/checkout/address-form-edit";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
-import ClientOnly from "@/components/client-only";
+import ClientOnly from "@/components/generic/client-only";
 import { SignUpForm } from "@/components/generic/auth/signup";
 import { useInvalidateCart, useUserAddresses } from "@/lib/hooks/useCart";
 

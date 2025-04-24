@@ -4,7 +4,7 @@ import React from "react";
 
 import ServerError from "@/components/server-error";
 import { useCategories } from "@/lib/hooks/useAdmin";
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 import CreateCategory from "@/components/admin/categories/create-categories";
 import CategoryTree from "@/components/admin/categories/tree";
 import { Category } from "@/types/models";

@@ -4,7 +4,7 @@ import { Home, MenuIcon, Search, User } from "lucide-react";
 
 import Menu from "./menu";
 
-import { CartComponent } from "@/components/generic/layout/components/cart";
+import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { auth } from "@/actions/auth";

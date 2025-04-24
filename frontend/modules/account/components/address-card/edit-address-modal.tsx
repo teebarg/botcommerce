@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/spinner";
+import { Spinner } from "@/components/generic/spinner";
 import { Address } from "@/types/models";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";

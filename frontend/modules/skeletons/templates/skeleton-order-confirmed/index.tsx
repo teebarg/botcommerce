@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 
 const SkeletonOrderConfirmed: React.FC = () => {
     return (

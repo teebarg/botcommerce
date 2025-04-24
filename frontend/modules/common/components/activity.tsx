@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import Logo from "../icons/logo";
 
-import { Spinner } from "@/components/spinner";
+import { Spinner } from "@/components/generic/spinner";
 import { useStore } from "@/app/store/use-store";
 
 interface Props {

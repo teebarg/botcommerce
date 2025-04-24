@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { BrandActions } from "@/components/admin/brands/brand-actions";
 import { CreateBrand } from "@/components/admin/brands/create-brand";
 import { useBrands } from "@/lib/hooks/useAdmin";
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 
 const BrandView: React.FC = () => {
     const { data: brands, isLoading, error } = useBrands();

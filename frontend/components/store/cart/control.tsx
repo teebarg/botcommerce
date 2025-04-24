@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Spinner } from "@components/spinner";
+import { Spinner } from "@/components/generic/spinner";
 import { toast } from "sonner";
 import { Trash } from "nui-react-icons";
 

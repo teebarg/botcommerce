@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import React from "react";
 
 import { api } from "@/apis";
-import ClientOnly from "@/components/client-only";
+import ClientOnly from "@/components/generic/client-only";
 import ReviewView from "@/components/admin/reviews/reviews-view";
 import ServerError from "@/components/server-error";
 

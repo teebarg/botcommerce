@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
 
-import ClientOnly from "@/components/client-only";
+import ClientOnly from "@/components/generic/client-only";
 import RecentOrdersList from "@/components/admin/dashboard";
 import StatComponent from "@/components/admin/dashboard/stat-component";
 

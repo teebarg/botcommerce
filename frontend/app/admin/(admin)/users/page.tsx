@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
 
-import ClientOnly from "@/components/client-only";
+import ClientOnly from "@/components/generic/client-only";
 import CustomerView from "@/components/admin/customers/customer-view";
 
 export const metadata: Metadata = {

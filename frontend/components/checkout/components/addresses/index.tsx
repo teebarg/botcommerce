@@ -9,7 +9,7 @@ import ShippingAddress from "../shipping-address";
 import { cn } from "@/lib/util/cn";
 import { Cart } from "@/types/models";
 import { useAddress } from "@/lib/hooks/useCart";
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/generic/skeleton";
 
 const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const searchParams = useSearchParams();
