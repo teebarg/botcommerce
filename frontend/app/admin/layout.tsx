@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import React from "react";
-import AdminNavbar from "@modules/admin/components/admin-navbar";
 import { redirect } from "next/navigation";
 import { SideBar } from "@modules/common/components/sidebar";
 
+import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { auth } from "@/actions/auth";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";

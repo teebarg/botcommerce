@@ -36,21 +36,22 @@ export async function mutateBrand(currentState: unknown, formData: FormData) {
         name: formData.get("name"),
         is_active: Boolean(formData.get("is_active")) ?? false,
     };
-
     const id = formData.get("id") as string;
     const type = formData.get("type") as string;
 
-    try {
-        if (type === "create") {
-            await api.brand.create(data);
-        } else {
-            await api.brand.update(id, data);
-        }
+    let response;
 
-        return { success: true, message: "successful", data: null };
-    } catch (error) {
-        return { success: false, message: error instanceof Error ? error.message : "Error occurred" };
+    if (type === "create") {
+        response = await api.brand.create(data);
+    } else {
+        response = await api.brand.update(id, data);
     }
+
+    if (response.error) {
+        return { success: false, message: response.error, data: null };
+    }
+
+    return { success: true, message: "successful", data: response.data };
 }
 
 export async function mutateCollection(currentState: unknown, formData: FormData) {
@@ -62,11 +63,19 @@ export async function mutateCollection(currentState: unknown, formData: FormData
     const id = formData.get("id") as string;
     const type = formData.get("type") as string;
 
+    let response;
+
     if (type === "create") {
-        return await api.collection.create(data);
+        response = await api.collection.create(data);
     } else {
-        return await api.collection.update(id, data);
+        response = await api.collection.update(id, data);
     }
+
+    if (response.error) {
+        return { success: false, message: response.error, data: null };
+    }
+
+    return { success: true, message: "successful", data: response.data };
 }
 
 export async function mutateSiteConfig(currentState: unknown, formData: FormData) {

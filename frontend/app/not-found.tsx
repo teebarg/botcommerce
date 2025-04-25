@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
 
-import NF from "@/components/not-found";
+import NF from "@/components/generic/not-found";
 
 export const metadata: Metadata = {
     title: "404",

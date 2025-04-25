@@ -44,6 +44,7 @@ async def get_orders(
     skip: int = Query(0, ge=0),
     take: int = Query(20, ge=1, le=100),
     status: Optional[OrderStatus] = None,
+    sort: Optional[str] = "desc",
     search: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
@@ -59,7 +60,8 @@ async def get_orders(
         start_date=start_date,
         end_date=end_date,
         customer_id=customer_id,
-        user_role=user.role
+        user_role=user.role,
+        sort=sort
     )
 
 @router.put("/orders/{order_id}", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)

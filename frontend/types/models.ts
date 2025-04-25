@@ -48,6 +48,7 @@ import {
     ShopSettingsTypeSchema,
     ShopSettingsSchema,
     BankDetailsSchema,
+    PaginatedUserSchema,
 } from "./schema";
 
 export type Facet = z.infer<typeof FacetSchema>;
@@ -62,6 +63,7 @@ export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
 export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type User = z.infer<typeof UserSchema>;
+export type PaginatedUser = z.infer<typeof PaginatedUserSchema>;
 export type Wishlist = z.infer<typeof WishlistSchema>;
 export type WishItem = z.infer<typeof WishItemSchema>;
 export type Review = z.infer<typeof ReviewSchema>;

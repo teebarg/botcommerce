@@ -8,7 +8,7 @@ import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 
 import { Order, PaymentStatus } from "@/types/models";
-import FadeInComponent from "@/components/fade-in-component";
+import FadeInComponent from "@/components/generic/fade-in-component";
 
 type OrderConfirmationProps = {
     status: PaymentStatus;

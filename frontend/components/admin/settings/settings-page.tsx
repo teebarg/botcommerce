@@ -8,7 +8,6 @@ import { CustomSettings } from "./custom-settings";
 import { ShopPayments } from "./shop-payments";
 
 import { BankDetails, ShopSettings } from "@/types/models";
-import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface SettingsPageProps {
@@ -23,7 +22,7 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
 
     return (
         <div className="py-8 px-2 md:px-8">
-            <h1 className="text-2xl font-semibold mb-8">Store Settings</h1>
+            <h1 className="text-2xl font-semibold mb-4">Store Settings</h1>
             <Tabs defaultValue="shop-details">
                 <TabsList className="mb-4">
                     <TabsTrigger value="shop-details">Shop Details</TabsTrigger>
@@ -32,11 +31,7 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
                     <TabsTrigger value="custom-settings">Custom Settings</TabsTrigger>
                 </TabsList>
                 <TabsContent value="shop-details">
-                    <Card>
-                        <CardContent>
-                            <ShopDetails settings={shopDetails} />
-                        </CardContent>
-                    </Card>
+                    <ShopDetails settings={shopDetails} />
                 </TabsContent>
                 <TabsContent value="details">
                     <FeatureToggles toggles={features} />
@@ -45,11 +40,7 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
                     <ShopPayments bankDetails={bankDetails} settings={settings} />
                 </TabsContent>
                 <TabsContent value="custom-settings">
-                    <Card>
-                        <CardContent>
-                            <CustomSettings settings={customSettings} />
-                        </CardContent>
-                    </Card>
+                    <CustomSettings settings={customSettings} />
                 </TabsContent>
             </Tabs>
         </div>

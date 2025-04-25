@@ -3,7 +3,7 @@
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Edit, Trash } from "nui-react-icons";
+import { Edit, Trash } from "lucide-react";
 
 import { ProductView } from "../products/product-view";
 
@@ -30,7 +30,7 @@ export function ProductActions({ product }: ProductActionsProps) {
     return (
         <div className="flex justify-end gap-1">
             <DrawerUI
-                direction="right"
+                // direction="right"
                 open={viewState.isOpen}
                 title={`Edit Product`}
                 trigger={<Edit className="h-5 w-5" />}

@@ -174,7 +174,7 @@ model Product {
   description        String?
   features           String[]
   price              Float
-  old_price          Float
+  old_price          Float?
   image              String?              @db.VarChar(255)
   status             ProductStatus        @default(IN_STOCK)
   variants           ProductVariant[]

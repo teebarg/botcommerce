@@ -7,7 +7,7 @@ import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 
-import FadeInComponent from "@/components/fade-in-component";
+import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/types/models";
 import { useStore } from "@/app/store/use-store";
 

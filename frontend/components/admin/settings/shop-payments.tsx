@@ -128,25 +128,27 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
     };
 
     return (
-        <div className="space-y-4 py-4">
-            {defaultFeatures.map((feature) => {
-                const existingToggle = settings.find((t) => t.key === feature.key);
-                const isEnabled = existingToggle ? existingToggle.value === "true" : false;
+        <div className="space-y-8 py-4">
+            <div className="space-y-4">
+                {defaultFeatures.map((feature) => {
+                    const existingToggle = settings.find((t) => t.key === feature.key);
+                    const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
-                return (
-                    <div key={feature.key} className="flex items-center justify-between p-4 bg-background rounded-lg">
-                        <div>
-                            <h3 className="font-medium">{feature.label}</h3>
-                            <p className="text-sm text-default-500">{feature.description}</p>
+                    return (
+                        <div key={feature.key} className="flex items-center justify-between p-4 bg-background rounded-lg">
+                            <div>
+                                <h3 className="font-medium">{feature.label}</h3>
+                                <p className="text-sm text-default-500">{feature.description}</p>
+                            </div>
+                            <Switch
+                                checked={isEnabled}
+                                disabled={isLoading[feature.key]}
+                                onCheckedChange={(checked) => handleToggle(feature.key, checked)}
+                            />
                         </div>
-                        <Switch
-                            checked={isEnabled}
-                            disabled={isLoading[feature.key]}
-                            onCheckedChange={(checked) => handleToggle(feature.key, checked)}
-                        />
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
             {/* bank details */}
             <div>
                 <div className="flex items-center justify-between">
@@ -190,7 +192,7 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                         </DialogContent>
                     </Dialog>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                     {bankDetails.map((detail, idx: number) => {
                         return <BankDetailComponent key={idx} bank={detail} />;
                     })}

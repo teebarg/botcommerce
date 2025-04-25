@@ -130,7 +130,8 @@ class OrderService:
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         customer_id: Optional[int] = None,
-        user_role: str = "CUSTOMER"
+        user_role: str = "CUSTOMER",
+        sort: Optional[str] = "desc"
     ):
         """
         List orders with filtering and pagination
@@ -153,12 +154,12 @@ class OrderService:
             where=where,
             skip=skip,
             take=take,
-            order={"created_at": "desc"},
+            order={"created_at": sort},
             include={
                 "order_items": True,
                 "user": True,
                 "shipping_address": True,
-                "billing_address": True
+                # "billing_address": True
             }
         )
         total = await db.order.count(where=where)

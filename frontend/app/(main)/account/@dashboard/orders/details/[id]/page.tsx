@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { api } from "@/apis";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import OrderConfirmation from "@/components/store/orders/order-confirmation";
 
 type Params = Promise<{ id: string }>;

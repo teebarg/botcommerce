@@ -5,19 +5,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { PencilSquare as Edit, Trash } from "nui-react-icons";
-import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/spinner";
+import { Spinner } from "@/components/generic/spinner";
 import { Address } from "@/types/models";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/apis";
 import { AddressTypeSchema } from "@/types/schema";
+import { states } from "@/components/store/collections/data";
 
 const addressSchema = z.object({
     address_type: AddressTypeSchema,

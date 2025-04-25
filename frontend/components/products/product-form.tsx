@@ -15,8 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import MultiSelect from "@/components/ui/multi-select";
-import { useStore } from "@/app/store/use-store";
-import { Category, Collection, Product } from "@/types/models";
+import { Brand, Category, Collection, Product } from "@/types/models";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -47,9 +46,16 @@ const formSchema = z.object({
     }),
 });
 
-const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ product, onClose }) => {
+interface ProductFormProps {
+    product?: Product;
+    onClose: () => void;
+    collections: Collection[];
+    categories: Category[];
+    brands: Brand[];
+}
+
+const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections, categories, brands }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
-    const { collections, categories, brands } = useStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -58,7 +64,7 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
             description: product?.description || "",
             sku: product?.sku || "",
             status: product?.status || "",
-            brand: product?.brand?.id || 0,
+            brand: product?.brand?.id || 1,
             categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
             collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],
             // tags: product?.tags?.map((tag) => ({ value: tag.id, label: tag.name })) || [],
@@ -116,7 +122,7 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="rounded-lg shadow-xl w-full h-full">
                         {/* Product Form */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
                                 name="name"
@@ -276,7 +282,7 @@ const ProductForm: React.FC<{ product?: Product; onClose: () => void }> = ({ pro
                                     </FormItem>
                                 )}
                             />
-                            <div className="flex gap-2 justify-end col-span-2">
+                            <div className="flex gap-2 justify-end md:col-span-2">
                                 <Button type="button" variant="destructive" onClick={() => onClose()}>
                                     Close
                                 </Button>

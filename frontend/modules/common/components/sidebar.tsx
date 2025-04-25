@@ -167,11 +167,6 @@ const SideBar: React.FC = () => {
                     icon: <Window size={18} />,
                 },
                 {
-                    label: "Configs",
-                    href: "/admin/configs",
-                    icon: <CogSixTooth size={18} />,
-                },
-                {
                     label: "Users",
                     href: "/admin/users",
                     icon: <Users size={18} />,
@@ -204,20 +199,12 @@ const SideBar: React.FC = () => {
                     href: "/admin/collections",
                 },
                 {
-                    label: "Tags",
-                    href: "/admin/tags",
-                },
-                {
                     label: "Reviews",
                     href: "/admin/reviews",
                 },
                 {
                     label: "Orders",
                     href: "/admin/orders",
-                },
-                {
-                    label: "Credit card",
-                    href: "/credit-card",
                 },
             ],
         },
@@ -299,11 +286,11 @@ const SideBar: React.FC = () => {
     const navs = [
         {
             group: "General",
-            iems: navItems,
+            items: navItems,
         },
         {
             group: "Extra",
-            iems: extraItems,
+            items: extraItems,
         },
     ];
 
@@ -342,7 +329,7 @@ const SideBar: React.FC = () => {
                         </div>
 
                         <nav>
-                            {nav.iems.map((item, index: number) =>
+                            {nav.items.map((item, index: number) =>
                                 "subMenu" in item ? (
                                     <SubMenuComponent key={index} isCollapsed={isCollapsed} item={item as SubMenuItem} />
                                 ) : (

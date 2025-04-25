@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { api } from "@/apis/base";
 import { Order } from "@/types/models";
-import PaymentLoading from "@/components/payment/payment-loading";
+import PaymentLoading from "@/components/store/payment/payment-loading";
 import { deleteCookie } from "@/lib/util/cookie";
 
 export default function PaymentVerifyPage() {

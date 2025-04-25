@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import { SignUpForm } from "@modules/auth/components/signup";
 
+import { SignUpForm } from "@/components/generic/auth/signup";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 

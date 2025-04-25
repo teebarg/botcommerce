@@ -61,7 +61,7 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = Field(None, min_length=1)
     sku: Optional[str] = None
     status: Optional[Literal["IN_STOCK", "OUT_OF_STOCK"]] = None
-    brand_ids: Optional[List[int]] = None
+    brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
@@ -109,17 +109,6 @@ class ProductCollection(BaseModel):
 class ProductImages(BaseModel):
     id: int
 
-class Variant(BaseModel):
-    id: int
-    name: str = Field(..., min_length=1, description="Variant name is required")
-    sku: Optional[str] = None
-    slug: str = Field(..., min_length=1, description="Variant slug is required")
-    image: Optional[str] = None
-    price: float = Field(..., gt=0, description="Price must be positive")
-    old_price: float = Field(..., ge=0, description="Old price must be positive")
-    inventory: int = Field(..., ge=0, description="Inventory cannot be negative")
-    status: Literal["IN_STOCK", "OUT_OF_STOCK"]
-
 
 class Product(BM):
     id: int
@@ -128,7 +117,7 @@ class Product(BM):
     slug: str
     description: str
     price: float
-    old_price: float
+    old_price: Optional[float] = 0.0
     image: Optional[str] = None
     status: str
     variants: Optional[List[ProductVariant]] = None
@@ -147,7 +136,7 @@ class SearchProduct(BaseModel):
     slug: str
     description: str
     price: float
-    old_price: float
+    old_price: Optional[float] = 0.0
     image: Optional[str] = None
     status: str
     ratings: float
@@ -158,7 +147,7 @@ class SearchProduct(BaseModel):
     images: Optional[List[str]] = []
     reviews: Optional[List[str]] = []
     favorites: Optional[List[str]] = []
-    variants: Optional[List[Variant]] = []
+    variants: Optional[List[ProductVariant]] = []
 
 class Facets(BaseModel):
     brand: dict[str, int]
