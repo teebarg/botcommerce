@@ -6,7 +6,7 @@ import { Shield } from "nui-react-icons";
 import EmptyCartMessage from "./empty-message";
 
 import { useCart } from "@/lib/hooks/useCart";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import { Skeleton } from "@/components/generic/skeleton";
 import SummaryMobile from "@/components/store/cart/summary-mobile";
 import RecommendedProducts from "@/components/store/products/recommended";

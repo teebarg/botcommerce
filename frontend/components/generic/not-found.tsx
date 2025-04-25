@@ -1,7 +1,7 @@
 import { Exclamation } from "nui-react-icons";
 import React from "react";
 
-import { BtnLink } from "./ui/btnLink";
+import { BtnLink } from "../ui/btnLink";
 
 import { cn } from "@/lib/util/cn";
 

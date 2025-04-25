@@ -5,7 +5,7 @@ import { Heart } from "lucide-react";
 import WishlistItem from "@/modules/common/components/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import { WishItem } from "@/types/models";
 import { useUserWishlist } from "@/lib/hooks/useCart";
 

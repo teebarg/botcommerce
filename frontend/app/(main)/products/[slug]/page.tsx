@@ -3,7 +3,7 @@ import React from "react";
 
 import RelatedProducts from "@/components/store/products/related-products";
 import { api } from "@/apis";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import ProductView from "@/components/store/products/product-view";
 import ReviewsSection from "@/components/product/product-reviews";
 import { auth } from "@/actions/auth";

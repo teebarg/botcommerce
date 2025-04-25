@@ -4,7 +4,7 @@ import React from "react";
 import { api } from "@/apis";
 import ClientOnly from "@/components/generic/client-only";
 import ReviewView from "@/components/admin/reviews/reviews-view";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 
 export const metadata: Metadata = {
     title: "Reviews",

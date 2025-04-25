@@ -4,7 +4,7 @@ import AddressBook from "@modules/account/components/address-book";
 
 import { auth } from "@/actions/auth";
 import { api } from "@/apis";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 
 export const metadata: Metadata = {
     title: "Addresses",

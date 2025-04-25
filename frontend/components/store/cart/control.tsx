@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Spinner } from "@/components/generic/spinner";
 import { toast } from "sonner";
 import { Trash } from "nui-react-icons";
 
+import { Spinner } from "@/components/generic/spinner";
 import { CartItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";

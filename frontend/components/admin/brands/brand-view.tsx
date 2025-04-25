@@ -5,7 +5,7 @@ import { ArrowUpDown, Search } from "nui-react-icons";
 
 import BrandItem from "./brand-item";
 
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import { Brand } from "@/types/models";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";

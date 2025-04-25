@@ -8,7 +8,7 @@ import InfiniteScrollClient from "../scroll-client2";
 
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { api } from "@/apis";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import { auth } from "@/actions/auth";
 import { BtnLink } from "@/components/ui/btnLink";
 

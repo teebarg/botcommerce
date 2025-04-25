@@ -15,7 +15,7 @@ const getThemeToggler = () =>
         loading: () => <div className="w-6 h-6" />,
     });
 
-const Navbar = async () => {
+const StoreNavbar = async () => {
     const user = await auth();
     const ThemeButton = getThemeToggler();
     const siteConfig = await getSiteConfig();
@@ -66,4 +66,4 @@ const Navbar = async () => {
     );
 };
 
-export default Navbar;
+export default StoreNavbar;

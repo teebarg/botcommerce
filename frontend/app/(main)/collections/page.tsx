@@ -8,7 +8,7 @@ import InfiniteScrollClient from "./scroll-client2";
 import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
 import { api } from "@/apis";
 import { auth } from "@/actions/auth";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import { BtnLink } from "@/components/ui/btnLink";
 
 type SearchParams = Promise<{

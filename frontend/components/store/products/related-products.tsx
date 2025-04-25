@@ -2,7 +2,7 @@
 
 import { Product, ProductSearch } from "@/types/models";
 import ProductCard from "@/components/store/products/product-card";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import { useProductSearch } from "@/lib/hooks/useCart";
 
 type RelatedProductsProps = {

@@ -1,9 +1,10 @@
 "use client";
 
+import DiscountCode from "../checkout/components/discount-code";
+
 import { BtnLink } from "@/components/ui/btnLink";
 import { Cart } from "@/types/models";
 import CartTotals from "@/components/store/cart/cart-totals";
-import DiscountCode from "@/components/checkout/components/discount-code";
 
 type SummaryProps = {
     cart: Cart;

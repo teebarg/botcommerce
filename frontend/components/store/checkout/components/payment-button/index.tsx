@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Cart } from "@/types/models";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
 import { api } from "@/apis";
-import { PaystackPayment } from "@/components/payment/paystack-payment";
-import BankTransfer from "@/components/payment/bank-transfer";
-import Pickup from "@/components/payment/pickup";
+import { PaystackPayment } from "@/components/store/payment/paystack-payment";
+import BankTransfer from "@/components/store/payment/bank-transfer";
+import Pickup from "@/components/store/payment/pickup";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;

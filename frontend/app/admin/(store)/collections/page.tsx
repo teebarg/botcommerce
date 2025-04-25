@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import React from "react";
 
 import { api } from "@/apis";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import ClientOnly from "@/components/generic/client-only";
 import CollectionView from "@/components/admin/collections/collection-view";
 

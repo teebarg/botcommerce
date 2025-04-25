@@ -6,7 +6,7 @@ import { Instagram } from "lucide-react";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import { Category } from "@/types/models";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import NewsletterForm from "@/components/store/newsletter";
 
 const about = [

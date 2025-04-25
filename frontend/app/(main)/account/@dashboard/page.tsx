@@ -7,7 +7,7 @@ import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import { Order, User } from "@/types/models";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 
 export const metadata: Metadata = {
     title: "Account",

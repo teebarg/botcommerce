@@ -5,7 +5,7 @@ import ProfilePassword from "@modules/account/components/profile-password";
 import { notFound } from "next/navigation";
 
 import { api } from "@/apis";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 
 export const metadata: Metadata = {
     title: "Profile",

@@ -1,9 +1,9 @@
 "use client";
 
-import Addresses from "@/components/checkout/components/addresses";
-import Payment from "@/components/checkout/components/payment";
-import Review from "@/components/checkout/components/review";
-import Shipping from "@/components/checkout/components/shipping";
+import Addresses from "@/components/store/checkout/components/addresses";
+import Payment from "@/components/store/checkout/components/payment";
+import Review from "@/components/store/checkout/components/review";
+import Shipping from "@/components/store/checkout/components/shipping";
 import { currency } from "@/lib/util/util";
 import { Cart, DeliveryOption } from "@/types/models";
 

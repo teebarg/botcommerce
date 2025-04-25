@@ -10,12 +10,13 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 
+import ShippingAddressFormEdit from "../../address-form-edit";
+import ShippingAddressForm from "../../address-form";
+
 import { Address, User } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import ShippingAddressForm from "@/components/checkout/address-form";
-import ShippingAddressFormEdit from "@/components/checkout/address-form-edit";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
 import ClientOnly from "@/components/generic/client-only";

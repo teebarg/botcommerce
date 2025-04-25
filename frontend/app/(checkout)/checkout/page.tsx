@@ -6,15 +6,15 @@ import { ChevronRight } from "nui-react-icons";
 import { BackButton } from "@/components/back";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import ClientOnly from "@/components/generic/client-only";
 import { useCart } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
-import CheckoutSkeleton from "@/components/checkout/checkout-skeleton";
-import CheckoutForm from "@/components/checkout/checkout-form";
-import CheckoutSummary from "@/components/checkout/checkout-summary";
 import { CartComponent } from "@/components/store/cart/cart-component";
+import CheckoutSkeleton from "@/components/store/checkout/checkout-skeleton";
+import CheckoutForm from "@/components/store/checkout/checkout-form";
+import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 
 export default function Checkout() {
     const { shopSettings } = useStore();

@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import { useCategories } from "@/lib/hooks/useAdmin";
 import { Skeleton } from "@/components/generic/skeleton";
 import CreateCategory from "@/components/admin/categories/create-categories";

@@ -9,7 +9,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
 import { api } from "@/apis";
 import { auth } from "@/actions/auth";
-import ServerError from "@/components/server-error";
+import ServerError from "@/components/generic/server-error";
 import ProductCard from "@/components/store/products/product-card";
 import { Category, Collection, ProductSearch, SortOptions, WishItem } from "@/types/models";
 import PaginationUI from "@/components/pagination";
