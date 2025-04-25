@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
 
-import { CheckboxGroup } from "@/modules/collections/templates/checkbox-group";
+import { CheckboxGroup } from "@/components/store/collections/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import LocalizedClientLink from "@/components/ui/link";

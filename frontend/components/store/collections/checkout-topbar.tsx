@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import useWatch from "@lib/hooks/use-watch";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Filter, X } from "lucide-react";
 
 import { filters } from "./data";
-import { CollectionsSideBar } from "./sidebar";
+import { CollectionsSideBar } from "./checkbox-sidebar";
 
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -25,7 +25,7 @@ interface ComponentProps {
 
 const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, brands = [], categories = [], collections = [] }) => {
     const { updateQuery } = useUpdateQuery();
-    const [value, setValue] = React.useState<string>(sortBy || "created_at:desc");
+    const [value, setValue] = useState<string>(sortBy || "created_at:desc");
     const state = useOverlayTriggerState({});
 
     useWatch(value, (newValue: any) => {

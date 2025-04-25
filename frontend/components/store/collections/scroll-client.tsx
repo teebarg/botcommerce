@@ -11,12 +11,13 @@ import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { Brand, Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/types/models";
-import { CollectionsSideBar } from "@/modules/collections/templates/sidebar";
-import { CollectionsTopBar } from "@/modules/collections/templates/topbar";
+import { Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/types/models";
+import { CollectionsSideBar } from "@/components/store/collections/checkbox-sidebar";
+import { CollectionsTopBar } from "@/components/store/collections/checkout-topbar";
 import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
 import { cn } from "@/lib/util/cn";
+import { useBrands, useCategories, useCollections } from "@/lib/hooks/useAdmin";
 
 interface SearchParams {
     page?: number;
@@ -24,33 +25,30 @@ interface SearchParams {
     cat_ids?: string;
     maxPrice?: string;
     minPrice?: string;
+    search?: string;
 }
 
 export default function InfiniteScrollClient({
     initialSearchParams,
     data,
-    brands,
-    categories,
-    collections,
     collection,
     wishlist,
     user,
 }: {
     initialSearchParams: SearchParams;
     data: PaginatedProductSearch;
-    brands?: Brand[];
-    categories?: Category[];
-    collections?: Collection[];
     collection?: Collection;
     wishlist: WishItem[];
     user?: any;
 }) {
+    const { data: brands } = useBrands();
+    const { data: categories } = useCategories();
+    const { data: collections } = useCollections();
     const [products, setProducts] = useState<ProductSearch[]>(data.products);
     const [facets, setFacets] = useState<Facet>();
     const [hasNext, setHasNext] = useState<boolean>(data.page < data.total_pages);
     const [page, setPage] = useState<number>(data.page ?? 1);
-    // const [loading, setLoading] = useState<boolean>(false);
-    // const observerRef = useRef<IntersectionObserver | null>(null);
+
     const [scrollTrigger, isInView] = useInView();
     const searchParams = useSearchParams();
 

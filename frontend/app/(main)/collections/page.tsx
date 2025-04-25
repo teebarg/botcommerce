@@ -3,13 +3,12 @@ import { SortOptions, WishItem } from "types/models";
 import { Suspense } from "react";
 import { Exclamation } from "nui-react-icons";
 
-import InfiniteScrollClient from "./scroll-client2";
-
-import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
+import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { api } from "@/apis";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/generic/server-error";
 import { BtnLink } from "@/components/ui/btnLink";
+import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 
 type SearchParams = Promise<{
     page?: number;
@@ -33,16 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Collections({ searchParams }: Props) {
     const { minPrice, maxPrice, brand_id, cat_ids, page, sortBy } = (await searchParams) || {};
     const user = await auth();
-    const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
-
-    // Early returns for error handling
-    if (!brandRes || !collectionsRes.data || !catRes) {
-        return <ServerError />;
-    }
-
-    const { brands } = brandRes;
-    const { collections } = collectionsRes.data;
-    const { categories } = catRes.data ?? {};
 
     let wishlist: WishItem[] = [];
 
@@ -86,15 +75,7 @@ export default async function Collections({ searchParams }: Props) {
     return (
         <div className="container mx-auto py-4 px-1">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient
-                    brands={brands}
-                    categories={categories}
-                    collections={collections}
-                    data={res.data}
-                    initialSearchParams={queryParams}
-                    user={user}
-                    wishlist={wishlist}
-                />
+                <InfiniteScrollClient data={res.data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
             </Suspense>
         </div>
     );

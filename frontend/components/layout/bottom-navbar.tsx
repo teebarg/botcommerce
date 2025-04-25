@@ -2,7 +2,7 @@ import { cn } from "@lib/util/cn";
 import React from "react";
 import { Home, MenuIcon, Search, User } from "lucide-react";
 
-import Menu from "./menu";
+import Menu from "../menu";
 
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";

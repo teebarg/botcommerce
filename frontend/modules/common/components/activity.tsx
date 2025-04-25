@@ -4,8 +4,6 @@ import { formatDistanceToNow } from "date-fns";
 import { deleteActivity } from "@modules/account/actions";
 import { toast } from "sonner";
 
-import Logo from "../icons/logo";
-
 import { Spinner } from "@/components/generic/spinner";
 import { useStore } from "@/app/store/use-store";
 
@@ -96,7 +94,6 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                             <div className="relative h-full w-full">
                                 <div className="text-default-500 flex justify-between">
                                     <div className="flex items-center">
-                                        <Logo className="mr-3" />
                                         <span className="text-sm font-semibold">{shopSettings?.shop_name}</span>
                                     </div>
                                     <span>

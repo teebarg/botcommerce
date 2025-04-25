@@ -4,16 +4,16 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus } from "nui-react-icons";
-import { states } from "@modules/collections/templates/data";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/apis";
+import { states } from "@/components/store/collections/data";
 
 const addressSchema = z.object({
     first_name: z.string().min(1, "First name is required"),

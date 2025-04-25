@@ -4,9 +4,8 @@ import { SortOptions, WishItem } from "types/models";
 import React, { Suspense } from "react";
 import { Exclamation } from "nui-react-icons";
 
-import InfiniteScrollClient from "../scroll-client2";
-
-import { CollectionTemplateSkeleton } from "@/modules/collections/skeleton";
+import InfiniteScrollClient from "@/components/store/collections/scroll-client";
+import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import { api } from "@/apis";
 import ServerError from "@/components/generic/server-error";
 import { auth } from "@/actions/auth";
@@ -38,21 +37,11 @@ export default async function CollectionPage({ params, searchParams }: { params:
     const user = await auth();
     const { minPrice, maxPrice, brand_id, cat_ids, page, sortBy } = (await searchParams) || {};
     const { slug } = await params;
-    const [brandRes, collectionsRes, catRes] = await Promise.all([api.brand.all(), api.collection.all(), api.category.all()]);
     const { data: collection } = await api.collection.getBySlug(slug).then((collection) => collection);
 
     if (!collection) {
         notFound();
     }
-
-    // Early returns for error handling
-    if (!brandRes || !collectionsRes.data || !catRes) {
-        return <ServerError />;
-    }
-
-    const { brands } = brandRes;
-    const { collections } = collectionsRes.data;
-    const { categories } = catRes.data ?? {};
 
     let wishlist: WishItem[] = [];
 
@@ -97,15 +86,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
     return (
         <div className="container mx-auto py-4 px-2">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient
-                    brands={brands}
-                    categories={categories}
-                    collections={collections}
-                    data={res.data}
-                    initialSearchParams={queryParams}
-                    user={user}
-                    wishlist={wishlist}
-                />
+                <InfiniteScrollClient data={res.data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
             </Suspense>
         </div>
     );

@@ -1,8 +1,6 @@
 import { ChevronRight } from "nui-react-icons";
 import React from "react";
 
-import SkeletonProductPreview from "../skeletons/components/skeleton-product-preview";
-
 import { Skeleton } from "@/components/generic/skeleton";
 
 const CollectionTemplateSkeleton = () => {
@@ -56,7 +54,14 @@ const CollectionTemplateSkeleton = () => {
                                     <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-4">
                                         {/* Generate 8 skeleton product cards */}
                                         {[...Array(8)].map((_, index) => (
-                                            <SkeletonProductPreview key={index} />
+                                            <div key={index} className="flex flex-col">
+                                                {/* Image skeleton */}
+                                                <Skeleton className="aspect-square w-full rounded-xl" />
+                                                {/* Title skeleton */}
+                                                <Skeleton className="h-4 w-3/4 rounded mt-2" />
+                                                {/* Price skeleton */}
+                                                <Skeleton className="h-4 w-1/4 rounded mt-2" />
+                                            </div>
                                         ))}
                                     </div>
                                 </div>

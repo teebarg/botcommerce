@@ -2,11 +2,11 @@ import React from "react";
 
 import { BackButton } from "@/components/back";
 import Search from "@/modules/search/components/search";
-import ButtonNav from "@/components/bottom-navbar";
 import ChatBotWrapper from "@/components/generic/chatbot";
 import Cookie from "@/components/store/cookie";
 import Footer from "@/components/layout/footer";
 import StoreNavbar from "@/components/layout/store-nav";
+import ButtonNav from "@/components/layout/bottom-navbar";
 
 // const Banner = dynamic(() => import("@modules/common/components/banner"), { loading: () => <p>Loading...</p> });
 // const Cookie = dynamic(() => import("@modules/store/components/cookie"));

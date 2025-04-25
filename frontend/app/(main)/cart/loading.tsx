@@ -1,5 +1,4 @@
 import repeat from "@lib/util/repeat";
-import SkeletonOrderSummary from "@modules/skeletons/components/skeleton-order-summary";
 
 import { Skeleton } from "@/components/generic/skeleton";
 
@@ -71,7 +70,30 @@ export default function Loading() {
                         </div>
                     </div>
                     <div className="hidden md:flex flex-col gap-y-8">
-                        <SkeletonOrderSummary />
+                        <div className="grid-cols-1">
+                            <div className="flex flex-col">
+                                <div className="flex items-center justify-between">
+                                    <Skeleton className="w-32 h-3" />
+                                    <Skeleton className="w-32 h-3" />
+                                </div>
+
+                                <div className="flex items-center justify-between my-4">
+                                    <Skeleton className="w-24 h-3" />
+                                    <Skeleton className="w-24 h-3" />
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <Skeleton className="w-28 h-3" />
+                                    <Skeleton className="w-20 h-3" />
+                                </div>
+
+                                <div className="flex items-center justify-between mt-4">
+                                    <Skeleton className="w-32 h-6 mb-4" />
+                                    <Skeleton className="w-24 h-6 mb-4" />
+                                </div>
+                            </div>
+                            <Skeleton className="w-full min-h-[50px] py-[10px] mt-4" />
+                        </div>
                         <div className="w-full flex flex-col">
                             <Skeleton className="h-7 w-24 mb-4" />
                             <div className="grid grid-cols-[1fr_80px] gap-x-2">

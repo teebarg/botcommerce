@@ -2,8 +2,7 @@
 
 import React from "react";
 import { notFound } from "next/navigation";
-import FastDelivery from "@modules/common/icons/fast-delivery";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Truck } from "lucide-react";
 
 import { Product } from "@/types/models";
 
@@ -21,7 +20,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
             <div className="text-sm py-8 bg-yellow-50/80 md:bg-content1 -mx-2 px-2 rounded-none md:rounded-lg text-gray-900 md:text-default-foreground">
                 <div className="grid grid-cols-1 gap-y-8">
                     <div className="flex items-start gap-x-2">
-                        <FastDelivery />
+                        <Truck className="text-default-foreground" size={16} />
                         <div>
                             <span className="font-semibold">Fast delivery</span>
                             <p className="max-w-sm">
