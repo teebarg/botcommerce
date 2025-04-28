@@ -38,7 +38,7 @@ const ReviewForm: React.FC<Props> = ({ onClose, review = { rating: 1, comment: "
     }, [state.error, state.message]);
 
     return (
-        <div className="mx-auto w-full pb-8">
+        <div className="mx-auto w-full">
             <form ref={formRef} action={formAction} className="h-full flex flex-col">
                 <input readOnly className="hidden" name="id" type="text" value={review.id} />
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll pb-6">
@@ -47,7 +47,7 @@ const ReviewForm: React.FC<Props> = ({ onClose, review = { rating: 1, comment: "
                         <Textarea required defaultValue={review.comment} label="Comment" name="comment" placeholder="Great product." />
                     </div>
                 </div>
-                <div className="flex flex-shrink-0 items-center justify-end p-4 space-x-2 absolute bottom-0 w-full right-0 z-50">
+                <div className="flex items-center justify-end py-4 space-x-2">
                     <Button aria-label="cancel" className="min-w-32" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>

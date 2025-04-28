@@ -19,8 +19,6 @@ interface Props {}
 const CartView: React.FC<Props> = () => {
     const { data: cart, isLoading, error } = useCart();
 
-    console.log("🚀 ~ cart:", cart);
-
     if (isLoading) {
         return <Skeleton className="h-[400px]" />;
     }

@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { PencilSquare as Edit, Trash } from "nui-react-icons";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { Edit, Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/util/cn";
 import { Button } from "@/components/ui/button";
@@ -122,7 +122,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                         data-testid="address-delete-button"
                         onClick={removeAddress}
                     >
-                        {removing ? <Spinner /> : <Trash />}
+                        {removing ? <Spinner /> : <Trash2 />}
                         Remove
                     </button>
                 </div>

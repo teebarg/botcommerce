@@ -1,15 +1,14 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { SortOptions, WishItem } from "types/models";
-import { Exclamation } from "nui-react-icons";
 
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/generic/server-error";
-import { BtnLink } from "@/components/ui/btnLink";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
+import NoProductsFound from "@/components/store/products/no-products";
 
 export const metadata: Metadata = {
     title: "Search",
@@ -49,25 +48,14 @@ export default async function SearchResults({ params, searchParams }: { params: 
         brand_id: brand_id,
     };
 
-    const res = await api.product.search(queryParams);
+    const { data, error } = await api.product.search(queryParams);
 
-    if (res.error) {
+    if (error) {
         return <ServerError />;
     }
 
-    if (!res.data) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-content1 w-full">
-                <div className="max-w-md mx-auto text-center">
-                    <Exclamation className="w-20 h-20 mx-auto text-danger" />
-                    <h1 className="text-4xl font-bold mt-6">Oops! No Products Found</h1>
-                    <p className="text-default-500 my-4">{`There are no products in this category`}</p>
-                    <BtnLink color="primary" href="/">
-                        Go to Home
-                    </BtnLink>
-                </div>
-            </div>
-        );
+    if (!data) {
+        return <NoProductsFound />;
     }
 
     return (
@@ -83,7 +71,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
             </div>
             <div className="w-full py-0 md:py-4">
                 <Suspense fallback={<CollectionTemplateSkeleton />}>
-                    <InfiniteScrollClient data={res.data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
+                    <InfiniteScrollClient data={data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
                 </Suspense>
             </div>
         </div>

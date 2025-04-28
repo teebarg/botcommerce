@@ -1,8 +1,9 @@
-import { Bell, Cancel, Excel, Trash } from "nui-react-icons";
+import { Bell, Cancel, Excel } from "nui-react-icons";
 import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { deleteActivity } from "@modules/account/actions";
 import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 
 import { Spinner } from "@/components/generic/spinner";
 import { useStore } from "@/app/store/use-store";
@@ -131,7 +132,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                                 data-testid="activity-delete-button"
                                                 onClick={() => removeActivity(item.id)}
                                             >
-                                                {removing == item.id ? <Spinner /> : <Trash />}
+                                                {removing == item.id ? <Spinner /> : <Trash2 />}
                                             </button>
                                             {item.is_success && item.activity_type == "product_export" && (
                                                 <a

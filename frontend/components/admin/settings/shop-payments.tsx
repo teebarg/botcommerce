@@ -161,27 +161,30 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                             <DialogHeader>
                                 <DialogTitle>Add Bank Details</DialogTitle>
                             </DialogHeader>
-                            <div className="space-y-4">
-                                <form>
+                            <form>
+                                <div className="space-y-4">
                                     <Input
+                                        label="Bank Name"
                                         placeholder="Enter bank name"
                                         value={formData.bank_name}
                                         onChange={(newValue) => setFormData((prev) => ({ ...prev, bank_name: newValue.target.value }))}
                                     />
                                     <Input
+                                        label="Account Name"
                                         placeholder="Enter account name"
                                         value={formData.account_name}
                                         onChange={(newValue) => setFormData((prev) => ({ ...prev, account_name: newValue.target.value }))}
                                     />
                                     <Input
+                                        label="Account Number"
                                         placeholder="Enter account number"
                                         type="number"
                                         value={formData.account_number}
                                         onChange={(newValue) => setFormData((prev) => ({ ...prev, account_number: newValue.target.value }))}
                                     />
-                                </form>
-                            </div>
-                            <DialogFooter>
+                                </div>
+                            </form>
+                            <DialogFooter className="flex-row justify-end space-x-2">
                                 <Button aria-label="close" className="min-w-36" variant="outline" onClick={deleteState.close}>
                                     Close
                                 </Button>

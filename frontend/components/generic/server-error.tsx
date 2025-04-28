@@ -25,8 +25,8 @@ const ServerError = () => {
                     </div>
                 </div>
 
-                <h2 className="text-2xl font-bold text-default-800 text-center mb-4">Oops! Something Went Wrong</h2>
-                <p className="text-default-600 text-center mb-6">
+                <h2 className="text-2xl font-bold text-default-900 text-center mb-4">Oops! Something Went Wrong</h2>
+                <p className="text-default-500 text-center mb-6">
                     {`We seem to be having some technical difficulties. Our team is working on it, but in the meantime, let's try that again!`}
                 </p>
 

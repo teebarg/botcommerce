@@ -2,12 +2,11 @@
 
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { Trash } from "nui-react-icons";
 
 import { api } from "@/apis";
+import { useInvalidate } from "@/lib/hooks/useAdmin";
 
 interface ProductImageManagerProps {
     productId: number;
@@ -15,22 +14,25 @@ interface ProductImageManagerProps {
 }
 
 const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, initialImage = "" }) => {
-    const router = useRouter();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isUploading, setIsUploading] = useState<boolean>(false);
+    const invalidate = useInvalidate();
 
     const deleteImage = () => {
         setIsDeleting(true);
         void (async () => {
-            try {
-                await api.product.deleteImage(productId);
-                toast.success("Image deleted successfully");
-                router.refresh();
-            } catch (error) {
+            const { error } = await api.product.deleteImage(productId);
+
+            if (error) {
                 toast.error(`Error - ${error as string}`);
-            } finally {
                 setIsDeleting(false);
+
+                return;
             }
+            toast.success("Image deleted successfully");
+            invalidate("products");
+            invalidate("product-search");
+            setIsDeleting(false);
         })();
     };
 
@@ -52,20 +54,26 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
                 const fileName = `images/${Date.now()}-${file.name}`;
 
                 void (async () => {
-                    try {
-                        await api.product.uploadImage({
-                            id: productId,
-                            data: {
-                                file: base64.split(",")[1]!, // Remove the data URL prefix
-                                file_name: fileName,
-                                content_type: file.type,
-                            },
-                        });
+                    setIsUploading(true);
+                    const { error } = await api.product.uploadImage({
+                        id: productId,
+                        data: {
+                            file: base64.split(",")[1]!, // Remove the data URL prefix
+                            file_name: fileName,
+                            content_type: file.type,
+                        },
+                    });
 
-                        toast.success("Image uploaded successfully");
-                    } catch (error) {
+                    if (error) {
                         toast.error(`Error - ${error as string}`);
+                        setIsUploading(false);
+
+                        return;
                     }
+                    toast.success("Image uploaded successfully");
+                    invalidate("products");
+                    invalidate("product-search");
+                    setIsUploading(false);
                 })();
             };
             reader.readAsDataURL(file);
@@ -106,7 +114,7 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
                             className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                             onClick={deleteImage}
                         >
-                            <Trash className="w-5 h-5" />
+                            <Trash2 className="w-5 h-5" />
                         </button>
                     </div>
                     {isDeleting && (

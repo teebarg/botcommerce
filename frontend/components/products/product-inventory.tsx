@@ -27,7 +27,6 @@ export function ProductInventory() {
                             <ProductUpload />
                         </div>
                         <DrawerUI
-                            // direction="right"
                             open={addState.isOpen}
                             title={`Add Product`}
                             trigger={

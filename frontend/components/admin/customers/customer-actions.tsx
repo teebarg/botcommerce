@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import CustomerForm from "./customer-form";
@@ -39,7 +39,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                         onDelete(user.id);
                     }}
                 >
-                    <Trash className="h-5 w-5 text-danger" />
+                    <Trash2 className="h-5 w-5 text-danger" />
                 </Button>
             </div>
         </div>

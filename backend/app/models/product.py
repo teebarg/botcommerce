@@ -27,18 +27,6 @@ class VariantWithStatus(BaseModel):
     status: Literal["IN_STOCK", "OUT_OF_STOCK"]
 
 
-# class Product(BM):
-#     name: str = Field(..., min_length=1, description="Name is required")
-#     description: str = Field(..., min_length=1, description="Description is required")
-#     brand_ids: Optional[List[int]] = None
-#     category_ids: Optional[List[int]] = None
-#     collection_ids: Optional[List[int]] = None
-#     tags_ids: Optional[List[int]] = None
-#     sku: Optional[str] = None
-#     variants: Optional[List[VariantCreate]] = None
-#     images: Optional[List[HttpUrl]] = None
-
-
 class ProductCreate(BaseModel):
     name: str = Field(..., min_length=1, description="Name is required")
     description: str = Field(..., min_length=1, description="Description is required")
@@ -53,14 +41,13 @@ class ProductCreate(BaseModel):
     images: Optional[List[HttpUrl]] = None
     status: Literal["IN_STOCK", "OUT_OF_STOCK"] = "IN_STOCK"
 
-class ProductPublic(BaseModel):
-    id: int
-
 class ProductUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = Field(None, min_length=1)
     sku: Optional[str] = None
     status: Optional[Literal["IN_STOCK", "OUT_OF_STOCK"]] = None
+    price: Optional[float] = None
+    old_price: Optional[float] = None
     brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
@@ -78,36 +65,6 @@ class ImageUpload(BaseModel):
     file_name: str
     content_type: str
     product_id: int = Field(..., gt=0)
-
-class ImageDelete(BaseModel):
-    id: int
-
-class PaginationParams(BaseModel):
-    page: int = Field(1, ge=1)
-    page_size: int = Field(10, ge=1, le=100)
-    category_slug: Optional[str] = None
-    search: Optional[str] = None
-    sort: Literal["asc", "desc"] = "desc"
-
-
-class ProductPublic(BaseModel):
-    id: int
-
-
-class ProductBrand(BaseModel):
-    id: int
-
-
-class ProductCategory(BaseModel):
-    id: int
-
-
-class ProductCollection(BaseModel):
-    id: int
-
-
-class ProductImages(BaseModel):
-    id: int
 
 
 class Product(BM):

@@ -1,4 +1,5 @@
 import { fetcher } from "./fetcher";
+import { api } from "./base";
 
 import { buildUrl, handleError } from "@/lib/util/util";
 import { Message, PaginatedProduct, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/types/models";
@@ -34,41 +35,13 @@ export const productApi = {
         return await tryCatch<Product>(fetcher(url, { next: { tags: ["product"] } }));
     },
     async create(input: any): ApiResult<Product> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`;
-        const response = await tryCatch<Product>(
-            fetcher(url, { method: "POST", body: JSON.stringify(input), headers: { "Content-Type": "application/json" } })
-        );
-
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+        return await api.post<Product>(`/product`, input);
     },
     async update(id: number, input: any): ApiResult<Product> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}`;
-        const response = await tryCatch<Product>(
-            fetcher(url, { method: "PUT", body: JSON.stringify(input), headers: { "Content-Type": "application/json" } })
-        );
-
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+        return await api.put<Product>(`/product/${id}`, input);
     },
     async delete(id: number): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}`;
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+        return await api.delete<Message>(`/product/${id}`);
     },
     async reviews({ product_id, page = 1, limit = 20 }: { product_id?: number; page: number; limit: number }): Promise<PaginatedReview> {
         const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });
@@ -111,40 +84,13 @@ export const productApi = {
         return response;
     },
     async deleteImage(id: number): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/image`;
-
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+        return await api.delete<Message>(`/product/${id}/image`);
     },
-    async uploadImages({ id, formData }: { id: number; formData: FormData }): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/image`;
-
-        const response = await tryCatch<Message>(fetcher(url, { method: "PATCH", body: formData }));
-
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+    async uploadImages({ id, data }: { id: number; data: any }): ApiResult<Message> {
+        return await api.post<Message>(`/product/${id}/images`, data);
     },
-    async deleteImages(id: number): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/images/${id}`;
-
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+    async deleteImages(id: number, imageId: number): ApiResult<Message> {
+        return await api.delete<Message>(`/product/${id}/images/${imageId}`);
     },
     async bulkUpload(formData: FormData): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`;
@@ -181,15 +127,8 @@ export const productApi = {
         status: "IN_STOCK" | "OUT_OF_STOCK";
     }): ApiResult<ProductVariant> {
         const { productId, ...variantData } = input;
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${productId}/variants`;
-        const response = await tryCatch<ProductVariant>(fetcher(url, { method: "POST", body: JSON.stringify(variantData) }));
 
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+        return await api.post<ProductVariant>(`/product/${productId}/variants`, variantData);
     },
     async updateVariant(input: {
         id: number;
@@ -200,15 +139,8 @@ export const productApi = {
         status?: "IN_STOCK" | "OUT_OF_STOCK";
     }): ApiResult<ProductVariant> {
         const { id, ...variantData } = input;
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/variants/${id}`;
-        const response = await tryCatch<ProductVariant>(fetcher(url, { method: "PATCH", body: JSON.stringify(variantData) }));
 
-        if (!response.error) {
-            revalidate("products");
-            revalidate("search");
-        }
-
-        return response;
+        return await api.put<ProductVariant>(`/product/variants/${id}`, variantData);
     },
     async deleteVariant(id: number): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/variants/${id}`;

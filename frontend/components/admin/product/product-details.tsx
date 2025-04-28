@@ -10,8 +10,8 @@ import ProductFilter from "./product-filter";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import PaginationUI from "@/components/pagination";
-import { ProductActions } from "@/components/products/product-actions";
-import { Brand, Category, Collection, Product } from "@/types/models";
+import { ProductActions } from "@/components/admin/product/product-actions";
+import { Brand, Collection, Product } from "@/types/models";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useBrands, useCollections, useProducts } from "@/lib/hooks/useAdmin";
@@ -62,11 +62,11 @@ export function ProductDetails() {
     };
 
     const handleManageCollections = () => {
-        router.push("/collections");
+        router.push("/admin/collections");
     };
 
     const handleManageBrands = () => {
-        router.push("/brands");
+        router.push("/admin/brands");
     };
 
     return (
@@ -80,7 +80,6 @@ export function ProductDetails() {
                             <TableHead>Product</TableHead>
                             <TableHead>Sku</TableHead>
                             <TableHead>Description</TableHead>
-                            <TableHead>Categories</TableHead>
                             <TableHead>Variant</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
@@ -104,15 +103,6 @@ export function ProductDetails() {
                                 <TableCell className="font-medium">{product.name}</TableCell>
                                 <TableCell>{product.sku}</TableCell>
                                 <TableCell>{product.description}</TableCell>
-                                <TableCell>
-                                    <div className="flex flex-wrap gap-2 items-center">
-                                        {product.categories?.map((category: Category, index: number) => (
-                                            <Badge key={index} variant="secondary">
-                                                {category.name}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </TableCell>
                                 <TableCell>{product.variants?.length}</TableCell>
                                 <TableCell>
                                     <Badge variant={product.status === "IN_STOCK" ? "default" : "destructive"}>{product.status}</Badge>

@@ -2,10 +2,9 @@
 
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Trash } from "nui-react-icons";
 
 import { api } from "@/apis";
 
@@ -106,7 +105,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                             className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                             onClick={deleteImage}
                         >
-                            <Trash className="w-5 h-5" />
+                            <Trash2 className="w-5 h-5" />
                         </button>
                     </div>
                     {isDeleting && (

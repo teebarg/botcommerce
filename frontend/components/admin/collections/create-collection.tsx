@@ -18,7 +18,7 @@ const CreateCollection: React.FC<Props> = () => {
                 <DrawerTrigger asChild>
                     <Button onClick={state.open}>Create Collection</Button>
                 </DrawerTrigger>
-                <DrawerContent>
+                <DrawerContent className="px-4">
                     <DrawerHeader>
                         <DrawerTitle>Create Collection</DrawerTitle>
                     </DrawerHeader>

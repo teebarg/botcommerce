@@ -1,16 +1,18 @@
-import { Home, PackageSearch, RefreshCcw } from "nui-react-icons";
+"use client";
+
 import React from "react";
+import { Home, PackageSearch, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useCollections } from "@/lib/hooks/useAdmin";
+import { Collection } from "@/types/models";
+import { BtnLink } from "@/components/ui/btnLink";
 
-const NoProductsFound = ({
-    searchQuery = "",
-    onClearSearch = () => {},
-    onGoHome = () => {},
-    suggestedCategories = ["Electronics", "Clothing", "Home & Garden", "Books"],
-}) => {
+const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome = () => {} }) => {
+    const { data: collections } = useCollections();
+
     return (
-        <div className="min-h-[400px] w-full flex flex-col items-center justify-center px-4 py-12">
+        <div className="min-h-[400px] w-full flex flex-col items-center justify-center px-4 py-8">
             {/* Icon Animation Container */}
             <div className="relative mb-6">
                 <div className="absolute inset-0 bg-blue-100 rounded-full opacity-20 animate-ping" />
@@ -21,7 +23,7 @@ const NoProductsFound = ({
 
             {/* Main Content */}
             <div className="text-center max-w-md mx-auto">
-                <h2 className="text-2xl font-bold text-default-900 mb-3">No Products Found</h2>
+                <h2 className="text-2xl font-bold text-default-900">No Products Found</h2>
 
                 {searchQuery && (
                     <p className="text-default-500 mb-2">
@@ -30,7 +32,7 @@ const NoProductsFound = ({
                     </p>
                 )}
 
-                <p className="text-default-500 mb-8">Try adjusting your search or browse our suggested categories below.</p>
+                <p className="text-default-500 mb-8 text-sm">Try adjusting your search or browse our suggested categories below.</p>
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
@@ -38,9 +40,8 @@ const NoProductsFound = ({
                         Clear Search
                     </Button>
 
-                    <Button aria-label="home" variant="outline" onClick={onGoHome}>
-                        <Home className="w-4 h-4" />
-                        Go to Homepage
+                    <Button aria-label="home" startContent={<Home className="w-4 h-4" />} variant="outline" onClick={onGoHome}>
+                        Go Home
                     </Button>
                 </div>
 
@@ -49,10 +50,10 @@ const NoProductsFound = ({
                     <h3 className="text-sm font-semibold text-default-900">Popular Categories</h3>
 
                     <div className="flex flex-wrap justify-center gap-2">
-                        {suggestedCategories.map((category) => (
-                            <Button key={category} aria-label={category}>
-                                {category}
-                            </Button>
+                        {collections?.slice(0, 4).map((collection: Collection, idx: number) => (
+                            <BtnLink key={idx} aria-label={collection.name} href={`/collections/${collection.name}`}>
+                                {collection.name}
+                            </BtnLink>
                         ))}
                     </div>
                 </div>

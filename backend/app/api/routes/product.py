@@ -1,7 +1,5 @@
 import asyncio
-import base64
 from typing import Annotated, Any
-import uuid
 
 from fastapi import (
     APIRouter,
@@ -10,8 +8,7 @@ from fastapi import (
     File,
     HTTPException,
     Query,
-    UploadFile,
-    Request
+    UploadFile
 )
 from app.core.decorators import cache
 from app.core.deps import (
@@ -23,7 +20,6 @@ from app.core.deps import (
 from app.core.logging import logger
 from app.core.utils import slugify, url_to_list
 from app.models.product import Product, Products, SearchProducts
-from app.models.reviews import Reviews
 from app.models.generic import Message
 from app.models.product import (
     ImageUpload,
@@ -47,7 +43,7 @@ from app.prisma_client import prisma as db
 from math import ceil
 from prisma.enums import ProductStatus
 from pydantic import BaseModel
-from app.core.storage import upload, delete_Image
+from app.core.storage import upload
 
 # Initialize Supabase client
 supabase_url = settings.SUPABASE_URL
@@ -357,6 +353,12 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
     if product.status is not None:
         update_data["status"] = product.status
 
+    if product.price is not None:
+        update_data["price"] = product.price
+
+    if product.old_price is not None:
+        update_data["old_price"] = product.old_price
+
     if product.description is not None:
         update_data["description"] = product.description
 
@@ -418,26 +420,27 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
     # Handle image updates if provided
     if product.images is not None:
         # Delete existing images
-        await db.product_image.delete_many(where={"product_id": id})
+        await db.productimage.delete_many(where={"product_id": id})
 
         # Create new images
-        image_creates = [{"url": str(url), "product_id": id}
+        image_creates = [{"image": str(url), "product_id": id}
                          for url in product.images]
         for image_data in image_creates:
-            await db.product_image.create(data=image_data)
+            await db.productimage.create(data=image_data)
 
     # Update the product
     updated_product = await db.product.update(
         where={"id": id},
         data=update_data,
         include={
-            "variants": True,
             "categories": True,
+            "brand": True,
+            "collections": True,
+            "tags": True,
+            "variants": True,
             "images": True
         }
     )
-    cache.invalidate("featured")
-    cache.invalidate("product")
 
     try:
         # Define the background task
@@ -446,9 +449,11 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
             product_data = prepare_product_data_for_indexing(product)
 
             update_document(index_name="products", document=product_data)
+            cache.invalidate("featured")
             cache.invalidate("search")
+            cache.invalidate("product")
 
-        background_tasks.add_task(update_task, product=updated_product)
+        background_tasks.add_task(update_task, updated_product)
         return updated_product
     except Exception as e:
         logger.error(e)
@@ -464,9 +469,9 @@ async def delete_product(id: int) -> Message:
     Delete a product.
     """
     # Delete related data first due to foreign key constraints
-    await db.product_image.delete_many(where={"product_id": id})
+    await db.productimage.delete_many(where={"product_id": id})
     await db.review.delete_many(where={"product_id": id})
-    await db.product_variant.delete_many(where={"product_id": id})
+    await db.productvariant.delete_many(where={"product_id": id})
 
     # Delete the product
     await db.product.delete(where={"id": id})
@@ -508,7 +513,7 @@ async def create_variant(id: int, variant: VariantWithStatus):
 @router.put("/variants/{variant_id}")
 async def update_variant(variant_id: int, variant: VariantWithStatus):
     # Check if variant exists
-    existing_variant = await db.product_variant.find_unique(where={"id": variant_id})
+    existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
 
@@ -530,7 +535,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
         update_data["status"] = variant.status
 
     # Update the variant
-    updated_variant = await db.product_variant.update(
+    updated_variant = await db.productvariant.update(
         where={"id": variant_id},
         data=update_data
     )
@@ -541,10 +546,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
 @router.delete("/variants/{variant_id}")
 async def delete_variant(variant_id: int):
     # Delete the variant
-    deleted_variant = await db.product_variant.delete(where={"id": variant_id})
-
-    return deleted_variant
-
+    return await db.productvariant.delete(where={"id": variant_id})
 
 class ImageUpload(BaseModel):
     file: str  # Base64 encoded file
@@ -579,69 +581,76 @@ async def add_image(id: int, image_data: ImageUpload) -> Product:
         )
 
 
-@router.post("/upload-image")
-async def upload_image(image_data: ImageUpload):
+@router.post("/{id}/images")
+async def upload_images(id: int, image_data: ImageUpload):
+    """
+    Upload images to a product.
+    """
     # Check if product exists
-    product = await db.product.find_unique(where={"id": image_data.product_id})
+    product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Decode base64 file
-    file_bytes = base64.b64decode(image_data.file)
-
-    # Generate unique filename
-    file_extension = image_data.file_name.split('.')[-1]
-    unique_filename = f"{image_data.product_id}/{uuid.uuid4()}.{file_extension}"
-
-    # Upload file to Supabase
-    result = supabase.storage.from_("product-images").upload(
-        unique_filename,
-        file_bytes,
-        {"content-type": image_data.content_type}
-    )
-
-    if result.get("error"):
-        raise HTTPException(
-            status_code=500,
-            detail=f"Upload failed: {result['error']}"
-        )
-
-    # Get public URL
-    public_url = supabase.storage.from_(
-        "product-images").get_public_url(unique_filename)
+    image_url = upload(bucket="product-images", data=image_data)
 
     # Create image record in database
-    image = await db.product_image.create(
+    image = await db.productimage.create(
         data={
-            "url": public_url,
-            "product_id": image_data.product_id
+            "image": image_url,
+            "product_id": product.id
         }
     )
 
     return image
 
 
-@router.delete("/images/{image_id}")
-async def delete_image(image_id: int):
+@router.delete("/{id}/image")
+async def delete_image(id: int):
+    """
+    Delete an image from a product.
+    """
+    # Check if product exists
+    product = await db.product.find_unique(where={"id": id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Extract file path from URL
+    file_path = product.image.split("/storage/v1/object/public/product-images/")[1]
+
+    # Delete from Supabase
+    result = supabase.storage.from_("product-images").remove([file_path])
+    logger.info(f"Delete result: {result}")
+
+    # Delete from database
+    await db.product.update(where={"id": id}, data={"image": None})
+
+    return {"success": True}
+
+
+@router.delete("/{id}/images/{image_id}")
+async def delete_images(id: int, image_id: int):
+    """
+    Delete an image from a product images.
+    """
+    # Check if product exists
+    product = await db.product.find_unique(where={"id": id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
     # Get image details
-    image = await db.product_image.find_unique(where={"id": image_id})
+    image = await db.productimage.find_unique(where={"id": image_id})
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
 
     # Extract file path from URL
-    file_path = image.url.split("/storage/v1/object/public/product-images/")[1]
+    file_path = image.image.split("/storage/v1/object/public/product-images/")[1]
 
     # Delete from Supabase
     result = supabase.storage.from_("product-images").remove([file_path])
-
-    if result.get("error"):
-        raise HTTPException(
-            status_code=500,
-            detail=f"Delete failed: {result['error']}"
-        )
+    logger.info(f"Delete result: {result}")
 
     # Delete from database
-    await db.product_image.delete(where={"id": image_id})
+    await db.productimage.delete(where={"id": image_id})
 
     return {"success": True}
 

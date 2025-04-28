@@ -19,7 +19,7 @@ const CreateCategory: React.FC<Props> = () => {
                 <DrawerTrigger asChild>
                     <Button aria-label="add category">Add category</Button>
                 </DrawerTrigger>
-                <DrawerContent>
+                <DrawerContent className="px-4">
                     <DrawerHeader>
                         <DrawerTitle className="py-6">Add Category</DrawerTitle>
                     </DrawerHeader>
