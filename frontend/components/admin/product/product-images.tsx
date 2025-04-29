@@ -14,7 +14,6 @@ interface ProductImageManagerProps {
 
 const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, initialImages = [] }) => {
     const invalidate = useInvalidate();
-    // const router = useRouter();
     const [imageId, setImageId] = useState<number>();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -50,7 +49,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
             if (!file) return;
 
             const reader = new FileReader();
-            // const formData = new FormData();
 
             reader.onload = (e) => {
                 const base64 = reader.result as string;
@@ -58,30 +56,26 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
 
                 void (async () => {
                     setIsUploading(true);
-                    try {
-                        const { error } = await api.product.uploadImages({
-                            id: productId,
-                            data: {
-                                file: base64.split(",")[1]!, // Remove the data URL prefix
-                                file_name: fileName,
-                                content_type: file.type,
-                            },
-                        });
+                    const { error } = await api.product.uploadImages({
+                        id: productId,
+                        data: {
+                            file: base64.split(",")[1]!, // Remove the data URL prefix
+                            file_name: fileName,
+                            content_type: file.type,
+                        },
+                    });
 
-                        if (error) {
-                            toast.error(`Error - ${error}`);
-
-                            return;
-                        }
-
-                        toast.success("Image uploaded successfully");
-                        invalidate("products");
-                        invalidate("product-search");
-                    } catch (error) {
-                        toast.error(`Error - ${error as string}`);
-                    } finally {
+                    if (error) {
+                        toast.error(`Error - ${error}`);
                         setIsUploading(false);
+
+                        return;
                     }
+
+                    toast.success("Image uploaded successfully");
+                    invalidate("products");
+                    invalidate("product-search");
+                    setIsUploading(false);
                 })();
             };
             reader.readAsDataURL(file);
