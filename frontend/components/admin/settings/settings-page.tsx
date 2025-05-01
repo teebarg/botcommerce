@@ -16,10 +16,6 @@ interface SettingsPageProps {
 }
 
 export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
-    const features = settings.filter((s) => s.type === "FEATURE");
-    const shopDetails = settings.filter((s) => s.type === "SHOP_DETAIL");
-    const customSettings = settings.filter((s) => s.type === "CUSTOM");
-
     return (
         <div className="py-8 px-2 md:px-8">
             <h1 className="text-2xl font-semibold mb-4">Store Settings</h1>
@@ -31,16 +27,16 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
                     <TabsTrigger value="custom-settings">Custom Settings</TabsTrigger>
                 </TabsList>
                 <TabsContent value="shop-details">
-                    <ShopDetails settings={shopDetails} />
+                    <ShopDetails settings={settings} />
                 </TabsContent>
                 <TabsContent value="details">
-                    <FeatureToggles toggles={features} />
+                    <FeatureToggles toggles={settings} />
                 </TabsContent>
                 <TabsContent value="payments">
                     <ShopPayments bankDetails={bankDetails} settings={settings} />
                 </TabsContent>
                 <TabsContent value="custom-settings">
-                    <CustomSettings settings={customSettings} />
+                    <CustomSettings settings={settings} />
                 </TabsContent>
             </Tabs>
         </div>

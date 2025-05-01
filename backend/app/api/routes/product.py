@@ -44,6 +44,7 @@ from math import ceil
 from prisma.enums import ProductStatus
 from pydantic import BaseModel
 from app.core.storage import upload
+from app.api.routes.websocket import manager
 
 # Initialize Supabase client
 supabase_url = settings.SUPABASE_URL
@@ -95,10 +96,8 @@ async def export_products(
 ) -> Any:
     try:
         # Define the background task
-        def run_task():
-            asyncio.run(
-                generate_excel_file(email=current_user.email)
-            )
+        async def run_task():
+            await generate_excel_file(email=current_user.email)
 
             # crud.activities.create_product_export_activity(
             #     db=db, user_id=current_user.id, download_url=download_url
@@ -305,7 +304,7 @@ async def create_product(product: ProductCreate, cache: CacheService):
 
 
 @router.get("/{slug}")
-@cache(key="product", hash=False)
+# @cache(key="product", hash=False)
 async def read(slug: str):
     """
     Get a specific product by slug with Redis caching.
@@ -614,12 +613,15 @@ async def delete_image(id: int):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Extract file path from URL
-    file_path = product.image.split("/storage/v1/object/public/product-images/")[1]
+    try:
+        # Extract file path from URL
+        file_path = product.image.split("/storage/v1/object/public/product-images/")[1]
 
-    # Delete from Supabase
-    result = supabase.storage.from_("product-images").remove([file_path])
-    logger.info(f"Delete result: {result}")
+        # Delete from Supabase
+        result = supabase.storage.from_("product-images").remove([file_path])
+        logger.info(f"Delete result: {result}")
+    except Exception as e:
+        logger.error(f"Error deleting image: {e}")
 
     # Delete from database
     await db.product.update(where={"id": id}, data={"image": None})
@@ -687,17 +689,25 @@ async def upload_products(
 
             products = await db.product.find_many(
                 include={
-                    # "variants": True,
+                    "variants": True,
                     "categories": True,
                     "collections": True,
                     "brand": True,
                     "images": True,
-                    # "reviews": { "include": { "user": True } },
                 }
             )
 
             # Re-index
             await index_products(products=products, cache=cache)
+            await manager.broadcast(
+                id=str(user.id),
+                data={
+                    "status": "completed",
+                    "total_rows": len(products),
+                    "processed_rows": len(products),
+                },
+                type="sheet-processor",
+            )
         except Exception as e:
             logger.error(f"Error processing data from file: {e}")
 

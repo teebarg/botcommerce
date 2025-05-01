@@ -19,7 +19,7 @@ async def get_settings() -> list[ShopSettings]:
 
 
 @router.get("/public")
-async def get_public_settings() -> Any:
+async def get_public_settings() -> dict[str, str]:
     """
     Get all public settings
     """

@@ -121,10 +121,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                 {/* Order Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-default-900">Order #{order.order_number}</h1>
+                        <h1 className="text-2xl font-bold text-default-900">Order: {order.order_number}</h1>
                         <div className="flex items-center">
                             <Calendar className="w-4 h-4 text-default-500 mr-2" />
-                            <span className="text-default-500">{order.created_at}</span>
+                            <span className="text-default-500">{format(order.created_at, "MMMM dd, yyyy")}.</span>
                         </div>
                     </div>
                     <div className="mt-4 md:mt-0">{getStatusBadge(order.status)}</div>
@@ -135,10 +135,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     <div className="lg:col-span-2 space-y-6">
                         {/* Order Items */}
                         <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                            <div className="border-b border-gray-200 px-6 py-4">
+                            <div className="border-b border-default-100 px-6 py-4">
                                 <h2 className="text-lg font-medium text-default-900">Order Items</h2>
                             </div>
-                            <div className="divide-y divide-gray-200">
+                            <div className="divide-y divide-default-100">
                                 {order.order_items.map((item: OrderItem, idx: number) => (
                                     <div key={idx} className="px-6 py-4">
                                         <div className="flex flex-col sm:flex-row">
@@ -168,7 +168,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
 
                         {/* Customer Information */}
-                        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium flex items-center text-default-900">
                                     <User className="w-5 h-5 mr-2 text-default-500" />
@@ -181,8 +181,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                     <p className="text-default-900 font-medium">
                                         {order.user.first_name} {order.user.last_name}
                                     </p>
-                                    <p className="text-default-500">{order.user.email}</p>
-                                    <p className="text-default-500">{order.shipping_address.phone}</p>
+                                    <p className="text-default-900">{order.user.email}</p>
+                                    <p className="text-default-900">{order.shipping_address.phone}</p>
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-medium text-default-500">Shipping Address</h3>
@@ -195,7 +195,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
 
                         {/* Payment Information */}
-                        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium flex items-center text-default-900">
                                     <CreditCard className="w-5 h-5 mr-2 text-default-500" />
@@ -215,7 +215,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
 
                         {/* Shipping Information */}
-                        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium flex items-center text-default-900">
                                     <Truck className="w-5 h-5 mr-2 text-default-500" />
@@ -246,7 +246,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Actions Card */}
-                        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium text-default-900">Actions</h2>
                             </div>
@@ -265,7 +265,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
 
                         {/* Order Timeline */}
-                        <div className="bg-white shadow-sm rounded-lg overflow-hidden pb-6">
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium text-default-900">Order Timeline</h2>
                             </div>
@@ -277,7 +277,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                 <span aria-hidden="true" className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
                                                 <div className="relative flex space-x-3">
                                                     <div>
-                                                        <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-white">
+                                                        <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-content1">
                                                             <Clock className="h-5 w-5 text-white" />
                                                         </span>
                                                     </div>
@@ -300,7 +300,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                         <span
                                                             className={
                                                                 paymentStatusMap[order.payment_status].color +
-                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
+                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
                                                             }
                                                         >
                                                             {paymentStatusMap[order.payment_status].icon}
@@ -321,7 +321,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                         <span
                                                             className={
                                                                 orderStatusMap[order.status].color +
-                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
+                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
                                                             }
                                                         >
                                                             {orderStatusMap[order.status].icon}

@@ -9,22 +9,17 @@ import Activity from "./activity";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-interface Props {
-    userId: string | number;
-}
-
-const ActivityTray: React.FC<Props> = ({ userId }) => {
+const ActivityTray: React.FC = () => {
     const [activities, setActivities] = useState<Activity[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const { messages: wsMessages, connect: initializeWebsocket, disconnect: disconnectWebsocket } = useWebSocket({ type: ["activities"] });
 
     const currentMessage = wsMessages[wsMessages.length - 1];
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/${userId}/`;
 
     useEffect(() => {
         fetchActivities();
-        initializeWebsocket(wsUrl);
+        initializeWebsocket();
 
         return () => {
             disconnectWebsocket();

@@ -44,20 +44,11 @@ async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
 TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
 
 
-async def get_current_user(token_data: TokenUser, cache: CacheService) -> User:
+async def get_current_user(token_data: TokenUser) -> User:
     if not token_data:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
 
-    # Check if user is in cache
-    user = cache.get(f"user:{token_data.sub}")
-    if user is None:
-        user = await prisma.user.find_unique(
-            where={"email": token_data.sub}
-        )
-        if user:
-            cache.set(f"user:{token_data.sub}", user.model_dump_json(), expire=3600)  # Store user in cache
-    else:
-        user = User(**json.loads(user))
+    user = await prisma.user.find_unique(where={"email": token_data.sub})
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")

@@ -48,7 +48,7 @@ const AdminNavbar = async () => {
                 <NavbarItem className="flex items-center gap-2.5">
                     {/* <Notification /> */}
                     <ThemeButton />
-                    {user?.id && <ActivityTray userId={user.id} />}
+                    <ActivityTray />
                 </NavbarItem>
                 <NavbarItem className="flex">
                     {user ? (

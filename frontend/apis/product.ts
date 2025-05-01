@@ -60,16 +60,8 @@ export const productApi = {
 
         return response;
     },
-    async export(): Promise<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/export`;
-
-        try {
-            await fetcher<Review>(url, { method: "GET" });
-
-            return { error: false, message: "Export Successful" };
-        } catch (error) {
-            return handleError(error);
-        }
+    async export(): ApiResult<Message> {
+        return await api.post<Message>(`/product/export`, {});
     },
     async uploadImage({ id, data }: { id: number; data: any }): ApiResult<Message> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/image`;

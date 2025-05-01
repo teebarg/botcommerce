@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { useMe } from "./useCart";
+
 interface Props {
     onOpen?: () => void;
     onClose?: () => void;
@@ -10,9 +12,12 @@ const useWebSocket = ({ onOpen, onClose, type = [] }: Props) => {
     const [socket, setSocket] = useState<WebSocket>();
     const [messages, setMessages] = useState<any[]>([]);
     const [error, setError] = useState<Event>();
+    const { data: user } = useMe();
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/${user?.id}/`;
 
-    const connect = async (url: string) => {
-        const socket = new WebSocket(url);
+    const connect = async () => {
+        if (!user) return;
+        const socket = new WebSocket(wsUrl);
 
         socket.onopen = () => {
             // socket.send(JSON.stringify({ type: "auth", token: "jwt token" }));

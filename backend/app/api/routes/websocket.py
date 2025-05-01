@@ -1,5 +1,6 @@
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from app.core.logging import logger
 
 
 class ConnectionManager:
@@ -18,6 +19,7 @@ class ConnectionManager:
         """
         await websocket.accept()
         self.connections[id] = websocket
+        logger.info(f"WebSocket connection established for user {id}")
 
     def disconnect(self, id: str) -> None:
         """

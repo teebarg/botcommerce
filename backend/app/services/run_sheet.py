@@ -309,15 +309,10 @@ async def bulk_upload_products(products: list[dict]):
                 )
 
             print(f"Processed product: {product_data['name']}")
-
-        # await db.tx.commit()
         print("Bulk upload completed successfully")
 
     except Exception as e:
-        # await db.tx.rollback()
         print(f"Error during bulk upload: {str(e)}")
-    finally:
-        await db.disconnect()
 
 
 async def process_products(file_content, content_type: str, user_id: int) -> list[dict]:
