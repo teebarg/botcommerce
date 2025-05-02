@@ -13,6 +13,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import WhatsAppWidget from "@/components/ui/whatsapp-widget";
 import { api } from "@/apis";
 import SetShopSettings from "@/components/set-shop-settings";
+import { WebSocketProvider } from "@/providers/websocket";
 
 // const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
 
@@ -74,7 +75,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <PushNotificationManager />
                         <InstallPrompt />
                         <Toaster closeButton richColors duration={10000} expand={false} position="top-right" />
-                        <TanstackProviders>{children}</TanstackProviders>
+                        <TanstackProviders>
+                            <WebSocketProvider>{children}</WebSocketProvider>
+                        </TanstackProviders>
                     </div>
                     {/* {!user && <Google />} */}
                 </ProgressBar>

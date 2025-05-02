@@ -2,43 +2,38 @@
 
 import React, { useEffect, useState } from "react";
 import { Bell } from "nui-react-icons";
-import { useWebSocket } from "@lib/hooks/use-websocket";
-import useWatch from "@lib/hooks/use-watch";
 
-import Activity from "./activity";
+import ActivityView from "./activity";
 
+import { Activity } from "@/types/models";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { api } from "@/apis";
+import { useWebSocket } from "@/providers/websocket";
 
-interface Props {
-    userId: string | number;
-}
-
-const ActivityTray: React.FC<Props> = ({ userId }) => {
+const ActivityTray: React.FC = () => {
     const [activities, setActivities] = useState<Activity[]>([]);
-    const [loading, setLoading] = useState(true);
 
-    const { messages: wsMessages, connect: initializeWebsocket, disconnect: disconnectWebsocket } = useWebSocket({ type: ["activities"] });
-
-    const currentMessage = wsMessages[wsMessages.length - 1];
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS}/api/ws/${userId}/`;
+    const [loading, setLoading] = useState<boolean>(true);
+    const { currentMessage, messages } = useWebSocket();
 
     useEffect(() => {
         fetchActivities();
-        initializeWebsocket(wsUrl);
-
-        return () => {
-            disconnectWebsocket();
-        };
     }, []);
 
-    useWatch(currentMessage, () => {
-        // Update the live activity message
-        setActivities((prev) => [currentMessage, ...prev]);
-    });
+    useEffect(() => {
+        if (currentMessage?.type === "activities") {
+            setActivities((prev) => [currentMessage, ...prev]);
+        }
+    }, [messages]);
 
     const fetchActivities = async () => {
         setLoading(true);
-        // const { data, error } = await fetch<any>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/`);
+        const { data: activities, error } = await api.activities.getMyActivities();
+
+        if (!activities || error) {
+            return;
+        }
+        setActivities(activities);
         setLoading(false);
     };
 
@@ -55,7 +50,7 @@ const ActivityTray: React.FC<Props> = ({ userId }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[450px] p-0" sideOffset={5}>
                 <div className="max-h-[calc(100vh-100px)] overflow-y-auto">
-                    {loading ? <div className="h-full p-4">Loading...</div> : <Activity activities={activities} onRemove={onRemove} />}
+                    {loading ? <div className="h-full p-4">Loading...</div> : <ActivityView activities={activities} onRemove={onRemove} />}
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>

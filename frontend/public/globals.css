@@ -25,7 +25,7 @@ body {
 
 @layer components {
     .tb-divider {
-        @apply shrink-0 bg-divider border-none w-full h-[1px];
+        @apply shrink-0 bg-border border-none w-full h-[1px];
     }
 }
 

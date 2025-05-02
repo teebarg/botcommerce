@@ -63,6 +63,14 @@ const RecentOrdersList = () => {
 
     const { orders } = data || {};
 
+    if (orders?.length === 0) {
+        return (
+            <div className="mt-4 md:px-2 py-8 mx-4 rounded-xl">
+                <p>No orders found!</p>
+            </div>
+        );
+    }
+
     return (
         <div className="mt-4 md:px-2 py-8 mx-4 rounded-xl">
             <div className="flex justify-between items-center mb-3">

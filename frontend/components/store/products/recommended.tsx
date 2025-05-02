@@ -1,3 +1,5 @@
+"use client";
+
 import { Skeleton } from "@/components/generic/skeleton";
 import ProductCard from "@/components/store/products/product-card";
 import { useProductSearch } from "@/lib/hooks/useCart";

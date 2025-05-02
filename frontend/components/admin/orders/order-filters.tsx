@@ -51,7 +51,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
     };
 
     return (
-        <div className="">
+        <div className="mb-2">
             <div className="hidden md:flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                     <div className="relative">

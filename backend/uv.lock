@@ -178,7 +178,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.114.2,<1.0.0" },
     { name = "httpx", specifier = ">=0.25.1,<1.0.0" },
     { name = "jinja2", specifier = ">=3.1.4,<4.0.0" },
-    { name = "meilisearch", specifier = "==0.34.0" },
+    { name = "meilisearch", specifier = "==0.34.1" },
     { name = "openpyxl", specifier = "==3.1.5" },
     { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4,<2.0.0" },
     { name = "prisma", specifier = ">=0.11.0,<1.0.0" },
@@ -187,7 +187,7 @@ requires-dist = [
     { name = "pyjwt", specifier = ">=2.8.0,<3.0.0" },
     { name = "python-multipart", specifier = ">=0.0.7,<1.0.0" },
     { name = "redis", specifier = "==5.2.1" },
-    { name = "supabase", specifier = "==2.15.0" },
+    { name = "supabase", specifier = "==2.15.1" },
     { name = "tenacity", specifier = ">=8.2.3,<10.0.0" },
 ]
 
@@ -1025,15 +1025,15 @@ wheels = [
 
 [[package]]
 name = "meilisearch"
-version = "0.34.0"
+version = "0.34.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "camel-converter", extra = ["pydantic"] },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/44/42/b6a62f355057521c0d9df44a402205e3037299fdcb9cee4dfa22eebd22f0/meilisearch-0.34.0.tar.gz", hash = "sha256:6244af23fa118f5a127ebf3f1297ea8d1d73324bf189b13d61cc201e18cd9e90", size = 23623 }
+sdist = { url = "https://files.pythonhosted.org/packages/11/d2/63b34effea260f2551685cdc38783d36e05a1734c1f14f8bd8dd059fe699/meilisearch-0.34.1.tar.gz", hash = "sha256:99a8d8f548cc1905668ffb2bbf641b5e3ec9231f3413cce4189c5d7b16e52afa", size = 24221 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/2f/264c07a3f488260ea36c78cbc201b76e6baf9ef92e0c7f78657a6a5e5f22/meilisearch-0.34.0-py3-none-any.whl", hash = "sha256:fae8ad2a15d12c27fa0a1fff2ae2e4e3e2e22b869950408d63c87e2c095a9f61", size = 24373 },
+    { url = "https://files.pythonhosted.org/packages/bf/3e/a3ec8d44b35e495444cac8ce3573b33adf19a9b6d70f2a51e4a971f17c81/meilisearch-0.34.1-py3-none-any.whl", hash = "sha256:43efa4521ce7dc3b065d404267ad5b3acb825602e6219b8b5356650306686cd4", size = 24918 },
 ]
 
 [[package]]
@@ -1743,7 +1743,7 @@ wheels = [
 
 [[package]]
 name = "supabase"
-version = "2.15.0"
+version = "2.15.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "gotrue" },
@@ -1753,9 +1753,9 @@ dependencies = [
     { name = "storage3" },
     { name = "supafunc" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f8/b1/3d6f6826daacf526a559c25e7c8eaa824dcefc640e1123f5d9d91a50fa60/supabase-2.15.0.tar.gz", hash = "sha256:2e66289ad74ae9c4cb04a69f9de00cd2ce880cd890de23269a40ac5b69151d26", size = 14444 }
+sdist = { url = "https://files.pythonhosted.org/packages/65/58/a211c4cb0fe1c139247c1e07d473da080e503969a93b7ffa5f20d6f9bb1e/supabase-2.15.1.tar.gz", hash = "sha256:66e847dab9346062aa6a25b4e81ac786b972c5d4299827c57d1d5bd6a0346070", size = 14548 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/37/08/0f27c01111c1e9233244cd60b3f01484772447768eea69fe07cbafde4424/supabase-2.15.0-py3-none-any.whl", hash = "sha256:a665c7ab6c8ad1d80609ab62ad657f66fdaf38070ec9e0db5c7887fd72b109c0", size = 17229 },
+    { url = "https://files.pythonhosted.org/packages/76/c4/ccf757e08a5b4a131e5fde89b3f6b64ab308ca765f2f3bc8f62d58007d7c/supabase-2.15.1-py3-none-any.whl", hash = "sha256:749299cdd74ecf528f52045c1e60d9dba81cc2054656f754c0ca7fba0dd34827", size = 17459 },
 ]
 
 [[package]]

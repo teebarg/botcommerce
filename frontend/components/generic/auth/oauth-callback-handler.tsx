@@ -10,6 +10,7 @@ import { CircleDot } from "lucide-react";
 import { api } from "@/apis/base";
 import { Token } from "@/types/models";
 import { setCookie } from "@/lib/util/cookie";
+import { useStore } from "@/app/store/use-store";
 
 interface OAuthCallbackHandlerProps {
     provider: "google" | "github";
@@ -20,6 +21,7 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
     const error = searchParams.get("error");
+    const { shopSettings } = useStore();
 
     useEffect(() => {
         const handleCallback = async () => {
@@ -63,7 +65,7 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
 
     return (
         <React.Fragment>
-            <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-gradient-to-b from-background to-content1 flex items-center justify-center p-4">
                 {/* Mobile-first container */}
                 <div className="w-full max-w-md mx-auto">
                     {/* Logo and branding */}
@@ -74,8 +76,8 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
                                 <CircleDot className="w-6 h-6 text-indigo-400 animate-pulse" />
                             </div>
                         </div>
-                        <h1 className="mt-4 text-2xl font-bold text-gray-900">ShopEase</h1>
-                        <p className="mt-2 text-gray-600 text-center">Authenticating your session</p>
+                        <h1 className="mt-4 text-2xl font-bold text-default-900">{shopSettings.shop_name}</h1>
+                        <p className="mt-2 text-default-500 text-center">Authenticating your session</p>
                     </div>
 
                     {/* Loading animation */}
@@ -91,24 +93,24 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
                         </div>
 
                         {/* Loading bar */}
-                        <div className="bg-gray-200 rounded-full overflow-hidden">
+                        <div className="bg-content1 rounded-full overflow-hidden">
                             <div className="h-2 bg-indigo-600 rounded-full animate-loading-bar" />
                         </div>
 
                         {/* Status message */}
-                        <p className="text-sm text-gray-500 text-center animate-pulse">Please wait while we securely log you in...</p>
+                        <p className="text-sm text-default-500 text-center animate-pulse">Please wait while we securely log you in...</p>
                     </div>
 
                     {/* Bottom section */}
                     <div className="mt-12 text-center">
-                        <p className="text-xs text-gray-400">Powered by secure OAuth authentication</p>
+                        <p className="text-xs text-default-500">Powered by secure OAuth authentication</p>
                     </div>
                 </div>
             </div>
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4" />
-                    <p className="text-gray-600">Completing your sign in...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-default-900 mx-auto mb-4" />
+                    <p className="text-default-500">Completing your sign in...</p>
                 </div>
             </div>
         </React.Fragment>

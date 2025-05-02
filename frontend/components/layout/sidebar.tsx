@@ -5,6 +5,7 @@ import { Calendar, Check, ChevronRight, CogSixTooth, Component, DocumentText, Ec
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@lib/util/cn";
+import { Activity } from "lucide-react";
 
 import { useStore } from "@/app/store/use-store";
 
@@ -175,6 +176,11 @@ const SideBar: React.FC = () => {
                     label: "Settings",
                     href: "/admin/settings",
                     icon: <CogSixTooth size={18} />,
+                },
+                {
+                    label: "Activities",
+                    href: "/admin/activities",
+                    icon: <Activity size={18} />,
                 },
             ],
         },

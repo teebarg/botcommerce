@@ -1,59 +1,61 @@
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Query
+from typing import List
+from math import ceil
 
-from app.api.routes.websocket import manager
-from app.core.deps import CurrentUser
-from app.models.activities import ActivityCreate, Activity
+from app.core.deps import CurrentUser, get_current_superuser
 from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 
+from prisma.models import ActivityLog
+
 # Create a router for activities
 router = APIRouter()
 
-
-# Log a new activity
-@router.post("/", response_model=Activity)
-async def log_activity(user: CurrentUser, activity: ActivityCreate):
-    try:
-        new_activity = await db.activitylog.create(
-            data={
-                **activity.model_dump(),
-                "user_id": user.id
-            }
-        )
-
-        # Broadcast the new activity to all connected clients
-        await manager.broadcast(
-            id=str(user.id), data=new_activity.model_dump(mode="json"), type="activities"
-        )
-
-        return new_activity
-    except PrismaError as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-# Get recent activities for a user
-@router.get("/")
-# @cache(key="activities")
-async def get_recent_activities(user: CurrentUser, limit: int = 10):
+@router.get("/", dependencies=[Depends(get_current_superuser)])
+async def index(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+):
+    """
+    Retrieve activities.
+    """
     activities = await db.activitylog.find_many(
+        skip=skip,
+        take=limit,
+        order={"created_at": "desc"},
+    )
+    total = await db.activitylog.count()
+    return {
+        "activities":activities,
+        "skip":skip * limit,
+        "limit":limit,
+        "total_pages":ceil(total/limit),
+        "total_count":total,
+    }
+
+@router.get("/me", response_model=List[ActivityLog])
+async def get_recent_activities(user: CurrentUser):
+    """
+    Get current user's activities
+    """
+    return await db.activitylog.find_many(
         where={"user_id": user.id},
-        take=limit
+        skip=0,
+        take=5,
+        order={"created_at": "desc"},
     )
-    return activities
 
 
-@router.delete("/{activity_id}", response_model=Message)
-async def delete_activity(activity_id: int, user: CurrentUser):
-    existing = await db.activitylog.find_unique(
-        where={"id": activity_id}
-    )
+@router.delete("/{id}", response_model=Message)
+async def delete_activity(id: int, user: CurrentUser):
+    existing = await db.activitylog.find_unique(where={"id": id})
     if not existing:
         raise HTTPException(status_code=404, detail="Activity not found")
 
     try:
-        whereQuery = {"id": activity_id}
+        whereQuery = {"id": id}
         if not user.role == "ADMIN":
             whereQuery.update({"user_id" : user.id})
         await db.activitylog.delete(where=whereQuery)

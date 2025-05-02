@@ -1,6 +1,6 @@
 "use server";
 
-import { addShippingAddress, deleteActivities, deleteShippingAddress, updateBillingAddress, updateCustomer, updateShippingAddress } from "@lib/data";
+import { addShippingAddress, deleteShippingAddress, updateBillingAddress, updateCustomer, updateShippingAddress } from "@lib/data";
 import { revalidateTag } from "next/cache";
 
 import { getCookie } from "@/lib/util/server-utils";
@@ -243,17 +243,6 @@ export async function newsletterForm(_currentState: resType, formData: FormData)
         }
     } catch (error: any) {
         return { success: false, message: error.toString() };
-    }
-}
-
-export async function deleteActivity(id: string | number) {
-    try {
-        await deleteActivities(id);
-        revalidateTag("activities");
-
-        return { success: true, error: null };
-    } catch (error: any) {
-        return { success: false, error: error.toString() };
     }
 }
 

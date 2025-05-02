@@ -1,5 +1,3 @@
-import { cache } from "react";
-
 import { getCookie } from "../util/server-utils";
 
 /**
@@ -126,50 +124,6 @@ export async function updateBillingAddress(updateData: any) {
                 ...headers,
             },
             body: JSON.stringify(updateData),
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (error) {
-        throw new Error(`Error: ${error}`);
-    }
-}
-
-export const getActivities = cache(async function (limit: number = 10) {
-    const headers = await getHeaders(["activities"]);
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities`, {
-            method: "GET",
-            headers: {
-                accept: "application/json",
-                ...headers,
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-
-        return await res.json();
-    } catch (error) {
-        return { message: error, status: "error" };
-    }
-});
-
-export async function deleteActivities(id: string | number) {
-    const headers = await getHeaders(["activities"]);
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/activities/${id}`, {
-            method: "DELETE",
-            headers: {
-                accept: "application/json",
-                ...headers,
-            },
         });
 
         if (!res.ok) {

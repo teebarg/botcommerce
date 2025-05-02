@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { Trash } from "nui-react-icons";
 
 import { ProductImage } from "@/types/models";
 import { api } from "@/apis";
+import { useInvalidate } from "@/lib/hooks/useAdmin";
 
 interface ProductImageManagerProps {
     productId: number;
     initialImages?: ProductImage[];
 }
 
-const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, initialImages = [] }) => {
-    const router = useRouter();
+const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, initialImages = [] }) => {
+    const invalidate = useInvalidate();
     const [imageId, setImageId] = useState<number>();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -23,15 +22,18 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
         setIsDeleting(true);
         setImageId(id);
         void (async () => {
-            try {
-                await api.product.deleteImage(id);
-                toast.success("Image deleted successfully");
-                router.refresh();
-            } catch (error) {
+            const { error } = await api.product.deleteImages(productId, id);
+
+            if (error) {
                 toast.error(`Error - ${error as string}`);
-            } finally {
                 setIsDeleting(false);
+
+                return;
             }
+            toast.success("Image deleted successfully");
+            invalidate("products");
+            invalidate("product-search");
+            setIsDeleting(false);
         })();
     };
 
@@ -46,22 +48,37 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
 
             if (!file) return;
 
-            const formData = new FormData();
+            const reader = new FileReader();
 
-            formData.append("file", file);
-            formData.append("batch", "batch1");
+            reader.onload = (e) => {
+                const base64 = reader.result as string;
+                const fileName = `images/${Date.now()}-${file.name}`;
 
-            void (async () => {
-                try {
-                    await api.product.uploadImages({ id: productId, formData });
+                void (async () => {
+                    setIsUploading(true);
+                    const { error } = await api.product.uploadImages({
+                        id: productId,
+                        data: {
+                            file: base64.split(",")[1]!, // Remove the data URL prefix
+                            file_name: fileName,
+                            content_type: file.type,
+                        },
+                    });
+
+                    if (error) {
+                        toast.error(`Error - ${error}`);
+                        setIsUploading(false);
+
+                        return;
+                    }
+
                     toast.success("Image uploaded successfully");
-                    router.refresh();
-                } catch (error) {
-                    toast.error(`Error - ${error as string}`);
-                } finally {
+                    invalidate("products");
+                    invalidate("product-search");
                     setIsUploading(false);
-                }
-            })();
+                })();
+            };
+            reader.readAsDataURL(file);
         },
     });
 
@@ -101,7 +118,7 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
                                 // disabled={deleteMutation.isPending}
                                 onClick={() => deleteImage(image.id)}
                             >
-                                <Trash className="w-5 h-5" />
+                                <Trash2 className="w-5 h-5" />
                             </button>
                         </div>
                         {isDeleting && imageId === image.id && (
@@ -124,4 +141,4 @@ const ProductImageManager: React.FC<ProductImageManagerProps> = ({ productId, in
     );
 };
 
-export default ProductImageManager;
+export default ProductImagesManager;

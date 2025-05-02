@@ -30,7 +30,7 @@ interface MenuProp {
 const Menu: React.FC<MenuProp> = ({ user }) => {
     return (
         <div className="flex flex-col py-6 px-4 flex-1">
-            <div className="mt-6 space-y-3">
+            <div className="space-y-3">
                 <NavLink href="/" icon={<Home className="h-8 w-8" />} title="Home" />
                 <NavLink href="/account/profile" icon={<User className="h-8 w-8" viewBox="0 0 20 20" />} title="Profile" />
                 <NavLink href="/collections" icon={<Collection className="h-8 w-8" />} title="Collections" />

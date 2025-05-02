@@ -1,7 +1,8 @@
 import { fetcher } from "./fetcher";
+import { api } from "./base";
 
 import { buildUrl } from "@/lib/util/util";
-import { Message, Order, PaginatedOrder } from "@/types/models";
+import { Order, OrderStatus, PaginatedOrder } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 import { revalidate } from "@/actions/revalidate";
 
@@ -38,14 +39,7 @@ export const orderApi = {
 
         return response;
     },
-    async delete(id: string): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/order/${id}`;
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("orders");
-        }
-
-        return response;
+    async status(id: number, status: OrderStatus): ApiResult<Order> {
+        return await api.patch<Order>(`/order/${id}/status?status=${status}`);
     },
 };

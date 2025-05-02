@@ -1,19 +1,17 @@
 "use client";
 
-import { PencilSquare } from "nui-react-icons";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { BrandForm } from "@/components/admin/brands/brand-form";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { Brand } from "@/types/models";
 import { useInvalidate } from "@/lib/hooks/useAdmin";
+import DrawerUI from "@/components/drawer";
 
 interface Props {
     item: Brand;
@@ -23,12 +21,10 @@ const BrandActions: React.FC<Props> = ({ item }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
-    const router = useRouter();
     const invalidate = useInvalidate();
 
     const onConfirmDelete = async () => {
         setIsPending(true);
-        // await deleteAction?.(item.id);
         const { error } = await api.brand.delete(item.id);
 
         if (error) {
@@ -45,19 +41,11 @@ const BrandActions: React.FC<Props> = ({ item }) => {
 
     return (
         <div className="relative flex items-center gap-2">
-            <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
-                <DrawerTrigger>
-                    <PencilSquare />
-                </DrawerTrigger>
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle>Edit {item.name}</DrawerTitle>
-                    </DrawerHeader>
-                    <div className="max-w-2xl">
-                        <BrandForm current={item} type="update" onClose={editState.close} />
-                    </div>
-                </DrawerContent>
-            </Drawer>
+            <DrawerUI open={editState.isOpen} title="Edit Brand" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
+                <div className="max-w-2xl">
+                    <BrandForm current={item} type="update" onClose={editState.close} />
+                </div>
+            </DrawerUI>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger>
                     <Trash2 className="text-red-500" />

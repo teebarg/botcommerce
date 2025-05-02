@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import { ChevronRight, Loader, Tag } from "nui-react-icons";
-import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 
@@ -18,6 +17,7 @@ import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
 import { cn } from "@/lib/util/cn";
 import { useBrands, useCategories, useCollections } from "@/lib/hooks/useAdmin";
+import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 
 interface SearchParams {
     page?: number;
@@ -49,7 +49,6 @@ export default function InfiniteScrollClient({
     const [hasNext, setHasNext] = useState<boolean>(data.page < data.total_pages);
     const [page, setPage] = useState<number>(data.page ?? 1);
 
-    const [scrollTrigger, isInView] = useInView();
     const searchParams = useSearchParams();
 
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
@@ -78,11 +77,13 @@ export default function InfiniteScrollClient({
         fetchItems(page);
     }, [page]);
 
-    useEffect(() => {
-        if (isInView && hasNext) {
-            setPage((prev) => prev + 1);
-        }
-    }, [isInView, hasNext]);
+    const { lastElementRef } = useInfiniteScroll({
+        onIntersect: () => {
+            if (hasNext) {
+                setPage((prev) => prev + 1);
+            }
+        },
+    });
 
     return (
         <div className="flex gap-6">
@@ -188,7 +189,7 @@ export default function InfiniteScrollClient({
                 </div>
                 <div className="w-full">
                     {hasNext && (
-                        <div ref={scrollTrigger} className="mt-8 flex flex-col items-center justify-center text-blue-600">
+                        <div ref={lastElementRef} className="mt-8 flex flex-col items-center justify-center text-blue-600">
                             <Loader className="h-8 w-8 animate-spin mb-2" />
                             <p className="text-sm font-medium text-default-500">Loading more products...</p>
                         </div>

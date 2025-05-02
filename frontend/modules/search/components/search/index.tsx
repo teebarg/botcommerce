@@ -85,7 +85,7 @@ const Search: React.FC<Props> = ({ className }) => {
                                 <Kbd className="md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
                             </button>
                         </div>
-                        <div className="max-h-[70vh] min-h-[70vh] overflow-y-auto mt-2">
+                        <div className="max-h-[80vh] min-h-[70vh] overflow-y-auto">
                             {products.length == 0 && <NoProductsFound />}
                             <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
                                 {products.map((product: ProductSearch, index: number) => (

@@ -1,40 +1,35 @@
-import { Bell, Cancel, Excel, Trash } from "nui-react-icons";
 import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { deleteActivity } from "@modules/account/actions";
 import { toast } from "sonner";
+import { Bell, Trash2 } from "lucide-react";
+import { Cancel, Excel } from "nui-react-icons";
 
 import { Spinner } from "@/components/generic/spinner";
 import { useStore } from "@/app/store/use-store";
+import { Activity } from "@/types/models";
+import { api } from "@/apis";
 
 interface Props {
     activities: Activity[];
     onRemove: (id: string | number) => void;
 }
-interface Activity {
-    id: number;
-    activity_type: string;
-    description: string;
-    action_download_url: string;
-    is_success: boolean;
-    created_at: string;
-    updated_at: string;
-}
 
-const Activity: React.FC<Props> = ({ activities, onRemove }) => {
+const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
     const [removing, setRemoving] = useState<number | string | null>(null);
     const { shopSettings } = useStore();
 
-    const removeActivity = async (id: string | number) => {
+    const removeActivity = async (id: number) => {
         setRemoving(id);
         try {
-            const res = await deleteActivity(id);
+            const { error } = await api.activities.deleteActivity(id);
 
-            if (res.success) {
-                onRemove(id); // Remove from UI
+            if (error) {
+                toast.error(error);
+
+                return;
             }
-        } catch (error) {
-            toast.error(`Error: ${error}`);
+
+            onRemove(id); // Remove from UI
         } finally {
             setRemoving(null);
         }
@@ -42,7 +37,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
 
     if (activities?.length == 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-white to-gray-50 border border-gray-100 rounded-lg shadow-sm h-full">
+            <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-background to-content2 border border-gray-100 rounded-lg shadow-sm h-full">
                 <div className="relative mb-6">
                     {/* Background decoration circles */}
                     <div className="absolute -z-10 animate-pulse">
@@ -75,9 +70,9 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                     </div>
                 </div>
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Recent Activity</h3>
+                <h3 className="text-lg font-semibold text-default-900 mb-2">No Recent Activity</h3>
 
-                <p className="text-gray-500 text-center mb-6 max-w-sm">
+                <p className="text-default-500 text-center mb-6 max-w-sm">
                     Your activity feed is empty right now. New notifications and updates will appear here as they happen.
                 </p>
             </div>
@@ -99,29 +94,30 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                     <span>
                                         <div className="flex text-sm font-semibold">
                                             <span>{formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}</span>
-                                            {/* <span>{timeAgo(item.created_at)}</span> */}
                                             <div className="flex items-center ml-2">
                                                 <div className="h-1.5 w-1.5 self-center rounded-full bg-violet-800" />
                                             </div>
                                         </div>
                                     </span>
                                 </div>
-                                <div className="pl-8">
+                                <div className="pl-8p">
                                     <div className="text-sm flex flex-col">
                                         <span>{item.description}</span>
-                                        <div className="mt-4 flex w-full cursor-pointer items-center">
-                                            <div className="border-grey-20p flex items-center justify-center rounded-lg border p-2.5">
-                                                {item.is_success ? <Excel /> : <Cancel className="text-default-500" size={18} />}
+                                        {item.activity_type == "PRODUCT_EXPORT" && (
+                                            <div className="mt-4 flex w-full cursor-pointer items-center">
+                                                <div className="border-grey-20p flex items-center justify-center rounded-lg border p-2.5">
+                                                    {item.is_success ? <Excel /> : <Cancel className="text-default-500" size={18} />}
+                                                </div>
+                                                <div className="relative w-full pl-4 text-left">
+                                                    <div className="text-sm max-w-[80%] overflow-hidden truncate">{item.action_download_url}</div>
+                                                    {!item.is_success && (
+                                                        <span>
+                                                            <div className="text-grey-40 text-sm text-rose-500">Job failed</div>
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="relative w-full pl-4 text-left">
-                                                <div className="text-sm max-w-[80%] overflow-hidden truncate">{item.action_download_url}</div>
-                                                {!item.is_success && (
-                                                    <span>
-                                                        <div className="text-grey-40 text-sm text-rose-500">Job failed</div>
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
                                     <div className="mt-6 flex">
                                         <div className="flex">
@@ -131,7 +127,7 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
                                                 data-testid="activity-delete-button"
                                                 onClick={() => removeActivity(item.id)}
                                             >
-                                                {removing == item.id ? <Spinner /> : <Trash />}
+                                                {removing == item.id ? <Spinner /> : <Trash2 />}
                                             </button>
                                             {item.is_success && item.activity_type == "product_export" && (
                                                 <a
@@ -154,4 +150,4 @@ const Activity: React.FC<Props> = ({ activities, onRemove }) => {
     );
 };
 
-export default Activity;
+export default ActivityView;

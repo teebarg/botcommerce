@@ -20,7 +20,7 @@ const CreateBrand: React.FC<Props> = () => {
                         Create Brand
                     </Button>
                 </DrawerTrigger>
-                <DrawerContent>
+                <DrawerContent className="px-4">
                     <DrawerHeader>
                         <DrawerTitle>Create Brand</DrawerTitle>
                     </DrawerHeader>

@@ -2,34 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import ProductFilter from "./product-filter";
+import { ProductQuery } from "./product-query";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import PaginationUI from "@/components/pagination";
-import { ProductActions } from "@/components/products/product-actions";
-import { Brand, Category, Collection, Product } from "@/types/models";
+import { ProductActions } from "@/components/admin/product/product-actions";
+import { Brand, Collection, Product } from "@/types/models";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useBrands, useCollections, useProducts } from "@/lib/hooks/useAdmin";
 import { Skeleton } from "@/components/generic/skeleton";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import ServerError from "@/components/generic/server-error";
 
 const LIMIT = 10;
 
 export function ProductDetails() {
     const router = useRouter();
-    const { data, isLoading } = useProducts({ limit: LIMIT });
     const { data: collections } = useCollections();
     const { data: brands } = useBrands();
     const searchParams = useSearchParams();
-    const { updateQuery } = useUpdateQuery(200);
+    const { data, isLoading } = useProducts({ limit: LIMIT, query: searchParams.get("search") || "" });
 
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const [filterOpen, setFilterOpen] = useState<boolean>(false);
     const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
 
@@ -48,30 +45,22 @@ export function ProductDetails() {
             </div>
         );
 
-    if (!data) return null;
+    if (!data) return <ServerError />;
 
     const { products, ...pagination } = data;
 
-    const filteredProducts = products?.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    const handleApplyFilters = (collections: number[], brands: number[]) => {
-        updateQuery([
-            { key: "collections", value: collections.join(",") },
-            { key: "brands", value: brands.join(",") },
-        ]);
-    };
-
     const handleManageCollections = () => {
-        router.push("/collections");
+        router.push("/admin/collections");
     };
 
     const handleManageBrands = () => {
-        router.push("/brands");
+        router.push("/admin/brands");
     };
 
     return (
         <div>
             <div className="hidden md:block">
+                <ProductQuery brands={brands} collections={collections} selectedBrands={selectedBrands} selectedCollections={selectedCollections} />
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -80,7 +69,6 @@ export function ProductDetails() {
                             <TableHead>Product</TableHead>
                             <TableHead>Sku</TableHead>
                             <TableHead>Description</TableHead>
-                            <TableHead>Categories</TableHead>
                             <TableHead>Variant</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
@@ -104,15 +92,6 @@ export function ProductDetails() {
                                 <TableCell className="font-medium">{product.name}</TableCell>
                                 <TableCell>{product.sku}</TableCell>
                                 <TableCell>{product.description}</TableCell>
-                                <TableCell>
-                                    <div className="flex flex-wrap gap-2 items-center">
-                                        {product.categories?.map((category: Category, index: number) => (
-                                            <Badge key={index} variant="secondary">
-                                                {category.name}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </TableCell>
                                 <TableCell>{product.variants?.length}</TableCell>
                                 <TableCell>
                                     <Badge variant={product.status === "IN_STOCK" ? "default" : "destructive"}>{product.status}</Badge>
@@ -128,21 +107,12 @@ export function ProductDetails() {
             </div>
             <div className="md:hidden">
                 <div className="py-4">
-                    <div className="relative mb-4">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="text-default-500" size={18} />
-                        </div>
-                        <input
-                            className="pl-10 pr-12 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                            placeholder="Search products..."
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setFilterOpen(true)}>
-                            <SlidersHorizontal className="text-default-500" size={18} />
-                        </button>
-                    </div>
+                    <ProductQuery
+                        brands={brands}
+                        collections={collections}
+                        selectedBrands={selectedBrands}
+                        selectedCollections={selectedCollections}
+                    />
 
                     {(selectedCollections.length > 0 || selectedBrands.length > 0) && (
                         <div className="mb-4 overflow-auto flex gap-2 flex-nowrap">
@@ -197,27 +167,17 @@ export function ProductDetails() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
-                        {filteredProducts?.map((product: Product, idx: number) => (
+                        {products?.map((product: Product, idx: number) => (
                             <ProductListItem key={idx} actions={<ProductActions product={product} />} product={product} />
                         ))}
                     </div>
 
-                    {filteredProducts?.length === 0 && (
+                    {products?.length === 0 && (
                         <div className="text-center py-8">
-                            <p className="text-gray-500">No products found</p>
+                            <p className="text-default-500">No products found</p>
                         </div>
                     )}
                 </div>
-
-                <ProductFilter
-                    brands={brands}
-                    collections={collections}
-                    open={filterOpen}
-                    selectedBrands={selectedBrands}
-                    selectedCollections={selectedCollections}
-                    onApplyFilters={handleApplyFilters}
-                    onOpenChange={setFilterOpen}
-                />
             </div>
         </div>
     );

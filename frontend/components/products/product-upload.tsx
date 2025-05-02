@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
-// import { api } from "@/apis";
 import { bulkUpload } from "@/modules/account/actions";
+import { useInvalidate } from "@/lib/hooks/useAdmin";
+import { useWebSocket } from "@/providers/websocket";
 
 interface ProductUploadProps {}
 
 const ProductUpload: React.FC<ProductUploadProps> = () => {
-    const router = useRouter();
     const [isUploading, setIsUploading] = useState<boolean>(false);
+    const { currentMessage } = useWebSocket();
+    const invalidate = useInvalidate();
+
+    useEffect(() => {
+        if (!currentMessage) return;
+        if (currentMessage.status === "completed") {
+            setIsUploading(false);
+            toast.success("Products uploaded successfully");
+            invalidate("products");
+        }
+    }, [currentMessage]);
 
     // Dropzone configuration
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -27,25 +39,25 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
             const formData = new FormData();
 
             formData.append("file", file);
-            // formData.append("batch", "batch1");
 
             void (async () => {
-                try {
-                    // await api.product.bulkUpload(formData);
-                    await bulkUpload(formData);
-                    toast.success("Product uploaded successfully");
-                    router.refresh();
-                } catch (error) {
-                    toast.error(`Error - ${error as string}`);
-                } finally {
+                setIsUploading(true);
+                const res = await bulkUpload(formData);
+
+                if (!res.success) {
+                    toast.error(res.message);
                     setIsUploading(false);
+
+                    return;
                 }
+
+                toast.success("Product upload started");
             })();
         },
     });
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-2">
             {/* Upload Area */}
             <div
                 {...getRootProps()}
@@ -55,15 +67,20 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
                 <input {...getInputProps()} />
                 <div className="flex flex-col items-center gap-2">
                     <Upload className="w-8 h-8 text-default-500" />
-                    <p className="text-default-600">{isDragActive ? "Drop the images here" : "Drag & drop images or click to upload"}</p>
-                    <p className="text-sm text-default-400">(Max 5MB, JPG/PNG/GIF only)</p>
+                    <p className="text-default-900">{isDragActive ? "Drop the images here" : "Drag & drop images or click to upload"}</p>
+                    <p className="text-sm text-default-500">(Max 5MB, XLSX/CSV only)</p>
                     {/* Upload progress */}
-                    {isUploading && (
-                        <div className="mb-4">
-                            <div className="w-full bg-default-200 rounded-full h-2.5">
-                                <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />
+                    {(isUploading || currentMessage?.processed_rows < currentMessage?.total_rows) && (
+                        <div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                <div
+                                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 animate-pulse"
+                                    style={{ width: `${(currentMessage?.processed_rows / currentMessage?.total_rows) * 100}%` }}
+                                />
                             </div>
-                            <p className="text-sm text-blue-500 mt-1">Uploading...</p>
+                            <p className="text-sm text-blue-500 mt-1">
+                                Uploading... {currentMessage?.processed_rows || 0} of {currentMessage?.total_rows || 0}
+                            </p>
                         </div>
                     )}
                 </div>

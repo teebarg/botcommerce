@@ -6,7 +6,7 @@ import * as z from "zod";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import ProductImageManager from "./product-image";
+import ProductImageManager from "../admin/product/product-image";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import MultiSelect from "@/components/ui/multi-select";
 import { Brand, Category, Collection, Product } from "@/types/models";
+import { useInvalidate } from "@/lib/hooks/useAdmin";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -56,6 +57,7 @@ interface ProductFormProps {
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections, categories, brands }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
+    const invalidate = useInvalidate();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -106,7 +108,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                 } else {
                     toast.success(`Product ${product?.id ? "updated" : "created"} successfully`);
                 }
-                // onClose?.();
+
+                invalidate("products");
+                invalidate("product-search");
+
+                if (!product?.id) {
+                    onClose?.();
+                }
             } catch (error) {
                 toast.error(`Error - ${error as string}`);
             } finally {
@@ -116,11 +124,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
     }
 
     return (
-        <div className="overflow-y-auto flex-1 flex flex-col">
+        <div className="overflow-y-auto flex flex-col pb-4">
             {product?.id && <ProductImageManager initialImage={product?.image || ""} productId={product?.id || 0} />}
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="rounded-lg shadow-xl w-full h-full">
+                    <div className="w-full h-full">
                         {/* Product Form */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
@@ -283,10 +291,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                 )}
                             />
                             <div className="flex gap-2 justify-end md:col-span-2">
-                                <Button type="button" variant="destructive" onClick={() => onClose()}>
+                                <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose()}>
                                     Close
                                 </Button>
-                                <Button disabled={isPending} isLoading={isPending} type="submit">
+                                <Button className="min-w-32" disabled={isPending} isLoading={isPending} type="submit">
                                     {product?.id ? "Update" : "Create"}
                                 </Button>
                             </div>

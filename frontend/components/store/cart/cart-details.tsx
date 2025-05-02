@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Minus, Plus, ShoppingCart, Trash, X } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
 
@@ -142,7 +142,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                                             className="text-red-500 hover:text-red-700 text-sm flex items-center"
                                             onClick={() => removeItem(item.id)}
                                         >
-                                            <Trash className="h-3 w-3 mr-1" />
+                                            <Trash2 className="h-3 w-3 mr-1" />
                                             Remove
                                         </button>
                                     </div>

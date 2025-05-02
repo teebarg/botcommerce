@@ -13,6 +13,7 @@ from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus
 from app.services.order import OrderService
 from app.core.decorators import cache
+from prisma.enums import PaymentStatus
 
 # Create a router for orders
 router = APIRouter()
@@ -113,22 +114,20 @@ async def export_orders(current_user: CurrentUser):
         logger.error(f"Export orders error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
 
-@router.post("/{order_id}/cancel", response_model=OrderResponse)
-async def cancel_order(order_id: int):
-    """Cancel an order"""
-    order = await db.order.find_unique(where={"id": order_id})
+
+@router.patch("/{id}/status", response_model=OrderResponse)
+async def order_status(id: int, status: OrderStatus):
+    """Change order status"""
+    order = await db.order.find_unique(where={"id": id})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    if order.status not in [OrderStatus.PENDING, OrderStatus.PROCESSING]:
-        raise HTTPException(status_code=400, detail="Order cannot be cancelled")
+    data = {"status": status}
 
-    updated_order = await db.order.update(
-        where={"id": order_id},
-        data={"status": OrderStatus.CANCELLED},
-        include={"order_items": True}
-    )
-    return updated_order
+    if status == OrderStatus.PAID:
+        data["payment_status"] = PaymentStatus.SUCCESS
+
+    return await db.order.update(where={"id": id}, data=data)
 
 @router.post("/{order_id}/fulfill", response_model=OrderResponse)
 async def fulfill_order(order_id: int):
@@ -143,23 +142,6 @@ async def fulfill_order(order_id: int):
     updated_order = await db.order.update(
         where={"id": order_id},
         data={"status": OrderStatus.FULFILLED},
-        # include={"order_items": True}
-    )
-    return updated_order
-
-@router.post("/{order_id}/refund", response_model=OrderResponse)
-async def refund_order(order_id: int):
-    """Refund an order"""
-    order = await db.order.find_unique(where={"id": order_id})
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-
-    if order.status != OrderStatus.FULFILLED:
-        raise HTTPException(status_code=400, detail="Order must be fulfilled to be refunded")
-
-    updated_order = await db.order.update(
-        where={"id": order_id},
-        data={"status": OrderStatus.REFUNDED},
         # include={"order_items": True}
     )
     return updated_order

@@ -1,0 +1,349 @@
+"use client";
+
+import React from "react";
+import {
+    User,
+    CreditCard,
+    Truck,
+    Calendar,
+    Eye,
+    Clock,
+    ArrowLeft,
+    ShieldAlert,
+    CircleDashed,
+    CircleCheck,
+    PackageCheck,
+    CircleX,
+    CircleSlash,
+} from "lucide-react";
+import { format } from "date-fns";
+
+import OrderProcessingAction from "./order-processing-actions";
+
+import { Order, OrderItem, OrderStatus } from "@/types/models";
+import { currency } from "@/lib/util/util";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+interface OrderDetailsProps {
+    order: Order;
+    onClose: () => void;
+}
+
+const getStatusBadge = (status?: OrderStatus) => {
+    const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success"> = {
+        ["PENDING"]: "warning",
+        ["PROCESSING"]: "default",
+        ["SHIPPED"]: "secondary",
+        ["CANCELED"]: "destructive",
+        ["DELIVERED"]: "success",
+        ["PAID"]: "default",
+        ["REFUNDED"]: "destructive",
+    };
+
+    return <Badge variant={variants[status ?? "PENDING"]}>{status}</Badge>;
+};
+
+const paymentStatusMap = {
+    PENDING: {
+        icon: <ShieldAlert className="h-5 w-5 text-white" />,
+        label: "Payment Pending",
+        color: "bg-warning",
+    },
+    SUCCESS: {
+        icon: <CircleCheck className="h-5 w-5 text-white" />,
+        label: "Paid",
+        color: "bg-success",
+    },
+    FAILED: {
+        icon: <CircleDashed className="h-5 w-5 text-white" />,
+        label: "Payment Failed",
+        color: "bg-danger",
+    },
+    REFUNDED: {
+        icon: <CircleDashed className="h-5 w-5 text-white" />,
+        label: "Payment Refunded",
+        color: "bg-danger",
+    },
+};
+
+const orderStatusMap = {
+    PENDING: {
+        icon: <ShieldAlert className="h-5 w-5 text-white" />,
+        label: "Pending",
+        color: "bg-warning",
+    },
+    PROCESSING: {
+        icon: <CircleDashed className="h-5 w-5 text-white" />,
+        label: "Processing",
+        color: "bg-secondary",
+    },
+    SHIPPED: {
+        icon: <Truck className="h-5 w-5 text-white" />,
+        label: "Shipped",
+        color: "bg-primary",
+    },
+    DELIVERED: {
+        icon: <PackageCheck className="h-5 w-5 text-white" />,
+        label: "Delivered",
+        color: "bg-success",
+    },
+    CANCELED: {
+        icon: <CircleX className="h-5 w-5 text-white" />,
+        label: "Cancelled",
+        color: "bg-danger",
+    },
+    PAID: {
+        icon: <CircleCheck className="h-5 w-5 text-white" />,
+        label: "Paid",
+        color: "bg-success",
+    },
+    REFUNDED: {
+        icon: <CircleSlash className="h-5 w-5 text-white" />,
+        label: "Refunded",
+        color: "bg-danger",
+    },
+};
+
+const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
+    return (
+        <div className="bg-content1 max-h-[calc(100vh-8rem)] overflow-y-auto">
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-2 sm:px-6 py-8">
+                {/* Back Button */}
+                <div className="mb-6">
+                    <button className="flex items-center text-default-500 hover:text-default-900" onClick={onClose}>
+                        <ArrowLeft className="w-4 h-4 mr-1" />
+                        <span>Back to Orders</span>
+                    </button>
+                </div>
+
+                {/* Order Header */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold text-default-900">Order: {order.order_number}</h1>
+                        <div className="flex items-center">
+                            <Calendar className="w-4 h-4 text-default-500 mr-2" />
+                            <span className="text-default-500">{format(order.created_at, "MMMM dd, yyyy")}.</span>
+                        </div>
+                    </div>
+                    <div className="mt-4 md:mt-0">{getStatusBadge(order.status)}</div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Main Order Information */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Order Items */}
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
+                            <div className="border-b border-default-100 px-6 py-4">
+                                <h2 className="text-lg font-medium text-default-900">Order Items</h2>
+                            </div>
+                            <div className="divide-y divide-default-100">
+                                {order.order_items.map((item: OrderItem, idx: number) => (
+                                    <div key={idx} className="px-6 py-4">
+                                        <div className="flex flex-col sm:flex-row">
+                                            <div className="flex-shrink-0 mr-4 mb-4 sm:mb-0">
+                                                <img alt={item.name} className="w-20 h-20 object-cover rounded" src={item.image} />
+                                            </div>
+                                            <div className="flex-grow">
+                                                <h3 className="text-base font-medium text-default-900">{item.name}</h3>
+                                                <p className="text-sm text-default-500">SKU: {item.variant_id}</p>
+                                                <div className="mt-1 flex flex-col sm:flex-row sm:justify-between">
+                                                    <div className="flex items-center text-sm text-default-500">
+                                                        <span>Qty: {item.quantity}</span>
+                                                    </div>
+                                                    <div className="text-sm font-medium text-default-900">{currency(item.price)}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="border-t border-gray-200 px-6 py-4">
+                                <div className="flex justify-between text-base font-medium text-default-900">
+                                    <p>Total</p>
+                                    <p>{currency(order.total)}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Customer Information */}
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
+                            <div className="border-b border-gray-200 px-6 py-4">
+                                <h2 className="text-lg font-medium flex items-center text-default-900">
+                                    <User className="w-5 h-5 mr-2 text-default-500" />
+                                    Customer Information
+                                </h2>
+                            </div>
+                            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 className="text-sm font-medium text-default-500">Contact Details</h3>
+                                    <p className="text-default-900 font-medium">
+                                        {order.user.first_name} {order.user.last_name}
+                                    </p>
+                                    <p className="text-default-900">{order.user.email}</p>
+                                    <p className="text-default-900">{order.shipping_address.phone}</p>
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium text-default-500">Shipping Address</h3>
+                                    <p className="text-default-900">{order.shipping_address.address_1},</p>
+                                    <p className="text-default-900">
+                                        {order.shipping_address.city}, {order.shipping_address.state}.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Payment Information */}
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
+                            <div className="border-b border-gray-200 px-6 py-4">
+                                <h2 className="text-lg font-medium flex items-center text-default-900">
+                                    <CreditCard className="w-5 h-5 mr-2 text-default-500" />
+                                    Payment Information
+                                </h2>
+                            </div>
+                            <div className="p-6">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-default-500">
+                                            <span className="font-medium">Method:</span> {order.payment_method}
+                                        </p>
+                                    </div>
+                                    {getStatusBadge(order.status)}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Shipping Information */}
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
+                            <div className="border-b border-gray-200 px-6 py-4">
+                                <h2 className="text-lg font-medium flex items-center text-default-900">
+                                    <Truck className="w-5 h-5 mr-2 text-default-500" />
+                                    Shipping Information
+                                </h2>
+                            </div>
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-default-500">
+                                            <span className="font-medium">Method:</span> {order.shipping_method}
+                                        </p>
+                                        <p className="text-default-500">
+                                            <span className="font-medium">Tracking:</span> {order.order_number}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-default-500">
+                                            <span className="font-medium">Estimated Delivery:</span>
+                                            <span className="ml-1">3days</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="space-y-6">
+                        {/* Actions Card */}
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden">
+                            <div className="border-b border-gray-200 px-6 py-4">
+                                <h2 className="text-lg font-medium text-default-900">Actions</h2>
+                            </div>
+                            <div className="p-6 space-y-4">
+                                <OrderProcessingAction order={order} />
+
+                                <Button size="lg" variant="outline">
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    View Invoice
+                                </Button>
+                                {/* <Button size="lg" variant="outline">
+                                    <Map className="w-4 h-4 mr-2" />
+                                    Track Order
+                                </Button> */}
+                            </div>
+                        </div>
+
+                        {/* Order Timeline */}
+                        <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
+                            <div className="border-b border-gray-200 px-6 py-4">
+                                <h2 className="text-lg font-medium text-default-900">Order Timeline</h2>
+                            </div>
+                            <div className="p-6">
+                                <div className="flow-root">
+                                    <ul className="-mb-8">
+                                        <li>
+                                            <div className="relative pb-6">
+                                                <span aria-hidden="true" className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
+                                                <div className="relative flex space-x-3">
+                                                    <div>
+                                                        <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-content1">
+                                                            <Clock className="h-5 w-5 text-white" />
+                                                        </span>
+                                                    </div>
+                                                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                                        <div>
+                                                            <p className="text-sm text-default-500">Order placed</p>
+                                                        </div>
+                                                        <div className="text-right text-sm whitespace-nowrap text-default-500">
+                                                            <time>{format(order.created_at, "MMMM dd")}</time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div className="relative pb-6">
+                                                <span aria-hidden="true" className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
+                                                <div className="relative flex space-x-3">
+                                                    <div>
+                                                        <span
+                                                            className={
+                                                                paymentStatusMap[order.payment_status].color +
+                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
+                                                            }
+                                                        >
+                                                            {paymentStatusMap[order.payment_status].icon}
+                                                        </span>
+                                                    </div>
+                                                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                                        <div>
+                                                            <p className="text-sm text-default-500">{paymentStatusMap[order.payment_status].label}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div className="relative">
+                                                <div className="relative flex space-x-3">
+                                                    <div>
+                                                        <span
+                                                            className={
+                                                                orderStatusMap[order.status].color +
+                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
+                                                            }
+                                                        >
+                                                            {orderStatusMap[order.status].icon}
+                                                        </span>
+                                                    </div>
+                                                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                                        <div>
+                                                            <p className="text-sm text-default-500">{orderStatusMap[order.status].label}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default OrderDetails;

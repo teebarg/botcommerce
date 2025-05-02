@@ -1,19 +1,26 @@
 "use client";
 
-import { LayoutDashboard, ShoppingCart, Package, Users, BarChart3, Settings, Search, User, LogOut, ChevronRight } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Search, User, LogOut, ChevronRight, Notebook, Image, Activity } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useMe } from "@/lib/hooks/useCart";
+
 const AdminMobileMenu: React.FC = () => {
     const pathname = usePathname();
+
+    const { data: user } = useMe();
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
         { id: "orders", label: "Orders", icon: <ShoppingCart size={20} />, href: "/admin/orders" },
         { id: "products", label: "Products", icon: <Package size={20} />, href: "/admin/products" },
-        { id: "customers", label: "Customers", icon: <Users size={20} />, href: "/admin/customers" },
-        { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} />, href: "/admin/analytics" },
+        { id: "customers", label: "Customers", icon: <Users size={20} />, href: "/admin/users" },
+        // { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} />, href: "/admin/analytics" },
+        { id: "categories", label: "Categories", icon: <Image size={20} />, href: "/admin/categories" },
+        { id: "reviews", label: "Reviews", icon: <Notebook size={20} />, href: "/admin/reviews" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
+        { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
     ];
 
     return (
@@ -25,8 +32,10 @@ const AdminMobileMenu: React.FC = () => {
                         <User size={24} />
                     </div>
                     <div>
-                        <div className="font-medium">Admin User</div>
-                        <div className="text-xs text-blue-100">admin@eshop.com</div>
+                        <div className="font-medium">
+                            {user?.first_name} {user?.last_name}
+                        </div>
+                        <div className="text-xs text-blue-100">{user?.email}</div>
                     </div>
                 </div>
             </div>
@@ -35,7 +44,7 @@ const AdminMobileMenu: React.FC = () => {
             <div className="p-4 border-b">
                 <div className="relative">
                     <input
-                        className="w-full py-2 pl-8 pr-4 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full py-2 pl-8 pr-4 bg-gray-100 rounded-lg text-sm focus:outline-none border"
                         placeholder="Search..."
                         type="text"
                     />

@@ -1,9 +1,10 @@
 "use client";
 
-import { InformationCircleSolid, Trash } from "nui-react-icons";
+import { InformationCircleSolid } from "nui-react-icons";
 import React, { useMemo, useState } from "react";
 import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
+import { Trash2 } from "lucide-react";
 
 import ErrorMessage from "../error-message";
 
@@ -68,7 +69,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                     data-testid="remove-gift-card-button"
                                     onClick={() => removeGiftCardCode(gc.code)}
                                 >
-                                    <Trash size={14} />
+                                    <Trash2 size={14} />
                                 </button>
                             </div>
                         ))}
@@ -95,7 +96,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                     data-testid="remove-discount-button"
                                     onClick={removeDiscountCode}
                                 >
-                                    <Trash size={14} />
+                                    <Trash2 size={14} />
                                     <span className="sr-only">Remove discount code from order</span>
                                 </button>
                             </div>

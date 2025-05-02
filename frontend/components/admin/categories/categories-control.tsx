@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { PencilSquare, Plus, Trash } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Edit, Plus, Trash2 } from "lucide-react";
 
 import { Category } from "@/types/models";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { useInvalidate } from "@/lib/hooks/useCart";
 import { api } from "@/apis";
 import { CategoryForm } from "@/components/admin/categories/category-form";
+import DrawerUI from "@/components/drawer";
 
 interface Props {
     canAdd?: boolean;
@@ -65,22 +66,14 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                         </DrawerContent>
                     </Drawer>
                 )}
-                <Drawer open={editState.isOpen} onOpenChange={editState.setOpen}>
-                    <DrawerTrigger>
-                        <PencilSquare />
-                    </DrawerTrigger>
-                    <DrawerContent>
-                        <DrawerHeader>
-                            <DrawerTitle>Edit {category?.name}</DrawerTitle>
-                        </DrawerHeader>
-                        <div className="max-w-lg">
-                            <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
-                        </div>
-                    </DrawerContent>
-                </Drawer>
+                <DrawerUI open={editState.isOpen} title="Edit Brand" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
+                    <div className="max-w-2xl">
+                        <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
+                    </div>
+                </DrawerUI>
                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                     <DialogTrigger>
-                        <Trash className="text-rose-500" />
+                        <Trash2 className="text-rose-500" />
                     </DialogTrigger>
                     <DialogContent className="bg-content1">
                         <DialogHeader>

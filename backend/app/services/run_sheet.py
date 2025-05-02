@@ -30,7 +30,7 @@ async def broadcast_channel(data, user_id: int):
 
 
 # Export products
-async def generate_excel_file(email: str):
+async def generate_excel_file(email: str) -> str:
     logger.debug("Products export started.......")
 
     products = await db.product.find_many(
@@ -309,15 +309,10 @@ async def bulk_upload_products(products: list[dict]):
                 )
 
             print(f"Processed product: {product_data['name']}")
-
-        # await db.tx.commit()
         print("Bulk upload completed successfully")
 
     except Exception as e:
-        # await db.tx.rollback()
         print(f"Error during bulk upload: {str(e)}")
-    finally:
-        await db.disconnect()
 
 
 async def process_products(file_content, content_type: str, user_id: int) -> list[dict]:

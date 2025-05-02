@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import React from "react";
 import { redirect } from "next/navigation";
-import { SideBar } from "@modules/common/components/sidebar";
 
+import { SideBar } from "@/components/layout/sidebar";
 import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { auth } from "@/actions/auth";
 

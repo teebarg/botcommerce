@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 const PageTransition: React.FC = () => {
-    const [progress, setProgress] = useState(0);
+    const [progress, setProgress] = useState<number>(0);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -16,7 +16,7 @@ const PageTransition: React.FC = () => {
     }, [progress]);
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center h-screen bg-background">
             <div className="w-20 h-20 mb-8 relative">
                 {/* Shopping bag icon with pulse animation */}
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -50,8 +50,8 @@ const PageTransition: React.FC = () => {
 
             {/* Loading text */}
             <div className="text-center">
-                <p className="text-lg font-medium text-gray-700">Loading your products</p>
-                <p className="text-sm text-gray-500">Please wait a moment...</p>
+                <p className="text-lg font-medium text-default-900">Loading your products</p>
+                <p className="text-sm text-default-500">Please wait a moment...</p>
             </div>
 
             {/* Animated dots */}
