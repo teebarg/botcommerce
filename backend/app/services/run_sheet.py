@@ -30,7 +30,7 @@ async def broadcast_channel(data, user_id: int):
 
 
 # Export products
-async def generate_excel_file(email: str):
+async def generate_excel_file(email: str) -> str:
     logger.debug("Products export started.......")
 
     products = await db.product.find_many(

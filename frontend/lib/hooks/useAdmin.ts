@@ -152,8 +152,7 @@ export const useDeleteCustomer = () => {
             toast.success("Customer deleted successfully");
         },
         onError: (error) => {
-            console.log("🚀 ~ useDeleteCustomer ~ error:", error);
-            toast.error("Failed to delete customer");
+            toast.error("Failed to delete customer" + error);
         },
     });
 };

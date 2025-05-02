@@ -2,7 +2,7 @@
 
 import { Heart } from "lucide-react";
 
-import WishlistItem from "@/modules/common/components/wishlist";
+import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";

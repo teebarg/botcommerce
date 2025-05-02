@@ -49,7 +49,12 @@ import {
     ShopSettingsSchema,
     BankDetailsSchema,
     PaginatedUserSchema,
+    ActivitySchema,
+    PaginatedActivitySchema,
 } from "./schema";
+
+export type Activity = z.infer<typeof ActivitySchema>;
+export type PaginatedActivity = z.infer<typeof PaginatedActivitySchema>;
 
 export type Facet = z.infer<typeof FacetSchema>;
 export type Brand = z.infer<typeof BrandSchema>;

@@ -1,4 +1,3 @@
-import asyncio
 from typing import Annotated, Any
 
 from fastapi import (
@@ -45,6 +44,7 @@ from prisma.enums import ProductStatus
 from pydantic import BaseModel
 from app.core.storage import upload
 from app.api.routes.websocket import manager
+from app.services.activity import log_activity
 
 # Initialize Supabase client
 supabase_url = settings.SUPABASE_URL
@@ -92,16 +92,20 @@ async def get_landing_products():
 @router.post("/export")
 async def export_products(
     current_user: CurrentUser,
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
 ) -> Any:
     try:
         # Define the background task
         async def run_task():
-            await generate_excel_file(email=current_user.email)
+            download_url = await generate_excel_file(email=current_user.email)
 
-            # crud.activities.create_product_export_activity(
-            #     db=db, user_id=current_user.id, download_url=download_url
-            # )
+            # Log the activity
+            await log_activity(
+                user_id=current_user.id,
+                activity_type="PRODUCT_EXPORT",
+                description="Exported products to Excel",
+                action_download_url=download_url
+            )
 
         background_tasks.add_task(run_task)
 
@@ -708,12 +712,23 @@ async def upload_products(
                 },
                 type="sheet-processor",
             )
+
+            # Log the activity
+            await log_activity(
+                user_id=user.id,
+                activity_type="PRODUCT_UPLOAD",
+                description=f"Uploaded products from file: {file.filename}",
+                is_success=True
+            )
         except Exception as e:
             logger.error(f"Error processing data from file: {e}")
-
-        # crud.activities.create_product_upload_activity(
-        #     db=db, user_id=user.id, filename=file.filename
-        # )
+            # Log failed activity
+            await log_activity(
+                user_id=user.id,
+                activity_type="PRODUCT_UPLOAD",
+                description=f"Failed to upload products from file: {file.filename}",
+                is_success=False
+            )
 
     background_tasks.add_task(update_task)
 

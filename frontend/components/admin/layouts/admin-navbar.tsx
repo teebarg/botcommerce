@@ -1,9 +1,9 @@
 import UserDropDown from "@modules/account/components/user-menu";
-import ActivityTray from "@modules/common/components/activity-tray";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
 import dynamic from "next/dynamic";
 import { MenuIcon } from "lucide-react";
 
+import ActivityTray from "@/components/generic/activities/activity-tray";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";

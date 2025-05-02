@@ -385,3 +385,19 @@ export const BankDetailsSchema = z.object({
     created_at: z.string(),
     updated_at: z.string(),
 });
+
+export const ActivitySchema = z.object({
+    id: z.number(),
+    user_id: z.number(),
+    activity_type: z.string(),
+    description: z.string(),
+    action_download_url: z.string().optional(),
+    is_success: z.boolean(),
+    user: UserSchema,
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const PaginatedActivitySchema = PagSchema.extend({
+    activities: z.array(ActivitySchema),
+});

@@ -6,25 +6,15 @@ import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { bulkUpload } from "@/modules/account/actions";
-import { useWebSocket } from "@/lib/hooks/use-websocket";
 import { useInvalidate } from "@/lib/hooks/useAdmin";
+import { useWebSocket } from "@/providers/websocket";
 
 interface ProductUploadProps {}
 
 const ProductUpload: React.FC<ProductUploadProps> = () => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const { messages, connect, disconnect } = useWebSocket({ type: ["sheet-processor"] });
+    const { currentMessage } = useWebSocket();
     const invalidate = useInvalidate();
-
-    const currentMessage = messages[messages.length - 1];
-
-    useEffect(() => {
-        connect();
-
-        return () => {
-            disconnect();
-        };
-    }, []);
 
     useEffect(() => {
         if (!currentMessage) return;

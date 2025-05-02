@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Search, User, LogOut, ChevronRight, Notebook, Image } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Search, User, LogOut, ChevronRight, Notebook, Image, Activity } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -20,6 +20,7 @@ const AdminMobileMenu: React.FC = () => {
         { id: "categories", label: "Categories", icon: <Image size={20} />, href: "/admin/categories" },
         { id: "reviews", label: "Reviews", icon: <Notebook size={20} />, href: "/admin/reviews" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
+        { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
     ];
 
     return (
