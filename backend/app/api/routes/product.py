@@ -308,7 +308,6 @@ async def create_product(product: ProductCreate, cache: CacheService):
 
 
 @router.get("/{slug}")
-# @cache(key="product", hash=False)
 async def read(slug: str):
     """
     Get a specific product by slug with Redis caching.
@@ -327,7 +326,6 @@ async def read(slug: str):
 
 
 @router.get("/{id}/reviews")
-# @cache(key="reviews", hash=False)
 async def read_reviews(id: int):
     """
     Get a specific product reviews with Redis caching.
@@ -447,16 +445,16 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
 
     try:
         # Define the background task
-        def update_task(product: Product):
+        async def update_task():
+            logger.info("Updating product in Meilisearch")
             # Prepare product data for Meilisearch indexing
-            product_data = prepare_product_data_for_indexing(product)
+            product_data = prepare_product_data_for_indexing(updated_product)
 
             update_document(index_name="products", document=product_data)
             cache.invalidate("featured")
             cache.invalidate("search")
-            cache.invalidate("product")
 
-        background_tasks.add_task(update_task, updated_product)
+        background_tasks.add_task(update_task)
         return updated_product
     except Exception as e:
         logger.error(e)

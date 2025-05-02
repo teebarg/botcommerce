@@ -1,10 +1,8 @@
-import { fetcher } from "./fetcher";
 import { api } from "./base";
 
-import { buildUrl, handleError } from "@/lib/util/util";
 import { Message, PaginatedProduct, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/types/models";
 import { revalidate } from "@/actions/revalidate";
-import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { ApiResult } from "@/lib/try-catch";
 
 interface SearchParams {
     query?: string;
@@ -20,53 +18,53 @@ interface SearchParams {
 // Product API methods
 export const productApi = {
     async all(searchParams: SearchParams): ApiResult<PaginatedProduct> {
-        const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/`, { ...searchParams });
-
-        return await tryCatch<PaginatedProduct>(fetcher(url, { next: { tags: ["products"] } }));
+        return await api.get<PaginatedProduct>("/product/", { next: { tags: ["products"] }, cache: "default", params: { ...searchParams } });
     },
     async search(searchParams: SearchParams): ApiResult<PaginatedProductSearch> {
-        const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/search`, { ...searchParams });
-
-        return await tryCatch<PaginatedProductSearch>(fetcher(url, { next: { tags: ["search"] } }));
+        return await api.get<PaginatedProductSearch>("/product/search", { next: { tags: ["search"] }, params: { ...searchParams } });
     },
     async get(slug: string): ApiResult<Product> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${slug}`;
-
-        return await tryCatch<Product>(fetcher(url, { next: { tags: ["product"] } }));
+        return await api.get<Product>(`/product/${slug}`, { next: { tags: ["product"] } });
     },
     async create(input: any): ApiResult<Product> {
         return await api.post<Product>(`/product`, input);
     },
     async update(id: number, input: any): ApiResult<Product> {
-        return await api.put<Product>(`/product/${id}`, input);
+        const response = await api.put<Product>(`/product/${id}`, input);
+
+        if (!response.error) {
+            revalidate("products");
+            revalidate("product");
+            revalidate("search");
+        }
+
+        return response;
     },
     async delete(id: number): ApiResult<Message> {
-        return await api.delete<Message>(`/product/${id}`);
-    },
-    async reviews({ product_id, page = 1, limit = 20 }: { product_id?: number; page: number; limit: number }): Promise<PaginatedReview> {
-        const url = buildUrl(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`, { product_id, page, limit });
-        const response = await fetcher<PaginatedReview>(url);
+        const response = await api.delete<Message>(`/product/${id}`);
+
+        if (!response.error) {
+            revalidate("products");
+            revalidate("product");
+            revalidate("search");
+        }
 
         return response;
+    },
+    async reviews({ product_id, page = 1, limit = 20 }: { product_id?: number; page: number; limit: number }): ApiResult<PaginatedReview> {
+        return await api.get<PaginatedReview>(`/reviews/`, { next: { tags: ["product"] }, params: { product_id, page, limit } });
     },
     async addReview(input: { product_id: number; rating: number; comment: string }): ApiResult<Review> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reviews/`;
-
-        return await tryCatch<Review>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
+        return await api.post<Review>(`/reviews/`, input);
     },
     async productReviews({ product_id }: { product_id?: number }): ApiResult<Review[]> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${product_id}/reviews`;
-        const response = await tryCatch<Review[]>(fetcher(url, { next: { tags: ["reviews"] } }));
-
-        return response;
+        return await api.get<Review[]>(`/product/${product_id}/reviews`, { next: { tags: ["reviews"] } });
     },
     async export(): ApiResult<Message> {
         return await api.post<Message>(`/product/export`, {});
     },
     async uploadImage({ id, data }: { id: number; data: any }): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/${id}/image`;
-
-        const response = await tryCatch<Message>(fetcher(url, { method: "PATCH", body: JSON.stringify(data) }));
+        const response = await api.patch<Message>(`/product/${id}/image`, data);
 
         if (!response.error) {
             revalidate("products");
@@ -85,8 +83,7 @@ export const productApi = {
         return await api.delete<Message>(`/product/${id}/images/${imageId}`);
     },
     async bulkUpload(formData: FormData): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`;
-        const response = await tryCatch<Message>(fetcher(url, { method: "POST", body: formData }));
+        const response = await api.post<Message>("/product/upload-products", formData);
 
         if (!response.error) {
             revalidate("products");
@@ -95,19 +92,15 @@ export const productApi = {
 
         return response;
     },
-    async reIndex(): Promise<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/reindex`;
+    async reIndex(): ApiResult<Message> {
+        const response = await api.post<Message>(`/product/reindex`);
 
-        try {
-            await fetcher<{ message: string }>(url, { method: "POST" });
-
-            revalidate("product");
+        if (!response.error) {
+            revalidate("products");
             revalidate("search");
-
-            return { error: false, message: "Products indexed successfully" };
-        } catch (error) {
-            return handleError(error);
         }
+
+        return response;
     },
     async createVariant(input: {
         productId: number;
@@ -135,8 +128,7 @@ export const productApi = {
         return await api.put<ProductVariant>(`/product/variants/${id}`, variantData);
     },
     async deleteVariant(id: number): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/variants/${id}`;
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
+        const response = await api.delete<Message>(`/product/variants/${id}`);
 
         if (!response.error) {
             revalidate("products");

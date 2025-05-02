@@ -104,12 +104,12 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </div>
                         <div className="flex-1">
                             <div className="h-[60vh] flex items-center justify-center p-4 relative">
-                                {selectedImage && (
+                                {(selectedImage || product.image) && (
                                     <Image
                                         fill
-                                        alt={selectedImage.image}
+                                        alt={selectedImage?.image || product.image}
                                         className="object-contain h-full w-full rounded"
-                                        src={selectedImage.image}
+                                        src={selectedImage?.image || product.image}
                                     />
                                 )}
                             </div>
@@ -120,26 +120,21 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
                             <ProductShare name={product.name} />
                         </div>
-                        <div className="text-2xl font-bold hidden md:block">{currency(product.variants[0].price)}</div>
+                        <div className="text-2xl font-bold hidden md:block">{currency(product.price)}</div>
                         <div className="my-2 flex items-center gap-2">
                             <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
                         </div>
                         <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4">
                             <div className="flex items-center text-white">
-                                <span className="text-3xl font-semibold ">{currency(product.variants[0].price)}</span>
-                                {product.variants[0].old_price > product.variants[0].price && (
-                                    <span className="ml-1 text-sm line-through">{currency(product.variants[0].old_price)}</span>
+                                <span className="text-3xl font-semibold">{currency(product.price)}</span>
+                                {product.old_price > product.price && (
+                                    <span className="ml-1 text-sm line-through">{currency(product.old_price)}</span>
                                 )}
                             </div>
-                            {product.variants[0].old_price > product.variants[0].price && (
+                            {product.old_price > product.price && (
                                 <div className="mt-1 -mb-1.5">
                                     <span className="text-xl font-medium text-orange-400">
-                                        Save{" "}
-                                        {(
-                                            ((product.variants[0].old_price - product.variants[0].price) / product.variants[0].old_price) *
-                                            100
-                                        ).toFixed(0)}
-                                        %
+                                        Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
                                     </span>
                                 </div>
                             )}
