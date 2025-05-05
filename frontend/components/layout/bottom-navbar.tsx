@@ -1,12 +1,11 @@
 import { cn } from "@lib/util/cn";
 import React from "react";
-import { Home, MenuIcon, Search, User } from "lucide-react";
+import { Home, Search, User } from "lucide-react";
 
-import Menu from "../menu";
+import StoreMenuComp from "./store-mobile-menu-drawer";
 
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { auth } from "@/actions/auth";
 
 const ButtonNav = async ({ className }: { className?: string }) => {
@@ -55,20 +54,7 @@ const ButtonNav = async ({ className }: { className?: string }) => {
                 Cart
             </span>
 
-            <Drawer>
-                <DrawerTrigger>
-                    <span className="flex flex-col items-center">
-                        <MenuIcon className="h-8 w-8" />
-                        Menu
-                    </span>
-                </DrawerTrigger>
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle className="sr-only">Menu</DrawerTitle>
-                    </DrawerHeader>
-                    <Menu user={user} />
-                </DrawerContent>
-            </Drawer>
+            <StoreMenuComp user={user} />
         </nav>
     );
 };

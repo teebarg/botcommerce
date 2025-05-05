@@ -157,7 +157,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </div>
 
                         {/* Add to Cart Button */}
-                        {product.variants[0].status == "OUT_OF_STOCK" ? (
+                        {product.variants?.[0].status == "OUT_OF_STOCK" ? (
                             <Button className="w-full mt-4 cursor-not-allowed" disabled={true} size="lg">
                                 Out of Stock
                             </Button>

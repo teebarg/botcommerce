@@ -87,7 +87,7 @@ export function ProductDetails() {
                                     {(pagination?.page - 1) * LIMIT + idx + 1}
                                 </TableCell>
                                 <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <img alt={product.name} className="w-10 h-10 rounded" src={product.image} />
+                                    <img alt={product.name} className="w-10 h-10 rounded" src={product.images[0]?.image || product.image} />
                                 </TableCell>
                                 <TableCell className="font-medium">{product.name}</TableCell>
                                 <TableCell>{product.sku}</TableCell>
@@ -116,7 +116,7 @@ export function ProductDetails() {
 
                     {(selectedCollections.length > 0 || selectedBrands.length > 0) && (
                         <div className="mb-4 overflow-auto flex gap-2 flex-nowrap">
-                            {selectedCollections.map((id, idx: number) => {
+                            {selectedCollections.map((id: number, idx: number) => {
                                 const collection = collections?.find((c: Collection) => c.id === id);
 
                                 if (!collection) return null;
@@ -135,7 +135,7 @@ export function ProductDetails() {
                                     </div>
                                 );
                             })}
-                            {selectedBrands.map((id, idx: number) => {
+                            {selectedBrands.map((id: number, idx: number) => {
                                 const brand = brands?.find((b: Brand) => b.id === id);
 
                                 if (!brand) return null;

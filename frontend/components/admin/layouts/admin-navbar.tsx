@@ -1,14 +1,12 @@
 import UserDropDown from "@modules/account/components/user-menu";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
 import dynamic from "next/dynamic";
-import { MenuIcon } from "lucide-react";
 
 import ActivityTray from "@/components/generic/activities/activity-tray";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import AdminMobileMenu from "@/components/admin/layouts/mobile-menu";
+import MenuComp from "@/components/layout/mobile-menu-drawer";
 
 const getThemeToggler = () =>
     dynamic(() => import("@lib/theme/theme-button"), {
@@ -28,17 +26,7 @@ const AdminNavbar = async () => {
                         <p className="font-bold text-inherit">{siteConfig.name}</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
-                <Drawer>
-                    <DrawerTrigger className="md:hidden">
-                        <MenuIcon className="h-8 w-8" />
-                    </DrawerTrigger>
-                    <DrawerContent>
-                        <DrawerHeader>
-                            <DrawerTitle className="sr-only">Menu</DrawerTitle>
-                        </DrawerHeader>
-                        <AdminMobileMenu />
-                    </DrawerContent>
-                </Drawer>
+                <MenuComp />
             </NavbarContent>
 
             <NavbarContent className="flex basis-1/5 sm:basis-full" justify="end">

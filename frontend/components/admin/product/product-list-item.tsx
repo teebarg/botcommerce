@@ -10,7 +10,11 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
     return (
         <div className="relative bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col">
             <div className="h-40 w-full bg-content1 overflow-hidden relative">
-                <img alt={product.name} className="h-full w-full object-cover" src={product.image || "/placeholder.svg"} />
+                <img
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                    src={product.images[0]?.image || product.image || "/placeholder.svg"}
+                />
                 <div className="absolute top-2 right-2 bg-white rounded-full p-1 text-xs text-gray-600 font-medium shadow-sm">5 in stock</div>
             </div>
             <div className="p-3 flex flex-col justify-end flex-1">

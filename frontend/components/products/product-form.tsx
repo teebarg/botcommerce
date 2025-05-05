@@ -6,8 +6,6 @@ import * as z from "zod";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import ProductImageManager from "../admin/product/product-image";
-
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -125,7 +123,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
 
     return (
         <div className="overflow-y-auto flex flex-col pb-4">
-            {product?.id && <ProductImageManager initialImage={product?.image || ""} productId={product?.id || 0} />}
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="w-full h-full">

@@ -23,7 +23,6 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
                     <TabsTrigger value="shop-details">Shop Details</TabsTrigger>
                     <TabsTrigger value="details">Details</TabsTrigger>
                     <TabsTrigger value="payments">Payments</TabsTrigger>
-                    <TabsTrigger value="custom-settings">Custom Settings</TabsTrigger>
                 </TabsList>
                 <TabsContent value="shop-details">
                     <ShopDetails settings={settings} />
