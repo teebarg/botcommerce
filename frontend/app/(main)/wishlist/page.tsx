@@ -7,7 +7,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";
 import { WishItem } from "@/types/models";
-import { useUserWishlist } from "@/lib/hooks/useCart";
+import { useUserWishlist } from "@/lib/hooks/useApi";
 
 export default function Wishlist() {
     const { data, isLoading, error } = useUserWishlist();

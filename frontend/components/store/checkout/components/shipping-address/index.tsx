@@ -10,7 +10,7 @@ import AddressSelect from "../address-select";
 import { Address } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { useMe } from "@/lib/hooks/useCart";
+import { useMe } from "@/lib/hooks/useApi";
 
 const ShippingAddress = ({ address, email }: { address: Address | null; email: string }) => {
     const router = useRouter();

@@ -3,7 +3,7 @@
 // WebSocketProvider.tsx
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
-import { useMe } from "@/lib/hooks/useCart";
+import { useMe } from "@/lib/hooks/useApi";
 
 type WebSocketContextType = {
     socket: WebSocket | null;

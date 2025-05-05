@@ -11,7 +11,7 @@ import ReviewForm from "./review-form";
 import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/util/util";
 import { Review } from "@/types/models";
-import { useProductReviews } from "@/lib/hooks/useCart";
+import { useProductReviews } from "@/lib/hooks/useApi";
 
 interface Prop {
     product_id: number;

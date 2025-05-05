@@ -11,7 +11,7 @@ import { api } from "@/apis";
 import { Product } from "@/types/models";
 import { ProductView } from "@/components/products/product-view";
 import { Confirm } from "@/components/generic/confirm";
-import { useInvalidate } from "@/lib/hooks/useAdmin";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface ProductActionsProps {
     product: Product;

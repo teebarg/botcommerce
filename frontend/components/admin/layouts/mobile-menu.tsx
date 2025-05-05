@@ -4,7 +4,7 @@ import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Search, User, 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useMe } from "@/lib/hooks/useCart";
+import { useMe } from "@/lib/hooks/useApi";
 
 const AdminMobileMenu: React.FC = () => {
     const pathname = usePathname();

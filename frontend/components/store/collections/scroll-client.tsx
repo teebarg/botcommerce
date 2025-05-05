@@ -16,7 +16,7 @@ import { CollectionsTopBar } from "@/components/store/collections/checkout-topba
 import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
 import { cn } from "@/lib/util/cn";
-import { useBrands, useCategories, useCollections } from "@/lib/hooks/useAdmin";
+import { useBrands, useCategories, useCollections } from "@/lib/hooks/useApi";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 
 interface SearchParams {
@@ -48,12 +48,14 @@ export default function InfiniteScrollClient({
     const [facets, setFacets] = useState<Facet>();
     const [hasNext, setHasNext] = useState<boolean>(data.page < data.total_pages);
     const [page, setPage] = useState<number>(data.page ?? 1);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const searchParams = useSearchParams();
 
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
 
     const fetchItems = async (page: number) => {
+        setLoading(true);
         const { data } = await api.product.search({ ...initialSearchParams, page });
 
         if (!data) {
@@ -61,11 +63,12 @@ export default function InfiniteScrollClient({
         }
         setProducts((prev) => [...prev, ...data.products]);
         setHasNext(data.page < data.total_pages);
+        setLoading(false);
     };
 
     useEffect(() => {
         setProducts(data.products);
-        setPage(1);
+        setPage(data.page);
         setHasNext(data.page < data.total_pages);
         setFacets(data.facets);
     }, [data]);
@@ -83,6 +86,7 @@ export default function InfiniteScrollClient({
                 setPage((prev) => prev + 1);
             }
         },
+        isFetching: loading,
     });
 
     return (
@@ -189,7 +193,7 @@ export default function InfiniteScrollClient({
                 </div>
                 <div className="w-full">
                     {hasNext && (
-                        <div ref={lastElementRef} className="mt-8 flex flex-col items-center justify-center text-blue-600">
+                        <div ref={lastElementRef} className="flex flex-col items-center justify-center text-blue-600">
                             <Loader className="h-8 w-8 animate-spin mb-2" />
                             <p className="text-sm font-medium text-default-500">Loading more products...</p>
                         </div>

@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Category } from "@/types/models";
 import { mutateCategory } from "@/actions/category";
 import CategoryImageManager from "@/components/admin/categories/category-image";
-import { useInvalidate } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface Props {
     current?: Category;

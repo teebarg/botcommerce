@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/types/models";
 import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useAdmin";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface ProductVariantsProps {
     variants: ProductVariant[];

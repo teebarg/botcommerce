@@ -10,7 +10,7 @@ import { BrandForm } from "@/components/admin/brands/brand-form";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { Brand } from "@/types/models";
-import { useInvalidate } from "@/lib/hooks/useAdmin";
+import { useInvalidate } from "@/lib/hooks/useApi";
 import DrawerUI from "@/components/drawer";
 
 interface Props {

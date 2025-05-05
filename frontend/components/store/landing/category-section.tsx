@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-import { useCategories } from "@/lib/hooks/useAdmin";
+import { useCategories } from "@/lib/hooks/useApi";
 import { Category } from "@/types/models";
 import { Skeleton } from "@/components/generic/skeleton";
 

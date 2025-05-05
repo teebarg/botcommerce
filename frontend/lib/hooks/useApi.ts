@@ -1,4 +1,3 @@
-// lib/hooks/useCart.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -15,6 +14,7 @@ import {
     PaginatedUser,
     Review,
     User,
+    Wishlist,
 } from "@/types/models";
 
 export const useMe = () => {
@@ -154,6 +154,13 @@ export const useDeleteCustomer = () => {
         onError: (error) => {
             toast.error("Failed to delete customer" + error);
         },
+    });
+};
+
+export const useUserWishlist = () => {
+    return useQuery({
+        queryKey: ["user-wishlist"],
+        queryFn: async () => await api.get<Wishlist>(`/users/wishlist`),
     });
 };
 

@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { mutateBrand } from "@/actions/product";
-import { useInvalidate } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface Props {
     current?: any;

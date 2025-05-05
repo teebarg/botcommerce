@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/util/util";
 import { api } from "@/apis";
-import { useBank } from "@/lib/hooks/useCart";
+import { useBank } from "@/lib/hooks/useApi";
 
 interface BankTransferProps {
     amount: number;

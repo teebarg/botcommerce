@@ -6,7 +6,7 @@ import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { bulkUpload } from "@/modules/account/actions";
-import { useInvalidate } from "@/lib/hooks/useAdmin";
+import { useInvalidate } from "@/lib/hooks/useApi";
 import { useWebSocket } from "@/providers/websocket";
 
 interface ProductUploadProps {}

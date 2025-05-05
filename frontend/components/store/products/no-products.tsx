@@ -4,7 +4,7 @@ import React from "react";
 import { Home, PackageSearch, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useCollections } from "@/lib/hooks/useAdmin";
+import { useCollections } from "@/lib/hooks/useApi";
 import { Collection } from "@/types/models";
 import { BtnLink } from "@/components/ui/btnLink";
 

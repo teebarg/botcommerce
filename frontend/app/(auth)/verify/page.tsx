@@ -9,7 +9,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
-import { useInvalidate } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 export default function VerifyMagicLink() {
     const [authState, setAuthState] = useState<"loading" | "success" | "expired">("loading");

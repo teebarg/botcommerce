@@ -14,7 +14,7 @@ import { ProductActions } from "@/components/admin/product/product-actions";
 import { Brand, Collection, Product } from "@/types/models";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
-import { useBrands, useCollections, useProducts } from "@/lib/hooks/useAdmin";
+import { useBrands, useCollections, useProducts } from "@/lib/hooks/useApi";
 import { Skeleton } from "@/components/generic/skeleton";
 import ServerError from "@/components/generic/server-error";
 

@@ -7,7 +7,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import CustomerForm from "./customer-form";
 
 import { User } from "@/types/models";
-import { useDeleteCustomer } from "@/lib/hooks/useAdmin";
+import { useDeleteCustomer } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import DrawerUI from "@/components/drawer";
 

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Order, OrderStatus } from "@/types/models";
 import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface OrderProcessingActionProps {
     order: Order;

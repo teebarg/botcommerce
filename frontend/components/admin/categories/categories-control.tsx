@@ -10,7 +10,7 @@ import { Category } from "@/types/models";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useInvalidate } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 import { api } from "@/apis";
 import { CategoryForm } from "@/components/admin/categories/category-form";
 import DrawerUI from "@/components/drawer";

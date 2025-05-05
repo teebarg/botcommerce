@@ -8,7 +8,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/types/models";
 import NewsletterForm from "@/components/store/newsletter";
 import { useStore } from "@/app/store/use-store";
-import { useCategories, useCollections } from "@/lib/hooks/useAdmin";
+import { useCategories, useCollections } from "@/lib/hooks/useApi";
 
 const about = [
     {

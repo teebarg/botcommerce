@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Order, Status, User } from "@/types/models";
-import { useCustomers } from "@/lib/hooks/useAdmin";
+import { useCustomers } from "@/lib/hooks/useApi";
 import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/util/util";
 

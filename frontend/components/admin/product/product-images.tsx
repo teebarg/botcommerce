@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { ProductImage } from "@/types/models";
 import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useAdmin";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface ProductImageManagerProps {
     productId: number;

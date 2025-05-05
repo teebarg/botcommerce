@@ -3,7 +3,7 @@
 import React from "react";
 
 import ServerError from "@/components/generic/server-error";
-import { useCategories } from "@/lib/hooks/useAdmin";
+import { useCategories } from "@/lib/hooks/useApi";
 import { Skeleton } from "@/components/generic/skeleton";
 import CreateCategory from "@/components/admin/categories/create-categories";
 import CategoryTree from "@/components/admin/categories/tree";
