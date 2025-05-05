@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "AddressType" AS ENUM ('HOME', 'WORK', 'BILLING', 'SHIPPING', 'OTHER');
+
+-- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELED', 'REFUNDED');
 
 -- CreateEnum
@@ -25,6 +28,9 @@ CREATE TYPE "roles" AS ENUM ('admin', 'customer');
 -- CreateEnum
 CREATE TYPE "statuses" AS ENUM ('pending', 'active', 'inactive');
 
+-- CreateEnum
+CREATE TYPE "ShopSettingsType" AS ENUM ('FEATURE', 'SHOP_DETAIL', 'CUSTOM');
+
 -- CreateTable
 CREATE TABLE "activity_logs" (
     "id" SERIAL NOT NULL,
@@ -43,6 +49,8 @@ CREATE TABLE "activity_logs" (
 CREATE TABLE "addresses" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
+    "label" TEXT,
+    "address_type" "AddressType" NOT NULL DEFAULT 'HOME',
     "first_name" TEXT,
     "last_name" TEXT,
     "address_1" TEXT NOT NULL,
@@ -75,6 +83,7 @@ CREATE TABLE "categories" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
+    "image" TEXT,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "parent_id" INTEGER,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -104,7 +113,7 @@ CREATE TABLE "products" (
     "description" TEXT,
     "features" TEXT[],
     "price" DOUBLE PRECISION NOT NULL,
-    "old_price" DOUBLE PRECISION NOT NULL,
+    "old_price" DOUBLE PRECISION,
     "image" VARCHAR(255),
     "status" "ProductStatus" NOT NULL DEFAULT 'IN_STOCK',
     "ratings" DOUBLE PRECISION DEFAULT 0,
@@ -121,6 +130,7 @@ CREATE TABLE "product_variants" (
     "product_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
+    "image" TEXT,
     "sku" TEXT NOT NULL,
     "status" "ProductStatus" NOT NULL DEFAULT 'IN_STOCK',
     "price" DOUBLE PRECISION NOT NULL,
@@ -185,8 +195,8 @@ CREATE TABLE "orders" (
     "id" SERIAL NOT NULL,
     "order_number" TEXT NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "shipping_address_id" INTEGER NOT NULL,
-    "billing_address_id" INTEGER NOT NULL,
+    "shipping_address_id" INTEGER,
+    "billing_address_id" INTEGER,
     "email" TEXT,
     "total" DOUBLE PRECISION NOT NULL,
     "subtotal" DOUBLE PRECISION NOT NULL,
@@ -207,6 +217,7 @@ CREATE TABLE "orders" (
 -- CreateTable
 CREATE TABLE "order_items" (
     "id" SERIAL NOT NULL,
+    "name" TEXT,
     "order_id" INTEGER NOT NULL,
     "variant_id" INTEGER NOT NULL,
     "image" TEXT,
@@ -270,7 +281,10 @@ CREATE TABLE "carts" (
 -- CreateTable
 CREATE TABLE "cart_items" (
     "id" SERIAL NOT NULL,
+    "name" TEXT,
+    "slug" TEXT,
     "cart_id" INTEGER NOT NULL,
+    "cart_number" TEXT,
     "variant_id" INTEGER NOT NULL,
     "quantity" INTEGER NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
@@ -309,6 +323,31 @@ CREATE TABLE "favorites" (
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "favorites_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "shop_settings" (
+    "id" SERIAL NOT NULL,
+    "key" VARCHAR(255) NOT NULL,
+    "value" TEXT,
+    "type" "ShopSettingsType" NOT NULL DEFAULT 'FEATURE',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "shop_settings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "bank_details" (
+    "id" SERIAL NOT NULL,
+    "bank_name" VARCHAR(255) NOT NULL,
+    "account_name" VARCHAR(255) NOT NULL,
+    "account_number" VARCHAR(255) NOT NULL,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "bank_details_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -402,6 +441,12 @@ CREATE INDEX "users_first_name_last_name_email_idx" ON "users"("first_name", "la
 CREATE UNIQUE INDEX "favorites_user_id_product_id_key" ON "favorites"("user_id", "product_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "shop_settings_key_key" ON "shop_settings"("key");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "bank_details_account_number_key" ON "bank_details"("account_number");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_ProductCategories_AB_unique" ON "_ProductCategories"("A", "B");
 
 -- CreateIndex
@@ -447,10 +492,10 @@ ALTER TABLE "reviews" ADD CONSTRAINT "reviews_user_id_fkey" FOREIGN KEY ("user_i
 ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "orders" ADD CONSTRAINT "orders_shipping_address_id_fkey" FOREIGN KEY ("shipping_address_id") REFERENCES "addresses"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "orders" ADD CONSTRAINT "orders_shipping_address_id_fkey" FOREIGN KEY ("shipping_address_id") REFERENCES "addresses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "orders" ADD CONSTRAINT "orders_billing_address_id_fkey" FOREIGN KEY ("billing_address_id") REFERENCES "addresses"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "orders" ADD CONSTRAINT "orders_billing_address_id_fkey" FOREIGN KEY ("billing_address_id") REFERENCES "addresses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_coupon_id_fkey" FOREIGN KEY ("coupon_id") REFERENCES "coupons"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
@@ -471,10 +516,10 @@ ALTER TABLE "payments" ADD CONSTRAINT "payments_order_id_fkey" FOREIGN KEY ("ord
 ALTER TABLE "carts" ADD CONSTRAINT "carts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "carts" ADD CONSTRAINT "carts_shipping_address_id_fkey" FOREIGN KEY ("shipping_address_id") REFERENCES "addresses"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "carts" ADD CONSTRAINT "carts_shipping_address_id_fkey" FOREIGN KEY ("shipping_address_id") REFERENCES "addresses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "carts" ADD CONSTRAINT "carts_billing_address_id_fkey" FOREIGN KEY ("billing_address_id") REFERENCES "addresses"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "carts" ADD CONSTRAINT "carts_billing_address_id_fkey" FOREIGN KEY ("billing_address_id") REFERENCES "addresses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "cart_items" ADD CONSTRAINT "cart_items_cart_id_fkey" FOREIGN KEY ("cart_id") REFERENCES "carts"("id") ON DELETE CASCADE ON UPDATE CASCADE;

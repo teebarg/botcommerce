@@ -14,16 +14,14 @@ from math import ceil
 from prisma.errors import PrismaError
 
 from app.core.deps import get_current_user
-from app.core.logging import logger
 from app.models.generic import Message
 from app.models.tag import (
     Search,
     TagCreate,
-    Tags,
     Tag,
     TagUpdate,
 )
-from app.services.export import export, validate_file
+from app.services.export import validate_file
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 
@@ -32,7 +30,6 @@ router = APIRouter()
 
 
 @router.get("/", dependencies=[Depends(get_current_user)])
-# @cache(key="tags")
 async def index(
     query: str = "",
     page: int = Query(default=1, gt=0),
@@ -83,7 +80,6 @@ async def create(*, create_data: TagCreate) -> Tag:
 
 
 @router.get("/{id}")
-# @cache(key="tag")
 async def read(id: int) -> Tag:
     """
     Get a specific tag by id.
@@ -156,7 +152,6 @@ async def upload_tags(
 
 
 @router.get("/autocomplete/")
-# @cache(key="tags")
 async def autocomplete(
     search: str = "",
 ) -> Any:

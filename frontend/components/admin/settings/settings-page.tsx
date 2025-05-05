@@ -4,7 +4,6 @@ import React from "react";
 
 import { FeatureToggles } from "./feature-toggles";
 import { ShopDetails } from "./shop-details";
-import { CustomSettings } from "./custom-settings";
 import { ShopPayments } from "./shop-payments";
 
 import { BankDetails, ShopSettings } from "@/types/models";
@@ -34,9 +33,6 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
                 </TabsContent>
                 <TabsContent value="payments">
                     <ShopPayments bankDetails={bankDetails} settings={settings} />
-                </TabsContent>
-                <TabsContent value="custom-settings">
-                    <CustomSettings settings={settings} />
                 </TabsContent>
             </Tabs>
         </div>

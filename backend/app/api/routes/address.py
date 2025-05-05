@@ -1,12 +1,10 @@
 from fastapi import (
     APIRouter,
-    Depends,
     HTTPException,
     Query,
 )
 
 from app.core.deps import CurrentUser
-from app.core.logging import logger
 from app.models.address import (
     AddressCreate,
     AddressUpdate,
@@ -23,7 +21,6 @@ router = APIRouter()
 
 
 @router.get("/")
-# @cache(key="addresses")
 async def index(
     current_user: CurrentUser,
     page: int = Query(default=1, gt=0),
@@ -74,7 +71,6 @@ async def create(
 
 
 @router.get("/{id}")
-# @cache(key="address")
 async def read(id: int, user: CurrentUser) -> Address:
     """
     Get a specific address by id.

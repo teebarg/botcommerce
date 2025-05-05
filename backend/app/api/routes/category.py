@@ -1,14 +1,12 @@
-from math import ceil
 from typing import Any, Optional
 
 from app.core.deps import (get_current_user)
-from app.models.category import Categories, Category, CategoryCreate, CategoryUpdate
+from app.models.category import Category, CategoryCreate, CategoryUpdate
 from app.models.generic import Message
 from app.core.utils import slugify
-from fastapi import (APIRouter, Depends, HTTPException, Query, Request)
+from fastapi import (APIRouter, Depends, HTTPException)
 from pydantic import BaseModel
 from app.core.storage import upload, delete_Image
-from app.core.decorators import cache
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
@@ -20,8 +18,8 @@ router = APIRouter()
 class Search(BaseModel):
     results: list[Category]
 
-@router.get("/all")
-async def all_categories(
+@router.get("/")
+async def index(
     query: str = "",
 ) -> Optional[list[Category]]:
     """
@@ -37,43 +35,6 @@ async def all_categories(
             ]
         }
     return await db.category.find_many(where=where_clause, order={"created_at": "desc"},include={"subcategories": True})
-
-
-@router.get("/", dependencies=[])
-# @cache(key="categories")
-async def index(
-    query: str = "",
-    page: int = Query(default=1, gt=0),
-    limit: int = Query(default=20, le=100),
-) -> Categories:
-    """
-    Retrieve categories with Redis caching.
-    """
-    # Define the where clause based on query parameter
-    where_clause = {"parent_id": None}
-    if query:
-        where_clause = {
-            "OR": [
-                {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
-            ]
-        }
-    categories = await db.category.find_many(
-        where=where_clause,
-        skip=(page - 1) * limit,
-        take=limit,
-        order={"created_at": "desc"},
-        include={"subcategories": True}
-    )
-    total = await db.category.count(where=where_clause)
-    return {
-        "categories":categories,
-        "page":page,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
-    }
-
 
 @router.post("/")
 async def create(*, data: CategoryCreate) -> Category:
@@ -94,7 +55,6 @@ async def create(*, data: CategoryCreate) -> Category:
 
 
 @router.get("/{id}")
-# @cache(key="category", hash=False)
 async def read(id: int) -> Any:
     """
     Get a specific category by id with Redis caching.
@@ -110,7 +70,6 @@ async def read(id: int) -> Any:
 
 
 @router.get("/slug/{slug}")
-# @cache(key="category", hash=False)
 async def get_by_slug(slug: str) -> Category:
     """
     Get a category by its slug.

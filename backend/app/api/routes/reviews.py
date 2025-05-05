@@ -16,7 +16,6 @@ from prisma.models import Review
 router = APIRouter()
 
 @router.get("/")
-# @cache(key="reviews")
 async def index(
     product_id: int = None,
     page: int = Query(default=1, gt=0),
@@ -48,7 +47,6 @@ async def index(
 
 
 @router.get("/{id}")
-# @cache(key="review", hash=False)
 async def read(id: int) -> Review:
     """
     Get a specific review by id with Redis caching.
@@ -75,14 +73,13 @@ async def create(review: ReviewCreate, user: CurrentUser) -> Review:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-# @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
-@router.patch("/{id}")
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update(
     id: int,
     update_data: ReviewUpdate,
 ) -> Review:
     """
-    Update a review and invalidate cache.
+    Update a review.
     """
     existing = await db.review.find_unique(
         where={"id": id}

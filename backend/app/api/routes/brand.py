@@ -7,7 +7,6 @@ from fastapi import (
 )
 
 from app.core.deps import get_current_user
-from app.core.logging import logger
 from app.models.brand import (
     BrandCreate,
     Brands,
@@ -18,7 +17,6 @@ from app.prisma_client import prisma as db
 from math import ceil
 from app.core.utils import slugify
 from prisma.errors import PrismaError
-# from app.core.decorators import cache
 from prisma.models import Brand
 
 # Create a router for brands
@@ -42,7 +40,6 @@ async def all_brands(query: str = "") -> Optional[list[Brand]]:
 
 
 @router.get("/")
-# @cache(key="brands")
 async def index(
     query: str = "",
     page: int = Query(default=1, gt=0),
@@ -94,7 +91,6 @@ async def create(*, create_data: BrandCreate) -> Brand:
 
 
 @router.get("/{id}")
-# @cache(key="brand", hash=False)
 async def read(id: int):
     """
     Get a specific brand by id with Redis caching.
@@ -109,7 +105,6 @@ async def read(id: int):
 
 
 @router.get("/slug/{slug}")
-# @cache(key="brand", hash=False)
 async def get_by_slug(slug: str) -> Brand:
     """
     Get a brand by its slug.
@@ -133,7 +128,7 @@ async def update(
     update_data: BrandUpdate,
 ) -> Brand:
     """
-    Update a brand and invalidate cache.
+    Update a brand.
     """
     existing = await db.brand.find_unique(
         where={"id": id}

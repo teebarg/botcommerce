@@ -1,13 +1,14 @@
-import { getSiteConfig } from "@lib/config";
+"use client";
+
 import { Facebook, Twitter, WhatsApp } from "nui-react-icons";
 import Link from "next/link";
 import { Instagram } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/apis";
 import { Category } from "@/types/models";
-import ServerError from "@/components/generic/server-error";
 import NewsletterForm from "@/components/store/newsletter";
+import { useStore } from "@/app/store/use-store";
+import { useCategories, useCollections } from "@/lib/hooks/useAdmin";
 
 const about = [
     {
@@ -47,16 +48,12 @@ const legal = [
     },
 ];
 
-export default async function Footer() {
-    const siteConfig = await getSiteConfig();
-    const collectionResponse = await api.collection.all({ limit: 6 });
+export default function Footer() {
+    const { shopSettings } = useStore();
 
-    if (!collectionResponse.data) {
-        return <ServerError />;
-    }
-    const { collections } = collectionResponse.data;
-    const catRes = await api.category.all({ limit: 100 });
-    const { categories: cat } = catRes.data ?? {};
+    const { data: collections } = useCollections();
+
+    const { data: cat } = useCategories();
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (
@@ -65,29 +62,29 @@ export default async function Footer() {
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="space-y-4 md:pr-8">
                         <div className="flex items-center justify-start">
-                            <span className="text-3xl font-semibold">{siteConfig?.name}</span>
+                            <span className="text-3xl font-semibold">{shopSettings?.shop_name}</span>
                         </div>
                         <p className="text-sm text-default-500">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
                         </p>
                         <div className="flex space-x-6">
-                            <Link aria-label="Twitter" href={siteConfig?.links?.facebook}>
+                            <Link aria-label="Twitter" href={shopSettings?.facebook || "#"}>
                                 <Facebook className="text-default-500" size={34} />
                             </Link>
-                            <Link aria-label="Twitter" href={siteConfig?.links?.instagram}>
+                            <Link aria-label="Twitter" href={shopSettings?.instagram || "#"}>
                                 <Instagram className="text-default-500" size={34} />
                             </Link>
-                            <Link aria-label="Twitter" href={siteConfig?.links?.tiktok}>
+                            <Link aria-label="Twitter" href={shopSettings?.tiktok || "#"}>
                                 <WhatsApp className="text-default-500" size={30} />
                             </Link>
-                            <Link aria-label="Twitter" href={siteConfig?.links?.x}>
+                            <Link aria-label="Twitter" href={shopSettings?.x || "#"}>
                                 <Twitter className="text-default-500" size={34} />
                             </Link>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 col-span-2 mt-8 md:mt-0">
-                        {collections?.length > 0 && (
+                        {collections && collections?.length > 0 && (
                             <div className="hidden md:block">
                                 <div>
                                     <h3 className="text-base font-semibold text-default-500">Collections</h3>
@@ -178,7 +175,7 @@ export default async function Footer() {
                 </div>
                 <div className="flex flex-wrap justify-between gap-2 md:pt-8">
                     <p className="text-sm text-default-500">
-                        &copy; {new Date().getFullYear()} {siteConfig?.name}. All rights reserved.
+                        &copy; {new Date().getFullYear()} {shopSettings?.shop_name}. All rights reserved.
                     </p>
                 </div>
             </div>

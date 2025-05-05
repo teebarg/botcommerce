@@ -46,7 +46,6 @@ async def all_collections(query: str = "") -> Optional[list[Collection]]:
 
 
 @router.get("/")
-# @cache(key="collections")
 async def index(
     query: str = "",
     page: int = Query(default=1, gt=0),
@@ -97,7 +96,6 @@ async def create(*, create_data: CollectionCreate) -> Collection:
 
 
 @router.get("/{id}")
-# @cache(key="collection", hash=False)
 async def read(id: int) -> Collection:
     """
     Get a specific collection by id with Redis caching.
@@ -112,7 +110,6 @@ async def read(id: int) -> Collection:
 
 
 @router.get("/slug/{slug}")
-# @cache(key="collection", hash=False)
 async def get_by_slug(slug: str) -> Collection:
     """
     Get a collection by its slug.
@@ -189,7 +186,6 @@ async def export_collections(current_user: CurrentUser):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 @router.get("/autocomplete/")
-# @cache(key="collections")
 async def autocomplete(search: str = "") -> Search:
     """
     Retrieve collections for autocomplete.

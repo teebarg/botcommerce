@@ -28,13 +28,3 @@ export async function mutateCategory(currentState: unknown, formData: FormData) 
 
     return { success: true, message: "Category created successfully", data: response.data };
 }
-
-export async function deleteCategory(id: number) {
-    try {
-        await api.category.delete(id);
-
-        return { success: true, message: "Category deleted successfully" };
-    } catch (error) {
-        return { success: false, message: "Error deleting category" };
-    }
-}

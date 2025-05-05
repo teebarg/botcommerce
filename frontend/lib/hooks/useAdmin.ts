@@ -115,7 +115,7 @@ export const useBrands = (query?: string) => {
 export const useCategories = (query?: string) => {
     return useQuery({
         queryKey: ["categories", query],
-        queryFn: async () => await api.get<Category[]>(`/category/all`, { params: { query: query ?? "" } }),
+        queryFn: async () => await api.get<Category[]>(`/category/`, { params: { query: query ?? "" } }),
     });
 };
 

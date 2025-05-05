@@ -7,10 +7,9 @@ from app.core.deps import (
     get_current_superuser
 )
 from app.models.order import OrderResponse
-from app.models.wishlist import Wishlist, Wishlists
+from app.models.wishlist import Wishlist, Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.models.user import UserUpdateMe, UserUpdate
-from app.models.wishlist import WishlistCreate
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from prisma.enums import Role, Status
@@ -22,7 +21,6 @@ router = APIRouter()
 
 
 @router.get("/me")
-# @cache(key="user", hash=False)
 async def read_user_me(
     user: CurrentUser
 ):
@@ -31,7 +29,6 @@ async def read_user_me(
 
 
 @router.get("/")
-# @cache(key="collections")
 async def index(
     query: str = "",
     role: Optional[Role] = None,
@@ -82,7 +79,7 @@ async def update(
     update_data: UserUpdate,
 ) -> User:
     """
-    Update a user and invalidate cache.
+    Update a user.
     """
     existing = await db.user.find_unique(
         where={"id": id}
@@ -165,7 +162,6 @@ async def update_user_me(
 
 
 @router.get("/wishlist")
-# @cache(key="wishlist", hash=False)
 async def read_wishlist(
     user: CurrentUser
 ) -> Wishlists:

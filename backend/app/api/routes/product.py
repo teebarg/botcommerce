@@ -56,7 +56,6 @@ router = APIRouter()
 
 
 @router.get("/landing-products")
-@cache(key="featured")
 async def get_landing_products():
     """
     Retrieve multiple product categories in a single request.
@@ -166,7 +165,6 @@ async def index(
 
 
 @router.get("/search")
-@cache(key="search")
 async def search(
     search: str = "",
     sort: str = "created_at:desc",
@@ -299,7 +297,7 @@ async def create_product(product: ProductCreate, cache: CacheService):
         product_data = prepare_product_data_for_indexing(created_product)
 
         add_documents_to_index(index_name="products", documents=[product_data])
-        cache.invalidate("search")
+        # cache.invalidate("search")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
     # return product
@@ -451,8 +449,8 @@ async def update_product(id: int, product: ProductUpdate, cache: CacheService, b
             product_data = prepare_product_data_for_indexing(updated_product)
 
             update_document(index_name="products", document=product_data)
-            cache.invalidate("featured")
-            cache.invalidate("search")
+            # cache.invalidate("featured")
+            # cache.invalidate("search")
 
         background_tasks.add_task(update_task)
         return updated_product
@@ -853,7 +851,7 @@ async def index_products(products, cache: CacheService):
         add_documents_to_index(index_name="products", documents=documents)
 
         # Clear all product-related cache
-        cache.invalidate("search")
+        # cache.invalidate("search")
         # cache.invalidate("products")
 
         logger.info(f"Reindexed {len(documents)} products successfully.")

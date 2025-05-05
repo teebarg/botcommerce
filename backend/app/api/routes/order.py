@@ -32,7 +32,6 @@ async def create_order(
     return await order_service.create_order(order_in, user.id, cartId, background_tasks)
 
 @router.get("/{order_id}", response_model=OrderResponse)
-@cache(key="order")
 async def get_order(
     order_id: str,
     order_service: OrderService = Depends(get_order_service)
@@ -89,7 +88,7 @@ async def update_order(order_id: int, order_update: OrderUpdate, cache: CacheSer
         data=update_data,
         include={"order_items": True}
     )
-    cache.invalidate("order")
+    # cache.invalidate("order")
     return updated_order
 
 @router.delete("/{order_id}")

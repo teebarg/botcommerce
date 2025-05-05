@@ -3,18 +3,17 @@ import React from "react";
 import { Location, Mail } from "nui-react-icons";
 import { getSiteConfig, openingHours } from "@lib/config";
 import Image from "next/image";
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import { api as baseApi } from "@/apis/base";
-import { Category, ProductSearch, WishItem } from "@/types/models";
+import { ProductSearch, WishItem } from "@/types/models";
 import { auth } from "@/actions/auth";
 import ProductCard from "@/components/store/products/product-card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import ContactForm from "@/components/store/contact-form";
+import CategoriesSection from "@/components/store/landing/category-section";
 
 // Mock banners
 const banners = [
@@ -58,9 +57,6 @@ export default async function Home() {
         "/product/landing-products",
         { next: { tags: ["featured"] } }
     );
-    const [catRes] = await Promise.all([api.category.all({ limit: 4 })]);
-
-    const { categories } = catRes.data ?? {};
 
     let wishlist: WishItem[] = [];
 
@@ -103,30 +99,7 @@ export default async function Home() {
                 </section>
 
                 {/* Category Sections */}
-                <section className="pt-6 md:pt-10">
-                    <div className="container mx-auto px-4">
-                        <h2 className="text-2xl font-bold text-commerce-primary mb-4 text-center">Shop by Category</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {categories?.map((category: Category, idx: number) => (
-                                <Link key={idx} className="group" href={`collections?cat_ids=${category.slug}`}>
-                                    <div className="relative h-48 rounded-lg overflow-hidden">
-                                        <img
-                                            alt={category.name}
-                                            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
-                                            src={category.image}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                                            <div className="w-full flex items-center justify-between">
-                                                <h3 className="text-xl font-semibold text-white">{category.name}</h3>
-                                                <ChevronRight className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
+                <CategoriesSection />
                 <PromotionalBanner
                     btnClass="text-purple-600"
                     outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"

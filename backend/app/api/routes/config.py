@@ -2,7 +2,6 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
-from app.core.decorators import cache
 from app.models.config import (
     SiteConfig,
     SiteConfigCreate,
@@ -18,17 +17,14 @@ router = APIRouter()
 
 
 @router.get("/site-config", response_model=dict[str, str])
-@cache(key="configs")  # Cache for 24hrs
 async def site_config() -> Any:
     """
     Retrieve site configuration.
     """
-    configs = await db.siteconfig.find_many()
-    return configs
+    return await db.siteconfig.find_many()
 
 
 @router.get("/")
-# @cache(key="configs")  # Cache for 24hrs
 async def index(
     skip: int = 0, limit: int = 20
 ) -> SiteConfigs:
@@ -51,7 +47,6 @@ async def index(
 
 
 @router.get("/{id}")
-# @cache(key="config")  # Cache for 24hrs
 async def read(id: int) -> SiteConfig:
     """
     Get a specific config by id with Redis caching.

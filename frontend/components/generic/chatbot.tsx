@@ -168,7 +168,9 @@ const ChatBot: React.FC<Props> = () => {
                     {/* Messages Container */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {/* Date */}
-                        <p className={cn("text-sm my-3 mx-0 text-center uppercase min-h-4 leading-6 font-medium")}>{formatDate(new Date())}</p>
+                        <p className={cn("text-sm my-3 mx-0 text-center uppercase min-h-4 leading-6 font-medium text-white")}>
+                            {formatDate(new Date())}
+                        </p>
                         {messages.map((message: Message, index: number) => (
                             <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
                                 <div

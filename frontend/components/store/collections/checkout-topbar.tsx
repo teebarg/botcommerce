@@ -35,7 +35,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
     return (
         <React.Fragment>
             <header className="relative z-20 flex flex-col sm:gap-2 rounded-xl px-1">
-                <div className="flex items-center justify-between gap-2 ">
+                <div className="flex items-center justify-between gap-2 bg-background">
                     <div className="flex flex-row gap-2">
                         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
                             <DrawerTrigger asChild>
