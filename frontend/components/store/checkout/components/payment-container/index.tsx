@@ -18,7 +18,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, sel
         <RadioGroup.Option
             key={paymentSession.id}
             className={`relative p-4 border rounded-lg cursor-pointer transition-all max-w-md ${
-                isSelected ? "border-indigo-600" : "border-gray-200 hover:border-gray-300"
+                isSelected ? "border-indigo-600" : "border-default-200 hover:border-default-300"
             }`}
             value={paymentSession.provider_id}
         >
@@ -33,7 +33,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, sel
                 <div className="absolute right-4 top-4">
                     <div
                         className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                            isSelected ? "border-indigo-600 bg-indigo-600" : "border-gray-300"
+                            isSelected ? "border-indigo-600 bg-indigo-600" : "border-default-300"
                         }`}
                     >
                         {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}

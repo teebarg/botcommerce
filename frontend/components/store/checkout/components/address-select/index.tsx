@@ -63,8 +63,8 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
         <motion.div
             key={address.id}
             animate={{ opacity: 1, y: 0 }}
-            className={`relative cursor-pointer group ${
-                selectedAddress?.id === address.id ? "bg-content2 border-1 border-primary" : "hover:bg-content2"
+            className={`relative cursor-pointer focus-visible:outline-none group border ${
+                selectedAddress?.id === address.id ? "bg-content1 border-primary" : "border-default-200"
             } rounded-xl p-4 transition-all`}
             exit={{ opacity: 0, y: -20 }}
             initial={{ opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
         >
             <div className="flex items-start space-x-4" onClick={() => handleSelect(address.id!)}>
                 <div className="flex-shrink-0">
-                    <Home className={`w-6 h-6 ${selectedAddress?.id === address.id ? "text-blue-500" : "text-gray-400"}`} />
+                    <Home className={`w-6 h-6 ${selectedAddress?.id === address.id ? "text-blue-500" : "text-default-500"}`} />
                 </div>
                 <div className="flex-grow">
                     <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
                 </div>
             </div>
             {loading && (
-                <div className="absolute inset-0 bg-gray-200 bg-opacity-50 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-content1 opacity-25">
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
                 </div>
             )}
@@ -230,12 +230,12 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
 
     return (
         <div className="w-auto overflow-hidden bg-content1">
-            <div className="border-b border-gray-100">
+            <div className="border-b border-default-300 pb-6">
                 {(filteredAddresses.length > 0 || searchQuery) && (
                     <div className="relative mb-6">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-default-500 w-5 h-5" />
                         <input
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-default-500 outline-none transition-all"
                             placeholder="Search addresses..."
                             type="text"
                             value={searchQuery}

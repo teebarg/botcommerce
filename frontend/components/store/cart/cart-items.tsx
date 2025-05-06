@@ -42,7 +42,7 @@ const CartClient = ({ className }: ItemsTemplateProps) => {
                         <div>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-default-500">{item.quantity}x</span>
-                                <span className="text-sm text-default-900">
+                                <span className="text-sm">
                                     <LineItemUnitPrice item={item} style="tight" />
                                 </span>
                             </div>

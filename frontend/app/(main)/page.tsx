@@ -206,7 +206,7 @@ export default async function Home() {
                 </div>
                 <div>
                     <div className="max-w-7xl mx-auto py-6">
-                        <p className="text-lg font-semibold text-gray-800 mb-2 ml-2 sm:ml-0">OUR LOCATION</p>
+                        <p className="text-lg font-semibold text-default-800 mb-2 ml-2 sm:ml-0">OUR LOCATION</p>
                         <iframe
                             allowFullScreen={true}
                             height="500"

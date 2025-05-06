@@ -48,7 +48,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-200 pt-3">
+                <div className="border-t border-default-300 pt-3">
                     <p className="text-sm font-medium text-default-900 mb-1">Important Information:</p>
                     <ul className="text-xs text-default-500 space-y-1">
                         <li>• Please bring your order confirmation email</li>

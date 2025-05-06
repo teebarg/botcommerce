@@ -15,10 +15,13 @@ import DrawerUI from "@/components/drawer";
 import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 export function ProductInventory() {
     const addState = useOverlayTriggerState({});
     const [isExporting, setIsExporting] = useState<boolean>(false);
+    const [isIndexing, setIsIndexing] = useState<boolean>(false);
+    const invalidate = useInvalidate();
 
     const handleExport = async () => {
         setIsExporting(true);
@@ -33,6 +36,23 @@ export function ProductInventory() {
 
         toast.success("Products exported successfully");
         setIsExporting(false);
+    };
+
+    const handleIndex = async () => {
+        setIsIndexing(true);
+        const { error } = await api.product.reIndex();
+
+        if (error) {
+            toast.error(error);
+            setIsIndexing(false);
+
+            return;
+        }
+        invalidate("products");
+        invalidate("product-search");
+
+        toast.success("Products indexed successfully");
+        setIsIndexing(false);
     };
 
     return (
@@ -62,6 +82,9 @@ export function ProductInventory() {
                             </DrawerUI>
                             <Button disabled={isExporting} isLoading={isExporting} variant="outline" onClick={handleExport}>
                                 <Download className="mr-2 h-4 w-4" /> Export Products
+                            </Button>
+                            <Button disabled={isIndexing} isLoading={isIndexing} variant="outline" onClick={handleIndex}>
+                                Index
                             </Button>
                         </div>
                         <ProductDetails />

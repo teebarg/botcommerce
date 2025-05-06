@@ -1,7 +1,7 @@
 import { api } from "./base";
 
-import { Message, PaginatedProduct, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/types/models";
-import { revalidate } from "@/actions/revalidate";
+import { Message, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/types/models";
+import { revalidate as revalidateAction } from "@/actions/revalidate";
 import { ApiResult } from "@/lib/try-catch";
 
 interface SearchParams {
@@ -17,9 +17,6 @@ interface SearchParams {
 
 // Product API methods
 export const productApi = {
-    async all(searchParams: SearchParams): ApiResult<PaginatedProduct> {
-        return await api.get<PaginatedProduct>("/product/", { next: { tags: ["products"] }, cache: "default", params: { ...searchParams } });
-    },
     async search(searchParams: SearchParams): ApiResult<PaginatedProductSearch> {
         return await api.get<PaginatedProductSearch>("/product/search", { next: { tags: ["search"] }, params: { ...searchParams } });
     },
@@ -33,9 +30,7 @@ export const productApi = {
         const response = await api.put<Product>(`/product/${id}`, input);
 
         if (!response.error) {
-            revalidate("products");
-            revalidate("product");
-            revalidate("search");
+            productApi.revalidate();
         }
 
         return response;
@@ -44,9 +39,7 @@ export const productApi = {
         const response = await api.delete<Message>(`/product/${id}`);
 
         if (!response.error) {
-            revalidate("products");
-            revalidate("product");
-            revalidate("search");
+            productApi.revalidate();
         }
 
         return response;
@@ -67,27 +60,34 @@ export const productApi = {
         const response = await api.patch<Message>(`/product/${id}/image`, data);
 
         if (!response.error) {
-            revalidate("products");
-            revalidate("search");
+            productApi.revalidate();
         }
 
         return response;
     },
     async deleteImage(id: number): ApiResult<Message> {
-        return await api.delete<Message>(`/product/${id}/image`);
-    },
-    async uploadImages({ id, data }: { id: number; data: any }): ApiResult<Message> {
-        return await api.post<Message>(`/product/${id}/images`, data);
-    },
-    async deleteImages(id: number, imageId: number): ApiResult<Message> {
-        return await api.delete<Message>(`/product/${id}/images/${imageId}`);
-    },
-    async bulkUpload(formData: FormData): ApiResult<Message> {
-        const response = await api.post<Message>("/product/upload-products", formData);
+        const response = await api.delete<Message>(`/product/${id}/image`);
 
         if (!response.error) {
-            revalidate("products");
-            revalidate("search");
+            productApi.revalidate();
+        }
+
+        return response;
+    },
+    async uploadImages({ id, data }: { id: number; data: any }): ApiResult<Message> {
+        const response = await api.post<Message>(`/product/${id}/images`, data);
+
+        if (!response.error) {
+            productApi.revalidate();
+        }
+
+        return response;
+    },
+    async deleteImages(id: number, imageId: number): ApiResult<Message> {
+        const response = await api.delete<Message>(`/product/${id}/images/${imageId}`);
+
+        if (!response.error) {
+            productApi.revalidate();
         }
 
         return response;
@@ -96,8 +96,7 @@ export const productApi = {
         const response = await api.post<Message>(`/product/reindex`);
 
         if (!response.error) {
-            revalidate("products");
-            revalidate("search");
+            productApi.revalidate();
         }
 
         return response;
@@ -131,10 +130,13 @@ export const productApi = {
         const response = await api.delete<Message>(`/product/variants/${id}`);
 
         if (!response.error) {
-            revalidate("products");
-            revalidate("search");
+            productApi.revalidate();
         }
 
         return response;
+    },
+    async revalidate(): Promise<void> {
+        revalidateAction("product");
+        revalidateAction("search");
     },
 };

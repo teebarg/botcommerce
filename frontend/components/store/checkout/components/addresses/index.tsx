@@ -28,7 +28,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                         <MapPin className="w-5 h-5 text-blue-500" />
                     </div>
                 </div>
-                <Skeleton className="h-36" />
+                <Skeleton className="h-48" />
             </div>
         );
 

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { bulkUpload } from "@/modules/account/actions";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useWebSocket } from "@/providers/websocket";
+import { api } from "@/apis";
 
 interface ProductUploadProps {}
 
@@ -21,7 +22,9 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
         if (currentMessage.status === "completed") {
             setIsUploading(false);
             toast.success("Products uploaded successfully");
+            void api.product.revalidate();
             invalidate("products");
+            invalidate("product-search");
         }
     }, [currentMessage]);
 
@@ -62,12 +65,12 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
-                    ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"}`}
+                    ${isDragActive ? "border-blue-500 bg-blue-50" : "border-default-300 hover:border-default-400"}`}
             >
                 <input {...getInputProps()} />
                 <div className="flex flex-col items-center gap-2">
                     <Upload className="w-8 h-8 text-default-500" />
-                    <p className="text-default-900">{isDragActive ? "Drop the images here" : "Drag & drop images or click to upload"}</p>
+                    <p className="text-default-900">{isDragActive ? "Drop the file here" : "Drag & drop file or click to upload"}</p>
                     <p className="text-sm text-default-500">(Max 5MB, XLSX/CSV only)</p>
                     {/* Upload progress */}
                     {(isUploading || currentMessage?.processed_rows < currentMessage?.total_rows) && (

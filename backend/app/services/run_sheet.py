@@ -375,6 +375,11 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
                 if isinstance(is_active, str):
                     is_active = True if active == "TRUE" else False
 
+                image = row_data.get("image")
+                image = f"{image}|" if image else ""
+                images = row_data.get("images", "")
+                images = f"{images}" if images else ""
+
                 product_data = {
                     "id": row_data.get("id", ""),
                     "name": name,
@@ -390,7 +395,7 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
                     "categories": row_data.get("categories", ""),
                     "collections": row_data.get("collections", ""),
                     "brand": row_data.get("brand", ""),
-                    "images": row_data.get("images", ""),
+                    "images": image + images,
                 }
 
                 products.append(product_data)

@@ -124,7 +124,7 @@ async def index(
     limit: int = Query(default=20, le=100),
 ) -> Products:
     """
-    Retrieve products with Redis caching.
+    Retrieve products.
     """
     where_clause = None
     if brand:

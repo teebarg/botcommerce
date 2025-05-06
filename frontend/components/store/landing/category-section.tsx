@@ -20,7 +20,7 @@ const CategoriesSection: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {categories?.slice(0, 4)?.map((category: Category, idx: number) => (
                             <Link key={idx} className="group" href={`collections?cat_ids=${category.slug}`}>
-                                <div className="relative h-48 rounded-lg overflow-hidden">
+                                <div className="relative h-28 md:h-40 rounded-lg overflow-hidden">
                                     <img
                                         alt={category.name}
                                         className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
@@ -28,8 +28,8 @@ const CategoriesSection: React.FC = () => {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent flex items-end p-4">
                                         <div className="w-full flex items-center justify-between">
-                                            <h3 className="text-xl font-semibold text-white">{category.name}</h3>
-                                            <ChevronRight className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <h3 className="text-xl font-semibold text-gray-700">{category.name}</h3>
+                                            <ChevronRight className="h-5 w-5 text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </div>
                                     </div>
                                 </div>

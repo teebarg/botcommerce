@@ -109,10 +109,10 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                         <RadioGroup.Option
                             key={option.id}
                             className={cn(
-                                `flex items-center justify-between px-4 py-4 md:px-3 rounded-lg border-2 cursor-pointer transition-all ${
+                                `flex items-center justify-between px-4 py-4 md:px-3 rounded-lg border cursor-pointer transition-all ${
                                     option.id === cart.shipping_method
                                         ? "border-blue-500 bg-transparent"
-                                        : "border-default-300 hover:border-default-400"
+                                        : "border-default-200 hover:border-default-300"
                                 }`
                                 // option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
                             )}

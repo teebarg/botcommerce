@@ -256,14 +256,11 @@ export async function bulkUpload(formData: FormData) {
             headers: { "X-Auth": accessToken ?? "" },
         });
 
-        if (response.ok) {
-            revalidateTag("products");
-            revalidateTag("search");
-
-            return { success: true, message: "Products uploaded successfully" };
-        } else {
-            return { success: false, message: "Failed to upload products" };
+        if (!response.ok) {
+            throw new Error("Failed to upload products");
         }
+
+        return { success: true, message: "Products upload started" };
     } catch (error: any) {
         return { success: false, error: error.toString() };
     }

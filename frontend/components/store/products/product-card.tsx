@@ -28,7 +28,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
     const invalidate = useInvalidate();
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
-    const { id, slug, name, price, old_price, image, variants, status } = product;
+    const { id, slug, name, price, old_price, image, images, variants, status } = product;
     // const discountedPrice = old_price ? price - (price * (old_price - price)) / 100 : price;
 
     // const discount = old_price ? Math.round((1 - price / old_price) * 100) : 0;
@@ -101,7 +101,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
         >
             <div className="flex flex-col gap-2 w-full">
                 <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
-                    {image && <Image fill alt={name} className="object-cover h-full w-full group-hover:scale-110 transition p-4" src={image} />}
+                    <Image
+                        fill
+                        alt={name}
+                        className="object-cover h-full w-full group-hover:scale-110 transition p-4"
+                        src={images?.[0] || image || "/placeholder.jpg"}
+                    />
                     {showWishlist && (
                         <Button
                             className={cn(
@@ -144,7 +149,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                     ) : (
                         <>
                             <ShoppingCart className="w-4 h-4" />
-                            <span>Add</span>
+                            <span>Add to cart</span>
                         </>
                     )}
                 </Button>
