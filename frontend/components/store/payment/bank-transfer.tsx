@@ -41,16 +41,16 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
         <div className="space-y-4">
             <div className="bg-content1 p-4 rounded-lg space-y-3">
                 <div>
-                    <p className="text-sm font-medium text-default-700">Bank Name</p>
-                    <p className="text-sm text-default-600">{bankDetails?.[0]?.bank_name}</p>
+                    <p className="text-sm font-medium text-default-500">Bank Name</p>
+                    <p className="text-sm text-default-900">{bankDetails?.[0]?.bank_name}</p>
                 </div>
                 <div>
-                    <p className="text-sm font-medium text-default-700">Account Number</p>
-                    <p className="text-sm text-default-600">{bankDetails?.[0]?.account_number}</p>
+                    <p className="text-sm font-medium text-default-500">Account Number</p>
+                    <p className="text-sm text-default-900">{bankDetails?.[0]?.account_number}</p>
                 </div>
                 <div>
-                    <p className="text-sm font-medium text-default-700">Account Name</p>
-                    <p className="text-sm text-default-600">{bankDetails?.[0]?.account_name}</p>
+                    <p className="text-sm font-medium text-default-500">Account Name</p>
+                    <p className="text-sm text-default-900">{bankDetails?.[0]?.account_name}</p>
                 </div>
                 <p className="text-xs text-default-500 mt-2">Please use your order number as reference when making the transfer.</p>
             </div>

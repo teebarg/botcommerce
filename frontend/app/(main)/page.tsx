@@ -172,8 +172,8 @@ export default async function Home() {
                     <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
                         <div className="sm:w-1/2 sm:pr-10 p-4 sm:p-8 rounded-lg">
                             <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
-                            <p className="text-xl font-medium text-default-800">Reach out to us for more information</p>
-                            <p className="font-semibold text-default-600">
+                            <p className="text-xl font-medium text-default-900">Reach out to us for more information</p>
+                            <p className="font-semibold text-default-500">
                                 For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have about
                                 our products and services.
                             </p>

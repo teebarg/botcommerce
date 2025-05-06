@@ -25,7 +25,7 @@ module.exports = {
             },
             borderColor: {
                 divider: "hsl(var(--divider))",
-                content1: "hsl(var(--content1))",
+                content1: "var(--content1)",
             },
             borderRadius: {
                 50: "50%",
@@ -60,7 +60,20 @@ module.exports = {
                 foreground: {
                     DEFAULT: "hsl(var(--foreground))",
                 },
-                default: generateColorScale("default"),
+                default: {
+                    DEFAULT: "hsl(var(--default))",
+                    foreground: "hsl(var(--default-foreground))",
+                    50: "hsl(var(--default-50))",
+                    100: "hsl(var(--default-100))",
+                    200: "hsl(var(--default-200))",
+                    300: "hsl(var(--default-300))",
+                    400: "hsl(var(--default-400))",
+                    500: "hsl(var(--default-500))",
+                    600: "hsl(var(--default-600))",
+                    700: "hsl(var(--default-700))",
+                    800: "hsl(var(--default-800))",
+                    900: "hsl(var(--default-900))",
+                },
                 danger: generateColorScale("danger"),
                 success: generateColorScale("success"), // Add other color names as needed
                 warning: generateColorScale("warning"),

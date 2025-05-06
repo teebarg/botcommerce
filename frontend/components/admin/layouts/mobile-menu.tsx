@@ -41,14 +41,14 @@ const AdminMobileMenu: React.FC = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="p-4 border-b">
+            <div className="p-4 border-b border-content2">
                 <div className="relative">
                     <input
-                        className="w-full py-2 pl-8 pr-4 bg-gray-100 rounded-lg text-sm focus:outline-none border"
+                        className="w-full py-2 pl-8 pr-4 bg-content1 rounded-lg text-sm focus:outline-none border"
                         placeholder="Search..."
                         type="text"
                     />
-                    <Search className="absolute left-2 top-2.5 text-gray-400" size={16} />
+                    <Search className="absolute left-2 top-2.5 text-default-500" size={16} />
                 </div>
             </div>
 
@@ -57,22 +57,22 @@ const AdminMobileMenu: React.FC = () => {
                 {menuItems.map((item) => (
                     <Link
                         key={item.id}
-                        className={`flex items-center justify-between w-full p-3 text-left hover:bg-gray-100 transition-colors ${
-                            pathname === item.href ? "text-blue-600 bg-blue-50" : ""
+                        className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
+                            pathname === item.href ? "text-blue-600 bg-background" : ""
                         }`}
                         href={item.href}
                     >
                         <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-blue-600" : "text-gray-500"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-blue-600" : "text-default-500"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
-                        <ChevronRight className={pathname === item.href ? "text-blue-600" : "text-gray-400"} size={16} />
+                        <ChevronRight className={pathname === item.href ? "text-blue-600" : "text-default-500"} size={16} />
                     </Link>
                 ))}
             </nav>
 
             {/* Logout Button */}
-            <div className="p-4 border-t">
+            <div className="p-4 border-t border-content2">
                 <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
                     <LogOut size={20} />
                     <span>Logout</span>

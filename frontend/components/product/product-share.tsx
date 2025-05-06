@@ -38,7 +38,7 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
             <div className="absolute right-0 mt-2 w-48 bg-content1 rounded-lg shadow-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                 <div className="space-y-2">
                     <button
-                        className="flex items-center w-full px-4 py-2 text-default-700 hover:bg-default-50 rounded-lg transition-colors"
+                        className="flex items-center w-full px-4 py-2 text-default-500 hover:bg-default-50 rounded-lg transition-colors"
                         onClick={() => handleShare("facebook")}
                     >
                         <Facebook className="w-5 h-5 mr-3 text-blue-600" />
@@ -46,7 +46,7 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
                     </button>
 
                     <button
-                        className="flex items-center w-full px-4 py-2 text-default-700 hover:bg-default-50 rounded-lg transition-colors"
+                        className="flex items-center w-full px-4 py-2 text-default-500 hover:bg-default-50 rounded-lg transition-colors"
                         onClick={() => handleShare("twitter")}
                     >
                         <Twitter className="w-5 h-5 mr-3 text-blue-400" />
@@ -54,7 +54,7 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
                     </button>
 
                     <button
-                        className="flex items-center w-full px-4 py-2 text-default-700 hover:bg-default-50 rounded-lg transition-colors"
+                        className="flex items-center w-full px-4 py-2 text-default-500 hover:bg-default-50 rounded-lg transition-colors"
                         onClick={() => handleShare("linkedin")}
                     >
                         <Linkedin className="w-5 h-5 mr-3 text-blue-700" />
@@ -64,10 +64,10 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
                     <hr className="my-2 border-gray-200" />
 
                     <button
-                        className="flex items-center w-full px-4 py-2 text-default-700 hover:bg-default-50 rounded-lg transition-colors"
+                        className="flex items-center w-full px-4 py-2 text-default-500 hover:bg-default-50 rounded-lg transition-colors"
                         onClick={copyToClipboard}
                     >
-                        <Link2 className="w-5 h-5 mr-3 text-default-600" />
+                        <Link2 className="w-5 h-5 mr-3 text-default-500" />
                         <span>Copy Link</span>
                     </button>
                 </div>

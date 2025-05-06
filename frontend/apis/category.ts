@@ -1,56 +1,23 @@
-import { fetcher } from "./fetcher";
+import { api } from "./base";
 
 import { Category, Message } from "@/types/models";
-import { revalidate } from "@/actions/revalidate";
-import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { ApiResult } from "@/lib/try-catch";
 
 // Product API methods
 export const categoryApi = {
-    async get(id: string): ApiResult<Category> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
-
-        return await tryCatch<Category>(fetcher(url));
-    },
     async create(input: any): ApiResult<Category> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/`;
-
-        return await tryCatch<Category>(fetcher(url, { method: "POST", body: JSON.stringify(input) }));
+        return await api.post<Category>("/category", input);
     },
     async update(id: number, input: any): ApiResult<Category> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
-
-        return await tryCatch<Category>(fetcher(url, { method: "PATCH", body: JSON.stringify(input) }));
+        return await api.patch<Category>(`/category/${id}`, input);
     },
     async delete(id: number): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}`;
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("categories");
-        }
-
-        return response;
+        return await api.delete<Message>(`/category/${id}`);
     },
     async uploadImage({ id, data }: { id: number; data: any }): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}/image`;
-
-        const response = await tryCatch<Message>(fetcher(url, { method: "PATCH", body: JSON.stringify(data) }));
-
-        if (!response.error) {
-            revalidate("categories");
-        }
-
-        return response;
+        return await api.patch<Message>(`/category/${id}/image`, data);
     },
     async deleteImage(id: number): ApiResult<Message> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/category/${id}/image`;
-
-        const response = await tryCatch<Message>(fetcher(url, { method: "DELETE" }));
-
-        if (!response.error) {
-            revalidate("categories");
-        }
-
-        return response;
+        return await api.delete<Message>(`/category/${id}/image`);
     },
 };

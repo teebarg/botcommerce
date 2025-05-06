@@ -40,7 +40,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
         <div className="space-y-4">
             {/* Details based on selected method */}
             <div className="bg-content1 p-4 rounded-lg">
-                <p className="text-sm text-default-700 mb-2">{`You'll be redirected to Paystack to complete your payment securely.`}</p>
+                <p className="text-sm text-default-500 mb-2">{`You'll be redirected to Paystack to complete your payment securely.`}</p>
                 <div className="flex items-center">
                     <div className="w-8 h-8 bg-content2 rounded-full flex items-center justify-center mr-2">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24">

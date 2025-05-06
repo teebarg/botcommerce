@@ -40,7 +40,7 @@ const AdminNavbar = async () => {
                 </NavbarItem>
                 <NavbarItem className="flex">
                     {user ? (
-                        <UserDropDown size="sm" user={user} />
+                        <UserDropDown user={user} />
                     ) : (
                         <LocalizedClientLink href="/sign-in">
                             Log In <span aria-hidden="true">&rarr;</span>

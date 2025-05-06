@@ -80,7 +80,7 @@ export default function VerifyMagicLink() {
                         </div>
                         <div className="mb-6">
                             <h3 className="text-xl font-semibold mb-3 text-default-800">Verifying your magic link</h3>
-                            <p className="text-default-600 text-base">Please wait while we authenticate your session...</p>
+                            <p className="text-default-500 text-base">Please wait while we authenticate your session...</p>
                             <div className="flex justify-center my-4">
                                 <div className="mx-1 w-2 h-2 bg-default-200 rounded-full animate-bounce" />
                                 <div className="mx-1 w-2 h-2 bg-default-200 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
@@ -110,8 +110,8 @@ export default function VerifyMagicLink() {
                         </div>
                         <div className="mb-6">
                             <h3 className="text-xl font-semibold mb-3 text-default-800">Successfully Authenticated!</h3>
-                            <p className="text-default-600 text-base mb-2">{`You're now securely logged in to your account.`}</p>
-                            <p className="text-default-600 text-base">{`You'll be redirected to your dashboard in a moment...`}</p>
+                            <p className="text-default-500 text-base mb-2">{`You're now securely logged in to your account.`}</p>
+                            <p className="text-default-500 text-base">{`You'll be redirected to your dashboard in a moment...`}</p>
                         </div>
                         <Button
                             className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-8 rounded-lg transition-all duration-200 transform hover:-translate-y-1 active:translate-y-0 animate-pulse"

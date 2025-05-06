@@ -46,7 +46,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
                 </div>
 
                 <h3 className="text-xl font-bold mb-2">No Reviews Yet</h3>
-                <p className="text-default-600 mb-6 max-w-sm">
+                <p className="text-default-500 mb-6 max-w-sm">
                     Be the first to share your experience with this product and help others make informed decisions!
                 </p>
                 {product_id && <ReviewForm product_id={product_id} />}
@@ -88,7 +88,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
                         ))}
                     </div>
                 </div>
-                <span className="text-sm text-default-600">{totalReviews} reviews</span>
+                <span className="text-sm text-default-500">{totalReviews} reviews</span>
             </div>
 
             <div className="space-y-1">
@@ -96,7 +96,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
                     <div key={index} className="flex items-center">
                         <span className="mr-2 text-sm w-6">{rating.stars}★</span>
                         <Progress className="flex-1 h-2" value={rating.percentage} />
-                        <span className="ml-2 text-sm text-default-600 w-10">{rating.percentage}%</span>
+                        <span className="ml-2 text-sm text-default-500 w-10">{rating.percentage}%</span>
                     </div>
                 ))}
             </div>
@@ -120,7 +120,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
                 </div>
             </div>
 
-            <p className="text-sm text-default-700 mb-2">{review.comment}</p>
+            <p className="text-sm text-default-500 mb-2">{review.comment}</p>
         </div>
     );
 

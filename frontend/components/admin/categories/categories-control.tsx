@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Edit, Plus, Trash2 } from "lucide-react";
 
@@ -26,7 +25,6 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
     const editState = useOverlayTriggerState({});
     const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
-    const router = useRouter();
 
     const onConfirmDelete = async () => {
         if (!category) {
@@ -43,7 +41,6 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
         }
 
         invalidate("categories");
-        router.refresh();
         setIsPending(false);
         deleteState.close();
     };
@@ -66,7 +63,7 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                         </DrawerContent>
                     </Drawer>
                 )}
-                <DrawerUI open={editState.isOpen} title="Edit Brand" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
+                <DrawerUI open={editState.isOpen} title="Edit Category" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
                     <div className="max-w-2xl">
                         <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
                     </div>

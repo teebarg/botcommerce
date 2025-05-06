@@ -42,15 +42,15 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                 <div className="flex items-start mb-3">
                     <MapPin className="text-indigo-600 w-5 h-5 mt-0.5 flex-shrink-0" />
                     <div className="ml-2">
-                        <p className="text-sm font-medium text-default-700">Collection Point</p>
-                        <p className="text-sm text-default-600">{shopSettings?.address}</p>
-                        <p className="text-sm text-default-600">Open Mon-Sat: 9am - 6pm</p>
+                        <p className="text-sm font-medium text-default-900">Collection Point</p>
+                        <p className="text-sm text-default-500">{shopSettings?.address}</p>
+                        <p className="text-sm text-default-500">Open Mon-Sat: 9am - 6pm</p>
                     </div>
                 </div>
 
                 <div className="border-t border-gray-200 pt-3">
-                    <p className="text-sm font-medium text-default-700 mb-1">Important Information:</p>
-                    <ul className="text-xs text-default-600 space-y-1">
+                    <p className="text-sm font-medium text-default-900 mb-1">Important Information:</p>
+                    <ul className="text-xs text-default-500 space-y-1">
                         <li>• Please bring your order confirmation email</li>
                         <li>• You can pay with cash or card at collection</li>
                         <li>• Orders are held for 7 days before being returned to stock</li>

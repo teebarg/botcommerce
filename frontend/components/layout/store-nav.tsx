@@ -53,7 +53,7 @@ const StoreNavbar = async () => {
                     </div>
                     <div className="hidden sm:flex">
                         {user ? (
-                            <UserDropDown size="sm" user={user} />
+                            <UserDropDown user={user} />
                         ) : (
                             <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
                                 Log In <span aria-hidden="true">&rarr;</span>

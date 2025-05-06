@@ -15,9 +15,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/util/cn";
 
-export default function UserDropDown({ user, size = "lg" }: { user: Session; size?: "sm" | "lg" }) {
+export default function UserDropDown({ user }: { user: Session }) {
     const handleLogout = async () => {
         await api.auth.logOut();
         window.location.href = "/";
@@ -51,38 +50,28 @@ export default function UserDropDown({ user, size = "lg" }: { user: Session; siz
     ];
 
     return (
-        <React.Fragment>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <div className="flex gap-2 w-full">
-                        <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-default">
-                            <Image fill alt="avatar" src={user?.image || ProfileAvatar} />
-                        </span>
-                        <div className="inline-flex flex-1 justify-between">
-                            <div className="inline-flex flex-col items-start justify-center">
-                                <span className="text-sm text-default-900">{user?.last_name}</span>
-                                <span className={cn("text-xs text-default-500 text-ellipsis overflow-hidden", size === "sm" && "max-w-12")}>
-                                    {user?.email}
-                                </span>
-                            </div>
-                        </div>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-default">
+                    <Image fill alt="avatar" src={user?.image || ProfileAvatar} />
+                </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                    <div key="user" className="flex gap-2">
+                        <p className="font-semibold">Signed in as</p>
+                        <p className="font-semibold">
+                            @{user?.first_name} {user?.last_name}
+                        </p>
                     </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>
-                        <div key="user" className="gap-2 flex min-w-[15rem]">
-                            <p className="font-bold">Signed in as</p>
-                            <p className="font-bold">@{user?.first_name}</p>
-                        </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {links.map((item, index: number) => (
-                        <DropdownMenuItem key={index} className="px-2 py-1.5 cursor-pointer" data-key={item.dataKey}>
-                            {item.child}
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </React.Fragment>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {links.map((item, index: number) => (
+                    <DropdownMenuItem key={index} className="px-2 py-1.5 cursor-pointer" data-key={item.dataKey}>
+                        {item.child}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

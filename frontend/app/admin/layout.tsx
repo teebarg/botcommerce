@@ -27,7 +27,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
                 </span>
                 <div className="flex-1 h-screen overflow-y-auto flex flex-col">
                     <AdminNavbar />
-                    <main className="flex-1 flex flex-col bg-content1">{props.children}</main>
+                    <main className="flex-1 flex flex-col">{props.children}</main>
                 </div>
             </div>
         </React.Fragment>

@@ -144,7 +144,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </div> */}
                         {/* Quantity Selection */}
                         <div className="flex items-center gap-4">
-                            <label className="text-sm font-medium text-default-700">Quantity:</label>
+                            <label className="text-sm font-medium text-default-900">Quantity:</label>
                             <div className="flex items-center border rounded-md">
                                 <Button size="sm" variant="ghost" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
                                     -

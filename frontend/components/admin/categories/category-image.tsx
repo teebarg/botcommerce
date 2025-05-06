@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
+import { useInvalidate } from "@/lib/hooks/useApi";
 import { api } from "@/apis";
 
 interface ProductImageManagerProps {
@@ -14,17 +14,24 @@ interface ProductImageManagerProps {
 }
 
 const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "" }) => {
-    const router = useRouter();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
-    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [isUploading] = useState<boolean>(false);
+    const invalidate = useInvalidate();
 
     const deleteImage = () => {
         setIsDeleting(true);
         void (async () => {
             try {
-                await api.category.deleteImage(categoryId);
+                const { error } = await api.category.deleteImage(categoryId);
+
+                if (error) {
+                    toast.error(error);
+
+                    return;
+                }
+
                 toast.success("Image deleted successfully");
-                router.refresh();
+                invalidate("categories");
             } catch (error) {
                 toast.error(`Error - ${error as string}`);
             } finally {
@@ -52,7 +59,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                 void (async () => {
                     try {
-                        await api.category.uploadImage({
+                        const { error } = await api.category.uploadImage({
                             id: categoryId,
                             data: {
                                 file: base64.split(",")[1]!, // Remove the data URL prefix
@@ -61,7 +68,14 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                             },
                         });
 
+                        if (error) {
+                            toast.error(error);
+
+                            return;
+                        }
+
                         toast.success("Image uploaded successfully");
+                        invalidate("categories");
                     } catch (error) {
                         toast.error(`Error - ${error as string}`);
                     }

@@ -14,7 +14,7 @@ const SignInPrompt: React.FC<SignInPromptProps> = ({ callbackUrl }) => {
 
     return (
         <div className="flex items-center justify-between">
-            <p className="text-default-400">
+            <p className="text-default-500">
                 Already have an account?{" "}
                 <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                     <DialogTrigger>

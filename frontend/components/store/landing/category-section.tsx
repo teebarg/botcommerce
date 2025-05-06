@@ -13,7 +13,7 @@ const CategoriesSection: React.FC = () => {
     return (
         <section className="pt-6 md:pt-10">
             <div className="max-w-8xl mx-auto px-2 md:px-0">
-                <h2 className="text-2xl font-bold text-commerce-primary mb-4 text-center">Shop by Category</h2>
+                <h2 className="text-2xl font-semibold mb-4 text-center">Shop by Category</h2>
                 {isLoading ? (
                     <Skeleton className="h-48" />
                 ) : (
@@ -24,9 +24,9 @@ const CategoriesSection: React.FC = () => {
                                     <img
                                         alt={category.name}
                                         className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
-                                        src={category.image}
+                                        src={category.image || "/placeholder.jpg"}
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent flex items-end p-4">
                                         <div className="w-full flex items-center justify-between">
                                             <h3 className="text-xl font-semibold text-white">{category.name}</h3>
                                             <ChevronRight className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />

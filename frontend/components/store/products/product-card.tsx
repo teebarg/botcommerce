@@ -119,7 +119,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                         </Button>
                     )}
                 </div>
-                <div className="font-semibold text-default-900 my-2 line-clamp-1 hover:text-default-700 transition-colors px-1">{name}</div>
+                <div className="font-semibold text-default-900 my-2 line-clamp-1 hover:text-default-900 transition-colors px-1">{name}</div>
                 <div className="flex items-center justify-between px-1">
                     <div className="flex items-center">
                         <span className="text-lg font-semibold text-danger">{currency(price)}</span>

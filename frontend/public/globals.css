@@ -107,7 +107,8 @@ body {
     [data-theme="dark"] {
         color-scheme: dark;
         /* --background: 0 0% 3.9%; */
-        --background: #111827;
+        /* --background: #111827; */
+        --background: #0E1012;
         --foreground: 0 0% 98%;
         --card: 0 0% 3.9%;
         --card-foreground: 0 0% 98%;
@@ -127,7 +128,8 @@ body {
         --ring: 0 0% 83.1%;
 
         /* Content Layers */
-        --content1: #1F2937;
+        --content1: #161A1D;
+        /* --content1: #1F2937; */
         /* --content1: 240 5.88% 10%; */
         --content2: 240 3.7% 15.88%;
         --content3: 240 5.26% 26.08%;
