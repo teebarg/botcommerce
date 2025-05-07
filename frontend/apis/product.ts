@@ -24,7 +24,13 @@ export const productApi = {
         return await api.get<Product>(`/product/${slug}`, { next: { tags: ["product"] } });
     },
     async create(input: any): ApiResult<Product> {
-        return await api.post<Product>(`/product`, input);
+        const response = await api.post<Product>("/product", input);
+
+        if (!response.error) {
+            productApi.revalidate();
+        }
+
+        return response;
     },
     async update(id: number, input: any): ApiResult<Product> {
         const response = await api.put<Product>(`/product/${id}`, input);
@@ -136,6 +142,7 @@ export const productApi = {
         return response;
     },
     async revalidate(): Promise<void> {
+        revalidateAction("featured");
         revalidateAction("product");
         revalidateAction("search");
     },

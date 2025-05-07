@@ -102,10 +102,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                     });
                 }
                 if (res.error) {
-                    toast.error(`Error - ${res.error}`);
-                } else {
-                    toast.success(`Product ${product?.id ? "updated" : "created"} successfully`);
+                    throw new Error(res.error);
                 }
+
+                toast.success(`Product ${product?.id ? "updated" : "created"} successfully`);
 
                 invalidate("products");
                 invalidate("product-search");
