@@ -221,6 +221,7 @@ model ProductImage {
   image      String? @db.VarChar(255)
   product_id Int
   product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order      Int     @default(1)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 

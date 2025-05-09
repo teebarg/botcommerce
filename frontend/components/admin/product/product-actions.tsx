@@ -1,7 +1,6 @@
 "use client";
 
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Edit, Trash2 } from "lucide-react";
 
@@ -20,7 +19,6 @@ interface ProductActionsProps {
 export function ProductActions({ product }: ProductActionsProps) {
     const deleteState = useOverlayTriggerState({});
     const viewState = useOverlayTriggerState({});
-    const router = useRouter();
     const invalidate = useInvalidate();
 
     const deleteProduct = async (id: number) => {
@@ -36,7 +34,6 @@ export function ProductActions({ product }: ProductActionsProps) {
         invalidate("products");
         invalidate("product-search");
         toast.success(`Product deleted successfully`);
-        router.refresh();
         deleteState.close();
     };
 

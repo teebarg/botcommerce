@@ -134,6 +134,7 @@ export const ProductImageSchema = z.object({
     id: z.number(),
     product_id: z.number(),
     image: z.string(),
+    order: z.number(),
     created_at: z.string().optional(),
 });
 

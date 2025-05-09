@@ -6,7 +6,6 @@ import { ChevronRight, Loader, Tag } from "nui-react-icons";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 
-import { api } from "@/apis";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
@@ -18,6 +17,7 @@ import ProductCard from "@/components/store/products/product-card";
 import { cn } from "@/lib/util/cn";
 import { useBrands, useCategories, useCollections } from "@/lib/hooks/useApi";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
+import { api } from "@/apis/client";
 
 interface SearchParams {
     page?: number;
@@ -56,7 +56,7 @@ export default function InfiniteScrollClient({
 
     const fetchItems = async (page: number) => {
         setLoading(true);
-        const { data } = await api.product.search({ ...initialSearchParams, page });
+        const data = await api.get<PaginatedProductSearch>("/product/search", { params: { ...initialSearchParams, page } });
 
         if (!data) {
             return;

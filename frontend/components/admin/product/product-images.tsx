@@ -3,9 +3,12 @@ import { useDropzone } from "react-dropzone";
 import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
+import DraggableImageList from "./draggable-images";
+
 import { ProductImage } from "@/types/models";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import ImageReorder from "@/components/generic/sortable-images";
 
 interface ProductImageManagerProps {
     productId: number;
@@ -107,6 +110,10 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
                 </div>
             </div>
 
+            <ImageReorder initialImages={initialImages} productId={productId} />
+
+            <DraggableImageList initialImages={initialImages} productId={productId} />
+
             {/* Image Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {initialImages.map((image: ProductImage, idx: number) => (
@@ -134,6 +141,7 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
 
             {/* Help text */}
             <div className="text-xs text-default-500">
+                <p>• Drag and drop images to reorder them</p>
                 <p>• The primary image will be displayed first in the product listing</p>
                 <p>• Recommended image size: 1000 x 1000 pixels</p>
             </div>

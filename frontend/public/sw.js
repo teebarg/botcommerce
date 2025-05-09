@@ -1,5 +1,5 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "botmerce-cache-v4"; // Increment this value for new versions
+const CACHE_NAME = "botmerce-cache-v5"; // Increment this value for new versions
 const ASSETS_TO_CACHE = [
     // "/", // Root URL
     "/career-opportunities",
@@ -44,6 +44,7 @@ self.addEventListener("activate", (event) => {
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
                         console.log("[Service Worker] Deleting old cache:", cache);
+
                         return caches.delete(cache);
                     }
                 })
@@ -65,12 +66,14 @@ self.addEventListener("fetch", (event) => {
                     fetch(event.request).then((networkResponse) => {
                         return caches.open(CACHE_NAME).then((cache) => {
                             cache.put(event.request, networkResponse.clone());
+
                             return networkResponse;
                         });
                     })
                 );
             })
         );
+
         return;
     }
 
@@ -116,6 +119,7 @@ self.addEventListener("push", function (event) {
 self.addEventListener("notificationclick", function (event) {
     if (event.action == "view") {
         event.waitUntil(clients.openWindow(event.notification.data.url));
+
         return;
     }
 

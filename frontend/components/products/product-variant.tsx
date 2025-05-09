@@ -100,7 +100,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
 
     return (
         <div>
-            <h4 className="text-lg font-medium text-default-800 mb-2">Product Variants</h4>
+            <h4 className="text-lg font-medium text-default-800 mt-4">Product Variants</h4>
             <div className="py-4 rounded-md">
                 <div className="max-h-[250px] overflow-y-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -145,7 +145,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                 </div>
 
                 <p className="text-default-500 mt-4 text-xl font-medium">Add new variant</p>
-                <div className="bg-content1 p-4 rounded-lg mt-4">
+                <div className="bg-content1 p-4 rounded-lg">
                     <Form {...form}>
                         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
