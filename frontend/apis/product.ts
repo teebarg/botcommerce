@@ -98,6 +98,15 @@ export const productApi = {
 
         return response;
     },
+    async reorderImages(id: number, imageIds: number[]): ApiResult<Message> {
+        const response = await api.patch<Message>(`/product/${id}/images/reorder`, imageIds);
+
+        if (!response.error) {
+            productApi.revalidate();
+        }
+
+        return response;
+    },
     async reIndex(): ApiResult<Message> {
         const response = await api.post<Message>(`/product/reindex`);
 

@@ -29,6 +29,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
 
         if (error) {
             toast.error(error);
+            setLoading(false);
 
             return;
         }

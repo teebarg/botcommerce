@@ -67,7 +67,7 @@ interface SearchParams {
 export const useProductSearch = (searchParams: SearchParams) => {
     return useQuery({
         queryKey: ["product-search", searchParams],
-        queryFn: async () => await api.get<PaginatedProductSearch>(`/product/search`, { params: { ...searchParams } }),
+        queryFn: async () => await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams } }),
         enabled: !!searchParams, // prevents running when searchParams is null
     });
 };
