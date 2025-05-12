@@ -72,7 +72,7 @@ export function ProductInventory() {
                                 open={addState.isOpen}
                                 title={`Add Product`}
                                 trigger={
-                                    <span className="h-10 rounded-md px-8 mb-4 bg-primary text-white hover:bg-primary/90 inline-flex items-center text-sm font-medium transition-colors focus-visible:outline-none">
+                                    <span className="h-10 rounded-md mb-4 px-4 bg-primary text-white hover:bg-primary/90 inline-flex items-center text-sm font-medium transition-colors focus-visible:outline-none">
                                         Add Product
                                     </span>
                                 }
@@ -87,6 +87,7 @@ export function ProductInventory() {
                                 Index
                             </Button>
                         </div>
+                        {/* Product Details */}
                         <ProductDetails />
                     </motion.div>
                 </AnimatePresence>

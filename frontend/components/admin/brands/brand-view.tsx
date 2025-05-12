@@ -67,7 +67,7 @@ const BrandView: React.FC = () => {
                         </TableHeader>
                         <TableBody>
                             {brands?.map((brand: Brand, idx: number) => (
-                                <TableRow key={`${brand.id}-${idx}`} className="even:bg-content1">
+                                <TableRow key={idx} className="even:bg-content1">
                                     <TableCell>{idx + 1}</TableCell>
                                     <TableCell className="flex-1">
                                         <div className="font-bold truncate min-w-72">{brand?.name}</div>

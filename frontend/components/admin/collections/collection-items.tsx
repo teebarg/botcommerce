@@ -10,9 +10,9 @@ interface CollectionItemProps {
 
 const CollectionItem = ({ collection, deleteAction }: CollectionItemProps) => {
     return (
-        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-            <div className="aspect-video w-full bg-gray-100 relative">
-                <img alt={collection.name} className="w-full h-full object-cover" src="/placeholder.svg" />
+        <div className="border border-default rounded-lg overflow-hidden bg-content1">
+            <div className="aspect-video w-full relative">
+                <img alt={collection.name} className="w-full h-full object-cover" src="/placeholder.jpg" />
             </div>
             <div className="p-3">
                 <div className="flex items-center justify-between">

@@ -5,7 +5,7 @@ import { ProductInventory } from "@/components/products/product-inventory";
 import ClientOnly from "@/components/generic/client-only";
 
 export const metadata: Metadata = {
-    title: "Children clothing",
+    title: "Products",
 };
 
 export default async function ProductsPage() {

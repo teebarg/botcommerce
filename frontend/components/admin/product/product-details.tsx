@@ -103,7 +103,7 @@ export function ProductDetails() {
                         ))}
                     </TableBody>
                 </Table>
-                {pagination && <PaginationUI pagination={pagination!} />}
+                {pagination && pagination.total_pages > 1 && <PaginationUI pagination={pagination!} />}
             </div>
             <div className="md:hidden">
                 <div className="py-4">

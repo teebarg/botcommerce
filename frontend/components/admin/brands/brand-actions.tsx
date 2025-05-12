@@ -48,7 +48,7 @@ const BrandActions: React.FC<Props> = ({ item }) => {
             </DrawerUI>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger>
-                    <Trash2 className="text-red-500" />
+                    <Trash2 className="text-red-500 h-5 w-5" />
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>

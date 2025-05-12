@@ -1,7 +1,6 @@
 "use client";
 
 import React, { forwardRef, useActionState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 
@@ -21,7 +20,6 @@ interface ChildRef {
 }
 
 const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current = { name: "", is_active: true } }, ref) => {
-    const router = useRouter();
     const isCreate = type === "create";
     const invalidate = useInvalidate();
 
@@ -40,7 +38,9 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
             if (formRef.current) {
                 formRef.current.reset();
                 invalidate("brands");
-                router.refresh();
+                if (isCreate) {
+                    onClose?.();
+                }
             }
         }
     }, [state.success, state.message, state.data]);

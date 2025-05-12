@@ -25,7 +25,7 @@ const TypingIndicator = () => (
 const ChatBotWrapper: React.FC = () => {
     const { shopSettings } = useStore();
 
-    if (shopSettings?.feature_chatbot == "false") {
+    if (shopSettings?.feature_chatbot != "true") {
         return null;
     }
 

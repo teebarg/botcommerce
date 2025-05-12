@@ -4,6 +4,8 @@ import { Metadata } from "next";
 
 import { BtnLink } from "@/components/ui/btnLink";
 
+export const dynamic = "force-static";
+
 export const metadata: Metadata = {
     title: "Claims",
 };
