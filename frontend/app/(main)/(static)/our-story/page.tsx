@@ -1,5 +1,12 @@
 import { getSiteConfig } from "@lib/config";
 import React from "react";
+import { Metadata } from "next";
+
+export const dynamic = "force-static";
+
+export const metadata: Metadata = {
+    title: "Our Story",
+};
 
 const OurStory = async () => {
     const siteConfig = await getSiteConfig();

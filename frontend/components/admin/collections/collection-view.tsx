@@ -54,7 +54,7 @@ const CollectionView: React.FC<Props> = ({ collections, deleteAction }) => {
                         </TableHeader>
                         <TableBody>
                             {collections?.map((collection: Collection, idx: number) => (
-                                <TableRow key={`${collection.id}-${idx}`} className="even:bg-content1">
+                                <TableRow key={idx} className="even:bg-content1">
                                     <TableCell>{idx + 1}</TableCell>
                                     <TableCell className="flex-1">
                                         <div className="font-bold truncate min-w-72">{collection?.name}</div>

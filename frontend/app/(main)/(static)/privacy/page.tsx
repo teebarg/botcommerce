@@ -1,7 +1,14 @@
 import React from "react";
 import { getSiteConfig } from "@lib/config";
+import { Metadata } from "next";
 
 import { BtnLink } from "@/components/ui/btnLink";
+
+export const dynamic = "force-static";
+
+export const metadata: Metadata = {
+    title: "Privacy Policy",
+};
 
 const Privacy = async () => {
     const siteConfig = await getSiteConfig();
@@ -49,8 +56,8 @@ const Privacy = async () => {
             </div>
 
             <div className="mt-8 text-center">
-                <BtnLink color="primary" href="/">
-                    Back to Home
+                <BtnLink color="primary" href="/" size="md">
+                    Back Home
                 </BtnLink>
             </div>
         </div>

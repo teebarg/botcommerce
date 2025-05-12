@@ -50,14 +50,15 @@ const ProductFilter = ({ open, onOpenChange, collections, brands, selectedCollec
                 <DialogHeader className="px-4 py-3 border-b">
                     <DialogTitle>Filters</DialogTitle>
                 </DialogHeader>
+                <p className="px-4 py-2 text-default-500 text-sm">Filter products by collections and brands</p>
                 <div className="flex-1 overflow-auto p-4">
                     {collections?.length && (
                         <div className="mb-6">
                             <h3 className="font-medium text-default-900 mb-3">Collections</h3>
                             <div className="flex flex-wrap gap-2">
-                                {collections?.map((collection) => (
+                                {collections?.map((collection: Collection, idx: number) => (
                                     <button
-                                        key={collection.id}
+                                        key={idx}
                                         className={`px-3 py-1.5 rounded-full text-sm ${
                                             tempCollections.includes(collection.id) ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
                                         }`}
@@ -74,9 +75,9 @@ const ProductFilter = ({ open, onOpenChange, collections, brands, selectedCollec
                         <div className="mb-6">
                             <h3 className="font-medium text-default-900 mb-3">Brands</h3>
                             <div className="flex flex-wrap gap-2">
-                                {brands?.map((brand) => (
+                                {brands?.map((brand: Brand, idx: number) => (
                                     <button
-                                        key={brand.id}
+                                        key={idx}
                                         className={`px-3 py-1.5 rounded-full text-sm ${
                                             tempBrands.includes(brand.id) ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
                                         }`}
