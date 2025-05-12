@@ -38,7 +38,6 @@ class ProductCreate(BaseModel):
     tags_ids: Optional[List[int]] = None
     sku: Optional[str] = None
     variants: Optional[List[VariantCreate]] = None
-    images: Optional[List[HttpUrl]] = None
     status: Literal["IN_STOCK", "OUT_OF_STOCK"] = "IN_STOCK"
 
 class ProductUpdate(BaseModel):
@@ -53,7 +52,6 @@ class ProductUpdate(BaseModel):
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
     variants: Optional[List[VariantUpdate]] = None
-    images: Optional[List[HttpUrl]] = None
 
 class ReviewCreate(BaseModel):
     product_id: int = Field(..., gt=0)

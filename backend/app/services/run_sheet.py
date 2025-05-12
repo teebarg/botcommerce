@@ -303,8 +303,8 @@ async def bulk_upload_products(products: list[dict]):
                 # Add new images
                 await db.productimage.create_many(
                     data=[
-                        {"product_id": product.id, "image": url}
-                        for url in image_urls
+                        {"product_id": product.id, "image": url, "order": index}
+                        for index, url in enumerate(image_urls)
                     ]
                 )
 
@@ -375,11 +375,6 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
                 if isinstance(is_active, str):
                     is_active = True if active == "TRUE" else False
 
-                image = row_data.get("image")
-                image = f"{image}|" if image else ""
-                images = row_data.get("images", "")
-                images = f"{images}" if images else ""
-
                 product_data = {
                     "id": row_data.get("id", ""),
                     "name": name,
@@ -390,12 +385,12 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
                     "old_price": float(row_data.get("old_price", 0.0)),
                     "inventory": row_data.get("inventory", 1),
                     "is_active": is_active,
-                    "ratings": row_data.get("ratings", 4.7),
+                    "ratings": row_data.get("ratings", 4.5),
                     "image": row_data.get("image", ""),
                     "categories": row_data.get("categories", ""),
                     "collections": row_data.get("collections", ""),
                     "brand": row_data.get("brand", ""),
-                    "images": image + images,
+                    "images": row_data.get("images", ""),
                 }
 
                 products.append(product_data)
