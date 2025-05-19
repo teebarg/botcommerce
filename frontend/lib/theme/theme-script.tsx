@@ -1,4 +1,5 @@
 import React from "react";
+import Script from "next/script";
 
 type Theme = "dark" | "light";
 
@@ -14,6 +15,15 @@ const code = function () {
     const localStorageKey = "__PREFERRED_THEME__";
 
     window.__onThemeChange = function () {};
+
+    window.__setPreferredTheme = function (newTheme: Theme) {
+        setTheme(newTheme);
+        try {
+            localStorage.setItem(localStorageKey, newTheme);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     function setTheme(newTheme: Theme) {
         document.documentElement.classList.remove(window.__theme);
@@ -32,15 +42,6 @@ const code = function () {
         console.error(err);
     }
 
-    window.__setPreferredTheme = function (newTheme: Theme) {
-        setTheme(newTheme);
-        try {
-            localStorage.setItem(localStorageKey, newTheme);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     darkQuery.addEventListener("change", function (e) {
@@ -53,5 +54,9 @@ const code = function () {
 const getTheme = `(${code})();`;
 
 export function ThemeScript() {
-    return <script dangerouslySetInnerHTML={{ __html: getTheme }} />;
+    return (
+        <Script id="theme-script" strategy="beforeInteractive">
+            {`(${code.toString()})();`}
+        </Script>
+    );
 }

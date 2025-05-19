@@ -34,7 +34,7 @@ const PushNotificationManager: React.FC = () => {
     const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
     const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
     const [show, setShow] = useState<boolean>(false);
-    const [offline, setOffline] = useState<boolean>(!navigator.onLine);
+    const [offline, setOffline] = useState<boolean>(false);
 
     useEffect(() => {
         if ("serviceWorker" in navigator) {
