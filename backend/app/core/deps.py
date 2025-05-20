@@ -9,13 +9,13 @@ from pydantic import ValidationError
 
 from app.core import security
 from app.core.config import settings
-from app.core.logging import logger
 from app.models.generic import TokenPayload
 from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from prisma.models import User
+from supabase import create_client, Client
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -23,6 +23,11 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 # Create once at startup
 meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
+
+# Initialize Supabase client
+supabase_url = settings.SUPABASE_URL
+supabase_key = settings.SUPABASE_KEY
+supabase: Client = create_client(supabase_url, supabase_key)
 
 
 # SessionDep = Annotated[Session, Depends(get_db)]

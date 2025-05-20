@@ -79,7 +79,7 @@ const RecentOrdersList = () => {
                     View all
                 </Link>
             </div>
-            <div className="hidden lg:block bg-background py-6 px-2 rounded-xl">
+            <div className="hidden md:block bg-background py-6 px-2 rounded-xl">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -115,7 +115,7 @@ const RecentOrdersList = () => {
                     </TableBody>
                 </Table>
             </div>
-            <div className="bg-background rounded-lg shadow-sm border border-gray-200 overflow-hidden lg:hidden">
+            <div className="bg-background rounded-lg shadow-sm border border-gray-200 overflow-hidden md:hidden">
                 <div className="divide-y divide-gray-200">
                     {orders?.map((order: Order, idx: number) => (
                         <div key={idx} className="p-4">

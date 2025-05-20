@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Calendar, Check, ChevronRight, CogSixTooth, Component, DocumentText, Ecommerce, User, Users, Window } from "nui-react-icons";
+import { Calendar, ChevronRight, CogSixTooth, DocumentText, Ecommerce, User, Users, Window } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@lib/util/cn";
@@ -211,54 +211,6 @@ const SideBar: React.FC = () => {
                 {
                     label: "Orders",
                     href: "/admin/orders",
-                },
-            ],
-        },
-        {
-            subMenu: "Components",
-            icon: <Component size={20} />,
-            menuItems: [
-                {
-                    label: "Grid",
-                    href: "/grid",
-                    icon: <Component size={18} />,
-                },
-                {
-                    label: "Layout",
-                    href: "/layout",
-                    icon: <Component size={18} />,
-                },
-                {
-                    subMenu: "Forms",
-                    icon: <Component size={18} />,
-                    menuItems: [
-                        {
-                            label: "Input",
-                            href: "/input",
-                            icon: <CogSixTooth size={20} />,
-                        },
-                        {
-                            label: "Select",
-                            href: "/secret",
-                            icon: <CogSixTooth size={20} />,
-                        },
-                        {
-                            subMenu: "More",
-                            icon: <CogSixTooth size={20} />,
-                            menuItems: [
-                                {
-                                    label: "Checkbox",
-                                    href: "/checkbox",
-                                    icon: <Check size={18} />,
-                                },
-                                {
-                                    label: "Radio",
-                                    href: "/radio",
-                                    icon: <Check size={18} />,
-                                },
-                            ],
-                        },
-                    ],
                 },
             ],
         },

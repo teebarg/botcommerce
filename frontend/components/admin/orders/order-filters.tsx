@@ -42,12 +42,12 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
     };
 
     const clearFilters = () => {
-        updateQuery([]);
-        setFilters({
-            status: "",
-            search: "",
-        });
-        setDateRange(undefined);
+        updateQuery([
+            { key: "status", value: "" },
+            { key: "search", value: "" },
+            { key: "start_date", value: "" },
+            { key: "end_date", value: "" },
+        ]);
     };
 
     return (

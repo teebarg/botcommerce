@@ -59,7 +59,7 @@ async def index(
         where=where_clause,
         skip=(page - 1) * limit,
         take=limit,
-        order={"createdAt": sort},
+        order={"created_at": sort},
         include={"orders": True}
     )
     total = await db.user.count(where=where_clause)

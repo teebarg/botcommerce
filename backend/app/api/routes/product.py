@@ -34,8 +34,6 @@ from app.services.meilisearch import (
     update_document,
 )
 from app.services.run_sheet import generate_excel_file, process_products
-from supabase import create_client, Client
-from app.core.config import settings
 from app.prisma_client import prisma as db
 from math import ceil
 from prisma.enums import ProductStatus
@@ -43,11 +41,7 @@ from pydantic import BaseModel
 from app.core.storage import upload
 from app.api.routes.websocket import manager
 from app.services.activity import log_activity
-
-# Initialize Supabase client
-supabase_url = settings.SUPABASE_URL
-supabase_key = settings.SUPABASE_KEY
-supabase: Client = create_client(supabase_url, supabase_key)
+from app.core.deps import supabase
 
 # Create a router for products
 router = APIRouter()
