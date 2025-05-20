@@ -23,15 +23,9 @@ const formSchema = z.object({
     description: z.string().min(10, {
         message: "Description must be at least 10 characters.",
     }),
-    categories: z.array(z.any()).min(1, {
-        message: "Please select at least one category.",
-    }),
-    collections: z.array(z.any()).min(1, {
-        message: "Please select at least one collection.",
-    }),
-    brand: z.number().min(1, {
-        message: "Please select at least one brand.",
-    }),
+    categories: z.array(z.any()),
+    collections: z.array(z.any()),
+    brand: z.number(),
     // tags: z.array(z.any()).min(1, {
     //     message: "Please select at least one tag.",
     // }),

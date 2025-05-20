@@ -1,7 +1,14 @@
 import React from "react";
 import { getSiteConfig } from "@lib/config";
+import { Metadata } from "next";
 
 import { BtnLink } from "@/components/ui/btnLink";
+
+export const dynamic = "force-static";
+
+export const metadata: Metadata = {
+    title: "Career Opportunities",
+};
 
 const CareerOpportunities = async () => {
     const siteConfig = await getSiteConfig();
@@ -44,7 +51,7 @@ const CareerOpportunities = async () => {
                                 {`We don't have any open positions at the moment, but we're always on the lookout for talent. Please check back later or
                                 submit your resume for future opportunities.`}
                             </p>
-                            <BtnLink color="primary" href="">
+                            <BtnLink color="primary" href="#" size="md">
                                 Submit Your Resume
                             </BtnLink>
                         </div>
@@ -57,7 +64,7 @@ const CareerOpportunities = async () => {
                         {`We're always interested in hearing from talented individuals. Send us your resume, and we'll keep you in mind for future
                         opportunities.`}
                     </p>
-                    <BtnLink color="success" href="">
+                    <BtnLink color="success" href="#" size="md">
                         Submit Your Resume
                     </BtnLink>
                 </div>

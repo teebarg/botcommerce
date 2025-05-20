@@ -417,8 +417,8 @@ model User {
     carts                  Cart[]    // Added relation to Cart
     activity_logs          ActivityLog[]
 
-    createdAt              DateTime? @default(now()) @map("created_at")
-    updatedAt              DateTime? @updatedAt @map("updated_at")
+    created_at              DateTime? @default(now())
+    updated_at              DateTime? @updatedAt
 
     @@index([first_name, last_name, email])
 

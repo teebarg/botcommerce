@@ -12,9 +12,9 @@ declare global {
     }
 }
 
-function InstallPrompt() {
+const InstallPrompt: React.FC = () => {
     const [isIOS, setIsIOS] = useState<boolean>(false);
-    // const [isStandalone, setIsStandalone] = useState<boolean>(false);
+    const [isStandalone, setIsStandalone] = useState<boolean>(false);
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [hasDismissed, setHasDismissed] = useState<boolean>(false);
 
@@ -25,6 +25,13 @@ function InstallPrompt() {
         setHasDismissed(true);
     };
 
+    // Hide if already installed (standalone mode)
+    useEffect(() => {
+        if (window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone) {
+            setIsStandalone(true);
+        }
+    }, []);
+
     useEffect(() => {
         // Set isOpen after hydration
         const savedIsOpen = localStorage.getItem("deferredPrompt") === "true";
@@ -33,35 +40,37 @@ function InstallPrompt() {
     }, []);
 
     useEffect(() => {
+        // Only show on client
+        if (typeof window === "undefined") return;
+
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
 
-        // setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
-
         // Capture the install prompt event
-        const handleBeforeInstallPrompt = (e: Event) => {
+        const handler = (e: Event) => {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
         };
 
-        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+        window.addEventListener("beforeinstallprompt", handler as EventListener);
 
         return () => {
-            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+            window.removeEventListener("beforeinstallprompt", handler as EventListener);
         };
     }, []);
 
-    const handleInstallClick = async () => {
+    const handleInstall = async () => {
         if (deferredPrompt) {
             // Show the install prompt
             await deferredPrompt.prompt();
 
             // Wait for the user to respond to the prompt
-            const choiceResult = await deferredPrompt.userChoice;
+            const { outcome } = await deferredPrompt.userChoice;
 
-            if (choiceResult.outcome === "accepted") {
+            if (outcome === "accepted") {
                 console.log("User accepted the install prompt");
-            } else {
-                console.log("User dismissed the install prompt");
+                setHasDismissed(true);
+                localStorage.setItem("deferredPrompt", "true");
+                setIsStandalone(true);
             }
 
             // Clear the deferredPrompt
@@ -69,7 +78,7 @@ function InstallPrompt() {
         }
     };
 
-    if (hasDismissed || !deferredPrompt) {
+    if (hasDismissed || !deferredPrompt || isStandalone) {
         return null; // Don't show install button if already installed
     }
 
@@ -91,8 +100,7 @@ function InstallPrompt() {
                             <p className="text-sm text-default-500 mb-3">Get faster checkout, exclusive offers and real-time order tracking</p>
 
                             {/* Install button */}
-                            <Button aria-label="install" className="w-full space-x-2" color="primary" onClick={handleInstallClick}>
-                                {/* <Download size={20} /> */}
+                            <Button aria-label="install" className="w-full space-x-2" color="primary" onClick={handleInstall}>
                                 <span>Add to Home Screen</span>
                             </Button>
                         </div>
@@ -118,6 +126,6 @@ function InstallPrompt() {
             </div>
         </>
     );
-}
+};
 
 export { InstallPrompt };

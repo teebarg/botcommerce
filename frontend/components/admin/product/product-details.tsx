@@ -25,7 +25,7 @@ export function ProductDetails() {
     const { data: collections } = useCollections();
     const { data: brands } = useBrands();
     const searchParams = useSearchParams();
-    const { data, isLoading } = useProducts({ limit: LIMIT, query: searchParams.get("search") || "" });
+    const { data, isLoading } = useProducts({ limit: LIMIT, query: searchParams.get("search") || "", page: Number(searchParams.get("page")) });
 
     const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
@@ -103,7 +103,6 @@ export function ProductDetails() {
                         ))}
                     </TableBody>
                 </Table>
-                {pagination && <PaginationUI pagination={pagination!} />}
             </div>
             <div className="md:hidden">
                 <div className="py-4">
@@ -179,6 +178,7 @@ export function ProductDetails() {
                     )}
                 </div>
             </div>
+            {pagination && pagination.total_pages > 1 && <PaginationUI pagination={pagination!} range={1} />}
         </div>
     );
 }

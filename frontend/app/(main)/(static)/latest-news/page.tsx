@@ -1,6 +1,13 @@
 import React from "react";
 import Link from "next/link";
 import { getSiteConfig } from "@lib/config";
+import { Metadata } from "next";
+
+export const dynamic = "force-static";
+
+export const metadata: Metadata = {
+    title: "Latest News",
+};
 
 interface NewsItem {
     id: number;

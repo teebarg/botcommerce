@@ -1,40 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 
 import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/lib/util/util";
-
-// In a real app, this would come from your API
-const mockStats = {
-    revenue: { value: 12945.5, previousValue: 9876.25 },
-    orders: { value: 156, previousValue: 132 },
-    products: { value: 78, previousValue: 65 },
-    customers: { value: 1243, previousValue: 1015 },
-};
+import { useStatsTrends } from "@/lib/hooks/useApi";
+import { Skeleton } from "@/components/generic/skeleton";
 
 const StatComponent: React.FC = () => {
-    const [stats, setStats] = useState(mockStats);
+    const { data, isLoading, error } = useStatsTrends();
 
-    // This would be a real API call in a production app
-    useEffect(() => {
-        // Simulate API loading
-        const timer = setTimeout(() => {
-            setStats(mockStats);
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    const getPercentageChange = (current: number, previous: number): { value: string; trend: "up" | "down" | "neutral" } => {
-        const change = ((current - previous) / previous) * 100;
-
+    const getPercentageChange = (growth: number): { value: string; trend: "up" | "down" | "neutral" } => {
         return {
-            value: `${change.toFixed(1)}%`,
-            trend: change > 0 ? "up" : change < 0 ? "down" : "neutral",
+            value: `${growth}%`,
+            trend: growth > 0 ? "up" : growth < 0 ? "down" : "neutral",
         };
     };
+
+    if (isLoading) {
+        return <Skeleton className="h-12 w-full" />;
+    }
+
+    if (error || !data) {
+        return <div>Error: {error?.message || "An error occurred"}</div>;
+    }
+
+    const { summary } = data;
 
     return (
         <div className="p-4">
@@ -44,33 +35,27 @@ const StatComponent: React.FC = () => {
                 <StatCard
                     icon={<DollarSign size={20} />}
                     title="Total Revenue"
-                    trend={getPercentageChange(stats.revenue.value, stats.revenue.previousValue).trend}
-                    trendValue={getPercentageChange(stats.revenue.value, stats.revenue.previousValue).value}
-                    value={currency(stats.revenue.value)}
+                    trend={getPercentageChange(summary?.revenueGrowth).trend}
+                    trendValue={getPercentageChange(summary?.revenueGrowth).value}
+                    value={currency(summary?.totalRevenue)}
                 />
 
                 <StatCard
                     icon={<ShoppingCart size={20} />}
                     title="Total Orders"
-                    trend={getPercentageChange(stats.orders.value, stats.orders.previousValue).trend}
-                    trendValue={getPercentageChange(stats.orders.value, stats.orders.previousValue).value}
-                    value={stats.orders.value}
+                    trend={getPercentageChange(summary?.ordersGrowth).trend}
+                    trendValue={getPercentageChange(summary?.ordersGrowth).value}
+                    value={summary?.totalOrders}
                 />
 
-                <StatCard
-                    icon={<Package size={20} />}
-                    title="Products"
-                    trend={getPercentageChange(stats.products.value, stats.products.previousValue).trend}
-                    trendValue={getPercentageChange(stats.products.value, stats.products.previousValue).value}
-                    value={stats.products.value}
-                />
+                <StatCard icon={<Package size={20} />} title="Products" value={summary?.totalProducts} />
 
                 <StatCard
                     icon={<Users size={20} />}
                     title="Customers"
-                    trend={getPercentageChange(stats.customers.value, stats.customers.previousValue).trend}
-                    trendValue={getPercentageChange(stats.customers.value, stats.customers.previousValue).value}
-                    value={stats.customers.value}
+                    trend={getPercentageChange(summary?.customersGrowth).trend}
+                    trendValue={getPercentageChange(summary?.customersGrowth).value}
+                    value={summary?.totalCustomers}
                 />
             </div>
         </div>

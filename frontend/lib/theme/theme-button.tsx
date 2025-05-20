@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTheme } from "@lib/hooks/use-theme";
+import useTheme from "@lib/hooks/use-theme";
 import { MoonFilled, SunFilled } from "nui-react-icons";
 
 export default function ThemeToggle() {

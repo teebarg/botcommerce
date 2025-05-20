@@ -33,7 +33,7 @@ const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
         count++;
     }
 
-    return (count / 4) * 100;
+    return (count / 3) * 100;
 };
 
 export default async function OverviewTemplate() {
@@ -75,7 +75,7 @@ export default async function OverviewTemplate() {
                                 <h3 className="font-semibold">Profile</h3>
                                 <div className="flex items-center gap-x-2">
                                     <span data-testid="customer-profile-completion" data-value={getProfileCompletion(customer)}>
-                                        {getProfileCompletion(customer)}%
+                                        {getProfileCompletion(customer).toFixed(2)}%
                                     </span>
                                     <span className="uppercase">Completed</span>
                                 </div>

@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-export function useTheme() {
+const useTheme = () => {
     const [theme, setTheme] = useState(typeof window === "undefined" ? "light" : window.__theme || "light");
 
     const toggleTheme = useCallback(() => {
-        window?.__setPreferredTheme(theme === "light" ? "dark" : "light");
+        if (typeof window !== "undefined" && typeof window.__setPreferredTheme === "function") {
+            window.__setPreferredTheme(theme === "light" ? "dark" : "light");
+        } else {
+            console.warn("__setPreferredTheme is not yet available");
+        }
     }, [theme]);
 
     useEffect(() => {
@@ -14,4 +18,6 @@ export function useTheme() {
     }, []);
 
     return { theme, toggleTheme };
-}
+};
+
+export default useTheme;

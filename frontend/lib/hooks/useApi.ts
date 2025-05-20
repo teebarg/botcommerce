@@ -13,6 +13,7 @@ import {
     PaginatedProductSearch,
     PaginatedUser,
     Review,
+    StatsTrends,
     User,
     Wishlist,
 } from "@/types/models";
@@ -160,6 +161,27 @@ export const useUserWishlist = () => {
     return useQuery({
         queryKey: ["user-wishlist"],
         queryFn: async () => await api.get<Wishlist>(`/users/wishlist`),
+    });
+};
+
+interface Stat {
+    orders_count?: number;
+    total_revenue?: number;
+    products_count?: number;
+    customers_count?: number;
+}
+
+export const useStats = () => {
+    return useQuery({
+        queryKey: ["stats"],
+        queryFn: async () => await api.get<Stat>("/stats"),
+    });
+};
+
+export const useStatsTrends = () => {
+    return useQuery({
+        queryKey: ["stats-trends"],
+        queryFn: async () => await api.get<StatsTrends>("/stats/trends"),
     });
 };
 

@@ -2,13 +2,7 @@ from pydantic import BaseModel
 import base64
 import uuid
 
-from supabase import create_client, Client
-from app.core.config import settings
-
-# Initialize Supabase client
-supabase_url = settings.SUPABASE_URL
-supabase_key = settings.SUPABASE_KEY
-supabase: Client = create_client(supabase_url, supabase_key)
+from app.core.deps import supabase
 
 class ImageUpload(BaseModel):
     file: str  # Base64 encoded file

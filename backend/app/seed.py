@@ -6,7 +6,7 @@ import bcrypt
 from prisma import Prisma
 import logging
 
-from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
+# from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
 
 logging.basicConfig(level=logging.INFO)
@@ -50,7 +50,7 @@ async def seed_database():
             "hashed_password": hashed_password,
             "role": role,
             "status": "ACTIVE",
-            "createdAt": datetime.now(),
+            "created_at": datetime.now(),
         })
 
     admin = await create_user("admin@email.com", "ADMIN")

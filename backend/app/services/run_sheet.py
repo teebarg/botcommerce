@@ -10,15 +10,12 @@ from openpyxl import Workbook, load_workbook
 
 from app.api.routes.websocket import manager
 from app.core.logging import logger
-from app.core.utils import generate_data_export_email, send_email, slugify
-
-from app.core.config import settings
+from app.core.utils import generate_data_export_email, send_email
 
 from typing import List
 from datetime import datetime
-
-from supabase import create_client, Client
 from app.prisma_client import prisma as db
+from app.core.deps import supabase
 
 
 async def broadcast_channel(data, user_id: int):
@@ -107,17 +104,13 @@ async def generate_excel_file(email: str) -> str:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"product_export_{timestamp}.xlsx"
 
-    # Upload the in-memory file to Supabase
-    client: Client = create_client(
-        settings.SUPABASE_URL, settings.SUPABASE_KEY)
-
     # Convert BytesIO to bytes to match the expected input type
     output_bytes = output.getvalue()
-    result = client.storage.from_("exports").upload(filename, output_bytes, {
+    result = supabase.storage.from_("exports").upload(filename, output_bytes, {
         "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
 
     # Get public URL
-    public_url = client.storage.from_("exports").get_public_url(filename)
+    public_url = supabase.storage.from_("exports").get_public_url(filename)
 
     # Send email with download link
     email_data = await generate_data_export_email(download_link=public_url)
