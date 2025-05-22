@@ -10,6 +10,8 @@ from app.api.routes import (
     category,
     collection,
     config,
+    faq,
+    conversation,
     order,
     payments,
     product,
@@ -18,6 +20,7 @@ from app.api.routes import (
     reviews,
     websocket,
     shop_settings,
+    base,
 )
 
 api_router = APIRouter()
@@ -26,10 +29,13 @@ api_router.include_router(activities.router, prefix="/activities", tags=["activi
 api_router.include_router(address.router, prefix="/address", tags=["address"])
 api_router.include_router(bank_details.router, prefix="/bank-details", tags=["bank-details"])
 api_router.include_router(brand.router, prefix="/brand", tags=["brand"])
+api_router.include_router(base.router, prefix="", tags=["base"])
 api_router.include_router(cart.router, prefix="/cart", tags=["cart"])
 api_router.include_router(category.router, prefix="/category", tags=["category"])
 api_router.include_router(collection.router, prefix="/collection", tags=["collection"])
+api_router.include_router(conversation.router, prefix="/conversation", tags=["conversation"])
 api_router.include_router(config.router, prefix="/config", tags=["config"])
+api_router.include_router(faq.router, prefix="/faq", tags=["faq"])
 api_router.include_router(order.router, prefix="/order", tags=["order"])
 api_router.include_router(product.router, prefix="/product", tags=["product"])
 api_router.include_router(payments.router, prefix="/payment", tags=["payment"])

@@ -17,4 +17,3 @@ class Payment(BaseModel):
     transaction_id: str = Field(...)
     status: PaymentStatus = Field(default=PaymentStatus.PENDING)
     payment_method: str = Field(...)
-    # metadata: dict = Field(default=None)

@@ -128,8 +128,17 @@ const timeAgo = (timestamp: string) => {
     else return `${Math.floor(diff / 86400)} days ago`;
 };
 
-const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+
+    const date = new Date(dateString);
+
+    return new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }).format(date);
 };
 
 const handleError = (error: any): Message => {

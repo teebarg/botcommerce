@@ -7,7 +7,10 @@ import {
     BankDetails,
     Brand,
     Category,
+    ChatMessage,
     Collection,
+    ConversationStatus,
+    PaginatedConversation,
     PaginatedOrder,
     PaginatedProduct,
     PaginatedProductSearch,
@@ -139,6 +142,42 @@ export const useCustomers = (searchParams: CustomerParams) => {
     return useQuery({
         queryKey: ["customers", { ...searchParams }],
         queryFn: async () => await api.get<PaginatedUser>(`/users/`, { params: { ...searchParams } }),
+    });
+};
+
+interface ConversationParams {
+    user_id?: number;
+    status?: ConversationStatus;
+    skip?: number;
+    limit?: number;
+}
+
+export const useConversations = (searchParams: ConversationParams) => {
+    return useQuery({
+        queryKey: ["conversations"],
+        queryFn: async () => await api.get<PaginatedConversation>(`/conversation/conversations/`, { params: { ...searchParams } }),
+    });
+};
+
+export const useDeleteConversation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: number) => await api.delete<User>(`/conversation/conversations/${id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["conversations"] });
+            toast.success("Conversation deleted successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to delete conversation" + error);
+        },
+    });
+};
+
+export const useConversationMessages = (uid: string) => {
+    return useQuery({
+        queryKey: ["conversations", uid],
+        queryFn: async () => await api.get<ChatMessage[]>(`/conversation/conversations/${uid}/messages`),
     });
 };
 

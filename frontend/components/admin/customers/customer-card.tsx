@@ -2,7 +2,7 @@ import { ShoppingBag, CreditCard } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Order, User } from "@/types/models";
-import { currency } from "@/lib/util/util";
+import { currency, formatDate } from "@/lib/util/util";
 
 interface CustomerCardProps {
     user: User;
@@ -10,18 +10,6 @@ interface CustomerCardProps {
 }
 
 const CustomerCard = ({ user, actions }: CustomerCardProps) => {
-    const formatDate = (dateString?: string) => {
-        if (!dateString) return "N/A";
-
-        const date = new Date(dateString);
-
-        return new Intl.DateTimeFormat("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        }).format(date);
-    };
-
     const fullName = `${user.first_name} ${user.last_name}`;
 
     const totalSpent = user.orders?.reduce((total: number, order: Order) => total + order.total, 0) || 0;

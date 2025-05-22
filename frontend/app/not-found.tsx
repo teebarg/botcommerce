@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import React from "react";
 
-import NF from "@/components/generic/not-found";
+import NotFoundUI from "@/components/generic/not-found";
 
 export const metadata: Metadata = {
     title: "404",
@@ -9,11 +9,7 @@ export const metadata: Metadata = {
 };
 
 const NotFound: React.FC = async () => {
-    return (
-        <div className="h-screen">
-            <NF />
-        </div>
-    );
+    return <NotFoundUI className="min-h-screen" scenario="404" />;
 };
 
 export default NotFound;
