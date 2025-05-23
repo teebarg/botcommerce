@@ -89,13 +89,9 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                         </div>
                     </div>
 
-                    {/* Title */}
                     <h1 className="text-2xl font-bold mb-3 transition-colors text-default-900">{currentScenario.title}</h1>
-
-                    {/* Description */}
                     <p className="mb-8 leading-relaxed transition-colors text-default-500">{currentScenario.description}</p>
 
-                    {/* Action Buttons */}
                     <div className="space-y-3">
                         <Button className="w-full" size="lg" variant="primary" onClick={handlePrimaryAction}>
                             {currentScenario.primaryAction}
@@ -107,7 +103,6 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                         </Button>
                     </div>
 
-                    {/* Optional Help Text */}
                     <div className="mt-6 pt-6 border-t transition-colors border-gray-10 dark:border-gray-700">
                         <p className="text-sm transition-colors text-default-500">
                             Need help?{" "}

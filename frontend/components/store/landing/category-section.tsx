@@ -1,30 +1,20 @@
 "use client";
 
 import { useCategories } from "@/lib/hooks/useApi";
-import { Skeleton } from "@/components/generic/skeleton";
 import { Category } from "@/types/models";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
 const CategoriesSection: React.FC = () => {
     const { data: categories, isLoading } = useCategories();
 
     if (isLoading) {
-        return (
-            <div className="max-w-8xl mx-auto bg-content1 p-4 w-full">
-                <h2 className="text-2xl font-bold text-center mb-8">Shop by category</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                    {[1, 2, 3, 4, 5, 6].map((_, idx) => (
-                        <Skeleton key={idx} className="w-32 h-32 lg:w-40 lg:h-40 rounded-full mb-3" />
-                    ))}
-                </div>
-            </div>
-        );
+        return <TableSkeleton />;
     }
 
     return (
         <div className="max-w-8xl mx-auto bg-content1 p-4 w-full">
             <h2 className="text-2xl font-bold text-center mb-8">Shop by category</h2>
 
-            {/* Mobile view: Horizontal scrolling */}
             <div className="flex overflow-x-auto pb-4 gap-5 md:hidden">
                 {categories?.map((category: Category, idx: number) => (
                     <div key={idx} className="flex flex-col items-center min-w-max">
@@ -36,7 +26,6 @@ const CategoriesSection: React.FC = () => {
                 ))}
             </div>
 
-            {/* Desktop view: Grid layout */}
             <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
                 {categories?.slice(0, 6).map((category: Category, idx: number) => (
                     <div key={idx} className="flex flex-col items-center">

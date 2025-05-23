@@ -187,6 +187,11 @@ const SideBar: React.FC = () => {
                     href: "/admin/chats",
                     icon: <MessageSquare size={18} />,
                 },
+                {
+                    label: "FAQs",
+                    href: "/admin/faqs",
+                    icon: <DocumentText size={18} />,
+                },
             ],
         },
         {

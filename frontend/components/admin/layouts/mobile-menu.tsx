@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DocumentText } from "nui-react-icons";
 
 import { useMe } from "@/lib/hooks/useApi";
 
@@ -36,6 +37,7 @@ const AdminMobileMenu: React.FC = () => {
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
         { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
+        { id: "faqs", label: "FAQs", icon: <DocumentText size={20} />, href: "/admin/faqs" },
     ];
 
     return (

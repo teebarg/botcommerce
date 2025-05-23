@@ -10,6 +10,7 @@ import {
     ChatMessage,
     Collection,
     ConversationStatus,
+    FAQ,
     PaginatedConversation,
     PaginatedOrder,
     PaginatedProduct,
@@ -221,6 +222,13 @@ export const useStatsTrends = () => {
     return useQuery({
         queryKey: ["stats-trends"],
         queryFn: async () => await api.get<StatsTrends>("/stats/trends"),
+    });
+};
+
+export const useFaqs = () => {
+    return useQuery({
+        queryKey: ["faqs"],
+        queryFn: async () => await api.get<FAQ[]>("/faq/"),
     });
 };
 

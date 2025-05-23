@@ -7,6 +7,10 @@ body {
     background: var(--background);
 }
 
+.chatbot-message li a {
+    @apply text-blue-500 hover:text-blue-600;
+}
+
 @layer utilities {
     /* Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {

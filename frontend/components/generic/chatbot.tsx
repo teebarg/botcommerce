@@ -42,7 +42,6 @@ const ChatBot: React.FC<Props> = () => {
             text: "Hello! I’m the Virtual Assistant, an automated support tool here to assist you with your questions. Ask me a question, or type 'help' for additional information.",
             isUser: false,
         },
-        { text: "How can we help you today?", isUser: false },
     ]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [input, setInput] = useState<string>("");
@@ -173,7 +172,7 @@ const ChatBot: React.FC<Props> = () => {
         <React.Fragment>
             <div className="fixed right-2 md:right-6 bottom-6 z-[500]">
                 <div
-                    className="max-w-md w-[calc(100%-8px)] ml-2 sm:ml-auto sm:w-[400px] h-[600px] bg-gray-900 rounded-lg shadow-xl hidden data-[open=true]:flex flex-col"
+                    className="max-w-md w-[calc(100%-8px)] ml-2 sm:ml-auto sm:w-[400px] h-[700px] bg-gray-900 rounded-lg shadow-xl hidden data-[open=true]:flex flex-col"
                     data-open={isOpen ? "true" : "false"}
                 >
                     {/* Header */}
@@ -199,7 +198,7 @@ const ChatBot: React.FC<Props> = () => {
                         {messages.map((message: Message, index: number) => (
                             <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
                                 <div
-                                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                                    className={`max-w-[80%] rounded-lg px-4 py-2 chatbot-message ${
                                         message.isUser ? "bg-blue-500 text-white rounded-br-none" : "bg-gray-800 text-gray-200 rounded-bl-none"
                                     }`}
                                 >

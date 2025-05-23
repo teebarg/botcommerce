@@ -172,7 +172,6 @@ export interface DashboardSummary {
     totalCustomers: number;
     revenueGrowth: number;
     ordersGrowth: number;
-    productsGrowth: number;
     customersGrowth: number;
 }
 

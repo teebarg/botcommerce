@@ -1,5 +1,4 @@
 import React from "react";
-import Script from "next/script";
 
 type Theme = "dark" | "light";
 
@@ -54,9 +53,5 @@ const code = function () {
 const getTheme = `(${code})();`;
 
 export function ThemeScript() {
-    return (
-        <Script id="theme-script" strategy="beforeInteractive">
-            {`(${code.toString()})();`}
-        </Script>
-    );
+    return <script dangerouslySetInnerHTML={{ __html: getTheme }} />;
 }

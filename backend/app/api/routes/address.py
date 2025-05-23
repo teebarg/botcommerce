@@ -16,7 +16,6 @@ from app.prisma_client import prisma as db
 from math import ceil
 from prisma.errors import PrismaError
 
-# Create a router for addresses
 router = APIRouter()
 
 

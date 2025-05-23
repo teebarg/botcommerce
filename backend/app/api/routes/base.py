@@ -3,55 +3,24 @@ from fastapi import (
     Depends,
     Query,
 )
-from pydantic import BaseModel
-from fastapi import HTTPException
-
 from app.prisma_client import prisma as db
-from google import genai
-from app.core.config import settings
 from prisma.enums import Role
 from app.core.deps import get_current_superuser
 from typing import Literal, Optional
 from datetime import timedelta, datetime
 
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
-
-# Create a router for addresses
 router = APIRouter()
-
-class ChatRequest(BaseModel):
-    message: str
-
-class ChatResponse(BaseModel):
-    reply: str
-
-@router.post("/chat", response_model=ChatResponse)
-async def chat_with_bot(req: ChatRequest):
-    try:
-
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-001', contents=req.message
-        )
-
-        return ChatResponse(reply=response.text)
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/stats", dependencies=[Depends(get_current_superuser)])
 async def admin_dashboard_stats():
-    # Count orders
+    """Get admin dashboard stats"""
     orders_count = await db.order.count()
 
-    # Sum total revenue manually
     orders = await db.order.find_many()
     total_revenue = sum(order.total for order in orders if order.total is not None)
 
-    # Count products
     products_count = await db.product.count()
 
-    # Count customers (manual filter since aggregate where is unsupported)
     users = await db.user.find_many(where={"role": Role.CUSTOMER})
     customers_count = len(users)
 
@@ -68,7 +37,7 @@ async def stats_trends(
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
 ):
-    # now = datetime.utcnow()
+    """Get admin dashboard stats trends"""
     now = datetime.now()
     start = start_date or now - timedelta(days=30)
     end = end_date or now
@@ -89,15 +58,13 @@ async def stats_trends(
             counts[key] = counts.get(key, 0) + 1
         return counts
 
-    # Fetch current period data
     current_orders = await db.order.find_many(where={"created_at": {"gte": start, "lte": end}})
     current_signups = await db.user.find_many(where={"role": Role.CUSTOMER, "created_at": {"gte": start, "lte": end}})
 
-    # Fetch previous period data
     prev_orders = await db.order.find_many(where={"created_at": {"gte": previous_start, "lt": previous_end}})
     prev_signups = await db.user.find_many(where={"role": Role.CUSTOMER, "created_at": {"gte": previous_start, "lt": previous_end}})
 
-    # Grouped data for charts
+    # Grouped data
     order_grouped = group(current_orders, group_by)
     signup_grouped = group(current_signups, group_by)
     keys = sorted(set(order_grouped.keys()) | set(signup_grouped.keys()))
@@ -110,7 +77,6 @@ async def stats_trends(
         for key in keys
     ]
 
-    # Fetch summary stats
     total_orders = len(current_orders)
     prev_orders_count = len(prev_orders)
 
@@ -119,11 +85,9 @@ async def stats_trends(
 
     products_count = await db.product.count()
 
-    # Revenue (assume order.total exists)
     current_revenue = sum(order.total for order in current_orders if order.total)
     prev_revenue = sum(order.total for order in prev_orders if order.total)
 
-    # Growth helper
     def growth(current, previous):
         if previous == 0:
             return 100.0 if current > 0 else 0.0
@@ -136,7 +100,6 @@ async def stats_trends(
         "totalCustomers": total_customers,
         "revenueGrowth": growth(current_revenue, prev_revenue),
         "ordersGrowth": growth(total_orders, prev_orders_count),
-        "productsGrowth": 0.0,  # You could implement this if needed
         "customersGrowth": growth(total_customers, prev_customers_count),
     }
 

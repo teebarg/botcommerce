@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Path, status
+from fastapi import APIRouter, HTTPException, Query
 
 from app.prisma_client import prisma as db
 from prisma.models import FAQ
@@ -43,9 +43,7 @@ async def list_faqs(
 
 
 @router.get("/{id}", response_model=FAQ)
-async def get_faq(
-    id: int = Path(..., description="The ID of the FAQ to retrieve"),
-):
+async def get_faq(id: int):
     """Get a specific FAQ entry by ID"""
     faq = await db.faq.find_unique(where={"id": id})
     if not faq:
@@ -53,10 +51,8 @@ async def get_faq(
     return faq
 
 
-@router.post("/", response_model=FAQ, status_code=status.HTTP_201_CREATED)
-async def create_faq(
-    faq: FAQCreate,
-):
+@router.post("/", response_model=FAQ)
+async def create_faq(faq: FAQCreate):
     """Create a new FAQ entry"""
     try:
         new_faq = await db.faq.create(
@@ -76,16 +72,12 @@ async def create_faq(
 
 
 @router.patch("/{id}", response_model=FAQ)
-async def update_faq(
-    faq_update: FAQUpdate,
-    id: int = Path(..., description="The ID of the FAQ to update"),
-):
+async def update_faq(faq_update: FAQUpdate, id: int):
     """Update a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:
         raise HTTPException(status_code=404, detail="FAQ not found")
 
-    # Prepare update data
     update_data = {}
     if faq_update.question is not None:
         update_data["question"] = faq_update.question
@@ -109,10 +101,8 @@ async def update_faq(
         raise
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_faq(
-    id: int = Path(..., description="The ID of the FAQ to delete"),
-):
+@router.delete("/{id}")
+async def delete_faq(id: int):
     """Delete a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:
