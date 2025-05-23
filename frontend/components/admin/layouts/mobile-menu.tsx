@@ -1,8 +1,23 @@
 "use client";
 
-import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Search, User, LogOut, ChevronRight, Notebook, Image, Activity } from "lucide-react";
+import {
+    LayoutDashboard,
+    ShoppingCart,
+    Package,
+    Users,
+    Settings,
+    Search,
+    User,
+    LogOut,
+    ChevronRight,
+    Notebook,
+    Image,
+    Activity,
+    MessageSquare,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DocumentText } from "nui-react-icons";
 
 import { useMe } from "@/lib/hooks/useApi";
 
@@ -21,6 +36,8 @@ const AdminMobileMenu: React.FC = () => {
         { id: "reviews", label: "Reviews", icon: <Notebook size={20} />, href: "/admin/reviews" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
+        { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
+        { id: "faqs", label: "FAQs", icon: <DocumentText size={20} />, href: "/admin/faqs" },
     ];
 
     return (

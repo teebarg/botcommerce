@@ -19,6 +19,9 @@ module.exports = {
     content: ["./modules/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
     theme: {
         extend: {
+            backgroundSize: {
+                200: "200% 100%",
+            },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
@@ -140,6 +143,10 @@ module.exports = {
                         transform: "translateX(100%)",
                     },
                 },
+                shimmer2: {
+                    "0%": { backgroundPosition: "-200% 0" },
+                    "100%": { backgroundPosition: "200% 0" },
+                },
                 "indeterminate-bar": {
                     "0%": { transform: "translateX(-50%) scaleX(.2)" },
                     "100%": { transform: "translateX(100%) scaleX(1)" },
@@ -176,6 +183,7 @@ module.exports = {
                 "accordion-up": "accordion-up 0.2s ease-out",
                 "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                 bounce: "bounce 1s infinite",
+                shimmer: "shimmer2 2s infinite",
             },
             maxWidth: {
                 "8xl": "88rem", // 1408px

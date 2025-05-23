@@ -5,7 +5,7 @@ import { Calendar, ChevronRight, CogSixTooth, DocumentText, Ecommerce, User, Use
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@lib/util/cn";
-import { Activity } from "lucide-react";
+import { Activity, MessageSquare } from "lucide-react";
 
 import { useStore } from "@/app/store/use-store";
 
@@ -181,6 +181,16 @@ const SideBar: React.FC = () => {
                     label: "Activities",
                     href: "/admin/activities",
                     icon: <Activity size={18} />,
+                },
+                {
+                    label: "Chats",
+                    href: "/admin/chats",
+                    icon: <MessageSquare size={18} />,
+                },
+                {
+                    label: "FAQs",
+                    href: "/admin/faqs",
+                    icon: <DocumentText size={18} />,
                 },
             ],
         },

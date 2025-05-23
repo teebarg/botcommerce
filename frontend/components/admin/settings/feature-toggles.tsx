@@ -23,16 +23,6 @@ const defaultFeatures = [
         description: "Enable wishlist functionality for customers",
     },
     {
-        key: "feature_compare",
-        label: "Product Comparison",
-        description: "Allow customers to compare products",
-    },
-    {
-        key: "feature_quick_view",
-        label: "Quick View",
-        description: "Enable quick product preview on hover",
-    },
-    {
         key: "feature_related_products",
         label: "Related Products",
         description: "Show related products on product pages",
@@ -41,6 +31,11 @@ const defaultFeatures = [
         key: "feature_chatbot",
         label: "Chatbot",
         description: "Enable chatbot functionality for customers",
+    },
+    {
+        key: "feature_whatsapp",
+        label: "WhatsApp",
+        description: "Enable WhatsApp functionality for customers",
     },
 ];
 

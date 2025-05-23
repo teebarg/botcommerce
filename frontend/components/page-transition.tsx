@@ -50,7 +50,7 @@ const PageTransition: React.FC = () => {
 
             {/* Loading text */}
             <div className="text-center">
-                <p className="text-lg font-medium text-default-900">Loading your products</p>
+                <p className="text-lg font-medium text-default-900">Loading</p>
                 <p className="text-sm text-default-500">Please wait a moment...</p>
             </div>
 

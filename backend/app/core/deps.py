@@ -1,4 +1,3 @@
-import json
 from typing import Annotated
 
 import jwt
@@ -47,6 +46,19 @@ async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
     return token_data
 
 TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
+
+async def get_user(token_data: Annotated[TokenPayload, Depends(get_user_token)]) -> User | None:
+    if not token_data:
+        return None
+
+    user = await prisma.user.find_unique(where={"email": token_data.sub})
+
+    if not user:
+        return None
+    return user
+
+
+UserDep = Annotated[User | None, Depends(get_user)]
 
 
 async def get_current_user(token_data: TokenUser) -> User:

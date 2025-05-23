@@ -1,6 +1,6 @@
 generator client {
-  provider  = "prisma-client-py"
-  interface = "asyncio"
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
   recursive_type_depth = -1
 }
 
@@ -72,124 +72,123 @@ enum Role {
 }
 
 enum Status {
-    PENDING   @map("pending")
-    ACTIVE    @map("active")
-    INACTIVE  @map("inactive")
+  PENDING  @map("pending")
+  ACTIVE   @map("active")
+  INACTIVE @map("inactive")
 
-    @@map("statuses")
+  @@map("statuses")
 }
 
 model ActivityLog {
-  id                  Int       @id @default(autoincrement())
+  id                  Int      @id @default(autoincrement())
   user_id             Int
-  activity_type       String?   @db.VarChar(255)
-  description         String?   @db.VarChar(255)
-  action_download_url String?   @db.VarChar(255)
+  activity_type       String?  @db.VarChar(255)
+  description         String?  @db.VarChar(255)
+  action_download_url String?  @db.VarChar(255)
   is_success          Boolean?
-  user                User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("activity_logs")
 }
 
 // Address Model
 model Address {
-  id              Int       @id @default(autoincrement())
-  user            User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id         Int
-  label           String?
-  address_type    AddressType @default(HOME)
-  first_name      String?
-  last_name       String?
-  address_1       String
-  address_2       String?
-  city            String?
-  state           String?
-  postal_code     String?
-  phone           String?
-  is_billing      Boolean   @default(false)
+  id           Int         @id @default(autoincrement())
+  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id      Int
+  label        String?
+  address_type AddressType @default(HOME)
+  first_name   String?
+  last_name    String?
+  address_1    String
+  address_2    String?
+  city         String?
+  state        String?
+  postal_code  String?
+  phone        String?
+  is_billing   Boolean     @default(false)
 
-  shipping_orders Order[]   @relation("ShippingAddress")
-  billing_orders  Order[]   @relation("BillingAddress")
-  shipping_carts  Cart[]    @relation("ShippingCartAddress")
-  billing_carts   Cart[]    @relation("BillingCartAddress")
+  shipping_orders Order[] @relation("ShippingAddress")
+  billing_orders  Order[] @relation("BillingAddress")
+  shipping_carts  Cart[]  @relation("ShippingCartAddress")
+  billing_carts   Cart[]  @relation("BillingCartAddress")
 
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("addresses")
 }
 
 model Brand {
-  id           Int            @id @default(autoincrement())
-  name         String         @unique @db.VarChar(255)
-  slug         String         @unique @db.VarChar(255)
-  is_active    Boolean
-  products     Product[]
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(255)
+  slug      String    @unique @db.VarChar(255)
+  is_active Boolean
+  products  Product[]
 
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("brands")
 }
 
 model Category {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
-  slug         String   @unique
-  image        String?
-  is_active    Boolean  @default(true)
-  parent_id    Int?     // Nullable for top-level categories
-  parent        Category?   @relation("CategoryToSubcategory", fields: [parent_id], references: [id], onDelete: Cascade)
-  subcategories Category[]  @relation("CategoryToSubcategory")
-  products     Product[]  @relation("ProductCategories")
+  id            Int        @id @default(autoincrement())
+  name          String     @unique
+  slug          String     @unique
+  image         String?
+  is_active     Boolean    @default(true)
+  parent_id     Int? // Nullable for top-level categories
+  parent        Category?  @relation("CategoryToSubcategory", fields: [parent_id], references: [id], onDelete: Cascade)
+  subcategories Category[] @relation("CategoryToSubcategory")
+  products      Product[]  @relation("ProductCategories")
 
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("categories")
 }
 
-
 model Collection {
-  id                Int                 @id @default(autoincrement())
-  name              String              @unique @db.VarChar(255)
-  slug              String              @unique @db.VarChar(255)
-  is_active         Boolean
-  products          Product[]           @relation("ProductCollections")
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(255)
+  slug      String    @unique @db.VarChar(255)
+  is_active Boolean
+  products  Product[] @relation("ProductCollections")
 
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("collections")
 }
 
 model Product {
-  id                 Int                  @id @default(autoincrement())
-  name               String               @unique @db.VarChar(255)
-  slug               String               @unique @db.VarChar(255)
-  sku                String               @unique
-  description        String?
-  features           String[]
-  price              Float
-  old_price          Float?
-  image              String?              @db.VarChar(255)
-  status             ProductStatus        @default(IN_STOCK)
-  variants           ProductVariant[]
-  ratings            Float?               @default(0)
-  categories         Category[]           @relation("ProductCategories")
-  collections        Collection[]         @relation("ProductCollections")
-  brand              Brand?               @relation(fields: [brand_id], references: [id], onDelete: SetNull)
-  brand_id           Int?
-  tags               Tag[]                @relation("ProductTags")
-  images             ProductImage[]
-  reviews            Review[]
-  favorites          Favorite[]
+  id          Int              @id @default(autoincrement())
+  name        String           @unique @db.VarChar(255)
+  slug        String           @unique @db.VarChar(255)
+  sku         String           @unique
+  description String?
+  features    String[]
+  price       Float
+  old_price   Float?
+  image       String?          @db.VarChar(255)
+  status      ProductStatus    @default(IN_STOCK)
+  variants    ProductVariant[]
+  ratings     Float?           @default(0)
+  categories  Category[]       @relation("ProductCategories")
+  collections Collection[]     @relation("ProductCollections")
+  brand       Brand?           @relation(fields: [brand_id], references: [id], onDelete: SetNull)
+  brand_id    Int?
+  tags        Tag[]            @relation("ProductTags")
+  images      ProductImage[]
+  reviews     Review[]
+  favorites   Favorite[]
 
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@index([name, slug])
   @@map("products")
@@ -197,124 +196,123 @@ model Product {
 
 // ProductVariant Model
 model ProductVariant {
-  id          Int       @id @default(autoincrement())
-  product     Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  id          Int           @id @default(autoincrement())
+  product     Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
   product_id  Int
-  name        String   @unique
-  slug        String   @unique
+  name        String        @unique
+  slug        String        @unique
   image       String?
-  sku         String   @unique
-  status      ProductStatus   @default(IN_STOCK)
-  price       Float     @db.DoublePrecision
-  old_price   Float?     @db.DoublePrecision
+  sku         String        @unique
+  status      ProductStatus @default(IN_STOCK)
+  price       Float         @db.DoublePrecision
+  old_price   Float?        @db.DoublePrecision
   inventory   Int
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
 
   @@map("product_variants")
 }
 
 model ProductImage {
-  id         Int     @id @default(autoincrement())
-  image      String? @db.VarChar(255)
+  id         Int      @id @default(autoincrement())
+  image      String?  @db.VarChar(255)
   product_id Int
-  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  order      Int     @default(1)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order      Int      @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("product_images")
 }
 
-
 model Review {
-  id         Int       @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   comment    String
   rating     Int
-  verified   Boolean  @default(false)
+  verified   Boolean @default(false)
   user_id    Int
   product_id Int
 
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-  product    Product   @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user       User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product Product @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user    User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("reviews")
 }
 
 model SiteConfig {
-  id         Int       @id @default(autoincrement())
-  key        String    @unique @db.VarChar(255)
+  id         Int      @id @default(autoincrement())
+  key        String   @unique @db.VarChar(255)
   value      String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("site_config")
 }
 
 model Tag {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique @db.VarChar(255)
-  slug       String    @unique @db.VarChar(255)
-  is_active  Boolean  @default(true)
-  products   Product[] @relation("ProductTags")
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(255)
+  slug      String    @unique @db.VarChar(255)
+  is_active Boolean   @default(true)
+  products  Product[] @relation("ProductTags")
 
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("tags")
 }
 
 // Order Model
 model Order {
-  id              Int          @id @default(autoincrement())
-  order_number    String       @unique
-  user            User         @relation(fields: [user_id], references: [id], onDelete: NoAction)
-  user_id         Int
+  id           Int    @id @default(autoincrement())
+  order_number String @unique
+  user         User   @relation(fields: [user_id], references: [id], onDelete: NoAction)
+  user_id      Int
 
-  shipping_address    Address?     @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
+  shipping_address    Address? @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
   shipping_address_id Int?
-  billing_address     Address?     @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
+  billing_address     Address? @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
   billing_address_id  Int?
 
-  email        String?
+  email           String?
   order_items     OrderItem[]
-  total           Float       @db.DoublePrecision
-  subtotal        Float       @db.DoublePrecision
-  tax             Float       @db.DoublePrecision
-  status          OrderStatus @default(PENDING)
+  total           Float           @db.DoublePrecision
+  subtotal        Float           @db.DoublePrecision
+  tax             Float           @db.DoublePrecision
+  status          OrderStatus     @default(PENDING)
   payment         Payment?
   payment_method  PaymentMethod
-  payment_status  PaymentStatus? @default(PENDING)
+  payment_status  PaymentStatus?  @default(PENDING)
   shipping_method ShippingMethod?
-  shipping_fee    Float       @db.DoublePrecision
-  coupon          Coupon?      @relation(fields: [coupon_id], references: [id], onDelete: NoAction)
+  shipping_fee    Float           @db.DoublePrecision
+  coupon          Coupon?         @relation(fields: [coupon_id], references: [id], onDelete: NoAction)
   coupon_id       Int?
-  cart            Cart?        @relation(fields: [cart_id], references: [id], onDelete: NoAction) // Optional link to originating cart
-  cart_id         Int?         @unique // Added relation to Cart
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
+  cart            Cart?           @relation(fields: [cart_id], references: [id], onDelete: NoAction) // Optional link to originating cart
+  cart_id         Int?            @unique // Added relation to Cart
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
 
   @@map("orders")
 }
 
 // OrderItem Model
 model OrderItem {
-  id           Int            @id @default(autoincrement())
-  name         String?
-  order        Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
-  order_id     Int
-  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
-  variant_id   Int
-  image        String?
-  quantity     Int
-  price        Float          @db.DoublePrecision
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt
+  id         Int            @id @default(autoincrement())
+  name       String?
+  order      Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order_id   Int
+  variant    ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
+  variant_id Int
+  image      String?
+  quantity   Int
+  price      Float          @db.DoublePrecision
+  created_at DateTime       @default(now())
+  updated_at DateTime       @updatedAt
 
   @@map("order_items")
 }
@@ -337,105 +335,103 @@ model Payment {
 
 // Coupon Model
 model Coupon {
-  id             Int          @id @default(autoincrement())
-  code           String       @unique
-  discount_type  DiscountType
-  discount_value Float        @db.DoublePrecision
+  id              Int          @id @default(autoincrement())
+  code            String       @unique
+  discount_type   DiscountType
+  discount_value  Float        @db.DoublePrecision
   expiration_date DateTime
-  orders         Order[]
-  created_at     DateTime     @default(now())
-  updated_at     DateTime     @updatedAt
+  orders          Order[]
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
 
   @@map("coupons")
 }
 
 // Cart Model (New)
 model Cart {
-  id           Int         @id @default(autoincrement())
-  cart_number  String       @unique
-  user         User?        @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id      Int?
-  items        CartItem[]  // List of items in the cart
-  status       CartStatus  @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
-  order        Order?      @relation // Links to the order if cart is converted
-  email        String?
-  total           Float       @db.DoublePrecision @default(0)
-  subtotal        Float       @db.DoublePrecision @default(0)
-  tax             Float       @db.DoublePrecision @default(0)
-  shipping_fee    Float       @db.DoublePrecision @default(0)
-  payment_method PaymentMethod?
+  id              Int             @id @default(autoincrement())
+  cart_number     String          @unique
+  user            User?           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id         Int?
+  items           CartItem[] // List of items in the cart
+  status          CartStatus      @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
+  order           Order?          @relation // Links to the order if cart is converted
+  email           String?
+  total           Float           @default(0) @db.DoublePrecision
+  subtotal        Float           @default(0) @db.DoublePrecision
+  tax             Float           @default(0) @db.DoublePrecision
+  shipping_fee    Float           @default(0) @db.DoublePrecision
+  payment_method  PaymentMethod?
   shipping_method ShippingMethod?
 
-  shipping_address    Address?     @relation("ShippingCartAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
+  shipping_address    Address? @relation("ShippingCartAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
   shipping_address_id Int?
-  billing_address     Address?     @relation("BillingCartAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
+  billing_address     Address? @relation("BillingCartAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
   billing_address_id  Int?
 
-  created_at   DateTime    @default(now())
-  updated_at   DateTime?    @updatedAt // Used to detect abandoned carts
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt // Used to detect abandoned carts
 
   @@map("carts")
 }
 
 // CartItem Model (New)
 model CartItem {
-  id           Int            @id @default(autoincrement())
-  name         String?
-  slug         String?
-  cart         Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
-  cart_id      Int
-  cart_number  String?
-  variant      ProductVariant @relation(fields: [variant_id], references: [id], onDelete: Cascade)
-  variant_id   Int
-  quantity     Int
-  price        Float          @db.DoublePrecision
-  image        String?
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt
+  id          Int            @id @default(autoincrement())
+  name        String?
+  slug        String?
+  cart        Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  cart_id     Int
+  cart_number String?
+  variant     ProductVariant @relation(fields: [variant_id], references: [id], onDelete: Cascade)
+  variant_id  Int
+  quantity    Int
+  price       Float          @db.DoublePrecision
+  image       String?
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
 
   @@map("cart_items")
 }
 
-
 // User Model
 model User {
-    id                      Int       @id @default(autoincrement())
-    email                   String    @unique
-    hashed_password         String
-    first_name             String?
-    last_name              String?
-    status                 Status    @default(PENDING)
-    role                   Role    @default(CUSTOMER)
-    image                  String?
-    email_verified         DateTime?
-    email_verification_token String?
-    email_verification_expires DateTime?
-    orders                 Order[]
-    addresses              Address[]
-    reviews                Review[]
-    favorites              Favorite[]
-    carts                  Cart[]    // Added relation to Cart
-    activity_logs          ActivityLog[]
+  id                         Int           @id @default(autoincrement())
+  email                      String        @unique
+  hashed_password            String
+  first_name                 String?
+  last_name                  String?
+  status                     Status        @default(PENDING)
+  role                       Role          @default(CUSTOMER)
+  image                      String?
+  email_verified             DateTime?
+  email_verification_token   String?
+  email_verification_expires DateTime?
+  orders                     Order[]
+  addresses                  Address[]
+  reviews                    Review[]
+  favorites                  Favorite[]
+  carts                      Cart[] // Added relation to Cart
+  activity_logs              ActivityLog[]
 
-    created_at              DateTime? @default(now())
-    updated_at              DateTime? @updatedAt
+  created_at   DateTime?      @default(now())
+  updated_at   DateTime?      @updatedAt
+  Conversation Conversation[]
 
-    @@index([first_name, last_name, email])
-
-    @@map("users")
+  @@index([first_name, last_name, email])
+  @@map("users")
 }
 
 model Favorite {
-  id          Int       @id @default(autoincrement())
-  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id     Int
-  product     Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  product_id  Int
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    Int
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@unique([user_id, product_id])
-
   @@map("favorites")
 }
 
@@ -446,24 +442,75 @@ enum ShopSettingsType {
 }
 
 model ShopSettings {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique @db.VarChar(255)
-  value       String?  @db.Text
-  type        ShopSettingsType @default(FEATURE)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id         Int              @id @default(autoincrement())
+  key        String           @unique @db.VarChar(255)
+  value      String?          @db.Text
+  type       ShopSettingsType @default(FEATURE)
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
 
   @@map("shop_settings")
 }
 
 model BankDetails {
-  id              Int       @id @default(autoincrement())
-  bank_name       String    @db.VarChar(255)
-  account_name    String    @db.VarChar(255)
-  account_number  String    @db.VarChar(255) @unique
-  is_active       Boolean   @default(true)
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
+  id             Int      @id @default(autoincrement())
+  bank_name      String   @db.VarChar(255)
+  account_name   String   @db.VarChar(255)
+  account_number String   @unique @db.VarChar(255)
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   @@map("bank_details")
+}
+
+enum ConversationStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+model Conversation {
+  id                Int                @id @default(autoincrement())
+  conversation_uuid String             @unique
+  user_id           Int?
+  user              User?              @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  status            ConversationStatus @default(ACTIVE)
+  messages          Message[]
+  started_at        DateTime           @default(now())
+  last_active       DateTime           @updatedAt
+
+  @@index([user_id, status])
+  @@index([conversation_uuid])
+  @@map("conversations")
+}
+
+enum MessageSender {
+  USER
+  BOT
+  SYSTEM
+}
+
+model Message {
+  id              Int           @id @default(autoincrement())
+  conversation_id Int
+  conversation    Conversation  @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  content         String        @db.Text
+  sender          MessageSender
+  timestamp       DateTime      @default(now())
+
+  @@index([conversation_id, timestamp])
+  @@map("messages")
+}
+
+model FAQ {
+  id         Int      @id @default(autoincrement())
+  question   String   @unique
+  answer     String   @db.Text
+  category   String?
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("faqs")
 }

@@ -11,7 +11,6 @@ class CartStatus(str, Enum):
     ABANDONED = "ABANDONED"
     CONVERTED = "CONVERTED"
 
-# Pydantic models for request/response validation
 class CartItemBase(BaseModel):
     slug: Optional[str] = None
     name: Optional[str] = None

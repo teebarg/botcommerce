@@ -51,6 +51,12 @@ import {
     PaginatedUserSchema,
     ActivitySchema,
     PaginatedActivitySchema,
+    FAQSchema,
+    ConversationSchema,
+    ChatMessageSchema,
+    ConversationStatusSchema,
+    MessageSenderSchema,
+    PaginatedConversationSchema,
 } from "./schema";
 
 export type Activity = z.infer<typeof ActivitySchema>;
@@ -114,6 +120,14 @@ export type BankDetails = z.infer<typeof BankDetailsSchema>;
 
 export type PaystackResponse = z.infer<typeof PaystackResponseSchema>;
 
+export type ConversationStatus = z.infer<typeof ConversationStatusSchema>;
+export type MessageSender = z.infer<typeof MessageSenderSchema>;
+
+export type FAQ = z.infer<typeof FAQSchema>;
+export type Conversation = z.infer<typeof ConversationSchema>;
+export type PaginatedConversation = z.infer<typeof PaginatedConversationSchema>;
+export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+
 // custom
 export type CartUpdate = {
     status?: CartStatus;
@@ -158,7 +172,6 @@ export interface DashboardSummary {
     totalCustomers: number;
     revenueGrowth: number;
     ordersGrowth: number;
-    productsGrowth: number;
     customersGrowth: number;
 }
 

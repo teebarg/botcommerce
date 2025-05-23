@@ -19,7 +19,7 @@ const ClientOnly: React.FC<Props> = ({ children }) => {
     }
 
     return (
-        <motion.div initial={{ opacity: 0 }} viewport={{ once: true }} whileInView={{ opacity: 1 }}>
+        <motion.div className="flex-1" initial={{ opacity: 0 }} viewport={{ once: true }} whileInView={{ opacity: 1 }}>
             {children}
         </motion.div>
     );

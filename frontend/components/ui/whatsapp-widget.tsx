@@ -66,7 +66,7 @@ const WhatsAppWidget: React.FC = () => {
                     <div className="p-4 bg-[#E5DDD5]">
                         <div className="bg-white rounded-lg p-3 inline-block max-w-[80%]">
                             <p className="text-gray-800">Hi, welcome to {shopSettings?.shop_name}, how can we help you today 😊</p>
-                            <p className="text-xs text-gray-500 text-right mt-1">{formatDate(new Date())}</p>
+                            <p className="text-xs text-gray-500 text-right mt-1">{formatDate(new Date().toISOString())}</p>
                         </div>
                     </div>
 

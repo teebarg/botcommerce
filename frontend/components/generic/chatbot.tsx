@@ -4,8 +4,12 @@ import { cn } from "@lib/util/cn";
 import React, { useState, useEffect, useRef } from "react";
 import { Minus, Send, Smiley, X } from "nui-react-icons";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 import { useStore } from "@/app/store/use-store";
+import { api } from "@/apis/base";
+import { ChatMessage, Conversation } from "@/types/models";
+import { formatDate } from "@/lib/util/util";
 
 interface Props {}
 
@@ -33,12 +37,45 @@ const ChatBotWrapper: React.FC = () => {
 };
 
 const ChatBot: React.FC<Props> = () => {
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<Message[]>([
+        {
+            text: "Hello! I’m the Virtual Assistant, an automated support tool here to assist you with your questions. Ask me a question, or type 'help' for additional information.",
+            isUser: false,
+        },
+    ]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [input, setInput] = useState<string>("");
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [hasBeenClosed, setHasBeenClosed] = useState<boolean>(true);
+
+    const [conversationId, setConversationId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const conversationId = sessionStorage.getItem("chatbotConversationId");
+
+        if (conversationId) {
+            setConversationId(conversationId);
+            getMessages(conversationId);
+
+            return;
+        }
+
+        const createConversation = async () => {
+            const { data, error } = await api.post<Conversation>("/conversation/conversations");
+
+            if (error || !data?.conversation_uuid) {
+                toast.error("Failed to start a new conversation.");
+
+                return;
+            }
+
+            sessionStorage.setItem("chatbotConversationId", data.conversation_uuid);
+            setConversationId(data.conversation_uuid);
+        };
+
+        createConversation();
+    }, []);
 
     useEffect(() => {
         // Set isOpen after hydration
@@ -46,20 +83,6 @@ const ChatBot: React.FC<Props> = () => {
 
         setIsOpen(savedIsOpen);
     }, []);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setMessages([
-                {
-                    text: "Hello! I’m the Virtual Assistant, an automated support tool here to assist you with your questions. Ask me a question, or type 'help' for additional information.",
-                    isUser: false,
-                },
-                { text: "How can we help you today?", isUser: false },
-            ]);
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, [isOpen]);
 
     useEffect(() => {
         scrollToBottom();
@@ -85,29 +108,24 @@ const ChatBot: React.FC<Props> = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    const formatDate = (date: Date) => {
-        return date.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-    };
+    const getMessages = async (id: string) => {
+        const { data, error } = await api.get<ChatMessage[]>(`/conversation/conversations/${id}/messages`);
 
-    // Function to send message to Rasa bot and get response
-    const getRasaResponse = async (message: string) => {
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_RASA_URL}/webhooks/rest/webhook`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ message: message }),
-            });
-            const data = await response.json();
+        if (error || !data) {
+            toast.error("Failed to fetch messages.");
 
-            return data[0]?.text || "Sorry, I couldn't understand that.";
-        } catch (error) {
-            toast.error("Error communicating with Rasa");
+            return;
         }
+
+        setMessages((prev) => [
+            ...prev,
+            ...data.map((message: ChatMessage) => ({
+                text: message.content,
+                isUser: message.sender === "USER",
+            })),
+        ]);
     };
 
-    // Update handleSend function to use Rasa
     const handleSend = async () => {
         if (!input.trim()) return;
 
@@ -115,10 +133,16 @@ const ChatBot: React.FC<Props> = () => {
         setMessages([...messages, { text: input, isUser: true }]);
         setInput("");
 
-        // Get response from Rasa
-        const botResponse = await getRasaResponse(input);
+        const { data, error } = await api.post<ChatMessage>(`/conversation/conversations/${conversationId}/messages`, { content: input });
 
-        setMessages((prev) => [...prev, { text: botResponse, isUser: false }]);
+        if (error) {
+            toast.error(error);
+            setIsLoading(false);
+
+            return;
+        }
+
+        setMessages((prev) => [...prev, { text: data?.content || "", isUser: false }]);
         setIsLoading(false);
     };
 
@@ -148,7 +172,7 @@ const ChatBot: React.FC<Props> = () => {
         <React.Fragment>
             <div className="fixed right-2 md:right-6 bottom-6 z-[500]">
                 <div
-                    className="max-w-md w-[calc(100%-8px)] ml-2 sm:ml-auto sm:w-[400px] h-[600px] bg-gray-900 rounded-lg shadow-xl hidden data-[open=true]:flex flex-col"
+                    className="max-w-md w-[calc(100%-8px)] ml-2 sm:ml-auto sm:w-[400px] h-[700px] bg-gray-900 rounded-lg shadow-xl hidden data-[open=true]:flex flex-col"
                     data-open={isOpen ? "true" : "false"}
                 >
                     {/* Header */}
@@ -169,16 +193,16 @@ const ChatBot: React.FC<Props> = () => {
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {/* Date */}
                         <p className={cn("text-sm my-3 mx-0 text-center uppercase min-h-4 leading-6 font-medium text-white")}>
-                            {formatDate(new Date())}
+                            {formatDate(new Date().toISOString())}
                         </p>
                         {messages.map((message: Message, index: number) => (
                             <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
                                 <div
-                                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                                    className={`max-w-[80%] rounded-lg px-4 py-2 chatbot-message ${
                                         message.isUser ? "bg-blue-500 text-white rounded-br-none" : "bg-gray-800 text-gray-200 rounded-bl-none"
                                     }`}
                                 >
-                                    <p className="text-sm">{message.text}</p>
+                                    <div className="text-sm">{message.isUser ? message.text : <ReactMarkdown>{message.text}</ReactMarkdown>}</div>
                                 </div>
                             </div>
                         ))}

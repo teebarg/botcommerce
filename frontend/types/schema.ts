@@ -23,6 +23,10 @@ export const StatusSchema = z.enum(["PENDING", "ACTIVE", "INACTIVE"]);
 
 export const ShopSettingsTypeSchema = z.enum(["FEATURE", "SHOP_DETAIL", "CUSTOM"]);
 
+export const ConversationStatusSchema = z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]);
+
+export const MessageSenderSchema = z.enum(["USER", "BOT", "SYSTEM"]);
+
 export const TokenSchema = z.object({
     access_token: z.string(),
     token_type: z.string().default("bearer"),
@@ -401,4 +405,35 @@ export const ActivitySchema = z.object({
 
 export const PaginatedActivitySchema = PagSchema.extend({
     activities: z.array(ActivitySchema),
+});
+
+export const ConversationSchema = z.object({
+    id: z.number(),
+    conversation_uuid: z.string(),
+    user_id: z.number(),
+    started_at: z.string(),
+    last_active: z.string(),
+    status: ConversationStatusSchema,
+});
+
+export const PaginatedConversationSchema = PagSchema.extend({
+    conversations: z.array(ConversationSchema),
+});
+
+export const ChatMessageSchema = z.object({
+    id: z.number(),
+    conversation_id: z.number(),
+    content: z.string(),
+    sender: MessageSenderSchema,
+    timestamp: z.string(),
+});
+
+export const FAQSchema = z.object({
+    id: z.number(),
+    question: z.string(),
+    answer: z.string(),
+    category: z.string().optional(),
+    is_active: z.boolean(),
+    created_at: z.string(),
+    updated_at: z.string(),
 });

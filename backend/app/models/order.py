@@ -2,11 +2,9 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
-from enum import Enum
 from prisma.models import Address, Payment, OrderItem, User
 from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
 
-# Pydantic models for request/response validation
 # class OrderStatus(str, Enum):
 #     PENDING = "PENDING"
 #     PAID = "PAID"
