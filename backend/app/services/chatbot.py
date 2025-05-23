@@ -55,7 +55,6 @@ async def enhance_prompt_with_data(user_message: str, user_id: Optional[int] = N
     enhanced_info = []
     query_terms = [term.lower() for term in user_message.split()]
 
-    # Query detection patterns
     product_patterns = ["product", "item", "buy", "purchase", "price", "do you have"]
     category_patterns = ["category", "categories", "type", "types", "group"]
     brand_patterns = ["brand", "make", "manufacturer"]
@@ -63,7 +62,6 @@ async def enhance_prompt_with_data(user_message: str, user_id: Optional[int] = N
     shipping_patterns = ["shipping", "delivery", "send", "track"]
     payment_patterns = ["payment", "pay", "credit card", "cash", "bank transfer", "paystack"]
 
-    # Check for product related queries
     if any(pattern in user_message.lower() for pattern in product_patterns):
         products_info, product_id = await get_relevant_products(query_terms)
         if products_info:

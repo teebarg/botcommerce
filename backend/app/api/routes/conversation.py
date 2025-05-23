@@ -20,7 +20,6 @@ client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 router = APIRouter()
 
-# E-commerce bot system prompt based on your specific schema
 ECOMMERCE_SYSTEM_PROMPT = """
 You are a helpful customer support assistant named Olaoluwa for an online e-commerce store.
 
@@ -85,8 +84,8 @@ async def create_conversation(user: UserDep):
 
 @router.get("/conversations")
 async def list_conversations(
-    user_id: Optional[int] = Query(None, description="Filter by user ID"),
-    status: Optional[ConversationStatus] = Query(None, description="Filter by status"),
+    user_id: Optional[int] = Query(None),
+    status: Optional[ConversationStatus] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100)
 ):
@@ -140,17 +139,13 @@ async def get_conversation_by_uuid(uid: str) -> Conversation:
 @router.patch("/conversations/{id}")
 async def update_conversation(conversation_update: ConversationUpdate, id: int) -> Conversation:
     """Update a conversation"""
-    # First check if conversation exists
     existing_conversation = await db.conversation.find_unique(where={"id": id})
     if not existing_conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    # Prepare update data
     update_data = {}
     if conversation_update.status is not None:
         update_data["status"] = conversation_update.status
-
-    # Update conversation
     updated_conversation = await db.conversation.update(where={"id": id}, data=update_data)
     return updated_conversation
 
@@ -178,7 +173,6 @@ async def create_message(user: UserDep, message: MessageCreate, uid: str):
     user_id = user.id if user else None
 
     try:
-        # Create message
         await db.message.create(
             data={
                 "conversation": {"connect": {"id": conversation.id}},

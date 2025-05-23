@@ -65,7 +65,6 @@ async def create_faq(faq: FAQCreate):
         )
         return new_faq
     except Exception as e:
-        # Handle unique constraint violation
         if "unique constraint" in str(e).lower():
             raise HTTPException(status_code=400, detail="A FAQ with this question already exists")
         raise
@@ -95,7 +94,6 @@ async def update_faq(faq_update: FAQUpdate, id: int):
         )
         return updated_faq
     except Exception as e:
-        # Handle unique constraint violation
         if "unique constraint" in str(e).lower():
             raise HTTPException(status_code=400, detail="A FAQ with this question already exists")
         raise
