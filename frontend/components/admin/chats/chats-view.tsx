@@ -10,7 +10,6 @@ import ChatsActions from "./chats-actions";
 import ChatsCard from "./chats-card";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Conversation, ConversationStatus } from "@/types/models";
 import { useConversations } from "@/lib/hooks/useApi";
@@ -50,86 +49,82 @@ const ChatsView: React.FC = () => {
     };
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Conversations view</CardTitle>
-                <CardDescription>Manage your conversations.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <AnimatePresence>
-                    <div key="table" className="md:block hidden">
-                        <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>S/N</TableHead>
-                                    <TableHead>Conversation UUID</TableHead>
-                                    <TableHead>User ID</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Started At</TableHead>
-                                    <TableHead>Last Active</TableHead>
-                                    <TableHead>Actions</TableHead>
+        <div className="px-2 md:px-10 py-8">
+            <h3 className="text-2xl font-semibold">Conversations view</h3>
+            <p className="text-muted-foreground mb-4">Manage your conversations.</p>
+            <AnimatePresence>
+                <div key="table" className="md:block hidden">
+                    <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>S/N</TableHead>
+                                <TableHead>Conversation UUID</TableHead>
+                                <TableHead>User ID</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Started At</TableHead>
+                                <TableHead>Last Active</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableRow key="loading">
+                                    <TableCell className="text-center" colSpan={6}>
+                                        Loading...
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                    <TableRow key="loading">
-                                        <TableCell className="text-center" colSpan={6}>
-                                            Loading...
+                            ) : conversations?.length === 0 ? (
+                                <TableRow key="no-orders">
+                                    <TableCell className="text-center" colSpan={6}>
+                                        No conversations found
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                conversations?.map((conversation: Conversation, idx: number) => (
+                                    <TableRow key={idx}>
+                                        <TableCell className="font-medium">{idx + 1}</TableCell>
+                                        <TableCell>{conversation.conversation_uuid}</TableCell>
+                                        <TableCell>{conversation.user_id}</TableCell>
+                                        <TableCell>{getStatusBadge(conversation.status)}</TableCell>
+                                        <TableCell>{formatDate(conversation.started_at)}</TableCell>
+                                        <TableCell>{formatDate(conversation.last_active)}</TableCell>
+                                        <TableCell>
+                                            <ChatsActions conversation={conversation} />
                                         </TableCell>
                                     </TableRow>
-                                ) : conversations?.length === 0 ? (
-                                    <TableRow key="no-orders">
-                                        <TableCell className="text-center" colSpan={6}>
-                                            No conversations found
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    conversations?.map((conversation: Conversation, idx: number) => (
-                                        <TableRow key={idx}>
-                                            <TableCell className="font-medium">{idx + 1}</TableCell>
-                                            <TableCell>{conversation.conversation_uuid}</TableCell>
-                                            <TableCell>{conversation.user_id}</TableCell>
-                                            <TableCell>{getStatusBadge(conversation.status)}</TableCell>
-                                            <TableCell>{formatDate(conversation.started_at)}</TableCell>
-                                            <TableCell>{formatDate(conversation.last_active)}</TableCell>
-                                            <TableCell>
-                                                <ChatsActions conversation={conversation} />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                    <div key="mobile" className="md:hidden">
-                        <div className="pb-4">
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+                <div key="mobile" className="md:hidden">
+                    <div className="pb-4">
+                        <div>
+                            <div className="relative mb-2 py-4 flex justify-end">
+                                <button className="flex items-center bg-content1 rounded-md p-4" onClick={() => setFilterOpen(true)}>
+                                    <SlidersHorizontal className="text-default-500" size={18} />
+                                </button>
+                            </div>
                             <div>
-                                <div className="relative mb-2 py-4 flex justify-end">
-                                    <button className="flex items-center bg-content1 rounded-md p-4" onClick={() => setFilterOpen(true)}>
-                                        <SlidersHorizontal className="text-default-500" size={18} />
-                                    </button>
-                                </div>
-                                <div>
-                                    {conversations?.map((conversation: Conversation, idx: number) => (
-                                        <ChatsCard key={idx} actions={<ChatsActions conversation={conversation} />} conversation={conversation} />
-                                    ))}
-                                </div>
-
-                                {conversations?.length === 0 && (
-                                    <div className="text-center py-10">
-                                        <p className="text-default-500">No users found</p>
-                                    </div>
-                                )}
+                                {conversations?.map((conversation: Conversation, idx: number) => (
+                                    <ChatsCard key={idx} actions={<ChatsActions conversation={conversation} />} conversation={conversation} />
+                                ))}
                             </div>
 
-                            <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
+                            {conversations?.length === 0 && (
+                                <div className="text-center py-10">
+                                    <p className="text-default-500">No conversation found</p>
+                                </div>
+                            )}
                         </div>
+
+                        <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                     </div>
-                    {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
-                </AnimatePresence>
-            </CardContent>
-        </Card>
+                </div>
+                {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
+            </AnimatePresence>
+        </div>
     );
 };
 

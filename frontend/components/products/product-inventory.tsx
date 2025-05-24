@@ -10,7 +10,6 @@ import { ProductDetails } from "../admin/product/product-details";
 
 import ProductUpload from "./product-upload";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DrawerUI from "@/components/drawer";
 import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
@@ -56,42 +55,39 @@ export function ProductInventory() {
     };
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Product Inventory</CardTitle>
-                <CardDescription>Manage your product inventory and stock levels.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <AnimatePresence>
-                    <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-                        <div className="max-w-[30rem] mb-8 w-full">
-                            <ProductUpload />
-                        </div>
-                        <div className="flex gap-2">
-                            <DrawerUI
-                                open={addState.isOpen}
-                                title={`Add Product`}
-                                trigger={
-                                    <span className="h-10 rounded-md mb-4 px-4 bg-primary text-white hover:bg-primary/90 inline-flex items-center text-sm font-medium transition-colors focus-visible:outline-none">
-                                        Add Product
-                                    </span>
-                                }
-                                onOpenChange={addState.setOpen}
-                            >
-                                <ProductView onClose={addState.close} />
-                            </DrawerUI>
-                            <Button disabled={isExporting} isLoading={isExporting} variant="outline" onClick={handleExport}>
-                                <Download className="mr-2 h-4 w-4" /> Export Products
-                            </Button>
-                            <Button disabled={isIndexing} isLoading={isIndexing} variant="outline" onClick={handleIndex}>
-                                Index
-                            </Button>
-                        </div>
-                        {/* Product Details */}
-                        <ProductDetails />
-                    </motion.div>
-                </AnimatePresence>
-            </CardContent>
-        </Card>
+        <div className="px-2 md:px-10 py-8">
+            <div>
+                <h3 className="text-2xl font-semibold">Product Inventory</h3>
+                <p className="text-muted-foreground">Manage your product inventory and stock levels.</p>
+            </div>
+            <AnimatePresence>
+                <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+                    <div className="max-w-[30rem] mb-8 w-full">
+                        <ProductUpload />
+                    </div>
+                    <div className="flex gap-2">
+                        <DrawerUI
+                            open={addState.isOpen}
+                            title={`Add Product`}
+                            trigger={
+                                <span className="h-10 rounded-md mb-4 px-4 bg-primary text-white hover:bg-primary/90 inline-flex items-center text-sm font-medium transition-colors focus-visible:outline-none">
+                                    Add Product
+                                </span>
+                            }
+                            onOpenChange={addState.setOpen}
+                        >
+                            <ProductView onClose={addState.close} />
+                        </DrawerUI>
+                        <Button disabled={isExporting} isLoading={isExporting} variant="outline" onClick={handleExport}>
+                            <Download className="mr-2 h-4 w-4" /> Export Products
+                        </Button>
+                        <Button disabled={isIndexing} isLoading={isIndexing} variant="outline" onClick={handleIndex}>
+                            Index
+                        </Button>
+                    </div>
+                    <ProductDetails />
+                </motion.div>
+            </AnimatePresence>
+        </div>
     );
 }

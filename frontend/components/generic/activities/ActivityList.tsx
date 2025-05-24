@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Activity } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
 interface ActivityListProps {
     activities: Activity[];
@@ -34,15 +35,7 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities, isLoadin
     const [removing, setRemoving] = useState<number | null>(null);
 
     if (isLoading) {
-        return (
-            <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                    <div key={i} className="animate-pulse">
-                        <div className="h-16 bg-gray-200 rounded-lg" />
-                    </div>
-                ))}
-            </div>
-        );
+        return <TableSkeleton />;
     }
 
     if (!activities.length) {

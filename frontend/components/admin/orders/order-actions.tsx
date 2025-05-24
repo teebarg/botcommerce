@@ -21,7 +21,7 @@ const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
         <div className="flex items-center gap-2">
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                 <DialogTrigger asChild>
-                    <Button className="flex-1" size="sm" variant="outline">
+                    <Button className="flex-1" variant="outline">
                         View Details
                     </Button>
                 </DialogTrigger>

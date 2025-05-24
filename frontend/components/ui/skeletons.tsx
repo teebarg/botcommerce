@@ -23,7 +23,7 @@ export const AvatarSkeleton = ({ size = "md" }) => {
 };
 
 export const CardSkeleton = ({ showAvatar = true, textLines = 3 }) => (
-    <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+    <div className="p-6 bg-background rounded-lg shadow-sm border border-input">
         {showAvatar && (
             <div className="flex items-center space-x-4 mb-4">
                 <AvatarSkeleton />
@@ -50,13 +50,13 @@ export const ListItemSkeleton = () => (
 
 export const TableSkeleton = ({ rows = 5, columns = 4 }) => (
     <div className="w-full">
-        <div className="flex space-x-4 p-4 border-b border-gray-200">
+        <div className="flex space-x-4 p-4 border-b border-input">
             {Array.from({ length: columns }).map((_, i) => (
                 <Skeleton key={i} className="h-4 flex-1" />
             ))}
         </div>
         {Array.from({ length: rows }).map((_, rowIndex) => (
-            <div key={rowIndex} className="flex space-x-4 p-4 border-b border-gray-100">
+            <div key={rowIndex} className="flex space-x-4 p-4 border-b border-input">
                 {Array.from({ length: columns }).map((_, colIndex) => (
                     <Skeleton key={colIndex} className="h-4 flex-1" />
                 ))}

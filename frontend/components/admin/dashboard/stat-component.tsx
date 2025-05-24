@@ -5,7 +5,7 @@ import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/lib/util/util";
 import { useStatsTrends } from "@/lib/hooks/useApi";
-import { Skeleton } from "@/components/generic/skeleton";
+import { CardSkeleton } from "@/components/ui/skeletons";
 
 const StatComponent: React.FC = () => {
     const { data, isLoading, error } = useStatsTrends();
@@ -18,17 +18,25 @@ const StatComponent: React.FC = () => {
     };
 
     if (isLoading) {
-        return <Skeleton className="h-12 w-full" />;
+        return (
+            <div className="px-2 md:px-10 py-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {Array.from({ length: 4 }).map((_, idx) => (
+                        <CardSkeleton key={idx} showAvatar={false} />
+                    ))}
+                </div>
+            </div>
+        );
     }
 
     if (error || !data) {
-        return <div>Error: {error?.message || "An error occurred"}</div>;
+        return;
     }
 
     const { summary } = data;
 
     return (
-        <div className="p-4">
+        <div className="px-2 md:px-10 py-8">
             <h2 className="text-lg font-medium mb-3">Store Overview</h2>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
