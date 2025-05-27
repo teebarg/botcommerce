@@ -80,7 +80,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     return (
         <div
             className={cn(
-                "transition-all duration-300 bg-gradient-to-br from-background to-content1 flex items-center justify-center p-4",
+                "transition-all duration-300 bg-gradient-to-br from-background to-content1 flex items-center justify-center p-4 w-full",
                 className
             )}
         >

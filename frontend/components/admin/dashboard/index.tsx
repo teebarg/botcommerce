@@ -53,7 +53,12 @@ const OrderStatusBadge = ({ status }: { status: string }) => {
 const RecentOrdersList = () => {
     const { data, isLoading } = useOrders({ take: 5 });
 
-    if (isLoading) return <TableSkeleton />;
+    if (isLoading)
+        return (
+            <div className="px-2 md:px-10 py-8">
+                <TableSkeleton />
+            </div>
+        );
 
     const { orders } = data || {};
 

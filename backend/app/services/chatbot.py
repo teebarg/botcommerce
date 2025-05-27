@@ -6,7 +6,8 @@ async def get_relevant_faqs(user_message: str) -> str:
     Get relevant FAQ entries based on the user message
     """
     try:
-        query_terms = [term.lower() for term in user_message.split() if len(term) > 3]
+        query_terms = [term.lower()
+                       for term in user_message.split() if len(term) > 3]
 
         all_faqs = []
         for term in query_terms:
@@ -47,6 +48,7 @@ async def get_relevant_faqs(user_message: str) -> str:
         print(f"Error fetching FAQs: {str(e)}")
         return ""
 
+
 async def enhance_prompt_with_data(user_message: str, user_id: Optional[int] = None):
     """
     Enhance the system prompt with relevant data from the database based on user query
@@ -55,17 +57,28 @@ async def enhance_prompt_with_data(user_message: str, user_id: Optional[int] = N
     enhanced_info = []
     query_terms = [term.lower() for term in user_message.split()]
 
-    product_patterns = ["product", "item", "buy", "purchase", "price", "do you have"]
+    product_intent_patterns = ['do you have', 'is there', 'can i get', 'i want to buy','show me',
+                               'have you got', 'is the', 'do you sell', 'looking for', 'find me', 'i need a']
+    product_patterns = ["product", "buy", "purchase", "latest products", "latest items", "products", 'bestsellers', 'deals', 'trending', 'new arrivals', 'available']
     category_patterns = ["category", "categories", "type", "types", "group"]
     brand_patterns = ["brand", "make", "manufacturer"]
     cart_patterns = ["cart", "basket", "bag", "add to cart", "checkout"]
     shipping_patterns = ["shipping", "delivery", "send", "track"]
-    payment_patterns = ["payment", "pay", "credit card", "cash", "bank transfer", "paystack"]
+    payment_patterns = ["payment", "pay", "credit card",
+                        "cash", "bank transfer", "paystack"]
+
+    if any(pattern in user_message.lower() for pattern in product_intent_patterns):
+        products_info, product_id = await get_relevant_products(query_terms=query_terms, product_intent=True)
+        if products_info:
+            enhanced_info.append(
+                "Available products for the customer's query:")
+            enhanced_info.append(products_info)
 
     if any(pattern in user_message.lower() for pattern in product_patterns):
-        products_info, product_id = await get_relevant_products(query_terms)
+        products_info, product_id = await get_relevant_products(query_terms=query_terms, trending=True)
         if products_info:
-            enhanced_info.append("Relevant products that might answer the customer's query:")
+            enhanced_info.append(
+                "Relevant products that might answer the customer's query:")
             enhanced_info.append(products_info)
 
     # Check for category related queries
@@ -108,7 +121,8 @@ async def enhance_prompt_with_data(user_message: str, user_id: Optional[int] = N
 
     return "\n\n".join(enhanced_info)
 
-async def get_relevant_products(query_terms: List[str]) -> tuple[str, Optional[str]]:
+
+async def get_relevant_products(query_terms: List[str], product_intent: bool = False, trending: bool = False) -> tuple[str, Optional[str]]:
     """
     Get relevant products based on query terms from the database
     Returns: (product_info_text, top_product_id)
@@ -116,18 +130,33 @@ async def get_relevant_products(query_terms: List[str]) -> tuple[str, Optional[s
     try:
         all_products = []
 
-        for term in query_terms:
-            if len(term) < 2:
-                continue
+        if product_intent:
+            for term in query_terms:
+                if len(term) < 3:
+                    continue
 
+                products = await db.product.find_many(
+                    where={
+                        "OR": [
+                            {"name": {"contains": term, "mode": "insensitive"}},
+                            {"description": {"contains": term, "mode": "insensitive"}},
+                            {"slug": {"contains": term, "mode": "insensitive"}}
+                        ]
+                    },
+                    include={
+                        "variants": True,
+                        "brand": True,
+                        "categories": True,
+                        "images": True
+                    },
+                    take=5
+                )
+
+                all_products.extend(products)
+
+        elif trending:
             products = await db.product.find_many(
-                where={
-                    "OR": [
-                        {"name": {"contains": term, "mode": "insensitive"}},
-                        {"description": {"contains": term, "mode": "insensitive"}},
-                        {"slug": {"contains": term, "mode": "insensitive"}}
-                    ]
-                },
+                where={"collections": {"name": "Trending"}},
                 include={
                     "variants": True,
                     "brand": True,
@@ -153,33 +182,36 @@ async def get_relevant_products(query_terms: List[str]) -> tuple[str, Optional[s
         # Limit to top 3 products
         # unique_products = unique_products[:3]
 
-        top_product_id = str(unique_products[0].id) if unique_products else None
+        top_product_id = str(
+            unique_products[0].id) if unique_products else None
 
         product_info = ""
         for product in unique_products:
             product_info += f"- {product.name} (SKU: {product.sku})\n"
-            product_info += f"  Price: ${product.price}\n"
-            product_info += f"  [Product Link](/products/{product.slug})\n"
-            product_info += f'  ![Product Image]({product.images[0].image} "Product Image!")\n'
+            product_info += f"  Price: ₦{product.price}\n"
+            product_info += f"  [View Product](/products/{product.slug})\n"
+            product_info += f'  ![Image]({product.images[0].image} "Product Image!")\n'
             if product.old_price:
-                product_info += f"  Was: ${product.old_price}\n"
+                product_info += f"  Was: ₦{product.old_price}\n"
             product_info += f"  Status: {product.status}\n"
 
             if product.brand:
                 product_info += f"  Brand: {product.brand.name}\n"
 
             if product.categories and len(product.categories) > 0:
-                categories = ", ".join([cat.name for cat in product.categories])
+                categories = ", ".join(
+                    [cat.name for cat in product.categories])
                 product_info += f"  Categories: {categories}\n"
 
             if product.description:
-                description = product.description[:100] + "..." if len(product.description) > 100 else product.description
+                description = product.description[:100] + "..." if len(
+                    product.description) > 100 else product.description
                 product_info += f"  Description: {description}\n"
 
-            if product.variants and len(product.variants) > 0:
-                product_info += "  Available variants:\n"
-                for variant in product.variants[:3]:  # Limit to 3 variants
-                    product_info += f"    - {variant.name}: ${variant.price} ({variant.status})\n"
+            # if product.variants and len(product.variants) > 0:
+            #     product_info += "  Available variants:\n"
+            #     for variant in product.variants[:3]:  # Limit to 3 variants
+            #         product_info += f"    - {variant.name}: ${variant.price} ({variant.status})\n"
 
             product_info += "\n"
 
@@ -187,6 +219,7 @@ async def get_relevant_products(query_terms: List[str]) -> tuple[str, Optional[s
     except Exception as e:
         print(f"Error fetching products: {str(e)}")
         return "", None
+
 
 async def get_categories_info(query_terms: List[str]) -> tuple[str, Optional[str]]:
     """
@@ -232,14 +265,16 @@ async def get_categories_info(query_terms: List[str]) -> tuple[str, Optional[str
         unique_categories = unique_categories[:3]
 
         # Get top category ID for relation tracking
-        top_category_id = str(unique_categories[0].id) if unique_categories else None
+        top_category_id = str(
+            unique_categories[0].id) if unique_categories else None
 
         category_info = ""
         for category in unique_categories:
             category_info += f"- {category.name}\n"
 
             if category.subcategories and len(category.subcategories) > 0:
-                subcats = ", ".join([subcat.name for subcat in category.subcategories])
+                subcats = ", ".join(
+                    [subcat.name for subcat in category.subcategories])
                 category_info += f"  Subcategories: {subcats}\n"
 
             if category.products and len(category.products) > 0:
@@ -253,6 +288,7 @@ async def get_categories_info(query_terms: List[str]) -> tuple[str, Optional[str
     except Exception as e:
         print(f"Error fetching categories: {str(e)}")
         return "", None
+
 
 async def get_brands_info(query_terms: List[str]) -> tuple[str, Optional[str]]:
     """
@@ -316,6 +352,7 @@ async def get_brands_info(query_terms: List[str]) -> tuple[str, Optional[str]]:
     except Exception as e:
         print(f"Error fetching brands: {str(e)}")
         return "", None
+
 
 async def get_user_cart_info(user_id: int) -> tuple[str, Optional[str]]:
     """

@@ -21,7 +21,7 @@ client = genai.Client(api_key=settings.GEMINI_API_KEY)
 router = APIRouter()
 
 ECOMMERCE_SYSTEM_PROMPT = """
-You are a helpful customer support assistant named Olaoluwa for an online e-commerce store.
+You are a helpful customer support assistant for our online e-commerce store.
 
 Your responsibilities include:
 1. Answering questions about products (including variants, categories, brands, collections)
@@ -57,6 +57,10 @@ When responding to customers:
 - Always thank customers for their patience and business
 
 Remember that you don't have access to specific customer order data, so for order-specific questions, guide customers to check their email confirmation or account page on our website.
+
+when you are not sure about something, just say "I don't know" and guide the customer to check their email confirmation or account page on our website.
+
+When a customer types `help`, you should respond with a list of available commands and the help you can provide.
 """
 
 class MessageCreate(BaseModel):
@@ -196,8 +200,8 @@ async def create_message(user: UserDep, message: MessageCreate, uid: str):
         initial_user_message_content = ECOMMERCE_SYSTEM_PROMPT
         if faqs:
             initial_user_message_content += "\n\nRelevant FAQs that might help with this query:\n" + faqs
-        if product_info:
-            initial_user_message_content += "\n\n" + product_info
+        # if product_info:
+        initial_user_message_content += "\n\nHere is available products for the customer's query below: If found, show product name, price, and link. If not found, say we don’t have it and suggest alternatives.\n" + product_info
 
         ai_messages.append({"role": "user", "parts": [{"text": initial_user_message_content}]})
 
