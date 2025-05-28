@@ -10,7 +10,6 @@ import { InstallPrompt } from "@/components/pwa/prompt";
 import { cn } from "@/lib/util/cn";
 import { getSiteConfig } from "@/lib/config";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import WhatsAppWidget from "@/components/ui/whatsapp-widget";
 import { api } from "@/apis";
 import SetShopSettings from "@/components/set-shop-settings";
 import { WebSocketProvider } from "@/providers/websocket";
@@ -81,7 +80,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     </div>
                     {/* {!user && <Google />} */}
                 </ProgressBar>
-                <WhatsAppWidget />
             </body>
         </html>
     );

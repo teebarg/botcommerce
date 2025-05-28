@@ -23,7 +23,7 @@ const FaqView: React.FC = () => {
     };
 
     return (
-        <div className="container mx-auto py-8 px-6">
+        <div className="px-2 md:px-10 py-8">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage FAQs</h1>
                 <Drawer open={state.isOpen} onOpenChange={state.setOpen}>

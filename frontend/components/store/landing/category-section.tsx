@@ -2,13 +2,17 @@
 
 import { useCategories } from "@/lib/hooks/useApi";
 import { Category } from "@/types/models";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { CardSkeleton } from "@/components/ui/skeletons";
 
 const CategoriesSection: React.FC = () => {
     const { data: categories, isLoading } = useCategories();
 
     if (isLoading) {
-        return <TableSkeleton />;
+        return (
+            <div className="max-w-8xl mx-auto bg-content1 p-4 w-full">
+                <CardSkeleton showAvatar={false} />
+            </div>
+        );
     }
 
     return (

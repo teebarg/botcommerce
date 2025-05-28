@@ -7,11 +7,10 @@ import Link from "next/link";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useOrders } from "@/lib/hooks/useApi";
 import { Order } from "@/types/models";
-import { Skeleton } from "@/components/generic/skeleton";
 import { currency } from "@/lib/util/util";
 import { Badge } from "@/components/ui/badge";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
-// Function to render status badge
 const OrderStatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<string, { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "success" }> = {
         PAID: {
@@ -56,8 +55,8 @@ const RecentOrdersList = () => {
 
     if (isLoading)
         return (
-            <div className="mt-4 bg-background px-2 md:px-8 py-8 mx-4 rounded-xl">
-                <Skeleton className="h-48" />
+            <div className="px-2 md:px-10 py-8">
+                <TableSkeleton />
             </div>
         );
 
@@ -65,14 +64,14 @@ const RecentOrdersList = () => {
 
     if (orders?.length === 0) {
         return (
-            <div className="mt-4 md:px-2 py-8 mx-4 rounded-xl">
+            <div className="px-2 md:px-10 py-8">
                 <p>No orders found!</p>
             </div>
         );
     }
 
     return (
-        <div className="mt-4 md:px-2 py-8 mx-4 rounded-xl">
+        <div className="px-2 md:px-10 py-8">
             <div className="flex justify-between items-center mb-3">
                 <h3 className="text-lg font-medium">Recent Orders</h3>
                 <Link className="text-sm font-medium text-primary" href="/admin/orders">

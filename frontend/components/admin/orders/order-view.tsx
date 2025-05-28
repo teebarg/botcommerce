@@ -17,7 +17,7 @@ import { useOrders } from "@/lib/hooks/useApi";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import PaginationUI from "@/components/pagination";
-import { Skeleton } from "@/components/generic/skeleton";
+import { CardSkeleton } from "@/components/ui/skeletons";
 
 const LIMIT = 10;
 
@@ -60,7 +60,7 @@ const OrderView: React.FC = () => {
     };
 
     return (
-        <div className="bg-card min-h-screen px-3 py-6">
+        <div className="px-2 md:px-10 py-8">
             <div className="mb-6 flex flex-col">
                 <h1 className="text-2xl font-semibold">Order view</h1>
                 <p className="text-muted-foreground">Manage your orders.</p>
@@ -118,7 +118,7 @@ const OrderView: React.FC = () => {
                                 <Search className="text-gray-400" size={18} />
                             </div>
                             <input
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                                className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                                 placeholder="Search orders..."
                                 type="text"
                                 value={searchParams.get("search") ?? ""}
@@ -129,7 +129,7 @@ const OrderView: React.FC = () => {
                         <OrderFilters />
 
                         <div>
-                            {isLoading && <Skeleton className="w-full h-96" />}
+                            {isLoading && <CardSkeleton showAvatar={false} />}
                             {orders?.map((order: Order, idx: number) => (
                                 <OrderCard key={idx} actions={<OrderActions order={order} />} order={order} />
                             ))}

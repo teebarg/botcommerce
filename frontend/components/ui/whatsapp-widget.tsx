@@ -33,7 +33,7 @@ const WhatsAppWidget: React.FC = () => {
         <>
             {/* WhatsApp Button */}
             <button
-                className="fixed bottom-24 right-6 md:right-12 bg-[#25D366] rounded-full p-2 shadow-lg hover:bg-[#128C7E] transition-colors z-50 text-white"
+                className="fixed bottom-40 right-6 md:right-12 bg-[#25D366] rounded-full p-2 shadow-lg hover:bg-[#128C7E] transition-colors z-50 text-white"
                 onClick={() => setIsOpen(true)}
             >
                 <svg fill="white" focusable="false" height="45" viewBox="0 0 24 24" width="45">

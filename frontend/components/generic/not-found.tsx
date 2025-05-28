@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
 import { cn } from "@/lib/util/cn";
+import { useStore } from "@/app/store/use-store";
 
 interface NotFoundProps {
     className?: string;
@@ -14,34 +15,43 @@ interface NotFoundProps {
 
 export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     const router = useRouter();
+    const { shopSettings } = useStore();
+
     const scenarios: Record<string, any> = {
         "404": {
-            icon: <Home className="w-16 h-16 text-blue-500" />,
+            icon: <Home className="w-12 h-12 text-blue-500" />,
             title: "Page Not Found",
             description: "The page you're looking for doesn't exist or has been moved.",
             primaryAction: "Go Home",
             secondaryAction: "Go Back",
         },
         search: {
-            icon: <Search className="w-16 h-16 text-purple-500" />,
+            icon: <Search className="w-12 h-12 text-purple-500" />,
             title: "No Results Found",
             description: "We couldn't find anything matching your search criteria. Try adjusting your filters or search terms.",
             primaryAction: "Clear Filters",
             secondaryAction: "Browse All",
         },
         data: {
-            icon: <RefreshCw className="w-16 h-16 text-green-500" />,
+            icon: <RefreshCw className="w-12 h-12 text-green-500" />,
             title: "No Data Available",
             description: "There's no data to display at the moment. This might be temporary or you may need different permissions.",
             primaryAction: "Refresh",
             secondaryAction: "Go back",
         },
         connection: {
-            icon: <RefreshCw className="w-16 h-16 text-red-500" />,
+            icon: <RefreshCw className="w-12 h-12 text-red-500" />,
             title: "Connection Lost",
             description: "We're having trouble connecting to our servers. Please check your internet connection and try again.",
             primaryAction: "Retry",
             secondaryAction: "Go Offline",
+        },
+        server: {
+            icon: <RefreshCw className="w-12 h-12 text-red-500" />,
+            title: "Server Error",
+            description: "An error occurred on our end. Please try again later.",
+            primaryAction: "Retry",
+            secondaryAction: "Go Home",
         },
     };
 
@@ -52,9 +62,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
             router.push("/");
         } else if (scenario === "search") {
             router.push("/search");
-        } else if (scenario === "data") {
-            router.refresh();
-        } else if (scenario === "connection") {
+        } else if (["data", "connection", "server"].includes(scenario!)) {
             router.refresh();
         }
     };
@@ -64,9 +72,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
             router.back();
         } else if (scenario === "search") {
             router.back();
-        } else if (scenario === "data") {
-            router.back();
-        } else if (scenario === "connection") {
+        } else if (["data", "connection", "server"].includes(scenario!)) {
             router.back();
         }
     };
@@ -74,14 +80,13 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     return (
         <div
             className={cn(
-                "transition-all duration-300 bg-gradient-to-br from-background to-content1 flex items-center justify-center p-4",
+                "transition-all duration-300 bg-gradient-to-br from-background to-content1 flex items-center justify-center p-4 w-full",
                 className
             )}
         >
             <div className="max-w-md w-full text-center">
                 {/* Main Content */}
                 <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-content1 border-input">
-                    {/* Animated Icon Container */}
                     <div className="mb-6 flex justify-center">
                         <div className="relative">
                             <div className="absolute inset-0 rounded-full blur-xl opacity-70 animate-pulse transition-colors bg-gradient-to-r from-blue-100 to-purple-100" />
@@ -103,10 +108,13 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                         </Button>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t transition-colors border-gray-10 dark:border-gray-700">
+                    <div className="mt-6 pt-6 border-t transition-colors border-input">
                         <p className="text-sm transition-colors text-default-500">
                             Need help?{" "}
-                            <a className="font-medium transition-colors text-blue-500 hover:text-blue-600" href="#">
+                            <a
+                                className="font-medium transition-colors text-blue-500 hover:text-blue-600"
+                                href={`mailto:${shopSettings.contact_email}`}
+                            >
                                 Contact our support team
                             </a>
                         </p>
