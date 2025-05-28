@@ -89,7 +89,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 <div className="relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
                     <div className="relative h-full w-full flex-none flex flex-col-reverse md:flex-row gap-2 md:gap-4">
                         {/* Image Gallery */}
-                        <div className="flex md:flex-col gap-4 px-2 md:px-0">
+                        <div className="flex flex-wrap md:flex-col gap-4 px-2 md:px-0">
                             {product.images.map((image: ProductImage, idx: number) => (
                                 <button
                                     key={idx}

@@ -44,4 +44,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 RUN prisma generate
 
-CMD ["sh", "-c", "fastapi run app/main.py --host 0.0.0.0 --reload"]
+CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
