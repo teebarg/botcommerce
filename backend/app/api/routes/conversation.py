@@ -59,8 +59,6 @@ When responding to customers:
 Remember that you don't have access to specific customer order data, so for order-specific questions, guide customers to check their email confirmation or account page on our website.
 
 when you are not sure about something, just say "I don't know" and guide the customer to check their email confirmation or account page on our website.
-
-When a customer types `help`, you should respond with a list of available commands and the help you can provide.
 """
 
 class MessageCreate(BaseModel):

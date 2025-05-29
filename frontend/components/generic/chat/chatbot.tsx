@@ -43,21 +43,21 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
             return;
         }
 
-        const createConversation = async () => {
-            const { data, error } = await api.post<Conversation>("/conversation/conversations");
-
-            if (error || !data?.conversation_uuid) {
-                toast.error("Failed to start a new conversation.");
-
-                return;
-            }
-
-            sessionStorage.setItem("chatbotConversationId", data.conversation_uuid);
-            setConversationId(data.conversation_uuid);
-        };
-
         createConversation();
     }, []);
+
+    const createConversation = async () => {
+        const { data, error } = await api.post<Conversation>("/conversation/conversations");
+
+        if (error || !data?.conversation_uuid) {
+            toast.error("Failed to start a new conversation.");
+
+            return;
+        }
+
+        sessionStorage.setItem("chatbotConversationId", data.conversation_uuid);
+        setConversationId(data.conversation_uuid);
+    };
 
     const getMessages = async (id: string) => {
         const { data, error } = await api.get<ChatMessage[]>(`/conversation/conversations/${id}/messages`);
@@ -80,6 +80,10 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim()) return;
+
+        if (!conversationId) {
+            await createConversation();
+        }
 
         setIsLoading(true);
         setMessages([...messages, { text: input, isUser: true }]);
