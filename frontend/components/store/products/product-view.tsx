@@ -13,6 +13,8 @@ import ProductShare from "@/components/product/product-share";
 import { Product, ProductImage } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
+import { MessageCircleMore } from "lucide-react";
+import { useStore } from "@/app/store/use-store";
 
 interface Props {
     product: Product;
@@ -24,6 +26,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedImageId, setSelectedImageId] = useState<number>(product.images[0]?.id || 0);
     const [loading, setLoading] = useState<boolean>(false);
+    const { shopSettings } = useStore();
 
     // Find the selected image
     const selectedImage = product.images.find((img: ProductImage) => img.id === selectedImageId) || product.images[0];
@@ -62,6 +65,14 @@ const ProductView: React.FC<Props> = ({ product }) => {
         setLoading(false);
     };
 
+    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*\nPrice: ${currency(product.price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
+
+        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
+    };
+
     return (
         <React.Fragment>
             <div className="max-w-7xl mx-auto h-full w-full md:my-8">
@@ -89,7 +100,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 <div className="relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
                     <div className="relative h-full w-full flex-none flex flex-col-reverse md:flex-row gap-2 md:gap-4">
                         {/* Image Gallery */}
-                        <div className="flex md:flex-col gap-4 px-2 md:px-0">
+                        <div className="flex flex-wrap md:flex-col gap-4 px-2 md:px-0">
                             {product.images.map((image: ProductImage, idx: number) => (
                                 <button
                                     key={idx}
@@ -139,9 +150,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 </div>
                             )}
                         </div>
-                        {/* <div className="max-w-40 mt-2 hidden md:block">
-                            <Suspense fallback={<div>Loading</div>}>prod action</Suspense>
-                        </div> */}
                         {/* Quantity Selection */}
                         <div className="flex items-center gap-4">
                             <label className="text-sm font-medium text-default-900">Quantity:</label>
@@ -162,15 +170,19 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 Out of Stock
                             </Button>
                         ) : (
-                            <Button
-                                className="w-full mt-4"
-                                disabled={loading || !product.variants[0]}
-                                size="lg"
-                                type="button"
-                                onClick={handleAddToCart}
-                            >
-                                {loading ? "Adding to cart..." : "Add to Cart"}
-                            </Button>
+                            <div className="flex items-center gap-4 mt-4">
+                                <Button className="w-auto" disabled={loading || !product.variants[0]} size="lg" onClick={handleAddToCart}>
+                                    {loading ? "Adding to cart..." : "Add to Cart"}
+                                </Button>
+                                <Button
+                                    className="gap-2 bg-[#075e54] hover:bg-[#128c7e] text-white w-auto"
+                                    size="lg"
+                                    onClick={handleWhatsAppPurchase}
+                                >
+                                    <MessageCircleMore className="w-4 h-4" />
+                                    <span>Buy on WhatsApp</span>
+                                </Button>
+                            </div>
                         )}
 
                         <div className="mt-4">

@@ -199,6 +199,11 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                     {bankDetails.map((detail, idx: number) => {
                         return <BankDetailComponent key={idx} bank={detail} />;
                     })}
+                    {bankDetails.length === 0 && (
+                        <div className="flex items-center justify-center">
+                            <p className="text-default-500">No bank details found</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

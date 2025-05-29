@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart, MessageCircleMore } from "lucide-react";
 import { HeartFilled } from "nui-react-icons";
 
 import { ProductSearch, WishItem } from "@/types/models";
@@ -15,6 +15,7 @@ import { cn } from "@/lib/util/cn";
 import { currency } from "@/lib/util/util";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
+import { useStore } from "@/app/store/use-store";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -23,6 +24,8 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishlist = false }) => {
+    const { shopSettings } = useStore();
+
     const invalidateCart = useInvalidateCart();
     const invalidateCartItems = useInvalidateCartItem();
     const invalidate = useInvalidate();
@@ -87,6 +90,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
         setLoading(false);
     };
 
+    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== 'undefined' ? window.location.origin : ''}/products/${slug}`;
+
+        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
+    };
+
     return (
         <motion.div
             animate={{ opacity: 1, scale: 1 }}
@@ -134,25 +145,31 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                         <span className="text-xs font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
                     )}
                 </div>
-                <Button
-                    className="w-full gap-2 mt-1"
-                    disabled={loading || status == "OUT_OF_STOCK"}
-                    isLoading={loading}
-                    size="lg"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddToCart();
-                    }}
-                >
-                    {status == "OUT_OF_STOCK" ? (
-                        <span>Out of stock</span>
-                    ) : (
-                        <>
-                            <ShoppingCart className="w-4 h-4" />
-                            <span>Add to cart</span>
-                        </>
-                    )}
-                </Button>
+                <div className="space-y-2 mt-1">
+                    <Button
+                        className="gap-2"
+                        disabled={loading || status == "OUT_OF_STOCK"}
+                        isLoading={loading}
+                        size="lg"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart();
+                        }}
+                    >
+                        {status == "OUT_OF_STOCK" ? (
+                            <span>Out of stock</span>
+                        ) : (
+                            <>
+                                <ShoppingCart className="w-4 h-4" />
+                                <span>Add to cart</span>
+                            </>
+                        )}
+                    </Button>
+                    <Button className="gap-2 bg-[#075e54] hover:bg-[#128c7e] text-white" size="lg" onClick={handleWhatsAppPurchase}>
+                        <MessageCircleMore className="w-4 h-4" />
+                        <span>Buy on WhatsApp</span>
+                    </Button>
+                </div>
             </div>
         </motion.div>
     );
