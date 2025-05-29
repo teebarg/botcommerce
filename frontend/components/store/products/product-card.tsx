@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart, MessageCircleMore } from "lucide-react";
 import { HeartFilled } from "nui-react-icons";
 
 import { ProductSearch, WishItem } from "@/types/models";
@@ -87,6 +87,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
         setLoading(false);
     };
 
+    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const phoneNumber = "07076038037"; // Replace with your actual WhatsApp business number
+        const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== 'undefined' ? window.location.origin : ''}/products/${slug}`;
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    };
+
     return (
         <motion.div
             animate={{ opacity: 1, scale: 1 }}
@@ -134,25 +142,36 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                         <span className="text-xs font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
                     )}
                 </div>
-                <Button
-                    className="w-full gap-2 mt-1"
-                    disabled={loading || status == "OUT_OF_STOCK"}
-                    isLoading={loading}
-                    size="lg"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddToCart();
-                    }}
-                >
-                    {status == "OUT_OF_STOCK" ? (
-                        <span>Out of stock</span>
-                    ) : (
-                        <>
-                            <ShoppingCart className="w-4 h-4" />
-                            <span>Add to cart</span>
-                        </>
-                    )}
-                </Button>
+                <div className="space-y-2 mt-1">
+                    <Button
+                        className="gap-2"
+                        disabled={loading || status == "OUT_OF_STOCK"}
+                        isLoading={loading}
+                        size="lg"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart();
+                        }}
+                    >
+                        {status == "OUT_OF_STOCK" ? (
+                            <span>Out of stock</span>
+                        ) : (
+                            <>
+                                <ShoppingCart className="w-4 h-4" />
+                                <span>Add to cart</span>
+                            </>
+                        )}
+                    </Button>
+                    <Button
+                        className="gap-2"
+                        variant="secondary"
+                        size="lg"
+                        onClick={handleWhatsAppPurchase}
+                    >
+                        <MessageCircleMore className="w-4 h-4" />
+                        <span>Buy on WhatsApp</span>
+                    </Button>
+                </div>
             </div>
         </motion.div>
     );
