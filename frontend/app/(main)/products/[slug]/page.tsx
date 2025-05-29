@@ -24,7 +24,8 @@ export async function generateMetadata({ params }: { params: Params }) {
         openGraph: {
             title: product.name,
             description: product.description,
-            images: product.image ? [product.image] : [],
+            images: product.images?.[0].image ? [product.images?.[0].image] : [],
+            url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${slug}`,
         },
     };
 }
@@ -48,7 +49,7 @@ export default async function ProductPage({ params }: { params: Params }) {
             <ProductView product={product} />
             {user && <ReviewsSection product_id={product.id} />}
 
-            <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products-container">
+            <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products">
                 <RelatedProducts product={product} />
             </div>
         </div>

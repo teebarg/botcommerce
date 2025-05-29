@@ -15,6 +15,7 @@ import { cn } from "@/lib/util/cn";
 import { currency } from "@/lib/util/util";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
+import { useStore } from "@/app/store/use-store";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -23,6 +24,8 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishlist = false }) => {
+    const { shopSettings } = useStore();
+
     const invalidateCart = useInvalidateCart();
     const invalidateCartItems = useInvalidateCartItem();
     const invalidate = useInvalidate();
@@ -89,10 +92,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {
         e.stopPropagation();
-        const phoneNumber = "07076038037"; // Replace with your actual WhatsApp business number
         const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== 'undefined' ? window.location.origin : ''}/products/${slug}`;
-        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
+
+        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
     };
 
     return (
@@ -162,12 +165,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                             </>
                         )}
                     </Button>
-                    <Button
-                        className="gap-2"
-                        variant="secondary"
-                        size="lg"
-                        onClick={handleWhatsAppPurchase}
-                    >
+                    <Button className="gap-2 bg-[#075e54] hover:bg-[#128c7e] text-white" size="lg" onClick={handleWhatsAppPurchase}>
                         <MessageCircleMore className="w-4 h-4" />
                         <span>Buy on WhatsApp</span>
                     </Button>
