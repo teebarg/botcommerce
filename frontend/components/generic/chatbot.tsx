@@ -6,7 +6,6 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import ChatBotComponent from "./chat/chatbot";
 
 import { useStore } from "@/app/store/use-store";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 interface Props {}
 
@@ -80,28 +79,21 @@ const ChatBot: React.FC<Props> = () => {
     }
 
     return (
-        <div className="fixed right-6 md:right-6 bottom-20 md:bottom-4 z-50">
-            {isOpen && <ChatBotComponent onClose={toggleChat} onMinimize={minimize} />}
-            <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
-                <DrawerTrigger className="bg-[#25D366] rounded-full p-2 shadow-lg hover:bg-[#128C7E] duration-300 transition-colors text-white md:hidden">
-                    <WhatsAppSvg />
-                </DrawerTrigger>
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle className="sr-only">Menu</DrawerTitle>
-                    </DrawerHeader>
-                    <ChatBotComponent onClose={state.close} onMinimize={minimize} />
-                </DrawerContent>
-            </Drawer>
-            <button
-                aria-label="assistant"
-                className="data-[open=true]:hidden hidden md:block bg-[#25D366] hover:bg-[#128C7E] rounded-full text-white duration-300 transition-all p-2 shadow-lg"
-                data-open={isOpen ? "true" : "false"}
-                type="button"
-                onClick={toggleChat}
-            >
-                <WhatsAppSvg />
-            </button>
+        <div>
+            {!isOpen && (
+                <div className="fixed right-2 bottom-20 md:bottom-6 z-50 px-2">
+                    <button
+                        aria-label="assistant"
+                        className="data-[open=true]:hidden bg-[#25D366] hover:bg-[#128C7E] rounded-full text-white duration-300 transition-all p-2 shadow-lg"
+                        data-open={isOpen ? "true" : "false"}
+                        type="button"
+                        onClick={toggleChat}
+                    >
+                        <WhatsAppSvg />
+                    </button>
+                </div>
+            )}
+            <div className="fixed right-0 bottom-0 md:bottom-4 z-50">{isOpen && <ChatBotComponent onClose={toggleChat} onMinimize={minimize} />}</div>
         </div>
     );
 };
