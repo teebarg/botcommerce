@@ -187,31 +187,21 @@ async def get_relevant_products(query_terms: List[str], product_intent: bool = F
 
         product_info = ""
         for product in unique_products:
-            product_info += f"- {product.name} (SKU: {product.sku})\n"
-            product_info += f"  Price: ₦{product.price}\n"
-            product_info += f"  [View Product](/products/{product.slug})\n"
-            product_info += f'  ![Image]({product.images[0].image} "Product Image!")\n'
-            if product.old_price:
-                product_info += f"  Was: ₦{product.old_price}\n"
-            product_info += f"  Status: {product.status}\n"
+            name = product.name
+            price = product.price
+            image = product.images[0].image if product.images else product.image
 
-            if product.brand:
-                product_info += f"  Brand: {product.brand.name}\n"
-
-            if product.categories and len(product.categories) > 0:
-                categories = ", ".join(
-                    [cat.name for cat in product.categories])
-                product_info += f"  Categories: {categories}\n"
+            product_info += f"""---
+            ![{name}]({image})  
+            **🛍️ {name}**
+            💵 **Price:** ${price}  
+            🔗 [View Product](/products/{product.slug})
+            """
 
             if product.description:
                 description = product.description[:100] + "..." if len(
                     product.description) > 100 else product.description
-                product_info += f"  Description: {description}\n"
-
-            # if product.variants and len(product.variants) > 0:
-            #     product_info += "  Available variants:\n"
-            #     for variant in product.variants[:3]:  # Limit to 3 variants
-            #         product_info += f"    - {variant.name}: ${variant.price} ({variant.status})\n"
+                product_info += f"Description: {description}\n"
 
             product_info += "\n"
 
