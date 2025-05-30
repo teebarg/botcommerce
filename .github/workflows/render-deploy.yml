@@ -1,0 +1,12 @@
+name: Trigger Render Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render deploy hook
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
