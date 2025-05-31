@@ -28,7 +28,7 @@ export const ChatMessageComponent: React.FC<ChatMessageProps> = ({ message }) =>
         >
             {message.sender === "BOT" && (
                 <Avatar className="h-8 w-8">
-                    <AvatarImage alt="AI" src="/placeholder.svg" />
+                    <AvatarImage alt="AI" src="/placeholder.jpg" />
                     <AvatarFallback className="bg-red-600 text-white text-xs">AI</AvatarFallback>
                 </Avatar>
             )}

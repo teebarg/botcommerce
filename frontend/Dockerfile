@@ -1,17 +1,18 @@
-# frontend/Dockerfile
-FROM node:18
+# Use the slim version of Node.js
+FROM node:20-slim
 
 # Set working directory
 WORKDIR /app
 
 # Install dependencies
-COPY package.json package-lock.json* ./
+COPY package*.json ./
 RUN npm install
 
-# Copy app code
+# Copy the rest of your app
 COPY . .
 
-EXPOSE 3000
+# Expose the development port
+EXPOSE 7000
 
+# Start Next.js in development mode
 CMD ["npm", "run", "dev"]
-
