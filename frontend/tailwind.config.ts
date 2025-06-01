@@ -29,7 +29,6 @@ const config: Config = {
             borderColor: {
                 divider: "hsl(var(--divider))",
                 content1: "var(--content1)",
-                border: "hsl(var(--border))",
             },
             borderRadius: {
                 "50": "50%",
