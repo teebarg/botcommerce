@@ -6,7 +6,7 @@ import { MapPin } from "lucide-react";
 
 import ShippingAddress from "../shipping-address";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Cart } from "@/types/models";
 import { useAddress } from "@/lib/hooks/useCart";
 import { Skeleton } from "@/components/generic/skeleton";

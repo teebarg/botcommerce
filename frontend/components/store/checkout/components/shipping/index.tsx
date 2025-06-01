@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import ErrorMessage from "../error-message";
 
 import { RadioGroup } from "@/components/ui/radio-group";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/util/util";

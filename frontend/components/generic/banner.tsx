@@ -5,7 +5,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface ComponentProps {}

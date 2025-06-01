@@ -14,7 +14,7 @@ import { CollectionsSideBar } from "@/components/store/collections/checkbox-side
 import { CollectionsTopBar } from "@/components/store/collections/checkout-topbar";
 import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { useBrands, useCategories, useCollections } from "@/lib/hooks/useApi";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { api } from "@/apis/client";

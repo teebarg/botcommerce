@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/types/models";
 import { formatDate } from "@/lib/util/util";
 

@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 
 import MessageBubble from "./message-bubble";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/util/util";
 
 interface Message {

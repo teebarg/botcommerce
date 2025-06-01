@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 const FAQSection: React.FC = () => {
     const [activeSection, setActiveSection] = useState<number | null>(null);

@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import CategoryAction from "./categories-control";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Category } from "@/types/models";
 import { Badge } from "@/components/ui/badge";
 

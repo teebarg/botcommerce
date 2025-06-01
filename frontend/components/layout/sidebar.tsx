@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { Calendar, ChevronRight, CogSixTooth, DocumentText, Ecommerce, User, Users, Window } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { cn } from "@lib/util/cn";
 import { Activity, MessageSquare } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 
 interface MenuItem {

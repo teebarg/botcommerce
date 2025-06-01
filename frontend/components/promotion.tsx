@@ -1,7 +1,7 @@
 import React from "react";
 
 import { BtnLink } from "@/components/ui/btnLink";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 interface Props {
     title: string;

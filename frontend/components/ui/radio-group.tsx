@@ -2,7 +2,7 @@ import type { CustomRadioGroupProps, RadioItemProps, RadioGroupProps, RadioOptio
 
 import React from "react";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 export function CustomRadioGroup({ options, value, onChange, name, className }: CustomRadioGroupProps) {
     return (

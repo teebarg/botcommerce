@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { ProductVariant } from "@/types/models";

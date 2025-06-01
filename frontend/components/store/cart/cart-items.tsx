@@ -4,8 +4,8 @@ import React from "react";
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
 import LineItemPrice from "@modules/common/components/line-item-price";
 import Image from "next/image";
-import { cn } from "@lib/util/cn";
 
+import { cn } from "@/lib/utils";
 import { CartItem } from "@/types/models";
 import { useCartItem } from "@/lib/hooks/useCart";
 import LocalizedClientLink from "@/components/ui/link";

@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@lib/util/cn";
 import { RefreshCcw } from "nui-react-icons";
 import React from "react";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface Props {

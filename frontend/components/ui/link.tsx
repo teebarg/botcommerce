@@ -5,7 +5,7 @@ import React, { startTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useProgressBar } from "@/components/ui/progress-bar";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 interface TransitionLinkProps extends LinkProps {
     children: React.ReactNode;

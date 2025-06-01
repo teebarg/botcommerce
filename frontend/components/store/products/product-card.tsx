@@ -11,7 +11,7 @@ import { HeartFilled } from "nui-react-icons";
 import { ProductSearch, WishItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { currency } from "@/lib/util/util";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";

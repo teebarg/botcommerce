@@ -5,7 +5,7 @@ import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
 import { ChevronDown } from "lucide-react";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 const NavigationMenu = React.forwardRef<
     React.ElementRef<typeof NavigationMenuPrimitive.Root>,
@@ -98,7 +98,7 @@ const NavigationMenuIndicator = React.forwardRef<
         )}
         {...props}
     >
-        <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
+        <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md" />
     </NavigationMenuPrimitive.Indicator>
 ));
 

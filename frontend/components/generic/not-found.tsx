@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "../ui/button";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 
 interface NotFoundProps {

@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 
 import PaymentButton from "../payment-button";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Cart } from "@/types/models";
 import { useStore } from "@/app/store/use-store";
 

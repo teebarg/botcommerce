@@ -2,7 +2,7 @@ import Image from "next/image";
 import React from "react";
 
 import { IconProps } from "@/types/models";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 type ThumbnailProps = {
     thumbnail?: string | null;

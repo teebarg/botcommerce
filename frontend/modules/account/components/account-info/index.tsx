@@ -1,7 +1,7 @@
 import useToggleState from "@lib/hooks/use-toggle-state";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 type AccountInfoProps = {
     label: string;

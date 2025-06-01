@@ -1,8 +1,9 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 
 import { ButtonProps, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
     <nav aria-label="pagination" className={cn("mx-auto flex w-full justify-center", className)} role="navigation" {...props} />
@@ -26,10 +27,10 @@ type PaginationLinkProps = {
     isActive?: boolean;
     disabled?: boolean;
 } & Pick<ButtonProps, "size"> &
-    React.ComponentProps<"a">;
+    React.ComponentProps<typeof Link>;
 
 const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
-    <a
+    <Link
         aria-current={isActive ? "page" : undefined}
         className={cn(
             buttonVariants({

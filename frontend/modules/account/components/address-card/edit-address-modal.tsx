@@ -8,7 +8,7 @@ import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 import { Edit, Trash2 } from "lucide-react";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/generic/spinner";
 import { Address } from "@/types/models";

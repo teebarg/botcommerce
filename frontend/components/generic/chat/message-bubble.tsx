@@ -1,7 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 interface MessageBubbleProps {
     text: string;
