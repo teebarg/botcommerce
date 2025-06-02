@@ -20,7 +20,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(({ className, labe
             <input ref={ref} className="sr-only" type="radio" {...props} />
             <div className="flex w-full items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {icon && <div className="flex-shrink-0">{icon}</div>}
+                    {icon && <div className="shrink-0">{icon}</div>}
                     <div>
                         {label && <div className="font-medium">{label}</div>}
                         {description && <div className="mt-1 text-sm opacity-90">{description}</div>}

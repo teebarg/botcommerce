@@ -113,7 +113,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                                     initial={{ opacity: 0, y: 20 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-default-100">
+                                    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-default-100">
                                         <img alt={item.name} className="h-full w-full object-cover object-center" src={item.image} />
                                     </div>
                                     <div className="flex-1">

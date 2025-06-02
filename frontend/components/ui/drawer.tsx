@@ -41,7 +41,7 @@ const DrawerContent = React.forwardRef<React.ElementRef<typeof DrawerPrimitive.C
                         "h-full w-auto max-w-4xl right-0 bottom-0": direction === "right",
                         "inset-x-0 h-auto rounded-t-[10px] bottom-0 max-h-[calc(100vh-50px)]": direction === "bottom",
                         "w-[90vw] sm:w-[25%] bottom-0": direction === "left",
-                        "max-w-lg inset-0 m-auto max-h-[50vh] rounded-md after:!h-auto": direction === "top",
+                        "max-w-lg inset-0 m-auto max-h-[50vh] rounded-md after:h-auto!": direction === "top",
                     },
                     className
                 )}

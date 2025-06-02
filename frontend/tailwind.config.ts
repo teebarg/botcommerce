@@ -26,19 +26,6 @@ const config: Config = {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
             },
-            borderColor: {
-                divider: "hsl(var(--divider))",
-                content1: "var(--content1)",
-            },
-            borderRadius: {
-                "50": "50%",
-                "1xl": "0.875rem",
-                "top-corners": "5px 5px 0 0",
-                "bottom-corners": "0 0 5px 5px",
-                lg: "var(--radius)",
-                md: "calc(var(--radius) - 2px)",
-                sm: "calc(var(--radius) - 4px)",
-            },
             borderWidth: {
                 "1": "1px",
                 "3": "3px",
@@ -48,24 +35,10 @@ const config: Config = {
                 medium: "var(--box-shadow-medium)",
                 large: "var(--box-shadow-large)",
             },
-            fontSize: {
-                xxs: [
-                    "0.625rem",
-                    {
-                        lineHeight: "0.875",
-                    },
-                ],
-            },
-            fontFamily: {
-                sans: "var(--font-inter)",
-                display: "var(--font-lexend)",
-            },
             transitionTimingFunction: {
                 "custom-ease": "cubic-bezier(0.6, 0.05, 0.15, 0.95)",
             },
             colors: {
-                background: "hsl(var(--background))",
-                foreground: "hsl(var(--foreground))",
                 default: {
                     "50": "hsl(var(--default-50))",
                     "100": "hsl(var(--default-100))",
@@ -83,49 +56,6 @@ const config: Config = {
                 danger: 'generateColorScale("danger")',
                 success: 'generateColorScale("success")',
                 warning: 'generateColorScale("warning")',
-                divider: "hsl(var(--divider))",
-                card: {
-                    DEFAULT: "hsl(var(--card))",
-                    foreground: "hsl(var(--card-foreground))",
-                },
-                popover: {
-                    DEFAULT: "hsl(var(--popover))",
-                    foreground: "hsl(var(--popover-foreground))",
-                },
-                primary: {
-                    DEFAULT: "hsl(var(--primary))",
-                    foreground: "hsl(var(--primary-foreground))",
-                },
-                secondary: {
-                    DEFAULT: "hsl(var(--secondary))",
-                    foreground: "hsl(var(--secondary-foreground))",
-                },
-                muted: {
-                    DEFAULT: "hsl(var(--muted))",
-                    foreground: "hsl(var(--muted-foreground))",
-                },
-                accent: {
-                    DEFAULT: "hsl(var(--accent))",
-                    foreground: "hsl(var(--accent-foreground))",
-                },
-                border: "hsl(var(--border))",
-                input: "hsl(var(--input))",
-                ring: "hsl(var(--ring))",
-                content1: "var(--content1)",
-                content2: "hsl(var(--content2))",
-                content3: "hsl(var(--content3))",
-                content4: "hsl(var(--content4))",
-                destructive: {
-                    DEFAULT: "hsl(var(--destructive))",
-                    foreground: "hsl(var(--destructive-foreground))",
-                },
-                chart: {
-                    "1": "hsl(var(--chart-1))",
-                    "2": "hsl(var(--chart-2))",
-                    "3": "hsl(var(--chart-3))",
-                    "4": "hsl(var(--chart-4))",
-                    "5": "hsl(var(--chart-5))",
-                },
             },
             keyframes: {
                 blob: {
@@ -209,10 +139,6 @@ const config: Config = {
                 "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                 bounce: "bounce 1s infinite",
                 shimmer: "shimmer2 2s infinite",
-            },
-            maxWidth: {
-                "8xl": "88rem",
-                "9xl": "96rem",
             },
         },
     },

@@ -43,7 +43,7 @@ const CartView: React.FC<Props> = () => {
             <div className="py-0 md:py-12">
                 <PromotionalBanner
                     btnClass="text-purple-600"
-                    outerClass="bg-gradient-to-r from-indigo-500/100 via-purple-500/75 to-pink-500 mx-2 md:mx-auto max-w-7xl"
+                    outerClass="bg-linear-to-r from-indigo-500 via-purple-500/75 to-pink-500 mx-2 md:mx-auto max-w-7xl"
                     subtitle="Get up to 50% OFF on select products."
                     title="Big Sale on Top Brands!"
                 />

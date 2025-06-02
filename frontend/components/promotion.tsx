@@ -16,7 +16,7 @@ const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass,
     return (
         <div
             className={cn(
-                "bg-gradient-to-r from-blue-600 to-purple-700 p-4 mx-2 md:mx-0 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden",
+                "bg-linear-to-r from-blue-600 to-purple-700 p-4 mx-2 md:mx-0 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden",
                 outerClass
             )}
         >
@@ -28,7 +28,7 @@ const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass,
                 </div>
             </div>
             {/* CTA Button */}
-            <BtnLink className={cn("bg-white text-blue-600 py-2 !rounded-full flex items-center text-sm font-semibold", btnClass)} href={href}>
+            <BtnLink className={cn("bg-white text-blue-600 py-2 rounded-full! flex items-center text-sm font-semibold", btnClass)} href={href}>
                 <span>Shop Now</span>
             </BtnLink>
         </div>

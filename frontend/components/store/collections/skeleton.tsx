@@ -15,7 +15,7 @@ const CollectionTemplateSkeleton = () => {
                                 {[1, 2, 3]?.map((_, index: number) => <Skeleton key={index} className="h-8 w-full rounded dark:bg-background" />)}
                             </div>
                         </div>
-                        <hr className="shrink-0 border-none w-full h-[1px] bg-default-100" />
+                        <hr className="shrink-0 border-none w-full h-px bg-default-100" />
                         {["Categories", "Brands"].map((item: string, index: number) => (
                             <div key={index} className="flex flex-col gap-2">
                                 <span>{item}</span>

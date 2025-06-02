@@ -65,7 +65,7 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
 
     return (
         <React.Fragment>
-            <div className="min-h-screen bg-gradient-to-b from-background to-content1 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-linear-to-b from-background to-content1 flex items-center justify-center p-4">
                 {/* Mobile-first container */}
                 <div className="w-full max-w-md mx-auto">
                     {/* Logo and branding */}

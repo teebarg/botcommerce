@@ -37,7 +37,7 @@ const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
 
     if (activities?.length == 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-background to-content2 border border-gray-100 rounded-lg shadow-sm h-full">
+            <div className="flex flex-col items-center justify-center p-8 bg-linear-to-b from-background to-content2 border border-gray-100 rounded-lg shadow-sm h-full">
                 <div className="relative mb-6">
                     {/* Background decoration circles */}
                     <div className="absolute -z-10 animate-pulse">

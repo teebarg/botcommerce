@@ -1,7 +1,51 @@
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
 @import "tailwindcss";
+
+@theme {
+    --font-sans: var(--font-inter);
+    --font-display: var(--font-lexend);
+
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+
+    --color-content1: var(--content1);
+    --color-content2: hsl(var(--content2));
+    --color-content3: hsl(var(--content3));
+    --color-content4: hsl(var(--content4));
+    --color-divider: hsl(var(--divider));
+
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+
+    --container-8xl: 88rem;
+    --container-9xl: 96rem;
+
+    --text-xxs: 0.625rem;
+    --text-xxs--line-height: calc(0.75 / 0.625);
+
+    --radius-50: 50%;
+    --radius-1xl: 0.875rem;
+    --radius-top-corners: "5px 5px 0 0";
+    --radius-bottom-corners: "0 0 5px 5px";
+}
 
 .chatbot-message li a {
     @apply text-blue-500 hover:text-blue-600;
@@ -25,7 +69,7 @@
 
 @layer components {
     .tb-divider {
-        @apply shrink-0 border-none w-full h-[1px];
+        @apply shrink-0 border-none w-full h-px;
     }
 }
 
@@ -35,7 +79,7 @@
     [data-theme="light"] {
         color-scheme: light;
         /* --background: 0 0% 100%; */
-        --background: #FFFFFF;
+        --background: #ffffff;
         --foreground: 0 0% 3.9%;
         --card: 0 0% 100%;
         --card-foreground: 0 0% 3.9%;
@@ -51,7 +95,7 @@
         --accent-foreground: 0 0% 9%;
         --border: 0 0% 89.8%;
 
-        --input: #E5E7EB;
+        --input: #e5e7eb;
         --ring: 0 0% 3.9%;
 
         /* Default State Colors */
@@ -96,12 +140,11 @@
         /* --danger-foreground: 0 0% 100%;
         --danger: 339.20000000000005 90.36% 51.18%; */
 
-        --box-shadow-small: 0px 0px 5px 0px rgba(0, 0, 0, .02), 0px 2px 10px 0px rgba(0, 0, 0, .06), 0px 0px 1px 0px rgba(0, 0, 0, .3);
-        --box-shadow-medium: 0px 0px 15px 0px rgba(0, 0, 0, .03), 0px 2px 30px 0px rgba(0, 0, 0, .08), 0px 0px 1px 0px rgba(0, 0, 0, .3);
-        --box-shadow-large: 0px 0px 30px 0px rgba(0, 0, 0, .04), 0px 30px 60px 0px rgba(0, 0, 0, .12), 0px 0px 1px 0px rgba(0, 0, 0, .3);
+        --box-shadow-small: 0px 0px 5px 0px rgba(0, 0, 0, 0.02), 0px 2px 10px 0px rgba(0, 0, 0, 0.06), 0px 0px 1px 0px rgba(0, 0, 0, 0.3);
+        --box-shadow-medium: 0px 0px 15px 0px rgba(0, 0, 0, 0.03), 0px 2px 30px 0px rgba(0, 0, 0, 0.08), 0px 0px 1px 0px rgba(0, 0, 0, 0.3);
+        --box-shadow-large: 0px 0px 30px 0px rgba(0, 0, 0, 0.04), 0px 30px 60px 0px rgba(0, 0, 0, 0.12), 0px 0px 1px 0px rgba(0, 0, 0, 0.3);
 
         --divider: 0 0% 6.67%;
-
 
         --background: 0 0% 100%;
         --foreground: 240 10% 3.9%;
@@ -127,7 +170,6 @@
         --chart-3: 197 37% 24%;
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
-        --radius: 0.5rem;
     }
 
     .dark,
@@ -135,7 +177,7 @@
         color-scheme: dark;
         /* --background: 0 0% 3.9%; */
         /* --background: #111827; */
-        --background: #0E1012;
+        --background: #0e1012;
         --foreground: 0 0% 98%;
         --card: 0 0% 3.9%;
         --card-foreground: 0 0% 98%;
@@ -151,11 +193,11 @@
         --accent-foreground: 0 0% 98%;
         --border: 0 0% 14.9%;
         /* --input: 0 0% 14.9%; */
-        --input: #3F4143;
+        --input: #3f4143;
         --ring: 0 0% 83.1%;
 
         /* Content Layers */
-        --content1: #161A1D;
+        --content1: #161a1d;
         /* --content1: #1F2937; */
         /* --content1: 240 5.88% 10%; */
         --content2: 240 3.7% 15.88%;
@@ -175,7 +217,6 @@
         --default-foreground: 0 0% 100%;
         --default: 240 5.26% 26.08%;
 
-
         /* Semantic Colors */
         --success-100: 146.2 79.78% 17.45%;
         --success-500: 146.01 62.45% 55.1%;
@@ -183,13 +224,11 @@
         --success: 145.96000000000004 79.46% 43.92%;
         --success-foreground: 0 0% 0%;
 
-
         --warning-100: 37.139999999999986 75% 21.96%;
         --warning-500: 37.00999999999999 91.26% 64.12%;
         --warning-900: 54.55000000000001 91.67% 95.29%;
         --warning-foreground: 0 0% 0%;
         --warning: 37.02999999999997 91.27% 55.1%;
-
 
         --danger-100: 339.3299999999999 86.54% 20.39%;
         --danger-500: 339 90% 60.78%;
@@ -199,9 +238,9 @@
         /* --danger-foreground: 0 0% 100%;
         --danger: 339.20000000000005 90.36% 51.18%; */
 
-        --box-shadow-small: 0px 0px 5px 0px rgba(0, 0, 0, .05), 0px 2px 10px 0px rgba(0, 0, 0, .2), inset 0px 0px 1px 0px hsla(0, 0%, 100%, .15);
-        --box-shadow-medium: 0px 0px 15px 0px rgba(0, 0, 0, .06), 0px 2px 30px 0px rgba(0, 0, 0, .22), inset 0px 0px 1px 0px hsla(0, 0%, 100%, .15);
-        --box-shadow-large: 0px 0px 30px 0px rgba(0, 0, 0, .07), 0px 30px 60px 0px rgba(0, 0, 0, .26), inset 0px 0px 1px 0px hsla(0, 0%, 100%, .15);
+        --box-shadow-small: 0px 0px 5px 0px rgba(0, 0, 0, 0.05), 0px 2px 10px 0px rgba(0, 0, 0, 0.2), inset 0px 0px 1px 0px hsla(0, 0%, 100%, 0.15);
+        --box-shadow-medium: 0px 0px 15px 0px rgba(0, 0, 0, 0.06), 0px 2px 30px 0px rgba(0, 0, 0, 0.22), inset 0px 0px 1px 0px hsla(0, 0%, 100%, 0.15);
+        --box-shadow-large: 0px 0px 30px 0px rgba(0, 0, 0, 0.07), 0px 30px 60px 0px rgba(0, 0, 0, 0.26), inset 0px 0px 1px 0px hsla(0, 0%, 100%, 0.15);
 
         --divider: 0 0% 100%;
 

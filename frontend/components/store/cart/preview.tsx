@@ -22,7 +22,7 @@ const ItemsPreviewTemplate = ({ className, items }: ItemsTemplateProps) => {
             <ul className={cn("max-h-[40vh] overflow-y-auto", className)}>
                 {items?.map((item: CartItem, key: number) => (
                     <li key={key} className="flex items-center gap-x-4 border-b-sm border-divider py-4">
-                        <div className="relative flex h-16 w-14 flex-shrink-0 items-center justify-center rounded-md overflow-hidden">
+                        <div className="relative flex h-16 w-14 shrink-0 items-center justify-center rounded-md overflow-hidden">
                             {item.image && <Image fill alt={item.name} src={item.image} />}
                         </div>
                         <div className="flex flex-1 flex-col">

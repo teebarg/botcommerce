@@ -61,7 +61,7 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities, isLoadin
         <div className="space-y-4">
             {activities.map((activity: Activity, idx: number) => (
                 <div key={idx} className="bg-background rounded-lg shadow p-4 flex items-start space-x-4">
-                    <div className="flex-shrink-0">{getActivityIcon(activity.activity_type)}</div>
+                    <div className="shrink-0">{getActivityIcon(activity.activity_type)}</div>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-default-900">{activity.description}</p>
                         <p className="text-sm text-default-500">{formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}</p>
@@ -86,7 +86,7 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities, isLoadin
                             Delete
                         </Button>
                     </div>
-                    <div className="flex-shrink-0">{getStatusIcon(activity.is_success)}</div>
+                    <div className="shrink-0">{getStatusIcon(activity.is_success)}</div>
                 </div>
             ))}
         </div>

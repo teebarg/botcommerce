@@ -71,10 +71,10 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
             transition={{ duration: 0.2 }}
         >
             <div className="flex items-start space-x-4" onClick={() => handleSelect(address.id!)}>
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                     <Home className={`w-6 h-6 ${selectedAddress?.id === address.id ? "text-blue-500" : "text-default-500"}`} />
                 </div>
-                <div className="flex-grow">
+                <div className="grow">
                     <div className="flex items-center justify-between">
                         <h3 className="font-medium text-default-900">
                             {address.address_type || "Home"}
@@ -92,7 +92,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
                     </p>
                     <p className="text-default-500 text-sm capitalize">{address.phone}</p>
                 </div>
-                <div className="flex items-center flex-shrink-0">
+                <div className="flex items-center shrink-0">
                     <Button
                         size="icon"
                         variant="ghost"

@@ -62,7 +62,7 @@ export function ProductInventory() {
             </div>
             <AnimatePresence>
                 <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-                    <div className="max-w-[30rem] mb-8 w-full">
+                    <div className="max-w-120 mb-8 w-full">
                         <ProductUpload />
                     </div>
                     <div className="flex gap-2">

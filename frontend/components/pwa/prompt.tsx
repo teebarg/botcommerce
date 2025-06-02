@@ -84,7 +84,7 @@ const InstallPrompt: React.FC = () => {
 
     return (
         <>
-            <div className="fixed bottom-4 left-4 right-4 md:max-w-[25rem] z-50">
+            <div className="fixed bottom-4 left-4 right-4 md:max-w-100 z-50">
                 <div className="bg-content2 rounded-lg shadow-xl p-8">
                     {/* Close button */}
                     <button aria-label="cancel" className="absolute top-2 right-2 text-default-500 hover:text-default-500/50" onClick={handleClose}>

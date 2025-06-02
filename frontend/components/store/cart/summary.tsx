@@ -13,7 +13,7 @@ type SummaryProps = {
 const Summary = ({ cart }: SummaryProps) => {
     return (
         <div className="flex flex-col gap-y-4">
-            <h2 className="text-[2rem] leading-[2.75rem]">Summary</h2>
+            <h2 className="text-[2rem] leading-11">Summary</h2>
             <DiscountCode cart={cart} />
             <hr className="tb-divider" />
             <CartTotals data={cart} />

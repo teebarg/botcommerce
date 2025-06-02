@@ -1,7 +1,7 @@
 import React from "react";
 
 export const Skeleton = ({ className = "", ...props }) => (
-    <div className={`bg-gradient-to-r from-content2 via-content1 to-content2 bg-200 animate-shimmer rounded ${className}`} {...props} />
+    <div className={`bg-linear-to-r from-content2 via-content1 to-content2 bg-200 animate-shimmer rounded ${className}`} {...props} />
 );
 export const TextSkeleton = ({ lines = 3, className = "" }) => (
     <div className={`space-y-3 ${className}`}>
@@ -69,8 +69,8 @@ export const ImageSkeleton = ({ aspectRatio = "video", className = "" }) => {
     const aspectClasses: Record<string, string> = {
         square: "aspect-square",
         video: "aspect-video",
-        portrait: "aspect-[3/4]",
-        wide: "aspect-[21/9]",
+        portrait: "aspect-3/4",
+        wide: "aspect-21/9",
     };
 
     return <Skeleton className={`w-full ${aspectClasses[aspectRatio]} ${className}`} />;

@@ -80,7 +80,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     return (
         <div
             className={cn(
-                "transition-all duration-300 bg-gradient-to-br from-background to-content1 flex items-center justify-center p-4 w-full",
+                "transition-all duration-300 bg-linear-to-br from-background to-content1 flex items-center justify-center p-4 w-full",
                 className
             )}
         >
@@ -89,7 +89,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                 <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-content1 border-input">
                     <div className="mb-6 flex justify-center">
                         <div className="relative">
-                            <div className="absolute inset-0 rounded-full blur-xl opacity-70 animate-pulse transition-colors bg-gradient-to-r from-blue-100 to-purple-100" />
+                            <div className="absolute inset-0 rounded-full blur-xl opacity-70 animate-pulse transition-colors bg-linear-to-r from-blue-100 to-purple-100" />
                             <div className="relative rounded-full p-4 shadow-lg transition-colors bg-content2">{currentScenario.icon}</div>
                         </div>
                     </div>

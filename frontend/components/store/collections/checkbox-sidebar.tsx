@@ -66,7 +66,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     </div>
                 </div>
                 <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>
-                <hr className="shrink-0 border-none w-full h-[1px] my-3 bg-default-100" />
+                <hr className="shrink-0 border-none w-full h-px my-3 bg-default-100" />
                 <RangeSlider
                     defaultValue={[Number(searchParams?.get("minPrice") ?? 500), Number(searchParams?.get("maxPrice") ?? 50000)]}
                     label="Price Range"

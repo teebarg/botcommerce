@@ -77,7 +77,7 @@ export default async function Home() {
                                 <CarouselItem key={idx}>
                                     <div className="relative h-[60vh] w-full overflow-hidden">
                                         <img alt={banner.title} className="object-cover w-full h-full" src={banner.image} />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
+                                        <div className="absolute inset-0 bg-linear-to-r from-black/50 to-transparent flex items-center">
                                             <div className="container mx-auto px-4 md:px-8 lg:px-12">
                                                 <div className="max-w-xl text-white">
                                                     <h2 className="text-xl md:text-2xl font-medium mb-2">{banner.subtitle}</h2>

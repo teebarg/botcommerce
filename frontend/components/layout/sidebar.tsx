@@ -134,7 +134,7 @@ const MenuItemComponent: React.FC<{
                     "pl-8 hover:bg-content2 bg-content1": level === 1,
                     "pl-12 hover:bg-content2 bg-content3": level === 2,
                     "pl-16 hover:bg-content3 bg-content4": level === 3,
-                    "!bg-rose-200 text-rose-800 hover:!text-rose-700": active,
+                    "bg-rose-200! text-rose-800 hover:text-rose-700!": active,
                 }
             )}
             href={item.href}
@@ -265,17 +265,17 @@ const SideBar: React.FC = () => {
     return (
         <div
             className={cn(
-                "h-screen bg-gradient-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
-                "transition-all duration-300 ease-in-out w-[22rem] text-default-500",
+                "h-screen bg-linear-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
+                "transition-all duration-300 ease-in-out w-88 text-default-500",
                 {
-                    "!w-20": isCollapsed,
+                    "w-20!": isCollapsed,
                 }
             )}
         >
             <div className="p-4 flex items-center justify-between mb-4">
                 <h1
                     className={cn("font-semibold text-3xl transition-opacity duration-200 opacity-100", {
-                        "!opacity-0 w-0": isCollapsed,
+                        "opacity-0! w-0": isCollapsed,
                     })}
                 >
                     {shopSettings?.shop_name}

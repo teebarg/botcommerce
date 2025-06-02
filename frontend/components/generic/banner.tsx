@@ -47,7 +47,7 @@ const Banner: React.FC<ComponentProps> = () => {
 
                     <Button
                         aria-label="shop now"
-                        className="min-w-[100px] !rounded-full p-[1px]"
+                        className="min-w-[100px] rounded-full! p-px"
                         size="sm"
                         onClick={() => router.push("/collections")}
                     >

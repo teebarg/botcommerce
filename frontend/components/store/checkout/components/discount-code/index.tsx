@@ -65,7 +65,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                 </p>
                                 <button
                                     aria-label="remove gift card"
-                                    className="flex items-center gap-x-2 !background-transparent !border-none"
+                                    className="flex items-center gap-x-2 !background-transparent border-none!"
                                     data-testid="remove-gift-card-button"
                                     onClick={() => removeGiftCardCode(gc.code)}
                                 >

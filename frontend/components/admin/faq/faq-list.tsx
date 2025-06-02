@@ -92,7 +92,7 @@ export function FaqList({ faqs, isLoading, onEdit }: FaqListProps) {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-1 flex-shrink-0">
+                                <div className="flex items-center gap-1 shrink-0">
                                     <Button size="icon" variant="ghost" onClick={() => onEdit(faq)}>
                                         <Pencil className="h-4 w-4" />
                                     </Button>

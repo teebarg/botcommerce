@@ -104,7 +104,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             {product.images.map((image: ProductImage, idx: number) => (
                                 <button
                                     key={idx}
-                                    className={`w-16 h-16 rounded-md flex-shrink-0 border-2 overflow-hidden relative ${
+                                    className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${
                                         selectedImageId === image.id ? "border-indigo-500" : "border-gray-200"
                                     }`}
                                     onClick={() => setSelectedImageId(image.id)}

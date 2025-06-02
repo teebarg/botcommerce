@@ -74,7 +74,7 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
             </div>
             <div className="flex-1 h-full max-w-7xl mx-auto bg-content1 flex flex-col rounded-md md:px-8">
                 <div className="md:flex md:gap-4 py-4 md:py-12">
-                    <div className="md:min-w-[15rem]">{user && <AccountNav />}</div>
+                    <div className="md:min-w-60">{user && <AccountNav />}</div>
                     <div className="md:flex-1">{dashboard}</div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-end justify-between sm:border-t border-gray-300 dark:border-gray-500 py-4 md:py-12 gap-8">

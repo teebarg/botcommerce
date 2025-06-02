@@ -142,10 +142,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 {order.order_items.map((item: OrderItem, idx: number) => (
                                     <div key={idx} className="px-6 py-4">
                                         <div className="flex flex-col sm:flex-row">
-                                            <div className="flex-shrink-0 mr-4 mb-4 sm:mb-0">
+                                            <div className="shrink-0 mr-4 mb-4 sm:mb-0">
                                                 <img alt={item.name} className="w-20 h-20 object-cover rounded" src={item.image} />
                                             </div>
-                                            <div className="flex-grow">
+                                            <div className="grow">
                                                 <h3 className="text-base font-medium text-default-900">{item.name}</h3>
                                                 <p className="text-sm text-default-500">SKU: {item.variant_id}</p>
                                                 <div className="mt-1 flex flex-col sm:flex-row sm:justify-between">
