@@ -78,7 +78,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
     return (
         <div
             className={cn(
-                "bg-content1 shadow-medium p-6 rounded border-l-2",
+                "bg-content1 shadow-md p-6 rounded border-l-2",
                 isOpen || hasShippingMethod ? "border-l-indigo-500" : "border-l-content3 opacity-50"
             )}
         >

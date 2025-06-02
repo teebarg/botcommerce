@@ -90,7 +90,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
     return (
         <div
             className={cn(
-                "bg-content1 shadow-medium p-6 rounded border-l-2",
+                "bg-content1 shadow-md p-6 rounded border-l-2",
                 isOpen || hasPaymentMethod ? "border-l-indigo-500" : "border-l-content3 opacity-50"
             )}
         >

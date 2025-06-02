@@ -60,6 +60,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     isLoading={loading}
                     type="button"
                     onClick={sendLink}
+                    variant="primary"
                 >
                     Send Magic Link
                 </Button>

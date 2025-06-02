@@ -34,7 +34,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
     // Check if the selected variant is in stock
     // const isInStock = selectedVariant.inventory > 0;
 
-    // Handle add to cart
     const handleAddToCart = async () => {
         if (!product.variants[0]) {
             toast.error("Please select a variant");
@@ -171,7 +170,13 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             </Button>
                         ) : (
                             <div className="flex items-center gap-4 mt-4">
-                                <Button className="w-auto" disabled={loading || !product.variants[0]} size="lg" onClick={handleAddToCart}>
+                                <Button
+                                    className="w-auto"
+                                    disabled={loading || !product.variants[0]}
+                                    size="lg"
+                                    onClick={handleAddToCart}
+                                    variant="primary"
+                                >
                                     {loading ? "Adding to cart..." : "Add to Cart"}
                                 </Button>
                                 <Button

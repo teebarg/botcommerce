@@ -23,7 +23,7 @@ const StoreNavbar = async () => {
     return (
         <NavigationBar className="my-2 hidden md:flex">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
-                <NavbarBrand className="flex items-center flex-1 md:w-[25vw] font-semibold">
+                <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink className="text-3xl block" href="/">
                         {siteConfig?.name}
                     </LocalizedClientLink>
@@ -36,10 +36,10 @@ const StoreNavbar = async () => {
                         </LocalizedClientLink>
                     )}
                 </NavbarBrand>
-                <NavbarItem className="hidden md:flex flex-1">
-                    <Search className="w-full justify-between" />
+                <NavbarItem className="hidden md:flex justify-center flex-1">
+                    <Search className="w-full justify-between max-w-lg" />
                 </NavbarItem>
-                <NavbarItem className="md:w-[25vw] flex gap-3 justify-end items-center">
+                <NavbarItem className="flex gap-3 justify-end items-center">
                     <CartComponent />
                     <ThemeButton />
                     <div className="hidden md:flex">

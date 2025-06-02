@@ -29,7 +29,7 @@ export default function NewsletterForm() {
                     type="email"
                 />
                 <div className="mt-4 sm:ml-4 sm:mt-0 sm:shrink-0">
-                    <Button aria-label="subscribe" isLoading={isPending} size="sm" type="submit">
+                    <Button variant="secondary" aria-label="subscribe" isLoading={isPending} size="sm" type="submit">
                         Subscribe
                     </Button>
                 </div>

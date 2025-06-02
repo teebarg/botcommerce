@@ -14,7 +14,7 @@ const CheckoutSummary = ({ cart }: CheckoutSummaryProps) => {
     }
 
     return (
-        <div className="relative md:sticky top-16 flex gap-y-8 w-full rounded-xl bg-content1 shadow-medium px-2 py-4 md:px-6 md:py-8 lg:w-[400px] lg:flex-none mt-6 sm:mt-0">
+        <div className="relative md:sticky top-16 flex gap-y-8 w-full rounded-xl bg-content1 shadow-md px-2 py-4 md:px-6 md:py-8 lg:w-[400px] lg:flex-none mt-6 sm:mt-0">
             <div className="w-full">
                 <h2 className="font-medium text-default-500">Cart Summary</h2>
                 <hr className="tb-divider mt-4" />

@@ -20,7 +20,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
 
     if (isLoading)
         return (
-            <div className="bg-content1 shadow-medium p-6 rounded border-l-2 border-l-indigo-500">
+            <div className="bg-content1 shadow-md p-6 rounded border-l-2 border-l-indigo-500">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full" />
@@ -41,7 +41,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
     return (
         <div>
             {/* Account Information Section */}
-            <div className="bg-content1 shadow-medium p-6 rounded border-l-2 border-l-indigo-500">
+            <div className="bg-content1 shadow-md p-6 rounded border-l-2 border-l-indigo-500">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full" />

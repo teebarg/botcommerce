@@ -60,43 +60,41 @@ const Search: React.FC<Props> = ({ className }) => {
     };
 
     return (
-        <React.Fragment>
-            <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
-                <DialogTrigger asChild>
-                    <Button
-                        className={className}
-                        endContent={<Kbd keys={["command"]}>K</Kbd>}
-                        startContent={<MagnifyingGlassMini />}
-                        variant="outline"
-                        onClick={modalState.open}
-                    >
-                        {`I'm looking for...`}
-                    </Button>
-                </DialogTrigger>
-                <DialogContent size="lg">
-                    <DialogHeader>
-                        <DialogTitle className="sr-only">Search</DialogTitle>
-                    </DialogHeader>
-                    <div>
-                        <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
-                            <MagnifyingGlassMini />
-                            <SearchInput onChange={debounce(handleChange, 500)} onReset={onReset} onSubmit={onSubmit} />
-                            <button aria-label="close" onClick={modalState.close}>
-                                <Kbd className="md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
-                            </button>
-                        </div>
-                        <div className="max-h-[80vh] min-h-[70vh] overflow-y-auto">
-                            {products.length == 0 && <NoProductsFound />}
-                            <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
-                                {products.map((product: ProductSearch, index: number) => (
-                                    <ProductCard key={index} product={product} />
-                                ))}
-                            </div>
+        <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    className={className}
+                    endContent={<Kbd keys={["command"]}>K</Kbd>}
+                    startContent={<MagnifyingGlassMini />}
+                    variant="outline"
+                    onClick={modalState.open}
+                >
+                    {`I'm looking for...`}
+                </Button>
+            </DialogTrigger>
+            <DialogContent size="lg">
+                <DialogHeader>
+                    <DialogTitle className="sr-only">Search</DialogTitle>
+                </DialogHeader>
+                <div>
+                    <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
+                        <MagnifyingGlassMini />
+                        <SearchInput onChange={debounce(handleChange, 500)} onReset={onReset} onSubmit={onSubmit} />
+                        <button aria-label="close" onClick={modalState.close}>
+                            <Kbd className="md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
+                        </button>
+                    </div>
+                    <div className="max-h-[80vh] min-h-[70vh] overflow-y-auto">
+                        {products.length == 0 && <NoProductsFound />}
+                        <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
+                            {products.map((product: ProductSearch, index: number) => (
+                                <ProductCard key={index} product={product} />
+                            ))}
                         </div>
                     </div>
-                </DialogContent>
-            </Dialog>
-        </React.Fragment>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

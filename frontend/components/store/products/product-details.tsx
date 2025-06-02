@@ -17,7 +17,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
 
     return (
         <React.Fragment>
-            <div className="text-sm py-8 bg-yellow-50/80 md:bg-content1 -mx-2 px-2 rounded-none md:rounded-lg text-gray-900 md:text-default-foreground">
+            <div className="text-sm py-8 bg-yellow-50/90 text-yellow-950 -mx-2 px-2 rounded-none md:rounded-lg">
                 <div className="grid grid-cols-1 gap-y-8">
                     <div className="flex items-start gap-x-2">
                         <Truck className="text-default-foreground" size={16} />

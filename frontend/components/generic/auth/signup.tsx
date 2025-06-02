@@ -78,11 +78,11 @@ const SignUpForm: React.FC<Props> = () => {
                 <Button
                     aria-label="join us"
                     className="w-full mt-6"
-                    color="warning"
                     data-testid="register-button"
                     isLoading={isPending}
                     size="lg"
                     type="submit"
+                    variant="primary"
                 >
                     Join Us
                 </Button>

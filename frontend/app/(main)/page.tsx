@@ -100,6 +100,9 @@ export default async function Home() {
 
                 {/* Category Sections */}
                 <CategoriesSection />
+                <div className="text-center h-24 bg-secondary text-secondary-foreground">
+                    <p>Top selling products</p>
+                </div>
                 <PromotionalBanner
                     btnClass="text-purple-600"
                     outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"

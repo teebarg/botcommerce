@@ -16,21 +16,19 @@ const Kbd: React.FC<Props> = ({ keys = [], className, children }) => {
     };
 
     return (
-        <React.Fragment>
-            <kbd
-                className={cn(
-                    "px-1.5 py-0.5 inline-flex space-x-0.5 items-center font-sans font-normal text-center text-sm shadow-small bg-default-100 text-default-500 rounded-lg",
-                    className
-                )}
-            >
-                {keys.map((key, index: number) => (
-                    <abbr key={index} className="no-underline" title={key}>
-                        {symbols[key]}
-                    </abbr>
-                ))}
-                <span>{children}</span>
-            </kbd>
-        </React.Fragment>
+        <kbd
+            className={cn(
+                "px-1.5 py-0.5 inline-flex space-x-0.5 items-center font-sans font-normal text-center text-sm shadow-sm bg-default-100 text-default-500 rounded-lg",
+                className
+            )}
+        >
+            {keys.map((key, index: number) => (
+                <abbr key={index} className="no-underline" title={key}>
+                    {symbols[key]}
+                </abbr>
+            ))}
+            <span>{children}</span>
+        </kbd>
     );
 };
 

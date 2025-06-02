@@ -155,6 +155,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                             e.stopPropagation();
                             handleAddToCart();
                         }}
+                        variant={status == "OUT_OF_STOCK" ? "ghost" : "primary"}
                     >
                         {status == "OUT_OF_STOCK" ? (
                             <span>Out of stock</span>
