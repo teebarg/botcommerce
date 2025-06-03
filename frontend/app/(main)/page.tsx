@@ -100,9 +100,7 @@ export default async function Home() {
 
                 {/* Category Sections */}
                 <CategoriesSection />
-                <div className="text-center h-24 bg-secondary text-secondary-foreground">
-                    <p>Top selling products</p>
-                </div>
+
                 <PromotionalBanner
                     btnClass="text-purple-600"
                     outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
@@ -113,10 +111,10 @@ export default async function Home() {
                     <div className="max-w-8xl mx-auto relative px-1 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                             <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
-                                <span className="text-secondary text-3xl font-semibold">{siteConfig.name}</span>
-                                <span className="text-secondary text-lg block mt-4 mb-4">Explore the exclusive beauty and cosmetics collection.</span>
+                                <span className="text-primary text-3xl font-semibold">{siteConfig.name}</span>
+                                <span className="text-primary text-lg block mt-4 mb-4">Explore the exclusive beauty and cosmetics collection.</span>
                                 <LocalizedClientLink
-                                    className="bg-transparent text-secondary border-2 border-secondary rounded-full px-8 py-2 hover:bg-secondary/10"
+                                    className="bg-transparent text-primary border-2 border-primary rounded-full px-8 py-2 hover:bg-primary/10"
                                     href="/collections"
                                 >
                                     Visit Shop
@@ -171,18 +169,17 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-                <div className="">
-                    <div className="max-w-5xl mx-auto sm:flex gap-8 py-16 sm:px-2">
-                        <div className="sm:w-1/2 sm:pr-10 p-4 sm:p-8 rounded-lg">
-                            <p className="text-lg font-medium text-danger">GET IN TOUCH</p>
+                <div className="py-8">
+                    <div className="max-w-5xl mx-auto sm:flex gap-8 py-4 sm:px-2 rounded-lg shadow-xl bg-content1">
+                        <div className="sm:w-1/2 sm:pr-10 p-4 sm:p-8">
                             <p className="text-xl font-medium text-default-900">Reach out to us for more information</p>
-                            <p className="font-semibold text-default-500">
+                            <p className="font-medium text-default-500 text-sm">
                                 For inquiries or to place an order, contact us today. We are here to assist you with any questions you may have about
                                 our products and services.
                             </p>
                             <ContactForm />
                         </div>
-                        <div className="sm:w-1/2 px-4 py-12 sm:p-8 rounded-lg mt-6 sm:mt-0">
+                        <div className="sm:w-1/2 px-4 py-12 sm:p-8 mt-6 sm:mt-0">
                             <div>
                                 <p className="font-semibold text-md text-default-500">Our Contacts</p>
                                 <div className="flex gap-2 text-default-800">

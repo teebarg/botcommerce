@@ -31,7 +31,7 @@ export default function ContactForm() {
                     <Checkbox checked={true} name="agreement" />
                     <label className="ml-2 text-sm">I allow this website to store my submission.</label>
                 </div>
-                <Button aria-label="submit" className="min-w-32" color="danger" isLoading={isPending} type="submit">
+                <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit" variant="primary">
                     Submit
                 </Button>
             </div>

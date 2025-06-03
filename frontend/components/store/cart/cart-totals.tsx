@@ -6,6 +6,7 @@ import { currency } from "@lib/util/util";
 import { Tooltip } from "@components/ui/tooltip";
 
 import { Cart } from "@/types/models";
+import { Separator } from "@/components/ui/separator";
 
 type CartTotalsProps = {
     data: Omit<Cart, "refundable_amount">;
@@ -62,7 +63,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                         </div>
                     )}
 
-                    <hr className="tb-divider" />
+                    <Separator className="my-2" />
                     <div className="flex justify-between">
                         <dt className="text-sm font-semibold text-default-500">Total</dt>
                         <dd className="text-sm font-semibold text-default-900">

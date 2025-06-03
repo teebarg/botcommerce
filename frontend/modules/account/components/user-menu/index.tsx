@@ -52,7 +52,7 @@ export default function UserDropDown({ user }: { user: Session }) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-2 ring-default">
+                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-default">
                     <Image fill alt="avatar" src={user?.image || ProfileAvatar} />
                 </span>
             </DropdownMenuTrigger>

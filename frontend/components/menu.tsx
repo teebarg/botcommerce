@@ -3,6 +3,7 @@ import UserDropDown from "@modules/account/components/user-menu";
 import { UserGroup, Collection, Checkout } from "nui-react-icons";
 import { Heart, Home, User } from "lucide-react";
 
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/types/models";
@@ -39,7 +40,7 @@ const Menu: React.FC<MenuProp> = ({ user }) => {
                 {user?.isAdmin && <NavLink href="/admin" icon={<UserGroup className="h-8 w-8" viewBox="0 0 24 24" />} title="Admin" />}
             </div>
 
-            <hr className="tb-divider my-8" />
+            <Separator className="my-8" />
 
             <div className="space-y-3">
                 <NavLink href="/our-story" title="Our Story" />

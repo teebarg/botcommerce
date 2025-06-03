@@ -45,7 +45,7 @@ const StoreNavbar = async () => {
                     <div className="hidden md:flex">
                         {user ? (
                             <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
-                                <HeartFilled className="h-8 w-8 text-primary" />
+                                <HeartFilled className="h-8 w-8 text-secondary" />
                             </LocalizedClientLink>
                         ) : (
                             <Heart className="h-8 w-8 text-default-500" />

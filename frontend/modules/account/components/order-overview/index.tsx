@@ -19,10 +19,10 @@ const OrderOverview = ({ orders }: { orders: Order[] }) => {
     }
 
     return (
-        <div className="w-full flex flex-col items-center gap-y-4" data-testid="no-orders-container">
+        <div className="w-full flex flex-col items-center" data-testid="no-orders-container">
             <h2 className="text-lg">Nothing to see here</h2>
             <p>You don&apos;t have any orders yet, let us change that {":)"}</p>
-            <div className="mt-4">
+            <div className="mt-8">
                 <BtnLink data-testid="continue-shopping-button" href="/">
                     Continue shopping
                 </BtnLink>

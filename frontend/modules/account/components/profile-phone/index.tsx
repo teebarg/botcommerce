@@ -10,7 +10,7 @@ type MyInformationProps = {
     customer: Omit<any, "password_hash">;
 };
 
-const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
+const ProfilePhone: React.FC<MyInformationProps> = ({ customer }) => {
     const [, setSuccessState] = React.useState(false);
 
     const [state, formAction] = useActionState(updateCustomerPhone, {
@@ -45,4 +45,4 @@ const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
     );
 };
 
-export default ProfileEmail;
+export default ProfilePhone;

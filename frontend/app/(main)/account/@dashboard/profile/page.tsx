@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { api } from "@/apis";
 import ServerError from "@/components/generic/server-error";
+import { Separator } from "@/components/ui/separator";
 
 export const metadata: Metadata = {
     title: "Profile",
@@ -32,11 +33,11 @@ export default async function Profile() {
                     or change your password.
                 </p>
             </div>
-            <div className="flex flex-col gap-y-8 w-full">
+            <div className="flex flex-col gap-y-2 w-full">
                 <ProfileName customer={customer} />
-                <hr className="tb-divider" />
+                <Separator className="my-4" />
                 <ProfileEmail customer={customer} />
-                <hr className="tb-divider" />
+                <Separator className="my-4" />
                 <ProfilePassword customer={customer} />
             </div>
         </div>

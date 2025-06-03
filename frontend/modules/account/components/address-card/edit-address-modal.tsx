@@ -107,24 +107,19 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                     </p>
                 </div>
                 <div className="flex items-center gap-x-4">
-                    <button
-                        aria-label="edit address"
-                        className="text-sm flex items-center gap-x-2"
-                        data-testid="address-edit-button"
-                        onClick={() => setIsOpen(true)}
-                    >
-                        <Edit />
+                    <Button aria-label="edit address" data-testid="address-edit-button" startContent={<Edit />} onClick={() => setIsOpen(true)}>
                         Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         aria-label="delete address"
-                        className="text-sm text-danger-500 flex items-center gap-x-2"
                         data-testid="address-delete-button"
+                        disabled={removing}
+                        startContent={removing ? <Spinner /> : <Trash2 />}
+                        variant="destructive"
                         onClick={removeAddress}
                     >
-                        {removing ? <Spinner /> : <Trash2 />}
                         Remove
-                    </button>
+                    </Button>
                 </div>
             </div>
 
