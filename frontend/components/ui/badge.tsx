@@ -12,6 +12,8 @@ const badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 p
             secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
             destructive: "border-transparent bg-danger text-danger-foreground hover:bg-danger/80",
             outline: "text-foreground",
+            emerald: "border-transparent bg-emerald-100 text-emerald-900 border-emerald-200 hover:bg-emerald-500/80",
+            blue: "border-transparent bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-500/80",
         },
     },
     defaultVariants: {

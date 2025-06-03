@@ -156,11 +156,11 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
-                            <div className="flex gap-2 justify-end md:col-span-2">
-                                <Button type="button" variant="destructive" onClick={() => onClose?.()}>
+                            <div className="flex gap-2 justify-end md:col-span-2 pb-2">
+                                <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose?.()}>
                                     Close
                                 </Button>
-                                <Button disabled={loading} isLoading={loading} type="submit">
+                                <Button variant="primary" className="min-w-32" disabled={loading} isLoading={loading} type="submit">
                                     {user?.id ? "Update" : "Create"}
                                 </Button>
                             </div>

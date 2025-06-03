@@ -1,22 +1,45 @@
 import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { Bell, Trash2 } from "lucide-react";
-import { Cancel, Excel } from "nui-react-icons";
-
-import { Spinner } from "@/components/generic/spinner";
+import { AlertCircle, CheckCircle2, Clock, Download, FileSpreadsheet, Trash2 } from "lucide-react";
 import { useStore } from "@/app/store/use-store";
 import { Activity } from "@/types/models";
 import { api } from "@/apis";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface Props {
     activities: Activity[];
     onRemove: (id: string | number) => void;
 }
 
+const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolean }) => {
+    if (type === "PRODUCT_EXPORT") {
+        return isSuccess ? <FileSpreadsheet className="text-emerald-600" size={20} /> : <AlertCircle className="text-red-500" size={20} />;
+    }
+    return <CheckCircle2 className="text-blue-500" size={20} />;
+};
+
+const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activityType: string }) => {
+    if (activityType === "PRODUCT_EXPORT") {
+        return <Badge variant={isSuccess ? "emerald" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
+    }
+    return <Badge variant="blue">Success</Badge>;
+};
+
 const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
     const [removing, setRemoving] = useState<number | string | null>(null);
     const { shopSettings } = useStore();
+
+    const handleDownload = (url: string, filename: string) => {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename || "export.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     const removeActivity = async (id: number) => {
         setRemoving(id);
@@ -35,118 +58,103 @@ const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
         }
     };
 
-    if (activities?.length == 0) {
-        return (
-            <div className="flex flex-col items-center justify-center p-8 bg-linear-to-b from-background to-content2 border border-gray-100 rounded-lg shadow-sm h-full">
-                <div className="relative mb-6">
-                    {/* Background decoration circles */}
-                    <div className="absolute -z-10 animate-pulse">
-                        <div className="absolute -top-8 -left-8 w-16 h-16 bg-blue-100 rounded-full opacity-20" />
-                        <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-purple-100 rounded-full opacity-20" />
-                    </div>
-
-                    {/* Main icon group */}
-                    <div className="relative flex items-center justify-center bg-white rounded-full p-4 shadow-md">
-                        <svg
-                            className="w-8 h-8 text-blue-500"
-                            fill="none"
-                            height="24"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            width="24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
-                        </svg>
-                        <div className="absolute -top-2 -right-2">
-                            <div className="relative">
-                                <Bell className="w-5 h-5 text-purple-500" />
-                                <div className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 className="text-lg font-semibold text-default-900 mb-2">No Recent Activity</h3>
-
-                <p className="text-default-500 text-center mb-6 max-w-sm">
-                    Your activity feed is empty right now. New notifications and updates will appear here as they happen.
-                </p>
-            </div>
-        );
-    }
-
     return (
-        <React.Fragment>
-            <div className="text-lg font-semibold pt-7 pl-8 pb-1">Activity</div>
-            <div>
-                {activities?.map((item: Activity, index: number) => (
-                    <div key={index} className="border-default-100 mx-8 border-b last:border-b-0">
-                        <div className="hover:bg-default-100 -mx-8 flex px-8 py-6">
-                            <div className="relative h-full w-full">
-                                <div className="text-default-500 flex justify-between">
-                                    <div className="flex items-center">
-                                        <span className="text-sm font-semibold">{shopSettings?.shop_name}</span>
+        <div className="bg-background rounded-lg shadow-sm border border-default-200">
+            {/* Header */}
+            <div className="px-6 py-4">
+                <h2 className="text-xl font-semibold text-default-900 flex items-center gap-2">
+                    <Clock size={20} className="text-default-500" />
+                    Recent Activity
+                </h2>
+            </div>
+            <Separator />
+
+            <div className="divide-y divide-default-200">
+                {activities.length === 0 ? (
+                    <div className="px-6 py-12 text-center">
+                        <Clock className="mx-auto h-12 w-12 text-default-400" />
+                        <h3 className="mt-2 text-sm font-medium text-default-900">No activity yet</h3>
+                        <p className="mt-1 text-sm text-default-500">Your recent activities will appear here.</p>
+                    </div>
+                ) : (
+                    activities.map((item) => (
+                        <div key={item.id} className="px-6 py-4 hover:bg-content1 transition-colors duration-150">
+                            <div className="flex items-start justify-between">
+                                <div className="flex items-start space-x-3 flex-1">
+                                    <div className="flex-shrink-0 mt-0.5">
+                                        <ActivityTypeIcon type={item.activity_type} isSuccess={item.is_success} />
                                     </div>
-                                    <span>
-                                        <div className="flex text-sm font-semibold">
-                                            <span>{formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}</span>
-                                            <div className="flex items-center ml-2">
-                                                <div className="h-1.5 w-1.5 self-center rounded-full bg-violet-800" />
-                                            </div>
+
+                                    {/* Content */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <p className="text-sm font-medium text-default-900 truncate max-w-[200px]">{item.description}</p>
+                                            <StatusBadge isSuccess={item.is_success} activityType={item.activity_type} />
                                         </div>
-                                    </span>
-                                </div>
-                                <div className="pl-8p">
-                                    <div className="text-sm flex flex-col">
-                                        <span>{item.description}</span>
-                                        {item.activity_type == "PRODUCT_EXPORT" && (
-                                            <div className="mt-4 flex w-full cursor-pointer items-center">
-                                                <div className="border-grey-20p flex items-center justify-center rounded-lg border p-2.5">
-                                                    {item.is_success ? <Excel /> : <Cancel className="text-default-500" size={18} />}
-                                                </div>
-                                                <div className="relative w-full pl-4 text-left">
-                                                    <div className="text-sm max-w-[80%] overflow-hidden truncate">{item.action_download_url}</div>
-                                                    {!item.is_success && (
-                                                        <span>
-                                                            <div className="text-grey-40 text-sm text-rose-500">Job failed</div>
-                                                        </span>
-                                                    )}
-                                                </div>
+
+                                        <div className="flex items-center text-xs text-default-500 mb-3">
+                                            <span className="font-medium">{shopSettings?.shop_name}</span>
+                                            <span className="mx-2">•</span>
+                                            <span>{formatDistanceToNow(new Date(item.created_at))}</span>
+                                        </div>
+
+                                        {/* Export specific content */}
+                                        {item.activity_type === "PRODUCT_EXPORT" && (
+                                            <div className="mt-3">
+                                                {item.is_success ? (
+                                                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center space-x-2">
+                                                                <FileSpreadsheet className="text-emerald-600" size={16} />
+                                                                <span className="text-sm text-emerald-800 font-medium">Export ready</span>
+                                                            </div>
+                                                            <Button
+                                                                onClick={() => handleDownload(item.action_download_url!, "products_export.xlsx")}
+                                                                variant="emerald"
+                                                                size="xs"
+                                                            >
+                                                                <Download size={14} className="mr-1" />
+                                                                Download
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                                        <div className="flex items-center space-x-2">
+                                                            <AlertCircle className="text-red-500" size={16} />
+                                                            <span className="text-sm text-red-800 font-medium">Export failed</span>
+                                                        </div>
+                                                        <p className="text-xs text-red-600 mt-1">
+                                                            Please try again or contact support if the issue persists.
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="mt-6 flex">
-                                        <div className="flex">
-                                            <button
-                                                aria-label="remove activity"
-                                                className="text-rose-500"
-                                                data-testid="activity-delete-button"
-                                                onClick={() => removeActivity(item.id)}
-                                            >
-                                                {removing == item.id ? <Spinner /> : <Trash2 />}
-                                            </button>
-                                            {item.is_success && item.activity_type == "product_export" && (
-                                                <a
-                                                    download
-                                                    className="flex items-center whitespace-nowrap font-normal overflow-hidden bg-success text-white ml-2 px-3 min-w-16 h-8 text-xs rounded-lg"
-                                                    href={item.action_download_url}
-                                                >
-                                                    Download
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
+                                </div>
+
+                                <div className="flex-shrink-0 ml-4">
+                                    <Button
+                                        onClick={() => removeActivity(item.id)}
+                                        disabled={removing === item.id}
+                                        aria-label="Remove activity"
+                                        size="icon"
+                                        variant="ghost"
+                                    >
+                                        {removing === item.id ? (
+                                            <div className="animate-spin h-4 w-4 border-2 border-default-200 border-t-red-500 rounded-full" />
+                                        ) : (
+                                            <Trash2 className="text-red-500" size={16} />
+                                        )}
+                                    </Button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
-        </React.Fragment>
+        </div>
     );
 };
 

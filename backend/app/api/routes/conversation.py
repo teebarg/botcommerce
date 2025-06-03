@@ -105,7 +105,8 @@ async def list_conversations(
         where=where,
         skip=skip,
         take=limit,
-        order={"last_active": "desc"}
+        order={"last_active": "desc"},
+        include={"user": True, "messages": True}
     )
     total = await db.conversation.count(where=where)
     return {

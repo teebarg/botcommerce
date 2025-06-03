@@ -35,7 +35,7 @@ const ConversationView: React.FC<ConversationViewProps> = ({ uid }) => {
                     Go Back
                 </Button>
             </div>
-            <Card className="shadow-lg border-input w-full max-w-2xl mx-auto bg-content1 overflow-auto">
+            <Card className="shadow-lg border-input w-full max-w-2xl mx-auto bg-content1 overflow-auto"> 
                 <CardHeader className="border-b border-input bg-indigo-600 text-white">
                     <CardTitle className="text-xl flex items-center gap-2">AI Assistant</CardTitle>
                     <CardDescription className="text-gray-100">How can we help with your software development needs?</CardDescription>

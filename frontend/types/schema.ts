@@ -407,10 +407,20 @@ export const PaginatedActivitySchema = PagSchema.extend({
     activities: z.array(ActivitySchema),
 });
 
+export const ChatMessageSchema = z.object({
+    id: z.number(),
+    conversation_id: z.number(),
+    content: z.string(),
+    sender: MessageSenderSchema,
+    timestamp: z.string(),
+});
+
 export const ConversationSchema = z.object({
     id: z.number(),
     conversation_uuid: z.string(),
     user_id: z.number(),
+    user: UserSchema,
+    messages: z.array(ChatMessageSchema),
     started_at: z.string(),
     last_active: z.string(),
     status: ConversationStatusSchema,
@@ -418,14 +428,6 @@ export const ConversationSchema = z.object({
 
 export const PaginatedConversationSchema = PagSchema.extend({
     conversations: z.array(ConversationSchema),
-});
-
-export const ChatMessageSchema = z.object({
-    id: z.number(),
-    conversation_id: z.number(),
-    content: z.string(),
-    sender: MessageSenderSchema,
-    timestamp: z.string(),
 });
 
 export const FAQSchema = z.object({

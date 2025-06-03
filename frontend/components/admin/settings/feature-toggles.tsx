@@ -75,10 +75,10 @@ export function FeatureToggles({ toggles }: FeatureTogglesProps) {
                 const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
                 return (
-                    <div key={feature.key} className="flex items-center justify-between p-4 bg-background rounded-lg">
+                    <div key={feature.key} className="flex items-center justify-between p-4 bg-content1 rounded-lg">
                         <div>
                             <h3 className="font-medium">{feature.label}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{feature.description}</p>
+                            <p className="text-sm text-default-500">{feature.description}</p>
                         </div>
                         <Switch
                             checked={isEnabled}

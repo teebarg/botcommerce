@@ -53,8 +53,8 @@ const CustomerView: React.FC = () => {
     return (
         <div className="px-2 md:px-10 py-8">
             <div className="mb-4">
-                <h3 className="text-2xl font-semibold">Customers view</h3>
-                <p className="text-muted-foreground">Manage your customers.</p>
+                <h3 className="text-xl font-semibold">Customers view</h3>
+                <p className="text-sm text-default-500">Manage your customers.</p>
             </div>
             <AnimatePresence>
                 <div key="table" className="md:block hidden">
@@ -86,7 +86,7 @@ const CustomerView: React.FC = () => {
                                 </TableRow>
                             ) : (
                                 users?.map((user: User, idx: number) => (
-                                    <TableRow key={idx}>
+                                    <TableRow key={idx} className="even:bg-content1">
                                         <TableCell className="font-medium">{idx + 1}</TableCell>
                                         <TableCell>
                                             <div>
@@ -131,7 +131,7 @@ const CustomerView: React.FC = () => {
                                     <SlidersHorizontal className="text-default-500" size={18} />
                                 </button>
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-4 bg-content1 p-2">
                                 {users?.map((user: User, idx: number) => (
                                     <CustomerCard key={idx} actions={<CustomerActions user={user} />} user={user} />
                                 ))}

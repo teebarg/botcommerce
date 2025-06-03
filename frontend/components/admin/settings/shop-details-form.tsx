@@ -118,7 +118,7 @@ export function ShopDetailsForm({ settings }: ShopDetailsProps) {
                 })}
             </div>
             <div className="flex justify-end">
-                <Button disabled={isPending} isLoading={isPending} type="button" variant="default" onClick={handleUpdate}>
+                <Button disabled={isPending} isLoading={isPending} type="button" variant="primary" onClick={handleUpdate}>
                     Save Changes
                 </Button>
             </div>
