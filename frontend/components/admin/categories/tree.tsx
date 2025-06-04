@@ -58,7 +58,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                             <Image fill alt={item.name} src={item.image} />
                                         </div>
                                     )}
-                                    <Badge className="mr-2" variant={item.is_active ? "success" : "destructive"}>
+                                    <Badge className="mr-2" variant={item.is_active ? "emerald" : "destructive"}>
                                         {item.is_active ? "active" : "inactive"}
                                     </Badge>
                                 </div>

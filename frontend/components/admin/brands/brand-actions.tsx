@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { Brand } from "@/types/models";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import DrawerUI from "@/components/drawer";
+import Overlay from "@/components/overlay";
 
 interface Props {
     item: Brand;
@@ -41,11 +41,18 @@ const BrandActions: React.FC<Props> = ({ item }) => {
 
     return (
         <div className="relative flex items-center gap-2">
-            <DrawerUI open={editState.isOpen} title="Edit Brand" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
-                <div className="max-w-2xl">
-                    <BrandForm current={item} type="update" onClose={editState.close} />
-                </div>
-            </DrawerUI>
+            <Overlay
+                trigger={
+                    <Button onClick={editState.open} size="iconOnly" variant="ghost">
+                        <Edit className="h-5 w-5" />
+                    </Button>
+                }
+                open={editState.isOpen}
+                onOpenChange={editState.setOpen}
+                title="Edit Brand"
+            >
+                <BrandForm current={item} type="update" onClose={editState.close} />
+            </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger>
                     <Trash2 className="text-red-500 h-5 w-5" />

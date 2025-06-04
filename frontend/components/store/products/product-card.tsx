@@ -92,7 +92,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {
         e.stopPropagation();
-        const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== 'undefined' ? window.location.origin : ''}/products/${slug}`;
+        const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, "_blank");

@@ -9,7 +9,7 @@ import CustomerForm from "./customer-form";
 import { User } from "@/types/models";
 import { useDeleteCustomer } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
-import DrawerUI from "@/components/drawer";
+import Overlay from "@/components/overlay";
 
 interface CustomerActionsProps {
     user: User;
@@ -26,14 +26,22 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     return (
         <div>
             <div className="flex gap-2">
-                <DrawerUI open={editState.isOpen} title="Edit Customer" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
+                <Overlay
+                    trigger={
+                        <Button size="iconOnly">
+                            <Edit className="h-5 w-5" />
+                        </Button>
+                    }
+                    open={editState.isOpen}
+                    onOpenChange={editState.setOpen}
+                    title="Edit Customer"
+                >
                     <CustomerForm user={user} onClose={editState.close} />
-                </DrawerUI>
+                </Overlay>
                 <Button
                     disabled={isPending}
                     isLoading={isPending}
-                    size="icon"
-                    variant="ghost"
+                    size="iconOnly"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete(user.id);

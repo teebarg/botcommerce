@@ -60,6 +60,7 @@ const ChatsView: React.FC = () => {
                             <TableRow>
                                 <TableHead>S/N</TableHead>
                                 <TableHead>Conversation UUID</TableHead>
+                                <TableHead>No of Messages</TableHead>
                                 <TableHead>User ID</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Started At</TableHead>
@@ -85,6 +86,7 @@ const ChatsView: React.FC = () => {
                                     <TableRow key={idx} className="even:bg-content1">
                                         <TableCell className="font-medium">{idx + 1}</TableCell>
                                         <TableCell>{conversation.conversation_uuid}</TableCell>
+                                        <TableCell>{conversation.messages?.length}</TableCell>
                                         <TableCell>{conversation.user_id}</TableCell>
                                         <TableCell>{getStatusBadge(conversation.status)}</TableCell>
                                         <TableCell>{formatDate(conversation.started_at)}</TableCell>

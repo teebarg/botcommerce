@@ -23,8 +23,8 @@ const MenuComp: React.FC = () => {
                 <MenuIcon className="h-8 w-8" />
             </DrawerTrigger>
             <DrawerContent>
-                <DrawerHeader>
-                    <DrawerTitle className="sr-only">Menu</DrawerTitle>
+                <DrawerHeader className="sr-only">
+                    <DrawerTitle>Menu</DrawerTitle>
                 </DrawerHeader>
                 <AdminMobileMenu />
             </DrawerContent>

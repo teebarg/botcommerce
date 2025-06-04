@@ -9,9 +9,10 @@ import { Trash2 } from "lucide-react";
 
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import DrawerUI from "@/components/drawer";
 import { CollectionForm } from "@/components/admin/collections/collection-form";
 import { Collection } from "@/types/models";
+import Overlay from "@/components/overlay";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     collection: Collection;
@@ -36,11 +37,18 @@ const CollectionActions: React.FC<Props> = ({ collection, deleteAction }) => {
 
     return (
         <div className="relative flex items-center gap-2">
-            <DrawerUI open={editState.isOpen} title="Edit Collection" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
-                <div className="max-w-2xl">
-                    <CollectionForm collection={collection} type="update" onClose={editState.close} />
-                </div>
-            </DrawerUI>
+            <Overlay
+                trigger={
+                    <Button size="iconOnly">
+                        <Edit className="h-5 w-5" />
+                    </Button>
+                }
+                open={editState.isOpen}
+                onOpenChange={editState.setOpen}
+                title="Edit Collection"
+            >
+                <CollectionForm collection={collection} type="update" onClose={editState.close} />
+            </Overlay>
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                 <DialogTrigger>
                     <Trash2 className="h-5 w-5 text-danger" />

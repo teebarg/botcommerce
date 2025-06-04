@@ -31,7 +31,7 @@ const DrawerUI: React.FC<Props> = ({ action, children, direction, trigger, title
     return (
         <Drawer direction={direction} {...restProps}>
             <DrawerTrigger> {trigger} </DrawerTrigger>
-            <DrawerContent className="px-4" direction={direction}>
+            <DrawerContent className="px-4">
                 <DrawerHeader>
                     <DrawerTitle>{title}</DrawerTitle>
                     <DrawerDescription>{description}</DrawerDescription>

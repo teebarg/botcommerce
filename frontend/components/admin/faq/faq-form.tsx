@@ -1,17 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
 import { api } from "@/apis/base";
 import { FAQ } from "@/types/models";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FaqFormProps {
     faq?: FAQ | null;
@@ -71,12 +70,9 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     };
 
     return (
-        <Card className="p-6 mb-6">
-            <div className="flex justify-between items-center mb-4">
+        <div className="py-6 px-3">
+            <div className="mb-4">
                 <h2 className="text-xl font-semibold">{faq ? "Edit FAQ" : "Create New FAQ"}</h2>
-                <Button className="h-8 w-8" size="icon" variant="ghost" onClick={onCancel}>
-                    <X className="h-4 w-4" />
-                </Button>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -112,12 +108,25 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                     <label className="block text-sm font-medium mb-1" htmlFor="category">
                         Category
                     </label>
-                    <Input
+                    <Select value={formData.category} onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}>
+                        <SelectTrigger className="">
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Category</SelectLabel>
+                                <SelectItem value="general">General</SelectItem>
+                                <SelectItem value="payment">Payment</SelectItem>
+                                <SelectItem value="shipping">Shipping</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                    {/* <Input
                         id="category"
                         placeholder="Enter the category"
                         value={formData.category}
                         onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-                    />
+                    /> */}
                 </div>
 
                 {/* Status */}
@@ -130,14 +139,14 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                     <label className="ml-2 text-sm">Active</label>
                 </div>
                 <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={onCancel}>
+                    <Button type="button" variant="outline" onClick={onCancel} className="min-w-32">
                         Cancel
                     </Button>
-                    <Button disabled={loading} isLoading={loading} type="submit">
+                    <Button disabled={loading} isLoading={loading} type="submit" variant="primary">
                         {faq ? "Update FAQ" : "Create FAQ"}
                     </Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 }

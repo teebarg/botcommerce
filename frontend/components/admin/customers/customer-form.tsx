@@ -74,12 +74,13 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
     }
 
     return (
-        <div>
+        <div className="mx-auto w-full py-6 px-2">
+            <h3 className="text-lg font-medium mb-4">Update Customer</h3>
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="w-full h-full">
                         {/* Product Form */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="first_name"

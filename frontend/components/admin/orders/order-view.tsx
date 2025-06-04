@@ -62,8 +62,8 @@ const OrderView: React.FC = () => {
     return (
         <div className="px-2 md:px-10 py-8">
             <div className="mb-6 flex flex-col">
-                <h1 className="text-2xl font-semibold">Order view</h1>
-                <p className="text-muted-foreground">Manage your orders.</p>
+                <h1 className="text-2xl font-medium">Order view</h1>
+                <p className="text-default-500 text-sm">Manage your orders.</p>
             </div>
             <AnimatePresence>
                 <div key="table" className="md:block hidden">

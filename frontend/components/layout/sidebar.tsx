@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Calendar, ChevronRight, CogSixTooth, DocumentText, Ecommerce, User, Users, Window } from "nui-react-icons";
+import { ChevronRight, CogSixTooth, DocumentText, Ecommerce, User, Users, Window } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Activity, MessageSquare } from "lucide-react";
@@ -15,7 +15,7 @@ interface MenuItem {
     icon?: React.ReactNode;
     suffix?: React.ReactNode;
     disabled?: boolean;
-    exact?: boolean; // Whether to match the route exactly
+    exact?: boolean;
 }
 
 interface SubMenuItem {
@@ -232,16 +232,6 @@ const SideBar: React.FC = () => {
             href: "/profile",
             icon: <User size={20} />,
             suffix: <span className="bg-pink-100 text-pink-500 text-xs font-medium px-2 py-0.5 rounded-full">New</span>,
-        },
-        {
-            label: "Calendar",
-            href: "/calendar",
-            icon: <Calendar size={20} />,
-            suffix: (
-                <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    New
-                </span>
-            ),
         },
         {
             label: "Documentation",
