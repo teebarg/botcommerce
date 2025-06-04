@@ -42,12 +42,15 @@ const code = function () {
     }
 
     const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    console.log("🚀 ~ code ~ darkQuery:", darkQuery)
 
     darkQuery.addEventListener("change", function (e) {
         window.__setPreferredTheme(e.matches ? "dark" : "light");
     });
 
     setTheme(preferredTheme || (darkQuery.matches ? "dark" : "light"));
+
+    console.log("🚀 ~ code ~ preferredTheme:", preferredTheme)
 };
 
 const getTheme = `(${code})();`;

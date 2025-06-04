@@ -1,25 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-    MessageCircle,
-    Bot,
-    User,
-    Search,
-    Filter,
-    Calendar,
-    Clock,
-    Star,
-    MoreVertical,
-    ArrowLeft,
-    Phone,
-    Mail,
-    MapPin,
-    ExternalLink,
-    Archive,
-    Flag,
-    Download,
-    UserX,
-    Eye,
-} from "lucide-react";
+import React, { useRef, useEffect } from "react";
+import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-react";
+
 import { ChatMessage } from "@/types/models";
 import { formatDate } from "@/lib/util/util";
 import { Conversation, ConversationStatus } from "@/types/models";
@@ -41,8 +22,7 @@ const StatusBadge = ({ status }: { status: ConversationStatus }) => {
     return <Badge variant={variants[status ?? "ABANDONED"]}>{labels[status]}</Badge>;
 };
 
-const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversation }) => {
-    const [showMobileList, setShowMobileList] = useState<boolean>(true);
+const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => void }> = ({ conversation, onClose }) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -53,21 +33,17 @@ const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversa
         scrollToBottom();
     }, []);
 
-    const handleBackToList = () => {
-        setShowMobileList(true);
-    };
-
     return (
         // <div className="h-screen bg-gray-50 flex flex-col lg:flex-row">
         <div className={`flex-1 flex flex-col`}>
             <>
                 {/* Conversation Header */}
-                <div className="bg-white border-b border-gray-200 py-4 px-1 md:px-4">
+                <div className="bg-content1p border-b border-default-200 py-4 px-1 md:px-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                             <button
-                                onClick={handleBackToList}
-                                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                                className="lg:hidden p-2 text-default-500 hover:text-default-600 hover:bg-default-100 rounded-lg"
+                                onClick={onClose}
                             >
                                 <ArrowLeft size={20} />
                             </button>
@@ -83,10 +59,10 @@ const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversa
                             </div>
 
                             <div>
-                                <h2 className="font-medium text-gray-900 flex items-center">
+                                <h2 className="font-medium text-default-900 flex items-center">
                                     {!conversation.user ? (
                                         <>
-                                            <span className="text-gray-600">Anonymous</span>
+                                            <span className="text-default-600">Anonymous</span>
                                             <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Guest</span>
                                         </>
                                     ) : (
@@ -95,16 +71,16 @@ const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversa
                                         </>
                                     )}
                                 </h2>
-                                <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
+                                <div className="flex items-center space-x-4 text-sm text-default-500 mt-1">
                                     {!conversation.user ? (
                                         <span className="flex items-center">
-                                            <Eye size={14} className="mr-1" />
+                                            <Eye className="mr-1" size={14} />
                                             Session: anon_456
                                         </span>
                                     ) : (
                                         <>
                                             <span className="flex items-center">
-                                                <Mail size={14} className="mr-1" />
+                                                <Mail className="mr-1" size={14} />
                                                 {conversation.user.email}
                                             </span>
                                         </>
@@ -113,9 +89,9 @@ const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversa
                             </div>
                         </div>
 
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1">
                             <StatusBadge status={conversation.status} />
-                            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <button className="p-2 text-default-500 hover:text-default-600 hover:bg-default-100 rounded-lg">
                                 <MoreVertical size={20} />
                             </button>
                         </div>
@@ -135,7 +111,7 @@ const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversa
                                     className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                                         message.sender === "USER"
                                             ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white"
-                                            : "bg-gray-100 text-gray-600"
+                                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                                     }`}
                                 >
                                     {message.sender === "USER" ? <User size={16} /> : <Bot size={16} />}
@@ -143,7 +119,9 @@ const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversa
 
                                 <div
                                     className={`rounded-2xl px-4 py-2 ${
-                                        message.sender === "USER" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-900"
+                                        message.sender === "USER"
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-300"
                                     }`}
                                 >
                                     <p className="text-sm">{message.content}</p>
@@ -160,22 +138,6 @@ const ConversationViewer: React.FC<{ conversation: Conversation }> = ({ conversa
                         </div>
                     )}
                     <div ref={messagesEndRef} />
-                </div>
-
-                {/* Conversation Footer */}
-                <div className="bg-white border-t border-gray-200 p-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <button className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg flex items-center">
-                                <Download size={16} className="mr-1" />
-                                Export
-                            </button>
-                            <button className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg flex items-center">
-                                <Archive size={16} className="mr-1" />
-                                Archive
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </>
         </div>

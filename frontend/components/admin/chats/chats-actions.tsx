@@ -2,25 +2,17 @@
 
 import React from "react";
 import { Eye, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+
+import ConversationViewer from "./chat-view";
 
 import { useDeleteConversation } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import { Conversation } from "@/types/models";
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from "@/components/ui/drawer";
-import ConversationViewer from "./chat-view";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface CustomerActionsProps {
     conversation: Conversation;
@@ -41,18 +33,19 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ conversation }) => {
                 <Eye className="h-5 w-5 text-default-500" />
             </Link> */}
             {isDesktop ? (
-                <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
-                    <DialogTrigger>
-                        <Eye className="h-5 w-5 text-default-500" />
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Edit profile</DialogTitle>
-                            <DialogDescription>Make changes to your profile here. Click save when you&apos;re done.</DialogDescription>
-                        </DialogHeader>
-                        <ConversationViewer conversation={conversation} />
-                    </DialogContent>
-                </Dialog>
+                <>
+                    <Sheet open={state.isOpen} onOpenChange={state.setOpen}>
+                        <SheetTrigger>
+                            <Eye className="h-5 w-5 text-default-500" />
+                        </SheetTrigger>
+                        <SheetContent className="min-w-[450px] w-auto">
+                            <SheetHeader className="sr-only">
+                                <SheetTitle>Conversation</SheetTitle>
+                            </SheetHeader>
+                            <ConversationViewer conversation={conversation} onClose={state.close} />
+                        </SheetContent>
+                    </Sheet>
+                </>
             ) : (
                 <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
                     <DrawerTrigger>
@@ -60,10 +53,9 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ conversation }) => {
                     </DrawerTrigger>
                     <DrawerContent>
                         <DrawerHeader className="text-left sr-only">
-                            <DrawerTitle>Edit profile</DrawerTitle>
-                            <DrawerDescription>Make changes to your profile here. Click save when you&apos;re done.</DrawerDescription>
+                            <DrawerTitle>Conversation</DrawerTitle>
                         </DrawerHeader>
-                        <ConversationViewer conversation={conversation} />
+                        <ConversationViewer conversation={conversation} onClose={state.close} />
                         {/* <DrawerFooter className="pt-2">
                             <DrawerClose asChild>
                                 <Button variant="outline">Cancel</Button>
