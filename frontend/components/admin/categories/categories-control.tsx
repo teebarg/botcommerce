@@ -49,27 +49,27 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
             <div className="flex items-center gap-2">
                 {canAdd && (
                     <Overlay
+                        open={state.isOpen}
+                        title={`Add SubCat to ${category?.name}`}
                         trigger={
                             <Button size="iconOnly">
                                 <Plus />
                             </Button>
                         }
-                        open={state.isOpen}
                         onOpenChange={state.setOpen}
-                        title={`Add SubCat to ${category?.name}`}
                     >
                         <CategoryForm hasParent parent_id={category?.id} onClose={state.close} />
                     </Overlay>
                 )}
                 <Overlay
+                    open={editState.isOpen}
+                    title={`Edit Category ${category?.name}`}
                     trigger={
                         <Button size="iconOnly">
                             <Edit className="h-5 w-5" />
                         </Button>
                     }
-                    open={editState.isOpen}
                     onOpenChange={editState.setOpen}
-                    title={`Edit Category ${category?.name}`}
                 >
                     <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
                 </Overlay>

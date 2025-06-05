@@ -1,5 +1,6 @@
 import { Category, Product } from "@/types/models";
 import { currency } from "@/lib/util/util";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductListItemProps {
     product: Product;
@@ -15,9 +16,9 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
                     className="h-full w-full object-cover"
                     src={product.images[0]?.image || product.image || "/placeholder.jpg"}
                 />
-                <div className="absolute top-2 right-2 bg-warning rounded-full py-1 px-2 text-xs text-white font-medium shadow-sm">
+                <Badge className="absolute top-2 right-2 shadow-sm" variant={product.status === "IN_STOCK" ? "emerald" : "destructive"}>
                     {product.variants?.[0]?.inventory ?? 0} in stock
-                </div>
+                </Badge>
             </div>
             <div className="p-3 flex flex-col justify-end flex-1">
                 <div className="text-sm text-primary font-medium mb-1">

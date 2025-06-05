@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { AlertCircle, CheckCircle2, Clock, Download, FileSpreadsheet, Trash2 } from "lucide-react";
+
 import { useStore } from "@/app/store/use-store";
 import { Activity } from "@/types/models";
 import { api } from "@/apis";
@@ -18,6 +19,7 @@ const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolea
     if (type === "PRODUCT_EXPORT") {
         return isSuccess ? <FileSpreadsheet className="text-emerald-600" size={20} /> : <AlertCircle className="text-red-500" size={20} />;
     }
+
     return <CheckCircle2 className="text-blue-500" size={20} />;
 };
 
@@ -25,6 +27,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
     if (activityType === "PRODUCT_EXPORT") {
         return <Badge variant={isSuccess ? "emerald" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
     }
+
     return <Badge variant="blue">Success</Badge>;
 };
 
@@ -34,6 +37,7 @@ const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
 
     const handleDownload = (url: string, filename: string) => {
         const link = document.createElement("a");
+
         link.href = url;
         link.download = filename || "export.xlsx";
         document.body.appendChild(link);
@@ -63,7 +67,7 @@ const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
             {/* Header */}
             <div className="px-6 py-4">
                 <h2 className="text-xl font-semibold text-default-900 flex items-center gap-2">
-                    <Clock size={20} className="text-default-500" />
+                    <Clock className="text-default-500" size={20} />
                     Recent Activity
                 </h2>
             </div>
@@ -82,14 +86,14 @@ const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
                             <div className="flex items-start justify-between">
                                 <div className="flex items-start space-x-3 flex-1">
                                     <div className="flex-shrink-0 mt-0.5">
-                                        <ActivityTypeIcon type={item.activity_type} isSuccess={item.is_success} />
+                                        <ActivityTypeIcon isSuccess={item.is_success} type={item.activity_type} />
                                     </div>
 
                                     {/* Content */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-1">
                                             <p className="text-sm font-medium text-default-900 truncate max-w-[200px]">{item.description}</p>
-                                            <StatusBadge isSuccess={item.is_success} activityType={item.activity_type} />
+                                            <StatusBadge activityType={item.activity_type} isSuccess={item.is_success} />
                                         </div>
 
                                         <div className="flex items-center text-xs text-default-500 mb-3">
@@ -109,11 +113,11 @@ const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
                                                                 <span className="text-sm text-emerald-800 font-medium">Export ready</span>
                                                             </div>
                                                             <Button
-                                                                onClick={() => handleDownload(item.action_download_url!, "products_export.xlsx")}
-                                                                variant="emerald"
                                                                 size="xs"
+                                                                variant="emerald"
+                                                                onClick={() => handleDownload(item.action_download_url!, "products_export.xlsx")}
                                                             >
-                                                                <Download size={14} className="mr-1" />
+                                                                <Download className="mr-1" size={14} />
                                                                 Download
                                                             </Button>
                                                         </div>
@@ -136,11 +140,11 @@ const ActivityView: React.FC<Props> = ({ activities, onRemove }) => {
 
                                 <div className="flex-shrink-0 ml-4">
                                     <Button
-                                        onClick={() => removeActivity(item.id)}
-                                        disabled={removing === item.id}
                                         aria-label="Remove activity"
+                                        disabled={removing === item.id}
                                         size="icon"
                                         variant="ghost"
+                                        onClick={() => removeActivity(item.id)}
                                     >
                                         {removing === item.id ? (
                                             <div className="animate-spin h-4 w-4 border-2 border-default-200 border-t-red-500 rounded-full" />

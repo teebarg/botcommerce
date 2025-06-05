@@ -24,17 +24,17 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ conversation }) => {
     };
 
     return (
-        <div className="flex gap-1">
+        <div className="flex">
             <Overlay
+                open={state.isOpen}
+                sheetClassName="min-w-[450px]"
+                title="Conversation"
                 trigger={
-                    <Button size="iconOnly">
-                        <Eye className="h-5 w-5 text-default-500" />
+                    <Button size="icon" variant="ghost">
+                        <Eye className="h-5 w-5" />
                     </Button>
                 }
-                open={state.isOpen}
                 onOpenChange={state.setOpen}
-                title="Conversation"
-                sheetClassName="min-w-[450px]"
             >
                 <ConversationViewer conversation={conversation} onClose={state.close} />
             </Overlay>
@@ -49,7 +49,7 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ conversation }) => {
                     onDelete();
                 }}
             >
-                <Trash2 className="h-5 w-5 text-danger" />
+                <Trash2 className="h-5 w-5 text-red-500" />
             </Button>
         </div>
     );

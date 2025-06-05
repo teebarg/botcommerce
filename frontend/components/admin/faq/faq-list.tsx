@@ -2,11 +2,12 @@
 
 import { Eye, EyeOff, Tag } from "lucide-react";
 
+import FaqActions from "./faq-actions";
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FAQ } from "@/types/models";
 import { TextSkeleton } from "@/components/ui/skeletons";
 import { Badge } from "@/components/ui/badge";
-import FaqActions from "./faq-actions";
 
 interface FaqListProps {
     faqs: FAQ[];

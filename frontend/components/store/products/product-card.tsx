@@ -95,6 +95,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
         const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
         window.open(whatsappUrl, "_blank");
     };
 
@@ -151,11 +152,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                         disabled={loading || status == "OUT_OF_STOCK"}
                         isLoading={loading}
                         size="lg"
+                        variant={status == "OUT_OF_STOCK" ? "ghost" : "primary"}
                         onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart();
                         }}
-                        variant={status == "OUT_OF_STOCK" ? "ghost" : "primary"}
                     >
                         {status == "OUT_OF_STOCK" ? (
                             <span>Out of stock</span>

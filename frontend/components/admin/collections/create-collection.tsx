@@ -14,14 +14,14 @@ const CreateCollection: React.FC<Props> = () => {
 
     return (
         <Overlay
+            open={state.isOpen}
+            title="Create Collection"
             trigger={
                 <Button variant="primary" onClick={state.open}>
                     Create Collection
                 </Button>
             }
-            open={state.isOpen}
             onOpenChange={state.setOpen}
-            title="Create Collection"
         >
             <CollectionForm type="create" onClose={state.close} />
         </Overlay>

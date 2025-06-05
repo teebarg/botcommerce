@@ -1,11 +1,11 @@
 import React from "react";
 import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 import { ChatMessage } from "@/types/models";
 import { formatDate } from "@/lib/util/util";
 import { Conversation, ConversationStatus } from "@/types/models";
 import { Badge } from "@/components/ui/badge";
-import ReactMarkdown from "react-markdown";
 
 const StatusBadge = ({ status }: { status: ConversationStatus }) => {
     const labels = {
@@ -25,9 +25,9 @@ const StatusBadge = ({ status }: { status: ConversationStatus }) => {
 
 function cleanMarkdown(md: string) {
     return md
-      .replace(/\t/g, '')         // Remove tabs
-      .replace(/[ ]{2,}/g, ' ')   // Extra spaces
-      .trim();
+        .replace(/\t/g, "") // Remove tabs
+        .replace(/[ ]{2,}/g, " ") // Extra spaces
+        .trim();
 }
 
 const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => void }> = ({ conversation, onClose }) => {

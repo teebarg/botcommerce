@@ -27,14 +27,14 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
         <div>
             <div className="flex gap-2">
                 <Overlay
+                    open={editState.isOpen}
+                    title="Edit Customer"
                     trigger={
                         <Button size="iconOnly">
                             <Edit className="h-5 w-5" />
                         </Button>
                     }
-                    open={editState.isOpen}
                     onOpenChange={editState.setOpen}
-                    title="Edit Customer"
                 >
                     <CustomerForm user={user} onClose={editState.close} />
                 </Overlay>

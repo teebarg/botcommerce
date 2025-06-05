@@ -15,13 +15,13 @@ const bubbleStyles = {
 
 function cleanMarkdown(md: string) {
     return md
-      .replace(/\t/g, '')         // Remove tabs
-      .replace(/[ ]{2,}/g, ' ')   // Extra spaces
-      .trim();
+        .replace(/\t/g, "") // Remove tabs
+        .replace(/[ ]{2,}/g, " ") // Extra spaces
+        .trim();
 
     // return md
-    // //   .replace(/\t/g, '') 
-    //   .replace(/[ ]{2,}/g, ' ') 
+    // //   .replace(/\t/g, '')
+    //   .replace(/[ ]{2,}/g, ' ')
     // //   .trim();
 }
 

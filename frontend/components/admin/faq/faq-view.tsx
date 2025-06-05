@@ -18,16 +18,16 @@ const FaqView: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage FAQs</h1>
                 <Overlay
+                    open={state.isOpen}
+                    sheetClassName="min-w-[450px]"
+                    title="Add New FAQ"
                     trigger={
                         <Button variant="primary" onClick={state.open}>
                             <Plus className="w-4 h-4 mr-2" />
                             Add New FAQ
                         </Button>
                     }
-                    open={state.isOpen}
                     onOpenChange={state.setOpen}
-                    title="Add New FAQ"
-                    sheetClassName="min-w-[450px]"
                 >
                     <FaqForm onCancel={() => state.close()} />
                 </Overlay>

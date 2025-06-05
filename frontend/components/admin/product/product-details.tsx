@@ -98,7 +98,7 @@ export function ProductDetails() {
                                 <TableCell>{product.description}</TableCell>
                                 <TableCell>{product.variants?.length}</TableCell>
                                 <TableCell>
-                                    <Badge variant={product.status === "IN_STOCK" ? "default" : "destructive"}>{product.status}</Badge>
+                                    <Badge variant={product.status === "IN_STOCK" ? "emerald" : "destructive"}>{product.status}</Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <ProductActions product={product} />

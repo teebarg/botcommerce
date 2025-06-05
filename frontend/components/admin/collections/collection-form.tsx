@@ -59,7 +59,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                     <Button aria-label="cancel" className="min-w-32" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit" disabled={isPending} variant="primary">
+                    <Button aria-label="update" className="min-w-32" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
                         {isCreate ? "Submit" : "Update"}
                     </Button>
                 </div>

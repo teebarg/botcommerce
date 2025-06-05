@@ -17,8 +17,8 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DocumentText } from "nui-react-icons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMe } from "@/lib/hooks/useApi";
 
 const AdminMobileMenu: React.FC = () => {
@@ -47,7 +47,7 @@ const AdminMobileMenu: React.FC = () => {
                 <div className="flex items-center space-x-3">
                     <Avatar>
                         <AvatarImage src={user?.image} />
-                        <AvatarFallback className="bg-secondary">{user?.first_name[0] || "" }</AvatarFallback>
+                        <AvatarFallback className="bg-secondary">{user?.first_name[0] || ""}</AvatarFallback>
                     </Avatar>
 
                     <div>

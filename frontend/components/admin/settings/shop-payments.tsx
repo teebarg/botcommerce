@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Exclamation } from "nui-react-icons";
 
 import { Switch } from "@/components/ui/switch";
 import { BankDetails, ShopSettings } from "@/types/models";
@@ -10,7 +11,6 @@ import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Exclamation } from "nui-react-icons";
 
 interface ShopPaymentsProps {
     settings: ShopSettings[];
@@ -156,7 +156,7 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                     <h3 className="font-medium">Bank Details</h3>
                     <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                         <DialogTrigger asChild>
-                            <Button variant="secondary" type="button">
+                            <Button type="button" variant="secondary">
                                 Add Bank Details
                             </Button>
                         </DialogTrigger>
@@ -192,10 +192,10 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                                     Close
                                 </Button>
                                 <Button
-                                    variant="primary"
                                     aria-label="delete"
                                     className="min-w-36"
                                     isLoading={isPending}
+                                    variant="primary"
                                     onClick={handleAddBankDetails}
                                 >
                                     Submit

@@ -15,14 +15,14 @@ const CreateCategory: React.FC<Props> = () => {
 
     return (
         <Overlay
+            open={state.isOpen}
+            title="Create Category"
             trigger={
                 <Button variant="primary" onClick={state.open}>
                     Create Category
                 </Button>
             }
-            open={state.isOpen}
             onOpenChange={state.setOpen}
-            title="Create Category"
         >
             <CategoryForm type="create" onClose={state.close} />
         </Overlay>

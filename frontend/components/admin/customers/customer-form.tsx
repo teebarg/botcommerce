@@ -161,7 +161,7 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
                                 <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose?.()}>
                                     Close
                                 </Button>
-                                <Button variant="primary" className="min-w-32" disabled={loading} isLoading={loading} type="submit">
+                                <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit" variant="primary">
                                     {user?.id ? "Update" : "Create"}
                                 </Button>
                             </div>

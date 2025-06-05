@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
 
@@ -87,9 +87,6 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                         <ShoppingCart className="h-5 w-5 text-default-700" />
                         <h2 className="font-semibold text-lg">Your Cart ({items.length})</h2>
                     </div>
-                    <Button size="icon" variant="ghost" onClick={onClose}>
-                        <X className="h-5 w-5 text-default-600" />
-                    </Button>
                 </div>
 
                 {/* Cart Content */}

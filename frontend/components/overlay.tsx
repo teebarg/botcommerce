@@ -1,8 +1,8 @@
+import { X } from "lucide-react";
+
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
-import { X } from "lucide-react";
 
 interface OverlayProps {
     trigger: React.ReactNode;
@@ -24,6 +24,7 @@ const Overlay: React.FC<OverlayProps> = ({
     showHeader = false,
 }) => {
     const { isDesktop } = useMediaQuery();
+
     if (isDesktop) {
         return (
             <Sheet open={open} onOpenChange={onOpenChange}>

@@ -21,6 +21,7 @@ const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolea
     if (type === "PRODUCT_EXPORT") {
         return isSuccess ? <FileSpreadsheet className="text-emerald-600" size={20} /> : <AlertCircle className="text-red-500" size={20} />;
     }
+
     return <CheckCircle2 className="text-blue-500" size={20} />;
 };
 
@@ -28,6 +29,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
     if (activityType === "PRODUCT_EXPORT") {
         return <Badge variant={isSuccess ? "emerald" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
     }
+
     return <Badge variant="blue">Success</Badge>;
 };
 
@@ -75,16 +77,16 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities, isLoadin
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center space-x-3">
                                     <div className="flex-shrink-0 mt-0.5">
-                                        <ActivityTypeIcon type={activity.activity_type} isSuccess={activity.is_success} />
+                                        <ActivityTypeIcon isSuccess={activity.is_success} type={activity.activity_type} />
                                     </div>
                                     <div className="hidden sm:block">
-                                        <StatusBadge isSuccess={activity.is_success} activityType={activity.activity_type} />
+                                        <StatusBadge activityType={activity.activity_type} isSuccess={activity.is_success} />
                                     </div>
                                 </div>
 
                                 {/* Mobile status indicator */}
                                 <div className="sm:hidden flex items-center space-x-1">
-                                    <StatusBadge isSuccess={activity.is_success} activityType={activity.activity_type} />
+                                    <StatusBadge activityType={activity.activity_type} isSuccess={activity.is_success} />
                                 </div>
                             </div>
 
@@ -103,10 +105,10 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities, isLoadin
                                         aria-label={`Remove ${activity.description}`}
                                         disabled={removing === activity.id}
                                         isLoading={removing === activity.id}
-                                        variant="destructive"
                                         size="sm"
-                                        onClick={() => handleDeleteActivity(activity.id)}
                                         startContent={<Trash2 className="w-4 h-4" />}
+                                        variant="destructive"
+                                        onClick={() => handleDeleteActivity(activity.id)}
                                     >
                                         Delete
                                     </Button>

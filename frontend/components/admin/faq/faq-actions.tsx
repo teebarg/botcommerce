@@ -5,6 +5,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { toast } from "sonner";
 
+import { FaqForm } from "./faq-form";
+
 import { Button } from "@/components/ui/button";
 import { FAQ } from "@/types/models";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -12,7 +14,6 @@ import { Confirm } from "@/components/generic/confirm";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { api } from "@/apis/base";
 import Overlay from "@/components/overlay";
-import { FaqForm } from "./faq-form";
 
 interface FaqActionsProps {
     faq: FAQ;
@@ -43,14 +44,14 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
     return (
         <div className="flex items-center gap-1 shrink-0">
             <Overlay
+                open={editState.isOpen}
+                title="Edit FAQ"
                 trigger={
-                    <Button size="icon" variant="outline">
-                        <Pencil className="h-4 w-4" />
+                    <Button size="icon" variant="ghost">
+                        <Pencil className="h-5 w-5" />
                     </Button>
                 }
-                open={editState.isOpen}
                 onOpenChange={editState.setOpen}
-                title="Edit FAQ"
             >
                 <FaqForm
                     faq={faq}
@@ -61,8 +62,8 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
             </Overlay>
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                 <DialogTrigger asChild>
-                    <Button size="icon" variant="destructive" onClick={() => setFaqToDelete(faq.id)}>
-                        <Trash2 className="h-4 w-4" />
+                    <Button size="icon" variant="ghost" onClick={() => setFaqToDelete(faq.id)}>
+                        <Trash2 className="h-5 w-5 text-red-500" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent>

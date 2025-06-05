@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import { toast } from "sonner";
 import Image from "next/image";
+import { MessageCircleMore } from "lucide-react";
 
 import { currency } from "@/lib/util/util";
 import ProductDetails from "@/components/store/products/product-details";
@@ -13,7 +14,6 @@ import ProductShare from "@/components/product/product-share";
 import { Product, ProductImage } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
-import { MessageCircleMore } from "lucide-react";
 import { useStore } from "@/app/store/use-store";
 
 interface Props {
@@ -69,6 +69,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
         const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*\nPrice: ${currency(product.price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
         window.open(whatsappUrl, "_blank");
     };
 
@@ -174,8 +175,8 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                     className="w-auto"
                                     disabled={loading || !product.variants[0]}
                                     size="lg"
-                                    onClick={handleAddToCart}
                                     variant="primary"
+                                    onClick={handleAddToCart}
                                 >
                                     {loading ? "Adding to cart..." : "Add to Cart"}
                                 </Button>

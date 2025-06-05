@@ -20,8 +20,8 @@ import { CardSkeleton } from "@/components/ui/skeletons";
 const LIMIT = 10;
 
 const CustomerView: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [filterOpen, setFilterOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
     const searchParams = useSearchParams();
 
@@ -41,9 +41,9 @@ const CustomerView: React.FC = () => {
     const { users, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     const getStatusBadge = (status?: Status) => {
-        const variants: Record<Status, "default" | "destructive" | "success" | "warning"> = {
+        const variants: Record<Status, "destructive" | "emerald" | "warning"> = {
             ["PENDING"]: "warning",
-            ["ACTIVE"]: "success",
+            ["ACTIVE"]: "emerald",
             ["INACTIVE"]: "destructive",
         };
 

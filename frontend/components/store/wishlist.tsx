@@ -75,8 +75,8 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, name, image, variants }
                         disabled={isAdding}
                         isLoading={isAdding}
                         startContent={<Cart className="w-6 h-6" />}
-                        onClick={handleAddToCart}
                         variant="primary"
+                        onClick={handleAddToCart}
                     >
                         <span>Add to Cart</span>
                     </Button>

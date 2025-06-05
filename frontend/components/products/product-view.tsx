@@ -13,7 +13,7 @@ export function ProductView({ product, onClose }: { product?: Product; onClose: 
     const { data: brands } = useBrands();
 
     return (
-        <div className="w-full mx-auto md:px-8 overflow-y-auto">
+        <div className="w-full mx-auto overflow-y-auto py-6 px-4">
             <Tabs defaultValue="details">
                 <TabsList>
                     <TabsTrigger value="details">Details</TabsTrigger>

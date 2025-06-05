@@ -42,14 +42,14 @@ const BrandActions: React.FC<Props> = ({ item }) => {
     return (
         <div className="relative flex items-center gap-2">
             <Overlay
+                open={editState.isOpen}
+                title="Edit Brand"
                 trigger={
-                    <Button onClick={editState.open} size="iconOnly" variant="ghost">
+                    <Button size="iconOnly" variant="ghost" onClick={editState.open}>
                         <Edit className="h-5 w-5" />
                     </Button>
                 }
-                open={editState.isOpen}
                 onOpenChange={editState.setOpen}
-                title="Edit Brand"
             >
                 <BrandForm current={item} type="update" onClose={editState.close} />
             </Overlay>
