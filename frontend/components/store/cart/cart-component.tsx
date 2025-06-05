@@ -34,6 +34,7 @@ const CartComponent: React.FC = () => {
                 </Button>
             }
             onOpenChange={state.setOpen}
+            sheetClassName="min-w-[450px]"
         >
             <CartDetails cart={cart!} items={items ?? []} shippingFee={cart?.shipping_fee} onClose={state.close} />
         </Overlay>

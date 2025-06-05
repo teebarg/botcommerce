@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 // const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 const outfit = Outfit({ weight: ["400", "500", "600"], subsets: ["latin"] });
 

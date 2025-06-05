@@ -151,22 +151,6 @@
     @apply text-blue-500 hover:text-blue-600;
 }
 
-@layer utilities {
-    /* Chrome, Safari and Opera */
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-
-    .no-scrollbar::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-
-    .no-scrollbar {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-    }
-}
-
 :root {
     /* Default State Colors */
     --default-50: 0 0% 98.04%;
@@ -279,3 +263,19 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Thin scrollbar for WebKit */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3); /* Change to fit your theme */
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  

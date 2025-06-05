@@ -6,7 +6,7 @@ import { SideBar } from "@/components/layout/sidebar";
 import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { auth } from "@/actions/auth";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000";
 
 export const metadata: Metadata = {
     metadataBase: new URL(BASE_URL),

@@ -11,8 +11,9 @@
     ],
     "scripts": {
         "dev": "next dev",
-        "dev-t": "next dev --turbopack --experimental-https",
+        "dev-t": "next dev --turbopack",
         "dev-https": "next dev --experimental-https",
+        "dev-https-t": "next dev --experimental-https --turbopack",
         "build": "npm run prettier && next build",
         "start": "next start",
         "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",
