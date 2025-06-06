@@ -1,20 +1,19 @@
 "use client";
 
-import { Edit } from "nui-react-icons";
 import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { ReviewForm } from "./reviews-form";
 
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import DrawerUI from "@/components/drawer";
 import { Review } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { publishReview } from "@/actions/reviews";
+import Overlay from "@/components/overlay";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface Props {
     review: Review;
@@ -24,13 +23,13 @@ interface Props {
 const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
     const editState = useOverlayTriggerState({});
     const state = useOverlayTriggerState({});
-    const router = useRouter();
     const [publishing, setPublishing] = useState<boolean>(false);
+    const invalidate = useInvalidate();
 
     const onConfirmDelete = async () => {
         try {
             await deleteAction(review.id);
-            router.refresh();
+            invalidate("reviews");
             toast.success("Review deleted successfully");
             state.close();
         } catch (error) {
@@ -49,7 +48,7 @@ const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
                 return;
             }
 
-            router.refresh();
+            invalidate("reviews");
             toast.success("Review published successfully");
         } catch (error) {
             toast.error("Error publishing review");
@@ -60,11 +59,18 @@ const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
 
     return (
         <div className="relative flex items-center gap-2">
-            <DrawerUI open={editState.isOpen} title="Edit Review" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
-                <div className="max-w-2xl">
-                    <ReviewForm review={review} onClose={editState.close} />
-                </div>
-            </DrawerUI>
+            <Overlay
+                open={editState.isOpen}
+                title="Edit Review"
+                trigger={
+                    <Button size="iconOnly" variant="ghost" onClick={editState.open}>
+                        <Pencil className="h-5 w-5" />
+                    </Button>
+                }
+                onOpenChange={editState.setOpen}
+            >
+                <ReviewForm review={review} onClose={editState.close} />
+            </Overlay>
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                 <DialogTrigger>
                     <Trash2 className="h-5 w-5 text-danger" />
@@ -82,7 +88,7 @@ const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
                     className="min-w-32"
                     disabled={publishing}
                     isLoading={publishing}
-                    variant="default"
+                    variant="emerald"
                     onClick={() => handlePublish(false)}
                 >
                     Un-publish

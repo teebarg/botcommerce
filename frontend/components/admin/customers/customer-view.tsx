@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Order, Status, User } from "@/types/models";
 import { useCustomers } from "@/lib/hooks/useApi";
 import PaginationUI from "@/components/pagination";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { CardSkeleton } from "@/components/ui/skeletons";
 
 const LIMIT = 10;

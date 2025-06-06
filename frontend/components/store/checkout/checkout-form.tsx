@@ -4,7 +4,7 @@ import Addresses from "@/components/store/checkout/components/addresses";
 import Payment from "@/components/store/checkout/components/payment";
 import Review from "@/components/store/checkout/components/review";
 import Shipping from "@/components/store/checkout/components/shipping";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { Cart, DeliveryOption } from "@/types/models";
 
 type CheckoutFormProps = {

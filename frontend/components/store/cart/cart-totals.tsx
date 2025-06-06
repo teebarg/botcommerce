@@ -2,7 +2,7 @@
 
 import { InformationCircleSolid } from "nui-react-icons";
 import React from "react";
-import { currency } from "@lib/util/util";
+import { currency } from "@lib/utils";
 import { Tooltip } from "@components/ui/tooltip";
 
 import { Cart } from "@/types/models";
@@ -18,7 +18,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
     return (
         <>
             <div>
-                <dl className="flex flex-col gap-4 py-4">
+                <dl className="flex flex-col gap-2 py-4">
                     <div className="flex justify-between">
                         <dt className="text-sm text-default-500">
                             <span className="flex gap-x-1 items-center">

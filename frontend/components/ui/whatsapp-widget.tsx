@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { Button } from "./button";
 
-import { formatDate } from "@/lib/util/util";
+import { formatDate } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 
 const WhatsAppWidget: React.FC = () => {

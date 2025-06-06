@@ -12,7 +12,7 @@ import { ProductSearch, WishItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";

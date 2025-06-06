@@ -1,5 +1,5 @@
 import { Category, Product } from "@/types/models";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface ProductListItemProps {

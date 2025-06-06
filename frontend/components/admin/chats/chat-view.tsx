@@ -3,7 +3,7 @@ import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-rea
 import ReactMarkdown from "react-markdown";
 
 import { ChatMessage } from "@/types/models";
-import { formatDate } from "@/lib/util/util";
+import { formatDate } from "@/lib/utils";
 import { Conversation, ConversationStatus } from "@/types/models";
 import { Badge } from "@/components/ui/badge";
 

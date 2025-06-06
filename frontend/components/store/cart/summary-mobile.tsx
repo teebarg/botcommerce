@@ -4,7 +4,7 @@ import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Cart, CartItem } from "@/types/models";

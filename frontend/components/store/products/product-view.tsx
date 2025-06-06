@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { MessageCircleMore } from "lucide-react";
 
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import ProductDetails from "@/components/store/products/product-details";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
@@ -128,7 +128,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     </div>
                     <div className="flex flex-col px-2 md:px-0 mt-6 md:mt-0">
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
+                            <h1 className="text-xl font-bold tracking-tight">{product.name}</h1>
                             <ProductShare name={product.name} />
                         </div>
                         <div className="text-2xl font-bold hidden md:block">{currency(product.price)}</div>

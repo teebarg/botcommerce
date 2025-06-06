@@ -1,11 +1,10 @@
 "use client";
 
-import { Edit } from "nui-react-icons";
 import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -42,7 +41,7 @@ const CollectionActions: React.FC<Props> = ({ collection, deleteAction }) => {
                 title="Edit Collection"
                 trigger={
                     <Button size="iconOnly">
-                        <Edit className="h-5 w-5" />
+                        <Pencil className="h-5 w-5" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}

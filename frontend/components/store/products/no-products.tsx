@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useCollections } from "@/lib/hooks/useApi";
 import { Collection } from "@/types/models";
 import { BtnLink } from "@/components/ui/btnLink";
+import { Separator } from "@/components/ui/separator";
 
 const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome = () => {} }) => {
     const { data: collections } = useCollections();
@@ -17,7 +18,7 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
             <div className="relative mb-6">
                 <div className="absolute inset-0 bg-blue-100 rounded-full opacity-20 animate-ping" />
                 <div className="relative">
-                    <PackageSearch className="w-20 h-20 text-blue-600" strokeWidth={1.5} />
+                    <PackageSearch className="w-18 h-18 text-blue-600" strokeWidth={1.5} />
                 </div>
             </div>
 
@@ -36,7 +37,7 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
-                    <Button aria-label="clear search" color="primary" startContent={<RefreshCcw className="w-4 h-4" />} onClick={onClearSearch}>
+                    <Button aria-label="clear search" variant="primary" startContent={<RefreshCcw className="w-4 h-4" />} onClick={onClearSearch}>
                         Clear Search
                     </Button>
 
@@ -59,7 +60,8 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
                 </div>
 
                 {/* Search Tips */}
-                <div className="mt-8 pt-6 border-t border-default-100">
+                <Separator />
+                <div className="mt-8 pt-6">
                     <h3 className="text-sm font-semibold text-default-900 mb-3">Search Tips</h3>
                     <ul className="text-sm text-default-500 space-y-2">
                         <li>• Check for spelling mistakes</li>

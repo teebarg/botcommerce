@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Conversation, ConversationStatus } from "@/types/models";
 import { useConversations } from "@/lib/hooks/useApi";
 import PaginationUI from "@/components/pagination";
-import { formatDate } from "@/lib/util/util";
+import { formatDate } from "@/lib/utils";
 
 const LIMIT = 10;
 

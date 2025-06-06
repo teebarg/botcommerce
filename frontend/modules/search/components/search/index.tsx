@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import NoProductsFound from "@/components/store/products/no-products";
-import { debounce } from "@/lib/util/util";
+import { debounce } from "@/lib/utils";
 import { ProductSearch } from "@/types/models";
 import { api } from "@/apis";
 import ProductCard from "@/components/store/products/product-card";
@@ -73,11 +73,11 @@ const Search: React.FC<Props> = ({ className }) => {
                 </Button>
             </DialogTrigger>
             <DialogContent size="lg">
-                <DialogHeader>
-                    <DialogTitle className="sr-only">Search</DialogTitle>
+                <DialogHeader className="sr-only">
+                    <DialogTitle>Search</DialogTitle>
                 </DialogHeader>
                 <div>
-                    <div className="flex items-center w-full px-4 border-b border-default-500/50 dark:border-default-100">
+                    <div className="flex items-center w-full px-4 border-b border-default-300">
                         <MagnifyingGlassMini />
                         <SearchInput onChange={debounce(handleChange, 500)} onReset={onReset} onSubmit={onSubmit} />
                         <button aria-label="close" onClick={modalState.close}>

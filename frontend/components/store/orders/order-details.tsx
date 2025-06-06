@@ -3,7 +3,7 @@
 import LineItemPrice from "@modules/common/components/line-item-price";
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
 import Image from "next/image";
-import { currency } from "@lib/util/util";
+import { currency } from "@lib/utils";
 
 import Thumbnail from "@/components/generic/thumbnail";
 import LocalizedClientLink from "@/components/ui/link";

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { Cart, CartItem } from "@/types/models";
 import { Button } from "@/components/ui/button";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { BtnLink } from "@/components/ui/btnLink";
 import CartItemComponent from "./cart-item";

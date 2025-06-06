@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 import { api } from "./base";
 
-import { buildUrl } from "@/lib/util/util";
+import { buildUrl } from "@/lib/utils";
 import { Order, OrderStatus, PaginatedOrder } from "@/types/models";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 import { revalidate } from "@/actions/revalidate";

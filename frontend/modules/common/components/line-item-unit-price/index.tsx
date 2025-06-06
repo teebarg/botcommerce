@@ -1,5 +1,5 @@
 import { getPercentageDiff } from "@lib/util/get-precentage-diff";
-import { currency } from "@lib/util/util";
+import { currency } from "@lib/utils";
 
 import { cn } from "@/lib/utils";
 

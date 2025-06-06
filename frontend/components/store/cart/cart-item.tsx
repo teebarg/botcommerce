@@ -1,5 +1,5 @@
 import React from "react";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { CartItem } from "@/types/models";
 import CartControl from "./cart-control";
 

@@ -2,7 +2,7 @@
 
 import { InformationCircleSolid } from "nui-react-icons";
 import React, { useMemo, useState } from "react";
-import { currency } from "@lib/util/util";
+import { currency } from "@lib/utils";
 import { Tooltip } from "@components/ui/tooltip";
 import { Trash2 } from "lucide-react";
 

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { Edit, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { BrandForm } from "@/components/admin/brands/brand-form";
@@ -46,7 +46,7 @@ const BrandActions: React.FC<Props> = ({ item }) => {
                 title="Edit Brand"
                 trigger={
                     <Button size="iconOnly" variant="ghost" onClick={editState.open}>
-                        <Edit className="h-5 w-5" />
+                        <Pencil className="h-5 w-5" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}

@@ -1,6 +1,6 @@
 import { fetcher } from "./fetcher";
 
-import { buildUrl } from "@/lib/util/util";
+import { buildUrl } from "@/lib/utils";
 import { Message, PaginatedSiteConfig, SiteConfig } from "@/types/models";
 import { revalidate } from "@/actions/revalidate";
 

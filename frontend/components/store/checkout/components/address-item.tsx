@@ -1,6 +1,6 @@
 "use client";
 
-import { omit } from "@lib/util/util";
+import { omit } from "@lib/utils";
 import { Loader } from "nui-react-icons";
 import React, { useState } from "react";
 import { motion } from "framer-motion";

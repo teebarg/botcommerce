@@ -7,16 +7,16 @@ import Link from "next/link";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useOrders } from "@/lib/hooks/useApi";
 import { Order } from "@/types/models";
-import { currency } from "@/lib/util/util";
+import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
 const OrderStatusBadge = ({ status }: { status: string }) => {
-    const statusConfig: Record<string, { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "success" }> = {
+    const statusConfig: Record<string, { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "emerald" }> = {
         PAID: {
             icon: <CheckCircle className="mr-1" size={14} />,
             label: "Paid",
-            variant: "success",
+            variant: "emerald",
         },
         pending: {
             icon: <AlertTriangle className="mr-1" size={14} />,
@@ -36,7 +36,7 @@ const OrderStatusBadge = ({ status }: { status: string }) => {
         delivered: {
             icon: <CheckCircle className="mr-1" size={14} />,
             label: "Delivered",
-            variant: "success",
+            variant: "emerald",
         },
     };
 
@@ -74,7 +74,7 @@ const RecentOrdersList = () => {
         <div className="px-2 md:px-10 py-8">
             <div className="flex justify-between items-center mb-3">
                 <h3 className="text-lg font-medium">Recent Orders</h3>
-                <Link className="text-sm font-medium text-primary" href="/admin/orders">
+                <Link className="text-sm font-medium text-primary hover:underline" href="/admin/orders">
                     View all
                 </Link>
             </div>
@@ -105,7 +105,7 @@ const RecentOrdersList = () => {
                                     {order.user.first_name} {order.user.last_name}
                                 </TableCell>
                                 <TableCell>{currency(order.total)}</TableCell>
-                                <TableCell>{order.created_at}</TableCell>
+                                <TableCell>{formatDate(order.created_at)}</TableCell>
                                 <TableCell>
                                     <OrderStatusBadge status={order.status} />
                                 </TableCell>
@@ -115,7 +115,7 @@ const RecentOrdersList = () => {
                 </Table>
             </div>
             <div className="bg-background rounded-lg shadow-sm border border-gray-200 overflow-hidden md:hidden">
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-default-200">
                     {orders?.map((order: Order, idx: number) => (
                         <div key={idx} className="p-4">
                             <div className="flex justify-between items-center mb-2">

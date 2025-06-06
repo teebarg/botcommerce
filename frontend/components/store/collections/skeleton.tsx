@@ -2,6 +2,7 @@ import { ChevronRight } from "nui-react-icons";
 import React from "react";
 
 import { Skeleton } from "@/components/generic/skeleton";
+import { Separator } from "@/components/ui/separator";
 
 const CollectionTemplateSkeleton = () => {
     return (
@@ -15,7 +16,7 @@ const CollectionTemplateSkeleton = () => {
                                 {[1, 2, 3]?.map((_, index: number) => <Skeleton key={index} className="h-8 w-full rounded dark:bg-background" />)}
                             </div>
                         </div>
-                        <hr className="shrink-0 border-none w-full h-px bg-default-100" />
+                        <Separator />
                         {["Categories", "Brands"].map((item: string, index: number) => (
                             <div key={index} className="flex flex-col gap-2">
                                 <span>{item}</span>

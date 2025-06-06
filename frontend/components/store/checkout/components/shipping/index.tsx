@@ -11,7 +11,7 @@ import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { Cart, DeliveryOption } from "@/types/models";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
 
@@ -90,7 +90,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 </div>
                 <button
                     aria-label="edit"
-                    className={cn("text-blue-500 items-center gap-2 text-sm hidden", !isOpen && cart?.shipping_method && "flex")}
+                    className={cn("text-blue-500 items-center gap-2 text-sm hidden cursor-pointer", !isOpen && cart?.shipping_method && "flex")}
                     onClick={handleEdit}
                 >
                     Edit <Pencil />

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { api } from "@/apis";
 import { useBank } from "@/lib/hooks/useApi";
 
