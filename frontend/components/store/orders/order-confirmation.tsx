@@ -25,7 +25,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
 
     if (props.order.payment_method === "CASH_ON_DELIVERY") {
         return (
-            <div className="min-h-screen flex items-center justify-center py-12 px-2">
+            <div className="min-h-screen flex items-center justify-center py-12 px-2 bg-content1">
                 <Pickup onContinueShopping={onContinueShopping} {...props} />
             </div>
         );
