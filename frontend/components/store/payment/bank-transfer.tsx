@@ -56,7 +56,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
             </div>
 
             <Button className="w-full" disabled={loading} isLoading={loading} onClick={onPaymentCompleted}>
-                Pay ${currency(amount)} via Bank Transfer
+                Pay {currency(amount)} via Bank Transfer
             </Button>
             {/* Security message */}
             <div className="mt-4 flex items-center justify-center text-xs text-default-500">

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Brand, Category, Collection } from "@/types/models";
+import { Separator } from "@/components/ui/separator";
 
 interface ComponentProps {
     count: any;
@@ -39,20 +40,27 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                     <div className="flex flex-row gap-2">
                         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
                             <DrawerTrigger asChild>
-                                <Button aria-label="filters" className="md:hidden" size="sm" onClick={state.open}>
-                                    <Filter className="text-white mr-1 w-4 h-4" />
+                                <Button
+                                    aria-label="filters"
+                                    className="md:hidden"
+                                    size="sm"
+                                    startContent={<Filter className="w-4 h-4" />}
+                                    variant="default"
+                                    onClick={state.open}
+                                >
                                     Filters ({count})
                                 </Button>
                             </DrawerTrigger>
                             <DrawerContent>
-                                <DrawerHeader>
+                                <DrawerHeader className="p-0 pt-4">
                                     <DrawerTitle>
-                                        <div className="flex items-center justify-between p-4 border-b">
+                                        <div className="flex items-center justify-between px-4">
                                             <h2 className="text-lg font-semibold">Filters</h2>
-                                            <button className="p-2" onClick={() => state.close()}>
+                                            <Button size="iconOnly" onClick={() => state.close()}>
                                                 <X />
-                                            </button>
+                                            </Button>
                                         </div>
+                                        <Separator />
                                     </DrawerTitle>
                                 </DrawerHeader>
                                 <CollectionsSideBar brands={brands} categories={categories} collections={collections} />

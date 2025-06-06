@@ -266,16 +266,15 @@
 
 /* Thin scrollbar for WebKit */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
+    width: 1px;
+    height: 1px;
+}
+
+::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.3); /* Change to fit your theme */
     border-radius: 10px;
-  }
-  
-  ::-webkit-scrollbar-track {
+}
+
+::-webkit-scrollbar-track {
     background: transparent;
-  }
-  
+}

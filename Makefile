@@ -77,7 +77,7 @@ serve-backend: ## Serve the backend in terminal
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
 
 serve-frontend: ## Serve the frontend in terminal
-	@cd frontend; npm run dev-t
+	@cd frontend; npm run dev-https-t
 
 sync: ## Sync dependencies
 	@cd backend; uv sync && source .venv/bin/activate

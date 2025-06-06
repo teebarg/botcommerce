@@ -78,7 +78,8 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
     };
 
     return (
-        <React.Fragment>
+        <div className="py-6 px-4">
+            <h2 className="text-lg font-semibold mb-4">Address</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label className="text-sm font-medium text-default-500 mb-0.5 block">Address Type</label>
@@ -192,7 +193,7 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
             >
                 Update
             </Button>
-        </React.Fragment>
+        </div>
     );
 };
 

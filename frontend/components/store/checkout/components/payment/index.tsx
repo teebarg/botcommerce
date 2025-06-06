@@ -138,6 +138,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     disabled={!hasPaymentMethod && !paidByGiftcard}
                     isLoading={isLoading}
                     size="sm"
+                    variant="primary"
                     onClick={handleSubmit}
                 >
                     Continue to review

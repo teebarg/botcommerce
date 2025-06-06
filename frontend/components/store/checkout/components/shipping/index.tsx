@@ -141,6 +141,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     disabled={!hasShippingMethod}
                     isLoading={isLoading}
                     size="sm"
+                    variant="primary"
                     onClick={handleSubmit}
                 >
                     Continue to payment

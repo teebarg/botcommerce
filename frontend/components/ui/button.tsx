@@ -24,10 +24,10 @@ const buttonVariants = cva(
                 emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
             },
             size: {
-                default: "h-10 px-4 py-2",
+                default: "h-10 px-4 py-2 min-w-32",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
-                lg: "h-11 rounded-md px-8 w-full text-base font-normal",
+                lg: "h-11 rounded-md px-8 w-full text-base font-normal min-w-32",
                 icon: "h-10 w-10",
                 iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent",
             },
