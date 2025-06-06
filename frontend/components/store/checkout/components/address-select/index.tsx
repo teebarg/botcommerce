@@ -1,128 +1,27 @@
 "use client";
 
 import { useMemo } from "react";
-import { omit } from "@lib/util/util";
-import { Loader } from "nui-react-icons";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Plus, Home, Pencil, MapPin } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { usePathname } from "next/navigation";
-import { toast } from "sonner";
 
-import ShippingAddressFormEdit from "../../address-form-edit";
 import ShippingAddressForm from "../../address-form";
+import AddressItem from "../address-item";
 
 import { Address, User } from "@/types/models";
-import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
 import ClientOnly from "@/components/generic/client-only";
 import { SignUpForm } from "@/components/generic/auth/signup";
-import { useInvalidateCart, useUserAddresses } from "@/lib/hooks/useCart";
+import { useUserAddresses } from "@/lib/hooks/useCart";
+import Overlay from "@/components/overlay";
 
 type AddressSelectProps = {
     address: Address | null;
     user: User | null;
-};
-
-interface AddressItemProp {
-    address: Address;
-    addresses: Address[];
-    selectedAddress?: Address;
-}
-
-const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAddress }) => {
-    const state = useOverlayTriggerState({});
-    const invalidateCart = useInvalidateCart();
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const handleSelect = async (id: number) => {
-        setLoading(true);
-        const savedAddress = addresses.find((a) => a.id === id);
-
-        if (savedAddress) {
-            const res = await api.cart.updateDetails({
-                shipping_address: omit(savedAddress, ["created_at", "updated_at"]) as any,
-            });
-
-            if (res.error) {
-                toast.error(res.error);
-
-                return;
-            }
-            invalidateCart();
-        }
-
-        setLoading(false);
-    };
-
-    return (
-        <motion.div
-            key={address.id}
-            animate={{ opacity: 1, y: 0 }}
-            className={`relative cursor-pointer focus-visible:outline-none group border ${
-                selectedAddress?.id === address.id ? "bg-content1 border-primary" : "border-default-200"
-            } rounded-xl p-4 transition-all`}
-            exit={{ opacity: 0, y: -20 }}
-            initial={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.2 }}
-        >
-            <div className="flex items-start space-x-4" onClick={() => handleSelect(address.id!)}>
-                <div className="flex-shrink-0">
-                    <Home className={`w-6 h-6 ${selectedAddress?.id === address.id ? "text-blue-500" : "text-default-500"}`} />
-                </div>
-                <div className="flex-grow">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-default-900">
-                            {address.address_type || "Home"}
-                            {address.label && <span>({address.label})</span>}
-                        </h3>
-                    </div>
-                    <p className="text-default-600 text-sm mt-1">
-                        {address.address_1}
-                        {address.address_2 && <span>, {address.address_2}</span>}
-                        {address.postal_code && <span>, {address.postal_code}</span>}
-                    </p>
-                    <p className="text-default-500 text-sm capitalize">
-                        {address.city}
-                        {address.state && <span>, {address.state}</span>}
-                    </p>
-                    <p className="text-default-500 text-sm capitalize">{address.phone}</p>
-                </div>
-                <div className="flex items-center flex-shrink-0">
-                    <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            state.open();
-                        }}
-                    >
-                        <Pencil className="w-4 h-4" />
-                    </Button>
-                    {/* {selectedAddress?.id === address.id && <Check className="w-5 h-5 text-blue-500" />} */}
-                </div>
-            </div>
-            {loading && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-content1 opacity-25">
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                </div>
-            )}
-            <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle className="sr-only">Address</DrawerTitle>
-                    </DrawerHeader>
-                    <div className="p-6">
-                        <ShippingAddressFormEdit address={address} onClose={state.close} />
-                    </div>
-                </DrawerContent>
-            </Drawer>
-        </motion.div>
-    );
 };
 
 const EmptyState = () => {
@@ -235,7 +134,7 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
                     <div className="relative mb-6">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-default-500 w-5 h-5" />
                         <input
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-default-500 outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-default-300 outline-none transition-all"
                             placeholder="Search addresses..."
                             type="text"
                             value={searchQuery}
@@ -263,23 +162,19 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
                     </AnimatePresence>
                 </div>
             </div>
-
-            <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
-                <DrawerTrigger asChild>
-                    <Button className="w-full mt-6" variant="default">
-                        <Plus className="w-5 h-5 mr-2" />
-                        <span>Add New Address</span>
+            <Overlay
+                open={state.isOpen}
+                sheetClassName="min-w-[500px]"
+                title="Create Address"
+                trigger={
+                    <Button className="w-full mt-6" variant="primary" onClick={state.open}>
+                        Add New Address
                     </Button>
-                </DrawerTrigger>
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle className="sr-only">Address</DrawerTitle>
-                    </DrawerHeader>
-                    <div className="p-6">
-                        <ShippingAddressForm onClose={state.close} />
-                    </div>
-                </DrawerContent>
-            </Drawer>
+                }
+                onOpenChange={state.setOpen}
+            >
+                <ShippingAddressForm onClose={state.close} />
+            </Overlay>
         </div>
     );
 };

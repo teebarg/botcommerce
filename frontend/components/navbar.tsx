@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@lib/util/cn";
 import React, { createContext, useState } from "react";
+
+import { cn } from "@/lib/utils";
 
 type NavbarContextType = {
     expanded: boolean;

@@ -1,11 +1,12 @@
 "use client";
 
-import { cn } from "@lib/util/cn";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "./ui/button";
+
+import { cn } from "@/lib/utils";
 
 interface Props {
     className?: string;

@@ -11,7 +11,7 @@ import PaymentContainer from "../payment-container";
 import ErrorMessage from "../error-message";
 
 import { RadioGroup } from "@/components/ui/radio-group";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Cart, PaymentMethod } from "@/types/models";
 import { api } from "@/apis";
@@ -90,7 +90,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
     return (
         <div
             className={cn(
-                "bg-content1 shadow-medium p-6 rounded border-l-2",
+                "bg-content1 shadow-md p-6 rounded border-l-2",
                 isOpen || hasPaymentMethod ? "border-l-indigo-500" : "border-l-content3 opacity-50"
             )}
         >
@@ -138,6 +138,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     disabled={!hasPaymentMethod && !paidByGiftcard}
                     isLoading={isLoading}
                     size="sm"
+                    variant="primary"
                     onClick={handleSubmit}
                 >
                     Continue to review

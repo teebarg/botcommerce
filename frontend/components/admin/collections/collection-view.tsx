@@ -22,8 +22,8 @@ const CollectionView: React.FC<Props> = ({ collections, deleteAction }) => {
         <div className="px-2 md:px-10 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div>
-                    <h1 className="text-2xl font-semibold">Collections</h1>
-                    <p className="text-muted-foreground">Manage your collections</p>
+                    <h1 className="text-2xl font-medium">Collections</h1>
+                    <p className="text-default-500 text-sm">Manage your collections</p>
                 </div>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                     <div className="relative w-full sm:w-64">
@@ -56,7 +56,7 @@ const CollectionView: React.FC<Props> = ({ collections, deleteAction }) => {
                                     <div className="font-bold truncate min-w-72">{collection?.name}</div>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant={collection.is_active ? "success" : "destructive"}>
+                                    <Badge variant={collection.is_active ? "emerald" : "destructive"}>
                                         {collection.is_active ? "Active" : "Inactive"}
                                     </Badge>
                                 </TableCell>

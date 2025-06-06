@@ -21,7 +21,7 @@ import { format } from "date-fns";
 import OrderProcessingAction from "./order-processing-actions";
 
 import { Order, OrderItem, OrderStatus } from "@/types/models";
-import { currency } from "@/lib/util/util";
+import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -31,13 +31,13 @@ interface OrderDetailsProps {
 }
 
 const getStatusBadge = (status?: OrderStatus) => {
-    const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success"> = {
+    const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success" | "emerald"> = {
         ["PENDING"]: "warning",
         ["PROCESSING"]: "default",
         ["SHIPPED"]: "secondary",
         ["CANCELED"]: "destructive",
         ["DELIVERED"]: "success",
-        ["PAID"]: "default",
+        ["PAID"]: "emerald",
         ["REFUNDED"]: "destructive",
     };
 
@@ -112,7 +112,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
             <div className="max-w-7xl mx-auto px-2 sm:px-6 py-8">
                 {/* Back Button */}
                 <div className="mb-6">
-                    <button className="flex items-center text-default-500 hover:text-default-900" onClick={onClose}>
+                    <button className="flex items-center text-default-500 hover:text-default-900 cursor-pointer" onClick={onClose}>
                         <ArrowLeft className="w-4 h-4 mr-1" />
                         <span>Back to Orders</span>
                     </button>
@@ -124,7 +124,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         <h1 className="text-2xl font-bold text-default-900">Order: {order.order_number}</h1>
                         <div className="flex items-center">
                             <Calendar className="w-4 h-4 text-default-500 mr-2" />
-                            <span className="text-default-500">{format(order.created_at, "MMMM dd, yyyy")}.</span>
+                            <span className="text-default-500">{formatDate(order.created_at)}.</span>
                         </div>
                     </div>
                     <div className="mt-4 md:mt-0">{getStatusBadge(order.status)}</div>
@@ -142,17 +142,17 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 {order.order_items.map((item: OrderItem, idx: number) => (
                                     <div key={idx} className="px-6 py-4">
                                         <div className="flex flex-col sm:flex-row">
-                                            <div className="flex-shrink-0 mr-4 mb-4 sm:mb-0">
+                                            <div className="shrink-0 mr-4 mb-4 sm:mb-0">
                                                 <img alt={item.name} className="w-20 h-20 object-cover rounded" src={item.image} />
                                             </div>
-                                            <div className="flex-grow">
-                                                <h3 className="text-base font-medium text-default-900">{item.name}</h3>
+                                            <div className="grow">
+                                                <h3 className="text-sm font-medium text-default-900">{item.name}</h3>
                                                 <p className="text-sm text-default-500">SKU: {item.variant_id}</p>
                                                 <div className="mt-1 flex flex-col sm:flex-row sm:justify-between">
                                                     <div className="flex items-center text-sm text-default-500">
                                                         <span>Qty: {item.quantity}</span>
                                                     </div>
-                                                    <div className="text-sm font-medium text-default-900">{currency(item.price)}</div>
+                                                    <div className="font-semibold text-default-900">{currency(item.price)}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -162,7 +162,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             <div className="border-t border-gray-200 px-6 py-4">
                                 <div className="flex justify-between text-base font-medium text-default-900">
                                     <p>Total</p>
-                                    <p>{currency(order.total)}</p>
+                                    <p className="font-semibold text-default-900 text-lg">{currency(order.total)}</p>
                                 </div>
                             </div>
                         </div>
@@ -226,16 +226,18 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <p className="text-default-500">
-                                            <span className="font-medium">Method:</span> {order.shipping_method}
+                                            <span className="font-medium">Method:</span>{" "}
+                                            <span className="font-semibold text-default-900">{order.shipping_method}</span>
                                         </p>
                                         <p className="text-default-500">
-                                            <span className="font-medium">Tracking:</span> {order.order_number}
+                                            <span className="font-medium">Tracking:</span>{" "}
+                                            <span className="font-semibold text-default-900">{order.order_number}</span>
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-default-500">
                                             <span className="font-medium">Estimated Delivery:</span>
-                                            <span className="ml-1">3days</span>
+                                            <span className="ml-1 font-semibold text-default-900">3days</span>
                                         </p>
                                     </div>
                                 </div>

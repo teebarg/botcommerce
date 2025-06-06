@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { api } from "@/apis";
 import { useBank } from "@/lib/hooks/useApi";
 
@@ -56,7 +56,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
             </div>
 
             <Button className="w-full" disabled={loading} isLoading={loading} onClick={onPaymentCompleted}>
-                Pay ${currency(amount)} via Bank Transfer
+                Pay {currency(amount)} via Bank Transfer
             </Button>
             {/* Security message */}
             <div className="mt-4 flex items-center justify-center text-xs text-default-500">

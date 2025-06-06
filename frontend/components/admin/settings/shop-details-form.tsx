@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ShopSettings } from "@/types/models";
 import { api } from "@/apis";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface ShopDetailsProps {
@@ -118,7 +118,7 @@ export function ShopDetailsForm({ settings }: ShopDetailsProps) {
                 })}
             </div>
             <div className="flex justify-end">
-                <Button disabled={isPending} isLoading={isPending} type="button" variant="default" onClick={handleUpdate}>
+                <Button disabled={isPending} isLoading={isPending} type="button" variant="primary" onClick={handleUpdate}>
                     Save Changes
                 </Button>
             </div>

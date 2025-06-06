@@ -1,0 +1,279 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: var(--font-inter);
+    --font-display: var(--font-lexend);
+
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+
+    --color-content1: var(--content1);
+    --color-content2: hsl(var(--content2));
+    --color-content3: hsl(var(--content3));
+    --color-content4: hsl(var(--content4));
+    --color-divider: hsl(var(--divider));
+
+    --color-default: hsl(var(--default));
+    --color-default-foreground: hsl(var(--default-foreground));
+    --color-default-50: hsl(var(--default-50));
+    --color-default-100: hsl(var(--default-100));
+    --color-default-200: hsl(var(--default-200));
+    --color-default-300: hsl(var(--default-300));
+    --color-default-400: hsl(var(--default-400));
+    --color-default-500: hsl(var(--default-500));
+    --color-default-600: hsl(var(--default-600));
+    --color-default-700: hsl(var(--default-700));
+    --color-default-800: hsl(var(--default-800));
+    --color-default-900: hsl(var(--default-900));
+
+    --color-ring: hsl(var(--ring));
+    --color-input: hsl(var(--input));
+    --color-border: hsl(var(--border));
+    --color-destructive: hsl(var(--destructive));
+    --color-accent-foreground: hsl(var(--accent-foreground));
+    --color-accent: hsl(var(--accent));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-muted: hsl(var(--muted));
+    --color-secondary-foreground: #fff;
+    --color-secondary: #fca311;
+    --color-primary-foreground: #fff;
+    --color-primary: #14213d;
+    --color-popover-foreground: hsl(var(--popover-foreground));
+    --color-popover: hsl(var(--popover));
+    --color-card-foreground: hsl(var(--card-foreground));
+    --color-card: hsl(var(--card));
+
+    --color-danger: hsl(var(--danger));
+    --color-danger-foreground: hsl(var(--danger-foreground));
+
+    --color-success: hsl(var(--success));
+    --color-success-foreground: hsl(var(--success-foreground));
+
+    --color-warning: hsl(var(--warning));
+    --color-warning-foreground: hsl(var(--warning-foreground));
+
+    --container-8xl: 88rem;
+    --container-9xl: 96rem;
+
+    --text-xxs: 0.625rem;
+    --text-xxs--line-height: calc(0.75 / 0.625);
+
+    --radius-50: 50%;
+    --radius-1xl: 0.875rem;
+    --radius-top-corners: "5px 5px 0 0";
+    --radius-bottom-corners: "0 0 5px 5px";
+
+    --animate-blob: blob 15s infinite;
+    --animate-blob-delayed: blob 15s infinite 2s;
+    --animate-spinner-ease-spin: spinner-spin 0.8s ease infinite;
+    --animate-spinner-linear-spin: spinner-spin 0.8s linear infinite;
+    --animate-indeterminate-bar: indeterminate-bar 1.5s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+    --animate-gradient-move: gradient-move 4s infinite alternate;
+    --animate-accordion-down: accordion-down 0.2s ease-out;
+    --animate-accordion-up: accordion-up 0.2s ease-out;
+    --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --animate-bounce: bounce 1s infinite;
+    --animate-shimmer: shimmer2 2s infinite;
+
+    @keyframes blob {
+        0% {
+            transform: translate(0, 0) scale(1);
+        }
+        33% {
+            transform: translate(30px, -50px) scale(1.1);
+        }
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
+        100% {
+            transform: translate(0, 0) scale(1);
+        }
+    }
+    @keyframes spinner-spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    @keyframes shimmer {
+        100% {
+            content: "var(--tw-content)";
+            transform: translateX(100%);
+        }
+    }
+    @keyframes shimmer2 {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+    @keyframes indeterminate {
+        0% {
+            transform: translateX(-50%) scaleX(0.2);
+        }
+        100% {
+            transform: translateX(100%) scaleX(1);
+        }
+    }
+    @keyframes gradient-move {
+        0% {
+            background-position: 0% 50%;
+        }
+        100% {
+            background-position: 100% 50%;
+        }
+    }
+    @keyframes accordion-down {
+        0% {
+            height: 0;
+        }
+        100% {
+            height: var(--radix-accordion-content-height);
+        }
+    }
+    @keyframes accordion-up {
+        0% {
+            height: var(--radix-accordion-content-height);
+        }
+        100% {
+            height: 0;
+        }
+    }
+}
+
+.chatbot-message li a {
+    @apply text-blue-500 hover:text-blue-600;
+}
+
+:root {
+    /* Content Layers */
+    --content1: #f4f4f4;
+    /* --content1: 0 0% 100%; */
+    --content2: 240 4.76% 95.88%;
+    --content3: 240 5.88% 90%;
+    --content4: 240 4.88% 83.92%;
+
+    /* Default State Colors */
+    --default-50: 0 0% 98.04%;
+    --default-100: 240 4.76% 95.88%;
+    --default-200: 240 5.88% 90%;
+    --default-300: 240 4.88% 83.92%;
+    --default-400: 240 5.03% 64.9%;
+    --default-500: 240 3.83% 46.08%;
+    --default-600: 240 5.2% 33.92%;
+    --default-700: 240 5.26% 26.08%;
+    --default-800: 240 3.7% 15.88%;
+    --default-900: 240 5.88% 10%;
+    --default-foreground: 0 0% 0%;
+    --default: 240 4.88% 83.92%;
+
+    /* Semantic Colors */
+    --success: 145.96000000000004 79.46% 43.92%;
+    --success-foreground: 0 0% 0%;
+
+    --warning-foreground: 0 0% 0%;
+    --warning: 37.02999999999997 91.27% 55.1%;
+
+    --danger-foreground: 0 0% 98%;
+    --danger: 0 84.2% 60.2%;
+
+    --divider: 0 0% 6.67%;
+
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+}
+
+.dark {
+    /* Content Layers */
+    --content1: #161a1d;
+    /* --content1: #1F2937; */
+    /* --content1: 240 5.88% 10%; */
+    --content2: 240 3.7% 15.88%;
+    --content3: 240 5.26% 26.08%;
+    --content4: 240 5.2% 33.92%;
+
+    /* Default State Colors */
+    --default-50: 240 5.88% 10%;
+    --default-100: 240 3.7% 15.88%;
+    --default-200: 240 5.26% 26.08%;
+    --default-300: 240 5.2% 33.92%;
+    --default-400: 240 3.83% 46.08%;
+    --default-500: 240 5.03% 64.9%;
+    --default-600: 240 4.88% 83.92%;
+    --default-700: 240 5.88% 90%;
+    --default-800: 240 4.76% 95.88%;
+    --default-900: 0 0% 98.04%;
+    --default-foreground: 0 0% 100%;
+    --default: 240 5.26% 26.08%;
+
+    /* Semantic Colors */
+    --success: 145.96000000000004 79.46% 43.92%;
+    --success-foreground: 0 0% 0%;
+
+    --warning-foreground: 0 0% 0%;
+    --warning: 37.02999999999997 91.27% 55.1%;
+
+    --danger-foreground: 0 0% 98%;
+    --danger: 0 62.8% 30.6%;
+
+    --divider: 0 0% 100%;
+
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+}
+
+@layer base {
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+/* Thin scrollbar for WebKit */
+::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3); /* Change to fit your theme */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}

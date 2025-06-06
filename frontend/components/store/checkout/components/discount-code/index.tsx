@@ -2,7 +2,7 @@
 
 import { InformationCircleSolid } from "nui-react-icons";
 import React, { useMemo, useState } from "react";
-import { currency } from "@lib/util/util";
+import { currency } from "@lib/utils";
 import { Tooltip } from "@components/ui/tooltip";
 import { Trash2 } from "lucide-react";
 
@@ -65,7 +65,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                 </p>
                                 <button
                                     aria-label="remove gift card"
-                                    className="flex items-center gap-x-2 !background-transparent !border-none"
+                                    className="flex items-center gap-x-2 !background-transparent border-none!"
                                     data-testid="remove-gift-card-button"
                                     onClick={() => removeGiftCardCode(gc.code)}
                                 >

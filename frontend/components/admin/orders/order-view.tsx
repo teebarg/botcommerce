@@ -12,7 +12,7 @@ import OrderFilters from "./order-filters";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Order, OrderStatus } from "@/types/models";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { useOrders } from "@/lib/hooks/useApi";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
@@ -46,13 +46,13 @@ const OrderView: React.FC = () => {
     const { orders, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     const getStatusBadge = (status?: OrderStatus) => {
-        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success"> = {
+        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success" | "emerald"> = {
             ["PENDING"]: "warning",
             ["PROCESSING"]: "default",
             ["SHIPPED"]: "secondary",
             ["CANCELED"]: "destructive",
             ["DELIVERED"]: "success",
-            ["PAID"]: "default",
+            ["PAID"]: "emerald",
             ["REFUNDED"]: "destructive",
         };
 
@@ -62,8 +62,8 @@ const OrderView: React.FC = () => {
     return (
         <div className="px-2 md:px-10 py-8">
             <div className="mb-6 flex flex-col">
-                <h1 className="text-2xl font-semibold">Order view</h1>
-                <p className="text-muted-foreground">Manage your orders.</p>
+                <h1 className="text-2xl font-medium">Order view</h1>
+                <p className="text-default-500 text-sm">Manage your orders.</p>
             </div>
             <AnimatePresence>
                 <div key="table" className="md:block hidden">
@@ -95,7 +95,7 @@ const OrderView: React.FC = () => {
                             ) : (
                                 orders?.map((order: Order, idx: number) => (
                                     <TableRow key={idx}>
-                                        <TableCell className="font-medium">{order.order_number}</TableCell>
+                                        <TableCell className="font-semibold">{order.order_number}</TableCell>
                                         <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
                                         <TableCell>
                                             {order.user?.first_name} {order.user?.last_name}

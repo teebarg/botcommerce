@@ -1,5 +1,9 @@
-import { XMarkMini } from "nui-react-icons";
+"use client";
+
 import { ChangeEvent, FormEvent, useRef } from "react";
+import { X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 interface ControlledSearchBoxProps {
     onChange(event: ChangeEvent): void;
@@ -48,7 +52,7 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
                         aria-label="click"
                         autoComplete="off"
                         autoCorrect="off"
-                        className="w-full px-2 h-14 text-lg focus-visible:outline-none rounded-none bg-transparent text-default-900 placeholder-default-500"
+                        className="w-full px-2 py-2 text-lg focus-visible:outline-none bg-transparent text-default-900 placeholder-default-500"
                         data-testid="search-input"
                         placeholder={placeholder}
                         role="combobox"
@@ -58,14 +62,9 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
                         onChange={onChange}
                     />
                     {value && (
-                        <button
-                            aria-label="reset"
-                            className="inline-flex justify-center rounded-full w-8 border data-[hover=true]:bg-content2 border-default-500 dark:border-default-100"
-                            type="button"
-                            onClick={handleReset}
-                        >
-                            <XMarkMini />
-                        </button>
+                        <Button aria-label="reset" size="icon" variant="ghost" onClick={handleReset}>
+                            <X />
+                        </Button>
                     )}
                 </div>
             </form>

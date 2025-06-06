@@ -5,7 +5,7 @@ import { HeartFilled, Heart } from "nui-react-icons";
 import dynamic from "next/dynamic";
 
 import { CartComponent } from "@/components/store/cart/cart-component";
-import Search from "@/modules/search/components/search";
+import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 import { getSiteConfig } from "@/lib/config";
@@ -23,7 +23,7 @@ const StoreNavbar = async () => {
     return (
         <NavigationBar className="my-2 hidden md:flex">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
-                <NavbarBrand className="flex items-center flex-1 md:w-[25vw] font-semibold">
+                <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink className="text-3xl block" href="/">
                         {siteConfig?.name}
                     </LocalizedClientLink>
@@ -36,16 +36,16 @@ const StoreNavbar = async () => {
                         </LocalizedClientLink>
                     )}
                 </NavbarBrand>
-                <NavbarItem className="hidden md:flex flex-1">
-                    <Search className="w-full justify-between" />
+                <NavbarItem className="hidden md:flex justify-center flex-1">
+                    <Search className="w-full justify-between max-w-lg" />
                 </NavbarItem>
-                <NavbarItem className="md:w-[25vw] flex gap-3 justify-end items-center">
+                <NavbarItem className="flex gap-3 justify-end items-center">
                     <CartComponent />
                     <ThemeButton />
                     <div className="hidden md:flex">
                         {user ? (
                             <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
-                                <HeartFilled className="h-8 w-8 text-primary" />
+                                <HeartFilled className="h-8 w-8 text-secondary" />
                             </LocalizedClientLink>
                         ) : (
                             <Heart className="h-8 w-8 text-default-500" />

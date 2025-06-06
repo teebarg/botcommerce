@@ -14,7 +14,7 @@ import { CollectionsSideBar } from "@/components/store/collections/checkbox-side
 import { CollectionsTopBar } from "@/components/store/collections/checkout-topbar";
 import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { useBrands, useCategories, useCollections } from "@/lib/hooks/useApi";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { api } from "@/apis/client";
@@ -109,7 +109,7 @@ export default function InfiniteScrollClient({
                         <BtnLink
                             className={cn(
                                 "flex-none rounded-full bg-content1 text-foreground font-semibold text-base py-2 min-w-min px-6",
-                                searchParams.get("cat_ids") === null && "border-1 border-foreground"
+                                searchParams.get("cat_ids") === null && "border border-foreground"
                             )}
                             href="/collections"
                         >
@@ -120,7 +120,7 @@ export default function InfiniteScrollClient({
                                 key={index}
                                 className={cn(
                                     "flex-none rounded-full bg-content1 text-foreground font-semibold text-base py-2 min-w-min",
-                                    searchParams.get("cat_ids") === category.slug && "border-1 border-foreground"
+                                    searchParams.get("cat_ids") === category.slug && "border border-foreground"
                                 )}
                                 href={`/collections?cat_ids=${category.slug}`}
                             >

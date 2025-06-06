@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { signUp } from "@/actions/auth";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { useStore } from "@/app/store/use-store";
+import { Separator } from "@/components/ui/separator";
 
 type Props = {};
 
@@ -78,16 +79,16 @@ const SignUpForm: React.FC<Props> = () => {
                 <Button
                     aria-label="join us"
                     className="w-full mt-6"
-                    color="warning"
                     data-testid="register-button"
                     isLoading={isPending}
                     size="lg"
                     type="submit"
+                    variant="primary"
                 >
                     Join Us
                 </Button>
             </form>
-            <hr className="tb-divider my-6" />
+            <Separator className="my-6" />
             <SocialLoginButtons />
         </React.Fragment>
     );

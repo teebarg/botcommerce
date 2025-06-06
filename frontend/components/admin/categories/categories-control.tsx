@@ -6,13 +6,12 @@ import { toast } from "sonner";
 import { Edit, Plus, Trash2 } from "lucide-react";
 
 import { Category } from "@/types/models";
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { api } from "@/apis";
 import { CategoryForm } from "@/components/admin/categories/category-form";
-import DrawerUI from "@/components/drawer";
+import Overlay from "@/components/overlay";
 
 interface Props {
     canAdd?: boolean;
@@ -49,25 +48,31 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
         <React.Fragment>
             <div className="flex items-center gap-2">
                 {canAdd && (
-                    <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
-                        <DrawerTrigger>
-                            <Plus />
-                        </DrawerTrigger>
-                        <DrawerContent>
-                            <DrawerHeader>
-                                <DrawerTitle>Add SubCat to {category?.name}</DrawerTitle>
-                            </DrawerHeader>
-                            <div className="max-w-2xl">
-                                <CategoryForm hasParent parent_id={category?.id} onClose={state.close} />
-                            </div>
-                        </DrawerContent>
-                    </Drawer>
+                    <Overlay
+                        open={state.isOpen}
+                        title={`Add SubCat to ${category?.name}`}
+                        trigger={
+                            <Button size="iconOnly">
+                                <Plus />
+                            </Button>
+                        }
+                        onOpenChange={state.setOpen}
+                    >
+                        <CategoryForm hasParent parent_id={category?.id} onClose={state.close} />
+                    </Overlay>
                 )}
-                <DrawerUI open={editState.isOpen} title="Edit Category" trigger={<Edit className="h-5 w-5" />} onOpenChange={editState.setOpen}>
-                    <div className="max-w-2xl">
-                        <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
-                    </div>
-                </DrawerUI>
+                <Overlay
+                    open={editState.isOpen}
+                    title={`Edit Category ${category?.name}`}
+                    trigger={
+                        <Button size="iconOnly">
+                            <Edit className="h-5 w-5" />
+                        </Button>
+                    }
+                    onOpenChange={editState.setOpen}
+                >
+                    <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
+                </Overlay>
                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                     <DialogTrigger>
                         <Trash2 className="text-rose-500" />

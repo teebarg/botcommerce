@@ -4,7 +4,7 @@ import { CheckCircle2, ShoppingBag } from "lucide-react";
 
 const PaymentLoading: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-b from-violet-50 to-violet-100 flex items-center justify-center p-4 fixed inset-0 z-10">
+        <div className="min-h-screen bg-linear-to-b from-violet-50 to-violet-100 flex items-center justify-center p-4 fixed inset-0 z-10">
             <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div className="p-8">
                     <div className="flex justify-center mb-8">
@@ -70,7 +70,7 @@ interface ProcessStepProps {
 function ProcessStep({ title, description, isCompleted, isActive = false }: ProcessStepProps) {
     return (
         <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
                 {isCompleted ? (
                     <motion.div
                         animate={{ scale: 1 }}

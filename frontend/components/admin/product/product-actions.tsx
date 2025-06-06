@@ -2,15 +2,16 @@
 
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { toast } from "sonner";
-import { Edit, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import DrawerUI from "@/components/drawer";
 import { api } from "@/apis";
 import { Product } from "@/types/models";
 import { ProductView } from "@/components/products/product-view";
 import { Confirm } from "@/components/generic/confirm";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import Overlay from "@/components/overlay";
+import { Button } from "@/components/ui/button";
 
 interface ProductActionsProps {
     product: Product;
@@ -38,13 +39,25 @@ export function ProductActions({ product }: ProductActionsProps) {
     };
 
     return (
-        <div className="flex space-x-1">
-            <DrawerUI open={viewState.isOpen} title={`Edit Product`} trigger={<Edit className="h-5 w-5" />} onOpenChange={viewState.setOpen}>
+        <div className="flex">
+            <Overlay
+                open={viewState.isOpen}
+                sheetClassName="min-w-[500px]"
+                title="Edit Product"
+                trigger={
+                    <Button size="icon" variant="ghost">
+                        <Pencil className="h-5 w-5" />
+                    </Button>
+                }
+                onOpenChange={viewState.setOpen}
+            >
                 <ProductView product={product} onClose={viewState.close} />
-            </DrawerUI>
+            </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger>
-                    <Trash2 className="h-5 w-5 text-danger" />
+                <DialogTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                        <Trash2 className="h-5 w-5 text-danger" />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>

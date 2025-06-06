@@ -6,6 +6,8 @@ import { KeyboardSensor } from "@dnd-kit/core";
 import { toast } from "sonner";
 import { GripVertical, Trash2 } from "lucide-react";
 
+import { Button } from "../ui/button";
+
 import { ProductImage } from "@/types/models";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
@@ -28,7 +30,14 @@ const SortableImage = ({ image, productId }: { image: ProductImage; productId: n
     const handleDelete = async () => {
         setIsDeleting(true);
 
-        await api.product.deleteImages(productId, image.id);
+        const { error } = await api.product.deleteImages(productId, image.id);
+
+        if (error) {
+            toast.error(`Error - ${error as string}`);
+            setIsDeleting(false);
+
+            return;
+        }
         invalidate("products");
         invalidate("product-search");
         api.product.revalidate();
@@ -38,7 +47,7 @@ const SortableImage = ({ image, productId }: { image: ProductImage; productId: n
     return (
         <div
             ref={setNodeRef}
-            className="relative group w-full aspect-square h-48 overflow-hidden rounded-xl border bg-white shadow-sm"
+            className="relative group w-full aspect-square h-48 overflow-hidden rounded-xl border border-default-200 shadow-sm py-4"
             style={style}
             {...attributes}
         >
@@ -48,21 +57,22 @@ const SortableImage = ({ image, productId }: { image: ProductImage; productId: n
             {/* Drag Handle */}
             <div
                 {...listeners}
-                className="absolute top-1 left-1 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                className="absolute top-1 left-1 hover:bg-content1 rounded-md py-2 px-3 opacity-0 group-hover:opacity-100 transition cursor-grab"
                 title="Hold to drag"
             >
-                <GripVertical className="text-gray-600" size={18} />
+                <GripVertical className="text-default-600 h-5 w-5" />
             </div>
 
             {/* Delete Button */}
-            <button
-                className="absolute top-1 right-1 bg-white/80 rounded-full p-1 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition"
+            <Button
+                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition"
                 disabled={isDeleting}
                 title="Delete"
+                variant="ghost"
                 onClick={handleDelete}
             >
-                <Trash2 size={18} />
-            </button>
+                <Trash2 className="text-red-500 h-5 w-5" />
+            </Button>
         </div>
     );
 };
@@ -117,8 +127,8 @@ export default function ImageReorder({ productId, initialImages }: Props) {
 
     return (
         <div className="mt-6 px-4">
-            <h2 className="text-xl font-semibold mb-4 text-center">Reorder Product Images</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <h2 className="text-lg font-medium mb-4 text-center">Reorder Product Images</h2>
+            <div className="space-y-4 max-h-[50vh] overflow-y-auto">
                 <DndContext collisionDetection={closestCenter} sensors={sensors} onDragEnd={handleDragEnd}>
                     <SortableContext items={images.map((img) => img.id)} strategy={verticalListSortingStrategy}>
                         {images.map((img: ProductImage, idx: number) => (
@@ -127,7 +137,7 @@ export default function ImageReorder({ productId, initialImages }: Props) {
                     </SortableContext>
                 </DndContext>
             </div>
-            <p className="text-xs text-gray-400 text-center mt-3">Tip: Tap and hold the drag icon to reorder images on mobile</p>
+            <p className="text-xs text-default-500 text-center mt-3">Tip: Tap and hold the drag icon to reorder images on mobile</p>
         </div>
     );
 }

@@ -23,7 +23,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({ paymentSession, sel
             value={paymentSession.provider_id}
         >
             <div className="flex items-start">
-                <div className="flex-shrink-0 mt-0.5">{provider?.icon}</div>
+                <div className="shrink-0 mt-0.5">{provider?.icon}</div>
 
                 <div className="ml-3">
                     <h3 className="font-medium text-default-900">{provider?.title || paymentSession.provider_id}</h3>

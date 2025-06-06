@@ -9,6 +9,7 @@ import RangeSlider from "@/components/ui/range-slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import LocalizedClientLink from "@/components/ui/link";
 import { Brand, Category, Collection, Facet } from "@/types/models";
+import { Separator } from "@/components/ui/separator";
 
 interface ComponentProps {
     brands?: Brand[];
@@ -66,7 +67,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     </div>
                 </div>
                 <h2 className="text-sm font-medium text-foreground mt-8">Filter by</h2>
-                <hr className="shrink-0 border-none w-full h-[1px] my-3 bg-default-100" />
+                <Separator className="mb-4" />
                 <RangeSlider
                     defaultValue={[Number(searchParams?.get("minPrice") ?? 500), Number(searchParams?.get("maxPrice") ?? 50000)]}
                     label="Price Range"

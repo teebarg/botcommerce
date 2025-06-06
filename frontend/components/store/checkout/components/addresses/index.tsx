@@ -6,7 +6,7 @@ import { MapPin } from "lucide-react";
 
 import ShippingAddress from "../shipping-address";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Cart } from "@/types/models";
 import { useAddress } from "@/lib/hooks/useCart";
 import { Skeleton } from "@/components/generic/skeleton";
@@ -20,7 +20,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
 
     if (isLoading)
         return (
-            <div className="bg-content1 shadow-medium p-6 rounded border-l-2 border-l-indigo-500">
+            <div className="bg-content1 shadow-md p-6 rounded border-l-2 border-l-indigo-500">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full" />
@@ -41,7 +41,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
     return (
         <div>
             {/* Account Information Section */}
-            <div className="bg-content1 shadow-medium p-6 rounded border-l-2 border-l-indigo-500">
+            <div className="bg-content1 shadow-md p-6 rounded border-l-2 border-l-indigo-500">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full" />
@@ -49,7 +49,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                         <MapPin className="w-5 h-5 text-blue-500" />
                     </div>
                     {!isOpen && address && (
-                        <button aria-label="edit" className="text-blue-500 flex items-center gap-2 text-sm" onClick={handleEdit}>
+                        <button aria-label="edit" className="text-blue-500 flex items-center gap-2 text-sm cursor-pointer" onClick={handleEdit}>
                             Edit <Pencil />
                         </button>
                     )}

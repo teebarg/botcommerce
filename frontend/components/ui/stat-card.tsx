@@ -1,4 +1,4 @@
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 interface StatCardProps {
     title: string;
@@ -12,7 +12,7 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon, description, trend, trendValue, className }) => {
     return (
-        <div className={cn("bg-background rounded-lg p-4 shadow-sm border border-input", className)}>
+        <div className={cn("bg-content1 rounded-lg p-4 shadow-lg", className)}>
             <div className="flex justify-between items-start">
                 <div>
                     <p className="text-sm font-medium text-default-500">{title}</p>
@@ -34,7 +34,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, description, tr
                         </div>
                     )}
                 </div>
-                {icon && <div className="p-2 rounded-full bg-primary/10 text-primary">{icon}</div>}
+                {icon && <div className="p-2 rounded-full bg-secondary/10 text-secondary">{icon}</div>}
             </div>
         </div>
     );

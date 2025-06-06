@@ -196,7 +196,7 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                                 {index + 1}
                             </div>
 
-                            <div className="flex-shrink-0 mr-4">
+                            <div className="shrink-0 mr-4">
                                 <img
                                     alt={image.image}
                                     className="w-24 h-24 object-cover rounded"
@@ -205,7 +205,7 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                                 />
                             </div>
 
-                            <div className="flex-grow">
+                            <div className="grow">
                                 <h3 className="font-medium text-gray-800">{image.image}</h3>
                                 <div className="text-sm text-gray-500 mt-1">
                                     {isTouching && draggedItem === index ? "Release to drop" : "Drag to reorder"}

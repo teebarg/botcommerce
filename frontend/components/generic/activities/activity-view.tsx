@@ -49,7 +49,7 @@ const ActivityView: React.FC = () => {
 
     return (
         <div className="px-2 md:px-10 py-8">
-            <h1 className="text-2xl font-bold mb-6">Activity History</h1>
+            <h1 className="text-2xl font-bold mb-6">Activities History</h1>
             <ActivityList activities={activities} isLoading={isLoading} onRemove={onRemove} />
             {hasMore && <div ref={lastElementRef} className="h-10" />}
         </div>

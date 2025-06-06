@@ -194,7 +194,7 @@ async def get_relevant_products(query_terms: List[str], product_intent: bool = F
             product_info += f"""---
             ![{name}]({image})  
             **🛍️ {name}**
-            💵 **Price:** ${price}  
+            💵 **Price:** ₦{price}  
             🔗 [View Product](/products/{product.slug})
             """
 
@@ -270,7 +270,7 @@ async def get_categories_info(query_terms: List[str]) -> tuple[str, Optional[str
             if category.products and len(category.products) > 0:
                 category_info += "  Popular products in this category:\n"
                 for product in category.products[:3]:  # Limit to 3 products
-                    category_info += f"    - {product.name}: ${product.price}\n"
+                    category_info += f"    - {product.name}: ₦{product.price}\n"
 
             category_info += "\n"
 
@@ -334,7 +334,7 @@ async def get_brands_info(query_terms: List[str]) -> tuple[str, Optional[str]]:
             if brand.products and len(brand.products) > 0:
                 brand_info += "  Popular products from this brand:\n"
                 for product in brand.products[:3]:  # Limit to 3 products
-                    brand_info += f"    - {product.name}: ${product.price}\n"
+                    brand_info += f"    - {product.name}: ₦{product.price}\n"
 
             brand_info += "\n"
 
@@ -374,11 +374,11 @@ async def get_user_cart_info(user_id: int) -> tuple[str, Optional[str]]:
         if cart.items and len(cart.items) > 0:
             cart_info += "Items in cart:\n"
             for item in cart.items:
-                cart_info += f"- {item.name} (x{item.quantity}): ${item.price} each\n"
+                cart_info += f"- {item.name} (x{item.quantity}): ₦{item.price} each\n"
 
-            cart_info += f"\nSubtotal: ${cart.subtotal}\n"
-            cart_info += f"Shipping: ${cart.shipping_cost}\n"
-            cart_info += f"Total: ${cart.total}\n"
+            cart_info += f"\nSubtotal: ₦{cart.subtotal}\n"
+            cart_info += f"Shipping: ₦{cart.shipping_cost}\n"
+            cart_info += f"Total: ₦{cart.total}\n"
 
             if cart.shipping_address:
                 cart_info += "\nShipping Address:\n"

@@ -35,8 +35,8 @@ const BrandView: React.FC = () => {
         <div className="px-2 md:px-10 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div>
-                    <h1 className="text-2xl font-semibold">Brands</h1>
-                    <p className="text-muted-foreground">Manage your brands</p>
+                    <h1 className="text-2xl font-medium">Brands</h1>
+                    <p className="text-default-500 text-sm">Manage your brands</p>
                 </div>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                     <div className="relative w-full sm:w-64">
@@ -69,7 +69,7 @@ const BrandView: React.FC = () => {
                                     <div className="font-bold truncate min-w-72">{brand?.name}</div>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant={brand.is_active ? "default" : "destructive"}>{brand.is_active ? "Active" : "Inactive"}</Badge>
+                                    <Badge variant={brand.is_active ? "emerald" : "destructive"}>{brand.is_active ? "Active" : "Inactive"}</Badge>
                                 </TableCell>
                                 <TableCell>{new Date(brand.created_at as string).toLocaleDateString()}</TableCell>
                                 <TableCell className="flex justify-end">

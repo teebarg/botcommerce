@@ -1,60 +1,29 @@
 "use client";
 
 import React from "react";
-import LineItemUnitPrice from "@modules/common/components/line-item-unit-price";
-import LineItemPrice from "@modules/common/components/line-item-price";
-import Image from "next/image";
-import { cn } from "@lib/util/cn";
 
+import CartItemComponent from "./cart-item";
+
+import { cn } from "@/lib/utils";
 import { CartItem } from "@/types/models";
 import { useCartItem } from "@/lib/hooks/useCart";
-import LocalizedClientLink from "@/components/ui/link";
-import Control from "@/components/store/cart/control";
+import { Skeleton } from "@/components/ui/skeletons";
 
 type ItemsTemplateProps = {
     className?: string;
 };
 
-const CartClient = ({ className }: ItemsTemplateProps) => {
+const CartItems: React.FC<ItemsTemplateProps> = ({ className }) => {
     const { data: items, isLoading } = useCartItem();
 
-    if (isLoading) return <div>Loading cart...</div>;
-    if (!items?.length) return <div>No items in cart</div>;
+    if (isLoading) return <Skeleton className="h-[400px]" />;
 
     return (
-        <React.Fragment>
-            <ul className={cn("max-h-[40vh] overflow-y-auto", className)}>
-                {items?.map((item: CartItem, key: number) => (
-                    <li key={key} className="flex items-center gap-x-4 border-b-sm border-divider py-4">
-                        <div className="relative flex h-16 w-14 flex-shrink-0 items-center justify-center rounded-md overflow-hidden">
-                            {item.image && <Image fill alt={item.name} src={item.image} />}
-                        </div>
-                        <div className="flex flex-1 flex-col">
-                            <div className="text-sm">
-                                <LocalizedClientLink href={`/products/${item.slug}`}>
-                                    <p className="font-semibold text-default-900 truncate max-w-40 md:max-w-max">{item.name}</p>
-                                </LocalizedClientLink>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <Control item={item} />
-                            </div>
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-default-500">{item.quantity}x</span>
-                                <span className="text-sm">
-                                    <LineItemUnitPrice item={item} style="tight" />
-                                </span>
-                            </div>
-                            <div>
-                                <LineItemPrice item={item} />
-                            </div>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </React.Fragment>
+        <div className={cn("flex flex-col gap-y-4 overflow-y-auto", className)}>
+            {items?.map((item: CartItem, idx: number) => <CartItemComponent key={idx} item={item} />)}
+            {items?.length === 0 && <div className="text-center">No items in cart</div>}
+        </div>
     );
 };
 
-export default CartClient;
+export default CartItems;

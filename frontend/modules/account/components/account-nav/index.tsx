@@ -2,9 +2,9 @@
 
 import { User as UserIcon } from "nui-react-icons";
 import { usePathname } from "next/navigation";
-import { cn } from "@lib/util/cn";
 import { MapPin, Package } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 

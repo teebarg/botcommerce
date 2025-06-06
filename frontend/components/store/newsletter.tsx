@@ -1,39 +1,84 @@
 "use client";
 
-import { newsletterForm } from "@modules/account/actions";
-import { useActionState, useEffect, useRef } from "react";
-import { Input } from "@components/ui/input";
+import { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Mail } from "lucide-react";
+import { Input } from "@components/ui/input";
 
 import { Button } from "@/components/ui/button";
+import { Message } from "@/types/models";
+import { api } from "@/apis/base";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+
+const newsletterSchema = z.object({
+    email: z.string().email("Please enter a valid email address"),
+});
+
+type NewsletterFormValues = z.infer<typeof newsletterSchema>;
 
 export default function NewsletterForm() {
-    const [state, formAction, isPending] = useActionState(newsletterForm, { success: false, message: "" });
-    const formRef = useRef<HTMLFormElement>(null);
+    const [isPending, setIsPending] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (state?.message) {
-            formRef?.current?.reset(); // Reset the form fields
-            toast.success(state.message);
+    const form = useForm<NewsletterFormValues>({
+        resolver: zodResolver(newsletterSchema),
+        defaultValues: {
+            email: "",
+        },
+    });
+
+    const onSubmit = async (data: NewsletterFormValues) => {
+        try {
+            setIsPending(true);
+            const { error } = await api.post<Message>("/newsletter", {
+                email: data.email,
+            });
+
+            if (error) {
+                toast.error(error);
+
+                return;
+            }
+
+            toast.success("Successfully subscribed to newsletter");
+            form.reset();
+        } catch (error) {
+            toast.error("Failed to subscribe to newsletter");
+        } finally {
+            setIsPending(false);
         }
-    }, [state]);
+    };
 
     return (
-        <form ref={formRef} action={formAction}>
-            <div className="mt-6 sm:flex sm:max-w-lg lg:mt-0 items-center">
-                <Input
-                    name="email"
-                    placeholder="email@gmail.com"
-                    startContent={<Mail className="text-default-500 pointer-events-none flex-shrink-0" />}
-                    type="email"
-                />
-                <div className="mt-4 sm:ml-4 sm:mt-0 sm:flex-shrink-0">
-                    <Button aria-label="subscribe" isLoading={isPending} size="sm" type="submit">
-                        Subscribe
-                    </Button>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="mt-6 sm:flex sm:max-w-lg lg:mt-0 items-center">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem className="flex-1">
+                                <FormControl>
+                                    <Input
+                                        placeholder="email@gmail.com"
+                                        startContent={<Mail className="text-default-500 pointer-events-none shrink-0" />}
+                                        type="email"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <div className="mt-4 sm:ml-4 sm:mt-0 sm:shrink-0">
+                        <Button aria-label="subscribe" disabled={isPending} isLoading={isPending} size="sm" type="submit" variant="secondary">
+                            Subscribe
+                        </Button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </Form>
     );
 }

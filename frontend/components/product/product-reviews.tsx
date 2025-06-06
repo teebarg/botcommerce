@@ -9,7 +9,7 @@ import { Badge } from "../ui/badge";
 import ReviewForm from "./review-form";
 
 import Progress from "@/components/ui/progress";
-import { timeAgo } from "@/lib/util/util";
+import { timeAgo } from "@/lib/utils";
 import { Review } from "@/types/models";
 import { useProductReviews } from "@/lib/hooks/useApi";
 
@@ -84,7 +84,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
                     <span className="text-3xl font-bold mr-2">{averageRating || "N/A"}</span>
                     <div className="flex">
                         {[...Array(5)].map((_, index: number) => (
-                            <Star key={index} className={`h-5 w-5 ${index < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
+                            <Star key={index} className={`h-5 w-5 ${index < 4 ? "text-yellow-400 fill-yellow-300" : "text-gray-300"}`} />
                         ))}
                     </div>
                 </div>
@@ -128,7 +128,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
         <div className="bg-content1">
             <div className="px-4 py-8 max-w-7xl mx-auto w-full">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    Customer Reviews <Badge variant="success">All from verified purchases</Badge>
+                    Customer Reviews <Badge variant="emerald">All from verified purchases</Badge>
                 </h2>
                 <RatingBreakdown />
                 <div className="mb-8">{reviews?.slice(0, 5).map((review: Review, index: number) => <ReviewCard key={index} review={review} />)}</div>

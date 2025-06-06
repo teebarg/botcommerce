@@ -3,7 +3,7 @@
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 
 import StatCard from "@/components/ui/stat-card";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { useStatsTrends } from "@/lib/hooks/useApi";
 import { CardSkeleton } from "@/components/ui/skeletons";
 

@@ -17,10 +17,10 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
 
     return (
         <React.Fragment>
-            <div className="text-sm py-8 bg-yellow-50/80 md:bg-content1 -mx-2 px-2 rounded-none md:rounded-lg text-gray-900 md:text-default-foreground">
+            <div className="text-sm py-8 bg-yellow-50 text-yellow-950 dark:bg-zinc-800 dark:text-yellow-50 -mx-2 px-2 rounded-none md:rounded-lg">
                 <div className="grid grid-cols-1 gap-y-8">
                     <div className="flex items-start gap-x-2">
-                        <Truck className="text-default-foreground" size={16} />
+                        <Truck className="h-6 w-6" />
                         <div>
                             <span className="font-semibold">Fast delivery</span>
                             <p className="max-w-sm">
@@ -29,7 +29,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                         </div>
                     </div>
                     <div className="flex items-start gap-x-2">
-                        <RefreshCw />
+                        <RefreshCw className="h-6 w-6" />
                         <div>
                             <span className="font-semibold">Simple exchanges</span>
                             <p className="max-w-sm">Is the fit not quite right? No worries - we&apos;ll exchange your product for a new one.</p>

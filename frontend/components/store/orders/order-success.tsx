@@ -23,8 +23,8 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
         <div className="w-full max-w-2xl mx-auto">
             <FadeInComponent>
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                        <Check className="w-8 h-8 text-green-600" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
+                        <Check className="w-8 h-8 text-emerald-700" />
                     </div>
 
                     <h2 className="text-2xl font-bold text-default-900 mb-2">Order Confirmed!</h2>

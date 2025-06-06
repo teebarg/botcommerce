@@ -105,11 +105,13 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
                     </div>
                 </div>
 
-                <DialogFooter className="flex sm:justify-between">
-                    <Button variant="outline" onClick={handleReset}>
+                <DialogFooter className="flex sm:justify-between gap-2">
+                    <Button variant="warning" onClick={handleReset}>
                         Reset
                     </Button>
-                    <Button onClick={handleApply}>Apply Filters</Button>
+                    <Button variant="primary" onClick={handleApply}>
+                        Apply Filters
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

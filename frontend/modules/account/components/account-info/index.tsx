@@ -1,7 +1,7 @@
 import useToggleState from "@lib/hooks/use-toggle-state";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 type AccountInfoProps = {
     label: string;
@@ -37,7 +37,7 @@ const AccountInfo = ({ label, currentInfo, isLoading, clearState, children, "dat
                 </div>
                 <div>
                     <Button
-                        className="w-[100px] py-1"
+                        className="py-1 min-w-32"
                         data-testid="edit-button"
                         type={state ? "reset" : "button"}
                         variant="outline"
@@ -54,10 +54,17 @@ const AccountInfo = ({ label, currentInfo, isLoading, clearState, children, "dat
                     state ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
                 )}
             >
-                <div className="flex flex-col gap-y-2 py-4">
+                <div className="flex flex-col gap-y-2 py-4 bg-card rounded-md px-4 mt-2">
                     <div>{children}</div>
                     <div className="flex items-center justify-end mt-2">
-                        <Button aria-label="save" className="w-full sm:max-w-[140px]" data-testid="save-button" isLoading={isLoading} type="submit">
+                        <Button
+                            aria-label="save"
+                            data-testid="save-button"
+                            disabled={isLoading}
+                            isLoading={isLoading}
+                            type="submit"
+                            variant="primary"
+                        >
                             Save changes
                         </Button>
                     </div>

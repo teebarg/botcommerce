@@ -2,7 +2,7 @@ import { Clock, CheckCircle, AlertTriangle, Truck } from "lucide-react";
 import { format } from "date-fns";
 
 import { Order } from "@/types/models";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 
 interface OrderCardProps {
     order: Order;

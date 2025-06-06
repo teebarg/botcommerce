@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { CloudOff, RefreshCcw, WifiOff } from "nui-react-icons";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const OfflinePage = () => {
@@ -33,7 +33,7 @@ const OfflinePage = () => {
     };
 
     return (
-        <div className="bg-gradient-to-b from-default-50 to-default-100 flex items-center justify-center p-4 flex-1">
+        <div className="bg-linear-to-b from-default-50 to-default-100 flex items-center justify-center p-4 flex-1">
             <div className="max-w-md w-full bg-content1 rounded-2xl shadow-xl p-8 text-center">
                 {/* Animation Container */}
                 <div className={cn("mb-8 relative", { "animate-bounce": showAnimation })}>

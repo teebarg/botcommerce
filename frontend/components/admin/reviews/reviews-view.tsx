@@ -2,30 +2,48 @@
 
 import React from "react";
 import { ArrowUpDown, Search } from "nui-react-icons";
+import { useSearchParams } from "next/navigation";
 
 import { ReviewActions } from "./reviews-actions";
 import ReviewItem from "./review-item";
 
-import { Pagination, Review } from "@/types/models";
+import { Review } from "@/types/models";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { timeAgo } from "@/lib/util/util";
+import { timeAgo } from "@/lib/utils";
 import PaginationUI from "@/components/pagination";
+import { useReviews } from "@/lib/hooks/useApi";
+import ServerError from "@/components/generic/server-error";
+import { Skeleton } from "@/components/ui/skeletons";
 
 interface Props {
-    reviews: Review[];
     deleteAction: (id: number) => void;
-    pagination: Pagination;
 }
 
-const ReviewView: React.FC<Props> = ({ reviews, deleteAction, pagination }) => {
+const ReviewView: React.FC<Props> = ({ deleteAction }) => {
+    const searchParams = useSearchParams();
+    const skip = parseInt(searchParams.get("skip") || "0", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+
+    const { data, isLoading, error } = useReviews({ skip, limit });
+
+    if (isLoading) {
+        return <Skeleton />;
+    }
+
+    if (error || !data) {
+        return <ServerError />;
+    }
+
+    const { reviews, ...pagination } = data;
+
     return (
         <div className="px-2 md:px-12 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold">Reviews</h1>
-                    <p className="text-muted-foreground">Manage your product reviews</p>
+                    <h1 className="text-2xl font-semibold">Reviews</h1>
+                    <p className="text-default-500 text-sm">Manage your product reviews</p>
                 </div>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                     <div className="relative w-full sm:w-64">
@@ -61,7 +79,7 @@ const ReviewView: React.FC<Props> = ({ reviews, deleteAction, pagination }) => {
                                     <div>{review?.rating}</div>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant={review.verified ? "success" : "destructive"}>
+                                    <Badge variant={review.verified ? "emerald" : "destructive"}>
                                         {review.verified ? "Verified" : "Un-verified"}
                                     </Badge>
                                 </TableCell>
@@ -73,7 +91,7 @@ const ReviewView: React.FC<Props> = ({ reviews, deleteAction, pagination }) => {
                         ))}
                         {reviews?.length === 0 && (
                             <TableRow>
-                                <TableCell className="text-center py-4 text-lg text-default-500" colSpan={5}>
+                                <TableCell className="text-center py-4 text-default-500" colSpan={5}>
                                     No reviews found.
                                 </TableCell>
                             </TableRow>

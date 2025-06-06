@@ -70,6 +70,7 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
                         disabled={isPending || cartEmail === ""}
                         isLoading={isPending}
                         type="button"
+                        variant="primary"
                         onClick={handleSubmit}
                     >
                         Continue to delivery

@@ -15,6 +15,7 @@ import {
     PaginatedOrder,
     PaginatedProduct,
     PaginatedProductSearch,
+    PaginatedReview,
     PaginatedUser,
     Review,
     StatsTrends,
@@ -229,6 +230,33 @@ export const useFaqs = () => {
     return useQuery({
         queryKey: ["faqs"],
         queryFn: async () => await api.get<FAQ[]>("/faq/"),
+    });
+};
+
+export const useDeleteFaq = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: number) => await api.delete<FAQ>(`/faq/${id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["faqs"] });
+            toast.success("FAQ deleted successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to delete FAQ" + error);
+        },
+    });
+};
+
+interface ReviewParams {
+    skip?: number;
+    limit?: number;
+}
+
+export const useReviews = (params: ReviewParams) => {
+    return useQuery({
+        queryKey: ["reviews"],
+        queryFn: async () => await api.get<PaginatedReview>("/reviews/", { params: { ...params } }),
     });
 };
 

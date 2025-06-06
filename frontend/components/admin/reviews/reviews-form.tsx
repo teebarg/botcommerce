@@ -38,20 +38,19 @@ const ReviewForm: React.FC<Props> = ({ onClose, review = { rating: 1, comment: "
     }, [state.error, state.message]);
 
     return (
-        <div className="mx-auto w-full">
+        <div className="mx-auto w-full py-6 px-2">
+            <h1 className="text-lg font-semibold mb-4">Update Review</h1>
             <form ref={formRef} action={formAction} className="h-full flex flex-col">
                 <input readOnly className="hidden" name="id" type="text" value={review.id} />
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-scroll pb-6">
-                    <div className="relative flex-1 space-y-2">
-                        <Input required defaultValue={review.rating} label="Rating" name="rating" placeholder="5" type="number" />
-                        <Textarea required defaultValue={review.comment} label="Comment" name="comment" placeholder="Great product." />
-                    </div>
+                <div className="relative flex-1 space-y-2">
+                    <Input required defaultValue={review.rating} label="Rating" name="rating" placeholder="5" type="number" />
+                    <Textarea required defaultValue={review.comment} label="Comment" name="comment" placeholder="Great product." />
                 </div>
-                <div className="flex items-center justify-end py-4 space-x-2">
+                <div className="flex items-center justify-end py-4 space-x-2 mt-4">
                     <Button aria-label="cancel" className="min-w-32" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit">
+                    <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit" variant="primary">
                         Update
                     </Button>
                 </div>

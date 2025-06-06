@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
+import { Separator } from "@/components/ui/separator";
 
 type Props = {
     callbackUrl?: string;
@@ -59,12 +60,13 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     data-testid="magic-link-button"
                     isLoading={loading}
                     type="button"
+                    variant="primary"
                     onClick={sendLink}
                 >
                     Send Magic Link
                 </Button>
             </div>
-            <hr className="tb-divider my-6" />
+            <Separator className="my-6" />
             <SocialLoginButtons callbackUrl={callbackUrl} />
         </React.Fragment>
     );

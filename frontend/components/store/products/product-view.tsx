@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import { toast } from "sonner";
 import Image from "next/image";
+import { MessageCircleMore } from "lucide-react";
 
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import ProductDetails from "@/components/store/products/product-details";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
@@ -13,7 +14,6 @@ import ProductShare from "@/components/product/product-share";
 import { Product, ProductImage } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
-import { MessageCircleMore } from "lucide-react";
 import { useStore } from "@/app/store/use-store";
 
 interface Props {
@@ -34,7 +34,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
     // Check if the selected variant is in stock
     // const isInStock = selectedVariant.inventory > 0;
 
-    // Handle add to cart
     const handleAddToCart = async () => {
         if (!product.variants[0]) {
             toast.error("Please select a variant");
@@ -70,6 +69,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
         const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*\nPrice: ${currency(product.price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
         window.open(whatsappUrl, "_blank");
     };
 
@@ -104,7 +104,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             {product.images.map((image: ProductImage, idx: number) => (
                                 <button
                                     key={idx}
-                                    className={`w-16 h-16 rounded-md flex-shrink-0 border-2 overflow-hidden relative ${
+                                    className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${
                                         selectedImageId === image.id ? "border-indigo-500" : "border-gray-200"
                                     }`}
                                     onClick={() => setSelectedImageId(image.id)}
@@ -128,7 +128,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     </div>
                     <div className="flex flex-col px-2 md:px-0 mt-6 md:mt-0">
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
+                            <h1 className="text-xl font-bold tracking-tight">{product.name}</h1>
                             <ProductShare name={product.name} />
                         </div>
                         <div className="text-2xl font-bold hidden md:block">{currency(product.price)}</div>
@@ -171,7 +171,13 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             </Button>
                         ) : (
                             <div className="flex items-center gap-4 mt-4">
-                                <Button className="w-auto" disabled={loading || !product.variants[0]} size="lg" onClick={handleAddToCart}>
+                                <Button
+                                    className="w-auto"
+                                    disabled={loading || !product.variants[0]}
+                                    size="lg"
+                                    variant="primary"
+                                    onClick={handleAddToCart}
+                                >
                                     {loading ? "Adding to cart..." : "Add to Cart"}
                                 </Button>
                                 <Button

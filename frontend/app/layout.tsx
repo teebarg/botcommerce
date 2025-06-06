@@ -1,4 +1,4 @@
-import "public/globals.css";
+import "./globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
@@ -7,16 +7,16 @@ import TanstackProviders from "./query-provider";
 
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
-import { cn } from "@/lib/util/cn";
 import { getSiteConfig } from "@/lib/config";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { api } from "@/apis";
 import SetShopSettings from "@/components/set-shop-settings";
 import { WebSocketProvider } from "@/providers/websocket";
+import { cn } from "@/lib/utils";
 
 // const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 const outfit = Outfit({ weight: ["400", "500", "600"], subsets: ["latin"] });
 

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { currency } from "@lib/util/util";
+import { currency } from "@lib/utils";
 import { ChevronDown } from "nui-react-icons";
 
 import PromotionalBanner from "@/components/promotion";

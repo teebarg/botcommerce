@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@lib/util/cn";
 import React, { useState, useRef, useEffect } from "react";
+
+import { cn } from "@/lib/utils";
 
 export interface TooltipProps {
     content: React.ReactNode | string;

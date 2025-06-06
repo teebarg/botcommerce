@@ -54,7 +54,7 @@ export default function VerifyMagicLink() {
 
     return (
         <>
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-center text-white">
+            <div className="bg-linear-to-r from-blue-500 to-blue-600 p-6 text-center text-white">
                 <div className="text-2xl font-bold mb-2">{shopSettings.shop_name}</div>
                 <h2 className="text-lg font-medium mb-1 opacity-90">Magic Link Authentication</h2>
                 <p className="text-sm opacity-80">Simple, secure, passwordless login</p>

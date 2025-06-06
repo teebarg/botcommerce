@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Exclamation } from "nui-react-icons";
 
 import { Switch } from "@/components/ui/switch";
 import { BankDetails, ShopSettings } from "@/types/models";
@@ -59,15 +60,15 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-background rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-card rounded-lg">
             <div>
-                <h3 className="font-medium">{bank.bank_name}</h3>
-                <p className="text-sm text-default-900">{bank.account_name}</p>
-                <p className="text-sm text-default-500">{bank.account_number}</p>
+                <h3 className="font-medium text-sm">{bank.bank_name}</h3>
+                <p className="text-default-900 font-semibold">{bank.account_name}</p>
+                <p className="text-default-700">{bank.account_number}</p>
             </div>
             <Button
                 aria-label="delete"
-                className="min-w-36"
+                className="min-w-32"
                 isLoading={isLoading}
                 variant="destructive"
                 onClick={() => handleDeleteBankDetails(bank.id)}
@@ -135,7 +136,7 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                     const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
                     return (
-                        <div key={feature.key} className="flex items-center justify-between p-4 bg-background rounded-lg">
+                        <div key={feature.key} className="flex items-center justify-between p-4 bg-content1 rounded-lg">
                             <div>
                                 <h3 className="font-medium">{feature.label}</h3>
                                 <p className="text-sm text-default-500">{feature.description}</p>
@@ -155,7 +156,9 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                     <h3 className="font-medium">Bank Details</h3>
                     <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                         <DialogTrigger asChild>
-                            <Button type="button">Add Bank Details</Button>
+                            <Button type="button" variant="secondary">
+                                Add Bank Details
+                            </Button>
                         </DialogTrigger>
                         <DialogContent className="bg-content1">
                             <DialogHeader>
@@ -188,20 +191,28 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                                 <Button aria-label="close" className="min-w-36" variant="outline" onClick={deleteState.close}>
                                     Close
                                 </Button>
-                                <Button aria-label="delete" className="min-w-36" isLoading={isPending} onClick={handleAddBankDetails}>
+                                <Button
+                                    aria-label="delete"
+                                    className="min-w-36"
+                                    isLoading={isPending}
+                                    variant="primary"
+                                    onClick={handleAddBankDetails}
+                                >
                                     Submit
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 bg-content1 rounded-lg min-h-[200px] p-4">
                     {bankDetails.map((detail, idx: number) => {
                         return <BankDetailComponent key={idx} bank={detail} />;
                     })}
                     {bankDetails.length === 0 && (
-                        <div className="flex items-center justify-center">
-                            <p className="text-default-500">No bank details found</p>
+                        <div className="flex flex-col items-center justify-center  md:col-span-2">
+                            <Exclamation className="w-14 h-14 text-default-500 mb-2" />
+                            <p className="text-default-800 font-semibold">No bank details found</p>
+                            <p className="text-default-500 text-sm">Add bank details to enable bank transfer payments</p>
                         </div>
                     )}
                 </div>

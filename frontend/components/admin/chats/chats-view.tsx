@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Conversation, ConversationStatus } from "@/types/models";
 import { useConversations } from "@/lib/hooks/useApi";
 import PaginationUI from "@/components/pagination";
-import { formatDate } from "@/lib/util/util";
+import { formatDate } from "@/lib/utils";
 
 const LIMIT = 10;
 
@@ -39,9 +39,9 @@ const ChatsView: React.FC = () => {
     const { conversations, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     const getStatusBadge = (status?: ConversationStatus) => {
-        const variants: Record<ConversationStatus, "default" | "destructive" | "success" | "warning"> = {
+        const variants: Record<ConversationStatus, "destructive" | "emerald" | "warning"> = {
             ["ABANDONED"]: "destructive",
-            ["ACTIVE"]: "success",
+            ["ACTIVE"]: "emerald",
             ["COMPLETED"]: "warning",
         };
 
@@ -50,8 +50,8 @@ const ChatsView: React.FC = () => {
 
     return (
         <div className="px-2 md:px-10 py-8">
-            <h3 className="text-2xl font-semibold">Conversations view</h3>
-            <p className="text-muted-foreground mb-4">Manage your conversations.</p>
+            <h3 className="text-2xl font-medium">Conversations view</h3>
+            <p className="text-default-500 text-sm mb-4">Manage your conversations.</p>
             <AnimatePresence>
                 <div key="table" className="md:block hidden">
                     <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
@@ -60,6 +60,7 @@ const ChatsView: React.FC = () => {
                             <TableRow>
                                 <TableHead>S/N</TableHead>
                                 <TableHead>Conversation UUID</TableHead>
+                                <TableHead>No of Messages</TableHead>
                                 <TableHead>User ID</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Started At</TableHead>
@@ -82,9 +83,10 @@ const ChatsView: React.FC = () => {
                                 </TableRow>
                             ) : (
                                 conversations?.map((conversation: Conversation, idx: number) => (
-                                    <TableRow key={idx}>
+                                    <TableRow key={idx} className="even:bg-content1">
                                         <TableCell className="font-medium">{idx + 1}</TableCell>
                                         <TableCell>{conversation.conversation_uuid}</TableCell>
+                                        <TableCell>{conversation.messages?.length}</TableCell>
                                         <TableCell>{conversation.user_id}</TableCell>
                                         <TableCell>{getStatusBadge(conversation.status)}</TableCell>
                                         <TableCell>{formatDate(conversation.started_at)}</TableCell>

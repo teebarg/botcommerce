@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { formatDate } from "@/lib/util/util";
+import { formatDate } from "@/lib/utils";
 import { Conversation, ConversationStatus } from "@/types/models";
 
 interface CustomerCardProps {
@@ -9,9 +9,9 @@ interface CustomerCardProps {
 }
 
 const getStatusBadge = (status?: ConversationStatus) => {
-    const variants: Record<ConversationStatus, "default" | "destructive" | "success" | "warning"> = {
+    const variants: Record<ConversationStatus, "destructive" | "emerald" | "warning"> = {
         ["ABANDONED"]: "destructive",
-        ["ACTIVE"]: "success",
+        ["ACTIVE"]: "emerald",
         ["COMPLETED"]: "warning",
     };
 
@@ -29,6 +29,7 @@ const ChatsCard = ({ conversation, actions }: CustomerCardProps) => {
                 <div className="text-base text-default-500 space-y-1">
                     <p>UUID: {conversation.conversation_uuid}</p>
                     <p>User: {conversation.user_id || "Anonymous"}</p>
+                    <p>Messages: {conversation.messages?.length}</p>
                     <p>Started: {formatDate(conversation.started_at)}</p>
                     <p>Last Active: {formatDate(conversation.last_active)}</p>
                 </div>

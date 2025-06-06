@@ -2,7 +2,7 @@ import { ShoppingBag, CreditCard } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Order, User } from "@/types/models";
-import { currency, formatDate } from "@/lib/util/util";
+import { currency, formatDate } from "@/lib/utils";
 
 interface CustomerCardProps {
     user: User;

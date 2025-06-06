@@ -19,10 +19,10 @@ dependencies = [
     "pyjwt<3.0.0,>=2.8.0",
     "openpyxl==3.1.5",
     "meilisearch==0.34.1",
-    "redis==5.2.1",
+    "redis==6.2.0",
     "prisma<1.0.0,>=0.11.0",
-    "supabase==2.15.1",
-    "google-genai==1.16.1"
+    "supabase==2.15.2",
+    "google-genai==1.18.0"
 ]
 
 [tool.uv]

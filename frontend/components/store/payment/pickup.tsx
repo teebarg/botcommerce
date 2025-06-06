@@ -40,7 +40,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
         <div className="space-y-4">
             <div className="bg-content1 p-4 rounded-lg space-y-3">
                 <div className="flex items-start mb-3">
-                    <MapPin className="text-indigo-600 w-5 h-5 mt-0.5 flex-shrink-0" />
+                    <MapPin className="text-indigo-600 w-5 h-5 mt-0.5 shrink-0" />
                     <div className="ml-2">
                         <p className="text-sm font-medium text-default-900">Collection Point</p>
                         <p className="text-sm text-default-500">{shopSettings?.address}</p>
@@ -58,7 +58,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                 </div>
             </div>
 
-            <Button className="w-full" disabled={loading} isLoading={loading} onClick={onPaymentCompleted}>
+            <Button className="w-full" disabled={loading} isLoading={loading} variant="primary" onClick={onPaymentCompleted}>
                 Confirm Order for Pickup
             </Button>
             {/* Security message */}

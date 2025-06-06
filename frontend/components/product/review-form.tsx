@@ -71,7 +71,7 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
                 />
             </div>
 
-            <Button aria-label="submit review" isLoading={loading} size="lg" type="submit">
+            <Button aria-label="submit review" isLoading={loading} size="lg" type="submit" variant="primary">
                 Submit Review
             </Button>
         </form>

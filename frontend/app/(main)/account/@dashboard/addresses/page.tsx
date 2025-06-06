@@ -8,7 +8,6 @@ import ServerError from "@/components/generic/server-error";
 
 export const metadata: Metadata = {
     title: "Addresses",
-    description: "View your addresses",
 };
 
 export default async function Addresses() {

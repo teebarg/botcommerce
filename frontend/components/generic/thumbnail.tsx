@@ -2,7 +2,7 @@ import Image from "next/image";
 import React from "react";
 
 import { IconProps } from "@/types/models";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 type ThumbnailProps = {
     thumbnail?: string | null;
@@ -41,9 +41,9 @@ const Thumbnail: React.FC<ThumbnailProps> = ({ thumbnail, images, size = "small"
     return (
         <div
             className={cn("relative w-full overflow-hidden p-4 rounded-md transition-shadow ease-in-out duration-150", className, {
-                "aspect-[11/14]": isFeatured,
-                "aspect-[9/16]": !isFeatured && size !== "square",
-                "aspect-[1/1]": size === "square",
+                "aspect-11/14": isFeatured,
+                "aspect-9/16": !isFeatured && size !== "square",
+                "aspect-square": size === "square",
                 "w-[180px]": size === "small",
                 "w-[290px]": size === "medium",
                 "w-[440px]": size === "large",

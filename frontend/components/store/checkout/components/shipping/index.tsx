@@ -8,10 +8,10 @@ import { toast } from "sonner";
 import ErrorMessage from "../error-message";
 
 import { RadioGroup } from "@/components/ui/radio-group";
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 import { Cart, DeliveryOption } from "@/types/models";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
 
@@ -78,7 +78,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
     return (
         <div
             className={cn(
-                "bg-content1 shadow-medium p-6 rounded border-l-2",
+                "bg-content1 shadow-md p-6 rounded border-l-2",
                 isOpen || hasShippingMethod ? "border-l-indigo-500" : "border-l-content3 opacity-50"
             )}
         >
@@ -90,7 +90,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 </div>
                 <button
                     aria-label="edit"
-                    className={cn("text-blue-500 items-center gap-2 text-sm hidden", !isOpen && cart?.shipping_method && "flex")}
+                    className={cn("text-blue-500 items-center gap-2 text-sm hidden cursor-pointer", !isOpen && cart?.shipping_method && "flex")}
                     onClick={handleEdit}
                 >
                     Edit <Pencil />
@@ -141,6 +141,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     disabled={!hasShippingMethod}
                     isLoading={isLoading}
                     size="sm"
+                    variant="primary"
                     onClick={handleSubmit}
                 >
                     Continue to payment

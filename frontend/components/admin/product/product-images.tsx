@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Trash2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import DraggableImageList from "./draggable-images";
@@ -17,28 +17,7 @@ interface ProductImageManagerProps {
 
 const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, initialImages = [] }) => {
     const invalidate = useInvalidate();
-    const [imageId, setImageId] = useState<number>();
-    const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isUploading, setIsUploading] = useState<boolean>(false);
-
-    const deleteImage = (id: number) => {
-        setIsDeleting(true);
-        setImageId(id);
-        void (async () => {
-            const { error } = await api.product.deleteImages(productId, id);
-
-            if (error) {
-                toast.error(`Error - ${error as string}`);
-                setIsDeleting(false);
-
-                return;
-            }
-            toast.success("Image deleted successfully");
-            invalidate("products");
-            invalidate("product-search");
-            setIsDeleting(false);
-        })();
-    };
 
     // Dropzone configuration
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -113,29 +92,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
             <ImageReorder initialImages={initialImages} productId={productId} />
 
             <DraggableImageList initialImages={initialImages} productId={productId} />
-
-            {/* Image Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {initialImages.map((image: ProductImage, idx: number) => (
-                    <div key={idx} className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                        <img alt={`Product image ${image.id}`} className="w-full h-48 object-cover" src={image.image} />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
-                            <button
-                                className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                                // disabled={deleteMutation.isPending}
-                                onClick={() => deleteImage(image.id)}
-                            >
-                                <Trash2 className="w-5 h-5" />
-                            </button>
-                        </div>
-                        {isDeleting && imageId === image.id && (
-                            <div className="absolute inset-0 bg-default-500 bg-opacity-50 flex items-center justify-center">
-                                <span className="text-white">Deleting...</span>
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
 
             {initialImages.length === 0 && <p className="text-center text-default-500">No images uploaded yet</p>}
 

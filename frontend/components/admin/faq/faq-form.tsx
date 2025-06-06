@@ -1,67 +1,72 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
 import { api } from "@/apis/base";
 import { FAQ } from "@/types/models";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface FaqFormProps {
     faq?: FAQ | null;
     onCancel: () => void;
 }
 
+const formSchema = z.object({
+    question: z.string().min(2, {
+        message: "Question must be at least 2 characters.",
+    }),
+    answer: z.string().min(10, {
+        message: "Answer must be at least 10 characters.",
+    }),
+    is_active: z.boolean().default(false),
+    category: z.string().min(1, {
+        message: "Please select a category.",
+    }),
+});
+
+type FaqFormValues = z.infer<typeof formSchema>;
+
 export function FaqForm({ faq, onCancel }: FaqFormProps) {
     const invalidate = useInvalidate();
-    const [formData, setFormData] = useState({
-        question: "",
-        answer: "",
-        is_active: false,
-        category: "",
-    });
     const [loading, setLoading] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (faq) {
-            setFormData({
-                question: faq.question,
-                answer: faq.answer,
-                is_active: faq.is_active,
-                category: faq.category || "",
-            });
-        }
-    }, [faq]);
+    const form = useForm<FaqFormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            question: faq?.question || "",
+            answer: faq?.answer || "",
+            is_active: faq?.is_active || false,
+            category: faq?.category || "",
+        },
+    });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const onSubmit = async (values: FaqFormValues) => {
         setLoading(true);
         try {
             if (faq) {
-                const { error } = await api.patch<FAQ>(`/faq/${faq.id}`, formData);
+                const { error } = await api.patch<FAQ>(`/faq/${faq.id}`, values);
 
                 if (error) throw error;
                 toast.success("FAQ updated successfully");
             } else {
-                const { error } = await api.post<FAQ>(`/faq`, formData);
+                const { error } = await api.post<FAQ>(`/faq`, values);
 
                 if (error) throw error;
                 toast.success("FAQ created successfully");
             }
 
             onCancel();
-            setFormData({
-                question: "",
-                answer: "",
-                is_active: false,
-                category: "",
-            });
+            form.reset();
             invalidate("faqs");
         } catch (error) {
             toast.error("Failed to save FAQ");
@@ -71,73 +76,90 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     };
 
     return (
-        <Card className="p-6 mb-6">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">{faq ? "Edit FAQ" : "Create New FAQ"}</h2>
-                <Button className="h-8 w-8" size="icon" variant="ghost" onClick={onCancel}>
-                    <X className="h-4 w-4" />
-                </Button>
-            </div>
+        <div className="py-6 px-3">
+            <h2 className="text-xl font-semibold mb-4">{faq ? "Edit FAQ" : "Create New FAQ"}</h2>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
-                <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="question">
-                        Question
-                    </label>
-                    <Input
-                        required
-                        id="question"
-                        placeholder="Enter the question"
-                        value={formData.question}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, question: e.target.value }))}
+            <Form {...form}>
+                <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+                    <FormField
+                        control={form.control}
+                        name="question"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Question</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter the question" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
-                </div>
 
-                <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="answer">
-                        Answer
-                    </label>
-                    <Textarea
-                        required
-                        id="answer"
-                        placeholder="Enter the answer"
-                        rows={4}
-                        value={formData.answer}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, answer: e.target.value }))}
+                    <FormField
+                        control={form.control}
+                        name="answer"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Answer</FormLabel>
+                                <FormControl>
+                                    <Textarea placeholder="Enter the answer" rows={4} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
-                </div>
 
-                {/* Category */}
-                <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="category">
-                        Category
-                    </label>
-                    <Input
-                        id="category"
-                        placeholder="Enter the category"
-                        value={formData.category}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
+                    <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Category</FormLabel>
+                                <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a category" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Category</SelectLabel>
+                                            <SelectItem value="general">General</SelectItem>
+                                            <SelectItem value="payment">Payment</SelectItem>
+                                            <SelectItem value="shipping">Shipping</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
-                </div>
 
-                {/* Status */}
-                <div className="text-default-500 flex items-center">
-                    <Checkbox
-                        checked={formData.is_active}
-                        name="agreement"
-                        onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, is_active: checked == "indeterminate" ? false : checked }))}
+                    <FormField
+                        control={form.control}
+                        name="is_active"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-2 space-y-0">
+                                <FormControl>
+                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                    <FormLabel>Active</FormLabel>
+                                </div>
+                            </FormItem>
+                        )}
                     />
-                    <label className="ml-2 text-sm">Active</label>
-                </div>
-                <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                    <Button disabled={loading} isLoading={loading} type="submit">
-                        {faq ? "Update FAQ" : "Create FAQ"}
-                    </Button>
-                </div>
-            </form>
-        </Card>
+
+                    <div className="flex justify-end space-x-2">
+                        <Button className="min-w-32" type="button" variant="outline" onClick={onCancel}>
+                            Cancel
+                        </Button>
+                        <Button disabled={loading} isLoading={loading} type="submit" variant="primary">
+                            {faq ? "Update FAQ" : "Create FAQ"}
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </div>
     );
 }

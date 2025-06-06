@@ -11,8 +11,8 @@ import { HeartFilled } from "nui-react-icons";
 import { ProductSearch, WishItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/util/cn";
-import { currency } from "@/lib/util/util";
+import { cn } from "@/lib/utils";
+import { currency } from "@/lib/utils";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
@@ -92,9 +92,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {
         e.stopPropagation();
-        const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== 'undefined' ? window.location.origin : ''}/products/${slug}`;
+        const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
         window.open(whatsappUrl, "_blank");
     };
 
@@ -151,6 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                         disabled={loading || status == "OUT_OF_STOCK"}
                         isLoading={loading}
                         size="lg"
+                        variant={status == "OUT_OF_STOCK" ? "ghost" : "primary"}
                         onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart();

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis/base";
 import { PaymentInitialize } from "@/types/payment";
-import { currency } from "@/lib/util/util";
+import { currency } from "@/lib/utils";
 
 interface PaystackPaymentProps {
     cartNumber: string;
@@ -71,8 +71,8 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
                     <span className="text-sm font-medium text-default-500">Secured by Paystack</span>
                 </div>
             </div>
-            <Button className="w-full" disabled={loading} isLoading={loading} onClick={handlePayment}>
-                Pay ${currency(amount)} Now
+            <Button className="w-full" disabled={loading} isLoading={loading} variant="primary" onClick={handlePayment}>
+                Pay {currency(amount)} Now
             </Button>
             {/* Security message */}
             <div className="mt-4 flex items-center justify-center text-xs text-gray-500">

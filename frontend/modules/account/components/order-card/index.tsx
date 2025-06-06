@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { currency } from "@lib/util/util";
+import { currency } from "@lib/utils";
 import Image from "next/image";
 
 import LocalizedClientLink from "@/components/ui/link";

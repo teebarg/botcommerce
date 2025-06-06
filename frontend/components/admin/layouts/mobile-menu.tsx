@@ -7,7 +7,6 @@ import {
     Users,
     Settings,
     Search,
-    User,
     LogOut,
     ChevronRight,
     Notebook,
@@ -19,6 +18,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DocumentText } from "nui-react-icons";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMe } from "@/lib/hooks/useApi";
 
 const AdminMobileMenu: React.FC = () => {
@@ -43,11 +43,13 @@ const AdminMobileMenu: React.FC = () => {
     return (
         <div className="h-full bg-content1 rounded-[inherit] overflow-hidden">
             {/* User Profile Section */}
-            <div className="p-4 bg-blue-600 text-white">
+            <div className="p-4 bg-primary text-white">
                 <div className="flex items-center space-x-3">
-                    <div className="h-12 w-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                        <User size={24} />
-                    </div>
+                    <Avatar>
+                        <AvatarImage src={user?.image} />
+                        <AvatarFallback className="bg-secondary">{user?.first_name[0] || ""}</AvatarFallback>
+                    </Avatar>
+
                     <div>
                         <div className="font-medium">
                             {user?.first_name} {user?.last_name}

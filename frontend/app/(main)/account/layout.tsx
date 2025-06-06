@@ -5,6 +5,7 @@ import RecommendedProducts from "@/components/store/products/recommended";
 import AccountNav from "@/modules/account/components/account-nav";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
+import { Separator } from "@/components/ui/separator";
 
 const navLinks = [
     {
@@ -74,20 +75,24 @@ export default async function AccountPageLayout({ dashboard }: { dashboard?: Rea
             </div>
             <div className="flex-1 h-full max-w-7xl mx-auto bg-content1 flex flex-col rounded-md md:px-8">
                 <div className="md:flex md:gap-4 py-4 md:py-12">
-                    <div className="md:min-w-[15rem]">{user && <AccountNav />}</div>
+                    <div className="md:min-w-60">{user && <AccountNav />}</div>
                     <div className="md:flex-1">{dashboard}</div>
                 </div>
-                <div className="flex flex-col sm:flex-row items-end justify-between sm:border-t border-gray-300 dark:border-gray-500 py-4 md:py-12 gap-8">
+                <Separator className="my-4" />
+                <div className="flex flex-col sm:flex-row items-end justify-between py-4 gap-8">
                     <div>
-                        <h3 className="text-lg font-semibold mb-2">Got questions?</h3>
-                        <span className="font-medium">You can find frequently asked questions and answers on our customer service page.</span>
+                        <h3 className="text-lg font-medium">Got questions?</h3>
+                        <span className="text-sm">You can find frequently asked questions and answers on our customer service page.</span>
                     </div>
                     <div>
-                        <LocalizedClientLink href="/customer-service">Customer Service</LocalizedClientLink>
+                        <LocalizedClientLink className="text-indigo-600" href="/customer-service">
+                            Customer Service
+                        </LocalizedClientLink>
                     </div>
                 </div>
-                <div className="mt-4">
+                <div className="mt-8">
                     <p className="text:sm md:text-lg font-semibold">More to love</p>
+                    <Separator className="my-2" />
                     <RecommendedProducts />
                 </div>
             </div>

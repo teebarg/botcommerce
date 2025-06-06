@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 
 const buttonConfig: any = {

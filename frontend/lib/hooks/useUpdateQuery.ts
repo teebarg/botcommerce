@@ -1,5 +1,5 @@
 import { startTransition, useCallback } from "react";
-import { debounce } from "@lib/util/util";
+import { debounce } from "@lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useProgressBar } from "@/components/ui/progress-bar";

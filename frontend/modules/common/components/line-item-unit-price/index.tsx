@@ -1,7 +1,6 @@
-import { getPercentageDiff } from "@lib/util/get-precentage-diff";
-import { currency } from "@lib/util/util";
+import { currency, getPercentageDiff } from "@lib/utils";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 type LineItemUnitPriceProps = {
     item: Omit<any, "beforeInsert">;

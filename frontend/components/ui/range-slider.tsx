@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 
-import { cn } from "@/lib/util/cn";
+import { cn } from "@/lib/utils";
 
 interface SliderProps {
     label?: string;
