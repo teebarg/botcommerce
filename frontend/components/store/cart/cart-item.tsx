@@ -1,7 +1,9 @@
 import React from "react";
+
+import CartControl from "./cart-control";
+
 import { currency } from "@/lib/utils";
 import { CartItem } from "@/types/models";
-import CartControl from "./cart-control";
 
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     return (

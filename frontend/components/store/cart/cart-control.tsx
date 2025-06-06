@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -88,7 +90,7 @@ const CartControl: React.FC<Props> = ({ item }) => {
                 </button>
             </div>
 
-            <Button disabled={loading} isLoading={loading} onClick={() => removeItem(item.id)} variant="ghost" size="icon">
+            <Button disabled={loading} isLoading={loading} size="icon" variant="ghost" onClick={() => removeItem(item.id)}>
                 <Trash2 className="h-4 w-4 text-rose-500" />
             </Button>
         </div>

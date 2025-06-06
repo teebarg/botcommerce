@@ -1,40 +1,149 @@
 "use client";
 
-import { submitContactForm } from "@modules/account/actions";
-import { useActionState, useEffect, useRef } from "react";
+import { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { api } from "@/apis/base";
+import { Message } from "@/types/models";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+const contactFormSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Please enter a valid email address"),
+    phone: z.string().optional(),
+    message: z.string().min(1, "Message is required"),
+    agreement: z.boolean().refine((val) => val === true, {
+        message: "You must agree to the terms",
+    }),
+});
+
+type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactForm() {
-    const [state, formAction, isPending] = useActionState(submitContactForm, { success: false, message: "" });
-    const formRef = useRef<HTMLFormElement>(null);
+    const [isPending, setIsPending] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (state?.message) {
-            formRef?.current?.reset(); // Reset the form fields
-            toast.success(state.message);
+    const form = useForm<ContactFormValues>({
+        resolver: zodResolver(contactFormSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            phone: "",
+            message: "",
+            agreement: true,
+        },
+    });
+
+    const onSubmit = async (data: ContactFormValues) => {
+        try {
+            setIsPending(true);
+            const { error } = await api.post<Message>("/contact-form", {
+                name: data.name,
+                email: data.email,
+                message: data.message,
+                phone: data.phone,
+            });
+
+            if (error) {
+                toast.error(error);
+
+                return;
+            }
+
+            toast.success("Message sent successfully");
+            form.reset();
+        } catch (error) {
+            toast.error("Failed to send message");
+        } finally {
+            setIsPending(false);
         }
-    }, [state]);
+    };
 
     return (
-        <form ref={formRef} action={formAction}>
-            <div className="mt-10 space-y-4">
-                <Input required label="Name" name="name" placeholder="Ex. John....." />
-                <Input required label="Email" name="email" placeholder="Ex. email@email.com" type="email" />
-                <Input label="Phone" name="phone" placeholder="Ex. 09000000000" type="number" />
-                <Textarea required label="Description" name="message" placeholder="Ex. I want to make an enquiry about..." />
-                <div className="text-default-500 flex items-center">
-                    <Checkbox checked={true} name="agreement" />
-                    <label className="ml-2 text-sm">I allow this website to store my submission.</label>
-                </div>
-                <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit" variant="primary">
+        <Form {...form}>
+            <form className="mt-10 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <Input required placeholder="Ex. John....." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <Input required placeholder="Ex. email@email.com" type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Phone</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Ex. 09000000000" type="tel" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                                <Textarea required placeholder="Ex. I want to make an enquiry about..." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="agreement"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm text-default-500">I allow this website to store my submission.</FormLabel>
+                                <FormMessage />
+                            </div>
+                        </FormItem>
+                    )}
+                />
+
+                <Button aria-label="submit" className="min-w-32" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
                     Submit
                 </Button>
-            </div>
-        </form>
+            </form>
+        </Form>
     );
 }

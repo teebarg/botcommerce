@@ -6,11 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
-import { Edit, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/generic/spinner";
 import { Address } from "@/types/models";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -86,16 +85,19 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
     return (
         <React.Fragment>
             <div
-                className={cn("border rounded-lg p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors", {
-                    "border-gray-900": isActive,
-                })}
+                className={cn(
+                    "border border-default-300 rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors",
+                    {
+                        "border-primary": isActive,
+                    }
+                )}
                 data-testid="address-container"
             >
                 <div className="flex flex-col">
-                    <h3 className="text-left text-sm" data-testid="address-name">
+                    <h3 className="text-left text-sm font-semibold" data-testid="address-name">
                         {address.first_name} {address.last_name}
                     </h3>
-                    <p className="flex flex-col text-left text-base mt-2">
+                    <p className="flex flex-col text-left mt-2 font-semibold">
                         <span data-testid="address-address">
                             {address.address_1}
                             {address.address_2 && <span>, {address.address_2}</span>}
@@ -106,19 +108,20 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                         <span data-testid="address-state-country">{address.state && `${address.state}`}</span>
                     </p>
                 </div>
-                <div className="flex items-center gap-x-4">
-                    <Button aria-label="edit address" data-testid="address-edit-button" startContent={<Edit />} onClick={() => setIsOpen(true)}>
-                        Edit
+                <div className="flex items-center gap-x-2">
+                    <Button aria-label="edit address" data-testid="address-edit-button" size="icon" onClick={() => setIsOpen(true)}>
+                        <Pencil />
                     </Button>
                     <Button
                         aria-label="delete address"
                         data-testid="address-delete-button"
                         disabled={removing}
-                        startContent={removing ? <Spinner /> : <Trash2 />}
+                        isLoading={removing}
+                        size="icon"
                         variant="destructive"
                         onClick={removeAddress}
                     >
-                        Remove
+                        <Trash2 />
                     </Button>
                 </div>
             </div>
@@ -288,10 +291,9 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                     )}
                                 />
                             </div>
-                            <div className="flex gap-3 mt-6">
+                            <div className="flex gap-3 mt-6 justify-end">
                                 <Button
                                     aria-label="cancel"
-                                    className="min-w-32"
                                     data-testid="cancel-button"
                                     type="button"
                                     variant="destructive"
@@ -299,7 +301,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                                 >
                                     Cancel
                                 </Button>
-                                <Button aria-label="update" className="min-w-32" data-testid="save-button" isLoading={isPending} type="submit">
+                                <Button aria-label="update" data-testid="save-button" isLoading={isPending} type="submit" variant="primary">
                                     Update
                                 </Button>
                             </div>

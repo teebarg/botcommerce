@@ -1,5 +1,3 @@
-// export type SiteConfig = typeof siteConfig;
-
 import { getCookie } from "@/lib/util/server-utils";
 
 export const getSiteConfig = async () => {

@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+
 import { Message } from "@/types/models";
 
 export function cn(...inputs: ClassValue[]) {
@@ -158,5 +159,18 @@ export const getPercentageDiff = (original: number, calculated: number) => {
     return decrease.toFixed();
 };
 
+export const isObject = (input: any) => input instanceof Object;
+export const isArray = (input: any) => Array.isArray(input);
+export const isEmpty = (input: any) => {
+    return (
+        input === null ||
+        input === undefined ||
+        (isObject(input) && Object.keys(input).length === 0) ||
+        (isArray(input) && (input as any[]).length === 0) ||
+        (typeof input === "string" && input.trim().length === 0)
+    );
+};
+
+export const onlyUnique = (value: unknown, index: number, self: unknown[]) => self.indexOf(value) === index;
 
 export { handleError, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo, formatDate };

@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 // Address & Payment Summary Component
 const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {
     return (
-        <div className="bg-content1 rounded-xl shadow-sm p-4 mb-6">
+        <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
             <h3 className="font-medium text-default-900 mb-3">Payment Details</h3>
 
             <div className="space-y-2 text-sm">

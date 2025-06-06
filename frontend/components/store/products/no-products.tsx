@@ -37,7 +37,7 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
-                    <Button aria-label="clear search" variant="primary" startContent={<RefreshCcw className="w-4 h-4" />} onClick={onClearSearch}>
+                    <Button aria-label="clear search" startContent={<RefreshCcw className="w-4 h-4" />} variant="primary" onClick={onClearSearch}>
                         Clear Search
                     </Button>
 

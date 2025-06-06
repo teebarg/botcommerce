@@ -2,7 +2,6 @@
 
 import React, { ChangeEvent, useState } from "react";
 import { MagnifyingGlassMini } from "nui-react-icons";
-import SearchInput from "@modules/search/components/search-input";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -15,6 +14,7 @@ import { ProductSearch } from "@/types/models";
 import { api } from "@/apis";
 import ProductCard from "@/components/store/products/product-card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import SearchInput from "@/components/store/search/search-input";
 
 interface Props {
     className?: string;

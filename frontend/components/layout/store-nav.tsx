@@ -5,7 +5,7 @@ import { HeartFilled, Heart } from "nui-react-icons";
 import dynamic from "next/dynamic";
 
 import { CartComponent } from "@/components/store/cart/cart-component";
-import Search from "@/modules/search/components/search";
+import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 import { getSiteConfig } from "@/lib/config";

@@ -6,7 +6,7 @@ import { Order } from "@/types/models";
 // Address & Payment Summary Component
 const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
     return (
-        <div className="bg-content1 rounded-xl shadow-sm p-4 mb-6">
+        <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
             <div className="flex items-start mb-3">
                 <MapPin className="w-5 h-5 text-default-500 mt-0.5" />
                 <div className="ml-3">

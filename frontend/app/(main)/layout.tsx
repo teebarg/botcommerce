@@ -1,7 +1,7 @@
 import React from "react";
 
 import { BackButton } from "@/components/back";
-import Search from "@/modules/search/components/search";
+import Search from "@/components/store/search";
 import ChatBotWrapper from "@/components/generic/chatbot";
 import Cookie from "@/components/store/cookie";
 import Footer from "@/components/layout/footer";

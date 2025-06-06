@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ChevronRight } from "lucide-react";
 
 import { BackButton } from "@/components/back";
 import LocalizedClientLink from "@/components/ui/link";
@@ -14,7 +15,6 @@ import { CartComponent } from "@/components/store/cart/cart-component";
 import CheckoutSkeleton from "@/components/store/checkout/checkout-skeleton";
 import CheckoutForm from "@/components/store/checkout/checkout-form";
 import CheckoutSummary from "@/components/store/checkout/checkout-summary";
-import { ChevronRight } from "lucide-react";
 
 export default function Checkout() {
     const { shopSettings } = useStore();

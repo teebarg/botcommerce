@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Depends
+from pydantic import BaseModel, Field
 
 from app.core.deps import (
     CurrentUser,
@@ -15,9 +16,14 @@ from prisma.errors import PrismaError
 from prisma.enums import Role, Status
 from prisma.models import User
 from math import ceil
+from app.core.security import verify_password, get_password_hash
 
 # Create a router for users
 router = APIRouter()
+
+class PasswordChange(BaseModel):
+    old_password: str = Field(min_length=8, max_length=40)
+    new_password: str = Field(min_length=8, max_length=40)
 
 
 @router.get("/me")
@@ -26,6 +32,38 @@ async def read_user_me(
 ):
     """Get current user with caching."""
     return user
+
+
+@router.patch("/me")
+async def update_user_me(
+    user_in: UserUpdateMe,
+    user: CurrentUser,
+) -> Any:
+    """
+    Update own user.
+    """
+    # Check if email is being updated and if it's already taken
+    if user_in.email:
+        existing = await db.user.find_unique(
+            where={
+                "email": user_in.email,
+                "NOT": {
+                    "id": user.id
+                }
+            }
+        )
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    try:
+        # Update user with provided fields
+        update = await db.user.update(
+            where={"id": user.id},
+            data=user_in.model_dump(exclude_unset=True)
+        )
+        return update
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/")
@@ -131,36 +169,6 @@ async def read_user_address(
     return {"addresses": address_dicts}
 
 
-@router.patch("/me")
-async def update_user_me(
-    user_in: UserUpdateMe,
-    user: CurrentUser,
-) -> Any:
-    """
-    Update own user.
-    """
-    if user_in.email:
-        existing = await db.user.find_unique(
-            where={
-                "email": user_in.email,
-                "NOT": {
-                    id: user.id
-                }
-            }
-        )
-        if not existing:
-            raise HTTPException(status_code=404, detail="User with this email already exists")
-
-    try:
-        update = await db.user.update(
-            where={"id": id},
-            data=user_in.model_dump()
-        )
-        return update
-    except PrismaError as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
 @router.get("/wishlist")
 async def read_wishlist(
     user: CurrentUser
@@ -217,3 +225,29 @@ async def get_user_orders(current_user: CurrentUser, skip: int = 0, take: int = 
         include={"order_items": True}
     )
     return orders
+
+
+@router.post("/change-password", response_model=Message)
+async def change_password(
+    password_data: PasswordChange,
+    current_user: CurrentUser,
+) -> Message:
+    """
+    Change user's password.
+    """
+    # Verify old password
+    if not verify_password(password_data.old_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect password"
+        )
+
+    try:
+        # Update password
+        await db.user.update(
+            where={"id": current_user.id},
+            data={"hashed_password": get_password_hash(password_data.new_password)}
+        )
+        return Message(message="Password updated successfully")
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

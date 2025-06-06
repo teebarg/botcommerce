@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
 
+import CartItemComponent from "./cart-item";
+
 import { Cart, CartItem } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { BtnLink } from "@/components/ui/btnLink";
-import CartItemComponent from "./cart-item";
 
 interface Props {
     onClose: () => void;

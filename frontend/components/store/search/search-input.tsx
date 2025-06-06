@@ -1,6 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { XMarkMini } from "nui-react-icons";
+"use client";
+
 import { ChangeEvent, FormEvent, useRef } from "react";
+import { X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 interface ControlledSearchBoxProps {
     onChange(event: ChangeEvent): void;
@@ -59,8 +62,8 @@ const SearchInput = ({ onChange, onReset, onSubmit, placeholder, value, ...props
                         onChange={onChange}
                     />
                     {value && (
-                        <Button aria-label="reset" onClick={handleReset} size="icon" variant="ghost">
-                            <XMarkMini />
+                        <Button aria-label="reset" size="icon" variant="ghost" onClick={handleReset}>
+                            <X />
                         </Button>
                     )}
                 </div>

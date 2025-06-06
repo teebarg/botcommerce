@@ -152,6 +152,13 @@
 }
 
 :root {
+    /* Content Layers */
+    --content1: #f4f4f4;
+    /* --content1: 0 0% 100%; */
+    --content2: 240 4.76% 95.88%;
+    --content3: 240 5.88% 90%;
+    --content4: 240 4.88% 83.92%;
+
     /* Default State Colors */
     --default-50: 0 0% 98.04%;
     --default-100: 240 4.76% 95.88%;
@@ -165,13 +172,6 @@
     --default-900: 240 5.88% 10%;
     --default-foreground: 0 0% 0%;
     --default: 240 4.88% 83.92%;
-
-    /* Content Layers */
-    --content1: #f4f4f4;
-    /* --content1: 0 0% 100%; */
-    --content2: 240 4.76% 95.88%;
-    --content3: 240 5.88% 90%;
-    --content4: 240 4.88% 83.92%;
 
     /* Semantic Colors */
     --success: 145.96000000000004 79.46% 43.92%;
@@ -205,8 +205,6 @@
 }
 
 .dark {
-    /* color-scheme: dark; */
-
     /* Content Layers */
     --content1: #161a1d;
     /* --content1: #1F2937; */
@@ -214,6 +212,7 @@
     --content2: 240 3.7% 15.88%;
     --content3: 240 5.26% 26.08%;
     --content4: 240 5.2% 33.92%;
+
     /* Default State Colors */
     --default-50: 240 5.88% 10%;
     --default-100: 240 3.7% 15.88%;
@@ -266,8 +265,8 @@
 
 /* Thin scrollbar for WebKit */
 ::-webkit-scrollbar {
-    width: 1px;
-    height: 1px;
+    width: 2px;
+    height: 2px;
 }
 
 ::-webkit-scrollbar-thumb {

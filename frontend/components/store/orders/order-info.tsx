@@ -2,7 +2,7 @@ import { Order } from "@/types/models";
 
 const OrderInfo: React.FC<{ order: Order }> = ({ order }) => {
     return (
-        <div className="bg-content1 rounded-xl shadow-sm p-4 mb-6">
+        <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
             <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                     <span className="text-default-500">Order Number</span>

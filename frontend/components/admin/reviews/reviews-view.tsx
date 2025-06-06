@@ -2,11 +2,12 @@
 
 import React from "react";
 import { ArrowUpDown, Search } from "nui-react-icons";
+import { useSearchParams } from "next/navigation";
 
 import { ReviewActions } from "./reviews-actions";
 import ReviewItem from "./review-item";
 
-import { Pagination, Review } from "@/types/models";
+import { Review } from "@/types/models";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,6 @@ import PaginationUI from "@/components/pagination";
 import { useReviews } from "@/lib/hooks/useApi";
 import ServerError from "@/components/generic/server-error";
 import { Skeleton } from "@/components/ui/skeletons";
-import { useSearchParams } from "next/navigation";
 
 interface Props {
     deleteAction: (id: number) => void;
@@ -28,8 +28,6 @@ const ReviewView: React.FC<Props> = ({ deleteAction }) => {
 
     const { data, isLoading, error } = useReviews({ skip, limit });
 
-
-
     if (isLoading) {
         return <Skeleton />;
     }
@@ -39,6 +37,7 @@ const ReviewView: React.FC<Props> = ({ deleteAction }) => {
     }
 
     const { reviews, ...pagination } = data;
+
     return (
         <div className="px-2 md:px-12 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

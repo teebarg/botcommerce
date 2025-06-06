@@ -11,6 +11,7 @@ import OrderAddress from "./order-address";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { BankDetails, Order, PaymentStatus } from "@/types/models";
 import { api } from "@/apis";
+import { Button } from "@/components/ui/button";
 
 type OrderConfirmationProps = {
     status: PaymentStatus;
@@ -21,7 +22,6 @@ type OrderConfirmationProps = {
 
 // Pending Payment Component
 const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
-    // const [countdown, setCountdown] = useState(3600 * 24); // 1 hour in seconds
     const [bankDetails, setBankDetails] = useState<BankDetails[]>([]);
 
     useEffect(() => {
@@ -35,22 +35,6 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
         fetchBankDetails();
     }, []);
-
-    // useEffect(() => {
-    //     const timer = setInterval(() => {
-    //         setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-    //     }, 1000);
-
-    //     return () => clearInterval(timer);
-    // }, []);
-
-    // const formatTime = (seconds: number): string => {
-    //     const hrs = Math.floor(seconds / 3600);
-    //     const mins = Math.floor((seconds % 3600) / 60);
-    //     const secs = seconds % 60;
-
-    //     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    // };
 
     return (
         <div className="w-full max-w-2xl mx-auto">
@@ -67,7 +51,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
             </FadeInComponent>
 
             <FadeInComponent delay="200ms">
-                <div className="bg-content1 rounded-xl shadow-sm p-4 mb-6">
+                <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
                     <h3 className="text-lg font-medium text-default-900 mb-4">Bank Transfer Details</h3>
                     <div className="space-y-3">
                         <div className="flex justify-between">
@@ -108,13 +92,10 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             <FadeInComponent delay="700ms">
                 <div className="mt-6">
-                    <button
-                        className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center"
-                        onClick={onContinueShopping}
-                    >
+                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
                         Continue Shopping
                         <ArrowRight className="ml-2 w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
             </FadeInComponent>
         </div>

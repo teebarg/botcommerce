@@ -71,7 +71,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
                     <span className="text-sm font-medium text-default-500">Secured by Paystack</span>
                 </div>
             </div>
-            <Button variant="primary" className="w-full" disabled={loading} isLoading={loading} onClick={handlePayment}>
+            <Button className="w-full" disabled={loading} isLoading={loading} variant="primary" onClick={handlePayment}>
                 Pay {currency(amount)} Now
             </Button>
             {/* Security message */}

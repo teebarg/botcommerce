@@ -199,10 +199,9 @@ const AddAddress = () => {
                                     )}
                                 />
                             </div>
-                            <div className="flex gap-3 mt-6">
+                            <div className="flex gap-3 mt-6 justify-end">
                                 <Button
                                     aria-label="cancel"
-                                    className="min-w-32"
                                     data-testid="cancel-button"
                                     type="button"
                                     variant="destructive"
@@ -210,7 +209,7 @@ const AddAddress = () => {
                                 >
                                     Cancel
                                 </Button>
-                                <Button aria-label="save" className="min-w-32" data-testid="save-button" isLoading={isPending} type="submit">
+                                <Button aria-label="save" data-testid="save-button" isLoading={isPending} type="submit" variant="primary">
                                     Save
                                 </Button>
                             </div>

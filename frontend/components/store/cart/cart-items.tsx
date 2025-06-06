@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
+
+import CartItemComponent from "./cart-item";
+
 import { cn } from "@/lib/utils";
 import { CartItem } from "@/types/models";
 import { useCartItem } from "@/lib/hooks/useCart";
-import CartItemComponent from "./cart-item";
 import { Skeleton } from "@/components/ui/skeletons";
 
 type ItemsTemplateProps = {
