@@ -65,7 +65,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
             transition={{ duration: 0.2 }}
         >
             <div className="flex items-start space-x-4" onClick={() => handleSelect(address.id!)}>
-                <div className="shrink-0 relative">
+                <div className="shrink-0 relative hidden md:block">
                     <div
                         className={`p-3 rounded-full transition-all duration-300 ${
                             selectedAddress?.id === address.id ? "bg-blue-500 shadow-lg shadow-blue-500/25" : "bg-gray-100 group-hover:bg-gray-200"

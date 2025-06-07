@@ -1,5 +1,4 @@
 import React from "react";
-import UserDropDown from "@modules/account/components/user-menu";
 import { UserGroup, Collection, Checkout } from "nui-react-icons";
 import { Heart, Home, User } from "lucide-react";
 
@@ -7,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/types/models";
+import ThemeButton from "@/lib/theme/theme-button";
 
 interface NavLinkProp {
     href: string;
@@ -30,7 +30,7 @@ interface MenuProp {
 
 const Menu: React.FC<MenuProp> = ({ user }) => {
     return (
-        <div className="flex flex-col py-6 px-4 flex-1">
+        <div className="flex flex-col py-4 px-4 flex-1">
             <div className="space-y-3">
                 <NavLink href="/" icon={<Home className="h-8 w-8" />} title="Home" />
                 <NavLink href="/account/profile" icon={<User className="h-8 w-8" viewBox="0 0 20 20" />} title="Profile" />
@@ -46,9 +46,14 @@ const Menu: React.FC<MenuProp> = ({ user }) => {
                 <NavLink href="/our-story" title="Our Story" />
                 <NavLink href="/support" title="Contact Us" />
             </div>
-            <div className="mt-8 mb-2 md:hidden">
+            <div className="mt-8">
+                <ThemeButton />
+            </div>
+            <div className="mt-4 mb-2 block md:hidden">
                 {user ? (
-                    <UserDropDown user={user} />
+                    <div>
+                        <p className="font-semibold leading-6 text-primary-900">Logged in as {user?.first_name}</p>
+                    </div>
                 ) : (
                     <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href="/sign-in">
                         Log In <span aria-hidden="true">&rarr;</span>

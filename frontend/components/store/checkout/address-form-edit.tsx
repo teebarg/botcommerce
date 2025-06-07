@@ -78,7 +78,7 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
     };
 
     return (
-        <div className="py-6 px-4">
+        <div className="py-6 px-4 overflow-y-auto">
             <h2 className="text-lg font-semibold mb-4">Address</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -187,8 +187,9 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
                 aria-label="continue"
                 className="mt-6"
                 data-testid="submit-address-button"
+                disabled={isPending}
                 isLoading={isPending}
-                type="button"
+                variant="primary"
                 onClick={handleSubmit}
             >
                 Update

@@ -52,7 +52,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                         <div className="flex flex-col items-center justify-center h-64 text-center">
                             <ShoppingCart className="h-12 w-12 text-default-300 mb-4" />
                             <p className="text-default-500">Your cart is empty</p>
-                            <Button className="mt-4 rounded-full" onClick={onClose}>
+                            <Button className="mt-4 rounded-full" variant="primary" onClick={onClose}>
                                 Continue Shopping
                             </Button>
                         </div>

@@ -207,6 +207,8 @@ model ProductVariant {
   price       Float         @db.DoublePrecision
   old_price   Float?        @db.DoublePrecision
   inventory   Int
+  size        String?
+  color       String?
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem
   created_at  DateTime      @default(now())

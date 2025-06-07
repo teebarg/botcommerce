@@ -127,6 +127,8 @@ export const ProductVariantSchema = z.object({
     price: z.number(),
     old_price: z.number(),
     inventory: z.number(),
+    size: z.string().optional(),
+    color: z.string().optional(),
     attributes: z.record(z.string()),
     order_items: z.null(),
     cart_items: z.null(),

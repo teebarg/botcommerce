@@ -30,8 +30,8 @@ const EmptyState = () => {
             <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                 <MapPin className="w-8 h-8 text-blue-500" />
             </div>
-            <h3 className="text-lg font-semibold text-default-900 mb-2">No Addresses Found</h3>
-            <p className="text-default-500 text-center mb-6">
+            <h3 className="text-lg font-semibold text-default-900">No Addresses Found</h3>
+            <p className="text-default-500 text-center mb-6 text-sm">
                 {`You haven't added any addresses yet. Add your first address to get started with your order.`}
             </p>
         </div>

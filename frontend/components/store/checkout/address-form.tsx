@@ -76,7 +76,7 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
     };
 
     return (
-        <div className="py-6 px-4">
+        <div className="py-6 px-4 overflow-y-auto">
             <h3 className="text-lg font-semibold text-default-900 mb-4">Shipping Address</h3>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
