@@ -124,6 +124,8 @@ export const productApi = {
         price: number;
         inventory: number;
         status: "IN_STOCK" | "OUT_OF_STOCK";
+        size?: string;
+        color?: string;
     }): ApiResult<ProductVariant> {
         const { productId, ...variantData } = input;
 
@@ -136,6 +138,8 @@ export const productApi = {
         price?: number;
         inventory?: number;
         status?: "IN_STOCK" | "OUT_OF_STOCK";
+        size?: string;
+        color?: string;
     }): ApiResult<ProductVariant> {
         const { id, ...variantData } = input;
 

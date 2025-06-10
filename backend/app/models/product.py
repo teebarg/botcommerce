@@ -10,6 +10,8 @@ class VariantCreate(BaseModel):
     slug: str = Field(..., min_length=1, description="Variant slug is required")
     price: float = Field(..., gt=0, description="Price must be positive")
     inventory: int = Field(..., ge=0, description="Inventory cannot be negative")
+    size: Optional[str] = None
+    color: Optional[str] = None
 
 class VariantUpdate(BaseModel):
     id: Optional[int] = None
@@ -17,6 +19,8 @@ class VariantUpdate(BaseModel):
     slug: Optional[str] = Field(None, min_length=1)
     price: Optional[float] = Field(None, gt=0)
     inventory: Optional[int] = Field(None, ge=0)
+    size: Optional[str] = None
+    color: Optional[str] = None
 
 class VariantWithStatus(BaseModel):
     name: str = Field(..., min_length=1, description="Variant name is required")

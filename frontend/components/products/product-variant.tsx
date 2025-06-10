@@ -34,6 +34,8 @@ const variantFormSchema = z.object({
     inventory: z.number().min(0, {
         message: "Inventory must be at least 0.",
     }),
+    size: z.string().optional(),
+    color: z.string().optional(),
 });
 
 const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, productId, variants = [] }) => {
@@ -49,6 +51,8 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
             status: "IN_STOCK",
             price: 0,
             inventory: 0,
+            size: "",
+            color: "",
         },
     });
 
@@ -83,6 +87,8 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
         form.setValue("status", variant.status);
         form.setValue("price", variant.price);
         form.setValue("inventory", variant.inventory);
+        form.setValue("size", variant.size || "");
+        form.setValue("color", variant.color || "");
     };
 
     const deleteVariant = (id: number) => {
@@ -106,7 +112,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead>
                             <tr>
-                                {["Name", "SKU", "Price", "Inventory", "Status", "Actions"]?.map((variant: string, idx: number) => (
+                                {["Name", "SKU", "Price", "Inventory", "Size", "Color", "Status", "Actions"]?.map((variant: string, idx: number) => (
                                     <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-default-500 uppercase tracking-wider">
                                         {variant}
                                     </th>
@@ -120,6 +126,8 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.sku}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.price}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.inventory}</td>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.size || "-"}</td>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.color || "-"}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">
                                         <Badge variant={variant.status === "IN_STOCK" ? "default" : "destructive"}>{variant.status}</Badge>
                                     </td>
@@ -135,7 +143,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                             ))}
                             {variants.length === 0 && (
                                 <tr>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500 text-center" colSpan={6}>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500 text-center" colSpan={8}>
                                         No variants found
                                     </td>
                                 </tr>
@@ -170,6 +178,32 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                                             <FormLabel>SKU</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Enter SKU" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="size"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Size</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter size" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="color"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Color</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter color" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

@@ -11,7 +11,7 @@ import ProductDetails from "@/components/store/products/product-details";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import ProductShare from "@/components/product/product-share";
-import { Product, ProductImage } from "@/types/models";
+import { Product, ProductImage, ProductVariant } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
@@ -26,35 +26,38 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedImageId, setSelectedImageId] = useState<number>(product.images[0]?.id || 0);
     const [loading, setLoading] = useState<boolean>(false);
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const { shopSettings } = useStore();
 
-    // Find the selected image
     const selectedImage = product.images.find((img: ProductImage) => img.id === selectedImageId) || product.images[0];
 
-    // Check if the selected variant is in stock
-    // const isInStock = selectedVariant.inventory > 0;
+    const sizes = [...new Set(product.variants.map((v) => v.size).filter(Boolean))];
+    const colors = [...new Set(product.variants.map((v) => v.color).filter(Boolean))];
+
+    const handleVariantSelection = (size?: string, color?: string) => {
+        const variant = product.variants.find((v) => (!size || v.size === size) && (!color || v.color === color));
+        setSelectedVariant(variant || null);
+    };
 
     const handleAddToCart = async () => {
-        if (!product.variants[0]) {
+        if (!selectedVariant) {
             toast.error("Please select a variant");
-
             return;
         }
 
-        // if (!isInStock) {
-        //     toast.error("Product out of stock")
-        //     return;
-        // }
+        if (selectedVariant.status === "OUT_OF_STOCK") {
+            toast.error("Selected variant is out of stock");
+            return;
+        }
 
         setLoading(true);
         const response = await api.cart.add({
-            variant_id: product.variants[0].id,
+            variant_id: selectedVariant.id,
             quantity,
         });
 
         if (response.error) {
             toast.error(response.error);
-
             return;
         }
         invalidateCartItems();
@@ -66,10 +69,13 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {
         e.stopPropagation();
-        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*\nPrice: ${currency(product.price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
+        const variantInfo = selectedVariant
+            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(selectedVariant.price)}`
+            : "";
+
+        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
-
         window.open(whatsappUrl, "_blank");
     };
 
@@ -121,6 +127,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                         alt={selectedImage?.image || product.image}
                                         className="object-contain h-full w-full rounded"
                                         src={selectedImage?.image || product.image}
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                 )}
                             </div>
@@ -131,21 +138,25 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             <h1 className="text-xl font-bold tracking-tight">{product.name}</h1>
                             <ProductShare name={product.name} />
                         </div>
-                        <div className="text-2xl font-bold hidden md:block">{currency(product.price)}</div>
+                        <div className="text-2xl font-bold hidden md:block">
+                            {selectedVariant ? currency(selectedVariant.price) : currency(product.price)}
+                        </div>
                         <div className="my-2 flex items-center gap-2">
                             <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
                         </div>
                         <div className="bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4">
                             <div className="flex items-center text-white">
-                                <span className="text-3xl font-semibold">{currency(product.price)}</span>
-                                {product.old_price > product.price && (
-                                    <span className="ml-1 text-sm line-through">{currency(product.old_price)}</span>
+                                <span className="text-3xl font-semibold">
+                                    {selectedVariant ? currency(selectedVariant.price) : currency(product.price)}
+                                </span>
+                                {selectedVariant && selectedVariant.old_price > selectedVariant.price && (
+                                    <span className="ml-1 text-sm line-through">{currency(selectedVariant.old_price)}</span>
                                 )}
                             </div>
-                            {product.old_price > product.price && (
+                            {selectedVariant && selectedVariant.old_price > selectedVariant.price && (
                                 <div className="mt-1 -mb-1.5">
                                     <span className="text-xl font-medium text-orange-400">
-                                        Save {(((product.old_price - product.price) / product.old_price) * 100).toFixed(0)}%
+                                        Save {(((selectedVariant.old_price - selectedVariant.price) / selectedVariant.old_price) * 100).toFixed(0)}%
                                     </span>
                                 </div>
                             )}
@@ -164,8 +175,49 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             </div>
                         </div>
 
-                        {/* Add to Cart Button */}
-                        {product.variants?.[0].status == "OUT_OF_STOCK" ? (
+                        {/* Variant Selection */}
+                        {sizes.length > 0 && (
+                            <div className="mt-4">
+                                <h3 className="text-sm font-medium text-default-900">Size</h3>
+                                <div className="grid grid-cols-4 gap-2 mt-2">
+                                    {sizes.map((size) => (
+                                        <Button
+                                            key={size}
+                                            className="w-full"
+                                            variant={selectedVariant?.size === size ? "default" : "outline"}
+                                            onClick={() => handleVariantSelection(size, selectedVariant?.color)}
+                                        >
+                                            {size}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {colors.length > 0 && (
+                            <div className="mt-4">
+                                <h3 className="text-sm font-medium text-default-900">Color</h3>
+                                <div className="grid grid-cols-4 gap-2 mt-2">
+                                    {colors.map((color) => (
+                                        <Button
+                                            key={color}
+                                            className="w-full"
+                                            variant={selectedVariant?.color === color ? "default" : "outline"}
+                                            onClick={() => handleVariantSelection(selectedVariant?.size, color)}
+                                        >
+                                            {color}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        {!selectedVariant && product.variants.length > 0 ? (
+                            <div className="mt-4">
+                                <p className="text-orange-600">Please select a variant</p>
+                            </div>
+                        ) : selectedVariant?.status === "OUT_OF_STOCK" ? (
                             <Button className="w-full mt-4 cursor-not-allowed" disabled={true} size="lg">
                                 Out of Stock
                             </Button>
@@ -173,7 +225,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             <div className="flex items-center gap-4 mt-4">
                                 <Button
                                     className="w-auto"
-                                    disabled={loading || !product.variants[0]}
+                                    disabled={loading || !selectedVariant}
                                     size="lg"
                                     variant="primary"
                                     onClick={handleAddToCart}

@@ -21,7 +21,8 @@
         "test-e2e": "playwright test e2e",
         "prepare": "husky",
         "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-        "lint:check": "eslint --max-warnings=0 \"**/*.{js,jsx,ts,tsx,json}\" --fix"
+        "lint:check": "eslint --max-warnings=0 \"**/*.{js,jsx,ts,tsx,json}\" --fix",
+        "format": "prettier --write ."
     },
     "resolutions": {
         "@types/react": "17.0.40"

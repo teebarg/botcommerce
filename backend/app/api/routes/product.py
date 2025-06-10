@@ -416,7 +416,9 @@ async def create_variant(id: int, variant: VariantWithStatus):
             "price": variant.price,
             "inventory": variant.inventory,
             "product_id": id,
-            "status": variant.status
+            "status": variant.status,
+            "size": variant.size,
+            "color": variant.color
         }
     )
 
@@ -449,6 +451,12 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
 
     if variant.status:
         update_data["status"] = variant.status
+
+    if variant.size is not None:
+        update_data["size"] = variant.size
+
+    if variant.color is not None:
+        update_data["color"] = variant.color
 
     # Update the variant
     updated_variant = await db.productvariant.update(

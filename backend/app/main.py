@@ -87,6 +87,14 @@ async def root():
     return {"message": "Server is running"}
 
 
+@app.get("/api/health")
+async def health():
+    # ping database
+    await db.user.find_unique(
+        where={"id": 1}
+    )
+    return {"message": "Server is running"}
+
 @app.post("/api/contact-form")
 async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreate):
     async def send_email_task():
