@@ -15,6 +15,7 @@ import { Product, ProductImage, ProductVariant } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
+import { ProductVariantSelection } from "@/components/product/product-variant-selection";
 
 interface Props {
     product: Product;
@@ -30,6 +31,9 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const { shopSettings } = useStore();
 
     const selectedImage = product.images.find((img: ProductImage) => img.id === selectedImageId) || product.images[0];
+
+    const [selectedProductPageVariant, setSelectedProductPageVariant] = useState<ProductVariant | undefined>();
+    const [selectedListingVariant, setSelectedListingVariant] = useState<ProductVariant | undefined>();
 
     const sizes = [...new Set(product.variants.map((v) => v.size).filter(Boolean))];
     const colors = [...new Set(product.variants.map((v) => v.color).filter(Boolean))];
@@ -247,6 +251,12 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 </Button>
                             </div>
                         )}
+
+                        <ProductVariantSelection
+                            product={product}
+                            selectedVariant={selectedProductPageVariant}
+                            onVariantChange={setSelectedProductPageVariant}
+                        />
 
                         <div className="mt-4">
                             <p className="line-clamp-3 text-base text-default-500">{product.description}</p>
