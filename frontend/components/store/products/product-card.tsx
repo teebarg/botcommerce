@@ -8,14 +8,14 @@ import { toast } from "sonner";
 import { Heart, ShoppingCart, MessageCircleMore } from "lucide-react";
 import { HeartFilled } from "nui-react-icons";
 
-import { ProductSearch, WishItem } from "@/types/models";
+import { ProductSearch, ProductVariant, WishItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { currency } from "@/lib/utils";
+import { cn, currency } from "@/lib/utils";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
+import { CompactVariantSelection } from "@/components/product/product-variant-compact-selection";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -31,11 +31,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
     const invalidate = useInvalidate();
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
-    const { id, slug, name, price, old_price, image, images, variants, status } = product;
+    const { id, slug, name, image, images } = product;
     // const discountedPrice = old_price ? price - (price * (old_price - price)) / 100 : price;
 
     // const discount = old_price ? Math.round((1 - price / old_price) * 100) : 0;
     const inWishlist = !!wishlist?.find((wishlist) => wishlist.product_id === product.id);
+
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
 
     const handleWishlistClick = async () => {
         const { error } = await api.user.addWishlist(id);
@@ -61,44 +63,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
         toast.success("Removed from favorites");
     };
 
-    const handleAddToCart = async () => {
-        // if (!isInStock) {
-        //     toast.error("Product out of stock")
-        //     return;
-        // }
-
-        if (!variants?.length) {
-            toast.error("Product out of stock");
-
-            return;
-        }
-
-        setLoading(true);
-        const response = await api.cart.add({
-            variant_id: variants[0].id,
-            quantity: 1,
-        });
-
-        if (response.error) {
-            toast.error(response.error);
-
-            return;
-        }
-        invalidateCart();
-        invalidateCartItems();
-        toast.success("Added to cart successfully");
-        setLoading(false);
-    };
-
-    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        const message = `Hi! I'm interested in purchasing:\n\n*${name}*\nPrice: ${currency(price)}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${slug}`;
-
-        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
-
-        window.open(whatsappUrl, "_blank");
-    };
-
     return (
         <motion.div
             animate={{ opacity: 1, scale: 1 }}
@@ -109,7 +73,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                 delay: 0.5,
                 ease: [0, 0.71, 0.2, 1.01],
             }}
-            onClick={() => router.push(`/products/${slug}`)}
         >
             <div className="flex flex-col gap-2 w-full">
                 <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
@@ -137,7 +100,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                     )}
                 </div>
                 <div className="font-semibold text-default-900 my-2 line-clamp-1 hover:text-default-900 transition-colors px-1">{name}</div>
-                <div className="flex items-center justify-between px-1">
+                <CompactVariantSelection product={product} onVariantChange={setSelectedVariant} />
+                {/* <div className="flex items-center justify-between px-1">
                     <div className="flex items-center">
                         <span className="text-lg font-semibold text-danger">{currency(price)}</span>
                         {old_price > price && <span className="ml-1 text-xs md:text-sm text-default-500 line-through">{currency(old_price)}</span>}
@@ -145,8 +109,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                     {old_price > price && (
                         <span className="text-xs font-semibold text-green-600">Save {(((old_price - price) / old_price) * 100).toFixed(0)}%</span>
                     )}
-                </div>
-                <div className="space-y-2 mt-1">
+                </div> */}
+                {/* <div className="space-y-2 mt-1">
                     <Button
                         className="gap-2"
                         disabled={loading || status == "OUT_OF_STOCK"}
@@ -171,7 +135,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                         <MessageCircleMore className="w-4 h-4" />
                         <span>Buy on WhatsApp</span>
                     </Button>
-                </div>
+                </div> */}
             </div>
         </motion.div>
     );

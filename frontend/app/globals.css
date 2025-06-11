@@ -270,7 +270,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3); /* Change to fit your theme */
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
 }
 

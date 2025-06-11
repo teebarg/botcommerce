@@ -34,13 +34,13 @@ const OrderItems = ({ items }: ItemsTemplateProps) => {
                             <TableRow key={idx} className="even:bg-content1">
                                 <TableCell>{idx + 1}</TableCell>
                                 <TableCell>
-                                    <LocalizedClientLink className="flex sm:w-20 w-12" href={`/products/${item.variant?.slug}`}>
+                                    <LocalizedClientLink className="flex sm:w-20 w-12" href={`/products/${item.variant.product?.slug!}`}>
                                         <Thumbnail size="square" thumbnail={item.image} />
                                     </LocalizedClientLink>
                                 </TableCell>
                                 <TableCell className="flex-1">
                                     <p className="font-medium text-default-900" data-testid="product-title">
-                                        {item.variant?.name}
+                                        {item.variant?.product?.name}
                                     </p>
                                 </TableCell>
                                 <TableCell>

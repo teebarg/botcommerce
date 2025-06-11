@@ -18,7 +18,6 @@ from prisma.models import User
 from math import ceil
 from app.core.security import verify_password, get_password_hash
 
-# Create a router for users
 router = APIRouter()
 
 class PasswordChange(BaseModel):

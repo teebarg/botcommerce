@@ -4,7 +4,6 @@ import { ChevronDown, ChevronUp } from "nui-react-icons";
 import { OrderItem } from "@/types/models";
 import { currency } from "@/lib/utils";
 
-// Order Items Component
 const OrderItems: React.FC<{ items: OrderItem[]; showDetails: boolean }> = ({ items, showDetails }) => {
     const [expanded, setExpanded] = useState<boolean>(showDetails);
 

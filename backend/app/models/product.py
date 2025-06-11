@@ -8,6 +8,7 @@ from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review
 class VariantWithStatus(BaseModel):
     sku: Optional[str] = None
     price: float = Field(..., gt=0)
+    old_price: Optional[float] = 0.0
     inventory: int = Field(..., ge=0)
     status: Literal["IN_STOCK", "OUT_OF_STOCK"]
     size: Optional[str] = None
@@ -16,8 +17,6 @@ class VariantWithStatus(BaseModel):
 class ProductCreate(BaseModel):
     name: str = Field(..., min_length=1)
     description: str = Field(..., min_length=1)
-    price: float = Field(..., gt=0)
-    old_price: float = Field(..., ge=0)
     brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
@@ -30,8 +29,6 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = Field(None, min_length=1)
     sku: Optional[str] = None
     status: Optional[Literal["IN_STOCK", "OUT_OF_STOCK"]] = None
-    price: Optional[float] = None
-    old_price: Optional[float] = None
     brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
@@ -55,8 +52,6 @@ class Product(BM):
     sku: Optional[str] = None
     slug: str
     description: str
-    price: float
-    old_price: Optional[float] = 0.0
     image: Optional[str] = None
     status: str
     variants: Optional[List[ProductVariant]] = None
@@ -74,8 +69,6 @@ class SearchProduct(BaseModel):
     sku: Optional[str] = None
     slug: str
     description: str
-    price: float
-    old_price: Optional[float] = 0.0
     image: Optional[str] = None
     status: str
     ratings: float

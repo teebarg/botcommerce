@@ -26,8 +26,6 @@ class OrderService:
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
 
-
-        # Create order with items
         new_order = await db.order.create(
             data={
                 "order_number": order_number,

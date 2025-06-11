@@ -188,7 +188,7 @@ async def get_relevant_products(query_terms: List[str], product_intent: bool = F
         product_info = ""
         for product in unique_products:
             name = product.name
-            price = product.price
+            price = product.variants[0].price
             image = product.images[0].image if product.images else product.image
 
             product_info += f"""---
@@ -270,7 +270,7 @@ async def get_categories_info(query_terms: List[str]) -> tuple[str, Optional[str
             if category.products and len(category.products) > 0:
                 category_info += "  Popular products in this category:\n"
                 for product in category.products[:3]:  # Limit to 3 products
-                    category_info += f"    - {product.name}: ₦{product.price}\n"
+                    category_info += f"    - {product.name}: ₦{product.variants[0].price}\n"
 
             category_info += "\n"
 
@@ -334,7 +334,7 @@ async def get_brands_info(query_terms: List[str]) -> tuple[str, Optional[str]]:
             if brand.products and len(brand.products) > 0:
                 brand_info += "  Popular products from this brand:\n"
                 for product in brand.products[:3]:  # Limit to 3 products
-                    brand_info += f"    - {product.name}: ₦{product.price}\n"
+                    brand_info += f"    - {product.name}: ₦{product.variants[0].price}\n"
 
             brand_info += "\n"
 

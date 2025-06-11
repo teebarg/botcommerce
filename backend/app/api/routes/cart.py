@@ -44,10 +44,9 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
     """Add an item to cart"""
     cart = await get_or_create_cart(cartId)
 
-    # Verify product variant exists and is in stock
     variant = await db.productvariant.find_unique(
         where={"id": item.variant_id},
-        include={"product": {"include": {"images": True, "name": True, "slug": True}}}
+        include={"product": {"include": {"images": True}}}
     )
 
     if not variant:

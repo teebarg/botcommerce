@@ -18,7 +18,7 @@ interface SearchParams {
 // Product API methods
 export const productApi = {
     async search(searchParams: SearchParams): ApiResult<PaginatedProductSearch> {
-        return await api.get<PaginatedProductSearch>("/product/search", { next: { tags: ["search"] }, params: { ...searchParams } });
+        return await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams }, cache: "default" });
     },
     async get(slug: string): ApiResult<Product> {
         return await api.get<Product>(`/product/${slug}`, { next: { tags: ["product"] } });
@@ -120,6 +120,7 @@ export const productApi = {
         productId: number;
         sku?: string;
         price: number;
+        old_price?: number;
         inventory: number;
         status: "IN_STOCK" | "OUT_OF_STOCK";
         size?: string;
@@ -132,6 +133,7 @@ export const productApi = {
     async updateVariant(input: {
         id: number;
         price?: number;
+        old_price?: number;
         inventory?: number;
         status?: "IN_STOCK" | "OUT_OF_STOCK";
         size?: string;

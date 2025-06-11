@@ -115,24 +115,6 @@ export const PaginatedReviewSchema = z.object({
     total_pages: z.number(),
 });
 
-export const ProductVariantSchema = z.object({
-    id: z.number(),
-    product: z.null(),
-    product_id: z.number(),
-    sku: z.string(),
-    status: ProductStatusSchema,
-    price: z.number(),
-    old_price: z.number(),
-    inventory: z.number(),
-    size: z.string().optional(),
-    color: z.string().optional(),
-    attributes: z.record(z.string()),
-    order_items: z.null(),
-    cart_items: z.null(),
-    created_at: z.string(),
-    updated_at: z.string(),
-});
-
 export const ProductImageSchema = z.object({
     id: z.number(),
     product_id: z.number(),
@@ -176,6 +158,48 @@ export const PaginationSchema = z.object({
     total_pages: z.number(),
 });
 
+export const ProductVariantSchema: z.ZodType<any> = z.lazy(() =>
+    z.object({
+        id: z.number(),
+        product_id: z.number(),
+        sku: z.string(),
+        status: ProductStatusSchema,
+        price: z.number(),
+        old_price: z.number().nullable().optional(),
+        inventory: z.number(),
+        size: z.string().nullable().optional(),
+        color: z.string().nullable().optional(),
+        order_items: z.null(),
+        cart_items: z.null(),
+        created_at: z.date(),
+        updated_at: z.date(),
+
+        // Bidirectional
+        product: ProductSchema.optional(),
+    })
+);
+
+export const ProductSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    sku: z.string(),
+    description: z.string(),
+    image: z.string(),
+    status: ProductStatusSchema,
+    variants: z.array(ProductVariantSchema).optional(),
+    ratings: z.number(),
+    categories: z.array(CategorySchema),
+    collections: z.array(CollectionSchema),
+    brand: BrandSchema,
+    tags: z.null(),
+    images: z.array(ProductImageSchema),
+    reviews: z.array(ReviewSchema),
+    favorites: z.null(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
 export const ProductSearchSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -195,29 +219,6 @@ export const ProductSearchSchema = z.object({
     images: z.array(z.string()),
     reviews: z.array(z.any()).nullable(),
     favorites: z.null(),
-});
-
-export const ProductSchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    slug: z.string(),
-    sku: z.string(),
-    description: z.string(),
-    price: z.number(),
-    old_price: z.number(),
-    image: z.string(),
-    status: ProductStatusSchema,
-    variants: z.array(ProductVariantSchema),
-    ratings: z.number(),
-    categories: z.array(CategorySchema),
-    collections: z.array(CollectionSchema),
-    brand: BrandSchema,
-    tags: z.null(),
-    images: z.array(ProductImageSchema),
-    reviews: z.array(ReviewSchema),
-    favorites: z.null(),
-    created_at: z.string(),
-    updated_at: z.string(),
 });
 
 export const CartItemSchema = z.object({

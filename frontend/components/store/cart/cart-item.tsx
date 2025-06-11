@@ -10,7 +10,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
         <div className="flex gap-3">
             <div className="relative">
                 <div className="h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
-                    <img alt={item.name} className="h-full w-full object-cover object-center" src={item.image} />
+                    <img alt={item.name} className="h-full w-full object-cover object-center" src={item?.image || "/placeholder.jpg"} />
                 </div>
             </div>
 

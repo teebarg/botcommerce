@@ -25,7 +25,6 @@ from app.services.export import validate_file
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 
-# Create a router for tags
 router = APIRouter()
 
 

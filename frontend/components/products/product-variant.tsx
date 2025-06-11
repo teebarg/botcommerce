@@ -28,6 +28,7 @@ const variantFormSchema = z.object({
     price: z.number().min(0, {
         message: "Price must be at least 0.",
     }),
+    old_price: z.number().optional(),
     inventory: z.number().min(0, {
         message: "Inventory must be at least 0.",
     }),
@@ -46,6 +47,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
             sku: "",
             status: "IN_STOCK",
             price: 0,
+            old_price: 0,
             inventory: 0,
             size: "",
             color: "",
@@ -81,6 +83,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
         form.setValue("sku", variant.sku);
         form.setValue("status", variant.status);
         form.setValue("price", variant.price);
+        form.setValue("old_price", variant.old_price);
         form.setValue("inventory", variant.inventory);
         form.setValue("size", variant.size || "");
         form.setValue("color", variant.color || "");
@@ -168,6 +171,24 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                 />
                                 <FormField
                                     control={form.control}
+                                    name="inventory"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Inventory</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Enter inventory"
+                                                    type="number"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
                                     name="size"
                                     render={({ field }) => (
                                         <FormItem>
@@ -212,13 +233,13 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="inventory"
+                                    name="old_price"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Inventory</FormLabel>
+                                            <FormLabel>Old Price</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="Enter inventory"
+                                                    placeholder="Enter old price"
                                                     type="number"
                                                     {...field}
                                                     onChange={(e) => field.onChange(Number(e.target.value))}
@@ -228,6 +249,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                         </FormItem>
                                     )}
                                 />
+
                                 <FormField
                                     control={form.control}
                                     name="status"
@@ -251,7 +273,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                 />
                             </div>
                             <div className="flex justify-end">
-                                <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit">
+                                <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit" variant="primary">
                                     {editingVariant ? "Update" : "Create"}
                                 </Button>
                             </div>

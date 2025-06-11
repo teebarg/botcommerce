@@ -26,13 +26,6 @@ const formSchema = z.object({
     categories: z.array(z.any()),
     collections: z.array(z.any()),
     brand: z.number(),
-    // tags: z.array(z.any()).min(1, {
-    //     message: "Please select at least one tag.",
-    // }),
-    price: z.number().min(0, {
-        message: "Price must be at least 0.",
-    }),
-    old_price: z.number().optional(),
     sku: z.string().optional(),
     status: z.string().min(3, {
         message: "Status must be at least 3 characters.",
@@ -61,9 +54,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
             brand: product?.brand?.id || 1,
             categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
             collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],
-            // tags: product?.tags?.map((tag) => ({ value: tag.id, label: tag.name })) || [],
-            price: product?.price || 0,
-            old_price: product?.old_price || 0,
         },
     });
 
@@ -84,7 +74,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                         category_ids: categoryIds,
                         collection_ids: collectionIds,
                         brand_id: brand,
-                        tags_ids: [],
                     });
                 } else {
                     res = await api.product.create({
@@ -92,7 +81,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                         category_ids: categoryIds,
                         collection_ids: collectionIds,
                         brand_id: brand,
-                        tags_ids: [],
                     });
                 }
                 if (res.error) {
@@ -185,44 +173,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
 
                             <FormField
                                 control={form.control}
-                                name="price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Price</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Enter price"
-                                                type="number"
-                                                {...field}
-                                                onChange={(e) => field.onChange(Number(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="old_price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Old Price</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Enter old price"
-                                                type="number"
-                                                {...field}
-                                                onChange={(e) => field.onChange(Number(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
                                 name="categories"
                                 render={({ field }) => (
                                     <FormItem className="md:col-span-2">
@@ -285,7 +235,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                 <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose()}>
                                     Close
                                 </Button>
-                                <Button className="min-w-32" disabled={isPending} isLoading={isPending} type="submit">
+                                <Button className="min-w-32" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
                                     {product?.id ? "Update" : "Create"}
                                 </Button>
                             </div>

@@ -46,7 +46,7 @@ const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => 
                                 !conversation.user ? "bg-gradient-to-br from-gray-500 to-gray-600" : "bg-gradient-to-br from-blue-500 to-purple-600"
                             }`}
                         >
-                            {!conversation.user ? <UserX size={20} /> : conversation.user.image}
+                            {!conversation.user ? <UserX size={20} /> : conversation.user?.image}
                         </div>
 
                         <div>

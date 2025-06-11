@@ -20,10 +20,8 @@ reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
 )
 
-# Create once at startup
 meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
 
-# Initialize Supabase client
 supabase_url = settings.SUPABASE_URL
 supabase_key = settings.SUPABASE_KEY
 supabase: Client = create_client(supabase_url, supabase_key)
