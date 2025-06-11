@@ -27,7 +27,6 @@ class CartItemResponse(CartItemBase):
     id: int
     cart_id: int
     cart_number: str
-    # variant: ProductVariant
     created_at: datetime
     updated_at: datetime
 

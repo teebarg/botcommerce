@@ -15,7 +15,7 @@ from app.core.deps import (
     meilisearch_client
 )
 from app.core.logging import logger
-from app.core.utils import slugify, url_to_list
+from app.core.utils import slugify, url_to_list, generate_sku
 from app.models.product import Product, Products, SearchProducts
 from app.models.generic import Message
 from app.models.product import (
@@ -244,7 +244,6 @@ async def create_product(product: ProductCreate):
         collection_connect = [{"id": id} for id in product.collection_ids]
         data["collections"] = {"connect": collection_connect}
 
-    # Prepare tag connections if provided
     if product.tags_ids:
         tag_connect = [{"id": id} for id in product.tags_ids]
         data["tags"] = {"connect": tag_connect}
@@ -398,21 +397,13 @@ async def delete_product(id: int) -> Message:
 
 @router.post("/{id}/variants")
 async def create_variant(id: int, variant: VariantWithStatus):
-    # Check if product exists
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Create slug from name
-    slug = slugify(variant.name)
-
-    # Create the variant
     created_variant = await db.productvariant.create(
         data={
-            "name": variant.name,
-            "slug": slug,
-            "sku": variant.sku or f"SK{slug}",
-            "image": variant.image,
+            "sku": variant.sku or f"{generate_sku(product_name=product.name, color=variant.color, size=variant.size)}",
             "price": variant.price,
             "inventory": variant.inventory,
             "product_id": id,
@@ -434,11 +425,6 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
 
     # Prepare update data
     update_data = {}
-
-    if variant.name:
-        update_data["name"] = variant.name
-        slug = slugify(variant.name)
-        update_data["slug"] = slug
 
     if variant.sku:
         update_data["sku"] = variant.sku

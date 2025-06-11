@@ -118,9 +118,7 @@ export const productApi = {
     },
     async createVariant(input: {
         productId: number;
-        name: string;
         sku?: string;
-        image?: string;
         price: number;
         inventory: number;
         status: "IN_STOCK" | "OUT_OF_STOCK";
@@ -133,8 +131,6 @@ export const productApi = {
     },
     async updateVariant(input: {
         id: number;
-        name?: string;
-        slug?: string;
         price?: number;
         inventory?: number;
         status?: "IN_STOCK" | "OUT_OF_STOCK";

@@ -15,17 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/types/models";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { currency } from "@/lib/utils";
 
 interface ProductVariantsProps {
     variants: ProductVariant[];
     productId: number;
-    productImage: string;
 }
 
 const variantFormSchema = z.object({
-    name: z.string().min(2, {
-        message: "Product name must be at least 2 characters.",
-    }),
     sku: z.string().optional(),
     status: z.enum(["IN_STOCK", "OUT_OF_STOCK"]),
     price: z.number().min(0, {
@@ -38,7 +35,7 @@ const variantFormSchema = z.object({
     color: z.string().optional(),
 });
 
-const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, productId, variants = [] }) => {
+const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants = [] }) => {
     const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const invalidate = useInvalidate();
@@ -46,7 +43,6 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
     const form = useForm<z.infer<typeof variantFormSchema>>({
         resolver: zodResolver(variantFormSchema),
         defaultValues: {
-            name: "",
             sku: "",
             status: "IN_STOCK",
             price: 0,
@@ -63,7 +59,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
         if (editingVariant?.id) {
             response = await api.product.updateVariant({ ...values, id: editingVariant.id });
         } else {
-            response = await api.product.createVariant({ productId, image: productImage, ...values });
+            response = await api.product.createVariant({ productId, ...values });
         }
 
         if (response.error) {
@@ -82,7 +78,6 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
 
     const handleEdit = (variant: ProductVariant) => {
         setEditingVariant(variant);
-        form.setValue("name", variant.name);
         form.setValue("sku", variant.sku);
         form.setValue("status", variant.status);
         form.setValue("price", variant.price);
@@ -112,7 +107,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead>
                             <tr>
-                                {["Name", "SKU", "Price", "Inventory", "Size", "Color", "Status", "Actions"]?.map((variant: string, idx: number) => (
+                                {["SKU", "Price", "Inventory", "Size", "Color", "Status", "Actions"]?.map((variant: string, idx: number) => (
                                     <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-default-500 uppercase tracking-wider">
                                         {variant}
                                     </th>
@@ -122,14 +117,15 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                         <tbody className="divide-y divide-gray-200">
                             {variants?.map((variant: ProductVariant, idx: number) => (
                                 <tr key={idx}>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.name}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.sku}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.price}</td>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">
+                                        <p className="max-w-32 overflow-hidden text-ellipsis">{variant.sku}</p>
+                                    </td>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{currency(variant.price)}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.inventory}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.size || "-"}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.color || "-"}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">
-                                        <Badge variant={variant.status === "IN_STOCK" ? "default" : "destructive"}>{variant.status}</Badge>
+                                        <Badge variant={variant.status === "IN_STOCK" ? "emerald" : "destructive"}>{variant.status}</Badge>
                                     </td>
                                     <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium flex items-center">
                                         <Button size="icon" variant="ghost" onClick={() => handleEdit(variant)}>
@@ -152,24 +148,11 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productImage, product
                     </table>
                 </div>
 
-                <p className="text-default-500 mt-4 text-xl font-medium">Add new variant</p>
+                <p className="text-default-500 mt-8 font-semibold">Add new variant</p>
                 <div className="bg-content1 p-4 rounded-lg">
                     <Form {...form}>
                         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter product name" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                                 <FormField
                                     control={form.control}
                                     name="sku"

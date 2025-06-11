@@ -36,17 +36,20 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const handleVariantSelection = (size?: string, color?: string) => {
         const variant = product.variants.find((v) => (!size || v.size === size) && (!color || v.color === color));
+
         setSelectedVariant(variant || null);
     };
 
     const handleAddToCart = async () => {
         if (!selectedVariant) {
             toast.error("Please select a variant");
+
             return;
         }
 
         if (selectedVariant.status === "OUT_OF_STOCK") {
             toast.error("Selected variant is out of stock");
+
             return;
         }
 
@@ -58,6 +61,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
         if (response.error) {
             toast.error(response.error);
+
             return;
         }
         invalidateCartItems();
@@ -76,6 +80,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
         const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
         window.open(whatsappUrl, "_blank");
     };
 
@@ -126,8 +131,8 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                         fill
                                         alt={selectedImage?.image || product.image}
                                         className="object-contain h-full w-full rounded"
-                                        src={selectedImage?.image || product.image}
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        src={selectedImage?.image || product.image}
                                     />
                                 )}
                             </div>
@@ -218,7 +223,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 <p className="text-orange-600">Please select a variant</p>
                             </div>
                         ) : selectedVariant?.status === "OUT_OF_STOCK" ? (
-                            <Button className="w-full mt-4 cursor-not-allowed" disabled={true} size="lg">
+                            <Button className="mt-4 w-max px-16 py-6" disabled={true}>
                                 Out of Stock
                             </Button>
                         ) : (

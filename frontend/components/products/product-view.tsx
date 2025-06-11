@@ -31,7 +31,7 @@ export function ProductView({ product, onClose }: { product?: Product; onClose: 
                 </TabsContent>
                 {product && (
                     <TabsContent value="variants">
-                        <ProductVariants productId={product.id} productImage={product?.image || ""} variants={product?.variants || []} />
+                        <ProductVariants productId={product.id} variants={product?.variants || []} />
                     </TabsContent>
                 )}
                 {product && (

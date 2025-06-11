@@ -252,6 +252,22 @@ def generate_slug(name: str) -> str:
 
     return name
 
+def generate_sku(product_name: str, color: str = "", size: str = "", rand_digits: int = 3) -> str:
+    def sanitize(text, length=3):
+        text = re.sub(r'\W+', '', text)  # Remove non-alphanumeric
+        return text[:length].upper()
+
+    # Sanitize inputs
+    name_part = sanitize(product_name)
+    color_part = sanitize(color)
+    size_part = sanitize(size)
+
+    random_part = ''.join(random.choices(string.digits, k=rand_digits))
+
+    sku = f"{name_part}-{color_part}-{size_part}-{random_part}"
+    return sku.strip('-')
+
+
 
 def generate_id(prefix="cart_", length=25):
     chars = string.ascii_uppercase + string.digits
