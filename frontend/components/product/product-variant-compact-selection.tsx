@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { ShoppingCart, MessageCircleMore } from "lucide-react";
 
 import { ProductSearch, ProductVariant } from "@/types/models";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
-import { toast } from "sonner";
 import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
-import { useRouter } from "next/navigation";
-import { Heart, ShoppingCart, MessageCircleMore } from "lucide-react";
 
 interface CompactVariantSelectionProps {
     product: ProductSearch;
@@ -23,6 +22,7 @@ export const CompactVariantSelection: React.FC<CompactVariantSelectionProps> = (
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(
         product.variants?.find((v) => v.status === "IN_STOCK") || product.variants?.[0]
     );
+
     console.log("🚀 ~ file: product-variant-compact-selection.tsx:17 ~ selectedVariant:", selectedVariant);
 
     const invalidateCart = useInvalidateCart();
