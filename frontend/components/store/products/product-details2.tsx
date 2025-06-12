@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Heart, Star, Plus, Minus, ShoppingCart, MessageCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import { ProductSearch, ProductVariant } from "@/types/models";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
@@ -76,10 +76,14 @@ const ProductDetail: React.FC<{
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {
         e.stopPropagation();
         const variantInfo = selectedVariant
-            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(selectedVariant.price)}`
+            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(
+                  selectedVariant.price
+              )}`
             : "";
 
-        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
+        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${
+            typeof window !== "undefined" ? window.location.origin : ""
+        }/products/${product.slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
 
@@ -140,9 +144,10 @@ const ProductDetail: React.FC<{
                         {colors?.map((color: string, idx: number) => (
                             <button
                                 key={idx}
-                                className={`relative w-10 h-10 rounded-full border-2 transition-all ${
-                                    selectedColor === color ? "border-blue-500 scale-110" : "border-gray-300"
-                                }`}
+                                className={cn("relative w-10 h-10 rounded-full border-2 transition-all", {
+                                    "border-blue-500 scale-110": selectedColor === color,
+                                    "border-gray-300": selectedColor !== color,
+                                })}
                                 style={{ backgroundColor: color }}
                                 onClick={() => toggleColorSelect(color)}
                             >
@@ -161,11 +166,10 @@ const ProductDetail: React.FC<{
                             {sizes?.map((size: string, idx: number) => (
                                 <button
                                     key={idx}
-                                    className={`px-4 py-2 rounded-lg border transition-all ${
-                                        selectedSize === size
-                                            ? "border-blue-500 bg-blue-50 text-blue-600"
-                                            : "border-gray-300 text-gray-700 hover:border-gray-400"
-                                    }`}
+                                    className={cn("px-4 py-2 rounded-lg border transition-all", {
+                                        "border-blue-500 bg-blue-50 text-blue-600": selectedSize === size,
+                                        "border-gray-300 text-gray-700 hover:border-gray-400": selectedSize !== size,
+                                    })}
                                     onClick={() => toggleSizeSelect(size)}
                                 >
                                     {size}
@@ -213,11 +217,11 @@ const ProductDetail: React.FC<{
                     </div>
 
                     <div className={cn("flex gap-3 flex-col md:flex-row")}>
-                        <Button onClick={handleAddToCart} variant="primary" size="lg" isLoading={loading} disabled={loading || !selectedVariant}>
+                        <Button disabled={loading || !selectedVariant} isLoading={loading} size="lg" variant="primary" onClick={handleAddToCart}>
                             <ShoppingCart className="w-5 h-5 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
                             <span className="relative z-10">Add to Cart</span>
                         </Button>
-                        <Button onClick={handleWhatsAppPurchase} variant="emerald" size="lg" disabled={loading || !selectedVariant}>
+                        <Button disabled={loading || !selectedVariant} size="lg" variant="emerald" onClick={handleWhatsAppPurchase}>
                             <MessageCircle className="w-5 h-5 relative z-10 group-hover:bounce transition-transform duration-300" />
                             <span className="relative z-10">Buy on WhatsApp</span>
                         </Button>
