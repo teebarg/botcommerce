@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { Heart, ShoppingCart, MessageCircleMore } from "lucide-react";
+import { Heart, ShoppingCart, MessageCircleMore, X } from "lucide-react";
 import { HeartFilled } from "nui-react-icons";
 
 import { ProductSearch, ProductVariant, WishItem } from "@/types/models";
@@ -16,6 +16,9 @@ import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
 import { CompactVariantSelection } from "@/components/product/product-variant-compact-selection";
+import ProductDetail from "./product-details2";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -32,6 +35,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const { id, slug, name, image, images } = product;
+    const state = useOverlayTriggerState({});
+    const dialogState = useOverlayTriggerState({});
     // const discountedPrice = old_price ? price - (price * (old_price - price)) / 100 : price;
 
     // const discount = old_price ? Math.round((1 - price / old_price) * 100) : 0;
@@ -75,6 +80,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
             }}
         >
             <div className="flex flex-col gap-2 w-full">
+                <Drawer open={dialogState.isOpen} onOpenChange={dialogState.open}>
+                    <DrawerTrigger>
+                        <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
+                            <Image
+                                fill
+                                alt={name}
+                                className="object-cover h-full w-full group-hover:scale-110 transition p-4"
+                                src={images?.[0] || image || "/placeholder.jpg"}
+                            />
+                        </div>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                        <DrawerHeader className="sr-only">
+                            <DrawerTitle>Details</DrawerTitle>
+                        </DrawerHeader>
+                        <ProductDetail product={product} onClose={dialogState.close} />
+                    </DrawerContent>
+                </Drawer>
                 <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
                     <Image
                         fill
@@ -137,6 +160,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                     </Button>
                 </div> */}
             </div>
+            {/* {state.isOpen && <ProductDetail product={product} onClose={state.close} />} */}
         </motion.div>
     );
 };

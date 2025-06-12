@@ -152,7 +152,7 @@ services:
       - traefik.http.routers.meilisearch-http.entrypoints=http
 
   adminer:
-    image: adminer
+    image: adminer:5.3.0
     ports:
       - "7006:8080"
     networks:

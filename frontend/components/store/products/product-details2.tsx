@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, Heart, Star, Plus, Minus, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Heart, Star, Plus, Minus, ShoppingCart, MessageCircle } from "lucide-react";
 
 import { ProductSearch, ProductVariant } from "@/types/models";
+import { cn, currency } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
+import { api } from "@/apis";
+import { useStore } from "@/app/store/use-store";
 
 const ProductDetail: React.FC<{
     product: ProductSearch;
     onClose: () => void;
-    isVisible: boolean;
-}> = ({ product, onClose, isVisible }) => {
+    isVisible?: boolean;
+}> = ({ product, onClose, isVisible = true }) => {
+    const invalidateCart = useInvalidateCart();
+    const invalidateCartItems = useInvalidateCartItem();
     const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0].color || null);
     const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0].size || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [isLiked, setIsLiked] = useState<boolean>(false);
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(
-        product.variants?.find((v) => v.status === "IN_STOCK") || product.variants?.[0]
-    );
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
+    const [loading, setLoading] = useState<boolean>(false);
+    const { shopSettings } = useStore();
 
     const sizes = [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
     const colors = [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
@@ -45,12 +53,45 @@ const ProductDetail: React.FC<{
         setSelectedColor((prev) => (prev === color ? null : color));
     };
 
+    const handleAddToCart = async () => {
+        setLoading(true);
+        const response = await api.cart.add({
+            variant_id: selectedVariant?.id!,
+            quantity,
+        });
+
+        if (response.error) {
+            toast.error(response.error);
+            setLoading(false);
+
+            return;
+        }
+        invalidateCartItems();
+        invalidateCart();
+
+        toast.success("Added to cart successfully");
+        setLoading(false);
+    };
+
+    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const variantInfo = selectedVariant
+            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(selectedVariant.price)}`
+            : "";
+
+        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
+
+        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
+        window.open(whatsappUrl, "_blank");
+    };
+
     if (!isVisible) return null;
 
     return (
-        <div className="fixed inset-0 bg-white z-50 overflow-y-auto animate-in slide-in-from-bottom duration-300">
+        <div className="bg-white z-50 overflow-y-auto duration-300">
             {/* Header */}
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 p-4 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-2 flex items-center justify-between z-10">
                 <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={onClose}>
                     <ArrowLeft className="w-6 h-6" />
                 </button>
@@ -60,9 +101,9 @@ const ProductDetail: React.FC<{
             </div>
 
             {/* Product Image */}
-            <div className="relative">
+            <div className="relative pt-4">
                 <img alt={product.name} className="w-full h-80 object-cover" src={product.images[0]} />
-                {product.old_price && (
+                {product.old_price > product.price && (
                     <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                         -{Math.round((1 - product.price / product.old_price) * 100)}% OFF
                     </div>
@@ -71,7 +112,6 @@ const ProductDetail: React.FC<{
 
             {/* Content */}
             <div className="p-6 space-y-6">
-                {/* Product Info */}
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
                     <div className="flex items-center mb-3">
@@ -82,44 +122,45 @@ const ProductDetail: React.FC<{
                         <span className="text-gray-500 ml-2">({product.reviews} reviews)</span>
                     </div>
                     <div className="flex items-center space-x-3">
-                        <span className="text-3xl font-bold text-gray-900">${product.price}</span>
-                        {product.old_price && <span className="text-xl text-gray-400 line-through">${product.old_price}</span>}
+                        <span className="text-3xl font-bold text-gray-900">{currency(product.price)}</span>
+                        {product.old_price > product.price && (
+                            <span className="text-xl text-gray-400 line-through">{currency(product.old_price)}</span>
+                        )}
                     </div>
                 </div>
 
-                {/* Description */}
                 <div>
                     <p className="text-gray-600 leading-relaxed">{product.description}</p>
                 </div>
 
-                {/* Color Selection */}
-                <div>
+                {/* Color */}
+                <div className={cn("hidden", colors?.length > 1 && "block")}>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Color</h3>
                     <div className="flex space-x-3">
-                        {colors?.map((color) => (
+                        {colors?.map((color: string, idx: number) => (
                             <button
-                                key={color.name}
-                                className={`relative w-12 h-12 rounded-full border-2 transition-all ${
-                                    selectedColor === color.name ? "border-blue-500 scale-110" : "border-gray-300"
+                                key={idx}
+                                className={`relative w-10 h-10 rounded-full border-2 transition-all ${
+                                    selectedColor === color ? "border-blue-500 scale-110" : "border-gray-300"
                                 }`}
-                                style={{ backgroundColor: color.value }}
+                                style={{ backgroundColor: color }}
                                 onClick={() => toggleColorSelect(color)}
                             >
-                                {selectedColor === color.name && <div className="absolute inset-0 rounded-full border-2 border-white" />}
+                                {selectedColor === color && <div className="absolute inset-0 rounded-full border-2 border-white" />}
                             </button>
                         ))}
                     </div>
                     <p className="text-sm text-gray-600 mt-2">{selectedColor}</p>
                 </div>
 
-                {/* Size Selection */}
+                {/* Size */}
                 {sizes?.length > 1 && (
                     <div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Size</h3>
                         <div className="flex flex-wrap gap-2">
-                            {sizes?.map((size) => (
+                            {sizes?.map((size: string, idx: number) => (
                                 <button
-                                    key={size}
+                                    key={idx}
                                     className={`px-4 py-2 rounded-lg border transition-all ${
                                         selectedSize === size
                                             ? "border-blue-500 bg-blue-50 text-blue-600"
@@ -131,6 +172,7 @@ const ProductDetail: React.FC<{
                                 </button>
                             ))}
                         </div>
+                        <p className="text-sm text-gray-600 mt-2">{selectedSize}</p>
                     </div>
                 )}
 
@@ -155,17 +197,31 @@ const ProductDetail: React.FC<{
                 </div>
             </div>
 
-            {/* Bottom Action */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6">
-                <div className="flex items-center justify-between space-x-4">
-                    <div>
-                        <p className="text-sm text-gray-500">Total</p>
-                        <p className="text-2xl font-bold text-gray-900">${(product.price * quantity).toFixed(2)}</p>
+            <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4">
+                <div className="space-y-3 pb-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-gray-500">Total</p>
+                            <p className="text-2xl font-bold text-gray-900">{currency(product.price * quantity)}</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-sm text-gray-500">Quantity</p>
+                            <p className="text-lg font-semibold text-gray-900">
+                                {quantity} item{quantity > 1 ? "s" : ""}
+                            </p>
+                        </div>
                     </div>
-                    <button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-2xl font-semibold flex items-center justify-center space-x-2 hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-[1.02] shadow-lg">
-                        <ShoppingCart className="w-5 h-5" />
-                        <span>Add to Cart</span>
-                    </button>
+
+                    <div className={cn("flex gap-3 flex-col md:flex-row")}>
+                        <Button onClick={handleAddToCart} variant="primary" size="lg" isLoading={loading} disabled={loading || !selectedVariant}>
+                            <ShoppingCart className="w-5 h-5 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+                            <span className="relative z-10">Add to Cart</span>
+                        </Button>
+                        <Button onClick={handleWhatsAppPurchase} variant="emerald" size="lg" disabled={loading || !selectedVariant}>
+                            <MessageCircle className="w-5 h-5 relative z-10 group-hover:bounce transition-transform duration-300" />
+                            <span className="relative z-10">Buy on WhatsApp</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>
