@@ -116,7 +116,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             <ArrowUpRightMini />
                         </LocalizedClientLink>
                     </div>
-                    <ProductDetails product={product} />
+                    <ProductDetails />
                 </div>
             </div>
         </div>

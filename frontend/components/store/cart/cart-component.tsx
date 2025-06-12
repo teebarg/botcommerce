@@ -36,7 +36,7 @@ const CartComponent: React.FC = () => {
             }
             onOpenChange={state.setOpen}
         >
-            <CartDetails cart={cart!} items={items ?? []} shippingFee={cart?.shipping_fee} onClose={state.close} />
+            <CartDetails cart={cart!} items={items ?? []} shippingFee={cart?.shipping_fee} />
         </Overlay>
     );
 };

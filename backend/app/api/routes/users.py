@@ -200,14 +200,24 @@ async def remove_wishlist_item(
     user: CurrentUser,
 ):
     existing = await db.favorite.find_unique(
-        where={"product_id": product_id, "user_id": user.id}
+        where={
+            'user_id_product_id': {
+                'user_id': user.id,
+                'product_id': product_id
+            }
+        }
     )
     if not existing:
         raise HTTPException(status_code=404, detail="Product not found")
 
     try:
         await db.favorite.delete(
-            where={"product_id": product_id, "user_id": user.id}
+            where={
+                'user_id_product_id': {
+                    'user_id': user.id,
+                    'product_id': product_id
+                }
+            }
         )
         return Message(message="Product deleted successfully")
     except PrismaError as e:

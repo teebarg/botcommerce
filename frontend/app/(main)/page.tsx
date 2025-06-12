@@ -55,7 +55,7 @@ export default async function Home() {
     const siteConfig = await getSiteConfig();
     const { data } = await baseApi.get<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
         "/product/landing-products",
-        { next: { tags: ["featured"] } }
+        { next: { tags: ["featured"] }, cache: "default" }
     );
 
     let wishlist: WishItem[] = [];

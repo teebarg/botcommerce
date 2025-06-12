@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { Heart, ShoppingCart, MessageCircleMore, X } from "lucide-react";
+import { Heart, ShoppingCart, MessageCircleMore, X, Star } from "lucide-react";
 import { HeartFilled } from "nui-react-icons";
 
 import { ProductSearch, ProductVariant, WishItem } from "@/types/models";
@@ -16,9 +16,10 @@ import { useInvalidate } from "@/lib/hooks/useApi";
 import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
 import { CompactVariantSelection } from "@/components/product/product-variant-compact-selection";
-import ProductDetail from "./product-details2";
+import ProductOverview from "./product-overview";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import Overlay from "@/components/overlay";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -80,25 +81,48 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
             }}
         >
             <div className="flex flex-col gap-2 w-full">
-                <Drawer open={dialogState.isOpen} onOpenChange={dialogState.open}>
-                    <DrawerTrigger>
-                        <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
-                            <Image
-                                fill
-                                alt={name}
-                                className="object-cover h-full w-full group-hover:scale-110 transition p-4"
-                                src={images?.[0] || image || "/placeholder.jpg"}
-                            />
+                <Overlay
+                    open={dialogState.isOpen}
+                    title="Details"
+                    trigger={
+                        <div>
+                            <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
+                                <Image
+                                    fill
+                                    alt={name}
+                                    className="object-cover h-full w-full group-hover:scale-110 transition p-4"
+                                    src={images?.[0] || image || "/placeholder.jpg"}
+                                />
+                                {showWishlist && (
+                                    <Button
+                                        className={cn(
+                                            "absolute top-3 right-3 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100",
+                                            inWishlist && "opacity-100"
+                                        )}
+                                        size="iconOnly"
+                                    >
+                                        {inWishlist ? <HeartFilled className="w-7 h-7 text-rose-400" /> : <Heart className="w-7 h-7" />}
+                                    </Button>
+                                )}
+                            </div>
+                            <div className="py-2">
+                                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
+                                <div className="flex items-center mb-2">
+                                    <div className="flex items-center">
+                                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                        <span className="text-sm text-gray-600 ml-1">{product.ratings}</span>
+                                    </div>
+                                    <span className="text-sm text-gray-400 ml-2">({product.reviews || 1})</span>
+                                </div>
+                            </div>
                         </div>
-                    </DrawerTrigger>
-                    <DrawerContent>
-                        <DrawerHeader className="sr-only">
-                            <DrawerTitle>Details</DrawerTitle>
-                        </DrawerHeader>
-                        <ProductDetail product={product} onClose={dialogState.close} />
-                    </DrawerContent>
-                </Drawer>
-                <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
+                    }
+                    sheetClassName="min-w-[40vw]"
+                    onOpenChange={dialogState.setOpen}
+                >
+                    <ProductOverview product={product} onClose={dialogState.close} isLiked={inWishlist} />
+                </Overlay>
+                {/* <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
                     <Image
                         fill
                         alt={name}
@@ -121,9 +145,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                             {inWishlist ? <HeartFilled className="w-7 h-7 text-rose-400" /> : <Heart className="w-7 h-7" />}
                         </Button>
                     )}
-                </div>
-                <div className="font-semibold text-default-900 my-2 line-clamp-1 hover:text-default-900 transition-colors px-1">{name}</div>
-                <CompactVariantSelection product={product} onVariantChange={setSelectedVariant} />
+                </div> */}
+                {/* <div className="font-semibold text-default-900 my-2 line-clamp-1 hover:text-default-900 transition-colors px-1">{name}</div> */}
+                {/* <div className="py-2">
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
+                    <div className="flex items-center mb-2">
+                        <div className="flex items-center">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-sm text-gray-600 ml-1">{product.ratings}</span>
+                        </div>
+                        <span className="text-sm text-gray-400 ml-2">({product.reviews})</span>
+                    </div>
+                </div> */}
+                {/* <CompactVariantSelection product={product} onVariantChange={setSelectedVariant} /> */}
                 {/* <div className="flex items-center justify-between px-1">
                     <div className="flex items-center">
                         <span className="text-lg font-semibold text-danger">{currency(price)}</span>
@@ -160,7 +194,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                     </Button>
                 </div> */}
             </div>
-            {/* {state.isOpen && <ProductDetail product={product} onClose={state.close} />} */}
+            {/* {state.isOpen && <ProductOverview product={product} onClose={state.close} />} */}
         </motion.div>
     );
 };

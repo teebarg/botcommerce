@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
+import { Button } from "./ui/button";
 
 interface OverlayProps {
     trigger: React.ReactNode;
@@ -46,7 +47,7 @@ const Overlay: React.FC<OverlayProps> = ({
                 <DrawerHeader className={showHeader ? "" : "sr-only"}>
                     <DrawerTitle>{title}</DrawerTitle>
                 </DrawerHeader>
-                <DrawerClose className="absolute top-4 right-4">
+                <DrawerClose className="absolute top-4 right-4 z-70">
                     <X className="h-5 w-5" />
                 </DrawerClose>
                 {children}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import CartItemComponent from "./cart-item";
@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { BtnLink } from "@/components/ui/btnLink";
 
 interface Props {
-    onClose: () => void;
+    onClose?: () => void;
     cart: Cart | null;
     items: CartItem[];
     shippingFee?: number;
@@ -30,14 +30,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
 
     return (
         <AnimatePresence>
-            {/* Cart Drawer */}
-            <motion.div
-                animate={{ y: 0 }}
-                className="rounded-t-2xl max-h-[85vh] md:max-h-screen overflow-hidden flex flex-col"
-                exit={{ y: "100%" }}
-                initial={{ y: "100%" }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            >
+            <div className="rounded-t-2xl max-h-screen overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="p-4 border-b border-default-100 flex justify-between items-center sticky top-0 z-10">
                     <div className="flex items-center space-x-2">
@@ -98,7 +91,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                         </button>
                     </motion.div>
                 )}
-            </motion.div>
+            </div>
         </AnimatePresence>
     );
 };
