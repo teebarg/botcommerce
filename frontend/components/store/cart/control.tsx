@@ -8,22 +8,21 @@ import { Spinner } from "@/components/generic/spinner";
 import { CartItem } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 type ItemsTemplateProps = {
     item: CartItem;
 };
 
 const Control = ({ item }: ItemsTemplateProps) => {
-    const invalidateCart = useInvalidateCart();
-    const invalidateCartItems = useInvalidateCartItem();
+    const invalidate = useInvalidate();
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleDelete = async (id: number) => {
         setLoading(true);
         await api.cart.delete(id);
-        invalidateCart();
-        invalidateCartItems();
+        invalidate("cart");
+        invalidate("cart-items");
         setLoading(false);
     };
 
@@ -46,8 +45,8 @@ const Control = ({ item }: ItemsTemplateProps) => {
         }
 
         toast.success("Cart updated successfully");
-        invalidateCart();
-        invalidateCartItems();
+        invalidate("cart");
+        invalidate("cart-items");
         setLoading(false);
     };
 

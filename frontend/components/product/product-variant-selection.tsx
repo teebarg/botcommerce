@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { Product, ProductVariant } from "@/types/models";
 import { cn, currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MessageCircleMore } from "lucide-react";
-import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
-import { toast } from "sonner";
-import { api } from "@/apis";
-import { useStore } from "@/app/store/use-store";
+import { useProductVariant } from "@/lib/hooks/useProductVariant";
 
 interface VariantSelectionProps {
     product: Product;
@@ -18,94 +15,26 @@ interface VariantSelectionProps {
     onVariantChange: (variant: ProductVariant | undefined) => void;
 }
 
-export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ product, selectedVariant, onVariantChange }) => {
-    const invalidateCart = useInvalidateCart();
-    const invalidateCartItems = useInvalidateCartItem();
-    const [selected, setSelected] = useState<ProductVariant | undefined>();
-    const [quantity, setQuantity] = useState<number>(1);
-    const [loading, setLoading] = useState<boolean>(false);
-    const { shopSettings } = useStore();
-
-    const sizes = [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
-    const colors = [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
-
-    const [selectedSize, setSelectedSize] = useState<string | null>(selected?.size || null);
-    const [selectedColor, setSelectedColor] = useState<string | null>(selected?.color || null);
-
-    const findMatchingVariant = (size: string | null, color: string | null) => {
-        return product.variants?.find((variant) => {
-            return variant.size === size && variant.color === color;
-        });
-    };
+export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ product, onVariantChange }) => {
+    const {
+        selectedColor,
+        selectedSize,
+        quantity,
+        selectedVariant,
+        setQuantity,
+        sizes,
+        colors,
+        isOptionAvailable,
+        toggleSizeSelect,
+        toggleColorSelect,
+        handleAddToCart,
+        handleWhatsAppPurchase,
+        loading,
+    } = useProductVariant(product);
 
     useEffect(() => {
-        setSelected(selectedVariant);
-    }, []);
-
-    useEffect(() => {
-        const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
-
-        if (matchingVariant && matchingVariant !== selected) {
-            setSelected(matchingVariant);
-            onVariantChange(matchingVariant);
-        } else {
-            setSelected(undefined);
-            onVariantChange(undefined);
-        }
-    }, [selectedSize, selectedColor]);
-
-    const isOptionAvailable = (type: "size" | "color", value: string) => {
-        if (type === "size") {
-            return product.variants?.some(
-                (v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.status === "IN_STOCK" && v.inventory > 0
-            );
-        } else {
-            return product.variants?.some(
-                (v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.status === "IN_STOCK" && v.inventory > 0
-            );
-        }
-    };
-
-    const toggleSizeSelect = (size: string) => {
-        setSelectedSize((prev) => (prev === size ? null : size));
-    };
-
-    const toggleColorSelect = (color: string) => {
-        setSelectedColor((prev) => (prev === color ? null : color));
-    };
-
-    const handleAddToCart = async () => {
-        setLoading(true);
-        const response = await api.cart.add({
-            variant_id: selected?.id!,
-            quantity,
-        });
-
-        if (response.error) {
-            toast.error(response.error);
-            setLoading(false);
-
-            return;
-        }
-        invalidateCartItems();
-        invalidateCart();
-
-        toast.success("Added to cart successfully");
-        setLoading(false);
-    };
-
-    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        const variantInfo = selectedVariant
-            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(selectedVariant.price)}`
-            : "";
-
-        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${typeof window !== "undefined" ? window.location.origin : ""}/products/${product.slug}`;
-
-        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
-
-        window.open(whatsappUrl, "_blank");
-    };
+        onVariantChange(selectedVariant);
+    }, [selectedVariant]);
 
     return (
         <div className="space-y-6">
@@ -183,23 +112,25 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </div>
             )}
 
-            {selected && (
+            {selectedVariant && (
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-sm font-medium text-default-900">Selected Variant</p>
-                            <p className="text-xs text-default-600">SKU: {selected.sku}</p>
+                            <p className="text-xs text-default-600">SKU: {selectedVariant.sku}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-lg font-bold text-default-900">{currency(selected.price)}</p>
-                            {selected.old_price && <p className="text-sm text-default-500 line-through">{currency(selected.old_price)}</p>}
+                            <p className="text-lg font-bold text-default-900">{currency(selectedVariant.price)}</p>
+                            {selectedVariant.old_price && (
+                                <p className="text-sm text-default-500 line-through">{currency(selectedVariant.old_price)}</p>
+                            )}
                         </div>
                     </div>
                     <div className="mt-2 flex justify-between items-center">
-                        <Badge variant={selected.status === "IN_STOCK" ? "emerald" : "destructive"}>
-                            {selected.status ? "In Stock" : "Out of Stock"}
+                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "emerald" : "destructive"}>
+                            {selectedVariant.status ? "In Stock" : "Out of Stock"}
                         </Badge>
-                        <span className="text-xs text-gray-600">{selected.inventory} available</span>
+                        <span className="text-xs text-gray-600">{selectedVariant.inventory} available</span>
                     </div>
                 </div>
             )}
@@ -217,17 +148,17 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </div>
             </div>
 
-            {selected?.status === "OUT_OF_STOCK" ? (
+            {selectedVariant?.status === "OUT_OF_STOCK" ? (
                 <Button className="mt-4 w-max px-16 py-6" disabled={true}>
                     Out of Stock
                 </Button>
             ) : (
                 <div className="flex items-center gap-4 mt-4">
-                    <Button className="w-auto" disabled={loading || !selected} size="lg" variant="primary" onClick={handleAddToCart}>
+                    <Button className="w-auto" disabled={loading || !selectedVariant} size="lg" variant="primary" onClick={handleAddToCart}>
                         {loading ? "Adding to cart..." : "Add to Cart"}
                     </Button>
                     <Button
-                        disabled={loading || !selected}
+                        disabled={loading || !selectedVariant}
                         className="gap-2 bg-[#075e54] hover:bg-[#128c7e] text-white w-auto"
                         size="lg"
                         onClick={handleWhatsAppPurchase}

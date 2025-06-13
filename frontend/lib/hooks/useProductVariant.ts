@@ -2,15 +2,12 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { currency } from "@/lib/utils";
-import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { Product, ProductVariant } from "@/types/models";
+import { Product, ProductVariant, ProductSearch } from "@/types/models";
 
-export const useProductVariant = (product: Product) => {
-    const invalidateCart = useInvalidateCart();
-    const invalidateCartItems = useInvalidateCartItem();
+export const useProductVariant = (product: Product | ProductSearch) => {
     const invalidate = useInvalidate();
     const { shopSettings } = useStore();
 
@@ -19,9 +16,6 @@ export const useProductVariant = (product: Product) => {
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
     const [loading, setLoading] = useState<boolean>(false);
-    const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
-
-    const selectedImage = product.images[selectedImageIdx];
 
     const sizes = [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
     const colors = [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
@@ -77,8 +71,8 @@ export const useProductVariant = (product: Product) => {
             return;
         }
 
-        invalidateCartItems();
-        invalidateCart();
+        invalidate("cart");
+        invalidate("cart-items");
 
         toast.success("Added to cart successfully");
         setLoading(false);
@@ -116,9 +110,6 @@ export const useProductVariant = (product: Product) => {
         toggleColorSelect,
         handleAddToCart,
         handleWhatsAppPurchase,
-        selectedImage,
-        selectedImageIdx,
-        setSelectedImageIdx,
         loading,
     };
 };

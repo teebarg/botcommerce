@@ -13,9 +13,9 @@ import ShippingAddressFormEdit from "../address-form-edit";
 import { Address, User } from "@/types/models";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
-import { useInvalidateCart } from "@/lib/hooks/useCart";
 import Overlay from "@/components/overlay";
 import { Badge } from "@/components/ui/badge";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 type AddressSelectProps = {
     address: Address | null;
@@ -30,7 +30,7 @@ interface AddressItemProp {
 
 const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAddress }) => {
     const state = useOverlayTriggerState({});
-    const invalidateCart = useInvalidateCart();
+    const invalidate = useInvalidate();
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleSelect = async (id: number) => {
@@ -47,7 +47,7 @@ const AddressItem: React.FC<AddressItemProp> = ({ address, addresses, selectedAd
 
                 return;
             }
-            invalidateCart();
+            invalidate("cart");
         }
 
         setLoading(false);

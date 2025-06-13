@@ -41,23 +41,3 @@ export const useUserAddresses = () => {
         },
     });
 };
-
-export const useInvalidateCart = () => {
-    const queryClient = useQueryClient();
-
-    const invalidateCart = () => {
-        queryClient.invalidateQueries({ queryKey: ["cart"] });
-    };
-
-    return invalidateCart;
-};
-
-export const useInvalidateCartItem = () => {
-    const queryClient = useQueryClient();
-
-    const invalidateCart = () => {
-        queryClient.invalidateQueries({ queryKey: ["cart-items"] });
-    };
-
-    return invalidateCart;
-};

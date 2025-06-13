@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Cart, PaymentMethod } from "@/types/models";
 import { api } from "@/apis";
-import { useInvalidateCart } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
@@ -24,7 +24,7 @@ const payMethods: { id: string; provider_id: PaymentMethod }[] = [
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
-    const invalidateCart = useInvalidateCart();
+    const invalidate = useInvalidate();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +59,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
             return;
         }
-        invalidateCart();
+        invalidate("cart");
 
         setIsLoading(false);
     };

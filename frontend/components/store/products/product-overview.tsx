@@ -1,114 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ArrowLeft, Heart, Star, Plus, Minus, ShoppingCart, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 
 import ProductDetails from "./product-details";
 
-import { ProductSearch, ProductVariant } from "@/types/models";
+import { ProductSearch } from "@/types/models";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
 import { api } from "@/apis";
-import { useStore } from "@/app/store/use-store";
 import LocalizedClientLink from "@/components/ui/link";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { useProductVariant } from "@/lib/hooks/useProductVariant";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
     isLiked?: boolean;
     onClose: () => void;
 }> = ({ product, onClose, isLiked = false }) => {
-    const invalidateCart = useInvalidateCart();
-    const invalidateCartItems = useInvalidateCartItem();
+    const {
+        selectedColor,
+        selectedSize,
+        quantity,
+        selectedVariant,
+        setQuantity,
+        sizes,
+        colors,
+        isOptionAvailable,
+        toggleSizeSelect,
+        toggleColorSelect,
+        handleAddToCart,
+        handleWhatsAppPurchase,
+        loading,
+    } = useProductVariant(product);
+
     const invalidate = useInvalidate();
-    const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0].color || null);
-    const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0].size || null);
-    const [quantity, setQuantity] = useState<number>(1);
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
-    const [loading, setLoading] = useState<boolean>(false);
-    const { shopSettings } = useStore();
 
     const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
     const selectedImage = product.images[selectedImageIdx];
-
-    const sizes = [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
-    const colors = [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
-
-    const findMatchingVariant = (size: string | null, color: string | null) => {
-        return product.variants?.find((variant) => variant.size === size && variant.color === color);
-    };
-
-    useEffect(() => {
-        setSelectedVariant(product.variants?.find((v) => v.status === "IN_STOCK") || product.variants?.[0]);
-    }, []);
-
-    useEffect(() => {
-        const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
-
-        if (matchingVariant) {
-            setSelectedVariant(matchingVariant);
-        } else {
-            setSelectedVariant(undefined);
-        }
-    }, [selectedSize, selectedColor]);
-
-    const isOptionAvailable = (type: "size" | "color", value: string) => {
-        if (type === "size") {
-            return product.variants?.some(
-                (v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.status === "IN_STOCK" && v.inventory > 0
-            );
-        } else {
-            return product.variants?.some(
-                (v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.status === "IN_STOCK" && v.inventory > 0
-            );
-        }
-    };
-
-    const toggleSizeSelect = (size: string) => {
-        setSelectedSize((prev) => (prev === size ? null : size));
-    };
-
-    const toggleColorSelect = (color: string) => {
-        setSelectedColor((prev) => (prev === color ? null : color));
-    };
-
-    const handleAddToCart = async () => {
-        setLoading(true);
-        const response = await api.cart.add({
-            variant_id: selectedVariant?.id!,
-            quantity,
-        });
-
-        if (response.error) {
-            toast.error(response.error);
-            setLoading(false);
-
-            return;
-        }
-        invalidateCartItems();
-        invalidateCart();
-
-        toast.success("Added to cart successfully");
-        setLoading(false);
-    };
-
-    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        const variantInfo = selectedVariant
-            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(
-                  selectedVariant.price
-              )}`
-            : "";
-
-        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${
-            typeof window !== "undefined" ? window.location.origin : ""
-        }/products/${product.slug}`;
-
-        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
-
-        window.open(whatsappUrl, "_blank");
-    };
 
     const addWishlist = async () => {
         const { error } = await api.user.addWishlist(product.id);

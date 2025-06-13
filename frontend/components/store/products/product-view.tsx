@@ -78,27 +78,27 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         <h1 className="text-xl font-bold tracking-tight">{product.name}</h1>
                         <ProductShare name={product.name} />
                     </div>
-                    <div className={cn("text-4xl font-bold", selectedVariant ? "hidden md:block" : "hidden")}>{currency(selectedVariant.price)}</div>
+                    <div className={cn("text-4xl font-bold", selectedVariant ? "hidden md:block" : "hidden")}>{currency(selectedVariant?.price)}</div>
                     <div className="my-2 flex items-center gap-2">
                         <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
                     </div>
                     <div className={cn("bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4", selectedVariant ? "" : "hidden")}>
                         <div className="flex items-center text-white">
-                            <span className="text-3xl font-semibold">{currency(selectedVariant.price)}</span>
+                            <span className="text-3xl font-semibold">{currency(selectedVariant?.price)}</span>
                             {selectedVariant?.old_price > selectedVariant?.price && (
-                                <span className="ml-1 text-sm line-through">{currency(selectedVariant.old_price)}</span>
+                                <span className="ml-1 text-sm line-through">{currency(selectedVariant?.old_price)}</span>
                             )}
                         </div>
                         {selectedVariant?.old_price > selectedVariant?.price && (
                             <div className="mt-1 -mb-1.5">
                                 <span className="text-xl font-medium text-orange-400">
-                                    Save {(((selectedVariant.old_price - selectedVariant.price) / selectedVariant.old_price) * 100).toFixed(0)}%
+                                    Save {(((selectedVariant?.old_price - selectedVariant?.price) / selectedVariant?.old_price) * 100).toFixed(0)}%
                                 </span>
                             </div>
                         )}
                     </div>
 
-                    <ProductVariantSelection product={product} selectedVariant={selectedVariant} onVariantChange={setSelectedVariant} />
+                    <ProductVariantSelection product={product} onVariantChange={setSelectedVariant} />
 
                     <div className="mt-4">
                         <p className="line-clamp-3 text-base text-default-500">{product.description}</p>

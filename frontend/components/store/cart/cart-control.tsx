@@ -7,15 +7,14 @@ import { toast } from "sonner";
 import { CartItem } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { useInvalidateCart, useInvalidateCartItem } from "@/lib/hooks/useCart";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface Props {
     item: CartItem;
 }
 
 const CartControl: React.FC<Props> = ({ item }) => {
-    const invalidateCart = useInvalidateCart();
-    const invalidateCartItems = useInvalidateCartItem();
+    const invalidate = useInvalidate();
     const [mounted, setMounted] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [updating, setUpdating] = useState<boolean>(false);
@@ -45,8 +44,8 @@ const CartControl: React.FC<Props> = ({ item }) => {
         }
 
         toast.success("Added to cart successfully");
-        invalidateCart();
-        invalidateCartItems();
+        invalidate("cart");
+        invalidate("cart-items");
         setUpdating(false);
     };
 
@@ -61,8 +60,8 @@ const CartControl: React.FC<Props> = ({ item }) => {
         }
 
         toast.success("Item removed from cart successfully");
-        invalidateCart();
-        invalidateCartItems();
+        invalidate("cart");
+        invalidate("cart-items");
         setLoading(false);
     };
 
