@@ -1,36 +1,19 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Pencil } from "nui-react-icons";
-import { MapPin } from "lucide-react";
+import { MapPin, Pencil } from "lucide-react";
 
 import ShippingAddress from "../shipping-address";
 
 import { cn } from "@/lib/utils";
 import { Cart } from "@/types/models";
-import { useAddress } from "@/lib/hooks/useCart";
-import { Skeleton } from "@/components/generic/skeleton";
 
 const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
 
-    const { data: address, isLoading } = useAddress(cart?.shipping_address_id ?? 0);
-
-    if (isLoading)
-        return (
-            <div className="bg-content1 shadow-md p-6 rounded border-l-2 border-l-indigo-500">
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                        <span className="font-medium">Shipping Address</span>
-                        <MapPin className="w-5 h-5 text-blue-500" />
-                    </div>
-                </div>
-                <Skeleton className="h-48" />
-            </div>
-        );
+    const { shipping_address: address } = cart ?? {};
 
     const isOpen = searchParams.get("step") === "address" || searchParams.get("step") == null;
 
@@ -56,7 +39,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                 </div>
 
                 <div className={cn("hidden", isOpen && "block")}>
-                    <ShippingAddress address={address ?? null} email={cart?.email ?? ""} />
+                    <ShippingAddress address={address ?? null} email={cart?.email ?? ""} /> 
                 </div>
                 {/* Account Information Section */}
                 {!isOpen && address?.address_1 && (

@@ -123,9 +123,9 @@ const ProductOverview: React.FC<{
                     <div className="flex items-center mb-3">
                         <div className="flex items-center">
                             <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                            <span className="text-lg font-medium text-default-900 ml-1">{product.ratings}</span>
+                            <span className="text-lg font-medium text-default-900 ml-1">{product.average_rating}</span>
                         </div>
-                        <span className="text-default-500 ml-2">({product.reviews} reviews)</span>
+                        <span className="text-default-500 ml-2">({product.review_count} reviews)</span>
                     </div>
                     <div className="flex items-center space-x-3">
                         <span className="text-3xl font-bold text-default-900">{currency(selectedVariant?.price)}</span>

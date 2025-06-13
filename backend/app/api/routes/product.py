@@ -184,7 +184,7 @@ async def search(
     if collections:
         filters.append(f"collections IN [{collections}]")
     if min_price and max_price:
-        filters.append(f"price >= {min_price} AND price <= {max_price}")
+        filters.append(f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
 
     search_params = {
         "limit": limit,
@@ -261,12 +261,7 @@ async def create_product(product: ProductCreate):
         }
     )
 
-    try:
-        product_data = prepare_product_data_for_indexing(created_product)
-
-        add_documents_to_index(index_name="products", documents=[product_data])
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    background_tasks.add_task(reindex_product, created_product.id)
 
     return created_product
 
@@ -339,33 +334,11 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     updated_product = await db.product.update(
         where={"id": id},
         data=update_data,
-        include={
-            "categories": True,
-            "brand": True,
-            "collections": True,
-            "tags": True,
-            "variants": True,
-            "images": True
-        }
     )
 
-    try:
-        # Define the background task
-        async def update_task():
-            logger.info("Updating product in Meilisearch")
-            # Prepare product data for Meilisearch indexing
-            product_data = prepare_product_data_for_indexing(updated_product)
+    background_tasks.add_task(reindex_product, id)
 
-            update_document(index_name="products", document=product_data)
-
-        background_tasks.add_task(update_task)
-        return updated_product
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{e}",
-        ) from e
+    return updated_product
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
@@ -389,7 +362,7 @@ async def delete_product(id: int) -> Message:
 
 
 @router.post("/{id}/variants")
-async def create_variant(id: int, variant: VariantWithStatus):
+async def create_variant(id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -406,6 +379,8 @@ async def create_variant(id: int, variant: VariantWithStatus):
             "color": variant.color
         }
     )
+
+    background_tasks.add_task(reindex_product, id)
 
     return created_variant
 
@@ -599,26 +574,17 @@ async def upload_products(
     async def update_task():
         logger.info("Starting product upload processing...")
         try:
-            await process_products(file_content=contents, content_type=content_type, user_id=user.id)
+            num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user.id)
 
-            products = await db.product.find_many(
-                include={
-                    "variants": True,
-                    "categories": True,
-                    "collections": True,
-                    "brand": True,
-                    "images": True,
-                }
-            )
 
             # Re-index
-            await index_products(products=products)
+            await index_products()
             await manager.broadcast(
                 id=str(user.id),
                 data={
                     "status": "completed",
-                    "total_rows": len(products),
-                    "processed_rows": len(products),
+                    "total_rows": num_rows,
+                    "processed_rows": num_rows,
                 },
                 type="sheet-processor",
             )
@@ -652,18 +618,7 @@ async def reindex_products(background_tasks: BackgroundTasks):
     This operation is performed asynchronously in the background.
     """
     try:
-        products = await db.product.find_many(
-            include={
-                "variants": True,
-                "categories": True,
-                "collections": True,
-                "brand": True,
-                "images": True,
-                # "reviews": { "include": { "user": True } },
-            }
-        )
-        # Add the task to background tasks
-        background_tasks.add_task(index_products, products)
+        background_tasks.add_task(index_products)
 
         return Message(message="Product re-indexing started. This may take a while.")
     except Exception as e:
@@ -685,10 +640,10 @@ async def configure_filterable_attributes(
         index = get_or_create_index("products")
         # Update the filterable attributes
         index.update_filterable_attributes(
-            ["brand", "categories", "collections", "name", "variants"]
+            ["brand", "categories", "collections", "name", "variants", "average_rating", "review_count", "max_variant_price", "min_variant_price"]
         )
         # Update the sortable attributes
-        index.update_sortable_attributes(["created_at", "variants.price"])
+        index.update_sortable_attributes(["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"])
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(
@@ -734,25 +689,51 @@ async def config_delete_index() -> dict:
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
-    product_dict["collections"] = [
-        collection.name for collection in product.collections
-    ]
+
+    product_dict["collections"] = [c.name for c in product.collections]
     if product.brand:
         product_dict["brand"] = product.brand.name
-    product_dict["categories"] = [
-        category.name for category in product.categories]
-    product_dict["images"] = [image.image for image in product.images]
-    product_dict["variants"] = [variant.dict() for variant in product.variants]
+    product_dict["categories"] = [c.name for c in product.categories]
+    product_dict["images"] = [img.image for img in sorted(product.images, key=lambda img: img.order)]
+
+    # Variants
+    variants = [v.dict() for v in product.variants]
+    product_dict["variants"] = variants
+
+    variant_prices = [v["price"] for v in variants if v.get("price") is not None]
+    product_dict["variant_prices"] = variant_prices
+    product_dict["min_variant_price"] = min(variant_prices) if variant_prices else 0
+    product_dict["max_variant_price"] = max(variant_prices) if variant_prices else 0
+
+    # Reviews
+    reviews = [r.dict() for r in product.reviews]
+    product_dict["reviews"] = reviews
+
+    ratings = [r["rating"] for r in reviews if r.get("rating") is not None]
+    product_dict["review_count"] = len(ratings)
+    # product_dict["ratings"] = ratings
+    product_dict["average_rating"] = round(sum(ratings) / len(ratings), 2) if ratings else 0
 
     return product_dict
 
 
-async def index_products(products):
+async def index_products():
     """
     Re-index all products in the database to Meilisearch.
     """
     try:
         logger.info("Starting re-indexing..........")
+
+        products = await db.product.find_many(
+            include={
+                "variants": True,
+                "categories": True,
+                "collections": True,
+                "brand": True,
+                "images": True,
+                "reviews": True,
+            }
+        )
 
         # Prepare the documents for Meilisearch
         documents = []
@@ -779,11 +760,12 @@ async def reindex_product(product_id: int):
                 "tags": True,
                 "images": True,
                 "collections": True,
+                "reviews": True,
             }
         )
 
         if not product:
-            logging.warning(f"Product with id {product_id} not found for re-indexing.")
+            logger.warning(f"Product with id {product_id} not found for re-indexing.")
             return
 
         # Prepare product data for Meilisearch indexing
@@ -791,10 +773,10 @@ async def reindex_product(product_id: int):
 
         update_document(index_name="products", document=product_data)
 
-        logging.info(f"Successfully reindexed product {product_id}")
+        logger.info(f"Successfully reindexed product {product_id}")
 
     except Exception as e:
-        logging.error(f"Error re-indexing product {product_id}: {e}")
+        logger.error(f"Error re-indexing product {product_id}: {e}")
 
 
 @router.patch("/{id}/images/reorder")
@@ -814,17 +796,8 @@ async def reorder_images(id: int, image_ids: list[int]):
             data={"order": index}
         )
 
-    products = await db.product.find_many(
-        include={
-            "variants": True,
-            "categories": True,
-            "collections": True,
-            "brand": True,
-            "images": True,
-        }
-    )
-
     # Re-index
-    await index_products(products=products)
+    await reindex_product(product_id=id)
+    # await index_products()
 
     return {"success": True}

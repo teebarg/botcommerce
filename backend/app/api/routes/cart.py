@@ -96,6 +96,15 @@ async def get_cart(cartId: str = Header()):
     return await db.cart.find_unique(where={"cart_number": cartId})
 
 
+@router.get("/checkout", response_model=Optional[CartResponse])
+async def get_checkout_cart(cartId: str = Header()):
+    """Get a specific cart by ID"""
+    if not cartId:
+        return None
+
+    return await db.cart.find_unique(where={"cart_number": cartId}, include={"shipping_address": True})
+
+
 @router.get("/items", response_model=Optional[list[CartItemResponse]])
 async def get_cart_items(cartId: str = Header()):
     """Get all items in a specific cart"""

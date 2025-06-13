@@ -17,7 +17,7 @@ type OrderConfirmationProps = {
     onContinueShopping?: () => void;
 };
 
-const Pickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
+const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
     const { shopSettings } = useStore();
 
     return (
@@ -74,4 +74,4 @@ const Pickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping })
     );
 };
 
-export default Pickup;
+export default OrderPickup;

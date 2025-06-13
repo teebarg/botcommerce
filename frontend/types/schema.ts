@@ -219,6 +219,10 @@ export const ProductSearchSchema = z.object({
     images: z.array(z.string()),
     reviews: z.array(z.any()).nullable(),
     favorites: z.null(),
+    average_rating: z.number(),
+    review_count: z.number(),
+    max_variant_price: z.number(),
+    min_variant_price: z.number(),
 });
 
 export const CartItemSchema = z.object({

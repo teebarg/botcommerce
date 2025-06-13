@@ -59,7 +59,7 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
 
             return;
         }
-        invalidate("cart");
+        invalidate("checkout-cart");
 
         setIsLoading(false);
     };

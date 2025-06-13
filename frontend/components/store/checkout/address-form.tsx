@@ -71,7 +71,7 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
         }
 
         queryClient.invalidateQueries({ queryKey: ["user-address"] });
-        queryClient.invalidateQueries({ queryKey: ["cart"] });
+        queryClient.invalidateQueries({ queryKey: ["checkout-cart"] });
         onClose?.();
     };
 

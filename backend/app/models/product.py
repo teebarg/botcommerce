@@ -77,9 +77,11 @@ class SearchProduct(BaseModel):
     brand: Optional[str] = None
     tags: Optional[List[str]] = []
     images: Optional[List[str]] = []
-    reviews: Optional[List[str]] = []
+    reviews: Optional[List[Review]] = []
     favorites: Optional[List[str]] = []
     variants: Optional[List[ProductVariant]] = []
+    average_rating: Optional[float] = None
+    review_count: Optional[int] = None
 
 class Facets(BaseModel):
     brand: dict[str, int]

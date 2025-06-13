@@ -37,7 +37,7 @@ export function ProductView({ product, onClose }: { product?: Product; onClose: 
                 {product && (
                     <TabsContent value="images">
                         <div className="pb-6 pt-2">
-                            <ProductImagesManager initialImages={product?.images || []} productId={product.id} />
+                            <ProductImagesManager initialImages={product?.images?.sort((a, b) => a.order - b.order) || []} productId={product.id} />
                         </div>
                     </TabsContent>
                 )}

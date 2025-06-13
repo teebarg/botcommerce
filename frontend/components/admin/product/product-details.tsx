@@ -90,7 +90,7 @@ export function ProductDetails() {
                                     <img
                                         alt={product.name}
                                         className="w-10 h-10 rounded"
-                                        src={product.images?.[0]?.image || product?.image || "/placeholder.jpg"}
+                                        src={product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"}
                                     />
                                 </TableCell>
                                 <TableCell className="font-medium">{product.name}</TableCell>

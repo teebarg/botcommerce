@@ -67,9 +67,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                             <div className="flex items-center mb-2">
                                 <div className="flex items-center">
                                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                    <span className="text-sm text-default-600 ml-1">{product.ratings}</span>
+                                    <span className="text-sm text-default-600 ml-1">{product.average_rating}</span>
                                 </div>
-                                <span className="text-sm text-default-400 ml-2">({product.reviews || 1})</span>
+                                <span className="text-sm text-default-400 ml-2">({product.review_count || 1})</span>
                             </div>
                         </div>
                     </div>

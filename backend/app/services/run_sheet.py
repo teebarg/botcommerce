@@ -398,7 +398,9 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
         end_time = time.time()
         logger.info(
             f"Total processing time: {end_time - start_time:.2f} seconds"
-        )  # Log total time
+        )
+        
+        return len(products)
     except Exception as e:
         logger.error(f"An error occurred while processing. Error{e}")
         await manager.broadcast(

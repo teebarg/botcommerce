@@ -55,7 +55,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
 
             return;
         }
-        invalidate("cart");
+        invalidate("checkout-cart");
 
         setIsLoading(false);
     };

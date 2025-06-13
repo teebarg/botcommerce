@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { api } from "@/apis/client";
 import { Address, Cart, CartItem } from "@/types/models";
@@ -13,13 +13,21 @@ export const useCart = () => {
     });
 };
 
+export const useCheckoutCart = () => {
+    return useQuery({
+        queryKey: ["checkout-cart"],
+        queryFn: async () => {
+            return await api.get<Cart>("/cart/checkout");
+        },
+    });
+};
+
 export const useCartItem = () => {
     return useQuery({
         queryKey: ["cart-items"],
         queryFn: async () => {
             return await api.get<CartItem[]>("/cart/items");
         },
-        // enabled: !!cartId, // prevents running when cartId is null
     });
 };
 

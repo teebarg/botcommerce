@@ -8,7 +8,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { usePathname } from "next/navigation";
 
 import ShippingAddressForm from "../../address-form";
-import AddressItem from "../address-item";
+import { AddressCard } from "../address-item";
 
 import { Address, User } from "@/types/models";
 import { Button } from "@/components/ui/button";
@@ -143,7 +143,7 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
                     </div>
                 )}
 
-                <div className="space-y-3 max-h-[30vh] overflow-y-auto">
+                <div className="space-y-3 max-h-[40vh] overflow-y-auto">
                     <AnimatePresence>
                         {filteredAddresses.length === 0 ? (
                             <motion.div
@@ -155,8 +155,10 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
                                 <EmptyState />
                             </motion.div>
                         ) : (
-                            filteredAddresses.map((address: Address) => (
-                                <AddressItem key={address.id} address={address} addresses={addresses} selectedAddress={selectedAddress} />
+                            filteredAddresses.map((address: Address, idx: number) => (
+                                <div key={idx}>
+                                    <AddressCard address={address} addresses={addresses} selectedAddress={selectedAddress} />
+                                </div>
                             ))
                         )}
                     </AnimatePresence>
