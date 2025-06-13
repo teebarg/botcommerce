@@ -4,6 +4,7 @@ import CartControl from "./cart-control";
 
 import { currency } from "@/lib/utils";
 import { CartItem } from "@/types/models";
+import { Badge } from "@/components/ui/badge";
 
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     return (
@@ -18,6 +19,22 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
                 <div className="flex justify-between items-start mb-1">
                     <h3 className="font-semibold text-default-900 line-clamp-2 leading-tight text-md">{item.name}</h3>
                 </div>
+
+                {item.variant && (item.variant.size || item.variant.color) && (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                        {item.variant.size && <Badge variant="gray">Size: {item.variant.size}</Badge>}
+
+                        {item.variant.color && (
+                            <Badge variant="gray">
+                                <div
+                                    className="w-2.5 h-2.5 rounded-full border border-default-300 mr-1"
+                                    style={{ backgroundColor: item.variant.color.toLowerCase() }}
+                                ></div>
+                                {item.variant.color}
+                            </Badge>
+                        )}
+                    </div>
+                )}
 
                 <div className="flex items-center gap-2 mb-2">
                     <span className="font-bold text-default-900 text-xl">{currency(Number(item.price) || 0)}</span>

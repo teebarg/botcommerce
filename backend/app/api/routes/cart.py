@@ -101,7 +101,7 @@ async def get_cart_items(cartId: str = Header()):
     """Get all items in a specific cart"""
     if not cartId:
         return None
-    return await db.cartitem.find_many(where={"cart_number": cartId})
+    return await db.cartitem.find_many(where={"cart_number": cartId}, include={"variant": True})
 
 
 @router.put("/", response_model=CartResponse)
