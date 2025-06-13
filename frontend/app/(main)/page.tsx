@@ -98,7 +98,6 @@ export default async function Home() {
                     </Carousel>
                 </section>
 
-                {/* Category Sections */}
                 <CategoriesSection />
 
                 <PromotionalBanner

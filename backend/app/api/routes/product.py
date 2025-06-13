@@ -16,7 +16,7 @@ from app.core.deps import (
 )
 from app.core.logging import logger
 from app.core.utils import slugify, url_to_list, generate_sku
-from app.models.product import Product, Products, SearchProducts
+from app.models.product import Product, Products, SearchProducts, SearchProduct
 from app.models.generic import Message
 from app.models.product import (
     ImageUpload,
@@ -45,9 +45,14 @@ from app.core.deps import supabase
 
 router = APIRouter()
 
+class LandingProducts(BaseModel):
+    trending: list[SearchProduct]
+    latest: list[SearchProduct]
+    featured: list[SearchProduct]
+
 
 @router.get("/landing-products")
-async def get_landing_products():
+async def get_landing_products() -> LandingProducts:
     """
     Retrieve multiple product categories in a single request.
     """
@@ -789,7 +794,7 @@ async def reindex_product(product_id: int):
         logging.info(f"Successfully reindexed product {product_id}")
 
     except Exception as e:
-        logging.error(f"Error reindexing product {product_id}: {e}")
+        logging.error(f"Error re-indexing product {product_id}: {e}")
 
 
 @router.patch("/{id}/images/reorder")
