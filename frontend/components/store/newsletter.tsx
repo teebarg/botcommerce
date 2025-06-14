@@ -9,7 +9,7 @@ import { Mail } from "lucide-react";
 import { Input } from "@components/ui/input";
 
 import { Button } from "@/components/ui/button";
-import { Message } from "@/types/models";
+import { Message } from "@/schemas";
 import { api } from "@/apis/base";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 

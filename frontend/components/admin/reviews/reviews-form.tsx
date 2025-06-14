@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { updateReview } from "@/actions/reviews";
 import { Input } from "@/components/ui/input";
-import { Review } from "@/types/models";
+import { Review } from "@/schemas";
 
 interface Props {
     review?: Review;

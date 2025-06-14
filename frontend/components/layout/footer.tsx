@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Instagram } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { Category } from "@/types/models";
+import { Category } from "@/schemas/product";
 import NewsletterForm from "@/components/store/newsletter";
 import { useStore } from "@/app/store/use-store";
 import { useCategories, useCollections } from "@/lib/hooks/useApi";

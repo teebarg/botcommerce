@@ -3,7 +3,7 @@ import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { Facet } from "@/types/models";
+import { Facet } from "@/schemas/product";
 
 interface CheckboxGroupProps {
     groupName: string;

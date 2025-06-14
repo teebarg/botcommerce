@@ -2,9 +2,9 @@ import React from "react";
 import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
-import { ChatMessage } from "@/types/models";
+import { ChatMessage } from "@/schemas";
 import { formatDate } from "@/lib/utils";
-import { Conversation, ConversationStatus } from "@/types/models";
+import { Conversation, ConversationStatus } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 
 const StatusBadge = ({ status }: { status: ConversationStatus }) => {
@@ -46,7 +46,7 @@ const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => 
                                 !conversation.user ? "bg-gradient-to-br from-gray-500 to-gray-600" : "bg-gradient-to-br from-blue-500 to-purple-600"
                             }`}
                         >
-                            {!conversation.user ? <UserX size={20} /> : conversation.user.image}
+                            {!conversation.user ? <UserX size={20} /> : conversation.user?.image}
                         </div>
 
                         <div>

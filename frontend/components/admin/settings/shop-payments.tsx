@@ -6,7 +6,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Exclamation } from "nui-react-icons";
 
 import { Switch } from "@/components/ui/switch";
-import { BankDetails, ShopSettings } from "@/types/models";
+import { BankDetails, ShopSettings } from "@/schemas";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

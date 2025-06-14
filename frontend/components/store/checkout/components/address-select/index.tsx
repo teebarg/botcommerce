@@ -8,9 +8,9 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { usePathname } from "next/navigation";
 
 import ShippingAddressForm from "../../address-form";
-import AddressItem from "../address-item";
+import { AddressCard } from "../address-item";
 
-import { Address, User } from "@/types/models";
+import { Address, User } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
@@ -30,8 +30,8 @@ const EmptyState = () => {
             <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                 <MapPin className="w-8 h-8 text-blue-500" />
             </div>
-            <h3 className="text-lg font-semibold text-default-900 mb-2">No Addresses Found</h3>
-            <p className="text-default-500 text-center mb-6">
+            <h3 className="text-lg font-semibold text-default-900">No Addresses Found</h3>
+            <p className="text-default-500 text-center mb-6 text-sm">
                 {`You haven't added any addresses yet. Add your first address to get started with your order.`}
             </p>
         </div>
@@ -143,7 +143,7 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
                     </div>
                 )}
 
-                <div className="space-y-3 max-h-[30vh] overflow-y-auto">
+                <div className="space-y-3 max-h-[40vh] overflow-y-auto">
                     <AnimatePresence>
                         {filteredAddresses.length === 0 ? (
                             <motion.div
@@ -155,8 +155,10 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
                                 <EmptyState />
                             </motion.div>
                         ) : (
-                            filteredAddresses.map((address: Address) => (
-                                <AddressItem key={address.id} address={address} addresses={addresses} selectedAddress={selectedAddress} />
+                            filteredAddresses.map((address: Address, idx: number) => (
+                                <div key={idx}>
+                                    <AddressCard address={address} addresses={addresses} selectedAddress={selectedAddress} />
+                                </div>
                             ))
                         )}
                     </AnimatePresence>

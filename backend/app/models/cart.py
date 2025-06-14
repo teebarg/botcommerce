@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 from enum import Enum
 from prisma.models import ProductVariant, Address
@@ -27,7 +27,7 @@ class CartItemResponse(CartItemBase):
     id: int
     cart_id: int
     cart_number: str
-    # variant: ProductVariant
+    variant: ProductVariant
     created_at: datetime
     updated_at: datetime
 

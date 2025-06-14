@@ -18,7 +18,6 @@ from prisma.models import User
 from math import ceil
 from app.core.security import verify_password, get_password_hash
 
-# Create a router for users
 router = APIRouter()
 
 class PasswordChange(BaseModel):
@@ -201,14 +200,24 @@ async def remove_wishlist_item(
     user: CurrentUser,
 ):
     existing = await db.favorite.find_unique(
-        where={"product_id": product_id, "user_id": user.id}
+        where={
+            'user_id_product_id': {
+                'user_id': user.id,
+                'product_id': product_id
+            }
+        }
     )
     if not existing:
         raise HTTPException(status_code=404, detail="Product not found")
 
     try:
         await db.favorite.delete(
-            where={"product_id": product_id, "user_id": user.id}
+            where={
+                'user_id_product_id': {
+                    'user_id': user.id,
+                    'product_id': product_id
+                }
+            }
         )
         return Message(message="Product deleted successfully")
     except PrismaError as e:

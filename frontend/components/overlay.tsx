@@ -46,7 +46,7 @@ const Overlay: React.FC<OverlayProps> = ({
                 <DrawerHeader className={showHeader ? "" : "sr-only"}>
                     <DrawerTitle>{title}</DrawerTitle>
                 </DrawerHeader>
-                <DrawerClose className="absolute top-4 right-4">
+                <DrawerClose className="absolute top-4 right-4 z-70">
                     <X className="h-5 w-5" />
                 </DrawerClose>
                 {children}

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { SortOptions, WishItem } from "types/models";
 
+import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
@@ -9,6 +9,7 @@ import { auth } from "@/actions/auth";
 import ServerError from "@/components/generic/server-error";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import NoProductsFound from "@/components/store/products/no-products";
+import { WishItem } from "@/schemas";
 
 export const metadata: Metadata = {
     title: "Search",

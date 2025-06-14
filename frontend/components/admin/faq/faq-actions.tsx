@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { FaqForm } from "./faq-form";
 
 import { Button } from "@/components/ui/button";
-import { FAQ } from "@/types/models";
+import { FAQ } from "@/schemas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useInvalidate } from "@/lib/hooks/useApi";

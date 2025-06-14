@@ -1,9 +1,10 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/utils";
-import { PaginatedAddress, Address, Message } from "@/types/models";
+import { PaginatedAddress, Address } from "@/schemas";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { Message } from "@/schemas";
 
 // Address API methods
 export const addressApi = {

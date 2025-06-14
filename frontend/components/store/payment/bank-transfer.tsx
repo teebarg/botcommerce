@@ -55,7 +55,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
                 <p className="text-xs text-default-500 mt-2">Please use your order number as reference when making the transfer.</p>
             </div>
 
-            <Button className="w-full" disabled={loading} isLoading={loading} onClick={onPaymentCompleted}>
+            <Button className="w-full" disabled={loading} isLoading={loading} variant="primary" onClick={onPaymentCompleted}>
                 Pay {currency(amount)} via Bank Transfer
             </Button>
             {/* Security message */}

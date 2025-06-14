@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/utils";
-import { Message, PaginatedSiteConfig, SiteConfig } from "@/types/models";
+import { Message, PaginatedSiteConfig, SiteConfig } from "@/schemas";
 import { revalidate } from "@/actions/revalidate";
 
 // Config API methods

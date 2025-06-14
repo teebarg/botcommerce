@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { BtnLink } from "@/components/ui/btnLink";
-import { Cart, CartItem } from "@/types/models";
+import { Cart, CartItem } from "@/schemas";
 
 type SummaryProps = {
     cart: Cart;

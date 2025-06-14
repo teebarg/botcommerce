@@ -8,7 +8,7 @@ import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
-import { Order } from "@/types/models";
+import { Order } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import { Button } from "@/components/ui/button";
 
@@ -17,7 +17,7 @@ type OrderConfirmationProps = {
     onContinueShopping?: () => void;
 };
 
-const Pickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
+const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
     const { shopSettings } = useStore();
 
     return (
@@ -74,4 +74,4 @@ const Pickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping })
     );
 };
 
-export default Pickup;
+export default OrderPickup;

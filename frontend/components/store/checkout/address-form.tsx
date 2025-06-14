@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { CartUpdate } from "@/types/models";
+import { CartUpdate } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -71,12 +71,12 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
         }
 
         queryClient.invalidateQueries({ queryKey: ["user-address"] });
-        queryClient.invalidateQueries({ queryKey: ["cart"] });
+        queryClient.invalidateQueries({ queryKey: ["checkout-cart"] });
         onClose?.();
     };
 
     return (
-        <div className="py-6 px-4">
+        <div className="py-6 px-4 overflow-y-auto">
             <h3 className="text-lg font-semibold text-default-900 mb-4">Shipping Address</h3>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>

@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/generic/skeleton";
 import ProductCard from "@/components/store/products/product-card";
 import { useProductSearch } from "@/lib/hooks/useApi";
-import { ProductSearch } from "@/types/models";
+import { ProductSearch } from "@/schemas/product";
 
 type RecommendedProductsProps = {
     exclude?: number[];

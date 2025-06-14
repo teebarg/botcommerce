@@ -15,8 +15,8 @@ from app.core.deps import (
     meilisearch_client
 )
 from app.core.logging import logger
-from app.core.utils import slugify, url_to_list
-from app.models.product import Product, Products, SearchProducts
+from app.core.utils import slugify, url_to_list, generate_sku
+from app.models.product import Product, Products, SearchProducts, SearchProduct
 from app.models.generic import Message
 from app.models.product import (
     ImageUpload,
@@ -43,12 +43,16 @@ from app.api.routes.websocket import manager
 from app.services.activity import log_activity
 from app.core.deps import supabase
 
-# Create a router for products
 router = APIRouter()
+
+class LandingProducts(BaseModel):
+    trending: list[SearchProduct]
+    latest: list[SearchProduct]
+    featured: list[SearchProduct]
 
 
 @router.get("/landing-products")
-async def get_landing_products():
+async def get_landing_products() -> LandingProducts:
     """
     Retrieve multiple product categories in a single request.
     """
@@ -180,7 +184,7 @@ async def search(
     if collections:
         filters.append(f"collections IN [{collections}]")
     if min_price and max_price:
-        filters.append(f"price >= {min_price} AND price <= {max_price}")
+        filters.append(f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
 
     search_params = {
         "limit": limit,
@@ -221,15 +225,13 @@ async def search(
 @router.post("/")
 async def create_product(product: ProductCreate):
     slugified_name = slugify(product.name)
-    sku = product.sku or f"SK{slugified_name}"
+    sku = product.sku or generate_sku(product_name=product.name)
 
     data = {
         "name": product.name,
         "slug": slugified_name,
         "sku": sku,
         "description": product.description,
-        "price": product.price or 0,
-        "old_price": product.old_price or 0,
         "status": product.status or ProductStatus.IN_STOCK,
         "brand": {"connect": {"id": product.brand_id}},
     }
@@ -239,17 +241,14 @@ async def create_product(product: ProductCreate):
         category_connect = [{"id": id} for id in product.category_ids]
         data["categories"] = {"connect": category_connect}
 
-    # Prepare collection connections if provided
     if product.collection_ids:
         collection_connect = [{"id": id} for id in product.collection_ids]
         data["collections"] = {"connect": collection_connect}
 
-    # Prepare tag connections if provided
     if product.tags_ids:
         tag_connect = [{"id": id} for id in product.tags_ids]
         data["tags"] = {"connect": tag_connect}
 
-    # Create product with all related data
     created_product = await db.product.create(
         data=data,
         include={
@@ -262,13 +261,7 @@ async def create_product(product: ProductCreate):
         }
     )
 
-    try:
-        # Create a dictionary with product data and collection names
-        product_data = prepare_product_data_for_indexing(created_product)
-
-        add_documents_to_index(index_name="products", documents=[product_data])
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    background_tasks.add_task(reindex_product, created_product.id)
 
     return created_product
 
@@ -320,12 +313,6 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     if product.status is not None:
         update_data["status"] = product.status
 
-    if product.price is not None:
-        update_data["price"] = product.price
-
-    if product.old_price is not None:
-        update_data["old_price"] = product.old_price
-
     if product.description is not None:
         update_data["description"] = product.description
 
@@ -347,33 +334,11 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     updated_product = await db.product.update(
         where={"id": id},
         data=update_data,
-        include={
-            "categories": True,
-            "brand": True,
-            "collections": True,
-            "tags": True,
-            "variants": True,
-            "images": True
-        }
     )
 
-    try:
-        # Define the background task
-        async def update_task():
-            logger.info("Updating product in Meilisearch")
-            # Prepare product data for Meilisearch indexing
-            product_data = prepare_product_data_for_indexing(updated_product)
+    background_tasks.add_task(reindex_product, id)
 
-            update_document(index_name="products", document=product_data)
-
-        background_tasks.add_task(update_task)
-        return updated_product
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{e}",
-        ) from e
+    return updated_product
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
@@ -397,34 +362,31 @@ async def delete_product(id: int) -> Message:
 
 
 @router.post("/{id}/variants")
-async def create_variant(id: int, variant: VariantWithStatus):
-    # Check if product exists
+async def create_variant(id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Create slug from name
-    slug = slugify(variant.name)
-
-    # Create the variant
     created_variant = await db.productvariant.create(
         data={
-            "name": variant.name,
-            "slug": slug,
-            "sku": variant.sku or f"SK{slug}",
-            "image": variant.image,
+            "sku": variant.sku or f"{generate_sku(product_name=product.name, color=variant.color, size=variant.size)}",
             "price": variant.price,
+            "old_price": variant.old_price,
             "inventory": variant.inventory,
             "product_id": id,
-            "status": variant.status
+            "status": variant.status,
+            "size": variant.size,
+            "color": variant.color
         }
     )
+
+    background_tasks.add_task(reindex_product, id)
 
     return created_variant
 
 
 @router.put("/variants/{variant_id}")
-async def update_variant(variant_id: int, variant: VariantWithStatus):
+async def update_variant(variant_id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     # Check if variant exists
     existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
     if not existing_variant:
@@ -433,16 +395,14 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
     # Prepare update data
     update_data = {}
 
-    if variant.name:
-        update_data["name"] = variant.name
-        slug = slugify(variant.name)
-        update_data["slug"] = slug
-
     if variant.sku:
         update_data["sku"] = variant.sku
 
     if variant.price:
         update_data["price"] = variant.price
+
+    if variant.old_price:
+        update_data["old_price"] = variant.old_price
 
     if variant.inventory is not None:
         update_data["inventory"] = variant.inventory
@@ -450,19 +410,31 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
     if variant.status:
         update_data["status"] = variant.status
 
+    if variant.size is not None:
+        update_data["size"] = variant.size
+
+    if variant.color is not None:
+        update_data["color"] = variant.color
+
     # Update the variant
     updated_variant = await db.productvariant.update(
         where={"id": variant_id},
-        data=update_data
+        data=update_data,
     )
+
+    background_tasks.add_task(reindex_product, existing_variant.product_id)
 
     return updated_variant
 
 
 @router.delete("/variants/{variant_id}")
-async def delete_variant(variant_id: int):
+async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
     # Delete the variant
-    return await db.productvariant.delete(where={"id": variant_id})
+    variant = await db.productvariant.delete(where={"id": variant_id})
+
+    background_tasks.add_task(reindex_product, variant.product_id)
+
+    return {"success": True}
 
 
 class ImageUpload(BaseModel):
@@ -486,10 +458,14 @@ async def add_image(id: int, image_data: ImageUpload) -> Product:
         image_url = upload(bucket="product-images", data=image_data)
 
         # Update product with new image URL
-        return await db.product.update(
+        updated_product = await db.product.update(
             where={"id": id},
             data={"image": image_url}
         )
+
+        background_tasks.add_task(reindex_product, id)
+
+        return updated_product
 
     except Exception as e:
         raise HTTPException(
@@ -499,18 +475,16 @@ async def add_image(id: int, image_data: ImageUpload) -> Product:
 
 
 @router.post("/{id}/images")
-async def upload_images(id: int, image_data: ImageUpload):
+async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks):
     """
     Upload images to a product.
     """
-    # Check if product exists
     product = await db.product.find_unique(where={"id": id}, include={"images": True})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
     image_url = upload(bucket="product-images", data=image_data)
 
-    # Create image record in database
     image = await db.productimage.create(
         data={
             "image": image_url,
@@ -519,21 +493,21 @@ async def upload_images(id: int, image_data: ImageUpload):
         }
     )
 
+    background_tasks.add_task(reindex_product, id)
+
     return image
 
 
 @router.delete("/{id}/image")
-async def delete_image(id: int):
+async def delete_image(id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product.
     """
-    # Check if product exists
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
     try:
-        # Extract file path from URL
         file_path = product.image.split(
             "/storage/v1/object/public/product-images/")[1]
 
@@ -543,14 +517,15 @@ async def delete_image(id: int):
     except Exception as e:
         logger.error(f"Error deleting image: {e}")
 
-    # Delete from database
     await db.product.update(where={"id": id}, data={"image": None})
+
+    background_tasks.add_task(reindex_product, id)
 
     return {"success": True}
 
 
 @router.delete("/{id}/images/{image_id}")
-async def delete_images(id: int, image_id: int):
+async def delete_images(id: int, image_id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product images.
     """
@@ -568,11 +543,9 @@ async def delete_images(id: int, image_id: int):
     file_path = image.image.split(
         "/storage/v1/object/public/product-images/")[1]
 
-    # Delete from Supabase
     result = supabase.storage.from_("product-images").remove([file_path])
     logger.info(f"Delete result: {result}")
 
-    # Delete from database
     await db.productimage.delete(where={"id": image_id})
 
     # Reorder images
@@ -582,6 +555,8 @@ async def delete_images(id: int, image_id: int):
             where={"id": image.id},
             data={"order": index}
         )
+
+    background_tasks.add_task(reindex_product, id)
 
     return {"success": True}
 
@@ -613,26 +588,17 @@ async def upload_products(
     async def update_task():
         logger.info("Starting product upload processing...")
         try:
-            await process_products(file_content=contents, content_type=content_type, user_id=user.id)
+            num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user.id)
 
-            products = await db.product.find_many(
-                include={
-                    "variants": True,
-                    "categories": True,
-                    "collections": True,
-                    "brand": True,
-                    "images": True,
-                }
-            )
 
             # Re-index
-            await index_products(products=products)
+            await index_products()
             await manager.broadcast(
                 id=str(user.id),
                 data={
                     "status": "completed",
-                    "total_rows": len(products),
-                    "processed_rows": len(products),
+                    "total_rows": num_rows,
+                    "processed_rows": num_rows,
                 },
                 type="sheet-processor",
             )
@@ -666,18 +632,7 @@ async def reindex_products(background_tasks: BackgroundTasks):
     This operation is performed asynchronously in the background.
     """
     try:
-        products = await db.product.find_many(
-            include={
-                "variants": True,
-                "categories": True,
-                "collections": True,
-                "brand": True,
-                "images": True,
-                # "reviews": { "include": { "user": True } },
-            }
-        )
-        # Add the task to background tasks
-        background_tasks.add_task(index_products, products)
+        background_tasks.add_task(index_products)
 
         return Message(message="Product re-indexing started. This may take a while.")
     except Exception as e:
@@ -699,10 +654,10 @@ async def configure_filterable_attributes(
         index = get_or_create_index("products")
         # Update the filterable attributes
         index.update_filterable_attributes(
-            ["brand", "categories", "collections", "name", "price"]
+            ["brand", "categories", "collections", "name", "variants", "average_rating", "review_count", "max_variant_price", "min_variant_price"]
         )
         # Update the sortable attributes
-        index.update_sortable_attributes(["created_at", "price"])
+        index.update_sortable_attributes(["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"])
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(
@@ -748,26 +703,50 @@ async def config_delete_index() -> dict:
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
-    product_dict["collections"] = [
-        collection.name for collection in product.collections
-    ]
+
+    product_dict["collections"] = [c.name for c in product.collections]
     if product.brand:
         product_dict["brand"] = product.brand.name
-    product_dict["categories"] = [
-        category.name for category in product.categories]
-    product_dict["images"] = [image.image for image in product.images]
-    product_dict["variants"] = [variant.dict() for variant in product.variants]
+    product_dict["categories"] = [c.name for c in product.categories]
+    product_dict["images"] = [img.image for img in sorted(product.images, key=lambda img: img.order)]
+
+    # Variants
+    variants = [v.dict() for v in product.variants]
+    product_dict["variants"] = variants
+
+    variant_prices = [v["price"] for v in variants if v.get("price") is not None]
+    product_dict["variant_prices"] = variant_prices
+    product_dict["min_variant_price"] = min(variant_prices) if variant_prices else 0
+    product_dict["max_variant_price"] = max(variant_prices) if variant_prices else 0
+
+    # Reviews
+    reviews = [r.dict() for r in product.reviews]
+    product_dict["reviews"] = reviews
+
+    ratings = [r["rating"] for r in reviews if r.get("rating") is not None]
+    product_dict["review_count"] = len(ratings)
+    product_dict["average_rating"] = round(sum(ratings) / len(ratings), 2) if ratings else 0
 
     return product_dict
 
 
-async def index_products(products):
+async def index_products():
     """
     Re-index all products in the database to Meilisearch.
     """
     try:
-        # products = await db.product.find_many()
         logger.info("Starting re-indexing..........")
+
+        products = await db.product.find_many(
+            include={
+                "variants": True,
+                "categories": True,
+                "collections": True,
+                "brand": True,
+                "images": True,
+                "reviews": True,
+            }
+        )
 
         # Prepare the documents for Meilisearch
         documents = []
@@ -781,6 +760,36 @@ async def index_products(products):
         logger.info(f"Reindexed {len(documents)} products successfully.")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
+
+
+async def reindex_product(product_id: int):
+    try:
+        product = await db.product.find_unique(
+            where={"id": product_id},
+            include={
+                "variants": True,
+                "categories": True,
+                "brand": True,
+                "tags": True,
+                "images": True,
+                "collections": True,
+                "reviews": True,
+            }
+        )
+
+        if not product:
+            logger.warning(f"Product with id {product_id} not found for re-indexing.")
+            return
+
+        # Prepare product data for Meilisearch indexing
+        product_data = prepare_product_data_for_indexing(product)
+
+        update_document(index_name="products", document=product_data)
+
+        logger.info(f"Successfully reindexed product {product_id}")
+
+    except Exception as e:
+        logger.error(f"Error re-indexing product {product_id}: {e}")
 
 
 @router.patch("/{id}/images/reorder")
@@ -800,17 +809,6 @@ async def reorder_images(id: int, image_ids: list[int]):
             data={"order": index}
         )
 
-    products = await db.product.find_many(
-        include={
-            "variants": True,
-            "categories": True,
-            "collections": True,
-            "brand": True,
-            "images": True,
-        }
-    )
-
-    # Re-index
-    await index_products(products=products)
+    await reindex_product(product_id=id)
 
     return {"success": True}

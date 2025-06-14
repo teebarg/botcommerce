@@ -8,7 +8,7 @@ import CartSkeleton from "./cart-skeleton";
 import CartItems from "./cart-items";
 
 import EmptyCartMessage from "@/components/store/cart/empty-message";
-import { Cart } from "@/types/models";
+import { Cart } from "@/schemas";
 import { useCartItem } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
 import Summary from "@/components/store/cart/summary";

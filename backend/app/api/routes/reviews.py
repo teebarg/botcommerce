@@ -12,7 +12,6 @@ from prisma.errors import PrismaError
 from math import ceil
 from prisma.models import Review
 
-# Create a router for reviews
 router = APIRouter()
 
 @router.get("/")

@@ -7,7 +7,18 @@
     </tr>
     {% for item in order.order_items %}
     <tr>
-        <td style="padding: 10px; border-bottom: 1px solid #dee2e6">{{ item.name }}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #dee2e6">
+            <p style="font-weight: bold; font-size: 14px; line-height: 1.5; color: #333;">{{ item.name }}</p>
+            {% if item.variant %}
+                <br />
+                {% if item.variant.size %}
+                    Size: {{ item.variant.size }}
+                {% endif %}
+                {% if item.variant.color %}
+                    Color: {{ item.variant.color }}
+                {% endif %}
+            {% endif %}
+        </td>
         <td style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6">
             <img src="{{item.image }}" alt="Product 1" style="max-width: 70px; height: auto" />
         </td>

@@ -5,7 +5,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { toast } from "sonner";
 import { Edit, Plus, Trash2 } from "lucide-react";
 
-import { Category } from "@/types/models";
+import { Category } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useInvalidate } from "@/lib/hooks/useApi";

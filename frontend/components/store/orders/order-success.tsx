@@ -7,8 +7,9 @@ import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 
-import { Order, PaymentStatus } from "@/types/models";
+import { Order, PaymentStatus } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
+import { Button } from "@/components/ui/button";
 
 type OrderConfirmationProps = {
     status: PaymentStatus;
@@ -56,12 +57,9 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
                         <ArrowRight className="ml-2 w-4 h-4" />
                     </Button> */}
 
-                    <button
-                        className="w-full px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
-                        onClick={onContinueShopping}
-                    >
+                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
                         Continue Shopping
-                    </button>
+                    </Button>
                 </div>
             </FadeInComponent>
         </div>

@@ -4,8 +4,8 @@ import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
 import { api } from "@/apis";
-import { Session } from "@/types/models";
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
+import { Session } from "@/schemas";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 

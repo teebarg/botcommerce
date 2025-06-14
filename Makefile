@@ -22,10 +22,7 @@ help:
 	@echo "  make docker-down - Stop Docker containers"
 
 # ANSI color codes
-GREEN=$(shell tput -Txterm setaf 2)
 YELLOW=$(shell tput -Txterm setaf 3)
-RED=$(shell tput -Txterm setaf 1)
-BLUE=$(shell tput -Txterm setaf 6)
 RESET=$(shell tput -Txterm sgr0)
 
 ## Docker

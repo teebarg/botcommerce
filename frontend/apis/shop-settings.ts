@@ -1,6 +1,6 @@
 import { api } from "./base";
 
-import { Message, ShopSettings } from "@/types/models";
+import { Message, ShopSettings } from "@/schemas";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult } from "@/lib/try-catch";
 

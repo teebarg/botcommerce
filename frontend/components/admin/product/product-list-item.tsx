@@ -1,4 +1,4 @@
-import { Category, Product } from "@/types/models";
+import { Category, Product } from "@/schemas/product";
 import { currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -14,7 +14,7 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
                 <img
                     alt={product.name}
                     className="h-full w-full object-cover"
-                    src={product.images[0]?.image || product.image || "/placeholder.jpg"}
+                    src={product.images?.[0]?.image || product?.image || "/placeholder.jpg"}
                 />
                 <Badge className="absolute top-2 right-2 shadow-sm" variant={product.status === "IN_STOCK" ? "emerald" : "destructive"}>
                     {product.variants?.[0]?.inventory ?? 0} in stock
@@ -26,7 +26,7 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
                 </div>
                 <h3 className="font-medium text-default-900 mb-1 truncate">{product.name}</h3>
                 <div className="flex justify-between items-center">
-                    <span className="font-bold text-lg">{currency(product.price)}</span>
+                    <span className="font-bold text-lg">{currency(product.variants?.[0]?.price)}</span>
                     <div className="flex space-x-1">{actions}</div>
                 </div>
             </div>

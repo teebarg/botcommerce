@@ -11,7 +11,7 @@ import CustomerCard from "./customer-card";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Order, Status, User } from "@/types/models";
+import { Order, Status, User } from "@/schemas";
 import { useCustomers } from "@/lib/hooks/useApi";
 import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/utils";

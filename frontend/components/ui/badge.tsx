@@ -15,6 +15,7 @@ const badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 p
             emerald: "border-transparent bg-emerald-100 text-emerald-900 border-emerald-200 hover:bg-emerald-500/80",
             blue: "border-transparent bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-500/80",
             yellow: "border-transparent bg-yellow-50 text-yellow-900 border-yellow-200 hover:bg-yellow-500/80 dark:bg-yellow-900 dark:text-yellow-100 dark:border-yellow-800",
+            gray: "border-transparent bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-800 hover:bg-gray-500/80",
         },
     },
     defaultVariants: {

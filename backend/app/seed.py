@@ -98,10 +98,10 @@ async def seed_database():
 
     # Seed Products
     products_data = [
-        {"name": "Running Shoes", "price": 99.99, "old_price": 129.99, "sku": "RUN123"},
-        {"name": "Sports T-Shirt", "price": 29.99, "old_price": 39.99, "sku": "TSH123"},
-        {"name": "Gym Bag", "price": 49.99, "old_price": 59.99, "sku": "GMB123"},
-        {"name": "Training Shorts", "price": 34.99, "old_price": 44.99, "sku": "TS123"},
+        {"name": "Running Shoes", "sku": "RUN123"},
+        {"name": "Sports T-Shirt", "sku": "TSH123"},
+        {"name": "Gym Bag", "sku": "GMB123"},
+        {"name": "Training Shorts", "sku": "TS123"},
     ]
 
     products = []
@@ -111,8 +111,6 @@ async def seed_database():
             "sku": product_data["sku"],
             "slug": product_data["name"].lower().replace(" ", "-"),
             "description": fake.text(max_nb_chars=200),
-            "price": product_data["price"],
-            "old_price": product_data["old_price"],
             "image": f"http://localhost/images/{product_data['name'].lower().replace(' ', '-')}.jpg",
             "status": "IN_STOCK",
             "ratings": round(random.uniform(3.0, 5.0), 1),
@@ -135,12 +133,12 @@ async def seed_database():
         for size in ["S", "M", "L"]:
             await db.productvariant.create({
                 "product": {"connect": {"id": product.id}},
-                "name": f"{product.name} - {size}",
-                "slug": f"{product.slug}-{size.lower()}",
                 "sku": f"{product.slug.upper()}-{size}-{random.randint(1000, 9999)}",
                 "status": "IN_STOCK",
-                "price": product.price + random.uniform(-5, 5),
-                "old_price": product.old_price,
+                "price": random.randint(100, 1000),
+                "old_price": random.randint(100, 1000),
+                "size": size,
+                "color": "Black",
                 "inventory": random.randint(10, 100),
                 "created_at": datetime.now()
             })

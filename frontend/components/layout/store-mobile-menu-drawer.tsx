@@ -8,7 +8,7 @@ import { MenuIcon } from "lucide-react";
 import Menu from "../menu";
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Session } from "@/types/models";
+import { Session } from "@/schemas";
 
 interface StoreMenuCompProps {
     user: Session | null;

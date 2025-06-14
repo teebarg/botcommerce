@@ -11,7 +11,7 @@ import OrderFilters from "./order-filters";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Order, OrderStatus } from "@/types/models";
+import { Order, OrderStatus } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useOrders } from "@/lib/hooks/useApi";
 import OrderCard from "@/components/admin/orders/order-card";

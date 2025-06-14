@@ -8,7 +8,7 @@ import ConversationViewer from "./chat-view";
 
 import { useDeleteConversation } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
-import { Conversation } from "@/types/models";
+import { Conversation } from "@/schemas";
 import Overlay from "@/components/overlay";
 
 interface CustomerActionsProps {

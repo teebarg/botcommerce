@@ -9,7 +9,7 @@ import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
-import { BankDetails, Order, PaymentStatus } from "@/types/models";
+import { BankDetails, Order, PaymentStatus } from "@/schemas";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 

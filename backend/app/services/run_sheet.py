@@ -233,8 +233,6 @@ async def bulk_upload_products(products: list[dict]):
                 "slug": product_data["slug"],
                 "sku": product_data["sku"],
                 "description": product_data["description"],
-                "price": float(product_data["price"]),
-                "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
                 "image": product_data["image"],
                 "status": status,
                 "ratings": float(product_data["ratings"]) if product_data["ratings"] else 0.0,
@@ -253,8 +251,6 @@ async def bulk_upload_products(products: list[dict]):
                     "update": {
                         "name": product_data["name"],
                         "description": product_data["description"],
-                        "price": float(product_data["price"]),
-                        "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
                         "image": product_data["image"],
                         "status": status,
                         "brand": {"connect": {"id": brand_id}} if brand_id else {"disconnect": True},
@@ -271,9 +267,6 @@ async def bulk_upload_products(products: list[dict]):
                 data={
                     "create": {
                         "product": {"connect": {"id": product.id}},
-                        "name": f"{product_data['name']} Default",
-                        "slug": f"{product_data['slug']}-default",
-                        "image": product_data["image"],
                         "sku": f"{product_data['slug']}-default",
                         "status": status,
                         "price": float(product_data["price"]),
@@ -405,7 +398,9 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
         end_time = time.time()
         logger.info(
             f"Total processing time: {end_time - start_time:.2f} seconds"
-        )  # Log total time
+        )
+        
+        return len(products)
     except Exception as e:
         logger.error(f"An error occurred while processing. Error{e}")
         await manager.broadcast(

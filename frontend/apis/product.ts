@@ -1,8 +1,9 @@
 import { api } from "./base";
 
-import { Message, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/types/models";
+import { Message, PaginatedReview, ProductVariant, Review } from "@/schemas";
 import { revalidate as revalidateAction } from "@/actions/revalidate";
 import { ApiResult } from "@/lib/try-catch";
+import { PaginatedProductSearch, Product } from "@/schemas/product";
 
 interface SearchParams {
     query?: string;
@@ -18,7 +19,7 @@ interface SearchParams {
 // Product API methods
 export const productApi = {
     async search(searchParams: SearchParams): ApiResult<PaginatedProductSearch> {
-        return await api.get<PaginatedProductSearch>("/product/search", { next: { tags: ["search"] }, params: { ...searchParams } });
+        return await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams }, cache: "default" });
     },
     async get(slug: string): ApiResult<Product> {
         return await api.get<Product>(`/product/${slug}`, { next: { tags: ["product"] } });
@@ -118,12 +119,13 @@ export const productApi = {
     },
     async createVariant(input: {
         productId: number;
-        name: string;
         sku?: string;
-        image?: string;
         price: number;
+        old_price?: number;
         inventory: number;
         status: "IN_STOCK" | "OUT_OF_STOCK";
+        size?: string;
+        color?: string;
     }): ApiResult<ProductVariant> {
         const { productId, ...variantData } = input;
 
@@ -131,11 +133,12 @@ export const productApi = {
     },
     async updateVariant(input: {
         id: number;
-        name?: string;
-        slug?: string;
         price?: number;
+        old_price?: number;
         inventory?: number;
         status?: "IN_STOCK" | "OUT_OF_STOCK";
+        size?: string;
+        color?: string;
     }): ApiResult<ProductVariant> {
         const { id, ...variantData } = input;
 

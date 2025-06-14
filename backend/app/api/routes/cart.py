@@ -44,7 +44,6 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
     """Add an item to cart"""
     cart = await get_or_create_cart(cartId)
 
-    # Verify product variant exists and is in stock
     variant = await db.productvariant.find_unique(
         where={"id": item.variant_id},
         include={"product": {"include": {"images": True}}}
@@ -72,8 +71,8 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
             data={
                 "cart_id": cart.id,
                 "cart_number": cart.cart_number,
-                "name": variant.name,
-                "slug": variant.slug,
+                "name": variant.product.name,
+                "slug": variant.product.slug,
                 "variant_id": item.variant_id,
                 "quantity": item.quantity,
                 "price": variant.price,
@@ -97,12 +96,21 @@ async def get_cart(cartId: str = Header()):
     return await db.cart.find_unique(where={"cart_number": cartId})
 
 
+@router.get("/checkout", response_model=Optional[CartResponse])
+async def get_checkout_cart(cartId: str = Header()):
+    """Get a specific cart by ID"""
+    if not cartId:
+        return None
+
+    return await db.cart.find_unique(where={"cart_number": cartId}, include={"shipping_address": True})
+
+
 @router.get("/items", response_model=Optional[list[CartItemResponse]])
 async def get_cart_items(cartId: str = Header()):
     """Get all items in a specific cart"""
     if not cartId:
         return None
-    return await db.cartitem.find_many(where={"cart_number": cartId})
+    return await db.cartitem.find_many(where={"cart_number": cartId}, include={"variant": True})
 
 
 @router.put("/", response_model=CartResponse)

@@ -8,7 +8,7 @@ import { GripVertical, Trash2 } from "lucide-react";
 
 import { Button } from "../ui/button";
 
-import { ProductImage } from "@/types/models";
+import { ProductImage } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
 

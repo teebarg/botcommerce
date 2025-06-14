@@ -5,7 +5,7 @@ import React from "react";
 import { currency } from "@lib/utils";
 import { Tooltip } from "@components/ui/tooltip";
 
-import { Cart } from "@/types/models";
+import { Cart } from "@/schemas";
 import { Separator } from "@/components/ui/separator";
 
 type CartTotalsProps = {

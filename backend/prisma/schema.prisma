@@ -172,8 +172,6 @@ model Product {
   sku         String           @unique
   description String?
   features    String[]
-  price       Float
-  old_price   Float?
   image       String?          @db.VarChar(255)
   status      ProductStatus    @default(IN_STOCK)
   variants    ProductVariant[]
@@ -199,14 +197,13 @@ model ProductVariant {
   id          Int           @id @default(autoincrement())
   product     Product       @relation(fields: [product_id], references: [id], onDelete: Cascade)
   product_id  Int
-  name        String        @unique
-  slug        String        @unique
-  image       String?
   sku         String        @unique
   status      ProductStatus @default(IN_STOCK)
   price       Float         @db.DoublePrecision
   old_price   Float?        @db.DoublePrecision
   inventory   Int
+  size        String?
+  color       String?
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem
   created_at  DateTime      @default(now())
@@ -347,7 +344,7 @@ model Coupon {
   @@map("coupons")
 }
 
-// Cart Model (New)
+// Cart Model
 model Cart {
   id              Int             @id @default(autoincrement())
   cart_number     String          @unique
@@ -375,7 +372,7 @@ model Cart {
   @@map("carts")
 }
 
-// CartItem Model (New)
+// CartItem Model
 model CartItem {
   id          Int            @id @default(autoincrement())
   name        String?

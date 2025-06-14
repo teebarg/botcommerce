@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
-import { ShopSettings } from "@/types/models";
+import { ShopSettings } from "@/schemas";
 import { api } from "@/apis";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";

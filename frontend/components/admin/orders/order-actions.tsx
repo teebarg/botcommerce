@@ -7,7 +7,7 @@ import OrderDetails from "./order-details";
 import OrderProcessingAction from "./order-processing-actions";
 
 import { Button } from "@/components/ui/button";
-import { Order } from "@/types/models";
+import { Order } from "@/schemas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface OrderActionsProps {

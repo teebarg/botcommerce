@@ -1,4 +1,4 @@
-import { Order } from "@/types/models";
+import { Order } from "@/schemas";
 
 const OrderInfo: React.FC<{ order: Order }> = ({ order }) => {
     return (

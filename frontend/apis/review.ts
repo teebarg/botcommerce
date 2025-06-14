@@ -1,6 +1,6 @@
 import { api } from "./base";
 
-import { Message, PaginatedReview, Review } from "@/types/models";
+import { Message, PaginatedReview, Review } from "@/schemas";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult } from "@/lib/try-catch";
 

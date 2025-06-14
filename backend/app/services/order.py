@@ -26,8 +26,6 @@ class OrderService:
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
 
-
-        # Create order with items
         new_order = await db.order.create(
             data={
                 "order_number": order_number,
@@ -57,7 +55,11 @@ class OrderService:
                 }
             },
             include={
-                "order_items": True,
+                "order_items": {
+                    "include": {
+                        "variant": True,
+                    }
+                },
                 "user": True,
                 "shipping_address": True,
             }
@@ -110,10 +112,13 @@ class OrderService:
         order = await db.order.find_unique(
             where={"order_number": order_id},
             include={
-                "order_items": True,
+                "order_items": {
+                    "include": {
+                        "variant": True,
+                    }
+                },
                 "user": True,
-                "shipping_address": True,
-                "billing_address": True
+                "shipping_address": True
             }
         )
         if not order:
@@ -156,10 +161,13 @@ class OrderService:
             take=take,
             order={"created_at": sort},
             include={
-                "order_items": True,
+                "order_items": {
+                    "include": {
+                        "variant": True,
+                    }
+                },
                 "user": True,
                 "shipping_address": True,
-                # "billing_address": True
             }
         )
         total = await db.order.count(where=where)

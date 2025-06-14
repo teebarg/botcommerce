@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 
-import { ProductImage } from "@/types/models";
+import { ProductImage } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
 
@@ -171,9 +171,9 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
             <p className="mb-4 text-gray-600">Drag and drop images to reorder them</p>
 
             <div ref={listRef} className="grid grid-cols-1 gap-4">
-                {images.map((image, index) => (
+                {images.map((image: ProductImage, index: number) => (
                     <div
-                        key={image.id}
+                        key={index}
                         ref={(el) => {
                             itemRefs.current[index] = el;
                         }}

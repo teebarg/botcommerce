@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Category } from "@/types/models";
+import { Category } from "@/schemas/product";
 import { mutateCategory } from "@/actions/category";
 import CategoryImageManager from "@/components/admin/categories/category-image";
 import { useInvalidate } from "@/lib/hooks/useApi";

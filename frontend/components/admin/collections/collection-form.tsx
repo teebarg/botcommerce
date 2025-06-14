@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { mutateCollection } from "@/actions/product";
-import { Collection } from "@/types/models";
+import { Collection } from "@/schemas/product";
 
 interface Props {
     collection?: Collection;

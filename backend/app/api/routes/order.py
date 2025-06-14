@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks
 
 from app.core.deps import (
-    CacheService,
     CurrentUser,
     Notification,
     get_current_superuser
@@ -12,10 +11,8 @@ from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus
 from app.services.order import OrderService
-from app.core.decorators import cache
 from prisma.enums import PaymentStatus
 
-# Create a router for orders
 router = APIRouter()
 
 def get_order_service(notification: Notification) -> OrderService:
@@ -65,7 +62,7 @@ async def get_orders(
     )
 
 @router.put("/orders/{order_id}", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
-async def update_order(order_id: int, order_update: OrderUpdate, cache: CacheService):
+async def update_order(order_id: int, order_update: OrderUpdate):
     """
     Update a order.
     """
@@ -88,7 +85,6 @@ async def update_order(order_id: int, order_update: OrderUpdate, cache: CacheSer
         data=update_data,
         include={"order_items": True}
     )
-    # cache.invalidate("order")
     return updated_order
 
 @router.delete("/{order_id}")

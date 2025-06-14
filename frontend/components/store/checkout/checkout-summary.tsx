@@ -1,6 +1,6 @@
 import DiscountCode from "./components/discount-code";
 
-import { Cart } from "@/types/models";
+import { Cart } from "@/schemas";
 import CartTotals from "@/components/store/cart/cart-totals";
 import { Separator } from "@/components/ui/separator";
 import CartItems from "@/components/store/cart/cart-items";

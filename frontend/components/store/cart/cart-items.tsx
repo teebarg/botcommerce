@@ -5,7 +5,7 @@ import React from "react";
 import CartItemComponent from "./cart-item";
 
 import { cn } from "@/lib/utils";
-import { CartItem } from "@/types/models";
+import { CartItem } from "@/schemas";
 import { useCartItem } from "@/lib/hooks/useCart";
 import { Skeleton } from "@/components/ui/skeletons";
 

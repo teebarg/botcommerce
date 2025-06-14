@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import { api } from "@/apis/base";
-import { Order } from "@/types/models";
+import { Order } from "@/schemas";
 import PaymentLoading from "@/components/store/payment/payment-loading";
 import { deleteCookie } from "@/lib/util/cookie";
 
@@ -32,8 +32,6 @@ export default function PaymentVerifyPage() {
                 return;
             }
             await deleteCookie("_cart_id");
-
-            toast.success("Payment verified successfully");
 
             router.push(`/order/confirmed/${data?.order_number}`);
         };

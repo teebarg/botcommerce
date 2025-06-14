@@ -8,7 +8,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import ServerError from "@/components/generic/server-error";
 import ClientOnly from "@/components/generic/client-only";
-import { useCart } from "@/lib/hooks/useCart";
+import { useCheckoutCart } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { CartComponent } from "@/components/store/cart/cart-component";
@@ -19,7 +19,7 @@ import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 export default function Checkout() {
     const { shopSettings } = useStore();
 
-    const { data: cart, error, isLoading } = useCart();
+    const { data: cart, error, isLoading } = useCheckoutCart();
 
     if (isLoading) {
         return <CheckoutSkeleton />;
@@ -50,17 +50,15 @@ export default function Checkout() {
                 </div>
                 <CartComponent />
             </div>
-            {/* Header */}
+            {/* Desktop Header */}
             <header className="hidden md:flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
                 <LocalizedClientLink className="text-xl font-semibold" href="/">
                     {shopSettings.shop_name}
                 </LocalizedClientLink>
                 <ThemeButton />
             </header>{" "}
-            {/* Main Content */}
             <main className="max-w-8xl mx-auto px-4 md:px-8 md:py-8">
                 <div className="flex flex-col md:flex-row md:gap-8">
-                    {/* Left Column - Form */}
                     <div className="w-full">
                         <nav aria-label="Breadcrumbs" data-slot="base">
                             <ol className="flex flex-wrap list-none rounded-lg mb-2 mt-4 md:mt-0" data-slot="list">
@@ -81,7 +79,6 @@ export default function Checkout() {
                         </ClientOnly>
                     </div>
 
-                    {/* Right Column Cart summary */}
                     <div className="mb-24 md:mb-0 hidden md:block">
                         <CheckoutSummary cart={cart} />
                     </div>

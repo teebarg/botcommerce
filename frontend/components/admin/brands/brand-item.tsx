@@ -1,7 +1,7 @@
 import { BrandActions } from "./brand-actions";
 
 import { Badge } from "@/components/ui/badge";
-import { Brand } from "@/types/models";
+import { Brand } from "@/schemas/product";
 
 interface BrandItemProps {
     brand: Brand;

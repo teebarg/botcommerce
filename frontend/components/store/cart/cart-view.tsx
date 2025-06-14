@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/generic/skeleton";
 import SummaryMobile from "@/components/store/cart/summary-mobile";
 import RecommendedProducts from "@/components/store/products/recommended";
 import PromotionalBanner from "@/components/promotion";
-import { CartItem } from "@/types/models";
+import { CartItem } from "@/schemas";
 import CartPageDetails from "@/components/store/cart/cart-page-details";
 
 interface Props {}

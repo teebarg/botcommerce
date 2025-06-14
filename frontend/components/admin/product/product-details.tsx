@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import PaginationUI from "@/components/pagination";
 import { ProductActions } from "@/components/admin/product/product-actions";
-import { Brand, Collection, Product } from "@/types/models";
+import { Brand, Collection, Product } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useBrands, useCollections, useProducts } from "@/lib/hooks/useApi";
@@ -90,7 +90,7 @@ export function ProductDetails() {
                                     <img
                                         alt={product.name}
                                         className="w-10 h-10 rounded"
-                                        src={product.images[0]?.image || product.image || "/placeholder.jpg"}
+                                        src={product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"}
                                     />
                                 </TableCell>
                                 <TableCell className="font-medium">{product.name}</TableCell>

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import PaymentButton from "../payment-button";
 
 import { cn } from "@/lib/utils";
-import { Cart } from "@/types/models";
+import { Cart } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 
 const Review = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> }) => {

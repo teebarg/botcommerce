@@ -18,8 +18,6 @@ export async function mutateProduct(currentState: unknown, formData: FormData) {
         brand_id: formData.get("brand_id") as string,
         categories: JSON.parse(formData.get("categories") as string) ?? [],
         collections: JSON.parse(formData.get("collections") as string) ?? [],
-        price: Number(formData.get("price")) ?? 0,
-        old_price: Number(formData.get("old_price")) ?? 0,
     };
 
     if (type === "create") {
