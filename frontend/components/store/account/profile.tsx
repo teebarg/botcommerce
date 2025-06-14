@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis/base";
-import { Message } from "@/types/models";
+import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useInvalidate, useMe } from "@/lib/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeletons";

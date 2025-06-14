@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import MultiSelect from "@/components/ui/multi-select";
-import { Brand, Category, Collection, Product } from "@/types/models";
+import { Brand, Category, Collection, Product } from "@/schemas/product";
 import { useInvalidate } from "@/lib/hooks/useApi";
 
 const formSchema = z.object({

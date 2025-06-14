@@ -6,7 +6,7 @@ import { DateRange } from "react-day-picker";
 import { Filter, Search, X } from "lucide-react";
 
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
-import { OrderStatus } from "@/types/models";
+import { OrderStatus } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

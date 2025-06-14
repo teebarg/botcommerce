@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import ChatBody from "./chatbody";
 
 import { api } from "@/apis/base";
-import { ChatMessage, Conversation } from "@/types/models";
+import { ChatMessage, Conversation } from "@/schemas";
 
 const profilePic = "https://i.pravatar.cc/50?img=12"; // Placeholder profile photo of assistant
 

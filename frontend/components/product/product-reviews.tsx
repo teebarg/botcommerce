@@ -10,7 +10,7 @@ import ReviewForm from "./review-form";
 
 import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/utils";
-import { Review } from "@/types/models";
+import { Review } from "@/schemas";
 import { useProductReviews } from "@/lib/hooks/useApi";
 
 interface Prop {

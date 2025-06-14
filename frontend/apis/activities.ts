@@ -1,6 +1,6 @@
 import { api } from "./base";
 
-import { Activity, PaginatedActivity } from "@/types/models";
+import { Activity, PaginatedActivity } from "@/schemas";
 import { ApiResult } from "@/lib/try-catch";
 
 export const activitiesApi = {

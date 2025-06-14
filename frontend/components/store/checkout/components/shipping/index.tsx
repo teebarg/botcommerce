@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/utils";
-import { Cart, DeliveryOption } from "@/types/models";
+import { Cart, DeliveryOption } from "@/schemas";
 import { useInvalidate } from "@/lib/hooks/useApi";
 
 type ShippingProps = {

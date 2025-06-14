@@ -8,8 +8,9 @@ import { cn, currency } from "@/lib/utils";
 import ProductDetails from "@/components/store/products/product-details";
 import LocalizedClientLink from "@/components/ui/link";
 import ProductShare from "@/components/product/product-share";
-import { Product, ProductImage, ProductVariant } from "@/types/models";
+import { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/product/product-variant-selection";
+import { Product } from "@/schemas/product";
 
 interface Props {
     product: Product;
@@ -49,17 +50,19 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 <div className="relative h-full w-full flex-none flex flex-col-reverse md:flex-row gap-2 md:gap-4">
                     {/* Image Gallery */}
                     <div className="flex flex-wrap md:flex-col gap-4 px-2 md:px-0">
-                        {product.images?.sort((a, b) => a.order - b.order)?.map((image: ProductImage, idx: number) => (
-                            <button
-                                key={idx}
-                                className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${
-                                    selectedImageId === image.id ? "border-indigo-500" : "border-gray-200"
-                                }`}
-                                onClick={() => setSelectedImageId(image.id)}
-                            >
-                                <Image fill alt={`Thumbnail - ${image.image}`} className="object-cover w-full h-full" src={image.image} />
-                            </button>
-                        ))}
+                        {product.images
+                            ?.sort((a, b) => a.order - b.order)
+                            ?.map((image: ProductImage, idx: number) => (
+                                <button
+                                    key={idx}
+                                    className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${
+                                        selectedImageId === image.id ? "border-indigo-500" : "border-gray-200"
+                                    }`}
+                                    onClick={() => setSelectedImageId(image.id)}
+                                >
+                                    <Image fill alt={`Thumbnail - ${image.image}`} className="object-cover w-full h-full" src={image.image} />
+                                </button>
+                            ))}
                     </div>
                     <div className="flex-1">
                         <div className="h-[60vh] flex items-center justify-center p-4 relative">

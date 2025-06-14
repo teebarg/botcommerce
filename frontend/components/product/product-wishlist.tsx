@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { addWish, removeWish } from "@/actions/user";
-import { Product } from "@/types/models";
+import { Product } from "@/schemas/product";
 
 interface ComponentProps {
     product: Product;

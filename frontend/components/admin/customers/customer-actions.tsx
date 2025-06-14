@@ -6,7 +6,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import CustomerForm from "./customer-form";
 
-import { User } from "@/types/models";
+import { User } from "@/schemas";
 import { useDeleteCustomer } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";

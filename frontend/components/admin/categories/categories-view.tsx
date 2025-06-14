@@ -7,7 +7,7 @@ import { useCategories } from "@/lib/hooks/useApi";
 import { Skeleton } from "@/components/generic/skeleton";
 import CreateCategory from "@/components/admin/categories/create-categories";
 import CategoryTree from "@/components/admin/categories/tree";
-import { Category } from "@/types/models";
+import { Category } from "@/schemas/product";
 
 const CategoryView: React.FC = () => {
     const { data, isLoading, error } = useCategories();

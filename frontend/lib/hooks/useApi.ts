@@ -5,23 +5,19 @@ import { api } from "@/apis/client";
 import {
     Address,
     BankDetails,
-    Brand,
-    Category,
     ChatMessage,
-    Collection,
     ConversationStatus,
     FAQ,
     PaginatedConversation,
     PaginatedOrder,
-    PaginatedProduct,
-    PaginatedProductSearch,
     PaginatedReview,
     PaginatedUser,
     Review,
-    StatsTrends,
     User,
     Wishlist,
-} from "@/types/models";
+} from "@/schemas";
+import { Brand, Category, Collection, PaginatedProduct, PaginatedProductSearch } from "@/schemas/product";
+import { StatsTrends } from "@/types/models";
 
 export const useMe = () => {
     return useQuery({

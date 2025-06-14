@@ -1,7 +1,7 @@
 import { api } from "./base";
 
-import { Category, Message } from "@/types/models";
 import { ApiResult } from "@/lib/try-catch";
+import { Category, Message } from "@/schemas";
 
 // Product API methods
 export const categoryApi = {

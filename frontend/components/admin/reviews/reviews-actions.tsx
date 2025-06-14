@@ -9,7 +9,7 @@ import { ReviewForm } from "./reviews-form";
 
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Review } from "@/types/models";
+import { Review } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { publishReview } from "@/actions/reviews";
 import Overlay from "@/components/overlay";

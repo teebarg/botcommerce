@@ -3,7 +3,7 @@
 import DiscountCode from "../checkout/components/discount-code";
 
 import { BtnLink } from "@/components/ui/btnLink";
-import { Cart } from "@/types/models";
+import { Cart } from "@/schemas";
 import CartTotals from "@/components/store/cart/cart-totals";
 import { Separator } from "@/components/ui/separator";
 

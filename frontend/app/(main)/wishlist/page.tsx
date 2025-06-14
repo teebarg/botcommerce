@@ -4,7 +4,7 @@ import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";
-import { WishItem } from "@/types/models";
+import { WishItem } from "@/schemas";
 import { useUserWishlist } from "@/lib/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeletons";
 

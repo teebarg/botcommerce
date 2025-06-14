@@ -9,10 +9,11 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import ProductOverview from "./product-overview";
 
-import { ProductSearch, WishItem } from "@/types/models";
+import { WishItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Overlay from "@/components/overlay";
+import { ProductSearch } from "@/schemas/product";
 
 interface ProductCardProps {
     product: ProductSearch;

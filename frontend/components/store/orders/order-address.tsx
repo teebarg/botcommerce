@@ -1,7 +1,7 @@
 import { MapPin } from "lucide-react";
 import { Truck } from "nui-react-icons";
 
-import { Order } from "@/types/models";
+import { Order } from "@/schemas";
 
 // Address & Payment Summary Component
 const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {

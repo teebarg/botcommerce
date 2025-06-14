@@ -10,7 +10,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import NoProductsFound from "@/components/store/products/no-products";
 import { debounce } from "@/lib/utils";
-import { ProductSearch } from "@/types/models";
+import { ProductSearch } from "@/schemas/product";
 import { api } from "@/apis";
 import ProductCard from "@/components/store/products/product-card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

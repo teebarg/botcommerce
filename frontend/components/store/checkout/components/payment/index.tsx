@@ -13,7 +13,7 @@ import ErrorMessage from "../error-message";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Cart, PaymentMethod } from "@/types/models";
+import { Cart, PaymentMethod } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
 

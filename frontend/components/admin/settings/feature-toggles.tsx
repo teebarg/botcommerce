@@ -4,7 +4,7 @@ import React from "react";
 import { toast } from "sonner";
 
 import { Switch } from "@/components/ui/switch";
-import { ShopSettings } from "@/types/models";
+import { ShopSettings } from "@/schemas";
 import { api } from "@/apis";
 
 interface FeatureTogglesProps {

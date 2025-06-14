@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { MessageCircleMore } from "lucide-react";
 
-import { Product, ProductVariant } from "@/types/models";
+import { ProductVariant } from "@/schemas";
 import { cn, currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircleMore } from "lucide-react";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
+import { Product } from "@/schemas/product";
 
 interface VariantSelectionProps {
     product: Product;
@@ -158,8 +159,8 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         {loading ? "Adding to cart..." : "Add to Cart"}
                     </Button>
                     <Button
-                        disabled={loading || !selectedVariant}
                         className="gap-2 bg-[#075e54] hover:bg-[#128c7e] text-white w-auto"
+                        disabled={loading || !selectedVariant}
                         size="lg"
                         onClick={handleWhatsAppPurchase}
                     >

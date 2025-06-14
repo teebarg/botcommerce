@@ -2,9 +2,10 @@ import { fetcher } from "./fetcher";
 import { api } from "./base";
 
 import { buildUrl } from "@/lib/utils";
-import { PaginatedCollection, Collection, Message } from "@/types/models";
+import { Message } from "@/schemas";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { Collection, PaginatedCollection } from "@/schemas/product";
 
 // Collection API methods
 export const collectionApi = {

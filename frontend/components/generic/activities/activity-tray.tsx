@@ -5,7 +5,7 @@ import { Bell } from "nui-react-icons";
 
 import ActivityView from "./activity";
 
-import { Activity } from "@/types/models";
+import { Activity } from "@/schemas";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { api } from "@/apis";
 import { useWebSocket } from "@/providers/websocket";

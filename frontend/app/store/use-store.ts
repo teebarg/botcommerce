@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
-import { Category, Collection, Product, Brand, User } from "@/types/models";
+import { User } from "@/schemas";
+import { Brand, Category, Collection, Product } from "@/schemas/product";
 
 interface StoreState {
     count: number;

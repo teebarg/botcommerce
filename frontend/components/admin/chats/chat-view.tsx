@@ -2,9 +2,9 @@ import React from "react";
 import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
-import { ChatMessage } from "@/types/models";
+import { ChatMessage } from "@/schemas";
 import { formatDate } from "@/lib/utils";
-import { Conversation, ConversationStatus } from "@/types/models";
+import { Conversation, ConversationStatus } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 
 const StatusBadge = ({ status }: { status: ConversationStatus }) => {

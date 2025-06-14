@@ -8,12 +8,13 @@ import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
 import { api as baseApi } from "@/apis/base";
-import { ProductSearch, WishItem } from "@/types/models";
+import { WishItem } from "@/schemas";
 import { auth } from "@/actions/auth";
 import ProductCard from "@/components/store/products/product-card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import ContactForm from "@/components/store/contact-form";
 import CategoriesSection from "@/components/store/landing/category-section";
+import { ProductSearch } from "@/schemas/product";
 
 // Mock banners
 const banners = [
@@ -122,7 +123,7 @@ export default async function Home() {
                             <Image alt="banner" className="h-auto w-full" height={0} sizes="100vw" src={"/side-banner.webp"} width={0} />
                         </div>
                         <div className="col-span-3">
-                            <h2 className="text-lg text-primary mb-2 font-semibold">Featured products</h2>
+                            <h2 className="text-lg text-default-700 mb-2 font-semibold">Featured products</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                                 {data?.featured?.map((product: ProductSearch, index: number) => (
                                     <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />

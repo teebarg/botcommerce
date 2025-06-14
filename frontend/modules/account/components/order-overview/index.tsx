@@ -2,7 +2,7 @@
 
 import OrderCard from "../order-card";
 
-import { Order } from "@/types/models";
+import { Order } from "@/schemas";
 import { BtnLink } from "@/components/ui/btnLink";
 
 const OrderOverview = ({ orders }: { orders: Order[] }) => {

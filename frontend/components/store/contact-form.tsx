@@ -11,7 +11,7 @@ import { Checkbox } from "@components/ui/checkbox";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis/base";
-import { Message } from "@/types/models";
+import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const contactFormSchema = z.object({

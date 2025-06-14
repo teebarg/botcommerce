@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ProductVariant } from "@/types/models";
+import { ProductVariant } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { currency } from "@/lib/utils";

@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { BrandForm } from "@/components/admin/brands/brand-form";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { Brand } from "@/types/models";
+import { Brand } from "@/schemas/product";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import Overlay from "@/components/overlay";
 

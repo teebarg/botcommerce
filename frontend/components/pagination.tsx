@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { type Pagination as PaginationType } from "@/types/models";
+import { type Pag as PaginationType } from "@/schemas/common";
 import {
     Pagination,
     PaginationContent,

@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import ProfileAvatar from "@/public/profile.svg";
 import LocalizedClientLink from "@/components/ui/link";
-import { Session } from "@/types/models";
+import { Session } from "@/schemas";
 import { api } from "@/apis";
 import {
     DropdownMenu,

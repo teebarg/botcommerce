@@ -5,7 +5,7 @@ import React from "react";
 import { ShopDetailsForm } from "./shop-details-form";
 import { ShopSocialForm } from "./shop-social-form";
 
-import { ShopSettings } from "@/types/models";
+import { ShopSettings } from "@/schemas";
 
 interface ShopDetailsProps {
     settings: ShopSettings[];

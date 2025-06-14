@@ -8,7 +8,7 @@ import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
-import { Order } from "@/types/models";
+import { Order } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import { Button } from "@/components/ui/button";
 

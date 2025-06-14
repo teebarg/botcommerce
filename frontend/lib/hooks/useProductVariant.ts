@@ -5,7 +5,8 @@ import { currency } from "@/lib/utils";
 import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { Product, ProductVariant, ProductSearch } from "@/types/models";
+import { ProductVariant } from "@/schemas";
+import { Product, ProductSearch } from "@/schemas/product";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const invalidate = useInvalidate();

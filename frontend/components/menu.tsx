@@ -5,7 +5,7 @@ import { Heart, Home, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
-import { Session } from "@/types/models";
+import { Session } from "@/schemas";
 import ThemeButton from "@/lib/theme/theme-button";
 
 interface NavLinkProp {

@@ -1,14 +1,15 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { SortOptions, WishItem } from "types/models";
 import React, { Suspense } from "react";
 
+import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import { api } from "@/apis";
 import ServerError from "@/components/generic/server-error";
 import { auth } from "@/actions/auth";
 import NoProductsFound from "@/components/store/products/no-products";
+import { WishItem } from "@/schemas";
 
 type Params = Promise<{ slug: string }>;
 

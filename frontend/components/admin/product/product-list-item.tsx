@@ -1,4 +1,4 @@
-import { Category, Product } from "@/types/models";
+import { Category, Product } from "@/schemas/product";
 import { currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 

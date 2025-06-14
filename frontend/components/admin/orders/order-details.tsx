@@ -20,7 +20,7 @@ import { format } from "date-fns";
 
 import OrderProcessingAction from "./order-processing-actions";
 
-import { Order, OrderItem, OrderStatus } from "@/types/models";
+import { Order, OrderItem, OrderStatus } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

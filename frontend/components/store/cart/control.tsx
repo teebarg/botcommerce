@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
 import { Spinner } from "@/components/generic/spinner";
-import { CartItem } from "@/types/models";
+import { CartItem } from "@/schemas";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { useInvalidate } from "@/lib/hooks/useApi";

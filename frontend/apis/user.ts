@@ -1,7 +1,7 @@
 import { fetcher } from "./fetcher";
 
 import { ApiResult, tryCatch } from "@/lib/try-catch";
-import { Message, User, Wishlist } from "@/types/models";
+import { Message, User, Wishlist } from "@/schemas";
 import { revalidate } from "@/actions/revalidate";
 
 // User API methods

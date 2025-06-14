@@ -7,7 +7,7 @@ import PendingPayment from "./order-pending";
 import OrderPickup from "./order-pickup";
 import SuccessConfirmation from "./order-success";
 
-import { Order, PaymentStatus } from "@/types/models";
+import { Order, PaymentStatus } from "@/schemas";
 
 type OrderConfirmationProps = {
     status: PaymentStatus;

@@ -1,9 +1,10 @@
 import { fetcher } from "./fetcher";
 
 import { buildUrl } from "@/lib/utils";
-import { PaginatedBrand, Brand, Message } from "@/types/models";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { Brand, PaginatedBrand } from "@/schemas/product";
+import { Message } from "@/schemas";
 
 // Brand API methods
 export const brandApi = {

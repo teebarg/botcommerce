@@ -11,7 +11,7 @@ import ChatsCard from "./chats-card";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Conversation, ConversationStatus } from "@/types/models";
+import { Conversation, ConversationStatus } from "@/schemas";
 import { useConversations } from "@/lib/hooks/useApi";
 import PaginationUI from "@/components/pagination";
 import { formatDate } from "@/lib/utils";

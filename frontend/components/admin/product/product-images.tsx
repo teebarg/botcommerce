@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import DraggableImageList from "./draggable-images";
 
-import { ProductImage } from "@/types/models";
+import { ProductImage } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import ImageReorder from "@/components/generic/sortable-images";

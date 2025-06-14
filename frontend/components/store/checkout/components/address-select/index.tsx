@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
 import ShippingAddressForm from "../../address-form";
 import { AddressCard } from "../address-item";
 
-import { Address, User } from "@/types/models";
+import { Address, User } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";

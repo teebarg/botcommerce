@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 
-import { ProductImage } from "@/types/models";
+import { ProductImage } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
 

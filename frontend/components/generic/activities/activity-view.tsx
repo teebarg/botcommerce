@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityList } from "@/components/generic/activities/ActivityList";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { api } from "@/apis";
-import { Activity } from "@/types/models";
+import { Activity } from "@/schemas";
 
 const ActivityView: React.FC = () => {
     const [activities, setActivities] = useState<Activity[]>([]);

@@ -7,7 +7,7 @@ import { CreateCollection } from "./create-collection";
 import { CollectionActions } from "./collection-actions";
 import CollectionItem from "./collection-items";
 
-import { Collection } from "@/types/models";
+import { Collection } from "@/schemas/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";

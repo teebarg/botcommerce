@@ -3,7 +3,7 @@ import { currency } from "@lib/utils";
 import Image from "next/image";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { Order, OrderItem } from "@/types/models";
+import { Order, OrderItem } from "@/schemas";
 
 type OrderCardProps = {
     order: Omit<Order, "beforeInsert">;
@@ -38,7 +38,9 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 {order.order_items.slice(0, 3).map((i: OrderItem, idx: number) => {
                     return (
                         <div key={idx} className="flex flex-col gap-y-2" data-testid="order-item">
-                            <div className="h-20 w-20 relative">{i.image && <Image fill alt={i.variant?.product?.name || i.image} src={i.image} />}</div>
+                            <div className="h-20 w-20 relative">
+                                {i.image && <Image fill alt={i.variant?.product?.name || i.image} src={i.image} />}
+                            </div>
                             <div className="flex items-center text-sm text-default-500">
                                 <span className="text-default-500 font-semibold" data-testid="item-title">
                                     {i.variant?.name}

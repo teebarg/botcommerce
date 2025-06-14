@@ -1,13 +1,14 @@
 import { Metadata } from "next";
-import { SortOptions, WishItem } from "types/models";
 import { Suspense } from "react";
 
+import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { api } from "@/apis";
 import { auth } from "@/actions/auth";
 import ServerError from "@/components/generic/server-error";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import NoProductsFound from "@/components/store/products/no-products";
+import { WishItem } from "@/schemas";
 
 type SearchParams = Promise<{
     page?: number;

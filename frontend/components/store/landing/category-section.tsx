@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { useCategories } from "@/lib/hooks/useApi";
-import { Category } from "@/types/models";
+import { Category } from "@/schemas/product";
 import { CardSkeleton } from "@/components/ui/skeletons";
 
 const CategoriesSection: React.FC = () => {

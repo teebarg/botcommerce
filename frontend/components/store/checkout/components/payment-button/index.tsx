@@ -7,7 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Cart } from "@/types/models";
+import { Cart } from "@/schemas";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
 import { api } from "@/apis";
 import { PaystackPayment } from "@/components/store/payment/paystack-payment";

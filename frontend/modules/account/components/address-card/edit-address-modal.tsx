@@ -10,12 +10,12 @@ import { Pencil, Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Address } from "@/types/models";
+import { Address } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/apis";
-import { AddressTypeSchema } from "@/types/schema";
+import { AddressTypeSchema } from "@/schemas";
 import { states } from "@/components/store/collections/data";
 
 const addressSchema = z.object({

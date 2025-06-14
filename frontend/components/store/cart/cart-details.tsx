@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, X } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import CartItemComponent from "./cart-item";
 
-import { Cart, CartItem } from "@/types/models";
+import { Cart, CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";

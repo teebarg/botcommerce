@@ -6,7 +6,7 @@ import { Pencil, Trash2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { api } from "@/apis";
-import { Product } from "@/types/models";
+import { Product } from "@/schemas/product";
 import { ProductView } from "@/components/products/product-view";
 import { Confirm } from "@/components/generic/confirm";
 import { useInvalidate } from "@/lib/hooks/useApi";

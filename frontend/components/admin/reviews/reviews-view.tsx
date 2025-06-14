@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { ReviewActions } from "./reviews-actions";
 import ReviewItem from "./review-item";
 
-import { Review } from "@/types/models";
+import { Review } from "@/schemas";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";

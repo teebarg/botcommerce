@@ -8,7 +8,7 @@ import { CheckboxGroup } from "@/components/store/collections/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import LocalizedClientLink from "@/components/ui/link";
-import { Brand, Category, Collection, Facet } from "@/types/models";
+import { Brand, Category, Collection, Facet } from "@/schemas/product";
 import { Separator } from "@/components/ui/separator";
 
 interface ComponentProps {

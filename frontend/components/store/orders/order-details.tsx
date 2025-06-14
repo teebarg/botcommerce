@@ -7,7 +7,7 @@ import { currency } from "@lib/utils";
 
 import Thumbnail from "@/components/generic/thumbnail";
 import LocalizedClientLink from "@/components/ui/link";
-import { OrderItem } from "@/types/models";
+import { OrderItem } from "@/schemas";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type ItemsTemplateProps = {

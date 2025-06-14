@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import AddressSelect from "../address-select";
 
-import { Address } from "@/types/models";
+import { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { useMe } from "@/lib/hooks/useApi";

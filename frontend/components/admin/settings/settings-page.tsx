@@ -6,7 +6,7 @@ import { FeatureToggles } from "./feature-toggles";
 import { ShopDetails } from "./shop-details";
 import { ShopPayments } from "./shop-payments";
 
-import { BankDetails, ShopSettings } from "@/types/models";
+import { BankDetails, ShopSettings } from "@/schemas";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface SettingsPageProps {

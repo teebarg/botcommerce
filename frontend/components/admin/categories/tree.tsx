@@ -7,7 +7,7 @@ import Image from "next/image";
 import CategoryAction from "./categories-control";
 
 import { cn } from "@/lib/utils";
-import { Category } from "@/types/models";
+import { Category } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {

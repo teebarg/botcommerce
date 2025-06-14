@@ -6,7 +6,7 @@ import { MapPin, Pencil } from "lucide-react";
 import ShippingAddress from "../shipping-address";
 
 import { cn } from "@/lib/utils";
-import { Cart } from "@/types/models";
+import { Cart } from "@/schemas";
 
 const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const searchParams = useSearchParams();
@@ -39,7 +39,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                 </div>
 
                 <div className={cn("hidden", isOpen && "block")}>
-                    <ShippingAddress address={address ?? null} email={cart?.email ?? ""} /> 
+                    <ShippingAddress address={address ?? null} email={cart?.email ?? ""} />
                 </div>
                 {/* Account Information Section */}
                 {!isOpen && address?.address_1 && (

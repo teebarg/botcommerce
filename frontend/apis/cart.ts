@@ -1,9 +1,10 @@
 import { fetcher } from "./fetcher";
 
-import { Cart, CartComplete, CartUpdate, Message, Order } from "@/types/models";
+import { Cart, CartComplete, CartUpdate, Order } from "@/schemas";
 import { ApiResult, tryCatch } from "@/lib/try-catch";
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
 import { getCookie } from "@/lib/util/server-utils";
+import { Message } from "@/schemas";
 
 // Cart API methods
 export const cartApi = {

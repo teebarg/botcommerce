@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "nui-react-icons";
 
-import { OrderItem } from "@/types/models";
 import OrderItemComponent from "./order-item";
+
+import { OrderItem } from "@/schemas";
 
 const OrderItems: React.FC<{ items: OrderItem[]; showDetails: boolean }> = ({ items, showDetails }) => {
     const [expanded, setExpanded] = useState<boolean>(showDetails);

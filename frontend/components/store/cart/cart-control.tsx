@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { CartItem } from "@/types/models";
+import { CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";

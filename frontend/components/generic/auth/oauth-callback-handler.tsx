@@ -8,7 +8,7 @@ import { ShoppingBag } from "nui-react-icons";
 import { CircleDot } from "lucide-react";
 
 import { api } from "@/apis/base";
-import { Token } from "@/types/models";
+import { Token } from "@/schemas";
 import { setCookie } from "@/lib/util/cookie";
 import { useStore } from "@/app/store/use-store";
 

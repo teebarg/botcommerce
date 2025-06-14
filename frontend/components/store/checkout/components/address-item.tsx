@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import ShippingAddressFormEdit from "../address-form-edit";
 
-import { Address } from "@/types/models";
+import { Address } from "@/schemas";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
@@ -116,9 +116,9 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     trigger={
                         <Button
                             className="text-default-500 hover:text-blue-600 hover:bg-blue-50"
-                            onClick={(e) => e.stopPropagation()}
                             size="icon"
                             variant="ghost"
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <Edit3 className="w-4 h-4" />
                         </Button>
@@ -131,9 +131,9 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     <DialogTrigger asChild>
                         <Button
                             className="text-default-500 hover:text-red-600 hover:bg-red-50"
-                            onClick={(e) => e.stopPropagation()}
                             size="icon"
                             variant="ghost"
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <Trash2 className="w-4 h-4" />
                         </Button>

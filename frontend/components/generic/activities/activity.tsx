@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { AlertCircle, CheckCircle2, Clock, Download, FileSpreadsheet, Trash2 } from "lucide-react";
 
 import { useStore } from "@/app/store/use-store";
-import { Activity } from "@/types/models";
+import { Activity } from "@/schemas";
 import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

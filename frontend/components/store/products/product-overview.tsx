@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import ProductDetails from "./product-details";
 
-import { ProductSearch } from "@/types/models";
+import { ProductSearch } from "@/schemas/product";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";

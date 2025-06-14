@@ -1,9 +1,11 @@
+"use client";
+
 import React from "react";
 
 import CartControl from "./cart-control";
 
 import { currency } from "@/lib/utils";
-import { CartItem } from "@/types/models";
+import { CartItem } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
@@ -29,7 +31,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
                                 <div
                                     className="w-2.5 h-2.5 rounded-full border border-default-300 mr-1"
                                     style={{ backgroundColor: item.variant.color.toLowerCase() }}
-                                ></div>
+                                />
                                 {item.variant.color}
                             </Badge>
                         )}

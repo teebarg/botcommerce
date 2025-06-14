@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Download, Trash2, Activity as ActivityIcon, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Activity } from "@/types/models";
+import { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { TableSkeleton } from "@/components/ui/skeletons";

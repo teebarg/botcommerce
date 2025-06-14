@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ConversationStatus } from "@/types/models";
+import { ConversationStatus } from "@/schemas";
 import { Select } from "@/components/ui/select";
 
 export interface CustomerFilterOptions {

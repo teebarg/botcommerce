@@ -1,8 +1,9 @@
 import { api } from "./base";
 
-import { BankDetails, Message } from "@/types/models";
+import { BankDetails } from "@/schemas";
 import { revalidate } from "@/actions/revalidate";
 import { ApiResult } from "@/lib/try-catch";
+import { Message } from "@/schemas";
 
 export const bankSettingsApi = {
     async getBankDetails(cache: "force-cache" | "no-cache" = "force-cache"): ApiResult<BankDetails[]> {

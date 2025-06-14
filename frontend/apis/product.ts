@@ -1,8 +1,9 @@
 import { api } from "./base";
 
-import { Message, PaginatedProductSearch, PaginatedReview, Product, ProductVariant, Review } from "@/types/models";
+import { Message, PaginatedReview, ProductVariant, Review } from "@/schemas";
 import { revalidate as revalidateAction } from "@/actions/revalidate";
 import { ApiResult } from "@/lib/try-catch";
+import { PaginatedProductSearch, Product } from "@/schemas/product";
 
 interface SearchParams {
     query?: string;

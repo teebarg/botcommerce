@@ -12,7 +12,7 @@ import { CollectionsSideBar } from "./checkbox-sidebar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { Brand, Category, Collection } from "@/types/models";
+import { Brand, Category, Collection } from "@/schemas/product";
 import { Separator } from "@/components/ui/separator";
 
 interface ComponentProps {

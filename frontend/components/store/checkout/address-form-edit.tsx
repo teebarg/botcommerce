@@ -5,7 +5,7 @@ import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { Address, AddressType } from "@/types/models";
+import { Address, AddressType } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

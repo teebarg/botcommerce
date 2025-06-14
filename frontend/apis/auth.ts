@@ -1,6 +1,6 @@
 import { api } from "./base";
 
-import { Message, Token } from "@/types/models";
+import { Message, Token } from "@/schemas";
 import { ApiResult } from "@/lib/try-catch";
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
 

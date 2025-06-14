@@ -428,9 +428,13 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
 
 @router.delete("/variants/{variant_id}")
-async def delete_variant(variant_id: int):
+async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
     # Delete the variant
-    return await db.productvariant.delete(where={"id": variant_id})
+    variant = await db.productvariant.delete(where={"id": variant_id})
+
+    background_tasks.add_task(reindex_product, variant.product_id)
+
+    return {"success": True}
 
 
 class ImageUpload(BaseModel):
@@ -454,10 +458,14 @@ async def add_image(id: int, image_data: ImageUpload) -> Product:
         image_url = upload(bucket="product-images", data=image_data)
 
         # Update product with new image URL
-        return await db.product.update(
+        updated_product = await db.product.update(
             where={"id": id},
             data={"image": image_url}
         )
+
+        background_tasks.add_task(reindex_product, id)
+
+        return updated_product
 
     except Exception as e:
         raise HTTPException(
@@ -467,7 +475,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Product:
 
 
 @router.post("/{id}/images")
-async def upload_images(id: int, image_data: ImageUpload):
+async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks):
     """
     Upload images to a product.
     """
@@ -485,11 +493,13 @@ async def upload_images(id: int, image_data: ImageUpload):
         }
     )
 
+    background_tasks.add_task(reindex_product, id)
+
     return image
 
 
 @router.delete("/{id}/image")
-async def delete_image(id: int):
+async def delete_image(id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product.
     """
@@ -509,11 +519,13 @@ async def delete_image(id: int):
 
     await db.product.update(where={"id": id}, data={"image": None})
 
+    background_tasks.add_task(reindex_product, id)
+
     return {"success": True}
 
 
 @router.delete("/{id}/images/{image_id}")
-async def delete_images(id: int, image_id: int):
+async def delete_images(id: int, image_id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product images.
     """
@@ -543,6 +555,8 @@ async def delete_images(id: int, image_id: int):
             where={"id": image.id},
             data={"order": index}
         )
+
+    background_tasks.add_task(reindex_product, id)
 
     return {"success": True}
 
@@ -711,7 +725,6 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
 
     ratings = [r["rating"] for r in reviews if r.get("rating") is not None]
     product_dict["review_count"] = len(ratings)
-    # product_dict["ratings"] = ratings
     product_dict["average_rating"] = round(sum(ratings) / len(ratings), 2) if ratings else 0
 
     return product_dict
@@ -796,8 +809,6 @@ async def reorder_images(id: int, image_ids: list[int]):
             data={"order": index}
         )
 
-    # Re-index
     await reindex_product(product_id=id)
-    # await index_products()
 
     return {"success": True}

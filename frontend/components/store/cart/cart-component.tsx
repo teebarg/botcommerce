@@ -4,7 +4,7 @@ import { ShoppingCart } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import React from "react";
 
-import { CartItem } from "@/types/models";
+import { CartItem } from "@/schemas";
 import CartDetails from "@/components/store/cart/cart-details";
 import { Button } from "@/components/ui/button";
 import { useCart, useCartItem } from "@/lib/hooks/useCart";

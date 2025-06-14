@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { Category, Collection, Facet, PaginatedProductSearch, ProductSearch, WishItem } from "@/types/models";
+import { WishItem } from "@/schemas";
 import { CollectionsSideBar } from "@/components/store/collections/checkbox-sidebar";
 import { CollectionsTopBar } from "@/components/store/collections/checkout-topbar";
 import NoProductsFound from "@/components/store/products/no-products";
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useBrands, useCategories, useCollections } from "@/lib/hooks/useApi";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { api } from "@/apis/client";
+import { Category, Collection, Facet, PaginatedProductSearch, ProductSearch } from "@/schemas/product";
 
 interface SearchParams {
     page?: number;
