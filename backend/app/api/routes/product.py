@@ -42,6 +42,7 @@ from app.core.storage import upload
 from app.api.routes.websocket import manager
 from app.services.activity import log_activity
 from app.core.deps import supabase
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -68,7 +69,7 @@ async def get_landing_products() -> LandingProducts:
         }
 
         try:
-            search_results = meilisearch_client.index('products').search(
+            search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
                 "",
                 {
                     **search_params
@@ -197,7 +198,7 @@ async def search(
         search_params["filter"] = " AND ".join(filters)
 
     try:
-        search_results = meilisearch_client.index('products').search(
+        search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
             search,
             {
                 **search_params
@@ -355,7 +356,7 @@ async def delete_product(id: int) -> Message:
     await db.product.delete(where={"id": id})
 
     try:
-        delete_document(index_name="products", document_id=str(id))
+        delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(id))
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
@@ -651,7 +652,7 @@ async def configure_filterable_attributes(
     Configure filterable attributes for the products index in Meilisearch.
     """
     try:
-        index = get_or_create_index("products")
+        index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         # Update the filterable attributes
         index.update_filterable_attributes(
             ["brand", "categories", "collections", "name", "variants", "average_rating", "review_count", "max_variant_price", "min_variant_price"]
@@ -677,7 +678,7 @@ async def config_clear_index():
     Clear the products index in Meilisearch.
     """
     try:
-        clear_index("products")
+        clear_index(settings.MEILI_PRODUCTS_INDEX)
         return {"message": "Index cleared"}
     except Exception as e:
         logger.error(f"Error clearing index: {e}")
@@ -692,7 +693,7 @@ async def config_delete_index() -> dict:
     Drop the products index in Meilisearch.
     """
     try:
-        delete_index("products")
+        delete_index(settings.MEILI_PRODUCTS_INDEX)
         return {"message": "Index dropping"}
     except Exception as e:
         logger.error(f"Error dropping index: {e}")
@@ -754,8 +755,8 @@ async def index_products():
             product_dict = prepare_product_data_for_indexing(product)
             documents.append(product_dict)
 
-        # Add all documents to the 'products' index
-        add_documents_to_index(index_name="products", documents=documents)
+        # Add all documents to the products index
+        add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
     except Exception as e:
@@ -784,7 +785,7 @@ async def reindex_product(product_id: int):
         # Prepare product data for Meilisearch indexing
         product_data = prepare_product_data_for_indexing(product)
 
-        update_document(index_name="products", document=product_data)
+        update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
 
         logger.info(f"Successfully reindexed product {product_id}")
 

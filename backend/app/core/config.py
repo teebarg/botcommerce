@@ -104,6 +104,7 @@ class Settings(BaseSettings):
 
     MEILI_MASTER_KEY: str = "masterKey"
     MEILI_HOST: str = "http://meilisearch:7700"
+    MEILI_PRODUCTS_INDEX: str = "products"
 
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
