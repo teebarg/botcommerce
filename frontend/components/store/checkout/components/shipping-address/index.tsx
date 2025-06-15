@@ -11,6 +11,8 @@ import { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { useMe } from "@/lib/hooks/useApi";
+import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
+import { Skeleton } from "@/components/ui/skeletons";
 
 const ShippingAddress = ({ address, email }: { address: Address | null; email: string }) => {
     const router = useRouter();
@@ -41,42 +43,44 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
     };
 
     if (meLoading) {
-        return null;
+        return <Skeleton className="h-24" />;
+    }
+
+    if (!user) {
+        return <CheckoutLoginPrompt />;
     }
 
     return (
         <React.Fragment>
             <div className="w-full rounded-lg mb-6">
-                <AddressSelect address={address} user={user!} />
+                <AddressSelect address={address} user={user} />
             </div>
-            {user && (
-                <React.Fragment>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                        <Input
-                            required
-                            autoComplete="email"
-                            data-testid="shipping-email-input"
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={cartEmail}
-                            onChange={(e) => setCartEmail(e.target.value)}
-                        />
-                    </div>
-                    <Button
-                        aria-label="continue"
-                        className="mt-6"
-                        data-testid="submit-address-button"
-                        disabled={isPending || cartEmail === ""}
-                        isLoading={isPending}
-                        type="button"
-                        variant="primary"
-                        onClick={handleSubmit}
-                    >
-                        Continue to delivery
-                    </Button>
-                </React.Fragment>
-            )}
+            <React.Fragment>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                    <Input
+                        required
+                        autoComplete="email"
+                        data-testid="shipping-email-input"
+                        label="Email"
+                        name="email"
+                        type="email"
+                        value={cartEmail}
+                        onChange={(e) => setCartEmail(e.target.value)}
+                    />
+                </div>
+                <Button
+                    aria-label="continue"
+                    className="mt-6"
+                    data-testid="submit-address-button"
+                    disabled={isPending || cartEmail === ""}
+                    isLoading={isPending}
+                    type="button"
+                    variant="primary"
+                    onClick={handleSubmit}
+                >
+                    Continue to delivery
+                </Button>
+            </React.Fragment>
         </React.Fragment>
     );
 };

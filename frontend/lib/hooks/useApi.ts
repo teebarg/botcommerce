@@ -7,6 +7,7 @@ import {
     BankDetails,
     ChatMessage,
     ConversationStatus,
+    DeliveryOption,
     FAQ,
     PaginatedConversation,
     PaginatedOrder,
@@ -244,15 +245,24 @@ export const useDeleteFaq = () => {
     });
 };
 
-interface ReviewParams {
-    skip?: number;
-    limit?: number;
-}
-
-export const useReviews = (params: ReviewParams) => {
+export const useReviews = (params: { skip?: number; limit?: number }) => {
     return useQuery({
         queryKey: ["reviews"],
         queryFn: async () => await api.get<PaginatedReview>("/reviews/", { params: { ...params } }),
+    });
+};
+
+export const useDeliveryOptions = () => {
+    return useQuery({
+        queryKey: ["available-delivery"],
+        queryFn: async () => await api.get<DeliveryOption[]>("/delivery/available"),
+    });
+};
+
+export const useAdminDeliveryOptions = () => {
+    return useQuery({
+        queryKey: ["all-delivery"],
+        queryFn: async () => await api.get<DeliveryOption[]>("/delivery"),
     });
 };
 

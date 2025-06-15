@@ -12,6 +12,7 @@ interface OverlayProps {
     title?: string;
     sheetClassName?: string;
     showHeader?: boolean;
+    showCloseButton?: boolean;
 }
 
 const Overlay: React.FC<OverlayProps> = ({
@@ -22,6 +23,7 @@ const Overlay: React.FC<OverlayProps> = ({
     title = "Content",
     sheetClassName = "min-w-[400px]",
     showHeader = false,
+    showCloseButton = true,
 }) => {
     const { isDesktop } = useMediaQuery();
 
@@ -46,9 +48,11 @@ const Overlay: React.FC<OverlayProps> = ({
                 <DrawerHeader className={showHeader ? "" : "sr-only"}>
                     <DrawerTitle>{title}</DrawerTitle>
                 </DrawerHeader>
-                <DrawerClose className="absolute top-4 right-4 z-70">
-                    <X className="h-5 w-5" />
-                </DrawerClose>
+                {showCloseButton && (
+                    <DrawerClose className="absolute top-4 right-4 z-70">
+                        <X className="h-5 w-5" />
+                    </DrawerClose>
+                )}
                 {children}
             </DrawerContent>
         </Drawer>

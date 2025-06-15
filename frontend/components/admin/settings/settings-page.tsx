@@ -2,6 +2,8 @@
 
 import React from "react";
 
+import DeliveryOverview from "../delivery/delivery-overview";
+
 import { FeatureToggles } from "./feature-toggles";
 import { ShopDetails } from "./shop-details";
 import { ShopPayments } from "./shop-payments";
@@ -23,6 +25,7 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
                     <TabsTrigger value="shop-details">Shop Details</TabsTrigger>
                     <TabsTrigger value="details">Details</TabsTrigger>
                     <TabsTrigger value="payments">Payments</TabsTrigger>
+                    <TabsTrigger value="delivery">Delivery</TabsTrigger>
                 </TabsList>
                 <TabsContent value="shop-details">
                     <ShopDetails settings={settings} />
@@ -32,6 +35,9 @@ export function SettingsPage({ settings, bankDetails }: SettingsPageProps) {
                 </TabsContent>
                 <TabsContent value="payments">
                     <ShopPayments bankDetails={bankDetails} settings={settings} />
+                </TabsContent>
+                <TabsContent value="delivery">
+                    <DeliveryOverview />
                 </TabsContent>
             </Tabs>
         </div>

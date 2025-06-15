@@ -41,6 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
             <Overlay
                 open={dialogState.isOpen}
                 sheetClassName="min-w-[40vw]"
+                showCloseButton={false}
                 title="Details"
                 trigger={
                     <div>
