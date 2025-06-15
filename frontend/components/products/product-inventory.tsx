@@ -65,7 +65,7 @@ export function ProductInventory() {
                     <div className="max-w-120 mb-8 w-full">
                         <ProductUpload />
                     </div>
-                    <div className="flex gap-2 mb-2">
+                    <div className="flex flex-wrap gap-2 mb-2">
                         <Overlay
                             open={addState.isOpen}
                             sheetClassName="min-w-[500px]"

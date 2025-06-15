@@ -7,7 +7,7 @@ type ProductDetailsProps = {};
 
 const ProductDetails: React.FC<ProductDetailsProps> = () => {
     return (
-        <div className="text-sm py-8 bg-yellow-50 text-yellow-950 dark:bg-zinc-800 dark:text-yellow-50 -mx-2 px-2 rounded-none md:rounded-lg">
+        <div className="text-sm py-8 bg-yellow-50 text-yellow-950 dark:bg-zinc-800 dark:text-yellow-50 -mx-4 px-2 rounded-none md:rounded-lg">
             <div className="grid grid-cols-1 gap-y-8">
                 <div className="flex items-start gap-x-2">
                     <Truck className="h-6 w-6" />

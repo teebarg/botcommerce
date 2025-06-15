@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
+import { buttonVariants } from "@/components/ui/button";
 
 const buttonConfig: any = {
     primary: {
@@ -54,6 +55,10 @@ const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", color = "primary", varia
     return (
         <LocalizedClientLink
             className={cn(
+                // buttonVariants({
+                //     variant: variant,
+                //     size,
+                // }),
                 "z-0 group relative inline-flex items-center justify-center whitespace-nowrap",
                 "font-medium overflow-hidden outline-none transition-all hover:opacity-80",
                 variant === "shadow" && buttonConfig[color].shadow,

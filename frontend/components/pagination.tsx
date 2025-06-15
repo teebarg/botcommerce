@@ -49,7 +49,6 @@ const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
         const start = Math.max(2, page - range);
         const end = Math.min(totalPages - 1, page + range);
 
-        // Always show first page
         pages.push(renderPage(1));
 
         if (start > 2) {
