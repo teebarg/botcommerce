@@ -12,7 +12,7 @@ export const getSiteConfig = async () => {
     }
 
     const siteConfig = {
-        name: shopSettings.shop_name || "E-Shop",
+        name: shopSettings.shop_name || "Thriftbyoba",
         description:
             "Discover a wide range of high-quality products at unbeatable prices. Shop now for exclusive deals and fast shipping, ensuring a seamless shopping experience tailored just for you.",
         contactEmail: shopSettings.contact_email || "",

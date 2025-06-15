@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { StatusSchema } from "./enums";
 import { AddressSchema } from "./address";
 import { AuditSchema } from "./base";
-import { PagSchema } from "./common";
+
+import { PagSchema } from "./index";
 
 export const UserSchema = z
     .object({

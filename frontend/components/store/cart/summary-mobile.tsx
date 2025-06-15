@@ -63,7 +63,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                 </div>
             </div>
             <div className="flex flex-row-reverse gap-2 p-2">
-                <BtnLink color="danger" href="/checkout" variant="bordered">
+                <BtnLink href="/checkout" variant="destructive">
                     Checkout ({totalItems ?? 0})
                 </BtnLink>
                 <Button

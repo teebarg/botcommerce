@@ -56,7 +56,7 @@ const Privacy = async () => {
             </div>
 
             <div className="mt-8 text-center">
-                <BtnLink color="primary" href="/" size="md">
+                <BtnLink href="/" size="lg" variant="primary">
                     Back Home
                 </BtnLink>
             </div>

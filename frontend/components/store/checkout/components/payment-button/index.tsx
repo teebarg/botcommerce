@@ -92,7 +92,7 @@ const LoginToCompleteOrder: React.FC = () => {
     return (
         <Dialog open={modalState.isOpen} onOpenChange={modalState.setOpen}>
             <DialogTrigger asChild>
-                <Button className="min-w-32" color="danger" size="sm">
+                <Button className="min-w-32" size="sm" variant="destructive">
                     Login to complete order
                 </Button>
             </DialogTrigger>

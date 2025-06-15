@@ -100,7 +100,7 @@ const InstallPrompt: React.FC = () => {
                             <p className="text-sm text-default-500 mb-3">Get faster checkout, exclusive offers and real-time order tracking</p>
 
                             {/* Install button */}
-                            <Button aria-label="install" className="w-full space-x-2" color="primary" onClick={handleInstall}>
+                            <Button aria-label="install" className="w-full space-x-2" variant="primary" onClick={handleInstall}>
                                 <span>Add to Home Screen</span>
                             </Button>
                         </div>

@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-import { ConversationStatusSchema, MessageSenderSchema, ShippingMethodSchema, ShopSettingsTypeSchema } from "./enums";
-import { UserSchema } from "./user";
+import { ShippingMethodSchema, ShopSettingsTypeSchema } from "./enums";
 
 export const TokenSchema = z.object({
     access_token: z.string(),
@@ -68,29 +67,6 @@ export const PaystackResponseSchema = z.object({
     trxref: z.string(),
 });
 
-export const ChatMessageSchema = z.object({
-    id: z.number(),
-    conversation_id: z.number(),
-    content: z.string(),
-    sender: MessageSenderSchema,
-    timestamp: z.string(),
-});
-
-export const ConversationSchema = z.object({
-    id: z.number(),
-    conversation_uuid: z.string(),
-    user_id: z.number(),
-    user: UserSchema,
-    messages: z.array(ChatMessageSchema),
-    started_at: z.string(),
-    last_active: z.string(),
-    status: ConversationStatusSchema,
-});
-
-export const PaginatedConversationSchema = PagSchema.extend({
-    conversations: z.array(ConversationSchema),
-});
-
 export const FAQSchema = z.object({
     id: z.number(),
     question: z.string(),
@@ -99,22 +75,6 @@ export const FAQSchema = z.object({
     is_active: z.boolean(),
     created_at: z.string(),
     updated_at: z.string(),
-});
-
-export const ActivitySchema = z.object({
-    id: z.number(),
-    user_id: z.number(),
-    activity_type: z.string(),
-    description: z.string(),
-    action_download_url: z.string().optional(),
-    is_success: z.boolean(),
-    user: UserSchema,
-    created_at: z.string(),
-    updated_at: z.string(),
-});
-
-export const PaginatedActivitySchema = PagSchema.extend({
-    activities: z.array(ActivitySchema),
 });
 
 export const DeliveryOptionSchema = z.object({
@@ -136,9 +96,4 @@ export type PaginatedSiteConfig = z.infer<typeof PaginatedSiteConfigSchema>;
 export type ShopSettings = z.infer<typeof ShopSettingsSchema>;
 export type BankDetails = z.infer<typeof BankDetailsSchema>;
 export type PaystackResponse = z.infer<typeof PaystackResponseSchema>;
-export type Conversation = z.infer<typeof ConversationSchema>;
-export type PaginatedConversation = z.infer<typeof PaginatedConversationSchema>;
 export type FAQ = z.infer<typeof FAQSchema>;
-export type ChatMessage = z.infer<typeof ChatMessageSchema>;
-export type Activity = z.infer<typeof ActivitySchema>;
-export type PaginatedActivity = z.infer<typeof PaginatedActivitySchema>;
