@@ -10,6 +10,7 @@ from app.api.routes import (
     category,
     collection,
     config,
+    delivery,
     faq,
     conversation,
     order,
@@ -44,3 +45,4 @@ api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(reviews.router, prefix="/reviews", tags=["reviews"])
 api_router.include_router(websocket.router, prefix="/ws", tags=["websocket"])
 api_router.include_router(shop_settings.router, prefix="/shop-settings", tags=["shop-settings"])
+api_router.include_router(delivery.router, prefix="/delivery", tags=["delivery"])

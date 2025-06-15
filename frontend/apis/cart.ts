@@ -8,13 +8,6 @@ import { Message } from "@/schemas";
 
 // Cart API methods
 export const cartApi = {
-    async get(): ApiResult<Cart> {
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/`;
-
-        const response = await tryCatch<Cart>(fetcher(url, { next: { tags: ["cart"] } }));
-
-        return response;
-    },
     async add({ variant_id, quantity }: { variant_id: number; quantity: number }): ApiResult<Cart> {
         const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart/items`;
         const response = await tryCatch<Cart>(

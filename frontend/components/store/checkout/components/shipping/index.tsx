@@ -9,33 +9,31 @@ import ErrorMessage from "../error-message";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import { currency } from "@/lib/utils";
 import { Cart, DeliveryOption } from "@/schemas";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useDeliveryOptions, useInvalidate } from "@/lib/hooks/useApi";
+import { Button } from "@/components/ui/button";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount">;
-    availableShippingMethods: DeliveryOption[] | null;
 };
 
-const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) => {
-    const invalidate = useInvalidate();
-    const [isLoading, setIsLoading] = useState(false);
+const Shipping: React.FC<ShippingProps> = ({ cart }) => {
     const [error, setError] = useState<string | null>(null);
-
-    const hasShippingMethod = !!cart?.shipping_method;
-
-    const searchParams = useSearchParams();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const invalidate = useInvalidate();
 
-    const selectedShippingMethod: DeliveryOption | undefined = availableShippingMethods?.find(
-        (item: DeliveryOption) => item.id == cart?.shipping_method
-    );
+    const { data: deliveryOptions } = useDeliveryOptions();
+
+    const selectedShippingMethod: DeliveryOption | undefined = deliveryOptions?.find((item: DeliveryOption) => item.method == cart?.shipping_method);
 
     const isOpen = searchParams.get("step") === "delivery";
+
+    const hasShippingMethod = !!cart.shipping_method;
 
     const handleEdit = () => {
         router.push(pathname + "?step=delivery", { scroll: false });
@@ -48,7 +46,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
 
     const set = async (option: DeliveryOption) => {
         setIsLoading(true);
-        const { error } = await api.cart.updateDetails({ shipping_method: option.id, shipping_fee: option.amount });
+        const { error } = await api.cart.updateDetails({ shipping_method: option.method, shipping_fee: option.amount });
 
         if (error) {
             toast.error(error);
@@ -61,7 +59,7 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
     };
 
     const handleChange = (value: string) => {
-        const item: DeliveryOption | undefined = availableShippingMethods?.find((item: DeliveryOption) => item.id == value);
+        const item: DeliveryOption | undefined = deliveryOptions?.find((item: DeliveryOption) => item.method == value);
 
         if (!item) {
             return;
@@ -97,7 +95,6 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                 </button>
             </div>
 
-            {/* Form */}
             <div className={cn("mt-6", isOpen ? "block" : "hidden")} data-testid="delivery-options-container">
                 <RadioGroup
                     className="grid grid-cols-1 md:grid-cols-3 gap-2"
@@ -105,29 +102,32 @@ const Shipping: React.FC<ShippingProps> = ({ cart, availableShippingMethods }) =
                     value={cart.shipping_method}
                     onChange={(value: string) => handleChange(value)}
                 >
-                    {availableShippingMethods?.map((option) => (
+                    {deliveryOptions?.map((option) => (
                         <RadioGroup.Option
                             key={option.id}
                             className={cn(
                                 `flex items-center justify-between px-4 py-4 md:px-3 rounded-lg border cursor-pointer transition-all ${
-                                    option.id === cart.shipping_method
+                                    option.method === cart.shipping_method
                                         ? "border-blue-500 bg-transparent"
                                         : "border-default-200 hover:border-default-300"
                                 }`
-                                // option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
                             )}
-                            value={option.id}
+                            value={option.method}
                         >
                             <div>
-                                <h3 className={`text-sm font-medium ${option.id === cart.shipping_method ? "text-blue-600" : "text-default-700"}`}>
+                                <h3
+                                    className={`text-sm font-medium ${option.method === cart.shipping_method ? "text-blue-600" : "text-default-700"}`}
+                                >
                                     {option.name}
                                 </h3>
                                 <p className="text-sm text-default-500">{option.description}</p>
                             </div>
                             <span
-                                className={`text-sm font-semibold ml-2 ${option.id === cart.shipping_method ? "text-blue-600" : "text-default-800"}`}
+                                className={`text-sm font-semibold ml-2 ${
+                                    option.method === cart.shipping_method ? "text-blue-600" : "text-default-800"
+                                }`}
                             >
-                                {option.amount == 0 ? "Free" : currency(option.amount)}
+                                {option.amount === 0 ? "Free" : currency(option.amount)}
                             </span>
                         </RadioGroup.Option>
                     ))}

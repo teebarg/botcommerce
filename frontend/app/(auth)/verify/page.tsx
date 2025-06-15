@@ -146,7 +146,7 @@ export default function VerifyMagicLink() {
                             <p className="text-default-500 text-base mb-2">This magic link has expired or already been used.</p>
                             <p className="text-default-500 text-base">Please request a new magic link to continue.</p>
                         </div>
-                        <BtnLink className="w-full" href="/sign-in" size="md">
+                        <BtnLink className="w-full" href="/sign-in" size="lg">
                             Request New Link
                         </BtnLink>
                     </div>

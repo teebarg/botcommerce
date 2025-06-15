@@ -35,10 +35,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                     <p className="text-xl text-default-900 mb-4">Internal Server Error</p>
                     <p className="text-default-500 mb-6 text-center">Oops! Something went wrong on our end. We apologize for the inconvenience.</p>
                     <div className="flex items-center">
-                        <BtnLink color="primary" href="/">
+                        <BtnLink href="/" variant="primary">
                             Go back to homepage
                         </BtnLink>
-                        <Button aria-label="try again" className="block ml-4" color="danger" type="button" onClick={() => reset()}>
+                        <Button aria-label="try again" className="block ml-4" variant="destructive" onClick={() => reset()}>
                             Try again
                         </Button>
                     </div>

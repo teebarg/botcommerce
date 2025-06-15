@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Cart, PaymentMethod } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { useStore } from "@/app/store/use-store";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
@@ -25,6 +26,7 @@ const payMethods: { id: string; provider_id: PaymentMethod }[] = [
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const invalidate = useInvalidate();
+    const { shopSettings } = useStore();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -119,14 +121,28 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                 </div>
                 {!paidByGiftcard && (
                     <RadioGroup name="payment" value={cart?.payment_method || ""} onChange={(value: string) => handleChange(value as PaymentMethod)}>
-                        {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => (
-                            <PaymentContainer
-                                key={idx}
-                                paymentInfoMap={paymentInfoMap}
-                                paymentSession={item}
-                                selectedPaymentOptionId={cart?.payment_method || null}
-                            />
-                        ))}
+                        {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
+                            if (item.provider_id === "PAYSTACK" && shopSettings?.payment_paystack != "true") {
+                                return null;
+                            }
+
+                            if (item.provider_id === "BANK_TRANSFER" && shopSettings?.payment_bank != "true") {
+                                return null;
+                            }
+
+                            if (item.provider_id === "CASH_ON_DELIVERY" && shopSettings?.payment_cash != "true") {
+                                return null;
+                            }
+
+                            return (
+                                <PaymentContainer
+                                    key={idx}
+                                    paymentInfoMap={paymentInfoMap}
+                                    paymentSession={item}
+                                    selectedPaymentOptionId={cart?.payment_method || null}
+                                />
+                            );
+                        })}
                     </RadioGroup>
                 )}
 

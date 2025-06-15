@@ -84,7 +84,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 # Root path
 @app.get("/")
 async def root():
-    return {"message": "Server is running"}
+    return {"message": "This is root"}
 
 
 @app.get("/api/health")

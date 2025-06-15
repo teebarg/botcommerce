@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { useCategories } from "@/lib/hooks/useApi";
 import { Category } from "@/schemas/product";
-import { CardSkeleton } from "@/components/ui/skeletons";
+import { Skeleton } from "@/components/ui/skeletons";
 
 const CategoriesSection: React.FC = () => {
     const { data: categories, isLoading } = useCategories();
@@ -15,8 +15,8 @@ const CategoriesSection: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="max-w-8xl mx-auto bg-content1 p-4 w-full">
-                <CardSkeleton showAvatar={false} />
+            <div className="max-w-8xl mx-auto w-full mt-4">
+                <Skeleton className="h-48" />
             </div>
         );
     }

@@ -73,7 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <SetShopSettings shopSettings={shopSettings!} />
                         <PushNotificationManager />
                         <InstallPrompt />
-                        <Toaster closeButton richColors duration={10000} expand={false} position="top-right" />
+                        <Toaster closeButton richColors duration={4000} expand={false} position="top-right" />
                         <TanstackProviders>
                             <WebSocketProvider>{children}</WebSocketProvider>
                         </TanstackProviders>
