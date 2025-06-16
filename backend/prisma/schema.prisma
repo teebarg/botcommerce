@@ -512,6 +512,22 @@ model FAQ {
   @@map("faqs")
 }
 
+model CarouselBanner {
+  id          Int      @id @default(autoincrement())
+  title       String
+  subtitle    String?
+  description String?  @db.Text
+  buttonText  String?
+  image       String?   @db.VarChar(255)
+  link        String?
+  order       Int      @default(0)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("carousel_banners")
+}
+
 model DeliveryOption {
   id          Int            @id @default(autoincrement())
   name        String         @db.VarChar(255)

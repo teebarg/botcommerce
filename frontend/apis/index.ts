@@ -13,6 +13,7 @@ import { paymentApi } from "./payment";
 import { shopSettingsApi } from "./shop-settings";
 import { bankSettingsApi } from "./bank-details";
 import { activitiesApi } from "./activities";
+import { adminApi } from "./admin";
 
 export const api = {
     activities: activitiesApi,
@@ -30,4 +31,5 @@ export const api = {
     review: reviewsApi,
     user: userApi,
     shopSettings: shopSettingsApi,
+    admin: adminApi,
 };

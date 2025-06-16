@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import {
-    CartStatusSchema,
     ShippingMethodSchema,
     PaymentMethodSchema,
     CartStatus,

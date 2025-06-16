@@ -19,7 +19,6 @@ from app.core.utils import slugify, url_to_list, generate_sku
 from app.models.product import Product, Products, SearchProducts, SearchProduct
 from app.models.generic import Message
 from app.models.product import (
-    ImageUpload,
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
@@ -43,6 +42,7 @@ from app.api.routes.websocket import manager
 from app.services.activity import log_activity
 from app.core.deps import supabase
 from app.core.config import settings
+from app.models.generic import ImageUpload
 
 router = APIRouter()
 
@@ -436,12 +436,6 @@ async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
     background_tasks.add_task(reindex_product, variant.product_id)
 
     return {"success": True}
-
-
-class ImageUpload(BaseModel):
-    file: str  # Base64 encoded file
-    file_name: str
-    content_type: str
 
 
 @router.patch("/{id}/image")

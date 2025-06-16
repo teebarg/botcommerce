@@ -19,6 +19,7 @@ import {
 } from "@/schemas";
 import { Brand, Category, Collection, PaginatedProduct, PaginatedProductSearch } from "@/schemas/product";
 import { StatsTrends } from "@/types/models";
+import { CarouselBanner } from "@/schemas/carousel";
 
 export const useMe = () => {
     return useQuery({
@@ -263,6 +264,13 @@ export const useAdminDeliveryOptions = () => {
     return useQuery({
         queryKey: ["all-delivery"],
         queryFn: async () => await api.get<DeliveryOption[]>("/delivery"),
+    });
+};
+
+export const useCarouselBanners = () => {
+    return useQuery({
+        queryKey: ["carousel-banners"],
+        queryFn: async () => await api.get<CarouselBanner[]>("/carousel/active"),
     });
 };
 

@@ -7,6 +7,7 @@ from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException)
 from pydantic import BaseModel
 from app.core.storage import upload, delete_Image
+from app.models.generic import ImageUpload
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
@@ -150,12 +151,6 @@ async def autocomplete(query: str = "") -> Any:
     return Search(results=categories)
 
 
-class ImageUpload(BaseModel):
-    file: str  # Base64 encoded file
-    file_name: str
-    content_type: str
-
-
 @router.patch("/{id}/image")
 async def add_image(id: int, image_data: ImageUpload) -> Category:
     """
@@ -184,10 +179,9 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
         )
 
 
-@router.delete("/{id}/image")
+@router.delete("/{id}/image", dependencies=[Depends(get_current_superuser)])
 async def delete_image(
     id: int,
-    current_user = Depends(get_current_user)
 ) -> Message:
     """
     Delete the image of a category.

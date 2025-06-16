@@ -39,12 +39,6 @@ class ReviewCreate(BaseModel):
     text: str = Field(..., min_length=1, description="Review text is required")
     rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
 
-class ImageUpload(BaseModel):
-    file: str  # Base64 encoded file
-    file_name: str
-    content_type: str
-    product_id: int = Field(..., gt=0)
-
 
 class Product(BM):
     id: int
