@@ -14,8 +14,6 @@ import SetShopSettings from "@/components/set-shop-settings";
 import { WebSocketProvider } from "@/providers/websocket";
 import { cn } from "@/lib/utils";
 
-// const Google = dynamic(() => import("./google"), { loading: () => <p>Loading...</p> });
-
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 const outfit = Outfit({ weight: ["400", "500", "600"], subsets: ["latin"] });
@@ -78,7 +76,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                             <WebSocketProvider>{children}</WebSocketProvider>
                         </TanstackProviders>
                     </div>
-                    {/* {!user && <Google />} */}
                 </ProgressBar>
             </body>
         </html>

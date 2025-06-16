@@ -39,6 +39,7 @@ async def seed_database():
     await db.product.delete_many()
     await db.productvariant.delete_many()
     await db.coupon.delete_many()
+    await db.deliveryoption.delete_many()
 
     # Seed Users
     async def create_user(email, role="CUSTOMER"):
@@ -171,6 +172,23 @@ async def seed_database():
             ("SAVE10", "PERCENTAGE", 10.0),
             ("FLAT5", "FIXED_AMOUNT", 5.0),
             ("WELCOME15", "PERCENTAGE", 15.0)
+        ]
+    ]
+
+    # Seed Delivery Options
+    delivery_options = [
+        await db.deliveryoption.create({
+            "name": name,
+            "description": description,
+            "method": method,
+            "amount": amount,
+            "is_active": True,
+            "created_at": datetime.now()
+        })
+        for name, description, method, amount in [
+            ("Standard Delivery", "Delivery within 3-5 business days.", "STANDARD", 2500),
+            ("Express Delivery", "Delivery within 2 business days.", "EXPRESS", 5000),
+            ("Pickup", "Pickup at store", "PICKUP", 0)
         ]
     ]
 

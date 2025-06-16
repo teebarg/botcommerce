@@ -116,15 +116,21 @@ async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreat
 @app.post("/api/newsletter")
 async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
     async def send_email_task():
-        email_data = await generate_newsletter_email(
-            email=data.email,
-        )
-        shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
-        send_email(
-            email_to=shop_email.value,
-            subject=email_data.subject,
-            html_content=email_data.html_content,
-        )
+        try:
+            email_data = await generate_newsletter_email(
+                email=data.email,
+            )
+            shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
+            if not shop_email:
+                logger.error("Shop email not found")
+                return
+            send_email(
+                email_to=shop_email.value,
+                subject=email_data.subject,
+                html_content=email_data.html_content,
+            )
+        except Exception as e:
+            logger.error(f"Failed to send newsletter email: {e}")
     background_tasks.add_task(send_email_task)
     return {"message": "Email sent successfully"}
 
