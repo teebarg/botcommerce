@@ -152,6 +152,10 @@
     @apply text-blue-500 hover:text-blue-600;
 }
 
+.bg-card-active {
+    @apply bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900 dark:to-teal-900 text-default-800;
+}
+
 :root {
     /* Content Layers */
     --content1: #f4f4f4;

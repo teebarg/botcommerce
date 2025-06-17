@@ -1,24 +1,25 @@
+"use client";
+
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { toast } from "sonner";
+
 import { CarouselBanner } from "@/schemas/carousel";
 import { api } from "@/apis";
-import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ImageUpload } from "@/components/ui/image-upload";
 
 const bannerSchema = z.object({
     title: z.string().min(1, "Title is required"),
     subtitle: z.string().optional(),
     description: z.string().optional(),
     buttonText: z.string().optional(),
-    image: z.string().min(1, "Image is required"),
+    // image: z.string().min(1, "Image is required"),
     link: z.string().optional(),
     order: z.number().default(0),
     is_active: z.boolean().default(true),
@@ -27,13 +28,13 @@ const bannerSchema = z.object({
 type BannerFormValues = z.infer<typeof bannerSchema>;
 
 interface BannerFormProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
+    open?: boolean;
     banner?: CarouselBanner | null;
-    onSuccess: () => void;
+    onSuccess?: () => void;
+    onClose: () => void;
 }
 
-export default function BannerForm({ open, onOpenChange, banner, onSuccess }: BannerFormProps) {
+export default function BannerForm({ banner, onSuccess, onClose }: BannerFormProps) {
     const form = useForm<BannerFormValues>({
         resolver: zodResolver(bannerSchema),
         defaultValues: {
@@ -41,32 +42,33 @@ export default function BannerForm({ open, onOpenChange, banner, onSuccess }: Ba
             subtitle: "",
             description: "",
             buttonText: "",
-            image: "",
             link: "",
             order: 0,
             is_active: true,
         },
     });
 
+    const { handleSubmit, reset, formState, ...rest } = form;
+    // console.log("🚀 ~ BannerForm ~ formState:", formState);
+    // console.log("🚀 ~ BannerForm ~ rest:", rest);
+
     useEffect(() => {
         if (banner) {
-            form.reset({
+            reset({
                 title: banner.title,
                 subtitle: banner.subtitle || "",
                 description: banner.description || "",
                 buttonText: banner.buttonText || "",
-                image: banner.image,
                 link: banner.link || "",
                 order: banner.order,
                 is_active: banner.is_active,
             });
         } else {
-            form.reset({
+            reset({
                 title: "",
                 subtitle: "",
                 description: "",
                 buttonText: "",
-                image: "",
                 link: "",
                 order: 0,
                 is_active: true,
@@ -75,6 +77,7 @@ export default function BannerForm({ open, onOpenChange, banner, onSuccess }: Ba
     }, [banner, form]);
 
     const onSubmit = async (values: BannerFormValues) => {
+        console.log("🚀 ~ onSubmit ~ values:", values)
         try {
             if (banner) {
                 await api.admin.carousel.update(banner.id, values);
@@ -83,142 +86,118 @@ export default function BannerForm({ open, onOpenChange, banner, onSuccess }: Ba
                 await api.admin.carousel.create(values);
                 toast.success("Banner created successfully");
             }
-            onSuccess();
+            onSuccess?.();
         } catch (error) {
             toast.error("Failed to save banner");
         }
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                    <DialogTitle>{banner ? "Edit Banner" : "Add Banner"}</DialogTitle>
-                </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="title"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Title</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="subtitle"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Subtitle</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="buttonText"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Button Text</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="image"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Image</FormLabel>
-                                    <FormControl>
-                                        <ImageUpload
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            onRemove={() => field.onChange("")}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="link"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Link</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="order"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Order</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="is_active"
-                            render={({ field }) => (
-                                <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                                    <div className="space-y-0.5">
-                                        <FormLabel>Active</FormLabel>
-                                    </div>
-                                    <FormControl>
-                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                        <div className="flex justify-end gap-2">
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                Cancel
-                            </Button>
-                            <Button type="submit">{banner ? "Update" : "Create"}</Button>
-                        </div>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+        <div className="bg-card py-8 px-4">
+            <Form {...form}>
+                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                    <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="subtitle"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Subtitle</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                    <Textarea {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="buttonText"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Button Text</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="link"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Link</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="order"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Order</FormLabel>
+                                <FormControl>
+                                    <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="is_active"
+                        render={({ field }) => (
+                            <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                                <div className="space-y-0.5">
+                                    <FormLabel>Active</FormLabel>
+                                </div>
+                                <FormControl>
+                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                    <div className="flex justify-end gap-2">
+                        <Button type="button" variant="outline" onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button disabled={formState.isSubmitting} isLoading={formState.isSubmitting} type="submit" variant="primary">
+                            {banner ? "Update" : "Create"}
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </div>
     );
-} 
+}

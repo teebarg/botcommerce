@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from app.core.deps import (get_current_user)
+from app.core.deps import (get_current_superuser)
 from app.models.category import Category, CategoryCreate, CategoryUpdate
 from app.models.generic import Message
 from app.core.utils import slugify
@@ -85,7 +85,7 @@ async def get_by_slug(slug: str) -> Category:
     return category
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_user)])
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update(
     *,
     id: int,

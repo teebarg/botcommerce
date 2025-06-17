@@ -85,8 +85,15 @@ export const DeliveryOptionSchema = z.object({
     description: z.string(),
 });
 
+export const ImageUploadSchema = z.object({
+    file: z.string(),
+    file_name: z.string(),
+    content_type: z.string(),
+});
+
 export type Pagination = z.infer<typeof PaginationSchema>;
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
+export type ImageUpload = z.infer<typeof ImageUploadSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;
 export type Pag = z.infer<typeof PagSchema>;

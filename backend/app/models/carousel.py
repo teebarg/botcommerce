@@ -19,16 +19,9 @@ class CarouselBannerUpdate(CarouselBannerBase):
 
 class CarouselBanner(CarouselBannerBase):
     id: int
-    image: str
+    image: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
     class Config:
         from_attributes = True
-
-class CarouselBanners(BaseModel):
-    banners: List[CarouselBanner]
-    page: int
-    limit: int
-    total_pages: int
-    total_count: int 
