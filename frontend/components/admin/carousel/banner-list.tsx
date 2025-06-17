@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Plus, Upload } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useOverlayTriggerState } from "@react-stately/overlays";
@@ -20,11 +19,7 @@ interface CarouselBannerListProps {
 }
 
 export default function CarouselBannerList({ initialBanners }: CarouselBannerListProps) {
-    const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedBanner, setSelectedBanner] = useState<CarouselBanner | null>(null);
     const addState = useOverlayTriggerState({});
-    const editState = useOverlayTriggerState({});
-    const deleteState = useOverlayTriggerState({});
 
     const { data, refetch, isLoading } = useQuery({
         queryKey: ["carousel-banners"],
@@ -32,17 +27,11 @@ export default function CarouselBannerList({ initialBanners }: CarouselBannerLis
         initialData: { data: initialBanners, error: null },
     });
 
-    console.log("banners");
-    console.log(data);
-
     if (isLoading) {
         return <Skeleton className="h-[200px]" />;
     }
 
     const banners = data?.data;
-
-    console.log("banners");
-    console.log(banners);
 
     return (
         <ClientOnly>

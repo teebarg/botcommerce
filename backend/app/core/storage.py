@@ -28,7 +28,7 @@ def upload(bucket: str, data: ImageUpload) -> str:
     return image_url
 
 
-def delete_Image(bucket: str, file_path: str):
+def delete_image(bucket: str, file_path: str):
     # Delete from Supabase
     result = supabase.storage.from_(bucket).remove([file_path])
 

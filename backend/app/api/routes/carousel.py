@@ -9,7 +9,7 @@ from app.models.carousel import (
 )
 from app.models.generic import Message
 from app.prisma_client import prisma as db
-from app.core.storage import upload, delete_Image
+from app.core.storage import upload, delete_image
 from app.models.generic import ImageUpload
 
 router = APIRouter()
@@ -77,8 +77,10 @@ async def delete_banner(id: int) -> Message:
         if not banner:
             raise HTTPException(status_code=404, detail="Banner not found")
 
-        # Delete the banner image
-        await delete_image(banner.image)
+        # Extract file path from URL
+        if banner.image:
+            file_path = banner.image.split("/storage/v1/object/public/images/")[1]
+            delete_image(bucket="images", file_path=file_path)
 
         await db.carouselbanner.delete(where={"id": id})
         return {"message": "Banner deleted successfully"}
@@ -100,7 +102,6 @@ async def add_image(id: int, image_data: ImageUpload) -> CarouselBanner:
     try:
         image_url = upload(bucket="images", data=image_data)
 
-        # Update banner with new image URL
         updated_banner = await db.carouselbanner.update(
             where={"id": id},
             data={"image": image_url}

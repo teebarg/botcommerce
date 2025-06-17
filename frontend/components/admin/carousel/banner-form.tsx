@@ -19,7 +19,6 @@ const bannerSchema = z.object({
     subtitle: z.string().optional(),
     description: z.string().optional(),
     buttonText: z.string().optional(),
-    // image: z.string().min(1, "Image is required"),
     link: z.string().optional(),
     order: z.number().default(0),
     is_active: z.boolean().default(true),
@@ -48,9 +47,7 @@ export default function BannerForm({ banner, onSuccess, onClose }: BannerFormPro
         },
     });
 
-    const { handleSubmit, reset, formState, ...rest } = form;
-    // console.log("🚀 ~ BannerForm ~ formState:", formState);
-    // console.log("🚀 ~ BannerForm ~ rest:", rest);
+    const { handleSubmit, reset, formState } = form;
 
     useEffect(() => {
         if (banner) {
@@ -77,15 +74,14 @@ export default function BannerForm({ banner, onSuccess, onClose }: BannerFormPro
     }, [banner, form]);
 
     const onSubmit = async (values: BannerFormValues) => {
-        console.log("🚀 ~ onSubmit ~ values:", values)
         try {
             if (banner) {
                 await api.admin.carousel.update(banner.id, values);
-                toast.success("Banner updated successfully");
             } else {
                 await api.admin.carousel.create(values);
-                toast.success("Banner created successfully");
+                onClose();
             }
+            toast.success("Banner saved successfully");
             onSuccess?.();
         } catch (error) {
             toast.error("Failed to save banner");
@@ -178,7 +174,7 @@ export default function BannerForm({ banner, onSuccess, onClose }: BannerFormPro
                         control={form.control}
                         name="is_active"
                         render={({ field }) => (
-                            <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                            <FormItem className="flex items-center justify-between rounded-lg border border-input px-4 py-2">
                                 <div className="space-y-0.5">
                                     <FormLabel>Active</FormLabel>
                                 </div>

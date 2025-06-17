@@ -14,6 +14,9 @@ const CarouselSection: React.FC = () => {
     if (isLoading) {
         return <Skeleton className="h-[60vh] w-full" />;
     }
+    if (!banners) {
+        return;
+    }
 
     return (
         <section className="relative">

@@ -6,7 +6,7 @@ from app.models.generic import Message
 from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException)
 from pydantic import BaseModel
-from app.core.storage import upload, delete_Image
+from app.core.storage import upload, delete_image
 from app.models.generic import ImageUpload
 
 from prisma.errors import PrismaError
@@ -198,7 +198,7 @@ async def delete_image(
     try:
         # Extract file path from URL
         file_path = category.image.split("/storage/v1/object/public/images/")[1]
-        delete_Image(bucket="images", file_path=file_path)
+        delete_image(bucket="images", file_path=file_path)
 
         # Update category to remove image URL
         await db.category.update(
