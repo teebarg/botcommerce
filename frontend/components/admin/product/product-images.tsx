@@ -8,7 +8,6 @@ import DraggableImageList from "./draggable-images";
 import { ProductImage } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import ImageReorder from "@/components/generic/sortable-images";
 
 interface ProductImageManagerProps {
     productId: number;
@@ -26,41 +25,40 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
         },
         maxSize: 5 * 1024 * 1024, // 5MB
         onDrop: (acceptedFiles: File[]) => {
-            const file = acceptedFiles[0];
 
-            if (!file) return;
+            for (const file of acceptedFiles) {
+                const reader = new FileReader();
 
-            const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64 = reader.result as string;
+                    const fileName = `images/${Date.now()}-${file.name}`;
 
-            reader.onload = (e) => {
-                const base64 = reader.result as string;
-                const fileName = `images/${Date.now()}-${file.name}`;
+                    void (async () => {
+                        setIsUploading(true);
+                        const { error } = await api.product.uploadImages({
+                            id: productId,
+                            data: {
+                                file: base64.split(",")[1]!, // Remove the data URL prefix
+                                file_name: fileName,
+                                content_type: file.type,
+                            },
+                        });
 
-                void (async () => {
-                    setIsUploading(true);
-                    const { error } = await api.product.uploadImages({
-                        id: productId,
-                        data: {
-                            file: base64.split(",")[1]!, // Remove the data URL prefix
-                            file_name: fileName,
-                            content_type: file.type,
-                        },
-                    });
+                        if (error) {
+                            toast.error(`Error - ${error}`);
+                            setIsUploading(false);
 
-                    if (error) {
-                        toast.error(`Error - ${error}`);
+                            return;
+                        }
+
+                        toast.success("Image uploaded successfully");
+                        invalidate("products");
+                        invalidate("product-search");
                         setIsUploading(false);
-
-                        return;
-                    }
-
-                    toast.success("Image uploaded successfully");
-                    invalidate("products");
-                    invalidate("product-search");
-                    setIsUploading(false);
-                })();
-            };
-            reader.readAsDataURL(file);
+                    })();
+                };
+                reader.readAsDataURL(file);
+            }
         },
     });
 
@@ -88,8 +86,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
                     )}
                 </div>
             </div>
-
-            <ImageReorder initialImages={initialImages} productId={productId} />
 
             <DraggableImageList initialImages={initialImages} productId={productId} />
 

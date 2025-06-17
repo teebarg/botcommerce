@@ -75,16 +75,15 @@ class OrderService:
             # Send invoice email
             try:
                 email_data = await generate_invoice_email(order=new_order, user=user)
+                self.notification_service.send_notification(
+                    channel_name="email",
+                    recipient=user.email,
+                    subject=email_data.subject,
+                    message=email_data.html_content
+                )
             except Exception as e:
                 logger.error(f"Failed to generate invoice email: {e}")
                 return
-
-            self.notification_service.send_notification(
-                channel_name="email",
-                recipient=user.email,
-                subject=email_data.subject,
-                message=email_data.html_content
-            )
 
             # Send to slack
             slack_message = {

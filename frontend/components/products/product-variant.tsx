@@ -23,10 +23,9 @@ interface ProductVariantsProps {
 }
 
 const variantFormSchema = z.object({
-    sku: z.string().optional(),
     status: z.enum(["IN_STOCK", "OUT_OF_STOCK"]),
-    price: z.number().min(0, {
-        message: "Price must be at least 0.",
+    price: z.number().min(1, {
+        message: "Price must be at least 1.",
     }),
     old_price: z.number().optional(),
     inventory: z.number().min(0, {
@@ -44,7 +43,6 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
     const form = useForm<z.infer<typeof variantFormSchema>>({
         resolver: zodResolver(variantFormSchema),
         defaultValues: {
-            sku: "",
             status: "IN_STOCK",
             price: 0,
             old_price: 0,
@@ -76,11 +74,11 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
         invalidate("product-search");
         form.reset();
         setLoading(false);
+        setEditingVariant(null);
     }
 
     const handleEdit = (variant: ProductVariant) => {
         setEditingVariant(variant);
-        form.setValue("sku", variant.sku);
         form.setValue("status", variant.status);
         form.setValue("price", variant.price);
         form.setValue("old_price", variant.old_price);
@@ -158,19 +156,6 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 <FormField
                                     control={form.control}
-                                    name="sku"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>SKU</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter SKU" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
                                     name="inventory"
                                     render={({ field }) => (
                                         <FormItem>
@@ -182,6 +167,27 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                                     {...field}
                                                     onChange={(e) => field.onChange(Number(e.target.value))}
                                                 />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="status"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Status</FormLabel>
+                                            <FormControl>
+                                                <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select status" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="IN_STOCK">In Stock</SelectItem>
+                                                        <SelectItem value="OUT_OF_STOCK">Out of Stock</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -244,28 +250,6 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                                     {...field}
                                                     onChange={(e) => field.onChange(Number(e.target.value))}
                                                 />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="status"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Status</FormLabel>
-                                            <FormControl>
-                                                <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select status" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="IN_STOCK">In Stock</SelectItem>
-                                                        <SelectItem value="OUT_OF_STOCK">Out of Stock</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

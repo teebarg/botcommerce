@@ -8,7 +8,7 @@ import OrderProcessingAction from "./order-processing-actions";
 
 import { Button } from "@/components/ui/button";
 import { Order } from "@/schemas";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import Overlay from "@/components/overlay";
 
 interface OrderActionsProps {
     order: Order;
@@ -19,19 +19,19 @@ const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
 
     return (
         <div className="flex items-center gap-2">
-            <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
-                <DialogTrigger asChild>
-                    <Button className="flex-1" variant="outline">
+            <Overlay
+                open={state.isOpen}
+                sheetClassName="min-w-[70vw]"
+                title="Order Details"
+                trigger={
+                    <Button variant="outline" onClick={state.open}>
                         View Details
                     </Button>
-                </DialogTrigger>
-                <DialogContent size="lg" onInteractOutside={state.close}>
-                    <DialogHeader>
-                        <DialogTitle>Order Details</DialogTitle>
-                    </DialogHeader>
-                    <OrderDetails order={order} onClose={state.close} />
-                </DialogContent>
-            </Dialog>
+                }
+                onOpenChange={state.setOpen}
+            >
+                <OrderDetails order={order} onClose={() => state.close()} />
+            </Overlay>
             <OrderProcessingAction order={order} />
         </div>
     );

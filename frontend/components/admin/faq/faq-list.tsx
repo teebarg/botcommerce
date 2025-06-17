@@ -52,12 +52,12 @@ export function FaqList({ faqs, isLoading }: FaqListProps) {
                                 <h3 className="text-lg font-semibold text-default-900 leading-tight mb-2">{faq.question}</h3>
                                 <div className="flex items-center gap-3">
                                     {faq.category && (
-                                        <Badge variant="secondary">
+                                        <Badge variant="yellow">
                                             <Tag className="w-3 h-3 mr-1" />
                                             {faq.category}
                                         </Badge>
                                     )}
-                                    <Badge variant={faq.is_active ? "success" : "destructive"}>
+                                    <Badge variant={faq.is_active ? "emerald" : "destructive"}>
                                         {faq.is_active ? <Eye className="w-3 h-3 mr-1" /> : <EyeOff className="w-3 h-3 mr-1" />}
                                         {faq.is_active ? "Active" : "Inactive"}
                                     </Badge>

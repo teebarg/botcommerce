@@ -107,7 +107,7 @@ const orderStatusMap = {
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     return (
-        <div className="bg-content1 max-h-[calc(100vh-8rem)] overflow-y-auto">
+        <div className="bg-content1 max-h-100vh overflow-y-auto">
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-2 sm:px-6 py-8">
                 {/* Back Button */}
@@ -255,14 +255,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             <div className="p-6 space-y-4">
                                 <OrderProcessingAction order={order} />
 
-                                <Button size="lg" variant="outline">
+                                <Button size="lg" variant="outline" className="w-full">
                                     <Eye className="w-4 h-4 mr-2" />
                                     View Invoice
                                 </Button>
-                                {/* <Button size="lg" variant="outline">
-                                    <Map className="w-4 h-4 mr-2" />
-                                    Track Order
-                                </Button> */}
                             </div>
                         </div>
 

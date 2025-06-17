@@ -150,13 +150,12 @@ export function ShopPayments({ settings, bankDetails }: ShopPaymentsProps) {
                     );
                 })}
             </div>
-            {/* bank details */}
             <div>
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium">Bank Details</h3>
                     <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                         <DialogTrigger asChild>
-                            <Button type="button" variant="secondary">
+                            <Button type="button" variant="primary">
                                 Add Bank Details
                             </Button>
                         </DialogTrigger>

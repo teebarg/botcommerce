@@ -96,7 +96,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 <input {...getInputProps()} />
                 <div className="flex flex-col items-center gap-2">
                     <Upload className="w-8 h-8 text-default-500" />
-                    <p className="text-default-600">{isDragActive ? "Drop the images here" : "Drag & drop images or click to upload"}</p>
+                    <p className="text-default-600">{isDragActive ? "Drop the image here" : "Drag & drop image or click to upload"}</p>
                     <p className="text-sm text-default-400">(Max 5MB, JPG/PNG/GIF only)</p>
                     {/* Upload progress */}
                     {isUploading && (

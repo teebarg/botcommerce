@@ -49,8 +49,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                             <Image
                                 fill
                                 alt={name}
-                                className="object-cover h-full w-full group-hover:scale-110 transition p-4"
+                                className="object-cover h-full w-full group-hover:scale-110 transition"
                                 src={images?.[0] || image || "/placeholder.jpg"}
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             />
                             {showWishlist && (
                                 <Button

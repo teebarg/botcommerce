@@ -64,7 +64,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
         <div
             className={`relative p-4 border rounded-xl cursor-pointer transition-all duration-300 group ${
                 isSelected
-                    ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900 dark:to-teal-900"
+                    ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950"
                     : "border-default-200 bg-card hover:border-default-300 hover:shadow-md"
             }`}
             onClick={() => handleSelect(address.id)}

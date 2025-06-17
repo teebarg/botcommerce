@@ -6,8 +6,9 @@ import { toast } from "sonner";
 import { ProductImage } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// TypeScript interfaces
 interface DraggableImageListProps {
     initialImages: ProductImage[];
     productId: number;
@@ -18,9 +19,35 @@ interface Position {
     y: number;
 }
 
+const DeleteButton: React.FC<{ image: ProductImage; productId: number }> = ({ image, productId }) => {
+    const invalidate = useInvalidate();
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const handleDelete = async () => {
+        setIsDeleting(true);
+
+        const { error } = await api.product.deleteImages(productId, image.id);
+
+        if (error) {
+            toast.error(`Error - ${error as string}`);
+            setIsDeleting(false);
+
+            return;
+        }
+        invalidate("products");
+        invalidate("product-search");
+        api.product.revalidate();
+        setIsDeleting(false);
+    };
+
+    return (
+        <Button className="absolute top-12 right-6" disabled={isDeleting} title="Delete" variant="ghost" size="iconOnly" onClick={handleDelete}>
+            <Trash className="text-red-500 h-6 w-6" />
+        </Button>
+    );
+};
+
 export default function DraggableImageList({ initialImages, productId }: DraggableImageListProps): JSX.Element {
     const invalidate = useInvalidate();
-    // Sample image data - replace with your own images
     const [images, setImages] = useState<ProductImage[]>(initialImages);
 
     const [draggedItem, setDraggedItem] = useState<number | null>(null);
@@ -28,11 +55,9 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
     const [touchStartPos, setTouchStartPos] = useState<Position | null>(null);
     const [isTouching, setIsTouching] = useState<boolean>(false);
 
-    // References
     const listRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-    // Resize itemRefs array when images array changes
     useEffect(() => {
         itemRefs.current = itemRefs.current.slice(0, images.length);
     }, [images]);
@@ -41,7 +66,6 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
         setImages(initialImages);
     }, [initialImages]);
 
-    // Handle desktop drag start
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number): void => {
         setDraggedItem(index);
         e.dataTransfer.effectAllowed = "move";
@@ -57,24 +81,20 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
         }, 0);
     };
 
-    // Handle desktop drag over
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number): void => {
         e.preventDefault();
         setDragOverItem(index);
     };
 
-    // Handle desktop drop
     const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
         e.preventDefault();
         reorderItems();
     };
 
-    // Handle desktop drag end
     const handleDragEnd = (): void => {
         resetDragState();
     };
 
-    // Handle mobile touch start
     const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>, index: number): void => {
         const touch = e.touches[0];
 
@@ -90,14 +110,12 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
         }
     };
 
-    // Handle mobile touch move
     const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>): void => {
         if (draggedItem === null || !isTouching) return;
 
-        e.preventDefault(); // Prevent scrolling while dragging
+        e.preventDefault();
         const touch = e.touches[0];
 
-        // Find which item is under the touch point
         const touchY = touch.clientY;
 
         if (listRef.current) {
@@ -106,7 +124,6 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
 
                 const rect = itemRef.getBoundingClientRect();
 
-                // If touch is within this item's bounds and it's not the dragged item
                 if (touchY >= rect.top && touchY <= rect.bottom && index !== draggedItem) {
                     setDragOverItem(index);
                 }
@@ -114,7 +131,6 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
         }
     };
 
-    // Handle mobile touch end
     const handleTouchEnd = (): void => {
         if (isTouching) {
             reorderItems();
@@ -122,19 +138,14 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
         resetDragState();
     };
 
-    // Common function to reorder items
     const reorderItems = async (): Promise<void> => {
         if (draggedItem !== null && dragOverItem !== null && draggedItem !== dragOverItem) {
             const newItems = [...images];
             const draggedItemContent = newItems[draggedItem];
 
-            // Remove the dragged item
             newItems.splice(draggedItem, 1);
-
-            // Insert at the new position
             newItems.splice(dragOverItem, 0, draggedItemContent);
 
-            // Update state with the new order
             setImages(newItems);
 
             const { error } = await api.product.reorderImages(
@@ -153,7 +164,6 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
         }
     };
 
-    // Common function to reset state
     const resetDragState = (): void => {
         if (draggedItem !== null && itemRefs.current[draggedItem]) {
             itemRefs.current[draggedItem]?.classList.remove("opacity-50");
@@ -166,9 +176,9 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Image Gallery</h2>
-            <p className="mb-4 text-gray-600">Drag and drop images to reorder them</p>
+        <div className="max-w-4xl mx-auto p-6 bg-content1 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold text-default-800">Image Gallery</h2>
+            <p className="mb-4 text-default-600">Drag and drop images to reorder them</p>
 
             <div ref={listRef} className="grid grid-cols-1 gap-4">
                 {images.map((image: ProductImage, index: number) => (
@@ -178,7 +188,7 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                             itemRefs.current[index] = el;
                         }}
                         draggable
-                        className={`relative bg-gray-50 rounded-lg shadow-md transition-all duration-300 cursor-move touch-manipulation
+                        className={`relative bg-card rounded-lg shadow-md transition-all duration-300 cursor-move touch-manipulation
                       ${dragOverItem === index ? "border-2 border-blue-400" : ""}
                       ${draggedItem === index ? "shadow-xl" : ""}`}
                         onDragEnd={handleDragEnd}
@@ -186,35 +196,27 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                         onDragStart={(e) => handleDragStart(e, index)}
                         onDrop={handleDrop}
                         onTouchEnd={handleTouchEnd}
-                        // Mobile events
                         onTouchMove={handleTouchMove}
-                        // Desktop events
                         onTouchStart={(e) => handleTouchStart(e, index)}
                     >
-                        <div className="flex items-center p-3 rounded-lg hover:bg-gray-100">
-                            <div className="mr-4 text-gray-500 font-semibold w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full">
+                        <div className="flex items-center p-3 rounded-lg hover:bg-default-100">
+                            <div className="mr-4 text-default-500 font-semibold w-8 h-8 flex items-center justify-center bg-default-200 rounded-full">
                                 {index + 1}
                             </div>
 
                             <div className="shrink-0 mr-4">
-                                <img
-                                    alt={image.image}
-                                    className="w-24 h-24 object-cover rounded"
-                                    draggable={false} // Prevent image dragging to avoid conflicts
-                                    src={image.image}
-                                />
+                                <img alt={image.image} className="w-24 h-24 object-cover rounded" draggable={false} src={image.image} />
                             </div>
 
                             <div className="grow">
-                                <h3 className="font-medium text-gray-800">{image.image}</h3>
-                                <div className="text-sm text-gray-500 mt-1">
+                                <div className="text-sm text-default-500 mt-1">
                                     {isTouching && draggedItem === index ? "Release to drop" : "Drag to reorder"}
                                 </div>
                             </div>
 
-                            <div className="w-10 flex items-center justify-center">
+                            {/* <div className="w-10 flex items-center justify-center">
                                 <svg
-                                    className="w-6 h-6 text-gray-400"
+                                    className="w-6 h-6 text-default-400"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -222,13 +224,14 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                                 >
                                     <path d="M4 6h16M4 12h16m-7 6h7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                                 </svg>
-                            </div>
+                            </div> */}
                         </div>
-
+                        <DeleteButton image={image} productId={productId} />
                         {dragOverItem === index && <div className="absolute inset-0 border-2 border-blue-400 rounded-lg pointer-events-none" />}
                     </div>
                 ))}
             </div>
+            <p className="text-xs text-default-500 text-center mt-3">Tip: Tap and hold the drag icon to reorder images on mobile</p>
         </div>
     );
 }

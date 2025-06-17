@@ -7,6 +7,7 @@ import { useCarouselBanners } from "@/lib/hooks/useApi";
 import { Skeleton } from "@/components/generic/skeleton";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { BtnLink } from "@/components/ui/btnLink";
+import ClientOnly from "@/components/generic/client-only";
 
 const CarouselSection: React.FC = () => {
     const { data, isLoading, error } = useCarouselBanners();
@@ -22,7 +23,7 @@ const CarouselSection: React.FC = () => {
     }
 
     return (
-        <section className="relative">
+        <ClientOnly>
             <Carousel className="w-full">
                 <CarouselContent>
                     {banners?.map((banner: CarouselBanner, idx: number) => (
@@ -50,7 +51,7 @@ const CarouselSection: React.FC = () => {
                 <CarouselPrevious className="left-4" />
                 <CarouselNext className="right-4" />
             </Carousel>
-        </section>
+        </ClientOnly>
     );
 };
 

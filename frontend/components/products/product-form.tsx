@@ -20,13 +20,10 @@ const formSchema = z.object({
     name: z.string().min(2, {
         message: "Product name must be at least 2 characters.",
     }),
-    description: z.string().min(10, {
-        message: "Description must be at least 10 characters.",
-    }),
+    description: z.string(),
     categories: z.array(z.any()),
     collections: z.array(z.any()),
     brand: z.number(),
-    sku: z.string().optional(),
     status: z.string().min(3, {
         message: "Status must be at least 3 characters.",
     }),
@@ -49,8 +46,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
         defaultValues: {
             name: product?.name || "",
             description: product?.description || "",
-            sku: product?.sku || "",
-            status: product?.status || "",
+            status: product?.status || "IN_STOCK",
             brand: product?.brand?.id || 1,
             categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
             collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],
@@ -118,19 +114,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                         <FormLabel>Product Name</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Enter product name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="sku"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>SKU</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Enter SKU" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

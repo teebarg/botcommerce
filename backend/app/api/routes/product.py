@@ -43,6 +43,7 @@ from app.services.activity import log_activity
 from app.core.deps import supabase
 from app.core.config import settings
 from app.models.generic import ImageUpload
+from prisma.errors import UniqueViolationError
 
 router = APIRouter()
 
@@ -224,20 +225,18 @@ async def search(
 
 
 @router.post("/")
-async def create_product(product: ProductCreate):
+async def create_product(product: ProductCreate, background_tasks: BackgroundTasks):
     slugified_name = slugify(product.name)
-    sku = product.sku or generate_sku(product_name=product.name)
 
     data = {
         "name": product.name,
         "slug": slugified_name,
-        "sku": sku,
+        "sku": generate_sku(product_name=product.name),
         "description": product.description,
         "status": product.status or ProductStatus.IN_STOCK,
         "brand": {"connect": {"id": product.brand_id}},
     }
 
-    # Prepare category connections if provided
     if product.category_ids:
         category_connect = [{"id": id} for id in product.category_ids]
         data["categories"] = {"connect": category_connect}
@@ -250,17 +249,12 @@ async def create_product(product: ProductCreate):
         tag_connect = [{"id": id} for id in product.tags_ids]
         data["tags"] = {"connect": tag_connect}
 
-    created_product = await db.product.create(
-        data=data,
-        include={
-            "categories": True,
-            "brand": True,
-            "collections": True,
-            "tags": True,
-            "variants": True,
-            "images": True
-        }
-    )
+    try:
+        created_product = await db.product.create(
+            data=data,
+        )
+    except UniqueViolationError:
+        raise HTTPException(status_code=400, detail="Product with this name already exists")
 
     background_tasks.add_task(reindex_product, created_product.id)
 
@@ -370,7 +364,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
 
     created_variant = await db.productvariant.create(
         data={
-            "sku": variant.sku or f"{generate_sku(product_name=product.name, color=variant.color, size=variant.size)}",
+            "sku": generate_sku(product_name=product.name),
             "price": variant.price,
             "old_price": variant.old_price,
             "inventory": variant.inventory,
@@ -395,9 +389,6 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     # Prepare update data
     update_data = {}
-
-    if variant.sku:
-        update_data["sku"] = variant.sku
 
     if variant.price:
         update_data["price"] = variant.price
@@ -506,7 +497,6 @@ async def delete_image(id: int, background_tasks: BackgroundTasks):
         file_path = product.image.split(
             "/storage/v1/object/public/product-images/")[1]
 
-        # Delete from Supabase
         result = supabase.storage.from_("product-images").remove([file_path])
         logger.info(f"Delete result: {result}")
     except Exception as e:

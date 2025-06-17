@@ -1,14 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X } from "lucide-react";
-import { Check, ChevronDown } from "nui-react-icons";
+import { ChevronDown } from "nui-react-icons";
+import ClientOnly from "@/components/generic/client-only";
 
-// Define the option type
 export interface SelectOption {
     value: string | number;
     label: string;
 }
 
-// Define props interface for the MultiSelect component
 interface MultiSelectProps {
     options?: SelectOption[];
     placeholder?: string;
@@ -116,9 +115,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                                             className={`mr-2 flex h-4 w-4 items-center justify-center rounded border ${
                                                 isSelected ? "border-blue-500 bg-blue-500" : "border-default-200"
                                             }`}
-                                        >
-                                            {isSelected && <Check color="white" size={12} />}
-                                        </div>
+                                        />
                                         {option.label}
                                     </div>
                                 );
@@ -147,23 +144,20 @@ interface MultiSelectWithHookFormProps {
 
 // Example of how to use with react-hook-form
 export const MultiSelectWithHookForm = ({ control, name, rules, options, placeholder, disabled }: MultiSelectWithHookFormProps) => {
-    if (typeof window === "undefined") {
-        // Import Controller only on client side
-        return null;
-    }
-
     // Using dynamic import for Controller
     const { Controller } = require("react-hook-form");
 
     return (
-        <Controller
-            control={control}
-            name={name}
-            render={({ field, fieldState: { error } }: any) => (
-                <MultiSelect {...field} disabled={disabled} error={error?.message} options={options} placeholder={placeholder} />
-            )}
-            rules={rules}
-        />
+        <ClientOnly>
+            <Controller
+                control={control}
+                name={name}
+                render={({ field, fieldState: { error } }: any) => (
+                    <MultiSelect {...field} disabled={disabled} error={error?.message} options={options} placeholder={placeholder} />
+                )}
+                rules={rules}
+            />
+        </ClientOnly>
     );
 };
 
