@@ -23,7 +23,7 @@ const DeliveryOverview: React.FC = () => {
     const deleteState = useOverlayTriggerState({});
     const invalidate = useInvalidate();
 
-    const { data: deliveryOptions, isLoading } = useAdminDeliveryOptions();
+    const { data: deliveryOptions } = useAdminDeliveryOptions();
 
     const getIcon = (iconName: string) => {
         const iconMap: Record<string, React.FC<LucideProps>> = {

@@ -9,12 +9,15 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { BtnLink } from "@/components/ui/btnLink";
 
 const CarouselSection: React.FC = () => {
-    const { data: banners, isLoading } = useCarouselBanners();
+    const { data, isLoading, error } = useCarouselBanners();
 
     if (isLoading) {
         return <Skeleton className="h-[60vh] w-full" />;
     }
-    if (!banners) {
+
+    const banners = data;
+
+    if (!banners || error) {
         return;
     }
 
