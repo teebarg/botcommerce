@@ -40,7 +40,6 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
         })();
     };
 
-    // Dropzone configuration
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
             "image/*": [".jpeg", ".jpg", ".png", ".gif"],

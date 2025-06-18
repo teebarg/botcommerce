@@ -12,5 +12,4 @@ export const adminApi = {
         uploadImage: (id: number, data: ImageUpload) => api.patch<CarouselBanner>(`/carousel/${id}/image`, data),
         deleteImage: (id: number) => api.delete<Message>(`/carousel/${id}/image`),
     },
-    // ... existing code ...
 };

@@ -178,9 +178,6 @@ export default function ContactForm() {
                         )}
                     />
 
-                    {/* <Button aria-label="submit" className="min-w-32" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
-                        Submit
-                    </Button> */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button aria-label="submit" className="flex-1" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
                             <Send className="h-4 w-4 mr-2" />

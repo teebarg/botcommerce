@@ -167,12 +167,10 @@
     --background: #f8fafc;
     --foreground: #0f172a;
 
-    /* Content Layers */
     --content1: #ffffff;
     --content2: #f8fafc;
     --content3: #f1f5f9;
 
-    /* Default State Colors (Blue-Gray for Text) */
     --default-50: #f8fafc;
     --default-100: #f1f5f9;
     --default-200: #e2e8f0;
@@ -226,12 +224,10 @@
     --background: #0f172a;
     --foreground: #f8fafc;
 
-    /* Content Layers */
     --content1: #1e293b;
     --content2: #334155;
     --content3: #475569;
 
-    /* Default State Colors (Blue-Gray for Text) */
     --default-50: #0f172a;
     --default-100: #1e293b;
     --default-200: #334155;

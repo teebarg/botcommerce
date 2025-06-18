@@ -72,7 +72,6 @@ export function ContactSection() {
                             </div>
                         </div>
 
-                        {/* Google Map */}
                         <div className="bg-content2 rounded-lg border border-divider overflow-hidden">
                             <div className="p-4 border-b border-divider">
                                 <h3 className="font-semibold text-default-foreground flex items-center gap-2">

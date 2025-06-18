@@ -17,7 +17,6 @@ const BannerImageManager: React.FC<BannerImageManagerProps> = ({ bannerId, onClo
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const invalidate = useInvalidate();
 
-    // Dropzone configuration
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
             "image/*": [".jpeg", ".jpg", ".png", ".gif"],

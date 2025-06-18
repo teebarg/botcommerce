@@ -5,7 +5,6 @@ import { CheckCircle, Shield, Package, User, Zap, CreditCard, Truck, Search } fr
 
 import FadeInComponent from "./generic/fade-in-component";
 
-// import ClientOnly from "@/components/generic/client-only";
 import { cn } from "@/lib/utils";
 
 interface LoadingStep {
@@ -254,7 +253,6 @@ const PremiumLoader: React.FC<PremiumLoaderProps> = ({ type, title, subtitle, st
     }, [config.duration, config.steps.length]);
 
     return (
-        // <ClientOnly>
         <div className={cn("fixed inset-0  bg-gradient-to-br from-[#3b82f6] via-[#6366f1] to-[#8b5cf6] z-40")}>
             <div className="absolute inset-0 overflow-hidden">
                 {particles.map((particle) => (
@@ -309,7 +307,6 @@ const PremiumLoader: React.FC<PremiumLoaderProps> = ({ type, title, subtitle, st
                 )}
             </div>
         </div>
-        // </ClientOnly>
     );
 };
 

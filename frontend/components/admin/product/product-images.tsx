@@ -18,7 +18,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
     const invalidate = useInvalidate();
     const [isUploading, setIsUploading] = useState<boolean>(false);
 
-    // Dropzone configuration
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
             "image/*": [".jpeg", ".jpg", ".png", ".gif"],
@@ -37,7 +36,7 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
                         const { error } = await api.product.uploadImages({
                             id: productId,
                             data: {
-                                file: base64.split(",")[1]!, // Remove the data URL prefix
+                                file: base64.split(",")[1]!,
                                 file_name: fileName,
                                 content_type: file.type,
                             },

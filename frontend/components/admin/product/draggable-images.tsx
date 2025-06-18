@@ -213,18 +213,6 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                                     {isTouching && draggedItem === index ? "Release to drop" : "Drag to reorder"}
                                 </div>
                             </div>
-
-                            {/* <div className="w-10 flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-default-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path d="M4 6h16M4 12h16m-7 6h7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                                </svg>
-                            </div> */}
                         </div>
                         <DeleteButton image={image} productId={productId} />
                         {dragOverItem === index && <div className="absolute inset-0 border-2 border-blue-400 rounded-lg pointer-events-none" />}
