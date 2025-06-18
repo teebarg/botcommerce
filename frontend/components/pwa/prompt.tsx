@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Cancel } from "nui-react-icons";
 
 import { Button } from "@/components/ui/button";
+import ClientOnly from "@/components/generic/client-only";
 
 declare global {
     interface BeforeInstallPromptEvent extends Event {
@@ -40,9 +41,6 @@ const InstallPrompt: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        // Only show on client
-        if (typeof window === "undefined") return;
-
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
 
         // Capture the install prompt event
@@ -83,7 +81,7 @@ const InstallPrompt: React.FC = () => {
     }
 
     return (
-        <>
+        <ClientOnly>
             <div className="fixed bottom-4 left-4 right-4 md:max-w-100 z-50">
                 <div className="bg-content2 rounded-lg shadow-xl p-8">
                     {/* Close button */}
@@ -124,7 +122,7 @@ const InstallPrompt: React.FC = () => {
                     </p>
                 )}
             </div>
-        </>
+        </ClientOnly>
     );
 };
 

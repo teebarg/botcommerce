@@ -1,12 +1,13 @@
 from typing import Any, Optional
 
-from app.core.deps import (get_current_user)
+from app.core.deps import (get_current_superuser)
 from app.models.category import Category, CategoryCreate, CategoryUpdate
 from app.models.generic import Message
 from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException)
 from pydantic import BaseModel
-from app.core.storage import upload, delete_Image
+from app.core.storage import upload, delete_image
+from app.models.generic import ImageUpload
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
@@ -84,7 +85,7 @@ async def get_by_slug(slug: str) -> Category:
     return category
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_user)])
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update(
     *,
     id: int,
@@ -150,12 +151,6 @@ async def autocomplete(query: str = "") -> Any:
     return Search(results=categories)
 
 
-class ImageUpload(BaseModel):
-    file: str  # Base64 encoded file
-    file_name: str
-    content_type: str
-
-
 @router.patch("/{id}/image")
 async def add_image(id: int, image_data: ImageUpload) -> Category:
     """
@@ -184,10 +179,9 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
         )
 
 
-@router.delete("/{id}/image")
+@router.delete("/{id}/image", dependencies=[Depends(get_current_superuser)])
 async def delete_image(
     id: int,
-    current_user = Depends(get_current_user)
 ) -> Message:
     """
     Delete the image of a category.
@@ -204,7 +198,7 @@ async def delete_image(
     try:
         # Extract file path from URL
         file_path = category.image.split("/storage/v1/object/public/images/")[1]
-        delete_Image(bucket="images", file_path=file_path)
+        delete_image(bucket="images", file_path=file_path)
 
         # Update category to remove image URL
         await db.category.update(

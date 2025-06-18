@@ -2,7 +2,7 @@
 
 import { Plus } from "nui-react-icons";
 import { toast } from "sonner";
-import { DollarSign, Edit2, LucideProps, Package, Trash2, Truck, Zap } from "lucide-react";
+import { Edit2, LucideProps, Package, Trash2, Truck, Zap } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import DeliveryOptionForm from "./delivery-option-form";
@@ -23,7 +23,7 @@ const DeliveryOverview: React.FC = () => {
     const deleteState = useOverlayTriggerState({});
     const invalidate = useInvalidate();
 
-    const { data: deliveryOptions, isLoading } = useAdminDeliveryOptions();
+    const { data: deliveryOptions } = useAdminDeliveryOptions();
 
     const getIcon = (iconName: string) => {
         const iconMap: Record<string, React.FC<LucideProps>> = {
@@ -88,7 +88,6 @@ const DeliveryOverview: React.FC = () => {
 
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div className="flex items-center gap-2 text-sm">
-                                                <DollarSign className="w-4 h-4 text-green-600" />
                                                 <span className="font-medium text-green-600">{currency(option.amount)}</span>
                                             </div>
                                         </div>

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/schemas";
 import ThemeButton from "@/lib/theme/theme-button";
+import { api } from "@/apis";
 
 interface NavLinkProp {
     href: string;
@@ -29,6 +30,11 @@ interface MenuProp {
 }
 
 const Menu: React.FC<MenuProp> = ({ user }) => {
+    const handleLogout = async () => {
+        await api.auth.logOut();
+        window.location.href = "/";
+    };
+
     return (
         <div className="flex flex-col py-4 px-4 flex-1">
             <div className="space-y-3">
@@ -43,7 +49,7 @@ const Menu: React.FC<MenuProp> = ({ user }) => {
             <Separator className="my-8" />
 
             <div className="space-y-3">
-                <NavLink href="/our-story" title="Our Story" />
+                <NavLink href="/about" title="About" />
                 <NavLink href="/support" title="Contact Us" />
             </div>
             <div className="mt-8">
@@ -53,6 +59,9 @@ const Menu: React.FC<MenuProp> = ({ user }) => {
                 {user ? (
                     <div>
                         <p className="font-semibold leading-6 text-primary-900">Logged in as {user?.first_name}</p>
+                        <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
+                            Log out
+                        </button>
                     </div>
                 ) : (
                     <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href="/sign-in">

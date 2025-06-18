@@ -3,11 +3,14 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 
+import { cn } from "@/lib/utils";
+
 type Props = {
     children: React.ReactNode;
+    className?: string;
 };
 
-const ClientOnly: React.FC<Props> = ({ children }) => {
+const ClientOnly: React.FC<Props> = ({ children, className }) => {
     const [hasMounted, setHasMounted] = useState<boolean>(false);
 
     useEffect(() => {
@@ -19,7 +22,7 @@ const ClientOnly: React.FC<Props> = ({ children }) => {
     }
 
     return (
-        <motion.div className="flex-1" initial={{ opacity: 0 }} viewport={{ once: true }} whileInView={{ opacity: 1 }}>
+        <motion.div className={cn("flex-1", className)} initial={{ opacity: 0 }} viewport={{ once: true }} whileInView={{ opacity: 1 }}>
             {children}
         </motion.div>
     );

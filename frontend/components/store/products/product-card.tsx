@@ -45,11 +45,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                 title="Details"
                 trigger={
                     <div>
-                        <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
+                        <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-transparent">
                             <Image
                                 fill
                                 alt={name}
-                                className="object-cover h-full w-full group-hover:scale-110 transition p-4"
+                                className="object-cover h-full w-full group-hover:scale-110 transition"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 src={images?.[0] || image || "/placeholder.jpg"}
                             />
                             {showWishlist && (

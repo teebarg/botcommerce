@@ -1,9 +1,9 @@
 import React from "react";
 
-import PageTransition from "@/components/page-transition";
+import PremiumLoader from "@/components/loader";
 
 const Loader = () => {
-    return <PageTransition />;
+    return <PremiumLoader type="page" />;
 };
 
 export default Loader;

@@ -29,7 +29,6 @@ class CategoryUpdate(BaseModel):
     name: Optional[str] = None
     is_active: Optional[bool] = None
     parent_id: Optional[int] = None
-    image: Optional[str] = None
 
 
 class Categories(BaseModel):

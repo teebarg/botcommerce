@@ -1,13 +1,8 @@
-from pydantic import BaseModel
 import base64
 import uuid
 
 from app.core.deps import supabase
-
-class ImageUpload(BaseModel):
-    file: str  # Base64 encoded file
-    file_name: str
-    content_type: str
+from app.models.generic import ImageUpload
 
 def upload(bucket: str, data: ImageUpload) -> str:
     # Decode base64 file
@@ -33,7 +28,7 @@ def upload(bucket: str, data: ImageUpload) -> str:
     return image_url
 
 
-def delete_Image(bucket: str, file_path: str):
+def delete_image(bucket: str, file_path: str):
     # Delete from Supabase
     result = supabase.storage.from_(bucket).remove([file_path])
 

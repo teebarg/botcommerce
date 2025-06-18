@@ -14,7 +14,6 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
 
     return (
         <div className="min-h-[400px] w-full flex flex-col items-center justify-center px-4 py-8">
-            {/* Icon Animation Container */}
             <div className="relative mb-6">
                 <div className="absolute inset-0 bg-blue-100 rounded-full opacity-20 animate-ping" />
                 <div className="relative">
@@ -22,12 +21,11 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="text-center max-w-md mx-auto">
-                <h2 className="text-2xl font-bold text-default-900">No Products Found</h2>
+                <h2 className="text-3xl font-bold text-default-900">No Products Found</h2>
 
                 {searchQuery && (
-                    <p className="text-default-500 mb-2">
+                    <p className="text-default-600 mb-2">
                         {`We couldn't find any products matching`}
                         <span className="font-medium text-default-900 mx-1">{`"${searchQuery}"`}</span>
                     </p>
@@ -35,7 +33,6 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
 
                 <p className="text-default-500 mb-8 text-sm">Try adjusting your search or browse our suggested categories below.</p>
 
-                {/* Action Buttons */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
                     <Button aria-label="clear search" startContent={<RefreshCcw className="w-4 h-4" />} variant="primary" onClick={onClearSearch}>
                         Clear Search
@@ -46,7 +43,6 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
                     </Button>
                 </div>
 
-                {/* Suggested Categories */}
                 <div className="space-y-4">
                     <h3 className="text-sm font-semibold text-default-900">Popular Categories</h3>
 
@@ -59,7 +55,6 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
                     </div>
                 </div>
 
-                {/* Search Tips */}
                 <Separator />
                 <div className="mt-8 pt-6">
                     <h3 className="text-sm font-semibold text-default-900 mb-3">Search Tips</h3>

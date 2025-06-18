@@ -107,10 +107,9 @@ const orderStatusMap = {
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     return (
-        <div className="bg-content1 max-h-[calc(100vh-8rem)] overflow-y-auto">
+        <div className="bg-content1 max-h-100vh overflow-y-auto">
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-2 sm:px-6 py-8">
-                {/* Back Button */}
                 <div className="mb-6">
                     <button className="flex items-center text-default-500 hover:text-default-900 cursor-pointer" onClick={onClose}>
                         <ArrowLeft className="w-4 h-4 mr-1" />
@@ -131,9 +130,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Order Information */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Order Items */}
                         <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-default-100 px-6 py-4">
                                 <h2 className="text-lg font-medium text-default-900">Order Items</h2>
@@ -167,7 +164,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Customer Information */}
                         <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium flex items-center text-default-900">
@@ -194,7 +190,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Payment Information */}
                         <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium flex items-center text-default-900">
@@ -214,7 +209,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Shipping Information */}
                         <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium flex items-center text-default-900">
@@ -245,9 +239,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Sidebar */}
                     <div className="space-y-6">
-                        {/* Actions Card */}
                         <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium text-default-900">Actions</h2>
@@ -255,18 +247,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             <div className="p-6 space-y-4">
                                 <OrderProcessingAction order={order} />
 
-                                <Button size="lg" variant="outline">
+                                <Button className="w-full" size="lg" variant="outline">
                                     <Eye className="w-4 h-4 mr-2" />
                                     View Invoice
                                 </Button>
-                                {/* <Button size="lg" variant="outline">
-                                    <Map className="w-4 h-4 mr-2" />
-                                    Track Order
-                                </Button> */}
                             </div>
                         </div>
 
-                        {/* Order Timeline */}
                         <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
                             <div className="border-b border-gray-200 px-6 py-4">
                                 <h2 className="text-lg font-medium text-default-900">Order Timeline</h2>

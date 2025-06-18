@@ -6,7 +6,6 @@ from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review
 
 # Models
 class VariantWithStatus(BaseModel):
-    sku: Optional[str] = None
     price: float = Field(..., gt=0)
     old_price: Optional[float] = 0.0
     inventory: int = Field(..., ge=0)
@@ -16,17 +15,16 @@ class VariantWithStatus(BaseModel):
 
 class ProductCreate(BaseModel):
     name: str = Field(..., min_length=1)
-    description: str = Field(..., min_length=1)
+    description: Optional[str] = None
     brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
-    sku: Optional[str] = None
     status: Literal["IN_STOCK", "OUT_OF_STOCK"] = "IN_STOCK"
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1)
-    description: Optional[str] = Field(None, min_length=1)
+    description: Optional[str] = None
     sku: Optional[str] = None
     status: Optional[Literal["IN_STOCK", "OUT_OF_STOCK"]] = None
     brand_id: Optional[int] = None
@@ -38,12 +36,6 @@ class ReviewCreate(BaseModel):
     product_id: int = Field(..., gt=0)
     text: str = Field(..., min_length=1, description="Review text is required")
     rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
-
-class ImageUpload(BaseModel):
-    file: str  # Base64 encoded file
-    file_name: str
-    content_type: str
-    product_id: int = Field(..., gt=0)
 
 
 class Product(BM):

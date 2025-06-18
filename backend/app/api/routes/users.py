@@ -175,7 +175,7 @@ async def read_wishlist(
     favorites = await db.favorite.find_many(
         where={"user_id": user.id},
         order={"created_at": "desc"},
-        include={"product": {"include" : {"variants": True}}}
+        include={"product": {"include" : {"images": True}}}
     )
     return {"wishlists": favorites}
 

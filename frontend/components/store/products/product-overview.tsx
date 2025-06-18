@@ -47,7 +47,7 @@ const ProductOverview: React.FC<{
 
             return;
         }
-        invalidate("wishlist");
+        invalidate("user-wishlist");
         toast.success("Added to favorites");
     };
 
@@ -59,7 +59,7 @@ const ProductOverview: React.FC<{
 
             return;
         }
-        invalidate("wishlist");
+        invalidate("user-wishlist");
         toast.success("Removed from favorites");
     };
 

@@ -33,3 +33,9 @@ class Token(BaseModel):
 class MagicLinkPayload(BaseModel):
     email: EmailStr
     callback_url: str | None = None
+
+
+class ImageUpload(BaseModel):
+    file: str  # Base64 encoded file
+    file_name: str
+    content_type: str

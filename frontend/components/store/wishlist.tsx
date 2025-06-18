@@ -8,15 +8,16 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import { api } from "@/apis";
+import { ProductImage } from "@/schemas";
 
 interface WishlistItemProps {
     id: number;
     slug: string;
     name: string;
-    image: string;
+    images: ProductImage[];
 }
 
-const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, image }) => {
+const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) => {
     const onRemove = async () => {
         try {
             const { error } = await api.user.deleteWishlist(id);
@@ -36,8 +37,10 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, image }) =>
     return (
         <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-inherit w-full snap-start h-full" id={id.toString()}>
             <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl bg-content2 h-64 md:h-80 justify-between">
-                <div className="relative md:rounded-1xl z-0 max-h-full w-full md:w-[80%] overflow-visible h-72">
-                    <Image fill alt={name} className="hover:scale-95" src={image as string} />
+                <div className="relative md:rounded-1xl z-0 h-full w-full overflow-visible">
+                    {images[0] && (
+                        <Image fill alt={name} className="hover:scale-105 transition-all" src={images.sort((a, b) => a.order - b.order)[0].image} />
+                    )}
                 </div>
             </div>
             <div className="space-y-1">

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
+import { Mail, Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
@@ -46,9 +47,11 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     <Input
                         required
                         data-testid="email-input"
+                        endContent={<Send className="h-5 w-5 text-default-500" />}
                         label="Email"
                         name="email"
                         placeholder="Enter your email address"
+                        startContent={<Mail className="h-5 w-5 text-default-500" />}
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}

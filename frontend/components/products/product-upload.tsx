@@ -28,7 +28,6 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
         }
     }, [currentMessage]);
 
-    // Dropzone configuration
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],

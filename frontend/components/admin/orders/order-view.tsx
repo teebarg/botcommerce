@@ -46,8 +46,8 @@ const OrderView: React.FC = () => {
     const { orders, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     const getStatusBadge = (status?: OrderStatus) => {
-        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success" | "emerald"> = {
-            ["PENDING"]: "warning",
+        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "yellow" | "success" | "emerald"> = {
+            ["PENDING"]: "yellow",
             ["PROCESSING"]: "default",
             ["SHIPPED"]: "secondary",
             ["CANCELED"]: "destructive",
