@@ -1,8 +1,10 @@
 "use client";
 
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { useStore } from "@/app/store/use-store";
+
 import ContactForm from "../contact-form";
+
+import { useStore } from "@/app/store/use-store";
 
 export function ContactSection() {
     const { shopSettings } = useStore();
@@ -13,8 +15,8 @@ export function ContactSection() {
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold text-default-foreground mb-4">Get in Touch</h2>
                     <p className="text-default-600 max-w-2xl mx-auto">
-                        Have questions about our products or need support? We're here to help. Visit our store or reach out through any of the
-                        channels below.
+                        {`Have questions about our products or need support? We're here to help. Visit our store or reach out through any of the
+                        channels below.`}
                     </p>
                 </div>
 
@@ -80,16 +82,16 @@ export function ContactSection() {
                             </div>
                             <div className="relative h-80">
                                 <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d990.7044697975375!2d3.3243740696178534!3d6.66947613161211!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b96bc12c94145%3A0xce8a5a69dcdc4350!2s8%20Agbado%20Oke%20Aro%20Road%2C%20Ifako-Ijaiye%2C%20Lagos%20101232%2C%20Lagos!5e0!3m2!1sen!2sng!4v1718193637813!5m2!1sen!2sng"
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0 }}
                                     allowFullScreen
+                                    className="absolute inset-0"
+                                    height="100%"
                                     loading="lazy"
                                     referrerPolicy="no-referrer-when-downgrade"
-                                    className="absolute inset-0"
-                                ></iframe>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d990.7044697975375!2d3.3243740696178534!3d6.66947613161211!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b96bc12c94145%3A0xce8a5a69dcdc4350!2s8%20Agbado%20Oke%20Aro%20Road%2C%20Ifako-Ijaiye%2C%20Lagos%20101232%2C%20Lagos!5e0!3m2!1sen!2sng!4v1718193637813!5m2!1sen!2sng"
+                                    style={{ border: 0 }}
+                                    width="100%"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                             </div>
                         </div>
                     </div>

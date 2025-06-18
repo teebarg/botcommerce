@@ -1,15 +1,15 @@
 "use client";
 
 import { Mail, Gift, Zap, Bell, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Message } from "@/schemas";
 import { api } from "@/apis/base";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -82,7 +82,7 @@ const NewsletterSection: React.FC = () => {
                                 </div>
                                 <h2 className="text-2xl font-bold text-default-foreground mb-2">Welcome to the Club! 🎉</h2>
                                 <p className="text-default-600">
-                                    You're now subscribed to our newsletter. Check your inbox for a welcome email with your exclusive discount code!
+                                    {`You're now subscribed to our newsletter. Check your inbox for a welcome email with your exclusive discount code!`}
                                 </p>
                             </div>
 
@@ -94,7 +94,7 @@ const NewsletterSection: React.FC = () => {
                                 </p>
                             </div>
 
-                            <Button onClick={() => setIsSubscribed(false)} variant="outline" className="border-divider hover:bg-content2">
+                            <Button className="border-divider hover:bg-content2" variant="outline" onClick={() => setIsSubscribed(false)}>
                                 Subscribe Another Email
                             </Button>
                         </div>
@@ -108,7 +108,6 @@ const NewsletterSection: React.FC = () => {
         <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
             <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
-                    {/* Header */}
                     <div className="text-center mb-12">
                         <div className="inline-flex items-center gap-2 bg-content1 rounded-full px-4 py-2 border border-divider mb-4">
                             <Mail className="h-4 w-4 text-primary" />
@@ -120,7 +119,6 @@ const NewsletterSection: React.FC = () => {
                         </p>
                     </div>
 
-                    {/* Benefits Grid */}
                     <div className="grid md:grid-cols-3 gap-6 mb-12">
                         {benefits.map((benefit, index) => (
                             <div
@@ -136,7 +134,6 @@ const NewsletterSection: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Subscription Form */}
                     <div className="bg-content1 rounded-2xl border border-divider p-8 shadow-lg">
                         <div className="max-w-md mx-auto">
                             <div className="text-center mb-6">
@@ -166,12 +163,12 @@ const NewsletterSection: React.FC = () => {
                                             )}
                                         />
                                         <Button
-                                            type="submit"
-                                            disabled={form.formState.isSubmitting || !form.formState.isValid}
                                             className="w-full"
-                                            variant="primary"
+                                            disabled={form.formState.isSubmitting || !form.formState.isValid}
                                             isLoading={form.formState.isSubmitting}
                                             size="lg"
+                                            type="submit"
+                                            variant="primary"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Mail className="h-4 w-4" />
@@ -201,7 +198,6 @@ const NewsletterSection: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Social Proof */}
                     <div className="mt-8 text-center">
                         <div className="flex items-center justify-center gap-2 text-sm text-default-600">
                             <div className="flex -space-x-2">

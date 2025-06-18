@@ -2,19 +2,17 @@ const broadcast = new BroadcastChannel("sw-messages");
 const CACHE_NAME = "botmerce-cache-v5"; // Increment this value for new versions
 const ASSETS_TO_CACHE = [
     // "/", // Root URL
-    "/career-opportunities",
-    "/claim",
-    "/latest-news",
-    "/our-story",
+    "/careers",
+    "/about",
     "/privacy",
-    "/support",
     "/terms",
-    "/user-agreement",
+    "/returns",
+    "/shipping",
+    "/contact-us",
+    "/help-center",
     "/globals.css",
     "/avatar_ai.png",
     "/bot.svg",
-    "/empty-cart.png",
-    "/frontend.webp",
     "/side-banner.webp",
     "/offline", // A fallback page for offline users
     "/favicon.ico", // Favicon

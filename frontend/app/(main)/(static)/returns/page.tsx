@@ -41,7 +41,7 @@ const ReturnsPage = () => (
                             </div>
                             <div>
                                 <h3 className="font-semibold text-default-foreground">Print Label</h3>
-                                <p className="text-default-600">We'll email you a prepaid return shipping label</p>
+                                <p className="text-default-600">{`We'll email you a prepaid return shipping label`}</p>
                             </div>
                         </div>
                         <div className="flex items-start">

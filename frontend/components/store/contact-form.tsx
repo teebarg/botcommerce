@@ -8,13 +8,13 @@ import { toast } from "sonner";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
+import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis/base";
 import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send } from "lucide-react";
 
 const contactFormSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -74,7 +74,7 @@ export default function ContactForm() {
         <div className="bg-content2 rounded-lg border border-divider md:p-8 p-4">
             <div className="mb-6">
                 <h3 className="text-xl font-semibold text-default-foreground mb-2">Send us a Message</h3>
-                <p className="text-default-600 text-sm">Fill out the form below and we'll get back to you within 24 hours.</p>
+                <p className="text-default-600 text-sm">{`Fill out the form below and we'll get back to you within 24 hours.`}</p>
             </div>
             <Form {...form}>
                 <form className="mt-10 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -128,7 +128,7 @@ export default function ContactForm() {
                                 <FormItem>
                                     <FormLabel>Subject</FormLabel>
                                     <FormControl>
-                                        <Select onValueChange={(value) => field.onChange(value)} required>
+                                        <Select required onValueChange={(value) => field.onChange(value)}>
                                             <SelectTrigger className="bg-content1 border-divider focus:border-primary">
                                                 <SelectValue placeholder="Select a subject" />
                                             </SelectTrigger>
@@ -182,16 +182,11 @@ export default function ContactForm() {
                         Submit
                     </Button> */}
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <Button aria-label="submit" className="flex-1" type="submit" variant="primary" disabled={isPending} isLoading={isPending}>
+                        <Button aria-label="submit" className="flex-1" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
                             <Send className="h-4 w-4 mr-2" />
                             Send Message
                         </Button>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="flex-1 border-divider hover:bg-content3"
-                            onClick={() => form.reset()}
-                        >
+                        <Button className="flex-1 border-divider hover:bg-content3" type="button" variant="outline" onClick={() => form.reset()}>
                             Clear Form
                         </Button>
                     </div>

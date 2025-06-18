@@ -1,7 +1,8 @@
+import { CheckCircle, Clock, Info } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { currency } from "@/lib/utils";
-import { CheckCircle, Clock, Info } from "lucide-react";
 
 const ShippingPage = () => (
     <div className="bg-content2">
@@ -20,7 +21,7 @@ const ShippingPage = () => (
                         <div>
                             <label className="block text-sm font-medium text-default-700 mb-2">Tracking Number</label>
                             <div className="flex gap-4">
-                                <Input type="text" placeholder="Enter tracking number" className="flex-1 w-full" />
+                                <Input className="flex-1 w-full" placeholder="Enter tracking number" type="text" />
                                 <Button variant="primary">Track Order</Button>
                             </div>
                         </div>
@@ -103,7 +104,7 @@ const ShippingPage = () => (
                                 q: "What if my package is lost or damaged?",
                                 a: "We'll replace lost or damaged packages at no cost to you. Just contact our support team with your order number.",
                             },
-                        ].map((faq, index) => (
+                        ].map((faq, index: number) => (
                             <details key={index} className="group">
                                 <summary className="flex justify-between items-center cursor-pointer p-4 bg-content1 rounded-lg hover:bg-content2 transition-colors">
                                     <span className="font-medium text-default-foreground">{faq.q}</span>

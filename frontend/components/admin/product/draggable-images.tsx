@@ -2,11 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { Trash } from "lucide-react";
 
 import { ProductImage } from "@/schemas";
 import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DraggableImageListProps {
@@ -40,7 +40,7 @@ const DeleteButton: React.FC<{ image: ProductImage; productId: number }> = ({ im
     };
 
     return (
-        <Button className="absolute top-12 right-6" disabled={isDeleting} title="Delete" variant="ghost" size="iconOnly" onClick={handleDelete}>
+        <Button className="absolute top-12 right-6" disabled={isDeleting} size="iconOnly" title="Delete" variant="ghost" onClick={handleDelete}>
             <Trash className="text-red-500 h-6 w-6" />
         </Button>
     );

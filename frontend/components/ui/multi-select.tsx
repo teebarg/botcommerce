@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { X } from "lucide-react";
-import { ChevronDown } from "nui-react-icons";
+import { ChevronDown, X } from "lucide-react";
+
 import ClientOnly from "@/components/generic/client-only";
 
 export interface SelectOption {

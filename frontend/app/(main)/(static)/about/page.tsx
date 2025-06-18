@@ -1,5 +1,6 @@
-import UnderConstruction from "@/components/under-construction";
 import { type Metadata } from "next";
+
+import UnderConstruction from "@/components/under-construction";
 
 export const metadata: Metadata = {
     title: "About",

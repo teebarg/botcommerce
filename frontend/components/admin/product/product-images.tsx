@@ -25,7 +25,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
         },
         maxSize: 5 * 1024 * 1024, // 5MB
         onDrop: (acceptedFiles: File[]) => {
-
             for (const file of acceptedFiles) {
                 const reader = new FileReader();
 

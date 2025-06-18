@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Wrench, AlertCircle, Cog, Hammer } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 
 const UnderConstruction: React.FC = () => {
@@ -47,8 +48,8 @@ const UnderConstruction: React.FC = () => {
                         <div className="text-center">
                             <p className="mb-6 text-default-600">Want to be notified when this page is ready?</p>
                             <a
-                                href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
                                 className="rounded-full border-2 border-secondary px-8 py-3 text-secondary transition-all duration-200 hover:bg-secondary/80"
+                                href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
                             >
                                 Contact Support
                             </a>

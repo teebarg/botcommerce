@@ -1,11 +1,8 @@
 "use client";
 
-import { MessageCircle, Package, Search, Truck } from "lucide-react";
-import { useState } from "react";
+import { MessageCircle, Package, Truck } from "lucide-react";
 
 const HelpCenterPage = () => {
-    const [searchQuery, setSearchQuery] = useState("");
-
     return (
         <div className="bg-content2">
             <div className="bg-gradient-to-br from-primary to-secondary text-white">

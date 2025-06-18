@@ -30,8 +30,10 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner, onSuccess }) => {
 
     const handleDelete = async () => {
         const { error } = await api.admin.carousel.delete(banner.id);
+
         if (error) {
             toast.error(error);
+
             return;
         }
         toast.success("Banner deleted successfully");
@@ -65,7 +67,7 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner, onSuccess }) => {
                                     <img alt={banner.title} className="w-full h-full object-cover" src={banner.image} />
                                     <Dialog open={updateImageState.isOpen} onOpenChange={updateImageState.setOpen}>
                                         <DialogTrigger asChild>
-                                            <Button size="icon" variant="ghost" className="absolute top-2 right-2">
+                                            <Button className="absolute top-2 right-2" size="icon" variant="ghost">
                                                 <Edit2 className="w-4 h-4 text-red-600" />
                                             </Button>
                                         </DialogTrigger>

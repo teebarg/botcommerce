@@ -34,6 +34,7 @@ const Menu: React.FC<MenuProp> = ({ user }) => {
         await api.auth.logOut();
         window.location.href = "/";
     };
+
     return (
         <div className="flex flex-col py-4 px-4 flex-1">
             <div className="space-y-3">
