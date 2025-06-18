@@ -75,7 +75,6 @@ const SubMenuComponent: React.FC<{
                         "pl-4": level === 0,
                         "pl-8 hover:bg-content2 bg-content1": level === 1,
                         "pl-12 hover:bg-content2 bg-content3": level === 2,
-                        "pl-16 hover:bg-content3 bg-content4": level === 3,
                     }
                 )}
                 onClick={() => setIsOpen(!isOpen)}
@@ -133,7 +132,6 @@ const MenuItemComponent: React.FC<{
                     "pl-4": level === 0,
                     "pl-8 hover:bg-content2 bg-content1": level === 1,
                     "pl-12 hover:bg-content2 bg-content3": level === 2,
-                    "pl-16 hover:bg-content3 bg-content4": level === 3,
                     "bg-rose-200! text-rose-800 hover:text-rose-700!": active,
                 }
             )}

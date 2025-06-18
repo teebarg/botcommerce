@@ -23,9 +23,10 @@ const CategoriesSection: React.FC = () => {
     }
 
     return (
-        <ClientOnly>
-            <div className="max-w-8xl mx-auto bg-content1 p-4 w-full">
-                <h2 className="text-2xl font-bold text-center mb-8">Shop by category</h2>
+        <ClientOnly className="bg-content2">
+            <div className="max-w-8xl mx-auto p-4 w-full text-center">
+                <h2 className="text-3xl font-bold mb-2">Shop by category</h2>
+                <p className="text-default-600 mb-8">Discover our wide range of products across different categories</p>
 
                 <div className="flex overflow-x-auto pb-4 gap-5 md:hidden">
                     {categories?.map((category: Category, idx: number) => (

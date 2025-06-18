@@ -65,7 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
                 <meta content={shopSettings?.shop_name} name="apple-mobile-web-app-title" />
             </head>
-            <body className="min-h-screen bg-background">
+            <body>
                 <ProgressBar className="h-1 bg-primary">
                     <div className="relative flex flex-col min-h-screen">
                         <SetShopSettings shopSettings={shopSettings!} />

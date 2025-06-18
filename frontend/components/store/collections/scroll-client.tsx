@@ -106,7 +106,7 @@ export default function InfiniteScrollClient({
                 />
                 {/* Categories */}
                 <div className="px-4 my-6 md:hidden">
-                    <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar">
+                    <div className="flex overflow-x-auto gap-3 pb-2">
                         <BtnLink
                             className={cn(
                                 "flex-none rounded-full bg-content1 text-foreground font-semibold text-base py-2 min-w-min px-6",

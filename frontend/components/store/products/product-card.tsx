@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                 title="Details"
                 trigger={
                     <div>
-                        <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-content1">
+                        <div className="aspect-square w-full relative overflow-hidden rounded-xl bg-transparent">
                             <Image
                                 fill
                                 alt={name}

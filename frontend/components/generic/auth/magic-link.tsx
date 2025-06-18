@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { Separator } from "@/components/ui/separator";
+import { Mail, Send } from "lucide-react";
 
 type Props = {
     callbackUrl?: string;
@@ -52,6 +53,8 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        startContent={<Mail className="h-5 w-5 text-default-500" />}
+                        endContent={<Send className="h-5 w-5 text-default-500" />}
                     />
                 </div>
                 <Button
