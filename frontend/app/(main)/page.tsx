@@ -33,6 +33,7 @@ export default async function Home() {
 
     if (user) {
         const { data } = await api.user.wishlist();
+
         wishlist = data?.wishlists || [];
     }
 
