@@ -46,7 +46,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                                 className="md:hidden"
                                 size="sm"
                                 startContent={<Filter className="w-4 h-4" />}
-                                variant="default"
+                                variant="primary"
                                 onClick={state.open}
                             >
                                 Filters ({count})
@@ -74,7 +74,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                 </div>
                 <div className="flex items-center flex-1 sm:flex-initial">
                     <Select defaultValue={value} onValueChange={handleSortChange}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-content1 border-divider focus:border-primary">
                             <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>

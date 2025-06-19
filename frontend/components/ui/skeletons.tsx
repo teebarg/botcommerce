@@ -1,7 +1,7 @@
 import React from "react";
 
 export const Skeleton = ({ className = "", ...props }) => (
-    <div className={`bg-linear-to-r from-content2 via-content1 to-content2 bg-200 animate-shimmer rounded ${className}`} {...props} />
+    <div className={`bg-linear-to-r from-default-400 to-default-200 bg-200 animate-shimmer rounded ${className}`} {...props} />
 );
 export const TextSkeleton = ({ lines = 3, className = "" }) => (
     <div className={`space-y-3 ${className}`}>
@@ -23,7 +23,7 @@ export const AvatarSkeleton = ({ size = "md" }) => {
 };
 
 export const CardSkeleton = ({ showAvatar = true, textLines = 3 }) => (
-    <div className="p-6 bg-background rounded-lg shadow-sm border border-input">
+    <div className="p-6 bg-background rounded-lg shadow-sm border border-divider">
         {showAvatar && (
             <div className="flex items-center space-x-4 mb-4">
                 <AvatarSkeleton />
@@ -50,13 +50,13 @@ export const ListItemSkeleton = () => (
 
 export const TableSkeleton = ({ rows = 5, columns = 4 }) => (
     <div className="w-full">
-        <div className="flex space-x-4 p-4 border-b border-input">
+        <div className="flex space-x-4 p-4 border-b border-divider">
             {Array.from({ length: columns }).map((_, i) => (
                 <Skeleton key={i} className="h-4 flex-1" />
             ))}
         </div>
         {Array.from({ length: rows }).map((_, rowIndex) => (
-            <div key={rowIndex} className="flex space-x-4 p-4 border-b border-input">
+            <div key={rowIndex} className="flex space-x-4 p-4 border-b border-divider">
                 {Array.from({ length: columns }).map((_, colIndex) => (
                     <Skeleton key={colIndex} className="h-4 flex-1" />
                 ))}
@@ -86,7 +86,7 @@ export const LoadingSpinner = ({ size = "md", className = "" }) => {
 
     return (
         <div className={`${sizeClasses[size]} ${className}`}>
-            <div className="w-full h-full border-2 border-input border-t-blue-500 rounded-full animate-spin" />
+            <div className="w-full h-full border-divider border-t-blue-500 rounded-full animate-spin" />
         </div>
     );
 };

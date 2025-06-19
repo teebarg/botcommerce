@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { toast } from "sonner";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 import { Category } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
@@ -45,9 +45,8 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
     };
 
     return (
-        <React.Fragment>
-            <div className="flex items-center gap-2">
-                {canAdd && (
+        <div className="flex items-center gap-2">
+            {/* {canAdd && (
                     <Overlay
                         open={state.isOpen}
                         title={`Add SubCat to ${category?.name}`}
@@ -60,40 +59,39 @@ const CategoryAction: React.FC<Props> = ({ category, canAdd = true }) => {
                     >
                         <CategoryForm hasParent parent_id={category?.id} onClose={state.close} />
                     </Overlay>
-                )}
-                <Overlay
-                    open={editState.isOpen}
-                    title={`Edit Category ${category?.name}`}
-                    trigger={
-                        <Button size="iconOnly">
-                            <Edit className="h-5 w-5" />
+                )} */}
+            <Overlay
+                open={editState.isOpen}
+                title={`Edit Category ${category?.name}`}
+                trigger={
+                    <Button size="iconOnly">
+                        <Edit className="h-5 w-5" />
+                    </Button>
+                }
+                onOpenChange={editState.setOpen}
+            >
+                <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
+            </Overlay>
+            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                <DialogTrigger>
+                    <Trash2 className="text-rose-500 h-5 w-5" />
+                </DialogTrigger>
+                <DialogContent className="bg-content1">
+                    <DialogHeader>
+                        <DialogTitle>Delete Category</DialogTitle>
+                    </DialogHeader>
+                    <p>Are you sure you want to delete this category?</p>
+                    <DialogFooter className="flex flex-row items-center justify-end gap-2">
+                        <Button aria-label="close" className="min-w-36" variant="outline" onClick={deleteState.close}>
+                            Close
                         </Button>
-                    }
-                    onOpenChange={editState.setOpen}
-                >
-                    <CategoryForm hasParent current={category} parent_id={category?.id} type="update" onClose={editState.close} />
-                </Overlay>
-                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                    <DialogTrigger>
-                        <Trash2 className="text-rose-500" />
-                    </DialogTrigger>
-                    <DialogContent className="bg-content1">
-                        <DialogHeader>
-                            <DialogTitle>Delete Category</DialogTitle>
-                        </DialogHeader>
-                        <p>Are you sure you want to delete this category?</p>
-                        <DialogFooter className="flex flex-row items-center justify-end gap-2">
-                            <Button aria-label="close" className="min-w-36" variant="outline" onClick={deleteState.close}>
-                                Close
-                            </Button>
-                            <Button aria-label="delete" className="min-w-36" isLoading={isPending} variant="destructive" onClick={onConfirmDelete}>
-                                Delete
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </React.Fragment>
+                        <Button aria-label="delete" className="min-w-36" isLoading={isPending} variant="destructive" onClick={onConfirmDelete}>
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 };
 

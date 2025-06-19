@@ -60,8 +60,8 @@ export default async function SearchResults({ params, searchParams }: { params: 
     }
 
     return (
-        <div className="max-w-8xl mx-auto mt-4">
-            <div className="flex justify-between border-b w-full items-center">
+        <div className="container mx-auto mt-4 py-4 px-1">
+            <div className="flex justify-between border-b border-divider w-full items-center px-4 mb-4">
                 <div className="flex flex-col items-start">
                     <p className="text-default-500">Search Results for:</p>
                     <h4>{decodeURI(query)}</h4>
@@ -70,11 +70,9 @@ export default async function SearchResults({ params, searchParams }: { params: 
                     Clear
                 </LocalizedClientLink>
             </div>
-            <div className="w-full py-0 md:py-4">
-                <Suspense fallback={<CollectionTemplateSkeleton />}>
-                    <InfiniteScrollClient data={data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
-                </Suspense>
-            </div>
+            <Suspense fallback={<CollectionTemplateSkeleton />}>
+                <InfiniteScrollClient data={data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
+            </Suspense>
         </div>
     );
 }

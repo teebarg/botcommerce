@@ -84,7 +84,7 @@ export default async function Home() {
             />
 
             <section className="py-16 bg-content3">
-                <div className="container mx-auto px-4">
+                <div className="max-w-8xl mx-auto px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold text-default-foreground mb-2">Trending Products</h2>
                         <p className="text-default-600">Discover our handpicked selection of premium products</p>

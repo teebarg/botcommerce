@@ -57,7 +57,7 @@ export default function Footer() {
 
     return (
         <footer className="flex w-full flex-col pb-20 md:pb-12 bg-content3 border-t border-divider">
-            <div className="mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
+            <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="md:pr-8">
                         <div className="flex items-center justify-start">

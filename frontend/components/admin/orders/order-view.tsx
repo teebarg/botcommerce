@@ -118,7 +118,7 @@ const OrderView: React.FC = () => {
                                 <Search className="text-gray-400" size={18} />
                             </div>
                             <input
-                                className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                                className="pl-10 pr-4 py-2 w-full border border-divider rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                                 placeholder="Search orders..."
                                 type="text"
                                 value={searchParams.get("search") ?? ""}

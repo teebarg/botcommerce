@@ -154,7 +154,7 @@ export default function InfiniteScrollClient({
                     </nav>
                     <div className="flex gap-6">
                         <div className="w-full flex-1 flex-col">
-                            <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10">
+                            <div className="sticky md:relative top-16 md:top-0 z-30 md:z-10">
                                 <CollectionsTopBar
                                     brands={brands}
                                     categories={filteredCategories}

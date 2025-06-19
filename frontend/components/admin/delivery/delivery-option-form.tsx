@@ -75,12 +75,16 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
             response = await api.post<DeliveryOption>("/delivery", data);
         }
 
-        if (!response.error) {
-            toast.success(`${initialData ? "Updated" : "Created"} delivery option successfully`);
-            invalidate("all-delivery");
-            invalidate("available-delivery");
-            onClose();
+        if (response.error) {
+            toast.error(response.error);
+
+            return;
         }
+
+        toast.success(`${initialData ? "Updated" : "Created"} delivery option successfully`);
+        invalidate("all-delivery");
+        invalidate("available-delivery");
+        onClose();
     };
 
     return (
@@ -172,7 +176,9 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                         <Button type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button type="submit">{initialData ? "Update" : "Create"}</Button>
+                        <Button disabled={form.formState.isSubmitting} isLoading={form.formState.isSubmitting} type="submit" variant="primary">
+                            {initialData ? "Update" : "Create"}
+                        </Button>
                     </div>
                 </form>
             </Form>

@@ -9,7 +9,7 @@ interface ProductListItemProps {
 
 const ProductListItem = ({ product, actions }: ProductListItemProps) => {
     return (
-        <div className="relative bg-content1 border border-default rounded-lg shadow-sm overflow-hidden flex flex-col">
+        <div className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col">
             <div className="h-40 w-full bg-content1 overflow-hidden relative">
                 <img
                     alt={product.name}

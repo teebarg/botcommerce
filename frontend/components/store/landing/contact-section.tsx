@@ -10,8 +10,8 @@ export function ContactSection() {
     const { shopSettings } = useStore();
 
     return (
-        <section className="py-16 bg-content3">
-            <div className="container mx-auto px-4">
+        <section className="py-16 bg-content2">
+            <div className="max-w-8xl mx-auto px-4">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold text-default-foreground mb-4">Get in Touch</h2>
                     <p className="text-default-600 max-w-2xl mx-auto">
@@ -23,7 +23,7 @@ export function ContactSection() {
                 <div className="grid lg:grid-cols-2 gap-12">
                     <div className="space-y-8">
                         <div className="grid sm:grid-cols-2 gap-4">
-                            <div className="bg-content2 p-6 rounded-lg border border-divider">
+                            <div className="bg-content1 p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="p-2 bg-primary/10 rounded-lg">
                                         <MapPin className="h-5 w-5 text-primary" />
@@ -37,7 +37,7 @@ export function ContactSection() {
                                 </p>
                             </div>
 
-                            <div className="bg-content2 p-6 rounded-lg border border-divider">
+                            <div className="bg-content1 p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="p-2 bg-secondary/10 rounded-lg">
                                         <Phone className="h-5 w-5 text-secondary" />
@@ -47,7 +47,7 @@ export function ContactSection() {
                                 <p className="text-default-600 text-sm">{shopSettings.contact_phone}</p>
                             </div>
 
-                            <div className="bg-content2 p-6 rounded-lg border border-divider">
+                            <div className="bg-content1 p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="p-2 bg-accent/10 rounded-lg">
                                         <Mail className="h-5 w-5 text-accent" />
@@ -57,7 +57,7 @@ export function ContactSection() {
                                 <p className="text-default-600 text-sm">{shopSettings.contact_email}</p>
                             </div>
 
-                            <div className="bg-content2 p-6 rounded-lg border border-divider">
+                            <div className="bg-content1 p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="p-2 bg-warning/10 rounded-lg">
                                         <Clock className="h-5 w-5 text-warning" />
@@ -72,7 +72,7 @@ export function ContactSection() {
                             </div>
                         </div>
 
-                        <div className="bg-content2 rounded-lg border border-divider overflow-hidden">
+                        <div className="bg-content1 rounded-lg border border-divider overflow-hidden">
                             <div className="p-4 border-b border-divider">
                                 <h3 className="font-semibold text-default-foreground flex items-center gap-2">
                                     <MapPin className="h-5 w-5 text-primary" />

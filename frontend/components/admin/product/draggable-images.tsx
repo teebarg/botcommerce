@@ -208,7 +208,7 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                                 <img alt={image.image} className="w-24 h-24 object-cover rounded" draggable={false} src={image.image} />
                             </div>
 
-                            <div className="grow">
+                            <div className="grow hidden md:block">
                                 <div className="text-sm text-default-500 mt-1">
                                     {isTouching && draggedItem === index ? "Release to drop" : "Drag to reorder"}
                                 </div>

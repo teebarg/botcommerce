@@ -105,7 +105,7 @@ const NewsletterSection: React.FC = () => {
     }
 
     return (
-        <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
+        <section className="py-12 bg-gradient-to-br from-primary/5 to-accent/5">
             <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
@@ -120,7 +120,7 @@ const NewsletterSection: React.FC = () => {
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-6 mb-12">
-                        {benefits.map((benefit, index) => (
+                        {benefits.map((benefit, index: number) => (
                             <div
                                 key={index}
                                 className="bg-content1 rounded-lg border border-divider p-6 text-center hover:shadow-md transition-shadow"

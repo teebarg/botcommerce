@@ -71,7 +71,7 @@ export default function ContactForm() {
     };
 
     return (
-        <div className="bg-content2 rounded-lg border border-divider md:p-8 p-4">
+        <div className="bg-content1 rounded-lg border border-divider md:p-8 p-4">
             <div className="mb-6">
                 <h3 className="text-xl font-semibold text-default-foreground mb-2">Send us a Message</h3>
                 <p className="text-default-600 text-sm">{`Fill out the form below and we'll get back to you within 24 hours.`}</p>
