@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 
 import { api } from "@/apis";
-import { auth } from "@/actions/auth";
 import CarouselBannerList from "@/components/admin/carousel/banner-list";
 
 export const metadata: Metadata = {
@@ -10,8 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default async function CarouselBannersPage() {
-    const user = await auth();
-
     const { data: banners } = await api.admin.carousel.list();
 
     return (

@@ -118,14 +118,14 @@ export function ProductDetails() {
                     />
 
                     {(selectedCollections.length > 0 || selectedBrands.length > 0) && (
-                        <div className="mb-4 overflow-auto flex gap-2 flex-nowrap">
+                        <div className="mb-4 flex gap-2 flex-wrap">
                             {selectedCollections.map((id: number, idx: number) => {
                                 const collection = collections?.find((c: Collection) => c.id === id);
 
                                 if (!collection) return null;
 
                                 return (
-                                    <div key={idx} className="bg-primary/10 text-primary text-sm rounded-full px-3 py-1 flex items-center flex-1">
+                                    <div key={idx} className="bg-primary/10 text-primary text-sm rounded-full px-3 py-1 flex items-center">
                                         <p>{collection.name}</p>
                                         <button
                                             className="ml-1"
@@ -144,7 +144,7 @@ export function ProductDetails() {
                                 if (!brand) return null;
 
                                 return (
-                                    <div key={idx} className="bg-gray-100 text-gray-700 text-sm rounded-full px-3 py-1 flex items-center flex-1">
+                                    <div key={idx} className="bg-emerald-100 text-emerald-700 text-sm rounded-full px-3 py-1 flex items-center">
                                         <p>{brand.name}</p>
                                         <button
                                             className="ml-1"

@@ -23,7 +23,7 @@ interface LoadingConfig {
     duration?: number;
 }
 
-interface PremiumLoaderProps extends LoadingConfig {
+interface PageLoaderProps extends LoadingConfig {
     onComplete?: () => void;
     className?: string;
 }
@@ -204,7 +204,7 @@ const LoadingStepComponent: React.FC<{
     );
 };
 
-const PremiumLoader: React.FC<PremiumLoaderProps> = ({ type, title, subtitle, steps }) => {
+const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps }) => {
     const config = useMemo(() => {
         const preset = LOADING_PRESETS[type] || {};
 
@@ -310,4 +310,4 @@ const PremiumLoader: React.FC<PremiumLoaderProps> = ({ type, title, subtitle, st
     );
 };
 
-export default PremiumLoader;
+export default PageLoader;

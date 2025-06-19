@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Category } from "@/schemas/product";
 import { mutateCategory } from "@/actions/category";
-import CategoryImageManager from "@/components/admin/categories/category-image";
 import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface Props {
@@ -53,12 +52,11 @@ const CategoryForm = forwardRef<ChildRef, Props>(
 
         return (
             <div className="mx-auto w-full px-2 py-6">
-                <h2 className="text-lg font-semibold mb-2">{isCreate ? "Create Category" : "Update Category"}</h2>
+                <h2 className="text-lg font-semibold mb-6">{isCreate ? "Create Category" : "Update Category"}</h2>
                 <form ref={formRef} action={formAction} className="h-full flex flex-col">
                     <input readOnly className="hidden" name="type" type="text" value={type} />
                     <input readOnly className="hidden" name="id" type="text" value={current.id} />
                     <div className="space-y-6">
-                        {current.id && <CategoryImageManager categoryId={current.id} initialImage={current.image} />}
                         {hasParent && parent_id && <input readOnly className="hidden" name="parent_id" type="text" value={parent_id} />}
                         <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
                         <div className="flex items-center gap-1">

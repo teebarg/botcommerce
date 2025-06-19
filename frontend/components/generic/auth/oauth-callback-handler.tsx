@@ -8,7 +8,7 @@ import React from "react";
 import { api } from "@/apis/base";
 import { Token } from "@/schemas";
 import { setCookie } from "@/lib/util/cookie";
-import PremiumLoader from "@/components/loader";
+import PageLoader from "@/components/loader";
 
 interface OAuthCallbackHandlerProps {
     provider: "google" | "github";
@@ -60,7 +60,7 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
         handleCallback();
     }, [code, error, provider, router, searchParams]);
 
-    return <PremiumLoader type="authentication" />;
+    return <PageLoader type="authentication" />;
 };
 
 export default OAuthCallbackHandler;

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { api } from "@/apis";
+import { Button } from "@/components/ui/button";
 
 interface ProductImageManagerProps {
     categoryId: number;
@@ -114,12 +115,9 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                     <img alt={`Category image`} className="w-full h-48 object-cover" src={initialImage} />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
-                        <button
-                            className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                            onClick={deleteImage}
-                        >
+                        <Button className="rounded-full" size="icon" variant="destructive" onClick={deleteImage}>
                             <Trash2 className="w-5 h-5" />
-                        </button>
+                        </Button>
                     </div>
                     {isDeleting && (
                         <div className="absolute inset-0 bg-default-500 bg-opacity-50 flex items-center justify-center">
@@ -129,7 +127,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 </div>
             )}
 
-            {!initialImage && <p className="text-center text-default-500">No images uploaded yet</p>}
+            {!initialImage && <p className="text-center text-default-500">No image uploaded yet</p>}
 
             {/* Help text */}
             <div className="text-xs text-default-500">

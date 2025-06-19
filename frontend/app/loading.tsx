@@ -1,9 +1,9 @@
 import React from "react";
 
-import PremiumLoader from "@/components/loader";
+import PageLoader from "@/components/loader";
 
 const Loader = () => {
-    return <PremiumLoader type="page" />;
+    return <PageLoader type="page" />;
 };
 
 export default Loader;
