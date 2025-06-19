@@ -16,6 +16,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Confirm } from "@/components/generic/confirm";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/lib/utils";
+import ServerError from "@/components/generic/server-error";
+import { Skeleton } from "@/components/ui/skeletons";
 
 const DeliveryOverview: React.FC = () => {
     const addState = useOverlayTriggerState({});
@@ -23,7 +25,15 @@ const DeliveryOverview: React.FC = () => {
     const deleteState = useOverlayTriggerState({});
     const invalidate = useInvalidate();
 
-    const { data: deliveryOptions } = useAdminDeliveryOptions();
+    const { data: deliveryOptions, isLoading, error } = useAdminDeliveryOptions();
+
+    if (error) {
+        return <ServerError />;
+    }
+
+    if (isLoading) {
+        return <Skeleton className="h-[400px]" />;
+    }
 
     const getIcon = (iconName: string) => {
         const iconMap: Record<string, React.FC<LucideProps>> = {

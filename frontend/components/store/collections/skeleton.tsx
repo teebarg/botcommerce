@@ -1,7 +1,7 @@
 import { ChevronRight } from "nui-react-icons";
 import React from "react";
 
-import { Skeleton } from "@/components/generic/skeleton";
+import { Skeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
 
 const CollectionTemplateSkeleton = () => {

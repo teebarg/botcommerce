@@ -15,7 +15,7 @@ import { Brand, Collection, Product } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useBrands, useCollections, useProducts } from "@/lib/hooks/useApi";
-import { Skeleton } from "@/components/generic/skeleton";
+import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
 
 const LIMIT = 10;
@@ -41,7 +41,7 @@ export function ProductDetails() {
     if (isLoading)
         return (
             <div>
-                <Skeleton className="h-40" />
+                <Skeleton className="h-[400px]" />
             </div>
         );
 

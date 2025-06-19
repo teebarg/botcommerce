@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "nui-react-icons";
 
-import { Skeleton } from "@/components/generic/skeleton";
+import { Skeleton } from "@/components/ui/skeletons";
 
 const SkeletonProductTemplate = () => {
     return (
