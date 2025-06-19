@@ -121,7 +121,7 @@ const CustomerView: React.FC = () => {
                                     <Search className="text-default-500" size={18} />
                                 </div>
                                 <input
-                                    className="pl-10 pr-12 py-2 w-full border border-input rounded-lg focus:outline-none"
+                                    className="pl-10 pr-12 py-2 w-full border border-divider rounded-lg focus:outline-none"
                                     placeholder="Search customers..."
                                     type="text"
                                     value={searchQuery}

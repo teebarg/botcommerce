@@ -28,14 +28,6 @@ interface PageLoaderProps extends LoadingConfig {
     className?: string;
 }
 
-interface ParticleProps {
-    id: number;
-    size: number;
-    delay: number;
-    duration: number;
-    x: number;
-}
-
 const LOADING_PRESETS: Record<string, Partial<LoadingConfig>> = {
     authentication: {
         title: "Authenticating",
@@ -141,19 +133,6 @@ const LOADING_PRESETS: Record<string, Partial<LoadingConfig>> = {
     },
 };
 
-const Particle: React.FC<ParticleProps> = ({ size, delay, duration, x }) => (
-    <div
-        className="absolute rounded-full pointer-events-none animate-bounce bg-gray-600"
-        style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            left: `${x}%`,
-            animationDelay: `${delay}s`,
-            animationDuration: `${duration}s`,
-        }}
-    />
-);
-
 const ProgressBar: React.FC<{
     progress: number;
     isActive: boolean;
@@ -219,16 +198,6 @@ const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps })
     const [progress, setProgress] = useState(0);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-    const particles = useMemo(() => {
-        return Array.from({ length: 30 }, (_, i) => ({
-            id: i,
-            x: Math.random() * 100,
-            size: Math.random() * 4 + 2,
-            delay: Math.random() * 6,
-            duration: Math.random() * 3 + 4,
-        }));
-    }, []);
-
     const currentStep = useMemo(() => config.steps[currentStepIndex], [config.steps, currentStepIndex]);
 
     useEffect(() => {
@@ -253,13 +222,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps })
     }, [config.duration, config.steps.length]);
 
     return (
-        <div className={cn("fixed inset-0  bg-gradient-to-br from-[#3b82f6] via-[#6366f1] to-[#8b5cf6] z-40")}>
-            <div className="absolute inset-0 overflow-hidden">
-                {particles.map((particle) => (
-                    <Particle key={particle.id} {...particle} />
-                ))}
-            </div>
-
+        <div suppressHydrationWarning className={cn("fixed inset-0  bg-gradient-to-br from-[#3b82f6] via-[#6366f1] to-[#8b5cf6] z-40")}>
             <div className={`relative z-10 flex flex-col items-center justify-center min-h-screen px-6 max-w-xl mx-auto`}>
                 <FadeInComponent delay="10ms">
                     <div className="mb-8 text-center">

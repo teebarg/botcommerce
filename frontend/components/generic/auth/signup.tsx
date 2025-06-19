@@ -33,7 +33,7 @@ const SignUpForm: React.FC<Props> = () => {
     return (
         <React.Fragment>
             <form action={formAction} className="w-full flex flex-col">
-                <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <Input required autoComplete="given-name" data-testid="first-name-input" label="First name" name="first_name" />
                     <Input required autoComplete="family-name" data-testid="last-name-input" label="Last name" name="last_name" />
                     <Input
@@ -43,7 +43,7 @@ const SignUpForm: React.FC<Props> = () => {
                         label="Email"
                         name="email"
                         type="email"
-                        wrapperClass="col-span-2"
+                        wrapperClass="md:col-span-2"
                     />
                     <Input autoComplete="tel" data-testid="phone-input" label="Phone" name="phone" type="tel" />
                     <Input
@@ -51,14 +51,11 @@ const SignUpForm: React.FC<Props> = () => {
                         autoComplete="new-password"
                         data-testid="password-input"
                         endContent={
-                            <button
-                                aria-label={show ? "Hide password" : "Show password"}
-                                className="text-default-500"
-                                type="button"
-                                onClick={() => setShow(!show)}
-                            >
-                                {show ? <EyeSlashFilled className="h-6 w-6" /> : <EyeFilled className="h-6 w-6" />}
-                            </button>
+                            show ? (
+                                <EyeSlashFilled onClick={() => setShow(false)} className="h-6 w-6" />
+                            ) : (
+                                <EyeFilled onClick={() => setShow(true)} className="h-6 w-6" />
+                            )
                         }
                         label="Password"
                         name="password"

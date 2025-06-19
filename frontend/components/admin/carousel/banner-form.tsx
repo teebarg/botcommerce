@@ -174,7 +174,7 @@ export default function BannerForm({ banner, onSuccess, onClose }: BannerFormPro
                         control={form.control}
                         name="is_active"
                         render={({ field }) => (
-                            <FormItem className="flex items-center justify-between rounded-lg border border-input px-4 py-2">
+                            <FormItem className="flex items-center justify-between rounded-lg border border-divider px-4 py-2">
                                 <div className="space-y-0.5">
                                     <FormLabel>Active</FormLabel>
                                 </div>

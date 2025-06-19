@@ -150,7 +150,7 @@ const ProductOverview: React.FC<{
                                 <button
                                     key={idx}
                                     className={cn(
-                                        "relative w-10 h-10 rounded-full transition-all border border-input focus:outline-hidden ring-offset-2 data-[state=checked]:ring-3 data-[state=checked]:ring-blue-500",
+                                        "relative w-10 h-10 rounded-full transition-all border border-divider focus:outline-hidden ring-offset-2 data-[state=checked]:ring-3 data-[state=checked]:ring-blue-500",
                                         {
                                             "cursor-not-allowed opacity-60": !available,
                                         }

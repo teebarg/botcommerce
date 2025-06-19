@@ -76,14 +76,11 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, items, shippingFee }) => 
                             <span>{currency(cart?.total || 0)}</span>
                         </div>
                         {path !== "/checkout" && (
-                            <BtnLink
-                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-full font-medium transition-colors mt-4"
-                                href="/checkout"
-                            >
+                            <BtnLink className="w-full py-4 rounded-full font-medium mt-4" href="/checkout" variant="primary">
                                 Checkout
                             </BtnLink>
                         )}
-                        <button className="w-full text-blue-600 py-2 text-sm hover:underline" onClick={onClose}>
+                        <button className="w-full text-primary py-2 text-sm hover:underline" onClick={onClose}>
                             Continue Shopping
                         </button>
                     </motion.div>

@@ -17,12 +17,12 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
             <div className="relative mb-6">
                 <div className="absolute inset-0 bg-blue-100 rounded-full opacity-20 animate-ping" />
                 <div className="relative">
-                    <PackageSearch className="w-18 h-18 text-blue-600" strokeWidth={1.5} />
+                    <PackageSearch className="w-16 h-16 text-primary" strokeWidth={1.5} />
                 </div>
             </div>
 
             <div className="text-center max-w-md mx-auto">
-                <h2 className="text-3xl font-bold text-default-900">No Products Found</h2>
+                <h2 className="text-2xl font-bold text-default-900">No Products Found</h2>
 
                 {searchQuery && (
                     <p className="text-default-600 mb-2">
@@ -31,7 +31,7 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
                     </p>
                 )}
 
-                <p className="text-default-500 mb-8 text-sm">Try adjusting your search or browse our suggested categories below.</p>
+                <p className="text-default-600 mb-6 text-sm">Try adjusting your search or browse our suggested categories below.</p>
 
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
                     <Button aria-label="clear search" startContent={<RefreshCcw className="w-4 h-4" />} variant="primary" onClick={onClearSearch}>

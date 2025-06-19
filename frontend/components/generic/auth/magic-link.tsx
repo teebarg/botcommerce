@@ -43,20 +43,18 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
     return (
         <React.Fragment>
             <div className="w-full">
-                <div className="flex flex-col w-full gap-y-4">
-                    <Input
-                        required
-                        data-testid="email-input"
-                        endContent={<Send className="h-5 w-5 text-default-500" />}
-                        label="Email"
-                        name="email"
-                        placeholder="Enter your email address"
-                        startContent={<Mail className="h-5 w-5 text-default-500" />}
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
+                <Input
+                    required
+                    data-testid="email-input"
+                    label="Email"
+                    name="email"
+                    placeholder="Enter your email address"
+                    startContent={<Mail className="text-default-500" />}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-content2"
+                />
                 <Button
                     aria-label="send magic link"
                     className="w-full mt-6"

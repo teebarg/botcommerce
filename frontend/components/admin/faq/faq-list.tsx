@@ -45,7 +45,7 @@ export function FaqList({ faqs, isLoading }: FaqListProps) {
     return (
         <div className="space-y-4">
             {faqs.map((faq: FAQ, idx: number) => (
-                <Card key={idx} className="group hover:border-input bg-content1">
+                <Card key={idx} className="group hover:border-divider bg-content1">
                     <CardHeader>
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">

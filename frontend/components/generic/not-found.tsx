@@ -86,7 +86,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
         >
             <div className="max-w-md w-full text-center">
                 {/* Main Content */}
-                <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-content1 border-input">
+                <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-content1 border-divider">
                     <div className="mb-6 flex justify-center">
                         <div className="relative">
                             <div className="absolute inset-0 rounded-full blur-xl opacity-70 animate-pulse transition-colors bg-linear-to-r from-blue-100 to-purple-100" />
@@ -108,7 +108,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                         </Button>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t transition-colors border-input">
+                    <div className="mt-6 pt-6 border-t transition-colors border-divider">
                         <p className="text-sm transition-colors text-default-500">
                             Need help?{" "}
                             <a
