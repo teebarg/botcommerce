@@ -109,7 +109,7 @@ const EditAddress: React.FC<EditAddressProps> = ({ address, isActive = false }) 
                     </p>
                 </div>
                 <div className="flex items-center gap-x-2">
-                    <Button aria-label="edit address" data-testid="address-edit-button" size="icon" onClick={() => setIsOpen(true)}>
+                    <Button aria-label="edit address" variant="primary" data-testid="address-edit-button" size="icon" onClick={() => setIsOpen(true)}>
                         <Pencil />
                     </Button>
                     <Button

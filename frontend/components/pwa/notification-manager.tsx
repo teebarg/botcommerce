@@ -119,7 +119,7 @@ const PushNotificationManager: React.FC = () => {
         const permissionGranted = await requestNotificationPermission();
 
         if (!permissionGranted) {
-            // enqueueSnackbar("Notification permission not granted", { variant: "error" });
+            toast.error("Please grant notification permission");
 
             return;
         }
@@ -161,21 +161,21 @@ const PushNotificationManager: React.FC = () => {
     if (!show && !offline) return null;
 
     return (
-        <div className="fixed bottom-4 left-1/2 z-50 w-[95vw] max-w-sm -translate-x-1/2 rounded-2xl bg-blue-600 text-white shadow-2xl border border-blue-200 p-5 flex flex-col items-center animate-fade-in">
+        <div className="fixed bottom-4 left-1/2 z-50 w-[95vw] max-w-sm -translate-x-1/2 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 text-gray-900 shadow-2xl border border-blue-200 p-5 flex flex-col items-center animate-fade-in">
             {offline ? (
                 <>
                     <h2 className="text-lg font-bold mb-1">No Internet Connection</h2>
-                    <p className="text-white text-sm mb-3 text-center">
+                    <p className="text-gray-700 text-sm mb-3 text-center">
                         You are currently offline. Some features may not work until you are back online.
                     </p>
                 </>
             ) : (
                 <>
                     <h2 className="text-lg font-bold mb-1">Update Available</h2>
-                    <p className="text-white text-sm mb-3 text-center">
+                    <p className="text-gray-700 text-sm mb-3 text-center">
                         A new version of the app is available. Please refresh to get the latest features and fixes.
                     </p>
-                    <Button className="mb-2 w-full" variant="outline" onClick={handleRefresh}>
+                    <Button className="mb-2 w-full" variant="emerald" onClick={handleRefresh}>
                         Refresh Now
                     </Button>
                 </>

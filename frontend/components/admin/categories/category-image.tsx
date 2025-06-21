@@ -16,7 +16,7 @@ interface ProductImageManagerProps {
 
 const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "" }) => {
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
-    const [isUploading] = useState<boolean>(false);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
     const invalidate = useInvalidate();
 
     const deleteImage = () => {
@@ -58,6 +58,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 const fileName = `images/${Date.now()}-${file.name}`;
 
                 void (async () => {
+                    setIsUploading(true);
                     try {
                         const { error } = await api.category.uploadImage({
                             id: categoryId,
@@ -78,6 +79,8 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                         invalidate("categories");
                     } catch (error) {
                         toast.error(`Error - ${error as string}`);
+                    } finally {
+                        setIsUploading(false);
                     }
                 })();
             };

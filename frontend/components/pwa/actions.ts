@@ -30,7 +30,7 @@ export async function getSubscription(endpoint: string) {
 
 export async function saveSubscription(subscriptionData: PushSubscriptionData) {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}/api/subscription`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

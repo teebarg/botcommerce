@@ -4,7 +4,7 @@ import React from "react";
 
 import { CarouselBanner } from "@/schemas/carousel";
 import { useCarouselBanners } from "@/lib/hooks/useApi";
-import { Skeleton } from "@/components/generic/skeleton";
+import { Skeleton } from "@/components/ui/skeletons";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { BtnLink } from "@/components/ui/btnLink";
 import ClientOnly from "@/components/generic/client-only";

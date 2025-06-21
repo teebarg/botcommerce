@@ -96,7 +96,6 @@ export default function InfiniteScrollClient({
                 <CollectionsSideBar brands={brands} categories={filteredCategories} collections={collections} facets={facets} />
             </div>
             <div className="w-full flex-1 flex-col relative">
-                {/* Mobile banner */}
                 <PromotionalBanner
                     btnClass="text-blue-600"
                     icon={<Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />}
@@ -110,7 +109,7 @@ export default function InfiniteScrollClient({
                         <BtnLink
                             className={cn(
                                 "flex-none rounded-full bg-content1 text-foreground font-semibold text-base py-2 min-w-min px-6",
-                                searchParams.get("cat_ids") === null && "border border-foreground"
+                                searchParams.get("cat_ids") === null && "border border-primary text-primary"
                             )}
                             href="/collections"
                         >
@@ -121,7 +120,7 @@ export default function InfiniteScrollClient({
                                 key={index}
                                 className={cn(
                                     "flex-none rounded-full bg-content1 text-foreground font-semibold text-base py-2 min-w-min",
-                                    searchParams.get("cat_ids") === category.slug && "border border-foreground"
+                                    searchParams.get("cat_ids") === category.slug && "border border-primary text-primary"
                                 )}
                                 href={`/collections?cat_ids=${category.slug}`}
                             >
