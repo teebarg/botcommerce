@@ -1,6 +1,6 @@
 import repeat from "@lib/util/repeat";
 
-import { Skeleton } from "@/components/generic/skeleton";
+import { Skeleton } from "@/components/ui/skeletons";
 
 export default function Loading() {
     return (
