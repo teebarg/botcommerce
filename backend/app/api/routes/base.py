@@ -5,11 +5,18 @@ from fastapi import (
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role
-from app.core.deps import get_current_superuser
+from app.core.deps import get_current_superuser, CacheService
 from typing import Literal, Optional
 from datetime import timedelta, datetime
 
 router = APIRouter()
+
+@router.get("/online-users")
+async def get_online_users(cache: CacheService):
+    keys = cache.get("online:*")
+    if keys is None:
+        return []
+    return [key.replace("online:", "") for key in keys]
 
 @router.get("/stats", dependencies=[Depends(get_current_superuser)])
 async def admin_dashboard_stats():

@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.core.logging import logger
-
+from app.core import deps
 
 class ConnectionManager:
     def __init__(self):
@@ -53,6 +53,32 @@ manager = ConnectionManager()
 
 router = APIRouter()
 
+
+async def broadcast_online_users():
+    keys = await redis_client.keys("online:*")
+    user_list = [k.replace("online:", "") for k in keys]
+    manager.broadcast("online-users", {"users": user_list}, type="online-users")
+    # for conn in active_connections:
+    #     await conn.send_json({"event": "online-users", "users": user_list})
+
+@router.websocket("/ws")
+async def ws_presence(websocket: WebSocket, cache: deps.CacheService):
+    await websocket.accept()
+    username = websocket.cookies.get("username")
+    ip = websocket.client.host
+    user_id = username or f"guest:{ip}"
+
+    key = f"online:{user_id}"
+    cache.set(key, "online", ex=60)
+    await broadcast_online_users()
+
+    try:
+        while True:
+            await websocket.receive_text()  # keep alive
+            await cache.expire(key, 60)
+    except WebSocketDisconnect:
+        cache.delete(key)
+        await broadcast_online_users()
 
 # WebSocket route for clients to listen for real-time updates
 @router.websocket("/{id}/")
