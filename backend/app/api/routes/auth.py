@@ -69,7 +69,6 @@ async def request_magic_link(
     email = payload.email
     callback_url = payload.callback_url
 
-    # Check if user exists
     user = await prisma.user.find_first(
         where={
             "email": email,
@@ -77,19 +76,13 @@ async def request_magic_link(
     )
 
     if not user:
-        # Don't reveal if user exists or not
         return {"message": "If an account exists with this email, you will receive a magic link"}
 
     async def send_magic_link_email(user: User, email: str, callback_url: Optional[str] = None):
-        # Generate magic link token
         token = security.create_magic_link_token(email)
-
-        # Create magic link URL
         magic_link = f"{settings.FRONTEND_HOST}/verify?token={token}"
         if callback_url is not None:
             magic_link += f"&callbackUrl={callback_url}"
-
-        # Generate and send email
         email_data = await generate_magic_link_email(email_to=email, magic_link=magic_link, first_name=user.first_name)
         send_email(
             email_to=email,

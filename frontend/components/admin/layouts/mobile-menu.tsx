@@ -13,6 +13,7 @@ import {
     Image,
     Activity,
     MessageSquare,
+    User,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,6 +40,7 @@ const AdminMobileMenu: React.FC = () => {
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
         { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
         { id: "faqs", label: "FAQs", icon: <DocumentText size={20} />, href: "/admin/faqs" },
+        { id: "online", label: "Online", icon: <User size={20} />, href: "/admin/online" },
     ];
 
     return (

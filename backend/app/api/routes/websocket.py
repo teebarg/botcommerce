@@ -2,6 +2,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.core.logging import logger
 from app.core import deps
+import json, time, httpx
 
 class ConnectionManager:
     def __init__(self):
@@ -17,7 +18,6 @@ class ConnectionManager:
         Returns:
         - None
         """
-        await websocket.accept()
         self.connections[id] = websocket
         logger.info(f"WebSocket connection established for user {id}")
 
@@ -36,10 +36,12 @@ class ConnectionManager:
 
     async def broadcast(self, id: str, data: dict, type: str = "general") -> None:
         """
-        Broadcasts the given data to all active connections.
+        Broadcasts the given data to a specific connection.
 
         Args:
+            id (str): The ID of the connection to which the data will be sent.
             data (dict): The data to be sent as a JSON object.
+            type (str, optional): The type of the message. Defaults to "general".
 
         Returns:
             None
@@ -48,41 +50,54 @@ class ConnectionManager:
             websocket = self.connections[id]
             await websocket.send_json({**data, "type": type})
 
+    # broadcast all sessions
+    async def broadcast_all(self, data: dict, type: str = "general"):
+        """
+        Broadcasts the given data to all active connections.
+
+        Args:
+            data (dict): The data to be sent as a JSON object.
+            type (str, optional): The type of the message. Defaults to "general".
+        Returns:
+            None
+        """
+        try:
+            for conn in self.connections.values():
+                await conn.send_json({**data, "type": type})
+        except Exception as e:
+            logger.error(f"An error occurred in broadcast_all - {e}")
+
 
 manager = ConnectionManager()
 
 router = APIRouter()
 
-
-async def broadcast_online_users():
-    keys = await redis_client.keys("online:*")
-    user_list = [k.replace("online:", "") for k in keys]
-    manager.broadcast("online-users", {"users": user_list}, type="online-users")
-    # for conn in active_connections:
-    #     await conn.send_json({"event": "online-users", "users": user_list})
-
-@router.websocket("/ws")
-async def ws_presence(websocket: WebSocket, cache: deps.CacheService):
-    await websocket.accept()
-    username = websocket.cookies.get("username")
-    ip = websocket.client.host
-    user_id = username or f"guest:{ip}"
-
-    key = f"online:{user_id}"
-    cache.set(key, "online", ex=60)
-    await broadcast_online_users()
-
+async def get_city(ip: str) -> str:
     try:
-        while True:
-            await websocket.receive_text()  # keep alive
-            await cache.expire(key, 60)
-    except WebSocketDisconnect:
-        cache.delete(key)
-        await broadcast_online_users()
+        async with httpx.AsyncClient() as client:
+            res = await client.get(f"https://ipapi.co/{ip}/city")
+            return res.text.strip()
+    except Exception as e:
+        logger.error(f"An error occurred in get_city - {e}")
+        return "Unknown"
 
-# WebSocket route for clients to listen for real-time updates
-@router.websocket("/{id}/")
-async def websocket(id: str, websocket: WebSocket):
+async def broadcast_sessions(cache: deps.CacheService):
+    keys = cache.keys("session:*")
+    sessions = []
+    for key in keys:
+        data = cache.hgetall(key)
+        sessions.append({
+            "id": key.replace("session:", ""),
+            "type": data.get("type", "guest"),
+            "email": data.get("email", "Unknown"),
+            "location": data.get("location", "Unknown"),
+            "path": data.get("path", "/"),
+            "last_seen": int(time.time()) - int(data.get("updated_at", 0))
+        })
+    await manager.broadcast_all({"users": sessions}, type="online-users")
+
+@router.websocket("/")
+async def websocket(ws: WebSocket, cache: deps.CacheService):
     """
     Handles the WebSocket endpoint.
 
@@ -93,11 +108,44 @@ async def websocket(id: str, websocket: WebSocket):
     Returns:
         None
     """
-    await manager.connect(id=id, websocket=websocket)
+    await ws.accept()
+    ip = ws.client.host
+    key = f"session:{ip}"
+
+    location = await get_city(ip)
+
+    cache.hset(key, mapping={
+        "type": "guest",
+        "path": "/",
+        "location": location,
+        "updated_at": str(int(time.time()))
+    })
+    cache.expire(key, seconds=120)
+    await broadcast_sessions(cache)
+
     try:
         while True:
-            await websocket.receive_text()  # WebSocket remains open
-    except WebSocketDisconnect:
+            msg = await ws.receive_text()
+            try:
+                payload = json.loads(msg)
+                if payload.get("type") == "init":
+                    id = payload.get("id")
+                    key = f"session:{id}"
+                    cache.hset_field(key=key, field="type", value="user")
+                    cache.hset_field(key=key, field="email", value=payload.get("email"))
+                    cache.hset_field(key=key, field="updated_at", value=str(int(time.time())))
+                    await manager.connect(id=id, websocket=ws)
+                if payload.get("type") == "ping":
+                    cache.hset_field(key=key, field="updated_at", value=str(int(time.time())))
+                elif payload.get("type") == "path":
+                    cache.hset_field(key=key, field="path", value=payload.get("path", "/"))
+                cache.expire(key, seconds=120)
+                await broadcast_sessions(cache)
+            except Exception as e:
+                logger.error(f"An error occurred in ws_presence - {e}")
+                continue
+    except WebSocketDisconnect as e:
+        logger.error(f"An error occurred in WebSocketDisconnect except - {e}")
         manager.disconnect(websocket)
 
 

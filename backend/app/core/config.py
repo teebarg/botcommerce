@@ -88,7 +88,7 @@ class Settings(BaseSettings):
     EMAILS_ENABLED: bool = False
 
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
-    # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000"]'
+    # e.g: '["http://localhost"]'
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
         []
     )

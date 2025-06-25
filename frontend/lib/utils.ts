@@ -173,4 +173,20 @@ export const isEmpty = (input: any) => {
 
 export const onlyUnique = (value: unknown, index: number, self: unknown[]) => self.indexOf(value) === index;
 
+export const getInitials = (name: string) => {
+    return name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+};
+
+export const getAvatarColor = (name: string) => {
+    const colors = ["bg-blue-500", "bg-green-500", "bg-purple-500", "bg-pink-500", "bg-yellow-500", "bg-indigo-500"];
+    const index = name.length % colors.length;
+
+    return colors[index];
+};
+
 export { handleError, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo, formatDate };
