@@ -29,4 +29,5 @@ services:
   # Redis Instance
   - type: redis
     name: botcommerce-redis
+    ipAllowList: []
     plan: free
