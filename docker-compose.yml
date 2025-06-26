@@ -170,9 +170,40 @@ services:
       - traefik.http.routers.adminer-http.rule=Host(`adminer.localhost`)
       - traefik.http.routers.adminer-http.entrypoints=http
 
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "7007:6379"
+    networks:
+      - traefik-public
+      - default
+    volumes:
+      - redis-data:/data
+
+
+  celery:
+    build:
+      context: ./backend
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-false}
+    image: shop-backend:${TAG-latest}
+    command: celery -A celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+    depends_on:
+      - backend
+    env_file:
+      - ./backend/.env
+    networks:
+      - traefik-public
+      - default
+
 volumes:
   pg-data:
   meili-data:
+  redis-data:
 
 networks:
   traefik-public:

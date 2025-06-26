@@ -109,7 +109,7 @@ export const productApi = {
         return response;
     },
     async reIndex(): ApiResult<Message> {
-        const response = await api.post<Message>(`/product/reindex`);
+        const response = await api.get<Message>(`/product/reindex`);
 
         if (!response.error) {
             productApi.revalidate();

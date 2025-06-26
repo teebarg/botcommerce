@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: botcommerce
+    env: python
+    rootDir: ./backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    
+  - type: worker
+    name: botcommerce-worker
+    env: python
+    rootDir: ./backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "celery -A celery_app worker --loglevel=info"
+
+databases:
+  - name: botcommerce-redis
+    plan: free
