@@ -75,6 +75,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_PASSWORD: str = "password"
+    REDIS_URL: str = "redis://localhost:6379/0"
 
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False

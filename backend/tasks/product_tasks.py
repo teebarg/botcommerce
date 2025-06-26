@@ -1,11 +1,21 @@
-from backend.celery_app import celery_app
-from backend.services.products import process_products, index_products
-from backend.ws.manager import manager
-from backend.services.audit import log_activity
+from celery_app import celery_app
+from app.api.routes.websocket import manager
+from app.services.activity import log_activity
+from app.services.product import index_products
 
 import logging
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s - %(name)s - %(message)s"
+)
+
+@celery_app.task()
+def index_products_task():
+    logging.info("Starting product indexing task...")
+    index_products()
+    logging.info("Product indexing task completed.")
+
 
 @celery_app.task
 def upload_product_file(user_id: str, contents: bytes, content_type: str, filename: str):
@@ -13,7 +23,7 @@ def upload_product_file(user_id: str, contents: bytes, content_type: str, filena
 
     async def _run():
         try:
-            logger.info("Starting product upload processing...")
+            logging.info("Starting product upload processing...")
             num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user_id)
 
             await index_products()
@@ -36,7 +46,7 @@ def upload_product_file(user_id: str, contents: bytes, content_type: str, filena
             )
 
         except Exception as e:
-            logger.error(f"Error processing data from file: {e}")
+            logging.error(f"Error processing data from file: {e}")
             await log_activity(
                 user_id=user_id,
                 activity_type="PRODUCT_UPLOAD",

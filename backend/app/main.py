@@ -16,6 +16,7 @@ from fastapi import BackgroundTasks, FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from datetime import datetime
+from tasks.sync_tasks import sync_disconnected_sessions
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -150,6 +151,11 @@ async def log_error(error: dict, notification: deps.Notification):
         channel_name="slack",
         slack_message=slack_message
     )
+
+@app.post("/trigger-sync")
+def trigger_sync():
+    sync_disconnected_sessions.delay()
+    return {"status": "task enqueued"}
 
 
 @app.get("/sitemap.xml", response_class=Response)

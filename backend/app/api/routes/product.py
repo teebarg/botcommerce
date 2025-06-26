@@ -44,6 +44,7 @@ from app.core.deps import supabase
 from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
+from tasks.product_tasks import index_products_task
 
 router = APIRouter()
 
@@ -610,22 +611,38 @@ async def upload_products(
     return {"message": "Upload started"}
 
 
-@router.post("/reindex", dependencies=[], response_model=Message)
-async def reindex_products(background_tasks: BackgroundTasks):
+@router.post("/reindex", response_model=Message)
+async def reindex_products():
     """
     Re-index all products in the database to Meilisearch.
-    This operation is performed asynchronously in the background.
+    This operation is performed asynchronously via Celery.
     """
     try:
-        background_tasks.add_task(index_products)
-
-        return Message(message="Product re-indexing started. This may take a while.")
+        index_products_task.delay()
+        return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
         raise HTTPException(
             status_code=500,
-            detail="An error occurred while starting the re-indexing process.",
-        ) from e
+            detail="Failed to queue the re-indexing task.",
+        )
+
+# @router.post("/reindex", dependencies=[], response_model=Message)
+# async def reindex_products(background_tasks: BackgroundTasks):
+#     """
+#     Re-index all products in the database to Meilisearch.
+#     This operation is performed asynchronously in the background.
+#     """
+#     try:
+#         background_tasks.add_task(index_products)
+
+#         return Message(message="Product re-indexing started. This may take a while.")
+#     except Exception as e:
+#         logger.error(f"Error during product re-indexing: {e}")
+#         raise HTTPException(
+#             status_code=500,
+#             detail="An error occurred while starting the re-indexing process.",
+#         ) from e
 
 
 @router.post("/configure-filterable-attributes")

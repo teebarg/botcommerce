@@ -1,6 +1,6 @@
 import httpx
-from backend.celery_app import celery_app
-from backend.app.core.config import settings
+from celery_app import celery_app
+from app.core.config import settings
 
 @celery_app.task
 def sync_disconnected_sessions():
