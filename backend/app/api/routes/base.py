@@ -12,13 +12,6 @@ import time
 
 router = APIRouter()
 
-@router.get("/online-users")
-async def get_online_users(cache: CacheService):
-    keys = cache.get("online:*")
-    if keys is None:
-        return []
-    return [key.replace("online:", "") for key in keys]
-
 @router.get("/sync-disconnected")
 async def sync_disconnected(cache: CacheService):
     now = datetime.utcnow()

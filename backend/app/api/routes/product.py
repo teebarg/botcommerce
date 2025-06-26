@@ -262,6 +262,23 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
     return created_product
 
 
+@router.get("/reindex", response_model=Message)
+async def reindex_products():
+    """
+    Re-index all products in the database to Meilisearch.
+    This operation is performed asynchronously via Celery.
+    """
+    try:
+        task = index_products_task.delay()
+        logger.info(f"Task enqueued with ID: {task.id}")
+        return Message(message="Re-indexing task enqueued.")
+    except Exception as e:
+        logger.error(f"Error during product re-indexing: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to queue the re-indexing task.",
+        )
+
 @router.get("/{slug}")
 async def read(slug: str):
     """
@@ -609,40 +626,6 @@ async def upload_products(
     background_tasks.add_task(update_task)
 
     return {"message": "Upload started"}
-
-
-@router.post("/reindex", response_model=Message)
-async def reindex_products():
-    """
-    Re-index all products in the database to Meilisearch.
-    This operation is performed asynchronously via Celery.
-    """
-    try:
-        index_products_task.delay()
-        return Message(message="Re-indexing task enqueued.")
-    except Exception as e:
-        logger.error(f"Error during product re-indexing: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to queue the re-indexing task.",
-        )
-
-# @router.post("/reindex", dependencies=[], response_model=Message)
-# async def reindex_products(background_tasks: BackgroundTasks):
-#     """
-#     Re-index all products in the database to Meilisearch.
-#     This operation is performed asynchronously in the background.
-#     """
-#     try:
-#         background_tasks.add_task(index_products)
-
-#         return Message(message="Product re-indexing started. This may take a while.")
-#     except Exception as e:
-#         logger.error(f"Error during product re-indexing: {e}")
-#         raise HTTPException(
-#             status_code=500,
-#             detail="An error occurred while starting the re-indexing process.",
-#         ) from e
 
 
 @router.post("/configure-filterable-attributes")

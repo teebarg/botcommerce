@@ -2,6 +2,7 @@ from celery_app import celery_app
 from app.api.routes.websocket import manager
 from app.services.activity import log_activity
 from app.services.product import index_products
+import asyncio
 
 import logging
 
@@ -13,14 +14,12 @@ logging.basicConfig(
 @celery_app.task()
 def index_products_task():
     logging.info("Starting product indexing task...")
-    index_products()
+    asyncio.run(index_products())
     logging.info("Product indexing task completed.")
 
 
 @celery_app.task
 def upload_product_file(user_id: str, contents: bytes, content_type: str, filename: str):
-    import asyncio
-
     async def _run():
         try:
             logging.info("Starting product upload processing...")
