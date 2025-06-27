@@ -1,4 +1,3 @@
-# app/core/huey_instance.py
 from huey import RedisHuey
 import os
 

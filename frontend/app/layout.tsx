@@ -13,6 +13,7 @@ import { api } from "@/apis";
 import SetShopSettings from "@/components/set-shop-settings";
 import { WebSocketProvider } from "@/providers/websocket";
 import { cn } from "@/lib/utils";
+import { AuthProvider } from "@/providers/auth-provider";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -73,7 +74,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <InstallPrompt />
                         <Toaster closeButton richColors duration={4000} expand={false} position="top-right" />
                         <TanstackProviders>
-                            <WebSocketProvider>{children}</WebSocketProvider>
+                            <AuthProvider>
+                                <WebSocketProvider>{children}</WebSocketProvider>
+                            </AuthProvider>
                         </TanstackProviders>
                     </div>
                 </ProgressBar>

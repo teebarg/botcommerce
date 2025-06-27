@@ -39,6 +39,11 @@ async def index_products():
 
 
 async def product_upload(user_id: str, contents: bytes, content_type: str, filename: str):
+    # delay by 30sec
+    await asyncio.sleep(30)
+
+
+async def product_upload1(user_id: str, contents: bytes, content_type: str, filename: str):
     logger.info("Starting product upload processing...")
     try:
         num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user_id)
@@ -48,7 +53,7 @@ async def product_upload(user_id: str, contents: bytes, content_type: str, filen
         logger.info("Re-indexing completed.")
         logger.info("Broadcasting message to user...")
         await manager.send_to_user(
-            user_id=str(user_id),
+            user_id=user_id,
             data={
                 "status": "completed",
                 "total_rows": num_rows,

@@ -43,7 +43,7 @@ from app.core.deps import supabase
 from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
-from tasks.product_tasks import index_products_task, product_upload_task
+from tasks.product_tasks import index_products_task, product_upload_task, upload_product_file
 
 router = APIRouter()
 
@@ -271,8 +271,8 @@ async def reindex_products():
     This operation is performed asynchronously via Celery.
     """
     try:
-        # task = index_products_task.delay()
-        task = index_products_task()
+        task = index_products_task.delay()
+        # task = index_products_task()
         logger.info(f"Task enqueued with ID: {task.id}")
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
@@ -591,8 +591,12 @@ async def upload_products(
     await validate_file(file=file)
 
     contents = await file.read()
-    task = product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
-    print(task)
+    # product_upload_task()
+    product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename).apply_async()
+    # await upload_product_file.delay(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
+    # upload_product_file(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename).delay()
+    # task = product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename).delay()
+    # print(task)
     return {"message": "Upload started"}
 
 
@@ -688,39 +692,6 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         sum(ratings) / len(ratings), 2) if ratings else 0
 
     return product_dict
-
-
-async def index_products():
-    """
-    Re-index all products in the database to Meilisearch.
-    """
-    try:
-        logger.info("Starting re-indexing..........")
-
-        products = await db.product.find_many(
-            include={
-                "variants": True,
-                "categories": True,
-                "collections": True,
-                "brand": True,
-                "images": True,
-                "reviews": True,
-            }
-        )
-
-        # Prepare the documents for Meilisearch
-        documents = []
-        for product in products:
-            product_dict = prepare_product_data_for_indexing(product)
-            documents.append(product_dict)
-
-        # Add all documents to the products index
-        add_documents_to_index(
-            index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
-
-        logger.info(f"Reindexed {len(documents)} products successfully.")
-    except Exception as e:
-        logger.error(f"Error during product re-indexing: {e}")
 
 
 async def reindex_product(product_id: int):

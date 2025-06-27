@@ -19,13 +19,8 @@ from app.core.deps import supabase
 
 
 async def broadcast_channel(data, user_id: int):
-    # await manager.broadcast(
-    #     id=str(user_id),
-    #     data=data,
-    #     type="sheet-processor",
-    # )
     await manager.send_to_user(
-        user_id=str(user_id),
+        user_id=user_id,
         data=data,
         message_type="sheet-processor",
     )

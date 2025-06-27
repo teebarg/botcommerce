@@ -19,7 +19,7 @@ from datetime import datetime
 from tasks.sync_tasks import sync_disconnected_sessions
 import threading
 from huey.consumer import Consumer
-from app.core.huey_instance import huey
+from app.huey_instance import huey
 
 
 @asynccontextmanager
@@ -28,36 +28,36 @@ async def lifespan(app: FastAPI):
     await db.connect()
     print("🚀 ~ connecting to prisma......: done")
 
-    def start_huey():
-        # Create consumer with minimal configuration
-        consumer = Consumer(
-            huey,
-            workers=1,
-            periodic=True,
-            initial_delay=0.1,
-            backoff=1.15,
-            max_delay=10.0,
-            # utc=True,
-            scheduler_interval=1,
-            check_worker_health=False,
-            worker_type='thread'  # Use thread worker instead of process
-        )
+    # def start_huey():
+    #     # Create consumer with minimal configuration
+    #     consumer = Consumer(
+    #         huey,
+    #         workers=1,
+    #         periodic=True,
+    #         initial_delay=0.1,
+    #         backoff=1.15,
+    #         max_delay=10.0,
+    #         # utc=True,
+    #         scheduler_interval=1,
+    #         check_worker_health=False,
+    #         worker_type='thread'  # Use thread worker instead of process
+    #     )
 
-        # Disable signal handlers since we're in a thread
-        def dummy_signal_handler():
-            pass
+    #     # Disable signal handlers since we're in a thread
+    #     def dummy_signal_handler():
+    #         pass
 
-        consumer._set_signal_handlers = dummy_signal_handler
+    #     consumer._set_signal_handlers = dummy_signal_handler
 
-        try:
-            # Start the consumer loop
-            consumer.run()
-        except Exception as e:
-            print(f"Huey consumer error: {e}")
+    #     try:
+    #         # Start the consumer loop
+    #         consumer.run()
+    #     except Exception as e:
+    #         print(f"Huey consumer error: {e}")
 
-    # Start Huey in a daemon thread
-    huey_thread = threading.Thread(target=start_huey, daemon=True)
-    huey_thread.start()
+    # # Start Huey in a daemon thread
+    # huey_thread = threading.Thread(target=start_huey, daemon=True)
+    # huey_thread.start()
 
     yield
     await db.disconnect()

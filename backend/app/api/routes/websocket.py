@@ -33,8 +33,7 @@ async def broadcast_sessions(cache: deps.CacheService):
         })
 
     # Use the new broadcast method
-    # await manager.broadcast_to_all({"users": sessions}, "online-users")
-    await manager.send_to_user(user_id=1, data={"users": sessions}, message_type="online-users")
+    await manager.broadcast_to_all({"users": sessions}, "online-users")
 
 @router.websocket("/")
 async def websocket(ws: WebSocket, cache: deps.CacheService):
@@ -54,7 +53,8 @@ async def websocket(ws: WebSocket, cache: deps.CacheService):
     user_id = None  # Will be set when user sends init message
 
     # Get location for this IP
-    location = await get_city(ip)
+    location = "Nigeria"
+    # location = await get_city(ip)
 
     # Create initial guest session
     cache.hset(session_key, mapping={

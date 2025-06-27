@@ -26,7 +26,7 @@ async def log_activity(
     )
     # broadcast
     await manager.send_to_user(
-        user_id=str(user_id),
+        user_id=user_id,
         data=jsonable_encoder(activity),
         message_type="activities",
     )
