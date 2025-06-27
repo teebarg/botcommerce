@@ -1,8 +1,9 @@
 from celery_app import celery_app
-from app.api.routes.websocket import manager
+from app.services.redis_websocket import manager
 from app.services.activity import log_activity
-from app.services.product import index_products
+from app.services.product import index_products, product_upload
 import asyncio
+from app.core.huey_instance import huey
 
 import logging
 
@@ -11,12 +12,18 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s - %(name)s - %(message)s"
 )
 
-@celery_app.task()
+@huey.task(retries=3, retry_delay=10)
 def index_products_task():
     logging.info("Starting product indexing task...")
     asyncio.run(index_products())
     logging.info("Product indexing task completed.")
 
+
+@huey.task()
+def product_upload_task(user_id: str, contents: bytes, content_type: str, filename: str):
+    logging.info("Starting product upload processing...")
+    asyncio.run(product_upload(user_id=user_id, contents=contents, content_type=content_type, filename=filename))
+    logging.info("Product upload processing completed.")
 
 @celery_app.task
 def upload_product_file(user_id: str, contents: bytes, content_type: str, filename: str):
@@ -27,14 +34,14 @@ def upload_product_file(user_id: str, contents: bytes, content_type: str, filena
 
             await index_products()
 
-            await manager.broadcast(
-                id=str(user_id),
+            await manager.send_to_user(
+                user_id=str(user_id),
                 data={
                     "status": "completed",
                     "total_rows": num_rows,
                     "processed_rows": num_rows,
                 },
-                type="sheet-processor",
+                message_type="sheet-processor",
             )
 
             await log_activity(

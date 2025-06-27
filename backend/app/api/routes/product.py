@@ -38,15 +38,15 @@ from math import ceil
 from prisma.enums import ProductStatus
 from pydantic import BaseModel
 from app.core.storage import upload
-from app.api.routes.websocket import manager
 from app.services.activity import log_activity
 from app.core.deps import supabase
 from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
-from tasks.product_tasks import index_products_task
+from tasks.product_tasks import index_products_task, product_upload_task
 
 router = APIRouter()
+
 
 class LandingProducts(BaseModel):
     trending: list[SearchProduct]
@@ -187,7 +187,8 @@ async def search(
     if collections:
         filters.append(f"collections IN [{collections}]")
     if min_price and max_price:
-        filters.append(f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+        filters.append(
+            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
 
     search_params = {
         "limit": limit,
@@ -255,7 +256,8 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
             data=data,
         )
     except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Product with this name already exists")
+        raise HTTPException(
+            status_code=400, detail="Product with this name already exists")
 
     background_tasks.add_task(reindex_product, created_product.id)
 
@@ -269,7 +271,8 @@ async def reindex_products():
     This operation is performed asynchronously via Celery.
     """
     try:
-        task = index_products_task.delay()
+        # task = index_products_task.delay()
+        task = index_products_task()
         logger.info(f"Task enqueued with ID: {task.id}")
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
@@ -278,6 +281,7 @@ async def reindex_products():
             status_code=500,
             detail="Failed to queue the re-indexing task.",
         )
+
 
 @router.get("/{slug}")
 async def read(slug: str):
@@ -368,7 +372,8 @@ async def delete_product(id: int) -> Message:
     await db.product.delete(where={"id": id})
 
     try:
-        delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(id))
+        delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
+                        document_id=str(id))
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
     return Message(message="Product deleted successfully")
@@ -568,7 +573,7 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
 async def upload_products(
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
-    background_tasks: BackgroundTasks,
+    # background_tasks: BackgroundTasks,
 ):
     logger.info(f"File uploaded: {file.filename}")
     content_type = file.content_type
@@ -586,45 +591,8 @@ async def upload_products(
     await validate_file(file=file)
 
     contents = await file.read()
-
-    # Define the background task
-    async def update_task():
-        logger.info("Starting product upload processing...")
-        try:
-            num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user.id)
-
-
-            # Re-index
-            await index_products()
-            await manager.broadcast(
-                id=str(user.id),
-                data={
-                    "status": "completed",
-                    "total_rows": num_rows,
-                    "processed_rows": num_rows,
-                },
-                type="sheet-processor",
-            )
-
-            # Log the activity
-            await log_activity(
-                user_id=user.id,
-                activity_type="PRODUCT_UPLOAD",
-                description=f"Uploaded products from file: {file.filename}",
-                is_success=True
-            )
-        except Exception as e:
-            logger.error(f"Error processing data from file: {e}")
-            # Log failed activity
-            await log_activity(
-                user_id=user.id,
-                activity_type="PRODUCT_UPLOAD",
-                description=f"Failed to upload products from file: {file.filename}",
-                is_success=False
-            )
-
-    background_tasks.add_task(update_task)
-
+    task = product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
+    print(task)
     return {"message": "Upload started"}
 
 
@@ -639,10 +607,12 @@ async def configure_filterable_attributes(
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         # Update the filterable attributes
         index.update_filterable_attributes(
-            ["brand", "categories", "collections", "name", "variants", "average_rating", "review_count", "max_variant_price", "min_variant_price"]
+            ["brand", "categories", "collections", "name", "variants", "average_rating",
+                "review_count", "max_variant_price", "min_variant_price"]
         )
         # Update the sortable attributes
-        index.update_sortable_attributes(["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"])
+        index.update_sortable_attributes(
+            ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"])
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(
@@ -693,16 +663,20 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     if product.brand:
         product_dict["brand"] = product.brand.name
     product_dict["categories"] = [c.name for c in product.categories]
-    product_dict["images"] = [img.image for img in sorted(product.images, key=lambda img: img.order)]
+    product_dict["images"] = [img.image for img in sorted(
+        product.images, key=lambda img: img.order)]
 
     # Variants
     variants = [v.dict() for v in product.variants]
     product_dict["variants"] = variants
 
-    variant_prices = [v["price"] for v in variants if v.get("price") is not None]
+    variant_prices = [v["price"]
+                      for v in variants if v.get("price") is not None]
     product_dict["variant_prices"] = variant_prices
-    product_dict["min_variant_price"] = min(variant_prices) if variant_prices else 0
-    product_dict["max_variant_price"] = max(variant_prices) if variant_prices else 0
+    product_dict["min_variant_price"] = min(
+        variant_prices) if variant_prices else 0
+    product_dict["max_variant_price"] = max(
+        variant_prices) if variant_prices else 0
 
     # Reviews
     reviews = [r.dict() for r in product.reviews]
@@ -710,7 +684,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
 
     ratings = [r["rating"] for r in reviews if r.get("rating") is not None]
     product_dict["review_count"] = len(ratings)
-    product_dict["average_rating"] = round(sum(ratings) / len(ratings), 2) if ratings else 0
+    product_dict["average_rating"] = round(
+        sum(ratings) / len(ratings), 2) if ratings else 0
 
     return product_dict
 
@@ -740,7 +715,8 @@ async def index_products():
             documents.append(product_dict)
 
         # Add all documents to the products index
-        add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+        add_documents_to_index(
+            index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
     except Exception as e:
@@ -763,13 +739,15 @@ async def reindex_product(product_id: int):
         )
 
         if not product:
-            logger.warning(f"Product with id {product_id} not found for re-indexing.")
+            logger.warning(
+                f"Product with id {product_id} not found for re-indexing.")
             return
 
         # Prepare product data for Meilisearch indexing
         product_data = prepare_product_data_for_indexing(product)
 
-        update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+        update_document(index_name=settings.MEILI_PRODUCTS_INDEX,
+                        document=product_data)
 
         logger.info(f"Successfully reindexed product {product_id}")
 

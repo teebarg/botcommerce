@@ -23,6 +23,7 @@ interface Session {
 const OnlineUsersWidget: React.FC = () => {
     const [sessions, setSessions] = useState<Session[]>([]);
     const { currentMessage } = useWebSocket();
+    console.log("🚀 ~ currentMessage:", currentMessage)
 
     useEffect(() => {
         if (currentMessage?.type === "online-users") {

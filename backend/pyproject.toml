@@ -23,7 +23,8 @@ dependencies = [
     "prisma<1.0.0,>=0.11.0",
     "supabase==2.15.2",
     "google-genai==1.20.0",
-    "celery==5.5.3"
+    "celery==5.5.3",
+    "huey==2.5.3"
 ]
 
 [tool.uv]

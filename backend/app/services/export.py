@@ -4,7 +4,7 @@ from fastapi import (
     HTTPException,
 )
 
-from app.api.routes.websocket import manager
+from app.services.redis_websocket import manager
 from app.core.logging import logger
 from app.models.generic import UploadStatus
 
@@ -42,10 +42,10 @@ async def process_file(file, task_id: str, db, upload_func = None):
 
 
 async def send_status_update(task_id: str):
-    await manager.broadcast(
-        id=task_id,
+    await manager.send_to_user(
+        user_id=task_id,
         data=upload_statuses.get(task_id).model_dump(),
-        type="sheet-processor",
+        message_type="sheet-processor",
     )
 
 

@@ -15,6 +15,7 @@ interface ProductUploadProps {}
 const ProductUpload: React.FC<ProductUploadProps> = () => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const { currentMessage } = useWebSocket();
+    console.log("🚀 ~ currentMessage:", currentMessage)
     const invalidate = useInvalidate();
 
     useEffect(() => {

@@ -1,7 +1,7 @@
 from typing import Optional
 from prisma.models import ActivityLog
 from app.prisma_client import prisma as db
-from app.api.routes.websocket import manager
+from app.services.redis_websocket import manager
 from fastapi.encoders import jsonable_encoder
 
 
@@ -25,9 +25,9 @@ async def log_activity(
         }
     )
     # broadcast
-    await manager.broadcast(
-        id=str(user_id),
+    await manager.send_to_user(
+        user_id=str(user_id),
         data=jsonable_encoder(activity),
-        type="activities",
+        message_type="activities",
     )
     return activity

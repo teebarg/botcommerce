@@ -17,17 +17,53 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from datetime import datetime
 from tasks.sync_tasks import sync_disconnected_sessions
+import threading
+from huey.consumer import Consumer
+from app.core.huey_instance import huey
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # app.state.redis_client.ping()
     print("🚀 ~ connecting to prisma......:")
     await db.connect()
     print("🚀 ~ connecting to prisma......: done")
+
+    def start_huey():
+        # Create consumer with minimal configuration
+        consumer = Consumer(
+            huey,
+            workers=1,
+            periodic=True,
+            initial_delay=0.1,
+            backoff=1.15,
+            max_delay=10.0,
+            # utc=True,
+            scheduler_interval=1,
+            check_worker_health=False,
+            worker_type='thread'  # Use thread worker instead of process
+        )
+
+        # Disable signal handlers since we're in a thread
+        def dummy_signal_handler():
+            pass
+
+        consumer._set_signal_handlers = dummy_signal_handler
+
+        try:
+            # Start the consumer loop
+            consumer.run()
+        except Exception as e:
+            print(f"Huey consumer error: {e}")
+
+    # Start Huey in a daemon thread
+    huey_thread = threading.Thread(target=start_huey, daemon=True)
+    huey_thread.start()
+
     yield
     await db.disconnect()
 
-app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", lifespan=lifespan)
+app = FastAPI(title="Botcommerce",
+              openapi_url="/api/openapi.json", lifespan=lifespan)
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):
@@ -96,6 +132,7 @@ async def health():
     )
     return {"message": "Server is running"}
 
+
 @app.post("/api/contact-form")
 async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreate):
     async def send_email_task():
@@ -152,9 +189,11 @@ async def log_error(error: dict, notification: deps.Notification):
         slack_message=slack_message
     )
 
+
 @app.post("/trigger-sync")
 def trigger_sync():
-    sync_disconnected_sessions.delay()
+    # sync_disconnected_sessions.delay()
+    sync_disconnected_sessions()
     return {"status": "task enqueued"}
 
 
