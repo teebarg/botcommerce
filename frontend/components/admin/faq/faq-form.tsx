@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -9,12 +7,11 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { api } from "@/apis/base";
 import { FAQ } from "@/schemas";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useCreateFaq, useUpdateFaq } from "@/lib/hooks/useFaq";
 
 interface FaqFormProps {
     faq?: FAQ | null;
@@ -34,12 +31,9 @@ const formSchema = z.object({
     }),
 });
 
-type FaqFormValues = z.infer<typeof formSchema>;
+export type FaqFormValues = z.infer<typeof formSchema>;
 
 export function FaqForm({ faq, onCancel }: FaqFormProps) {
-    const invalidate = useInvalidate();
-    const [loading, setLoading] = useState<boolean>(false);
-
     const form = useForm<FaqFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -50,29 +44,18 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
         },
     });
 
+    const { mutateAsync: createFaq, isPending: createLoading } = useCreateFaq();
+    const { mutateAsync: updateFaq, isPending: updateLoading } = useUpdateFaq();
+
     const onSubmit = async (values: FaqFormValues) => {
-        setLoading(true);
-        try {
-            if (faq) {
-                const { error } = await api.patch<FAQ>(`/faq/${faq.id}`, values);
-
-                if (error) throw error;
-                toast.success("FAQ updated successfully");
-            } else {
-                const { error } = await api.post<FAQ>(`/faq`, values);
-
-                if (error) throw error;
-                toast.success("FAQ created successfully");
-            }
-
-            onCancel();
+        if (faq) {
+            await updateFaq({ id: faq.id, data: values });
+        } else {
+            await createFaq(values);
             form.reset();
-            invalidate("faqs");
-        } catch (error) {
-            toast.error("Failed to save FAQ");
-        } finally {
-            setLoading(false);
         }
+
+        onCancel();
     };
 
     return (
@@ -154,7 +137,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                         <Button className="min-w-32" type="button" variant="outline" onClick={onCancel}>
                             Cancel
                         </Button>
-                        <Button disabled={loading} isLoading={loading} type="submit" variant="primary">
+                        <Button disabled={createLoading || updateLoading} isLoading={createLoading || updateLoading} type="submit" variant="primary">
                             {faq ? "Update FAQ" : "Create FAQ"}
                         </Button>
                     </div>

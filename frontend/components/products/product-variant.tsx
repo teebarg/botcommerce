@@ -46,7 +46,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
             status: "IN_STOCK",
             price: 0,
             old_price: 0,
-            inventory: 0,
+            inventory: 1,
             size: "",
             color: "",
         },
@@ -70,8 +70,6 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
         }
 
         toast.success(`Variant ${editingVariant?.id ? "updated" : "created"} successfully`);
-        invalidate("products");
-        invalidate("product-search");
         form.reset();
         setLoading(false);
         setEditingVariant(null);

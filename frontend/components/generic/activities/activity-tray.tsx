@@ -1,45 +1,25 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Bell } from "nui-react-icons";
 
 import ActivityView from "./activity";
 
-import { Activity } from "@/schemas";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { api } from "@/apis";
 import { useWebSocket } from "@/providers/websocket";
+import { useMyActivities } from "@/lib/hooks/useActivities";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 const ActivityTray: React.FC = () => {
-    const [activities, setActivities] = useState<Activity[]>([]);
-
-    const [loading, setLoading] = useState<boolean>(true);
+    const invalidate = useInvalidate()
     const { currentMessage, messages } = useWebSocket();
-
-    useEffect(() => {
-        fetchActivities();
-    }, []);
+    const { data: activities, isLoading } = useMyActivities();
 
     useEffect(() => {
         if (currentMessage?.type === "activities") {
-            setActivities((prev) => [currentMessage, ...prev]);
+            invalidate("activities")
         }
     }, [messages]);
-
-    const fetchActivities = async () => {
-        setLoading(true);
-        const { data: activities, error } = await api.activities.getMyActivities();
-
-        if (!activities || error) {
-            return;
-        }
-        setActivities(activities);
-        setLoading(false);
-    };
-
-    const onRemove = async (id: string | number) => {
-        setActivities((prev) => prev.filter((activity) => activity.id !== id));
-    };
 
     return (
         <DropdownMenu>
@@ -50,7 +30,7 @@ const ActivityTray: React.FC = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[450px] p-0" sideOffset={5}>
                 <div className="max-h-[calc(100vh-100px)] overflow-y-auto overflow-x-hidden">
-                    {loading ? <div className="h-full p-4">Loading...</div> : <ActivityView activities={activities} onRemove={onRemove} />}
+                    {isLoading ? <div className="h-full p-4">Loading...</div> : <ActivityView activities={activities} />}
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>

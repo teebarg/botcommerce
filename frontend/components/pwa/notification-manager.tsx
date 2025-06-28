@@ -119,7 +119,7 @@ const PushNotificationManager: React.FC = () => {
         const permissionGranted = await requestNotificationPermission();
 
         if (!permissionGranted) {
-            toast.error("Please grant notification permission");
+            // toast.error("Please grant notification permission");
 
             return;
         }

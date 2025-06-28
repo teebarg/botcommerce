@@ -12,8 +12,8 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     const invalidate = useInvalidate();
     const { shopSettings } = useStore();
 
-    const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0].color || null);
-    const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0].size || null);
+    const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0]?.color || null);
+    const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0]?.size || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
     const [loading, setLoading] = useState<boolean>(false);

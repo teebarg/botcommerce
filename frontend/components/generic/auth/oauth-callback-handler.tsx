@@ -5,10 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import React from "react";
 
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 import { Token } from "@/schemas";
 import { setCookie } from "@/lib/util/cookie";
 import PageLoader from "@/components/loader";
+import { tryCatch } from "@/lib/try-catch";
 
 interface OAuthCallbackHandlerProps {
     provider: "google" | "github";
@@ -36,9 +37,11 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
                 return;
             }
 
-            const { data, error: err } = await api.post<Token>(`/auth/oauth/${provider}/callback`, {
-                code,
-            });
+            const { data, error: err } = await tryCatch<Token>(
+                api.post(`/auth/oauth/${provider}/callback`, {
+                    code,
+                })
+            );
 
             if (err) {
                 toast.error(error);

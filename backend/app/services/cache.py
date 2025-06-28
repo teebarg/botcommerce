@@ -20,12 +20,49 @@ class CacheService:
     def __init__(self, redis: Redis):
         self.redis = redis
 
+
+    # get keys
+    def keys(self, pattern: str) -> list:
+        try:
+            return self.redis.keys(pattern)
+        except Exception as e:
+            logger.error(f"Error getting keys from cache: {str(e)}")
+            return []
+
     def ping(self) -> bool:
         try:
             return self.redis.ping()
         except Exception as e:
             logger.error(f"Error pinging Redis: {str(e)}")
             return False
+
+    def hset(self, key: str, mapping: dict) -> bool:
+        try:
+            return self.redis.hset(key, mapping=mapping)
+        except Exception as e:
+            logger.error(f"Error setting cache: {str(e)}")
+            return False
+
+    def hset_field(self, key: str, field: str, value: Any) -> bool:
+        try:
+            return self.redis.hset(key, field, value)
+        except Exception as e:
+            logger.error(f"Error setting cache: {str(e)}")
+            return False
+
+    def hget(self, key: str, field: str) -> str | None:
+        try:
+            return self.redis.hget(key, field)
+        except Exception as e:
+            logger.error(f"Error getting from cache: {str(e)}")
+            return None
+
+    def hgetall(self, key: str) -> dict | None:
+        try:
+            return self.redis.hgetall(key)
+        except Exception as e:
+            logger.error(f"Error getting from cache: {str(e)}")
+            return None
 
     def set(
         self,

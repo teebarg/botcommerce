@@ -4,9 +4,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 import { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/lib/utils";
+import { tryCatch } from "@/lib/try-catch";
 
 interface PaystackPaymentProps {
     cartNumber: string;
@@ -18,22 +19,17 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
     const [loading, setLoading] = useState<boolean>(false);
 
     const handlePayment = async () => {
-        try {
-            setLoading(true);
-            const { data, error } = await api.post<PaymentInitialize>(`/payment/initialize/${cartNumber}`);
+        setLoading(true);
+        const { data, error } = await tryCatch<PaymentInitialize>(api.post(`/payment/initialize/${cartNumber}`));
 
-            if (error || !data) {
-                toast.error(error || "Failed to initialize payment");
+        if (error || !data) {
+            toast.error(error || "Failed to initialize payment");
 
-                return;
-            }
-            // Redirect to Paystack payment page
-            window.location.href = data?.authorization_url ?? "/";
-        } catch (error) {
-            toast.error(`${error} ?? "Failed to initialize payment"`);
-        } finally {
-            setLoading(false);
+            return;
         }
+        // Redirect to Paystack payment page
+        window.location.href = data?.authorization_url ?? "/";
+        setLoading(false);
     };
 
     return (

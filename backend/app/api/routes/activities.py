@@ -10,7 +10,6 @@ from app.prisma_client import prisma as db
 
 from prisma.models import ActivityLog
 
-# Create a router for activities
 router = APIRouter()
 
 @router.get("/", dependencies=[Depends(get_current_superuser)])
@@ -28,8 +27,8 @@ async def index(
     )
     total = await db.activitylog.count()
     return {
-        "activities":activities,
-        "skip":skip * limit,
+        "activities": activities,
+        "skip": skip + limit,
         "limit":limit,
         "total_pages":ceil(total/limit),
         "total_count":total,

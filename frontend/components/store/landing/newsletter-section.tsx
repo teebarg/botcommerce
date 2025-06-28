@@ -5,14 +5,12 @@ import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Message } from "@/schemas";
-import { api } from "@/apis/base";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { useSubscribeNewsletter } from "@/lib/hooks/useGeneric";
 
 const newsletterSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -30,19 +28,12 @@ const NewsletterSection: React.FC = () => {
         },
     });
 
+    const { mutateAsync, isPending } = useSubscribeNewsletter();
+
     const onSubmit = async (data: NewsletterFormValues) => {
-        const { error } = await api.post<Message>("/newsletter", {
-            email: data.email,
-        });
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
+        await mutateAsync({ email: data.email });
 
         setIsSubscribed(true);
-        toast.success("Successfully subscribed to newsletter");
         form.reset();
     };
 
@@ -120,9 +111,9 @@ const NewsletterSection: React.FC = () => {
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-6 mb-12">
-                        {benefits.map((benefit, index: number) => (
+                        {benefits.map((benefit, idx: number) => (
                             <div
-                                key={index}
+                                key={idx}
                                 className="bg-content1 rounded-lg border border-divider p-6 text-center hover:shadow-md transition-shadow"
                             >
                                 <div className={`w-12 h-12 ${benefit.bgColor} rounded-lg flex items-center justify-center mx-auto mb-4`}>
@@ -164,8 +155,8 @@ const NewsletterSection: React.FC = () => {
                                         />
                                         <Button
                                             className="w-full"
-                                            disabled={form.formState.isSubmitting || !form.formState.isValid}
-                                            isLoading={form.formState.isSubmitting}
+                                            disabled={!form.formState.isValid}
+                                            isLoading={isPending}
                                             size="lg"
                                             type="submit"
                                             variant="primary"
@@ -201,12 +192,12 @@ const NewsletterSection: React.FC = () => {
                     <div className="mt-8 text-center">
                         <div className="flex items-center justify-center gap-2 text-sm text-default-600">
                             <div className="flex -space-x-2">
-                                {[1, 2, 3, 4].map((i) => (
+                                {[1, 2, 3, 4].map((idx: number) => (
                                     <div
-                                        key={i}
+                                        key={idx}
                                         className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full border-2 border-content1 flex items-center justify-center text-xs font-bold text-white"
                                     >
-                                        {String.fromCharCode(65 + i)}
+                                        {String.fromCharCode(65 + idx)}
                                     </div>
                                 ))}
                                 <div className="w-8 h-8 bg-content2 border-2 border-content1 rounded-full flex items-center justify-center text-xs font-bold text-default-600">

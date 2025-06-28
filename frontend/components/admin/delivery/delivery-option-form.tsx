@@ -14,8 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { DeliveryOption } from "@/schemas";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 import { ShippingMethodSchema } from "@/schemas";
+import { tryCatch } from "@/lib/try-catch";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -70,9 +71,9 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
         let response = null;
 
         if (initialData?.id) {
-            response = await api.patch<DeliveryOption>(`/delivery/${initialData.id}`, data);
+            response = await tryCatch<DeliveryOption>(api.patch(`/delivery/${initialData.id}`, data));
         } else {
-            response = await api.post<DeliveryOption>("/delivery", data);
+            response = await tryCatch<DeliveryOption>(api.post("/delivery", data));
         }
 
         if (response.error) {

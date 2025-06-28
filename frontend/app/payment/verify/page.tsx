@@ -4,10 +4,11 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 import { Order } from "@/schemas";
 import PaymentLoading from "@/components/store/payment/payment-loading";
 import { deleteCookie } from "@/lib/util/cookie";
+import { tryCatch } from "@/lib/try-catch";
 
 export default function PaymentVerifyPage() {
     const router = useRouter();
@@ -23,7 +24,7 @@ export default function PaymentVerifyPage() {
                 return;
             }
 
-            const { data, error } = await api.get<Order>(`/payment/verify/${reference}`);
+            const { data, error } = await tryCatch<Order>(api.get(`/payment/verify/${reference}`));
 
             if (error) {
                 toast.error(error);

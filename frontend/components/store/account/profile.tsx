@@ -9,12 +9,14 @@ import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useInvalidate, useMe } from "@/lib/hooks/useApi";
+import { useInvalidate } from "@/lib/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
+import { tryCatch } from "@/lib/try-catch";
+import { useAuth } from "@/providers/auth-provider";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -40,8 +42,7 @@ const ProfilePage: React.FC = () => {
     const [editingSection, setEditingSection] = useState<string | null>(null);
     const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
-
-    const { data: user, isLoading, error } = useMe();
+    const { user, loading, error } = useAuth();
 
     const profileForm = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
@@ -61,47 +62,41 @@ const ProfilePage: React.FC = () => {
     });
 
     const handleProfileSave = async (data: ProfileFormValues) => {
-        try {
-            setIsPending(true);
-            const { error } = await api.patch<Message>("/users/me", data);
+        setIsPending(true);
+        const { error } = await tryCatch<Message>(api.patch("/users/me", data));
 
-            if (error) {
-                toast.error(error);
-
-                return;
-            }
-            invalidate("me");
-            toast.success("Profile updated successfully");
-            setEditingSection(null);
-        } catch (error) {
-            toast.error("Failed to update profile");
-        } finally {
+        if (error) {
+            toast.error(error);
             setIsPending(false);
+
+            return;
         }
+        invalidate("me");
+        toast.success("Profile updated successfully");
+        setEditingSection(null);
+        setIsPending(false);
     };
 
     const handlePasswordSave = async (data: PasswordFormValues) => {
-        try {
-            setIsPending(true);
-            const { error } = await api.post<Message>("/users/change-password", {
+        setIsPending(true);
+        const { error } = await tryCatch<Message>(
+            api.post("/users/change-password", {
                 old_password: data.currentPassword,
                 new_password: data.newPassword,
-            });
+            })
+        );
 
-            if (error) {
-                toast.error(error);
-
-                return;
-            }
-            invalidate("me");
-            toast.success("Password updated successfully");
-            setEditingSection(null);
-            passwordForm.reset();
-        } catch (error) {
-            toast.error("Failed to update password");
-        } finally {
+        if (error) {
+            toast.error(error);
             setIsPending(false);
+
+            return;
         }
+        invalidate("me");
+        toast.success("Password updated successfully");
+        setEditingSection(null);
+        passwordForm.reset();
+        setIsPending(false);
     };
 
     const handleEdit = (section: string) => {
@@ -118,13 +113,12 @@ const ProfilePage: React.FC = () => {
         return <ServerError />;
     }
 
-    if (isLoading) {
+    if (loading) {
         return <Skeleton className="h-[600px]" />;
     }
 
     return (
         <div>
-            {/* Header */}
             <div className="border-border border-b transition-colors duration-300">
                 <div className="max-w-5xl mx-auto py-4 flex justify-between items-center">
                     <div>
@@ -135,7 +129,6 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div className="max-w-5xl mx-auto py-8">
-                {/* Profile Information Form */}
                 <div className="bg-card rounded-xl shadow-sm border border-border mb-6 transition-colors duration-300">
                     <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                         <div className="md:flex items-center justify-between">
@@ -215,7 +208,6 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Password Section */}
                 <div className="bg-card rounded-xl shadow-sm border border-border transition-colors duration-300">
                     <div className="p-6 border-b border-border">
                         <div className="md:flex items-center justify-between">

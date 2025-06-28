@@ -4,7 +4,7 @@ import { ImageUpload, Message, CarouselBanner } from "@/schemas";
 
 export const adminApi = {
     carousel: {
-        list: () => api.get<CarouselBanner[]>("/carousel/", { cache: "default" }),
+        list: () => api.get<CarouselBanner[]>("/carousel/"),
         get: (id: number) => api.get<CarouselBanner>(`/carousel/${id}`),
         create: (data: Partial<CarouselBanner>) => api.post<CarouselBanner>("/carousel", data),
         update: (id: number, data: Partial<CarouselBanner>) => api.put<CarouselBanner>(`/carousel/${id}`, data),

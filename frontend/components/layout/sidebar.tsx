@@ -99,7 +99,7 @@ const SubMenuComponent: React.FC<{
                 </div>
             </button>
 
-            <div className={cn("overflow-hidden transition-all duration-300 ease-in-out", isOpen ? "max-h-96" : "max-h-0")}>
+            <div className={cn("overflow-hidden transition-all duration-300 ease-in-out", isOpen ? "" : "max-h-0")}>
                 <div ref={contentRef}>
                     {item.menuItems.map((subItem, index) =>
                         "subMenu" in subItem ? (
@@ -195,6 +195,11 @@ const SideBar: React.FC = () => {
                     href: "/admin/carousel",
                     icon: <Image size={18} />,
                 },
+                {
+                    label: "Online",
+                    href: "/admin/online",
+                    icon: <User size={18} />,
+                },
             ],
         },
         {
@@ -236,12 +241,6 @@ const SideBar: React.FC = () => {
             icon: <User size={20} />,
             suffix: <span className="bg-pink-100 text-pink-500 text-xs font-medium px-2 py-0.5 rounded-full">New</span>,
         },
-        {
-            label: "Documentation",
-            href: "/documentation",
-            icon: <DocumentText size={20} />,
-            disabled: true,
-        },
     ];
 
     const navs = [
@@ -258,8 +257,8 @@ const SideBar: React.FC = () => {
     return (
         <div
             className={cn(
-                "h-screen bg-linear-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
-                "transition-all duration-300 ease-in-out w-88 text-default-500",
+                "max-h-screen bg-linear-to-b from-default-100 via-danger-100 to-secondary-100 border-r border-default-100 flex flex-col",
+                "transition-all duration-300 ease-in-out w-88 text-default-500 overflow-y-auto",
                 {
                     "w-20!": isCollapsed,
                 }

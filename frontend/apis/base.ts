@@ -33,7 +33,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     };
 
     const response = await fetch(url, {
-        cache: options?.method == null || options?.method === "GET" ? "force-cache" : "default",
+        // cache: options?.method == null || options?.method === "GET" ? "force-cache" : "default",
         ...restOptions,
         headers,
         credentials: "include",

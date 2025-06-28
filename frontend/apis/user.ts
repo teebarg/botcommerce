@@ -1,25 +1,25 @@
-import { ApiResult } from "@/lib/try-catch";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
 import { Message, User, Wishlist } from "@/schemas";
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 
 // User API methods
 export const userApi = {
     async me(): ApiResult<User> {
-        return await api.get<User>("/users/me");
+        return await tryCatch<User>(api.get<User>("/users/me"));
     },
     async wishlist(): ApiResult<Wishlist> {
-        return await api.get<Wishlist>("/users/wishlist");
+        return await tryCatch<Wishlist>(api.get<Wishlist>("/users/wishlist"));
     },
     async addWishlist(product_id: number): ApiResult<Wishlist> {
-        return await api.post<Wishlist>("/users/wishlist", { product_id });
+        return await tryCatch<Wishlist>(api.post<Wishlist>("/users/wishlist", { product_id }));
     },
     async deleteWishlist(id: number): ApiResult<Message> {
-        return await api.delete<Message>(`/users/wishlist/${id}`);
+        return await tryCatch<Message>(api.delete<Message>(`/users/wishlist/${id}`));
     },
     async create(input: any): ApiResult<User> {
-        return await api.post<User>("/users", input);
+        return await tryCatch<User>(api.post<User>("/users", input));
     },
     async update(id: number, input: any): ApiResult<User> {
-        return await api.patch<User>(`/users/${id}`, input);
+        return await tryCatch<User>(api.patch<User>(`/users/${id}`, input));
     },
 };
