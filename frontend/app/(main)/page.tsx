@@ -6,7 +6,7 @@ import Image from "next/image";
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
-import { api as baseApi } from "@/apis/base";
+import { api as baseApi } from "@/apis/client";
 import { WishItem } from "@/schemas";
 import { auth } from "@/actions/auth";
 import ProductCard from "@/components/store/products/product-card";
@@ -15,6 +15,7 @@ import { ProductSearch } from "@/schemas/product";
 import CarouselSection from "@/components/store/carousel";
 import { ContactSection } from "@/components/store/landing/contact-section";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
+import { tryCatch } from "@/lib/try-catch";
 
 export const metadata: Metadata = {
     title: "Home",
@@ -24,9 +25,8 @@ export const metadata: Metadata = {
 export default async function Home() {
     const user = await auth();
     const siteConfig = await getSiteConfig();
-    const { data } = await baseApi.get<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
-        "/product/landing-products",
-        { next: { tags: ["featured"] }, cache: "default" }
+    const { data } = await tryCatch<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
+        baseApi.get("/product/landing-products", { next: { tags: ["featured"] }, cache: "default" })
     );
 
     let wishlist: WishItem[] = [];
@@ -38,7 +38,7 @@ export default async function Home() {
     }
 
     return (
-        <div className="">
+        <div>
             <CarouselSection />
 
             <CategoriesSection />

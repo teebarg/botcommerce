@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { useAuth } from "./auth-provider";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 type WebSocketContextType = {
     socket: WebSocket | null;
@@ -36,6 +37,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     const shouldReconnectRef = useRef<boolean>(true);
     const userInitSentRef = useRef<boolean>(false);
     const userRef = useRef(user);
+    const invalidate = useInvalidate();
 
     const connect = async () => {
         try {
@@ -44,29 +46,29 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             socketRef.current = socket;
 
             socket.onopen = () => {
-                console.log("WebSocket connected");
-
                 setReconnecting(false);
                 setReconnectAttempts(0);
-
-                const currentUser = userRef.current;
-
-                if (currentUser) {
-                    console.log("Sending user init on connection:", currentUser.id);
-                    socket.send(JSON.stringify({ type: "init", id: currentUser.id, email: currentUser.email }));
-                    userInitSentRef.current = true;
-                }
 
                 pingIntervalRef.current = setInterval(() => {
                     if (socket.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({ type: "ping" }));
                         socket.send(JSON.stringify({ type: "path", path: pathname }));
+
+                        if (!userInitSentRef.current && userRef.current) {
+                            socket.send(JSON.stringify({ type: "init", id: userRef.current.id, email: userRef.current.email }));
+                            userInitSentRef.current = true;
+                        }
                     }
-                }, 30000);
+                }, 15000);
             };
 
             socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
+
+                if (data?.type === "product-index" && data?.status === "completed") {
+                    invalidate("products");
+                    invalidate("product-search");
+                }
 
                 setMessages((prev) => [...prev, data]);
                 setCurrentMessage(data);
@@ -91,6 +93,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
                     setReconnecting(true);
                     setReconnectAttempts(attempt);
+                    userInitSentRef.current = false;
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         console.log("retrying connection....");

@@ -20,12 +20,12 @@ import { usePathname } from "next/navigation";
 import { DocumentText } from "nui-react-icons";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useMe } from "@/lib/hooks/useApi";
+import { useAuth } from "@/providers/auth-provider";
 
 const AdminMobileMenu: React.FC = () => {
     const pathname = usePathname();
 
-    const { data: user } = useMe();
+    const { user } = useAuth();
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },

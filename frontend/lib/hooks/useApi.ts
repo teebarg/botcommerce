@@ -72,7 +72,7 @@ export const useProductSearch = (searchParams: SearchParams) => {
     return useQuery({
         queryKey: ["product-search", searchParams],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams } }),
-        enabled: !!searchParams, // prevents running when searchParams is null
+        enabled: !!searchParams,
     });
 };
 
@@ -103,7 +103,7 @@ interface ProductParams {
 
 export const useProducts = (searchParams: ProductParams) => {
     return useQuery({
-        queryKey: ["products", { ...searchParams }],
+        queryKey: ["products", JSON.stringify(searchParams)],
         queryFn: async () => await api.get<PaginatedProduct>(`/product/`, { params: { ...searchParams } }),
     });
 };
@@ -221,28 +221,6 @@ export const useStatsTrends = () => {
     return useQuery({
         queryKey: ["stats-trends"],
         queryFn: async () => await api.get<StatsTrends>("/stats/trends"),
-    });
-};
-
-export const useFaqs = () => {
-    return useQuery({
-        queryKey: ["faqs"],
-        queryFn: async () => await api.get<FAQ[]>("/faq/"),
-    });
-};
-
-export const useDeleteFaq = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (id: number) => await api.delete<FAQ>(`/faq/${id}`),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["faqs"] });
-            toast.success("FAQ deleted successfully");
-        },
-        onError: (error) => {
-            toast.error("Failed to delete FAQ" + error);
-        },
     });
 };
 

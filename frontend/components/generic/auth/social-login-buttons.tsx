@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
+import { tryCatch } from "@/lib/try-catch";
+import { toast } from "sonner";
 
 type Props = {
     callbackUrl?: string;
@@ -16,14 +18,16 @@ export default function SocialLoginButtons({ callbackUrl }: Props) {
 
     const handleSocialLogin = async (provider: "google" | "github") => {
         setIsLoading(provider);
-        const { data, error } = await api.get<{ url: string }>(`/auth/oauth/${provider}`);
+        const { data, error } = await tryCatch<{ url: string }>(api.get(`/auth/oauth/${provider}`));
 
-        if (!data || error) {
+        if (error || !data?.url) {
+            toast.error(error);
+            setIsLoading(null);
+
             return;
         }
         const url = new URL(data?.url);
 
-        // Add callbackUrl to the OAuth redirect if provided
         const state = callbackUrl || searchParams.get("callbackUrl");
 
         if (state) {

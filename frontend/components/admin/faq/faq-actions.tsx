@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { toast } from "sonner";
 
 import { FaqForm } from "./faq-form";
 
@@ -12,8 +11,8 @@ import { FAQ } from "@/schemas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { api } from "@/apis/base";
 import Overlay from "@/components/overlay";
+import { useDeleteFaq } from "@/lib/hooks/useFaq";
 
 interface FaqActionsProps {
     faq: FAQ;
@@ -25,20 +24,15 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
     const state = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
 
+    const { mutateAsync } = useDeleteFaq();
+
     const handleDelete = async () => {
         if (!faqToDelete) return;
-        try {
-            const { error } = await api.delete<any>(`/faq/${faqToDelete}`);
-
-            if (error) throw error;
-
+        mutateAsync(faqToDelete).then(() => {
             invalidate("faqs");
-            toast.success("FAQ deleted successfully");
             setFaqToDelete(null);
             state.close();
-        } catch (error) {
-            toast.error("Failed to delete FAQ");
-        }
+        });
     };
 
     return (

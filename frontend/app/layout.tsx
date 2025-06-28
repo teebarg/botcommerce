@@ -14,6 +14,7 @@ import SetShopSettings from "@/components/set-shop-settings";
 import { WebSocketProvider } from "@/providers/websocket";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/auth-provider";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -77,6 +78,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                             <AuthProvider>
                                 <WebSocketProvider>{children}</WebSocketProvider>
                             </AuthProvider>
+                            <ReactQueryDevtools initialIsOpen={false} />
                         </TanstackProviders>
                     </div>
                 </ProgressBar>

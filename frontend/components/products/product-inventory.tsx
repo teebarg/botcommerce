@@ -14,13 +14,11 @@ import ProductUpload from "./product-upload";
 import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
 
 export function ProductInventory() {
     const addState = useOverlayTriggerState({});
     const [isExporting, setIsExporting] = useState<boolean>(false);
     const [isIndexing, setIsIndexing] = useState<boolean>(false);
-    const invalidate = useInvalidate();
 
     const handleExport = async () => {
         setIsExporting(true);
@@ -47,8 +45,6 @@ export function ProductInventory() {
 
             return;
         }
-        invalidate("products");
-        invalidate("product-search");
 
         toast.success("Products indexed successfully");
         setIsIndexing(false);

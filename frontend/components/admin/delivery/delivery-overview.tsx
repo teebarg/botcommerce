@@ -8,8 +8,8 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import DeliveryOptionForm from "./delivery-option-form";
 
 import { Button } from "@/components/ui/button";
-import { DeliveryOption } from "@/schemas";
-import { api } from "@/apis/base";
+import { DeliveryOption, Message } from "@/schemas";
+import { api } from "@/apis/client";
 import { useAdminDeliveryOptions } from "@/lib/hooks/useApi";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { currency } from "@/lib/utils";
 import ServerError from "@/components/generic/server-error";
 import { Skeleton } from "@/components/ui/skeletons";
+import { tryCatch } from "@/lib/try-catch";
 
 const DeliveryOverview: React.FC = () => {
     const addState = useOverlayTriggerState({});
@@ -47,9 +48,9 @@ const DeliveryOverview: React.FC = () => {
     };
 
     const handleDelete = async (id: number) => {
-        const response = await api.delete<DeliveryOption>(`/delivery/${id}`);
+        const { error } = await tryCatch<Message>(api.delete(`/delivery/${id}`));
 
-        if (!response.error) {
+        if (!error) {
             toast.success("Delivery option deleted successfully");
             invalidate("all-delivery");
             invalidate("available-delivery");

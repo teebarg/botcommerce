@@ -10,15 +10,15 @@ import AddressSelect from "../address-select";
 import { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
-import { useMe } from "@/lib/hooks/useApi";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import { Skeleton } from "@/components/ui/skeletons";
+import { useAuth } from "@/providers/auth-provider";
 
 const ShippingAddress = ({ address, email }: { address: Address | null; email: string }) => {
     const router = useRouter();
     const [isPending, setIsPending] = useState<boolean>(false);
     const [cartEmail, setCartEmail] = useState<string>(email);
-    const { data: user, isLoading: meLoading } = useMe();
+    const { user, loading: meLoading } = useAuth();
 
     useEffect(() => {
         setCartEmail(email);

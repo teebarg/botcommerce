@@ -1,11 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { api } from "@/apis";
+import React, { createContext, useContext } from "react";
 import { User } from "@/schemas";
+import { useMe } from "@/lib/hooks/useApi";
 
 type AuthContextType = {
-    user: User | null;
+    user?: User | null;
     loading: boolean;
     error: any;
 };
@@ -13,22 +13,9 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<any>(null);
+    const { data: user, isLoading, error } = useMe();
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            const { data, error } = await api.user.me();
-            setUser(data);
-            setError(error);
-            setLoading(false);
-        };
-
-        fetchUser();
-    }, []);
-
-    return <AuthContext.Provider value={{ user, loading, error }}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={{ user, loading: isLoading, error }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

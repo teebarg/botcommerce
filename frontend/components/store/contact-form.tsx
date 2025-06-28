@@ -1,20 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@components/ui/textarea";
 import { Checkbox } from "@components/ui/checkbox";
 import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis/base";
-import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useContactForm } from "@/lib/hooks/useGeneric";
 
 const contactFormSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -27,11 +24,9 @@ const contactFormSchema = z.object({
     }),
 });
 
-type ContactFormValues = z.infer<typeof contactFormSchema>;
+export type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactForm() {
-    const [isPending, setIsPending] = useState<boolean>(false);
-
     const form = useForm<ContactFormValues>({
         resolver: zodResolver(contactFormSchema),
         defaultValues: {
@@ -44,30 +39,11 @@ export default function ContactForm() {
         },
     });
 
+    const { mutateAsync, isPending } = useContactForm();
+
     const onSubmit = async (data: ContactFormValues) => {
-        try {
-            setIsPending(true);
-            const { error } = await api.post<Message>("/contact-form", {
-                name: data.name,
-                email: data.email,
-                message: data.message,
-                phone: data.phone,
-                subject: data.subject,
-            });
-
-            if (error) {
-                toast.error(error);
-
-                return;
-            }
-
-            toast.success("Message sent successfully");
-            form.reset();
-        } catch (error) {
-            toast.error("Failed to send message");
-        } finally {
-            setIsPending(false);
-        }
+        await mutateAsync(data);
+        form.reset();
     };
 
     return (
