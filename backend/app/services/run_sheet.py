@@ -8,7 +8,7 @@ from fastapi import (
 )
 from openpyxl import Workbook, load_workbook
 
-from app.services.redis_websocket import manager
+from app.services.websocket import manager
 from app.core.logging import logger
 from app.core.utils import generate_data_export_email, send_email
 

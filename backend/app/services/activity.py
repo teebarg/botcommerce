@@ -1,7 +1,7 @@
 from typing import Optional
 from prisma.models import ActivityLog
 from app.prisma_client import prisma as db
-from app.services.redis_websocket import manager
+from app.services.websocket import manager
 from fastapi.encoders import jsonable_encoder
 
 

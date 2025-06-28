@@ -3,7 +3,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.core.logging import logger
 from app.core import deps
 import json, time, httpx
-from app.services.redis_websocket import manager
+from app.services.websocket import manager
 
 router = APIRouter()
 

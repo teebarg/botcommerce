@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+
 import { useAuth } from "./auth-provider";
 
 type WebSocketContextType = {
@@ -39,6 +40,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     const connect = async () => {
         try {
             const socket = new WebSocket(`${process.env.NEXT_PUBLIC_WS}/api/ws/`);
+
             socketRef.current = socket;
 
             socket.onopen = () => {
@@ -48,6 +50,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                 setReconnectAttempts(0);
 
                 const currentUser = userRef.current;
+
                 if (currentUser) {
                     console.log("Sending user init on connection:", currentUser.id);
                     socket.send(JSON.stringify({ type: "init", id: currentUser.id, email: currentUser.email }));
@@ -59,11 +62,12 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                         socket.send(JSON.stringify({ type: "ping" }));
                         socket.send(JSON.stringify({ type: "path", path: pathname }));
                     }
-                }, 10000);
+                }, 30000);
             };
 
             socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
+
                 setMessages((prev) => [...prev, data]);
                 setCurrentMessage(data);
             };
@@ -111,6 +115,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
     useEffect(() => {
         connect();
+
         return () => {
             shouldReconnectRef.current = false;
             clearInterval(pingIntervalRef.current!);
@@ -155,8 +160,10 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
 export const useWebSocket = () => {
     const context = useContext(WebSocketContext);
+
     if (!context) {
         throw new Error("useWebSocket must be used within a WebSocketProvider");
     }
+
     return context;
 };

@@ -43,7 +43,7 @@ from app.core.deps import supabase
 from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
-from tasks.product_tasks import index_products_task, product_upload_task, upload_product_file
+from tasks.product_tasks import index_products_task, product_upload_task
 
 router = APIRouter()
 
@@ -271,8 +271,7 @@ async def reindex_products():
     This operation is performed asynchronously via Celery.
     """
     try:
-        task = index_products_task.delay()
-        # task = index_products_task()
+        task = index_products_task()
         logger.info(f"Task enqueued with ID: {task.id}")
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
@@ -592,7 +591,7 @@ async def upload_products(
 
     contents = await file.read()
     # product_upload_task()
-    product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename).apply_async()
+    product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
     # await upload_product_file.delay(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
     # upload_product_file(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename).delay()
     # task = product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename).delay()

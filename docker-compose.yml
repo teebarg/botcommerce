@@ -181,19 +181,14 @@ services:
     volumes:
       - redis-data:/data
 
-
-  celery:
-    build:
-      context: ./backend
-      args:
-        INSTALL_DEV: ${INSTALL_DEV-false}
-    image: shop-backend:${TAG-latest}
-    command: celery -A celery_app worker --loglevel=info
+  worker:
+    build: .
+    depends_on:
+      - redis
+    command: huey_consumer.py huey_instance.huey
     volumes:
       - ./backend:/app
       - /app/.venv
-    depends_on:
-      - backend
     env_file:
       - ./backend/.env
     networks:

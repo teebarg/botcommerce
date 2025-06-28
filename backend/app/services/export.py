@@ -4,7 +4,7 @@ from fastapi import (
     HTTPException,
 )
 
-from app.services.redis_websocket import manager
+from app.services.websocket import manager
 from app.core.logging import logger
 from app.models.generic import UploadStatus
 

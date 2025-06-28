@@ -4,10 +4,11 @@ from app.core.logging import logger
 from app.services.meilisearch import add_documents_to_index
 from app.models.product import Product
 from app.services.run_sheet import process_products
-
-from app.services.redis_websocket import manager
+from app.services.prisma import with_prisma_connection
+from app.services.websocket import manager
 from app.services.activity import log_activity
 
+@with_prisma_connection
 async def index_products():
     """
     Re-index all products in the database to Meilisearch.
@@ -38,12 +39,8 @@ async def index_products():
         logger.error(f"Error during product re-indexing: {e}")
 
 
+@with_prisma_connection
 async def product_upload(user_id: str, contents: bytes, content_type: str, filename: str):
-    # delay by 30sec
-    await asyncio.sleep(30)
-
-
-async def product_upload1(user_id: str, contents: bytes, content_type: str, filename: str):
     logger.info("Starting product upload processing...")
     try:
         num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user_id)

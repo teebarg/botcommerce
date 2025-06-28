@@ -12,7 +12,7 @@ from app.core.config import settings
 
 
 # tasks/sync_tasks.py
-from app.huey_instance import huey
+from huey_instance import huey
 
 @huey.task()
 def sync_disconnected_sessions():

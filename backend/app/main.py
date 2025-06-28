@@ -17,9 +17,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from datetime import datetime
 from tasks.sync_tasks import sync_disconnected_sessions
-import threading
-from huey.consumer import Consumer
-from app.huey_instance import huey
+# import threading
+# from huey.consumer import Consumer
+# from app.huey_instance import huey
 
 
 @asynccontextmanager
