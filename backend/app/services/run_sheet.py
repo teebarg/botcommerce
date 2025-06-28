@@ -36,6 +36,7 @@ async def generate_excel_file(email: str) -> str:
             "collections": True,
             "brand": True,
             "images": True,
+            "variants": True,
         }
     )
 
@@ -63,6 +64,7 @@ async def generate_excel_file(email: str) -> str:
         "collections",
         "brand",
         "images",
+        "variants",
     ]
     sheet.append(headers)
 
@@ -82,9 +84,9 @@ async def generate_excel_file(email: str) -> str:
                 product.name,
                 product.slug,
                 product.description,
-                product.price,
-                product.old_price,
-                0,
+                product.variants[0].price if product.variants else 0,
+                product.variants[0].old_price if product.variants else 0,
+                product.variants[0].inventory if product.variants else 0,
                 product.ratings,
                 product.image,
                 True,
@@ -92,6 +94,7 @@ async def generate_excel_file(email: str) -> str:
                 collections_str,
                 product.brand.name if product.brand else "",
                 images_str,
+                "|".join([variant.sku for variant in product.variants]),
             ]
         )
 

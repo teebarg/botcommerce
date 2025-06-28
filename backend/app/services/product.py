@@ -1,12 +1,50 @@
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import logger
-from app.services.meilisearch import add_documents_to_index
+from app.services.meilisearch import add_documents_to_index, update_document
 from app.models.product import Product
-from app.services.run_sheet import process_products
+from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
 from app.services.websocket import manager
 from app.services.activity import log_activity
+
+@with_prisma_connection
+async def reindex_product(product_id: int):
+    try:
+        product = await db.product.find_unique(
+            where={"id": product_id},
+            include={
+                "variants": True,
+                "categories": True,
+                "brand": True,
+                "tags": True,
+                "images": True,
+                "collections": True,
+                "reviews": True,
+            }
+        )
+
+        if not product:
+            logger.warning(
+                f"Product with id {product_id} not found for re-indexing.")
+            return
+
+        product_data = prepare_product_data_for_indexing(product)
+
+        update_document(index_name=settings.MEILI_PRODUCTS_INDEX,
+                        document=product_data)
+
+        logger.info(f"Successfully reindexed product {product_id}")
+        await manager.broadcast_to_all(
+            data={
+                "message": "Product re-indexed successfully",
+                "status": "completed",
+            },
+            message_type="product-index",
+        )
+
+    except Exception as e:
+        logger.error(f"Error re-indexing product {product_id}: {e}")
 
 @with_prisma_connection
 async def index_products():
@@ -35,6 +73,13 @@ async def index_products():
             index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
+        await manager.broadcast_to_all(
+            data={
+                "message": "Products re-indexed successfully",
+                "status": "completed",
+            },
+            message_type="product-index",
+        )
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 
@@ -45,7 +90,6 @@ async def product_upload(user_id: str, contents: bytes, content_type: str, filen
     try:
         num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user_id)
 
-        # Re-index
         await index_products()
         logger.info("Re-indexing completed.")
         logger.info("Broadcasting message to user...")
@@ -59,7 +103,6 @@ async def product_upload(user_id: str, contents: bytes, content_type: str, filen
             message_type="sheet-processor",
         )
 
-        # Log the activity
         await log_activity(
             user_id=user_id,
             activity_type="PRODUCT_UPLOAD",
@@ -68,13 +111,23 @@ async def product_upload(user_id: str, contents: bytes, content_type: str, filen
         )
     except Exception as e:
         logger.error(f"Error processing data from file: {e}")
-        # Log failed activity
         await log_activity(
             user_id=user_id,
             activity_type="PRODUCT_UPLOAD",
             description=f"Failed to upload products from file: {filename}",
             is_success=False
         )
+
+@with_prisma_connection
+async def product_export(email: str, user_id: str):
+    download_url = await generate_excel_file(email=email)
+
+    await log_activity(
+        user_id=user_id,
+        activity_type="PRODUCT_EXPORT",
+        description="Exported products to Excel",
+        action_download_url=download_url
+    )
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
@@ -98,7 +151,6 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["max_variant_price"] = max(
         variant_prices) if variant_prices else 0
 
-    # Reviews
     reviews = [r.dict() for r in product.reviews]
     product_dict["reviews"] = reviews
 

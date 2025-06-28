@@ -182,8 +182,9 @@ services:
       - redis-data:/data
 
   worker:
-    build: .
+    image: 'shop-backend:${TAG-latest}'
     depends_on:
+      - backend
       - redis
     command: huey_consumer.py huey_instance.huey
     volumes:

@@ -2,7 +2,7 @@ import redis
 import json
 import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from app.core.logging import logger
 from app.core.config import settings
@@ -65,9 +65,6 @@ class RedisConnectionManager:
         """Connect user and register in Redis."""
         try:
             await websocket.accept()
-            # Accept only if not already accepted
-            # if websocket.client_state.name == "CONNECTING":
-            #     await websocket.accept()
 
             # Start polling if not already started
             self._start_polling()
@@ -98,7 +95,6 @@ class RedisConnectionManager:
     async def disconnect(self, user_id: str) -> None:
         """Disconnect user and clean up Redis."""
         try:
-            # Close local connection
             if user_id in self.local_connections:
                 websocket = self.local_connections[user_id]
                 try:
@@ -118,9 +114,7 @@ class RedisConnectionManager:
     async def send_to_user(self, user_id: str, data: dict, message_type: str = "general") -> bool:
         """Send message to specific user (may be on different server)."""
         try:
-            # Check if user is connected anywhere
             user_info = self.redis_client.hget(self.connections_key, user_id)
-            print("🚀 ~ user_info:", user_info)
             if not user_info:
                 logger.warning(f"User {user_id} not connected")
                 return False
@@ -131,15 +125,13 @@ class RedisConnectionManager:
             message = {
                 **data,
                 "type": message_type,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "target_user": user_id
             }
 
             if target_server == self.server_id:
-                # User is on this server, send directly
                 return await self._send_local_message(user_id, message)
             else:
-                # User is on different server, queue message for that server
                 target_queue = f"ws:messages:{target_server}"
                 self.redis_client.rpush(target_queue, json.dumps(message))
                 return True
@@ -154,14 +146,12 @@ class RedisConnectionManager:
             message = {
                 **data,
                 "type": message_type,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "broadcast": True
             }
 
-            # Add to broadcast queue (all servers will pick this up)
             self.redis_client.rpush(self.broadcast_key, json.dumps(message))
 
-            # Get total connection count
             total_connections = self.redis_client.hlen(self.connections_key)
             return total_connections
 
@@ -211,11 +201,10 @@ class RedisConnectionManager:
 
     async def handle_heartbeat_response(self, user_id: str) -> None:
         """Handle heartbeat response from client."""
-        # Update last seen time in Redis if needed
         user_info = self.redis_client.hget(self.connections_key, user_id)
         if user_info:
             user_data = json.loads(user_info)
-            user_data["last_heartbeat"] = datetime.utcnow().isoformat()
+            user_data["last_heartbeat"] = datetime.now(timezone.utc).isoformat()
             self.redis_client.hset(self.connections_key, user_id, json.dumps(user_data))
 
     async def add_user_to_group(self, user_id: str, group_name: str) -> bool:
@@ -281,18 +270,15 @@ class RedisConnectionManager:
                     data = json.loads(connection_data)
                     server_id = data["server_id"]
 
-                    # Check if server's message queue exists (indicates server is alive)
                     server_queue = f"ws:messages:{server_id}"
                     queue_exists = self.redis_client.exists(server_queue)
 
-                    # If queue doesn't exist and it's not this server, clean up
                     if not queue_exists and server_id != self.server_id:
                         self.redis_client.hdel(self.connections_key, user_id)
                         cleaned_count += 1
                         logger.info(f"Cleaned up connection for user {user_id} from dead server {server_id}")
 
                 except json.JSONDecodeError:
-                    # Invalid data, clean it up
                     self.redis_client.hdel(self.connections_key, user_id)
                     cleaned_count += 1
 
@@ -306,7 +292,7 @@ class RedisConnectionManager:
     async def promote_connection(self, old_id: str, new_id: str, metadata: Optional[dict] = None) -> bool:
         """
         Promote a WebSocket connection from a guest (IP) to an authenticated user.
-        This avoids closing/reconnecting the socket.
+        Need this to avoid closing/reconnecting the socket.
         """
         try:
             if old_id not in self.local_connections:
@@ -316,13 +302,11 @@ class RedisConnectionManager:
             websocket = self.local_connections.pop(old_id)
             self.local_connections[new_id] = websocket
 
-            # Remove old Redis entry
             self.redis_client.hdel(self.connections_key, old_id)
 
-            # Register new Redis entry
             connection_data = {
                 "server_id": self.server_id,
-                "connected_at": datetime.utcnow().isoformat(),
+                "connected_at": datetime.now(timezone.utc).isoformat(),
                 "metadata": metadata or {}
             }
             self.redis_client.hset(
@@ -338,6 +322,4 @@ class RedisConnectionManager:
             logger.error(f"Failed to promote connection from {old_id} to {new_id}: {e}")
             return False
 
-
-# Create the manager instance
 manager = RedisConnectionManager()
