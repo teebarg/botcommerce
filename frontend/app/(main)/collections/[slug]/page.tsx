@@ -5,11 +5,13 @@ import React, { Suspense } from "react";
 import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
-import { api } from "@/apis";
+import { api as clientApi } from "@/apis/client";
 import ServerError from "@/components/generic/server-error";
 import { auth } from "@/actions/auth";
 import NoProductsFound from "@/components/store/products/no-products";
-import { WishItem } from "@/schemas";
+import { Collection, WishItem } from "@/schemas";
+import { tryCatch } from "@/lib/try-catch";
+import { api } from "@/apis";
 
 type Params = Promise<{ slug: string }>;
 
@@ -24,7 +26,7 @@ type SearchParams = Promise<{
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: collection } = await api.collection.getBySlug(slug);
+    const { data: collection } = await tryCatch<Collection>(clientApi.get(`/collection/slug/${slug}`));
 
     if (!collection) {
         notFound();
@@ -37,7 +39,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
     const user = await auth();
     const { minPrice, maxPrice, brand_id, cat_ids, page, sortBy } = (await searchParams) || {};
     const { slug } = await params;
-    const { data: collection } = await api.collection.getBySlug(slug).then((collection) => collection);
+    const { data: collection } = await tryCatch<Collection>(clientApi.get(`/collection/slug/${slug}`));
 
     if (!collection) {
         notFound();

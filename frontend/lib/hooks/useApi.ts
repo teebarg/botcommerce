@@ -8,9 +8,7 @@ import {
     ChatMessage,
     ConversationStatus,
     DeliveryOption,
-    FAQ,
     PaginatedConversation,
-    PaginatedOrder,
     PaginatedReview,
     PaginatedUser,
     Review,
@@ -73,23 +71,6 @@ export const useProductSearch = (searchParams: SearchParams) => {
         queryKey: ["product-search", searchParams],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams } }),
         enabled: !!searchParams,
-    });
-};
-
-interface OrderSearchParams {
-    query?: string;
-    status?: string;
-    skip?: number;
-    take?: number;
-    customer_id?: number;
-    sort?: string;
-}
-
-export const useOrders = (searchParams: OrderSearchParams) => {
-    return useQuery({
-        queryKey: ["orders", { ...searchParams }],
-        queryFn: async () => await api.get<PaginatedOrder>(`/order/`, { params: { ...searchParams } }),
-        enabled: !!searchParams, // prevents running when searchParams is null
     });
 };
 

@@ -4,9 +4,6 @@ import { api } from "@/apis/client";
 
 // User API methods
 export const userApi = {
-    async me(): ApiResult<User> {
-        return await tryCatch<User>(api.get<User>("/users/me"));
-    },
     async wishlist(): ApiResult<Wishlist> {
         return await tryCatch<Wishlist>(api.get<Wishlist>("/users/wishlist"));
     },

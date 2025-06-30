@@ -1,21 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
-import { toast } from "sonner";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Order, OrderStatus } from "@/schemas";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useChangeOrderStatus } from "@/lib/hooks/useOrder";
 
 interface OrderProcessingActionProps {
     order: Order;
 }
 
 const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) => {
-    const invalidate = useInvalidate();
-    const [loading, setLoading] = useState<boolean>(false);
-
     const statusConfig: Record<
         "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELED" | "PAID" | "REFUNDED",
         {
@@ -79,21 +74,11 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
 
     const config = statusConfig[order.status];
 
+    const { mutateAsync: changeOrderStatus, isPending } = useChangeOrderStatus();
+
     const handleStatusChange = async (orderId: number, newStatus: OrderStatus | null) => {
         if (!newStatus) return;
-        setLoading(true);
-        const { error } = await api.order.status(orderId, newStatus);
-
-        if (error) {
-            toast.error(error);
-            setLoading(false);
-
-            return;
-        }
-
-        invalidate("orders");
-        toast.success("Order status updated successfully");
-        setLoading(false);
+        await changeOrderStatus({ id: orderId, status: newStatus });
     };
 
     return (
@@ -101,8 +86,8 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             {config.nextStatus && (
                 <Button
                     className="flex-1 w-full"
-                    disabled={loading}
-                    isLoading={loading}
+                    disabled={isPending}
+                    isLoading={isPending}
                     variant={config.variant}
                     onClick={() => handleStatusChange(order.id, config.nextStatus)}
                 >

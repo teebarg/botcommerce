@@ -27,9 +27,5 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
         return notFound();
     }
 
-    if (error || !order) {
-        notFound();
-    }
-
     return <OrderConfirmation order={order} status={order.payment_status} />;
 }

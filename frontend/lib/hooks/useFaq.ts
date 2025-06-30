@@ -1,10 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { useInvalidate } from "./useApi";
+
 import { api } from "@/apis/client";
 import { FAQ, Message } from "@/schemas";
 import { FaqFormValues } from "@/components/admin/faq/faq-form";
-import { useInvalidate } from "./useApi";
 
 export const useFaqs = () => {
     return useQuery({
@@ -15,6 +16,7 @@ export const useFaqs = () => {
 
 export const useCreateFaq = () => {
     const invalidate = useInvalidate();
+
     return useMutation({
         mutationFn: async (data: FaqFormValues) =>
             await api.post<Message>("/faq", {
@@ -32,6 +34,7 @@ export const useCreateFaq = () => {
 
 export const useUpdateFaq = () => {
     const invalidate = useInvalidate();
+
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: FaqFormValues }) => await api.patch<Message>(`/faq/${id}`, data),
         onSuccess: () => {

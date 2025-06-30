@@ -22,11 +22,6 @@ const BrandView: React.FC = () => {
         return <ServerError />;
     }
 
-    // const deleteBrand = async (id: number) => {
-    //     "use server";
-    //     await api.brand.delete(id);
-    // };
-
     if (isLoading) {
         return <TableSkeleton />;
     }

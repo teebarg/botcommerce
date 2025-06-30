@@ -39,7 +39,7 @@ from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
 from tasks.product_tasks import index_products_task, product_upload_task, product_export_task, reindex_product_task
-from app.services.product_service import reindex_product
+from app.services.product import reindex_product
 
 router = APIRouter()
 

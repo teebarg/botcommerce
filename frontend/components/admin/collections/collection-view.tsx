@@ -11,13 +11,30 @@ import { Collection } from "@/schemas/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useCollections } from "@/lib/hooks/useCollection";
+import ServerError from "@/components/generic/server-error";
+import { Skeleton } from "@/components/ui/skeletons";
 
 interface Props {
-    collections: Collection[];
-    deleteAction: (id: number) => void;
+    search?: string;
 }
 
-const CollectionView: React.FC<Props> = ({ collections, deleteAction }) => {
+const CollectionView: React.FC<Props> = ({ search }) => {
+    const { data, error, isLoading } = useCollections({ search });
+
+    const collections = data?.collections;
+
+    if (error) {
+        return <ServerError />;
+    }
+    if (isLoading) {
+        return (
+            <div className="px-2 md:px-10 py-8">
+                <Skeleton className="h-192" />
+            </div>
+        );
+    }
+
     return (
         <div className="px-2 md:px-10 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -62,7 +79,7 @@ const CollectionView: React.FC<Props> = ({ collections, deleteAction }) => {
                                 </TableCell>
                                 <TableCell>{new Date(collection.created_at as string).toLocaleDateString()}</TableCell>
                                 <TableCell className="flex justify-end">
-                                    <CollectionActions collection={collection} deleteAction={deleteAction} />
+                                    <CollectionActions collection={collection} />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -79,9 +96,7 @@ const CollectionView: React.FC<Props> = ({ collections, deleteAction }) => {
             <div className="md:hidden">
                 <div>
                     <div className="flex flex-col gap-3">
-                        {collections?.map((collection: Collection, idx: number) => (
-                            <CollectionItem key={idx} collection={collection} deleteAction={deleteAction} />
-                        ))}
+                        {collections?.map((collection: Collection, idx: number) => <CollectionItem key={idx} collection={collection} />)}
                     </div>
 
                     {collections?.length === 0 && (

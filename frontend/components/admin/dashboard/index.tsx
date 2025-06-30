@@ -5,7 +5,7 @@ import { ShoppingCart, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useOrders } from "@/lib/hooks/useApi";
+import { useOrders } from "@/lib/hooks/useOrder";
 import { Order } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";

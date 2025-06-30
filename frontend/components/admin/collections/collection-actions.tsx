@@ -2,8 +2,6 @@
 
 import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Confirm } from "@/components/generic/confirm";
@@ -12,26 +10,22 @@ import { CollectionForm } from "@/components/admin/collections/collection-form";
 import { Collection } from "@/schemas/product";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
+import { useDeleteCollection } from "@/lib/hooks/useCollection";
 
 interface Props {
     collection: Collection;
-    deleteAction: (id: number) => void;
 }
 
-const CollectionActions: React.FC<Props> = ({ collection, deleteAction }) => {
+const CollectionActions: React.FC<Props> = ({ collection }) => {
     const editState = useOverlayTriggerState({});
     const state = useOverlayTriggerState({});
-    const router = useRouter();
+
+    const deleteCollection = useDeleteCollection();
 
     const onConfirmDelete = async () => {
-        try {
-            await deleteAction(collection.id);
-            router.refresh();
-            toast.success(`Deleted ${collection.name}`);
+        deleteCollection.mutateAsync(collection.id).then(() => {
             state.close();
-        } catch (error) {
-            toast.error(`Error deleting ${collection.name}`);
-        }
+        });
     };
 
     return (

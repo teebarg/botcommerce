@@ -5,10 +5,9 @@ import { Collection } from "@/schemas/product";
 
 interface CollectionItemProps {
     collection: Collection;
-    deleteAction: (id: number) => void;
 }
 
-const CollectionItem = ({ collection, deleteAction }: CollectionItemProps) => {
+const CollectionItem = ({ collection }: CollectionItemProps) => {
     return (
         <div className="border border-default rounded-lg overflow-hidden bg-content1">
             <div className="aspect-video w-full relative">
@@ -21,7 +20,7 @@ const CollectionItem = ({ collection, deleteAction }: CollectionItemProps) => {
                 </div>
                 <p className="text-sm text-default-500 mb-2 line-clamp-2">{collection.slug}</p>
                 <div className="flex justify-between items-center">
-                    <CollectionActions collection={collection} deleteAction={deleteAction} />
+                    <CollectionActions collection={collection} />
                 </div>
             </div>
         </div>

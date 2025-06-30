@@ -1,24 +1,20 @@
-import { Metadata } from "next";
+"use client";
+
 import OrderOverview from "@modules/account/components/order-overview";
-import { notFound } from "next/navigation";
 
-import { api } from "@/apis";
 import ServerError from "@/components/generic/server-error";
+import { useOrders } from "@/lib/hooks/useOrder";
+import { Skeleton } from "@/components/ui/skeletons";
 
-export const metadata: Metadata = {
-    title: "Orders",
-    description: "Overview of your previous orders.",
-};
-
-export default async function Orders() {
-    const { data, error } = await api.order.query({ take: 20 });
+export default function Orders() {
+    const { data, error, isLoading } = useOrders({ take: 20 });
 
     if (error) {
         return <ServerError />;
     }
 
-    if (!data) {
-        notFound();
+    if (isLoading) {
+        return <Skeleton className="h-192" />;
     }
 
     return (
@@ -28,7 +24,7 @@ export default async function Orders() {
                 <p>View your previous orders and their status. You can also create returns or exchanges for your orders if needed.</p>
             </div>
             <div>
-                <OrderOverview orders={data.orders} />
+                <OrderOverview orders={data?.orders || []} />
             </div>
         </div>
     );

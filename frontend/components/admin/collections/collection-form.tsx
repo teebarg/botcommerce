@@ -1,13 +1,24 @@
 "use client";
 
-import React, { forwardRef, useActionState, useEffect, useRef } from "react";
+import type { Collection } from "@/schemas/product";
+
+import React, { forwardRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@components/ui/input";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { mutateCollection } from "@/actions/product";
-import { Collection } from "@/schemas/product";
+import { useCreateCollection, useUpdateCollection } from "@/lib/hooks/useCollection";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+
+const CollectionFormSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    is_active: z.boolean().default(true),
+});
+
+export type CollectionFormValues = z.infer<typeof CollectionFormSchema>;
 
 interface Props {
     collection?: Collection;
@@ -15,55 +26,100 @@ interface Props {
     onClose?: () => void;
 }
 
-interface ChildRef {
-    // submit: () => void;
-}
+interface ChildRef {}
 
-const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, collection = { name: "", is_active: true } }, ref) => {
+const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, collection }, ref) => {
     const isCreate = type === "create";
+    const defaultValues: CollectionFormValues = {
+        name: collection?.name || "",
+        is_active: collection?.is_active ?? true,
+    };
 
-    const [state, formAction, isPending] = useActionState(mutateCollection, {
-        success: false,
-        message: "",
-        data: null,
+    const form = useForm<CollectionFormValues>({
+        resolver: zodResolver(CollectionFormSchema),
+        defaultValues,
     });
 
-    const formRef = useRef<HTMLFormElement>(null);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        control,
+    } = form;
+
+    const createMutation = useCreateCollection();
+    const updateMutation = useUpdateCollection();
+    const isPending = createMutation.isPending || updateMutation.isPending;
 
     useEffect(() => {
-        if (state.data) {
-            toast.success("Successful");
-            // Leave the slider open and clear form
-            if (formRef.current) {
-                formRef.current.reset();
-                onClose?.();
-                // router.refresh();
-            }
+        reset(defaultValues);
+    }, [collection]);
+
+    useEffect(() => {
+        if (createMutation.isSuccess || updateMutation.isSuccess) {
+            reset();
+            onClose?.();
         }
-    }, [state.data, state.message, state.success]);
+    }, [createMutation.isSuccess, updateMutation.isSuccess]);
+
+    const onSubmit = async (data: CollectionFormValues) => {
+        if (isCreate) {
+            createMutation.mutate(data);
+        } else if (collection?.id) {
+            updateMutation.mutate({ id: collection.id, data });
+        }
+    };
 
     return (
         <div className="mx-auto w-full py-6 px-2">
             <h3 className="text-lg font-medium mb-4">{isCreate ? "Create Collection" : "Update Collection"}</h3>
-            <form ref={formRef} action={formAction} className="h-full flex flex-col">
-                <input readOnly className="hidden" name="type" type="text" value={type} />
-                <input readOnly className="hidden" name="id" type="text" value={collection.id} />
-                <div className="space-y-6">
-                    <Input required defaultValue={collection.name} label="Name" name="name" placeholder="Ex. Gown" />
-                    <div className="flex items-center gap-2">
-                        <Switch defaultChecked={collection.is_active} name="is_active" />
-                        <label>Is Active</label>
+            <Form {...form}>
+                <form className="h-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+                    <div className="space-y-6">
+                        <div>
+                            <Input
+                                label="Name"
+                                placeholder="Ex. Gown"
+                                {...register("name")}
+                                required
+                                disabled={isPending}
+                                error={errors.name?.message}
+                            />
+                            {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>}
+                        </div>
+                        <FormField
+                            control={control}
+                            name="is_active"
+                            render={({ field }) => (
+                                <FormItem className="flex items-center justify-between rounded-lg border border-divider px-4 py-2">
+                                    <div className="space-y-0.5">
+                                        <FormLabel>Active</FormLabel>
+                                    </div>
+                                    <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
                     </div>
-                </div>
-                <div className="flex justify-end space-x-2 mt-6">
-                    <Button aria-label="cancel" className="min-w-32" variant="destructive" onClick={onClose}>
-                        Cancel
-                    </Button>
-                    <Button aria-label="update" className="min-w-32" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
-                        {isCreate ? "Submit" : "Update"}
-                    </Button>
-                </div>
-            </form>
+                    <div className="flex justify-end space-x-2 mt-6">
+                        <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="destructive" onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button
+                            aria-label={isCreate ? "submit" : "update"}
+                            className="min-w-32"
+                            disabled={isPending}
+                            isLoading={isPending}
+                            type="submit"
+                            variant="primary"
+                        >
+                            {isCreate ? "Submit" : "Update"}
+                        </Button>
+                    </div>
+                </form>
+            </Form>
         </div>
     );
 });
