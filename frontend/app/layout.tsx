@@ -10,11 +10,12 @@ import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
 import { getSiteConfig } from "@/lib/config";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { api } from "@/apis";
+import { api } from "@/apis/client";
 import SetShopSettings from "@/components/set-shop-settings";
 import { WebSocketProvider } from "@/providers/websocket";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/auth-provider";
+import { tryCatch } from "@/lib/try-catch";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -55,7 +56,7 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    const { data: shopSettings } = await api.shopSettings.getPublicSettings();
+    const { data: shopSettings } = await tryCatch<Record<string, string>>(api.get("/shop-settings/public"));
 
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">

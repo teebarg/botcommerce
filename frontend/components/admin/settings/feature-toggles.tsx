@@ -1,11 +1,10 @@
 "use client";
 
 import React from "react";
-import { toast } from "sonner";
 
 import { Switch } from "@/components/ui/switch";
 import { ShopSettings } from "@/schemas";
-import { api } from "@/apis";
+import { useSyncShopDetails } from "@/lib/hooks/useGeneric";
 
 interface FeatureTogglesProps {
     toggles: ShopSettings[];
@@ -42,28 +41,14 @@ const defaultFeatures = [
 export function FeatureToggles({ toggles }: FeatureTogglesProps) {
     const [isLoading, setIsLoading] = React.useState<Record<string, boolean>>({});
 
-    /**
-     * Toggles the feature's active state.
-     *
-     * This function checks if a feature toggle with the given key already exists. If it does,
-     * it updates the toggle's state based on the `checked` parameter. If it doesn't exist,
-     * it creates a new toggle with the provided key and sets its state.
-     *
-     * @param featureKey - The unique key representing the feature toggle.
-     * @param checked - A boolean indicating whether the feature is active or not.
-     */
+    const syncShopDetailsMutation = useSyncShopDetails();
+
     const handleToggle = async (featureKey: string, checked: boolean) => {
         setIsLoading((prev) => ({ ...prev, [featureKey]: true }));
 
-        const { error } = await api.shopSettings.syncShopDetails({
+        syncShopDetailsMutation.mutate({
             [featureKey]: checked.toString(),
         });
-
-        if (error) {
-            toast.error("Failed to update feature");
-        } else {
-            toast.success("Feature updated successfully");
-        }
 
         setIsLoading((prev) => ({ ...prev, [featureKey]: false }));
     };

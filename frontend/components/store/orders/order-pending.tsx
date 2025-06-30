@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowRight, Clock } from "nui-react-icons";
-import { useEffect, useState } from "react";
 
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
@@ -9,32 +8,18 @@ import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
-import { BankDetails, Order, PaymentStatus } from "@/schemas";
-import { api } from "@/apis";
+import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
+import { useBankDetails } from "@/lib/hooks/useApi";
 
 type OrderConfirmationProps = {
-    status: PaymentStatus;
     order: Order;
     onRetry?: () => void;
     onContinueShopping?: () => void;
 };
 
-// Pending Payment Component
 const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
-    const [bankDetails, setBankDetails] = useState<BankDetails[]>([]);
-
-    useEffect(() => {
-        const fetchBankDetails = async () => {
-            const { data, error } = await api.bank.getBankDetails("no-cache");
-
-            if (!error) {
-                setBankDetails(data || []);
-            }
-        };
-
-        fetchBankDetails();
-    }, []);
+    const { data: bankDetails } = useBankDetails();
 
     return (
         <div className="w-full max-w-2xl mx-auto">
@@ -56,15 +41,15 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
                     <div className="space-y-3">
                         <div className="flex justify-between">
                             <span className="text-default-500">Bank Name</span>
-                            <span className="font-medium">{bankDetails[0]?.bank_name}</span>
+                            <span className="font-medium">{bankDetails?.[0]?.bank_name}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-default-500">Account Name</span>
-                            <span className="font-medium">{bankDetails[0]?.account_name}</span>
+                            <span className="font-medium">{bankDetails?.[0]?.account_name}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-default-500">Account Number</span>
-                            <span className="font-medium">{bankDetails[0]?.account_number}</span>
+                            <span className="font-medium">{bankDetails?.[0]?.account_number}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-default-500">Reference</span>

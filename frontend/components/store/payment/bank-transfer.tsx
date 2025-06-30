@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/utils";
-import { useBank } from "@/lib/hooks/useApi";
+import { useBankDetails } from "@/lib/hooks/useApi";
 import { useCompleteCart } from "@/lib/hooks/useCart";
 
 interface BankTransferProps {
@@ -13,7 +13,7 @@ interface BankTransferProps {
 const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
     const completeCart = useCompleteCart();
 
-    const { data: bankDetails } = useBank();
+    const { data: bankDetails } = useBankDetails();
 
     const onPaymentCompleted = async () => {
         completeCart.mutate({

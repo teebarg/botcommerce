@@ -27,9 +27,9 @@ export const useMe = () => {
     });
 };
 
-export const useBank = () => {
+export const useBankDetails = () => {
     return useQuery({
-        queryKey: ["bank"],
+        queryKey: ["bank-details"],
         queryFn: async () => {
             return await api.get<BankDetails[]>("/bank-details/");
         },
