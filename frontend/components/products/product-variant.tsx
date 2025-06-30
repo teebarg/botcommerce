@@ -4,7 +4,6 @@ import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { Edit, Trash2 } from "lucide-react";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -13,9 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/schemas";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { currency } from "@/lib/utils";
+import { useCreateVariant, useUpdateVariant, useDeleteVariant } from "@/lib/hooks/useProduct";
 
 interface ProductVariantsProps {
     variants: ProductVariant[];
@@ -38,7 +36,9 @@ const variantFormSchema = z.object({
 const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants = [] }) => {
     const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const invalidate = useInvalidate();
+    const createVariant = useCreateVariant();
+    const updateVariant = useUpdateVariant();
+    const deleteVariantMutation = useDeleteVariant();
 
     const form = useForm<z.infer<typeof variantFormSchema>>({
         resolver: zodResolver(variantFormSchema),
@@ -53,26 +53,18 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
     });
 
     async function onSubmit(values: z.infer<typeof variantFormSchema>) {
-        let response;
-
         setLoading(true);
-        if (editingVariant?.id) {
-            response = await api.product.updateVariant({ ...values, id: editingVariant.id });
-        } else {
-            response = await api.product.createVariant({ productId, ...values });
-        }
-
-        if (response.error) {
-            toast.error(`Error - ${response.error}`);
+        try {
+            if (editingVariant?.id) {
+                await updateVariant.mutateAsync({ ...values, id: editingVariant.id });
+            } else {
+                await createVariant.mutateAsync({ productId, ...values });
+            }
+            form.reset();
+            setEditingVariant(null);
+        } finally {
             setLoading(false);
-
-            return;
         }
-
-        toast.success(`Variant ${editingVariant?.id ? "updated" : "created"} successfully`);
-        form.reset();
-        setLoading(false);
-        setEditingVariant(null);
     }
 
     const handleEdit = (variant: ProductVariant) => {
@@ -86,16 +78,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
     };
 
     const deleteVariant = (id: number) => {
-        api.product
-            .deleteVariant(id)
-            .then(() => {
-                toast.success(`Variant deleted successfully`);
-                invalidate("products");
-                invalidate("product-search");
-            })
-            .catch((error) => {
-                toast.error(`Error - ${error as string}`);
-            });
+        deleteVariantMutation.mutate(id);
     };
 
     return (

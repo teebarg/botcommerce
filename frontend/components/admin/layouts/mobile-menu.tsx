@@ -62,7 +62,6 @@ const AdminMobileMenu: React.FC = () => {
                 </div>
             </div>
 
-            {/* Search Bar */}
             <div className="p-4 border-b border-content2">
                 <div className="relative">
                     <input
@@ -74,7 +73,6 @@ const AdminMobileMenu: React.FC = () => {
                 </div>
             </div>
 
-            {/* Menu Items */}
             <nav className="py-2">
                 {menuItems.map((item) => (
                     <Link
@@ -93,7 +91,6 @@ const AdminMobileMenu: React.FC = () => {
                 ))}
             </nav>
 
-            {/* Logout Button */}
             <div className="p-4 border-t border-content2">
                 <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
                     <LogOut size={20} />

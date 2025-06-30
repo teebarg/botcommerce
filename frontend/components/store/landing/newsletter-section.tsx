@@ -112,10 +112,7 @@ const NewsletterSection: React.FC = () => {
 
                     <div className="grid md:grid-cols-3 gap-6 mb-12">
                         {benefits.map((benefit, idx: number) => (
-                            <div
-                                key={idx}
-                                className="bg-content1 rounded-lg border border-divider p-6 text-center hover:shadow-md transition-shadow"
-                            >
+                            <div key={idx} className="bg-content1 rounded-lg border border-divider p-6 text-center hover:shadow-md transition-shadow">
                                 <div className={`w-12 h-12 ${benefit.bgColor} rounded-lg flex items-center justify-center mx-auto mb-4`}>
                                     <benefit.icon className={`h-6 w-6 ${benefit.color}`} />
                                 </div>

@@ -20,11 +20,9 @@ interface Props {
 }
 
 const CollectionView: React.FC<Props> = ({ search }) => {
-    const { data, error, isLoading } = useCollections({ search });
+    const { data: collections, error, isLoading } = useCollections(search);
 
-    const collections = data?.collections;
-
-    if (error) {
+    if (error || !collections) {
         return <ServerError />;
     }
     if (isLoading) {

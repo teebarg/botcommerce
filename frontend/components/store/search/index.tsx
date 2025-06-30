@@ -4,17 +4,18 @@ import React, { ChangeEvent, useState } from "react";
 import { MagnifyingGlassMini } from "nui-react-icons";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import { Kbd } from "@/components/ui/kbd";
 import { Button } from "@/components/ui/button";
 import NoProductsFound from "@/components/store/products/no-products";
 import { debounce } from "@/lib/utils";
 import { ProductSearch } from "@/schemas/product";
-import { api } from "@/apis";
 import ProductCard from "@/components/store/products/product-card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SearchInput from "@/components/store/search/search-input";
+import { useProductSearch } from "@/lib/hooks/useProduct";
+import { Skeleton } from "@/components/ui/skeletons";
+import ServerError from "@/components/generic/server-error";
 
 interface Props {
     className?: string;
@@ -24,29 +25,11 @@ const Search: React.FC<Props> = ({ className }) => {
     const router = useRouter();
     const state = useOverlayTriggerState({});
     const modalState = useOverlayTriggerState({});
-    const [products, setProducts] = useState<ProductSearch[]>([]);
     const [value, setValue] = useState("");
+    const { data, error, isLoading } = useProductSearch({ search: value, limit: 15, page: 1 });
 
-    const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValue(event?.target?.value);
-        try {
-            const queryParams: any = {
-                query: event?.target?.value,
-                limit: 15,
-                page: 1,
-            };
-            const { data, error } = await api.product.search({ ...queryParams });
-
-            if (error) {
-                toast.error(error);
-
-                return;
-            }
-
-            setProducts(data?.products ?? []);
-        } catch (error) {
-            toast.error(`Error occurred fetching products - ${error}`);
-        }
     };
 
     const onSubmit = () => {
@@ -58,6 +41,10 @@ const Search: React.FC<Props> = ({ className }) => {
     const onReset = () => {
         setValue("");
     };
+
+    if (error) {
+        return <ServerError />;
+    }
 
     return (
         <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
@@ -84,14 +71,16 @@ const Search: React.FC<Props> = ({ className }) => {
                             <Kbd className="md:block border-none px-2 py-1 font-medium text-[0.5rem] cursor-pointer">ESC</Kbd>
                         </button>
                     </div>
-                    <div className="max-h-[80vh] min-h-[70vh] overflow-y-auto">
-                        {products.length == 0 && <NoProductsFound />}
-                        <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
-                            {products.map((product: ProductSearch, index: number) => (
-                                <ProductCard key={index} product={product} />
-                            ))}
+                    {isLoading ? (
+                        <Skeleton className="h-[70vh]" />
+                    ) : (
+                        <div className="h-[70vh] overflow-y-auto">
+                            {data?.products.length == 0 && <NoProductsFound />}
+                            <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
+                                {data?.products.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </DialogContent>
         </Dialog>

@@ -26,7 +26,6 @@ const InstallPrompt: React.FC = () => {
         setHasDismissed(true);
     };
 
-    // Hide if already installed (standalone mode)
     useEffect(() => {
         if (window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone) {
             setIsStandalone(true);
@@ -34,7 +33,6 @@ const InstallPrompt: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        // Set isOpen after hydration
         const savedIsOpen = localStorage.getItem("deferredPrompt") === "true";
 
         setHasDismissed(savedIsOpen);
@@ -43,7 +41,6 @@ const InstallPrompt: React.FC = () => {
     useEffect(() => {
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
 
-        // Capture the install prompt event
         const handler = (e: Event) => {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -58,38 +55,33 @@ const InstallPrompt: React.FC = () => {
 
     const handleInstall = async () => {
         if (deferredPrompt) {
-            // Show the install prompt
             await deferredPrompt.prompt();
 
-            // Wait for the user to respond to the prompt
             const { outcome } = await deferredPrompt.userChoice;
 
             if (outcome === "accepted") {
-                console.log("User accepted the install prompt");
                 setHasDismissed(true);
                 localStorage.setItem("deferredPrompt", "true");
                 setIsStandalone(true);
             }
 
-            // Clear the deferredPrompt
             setDeferredPrompt(null);
         }
     };
 
     if (hasDismissed || !deferredPrompt || isStandalone) {
-        return null; // Don't show install button if already installed
+        return null;
     }
 
     return (
         <ClientOnly>
             <div className="fixed bottom-4 left-4 right-4 md:max-w-100 z-50">
                 <div className="bg-content2 rounded-lg shadow-xl p-8">
-                    {/* Close button */}
+
                     <button aria-label="cancel" className="absolute top-2 right-2 text-default-500 hover:text-default-500/50" onClick={handleClose}>
                         <Cancel className="h-6 w-6" />
                     </button>
 
-                    {/* Icon and content container */}
                     <div className="flex items-start space-x-4">
                         <div className="bg-blue-500 p-3 rounded-full">{/* <ShoppingBag className="w-6 h-6 text-white" /> */}</div>
 
@@ -97,7 +89,6 @@ const InstallPrompt: React.FC = () => {
                             <h3 className="font-semibold text-default-900 mb-1">Install Our App</h3>
                             <p className="text-sm text-default-500 mb-3">Get faster checkout, exclusive offers and real-time order tracking</p>
 
-                            {/* Install button */}
                             <Button aria-label="install" className="w-full space-x-2" variant="primary" onClick={handleInstall}>
                                 <span>Add to Home Screen</span>
                             </Button>

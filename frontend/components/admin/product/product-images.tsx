@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+"use client";
+
+import React from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
-import { toast } from "sonner";
 
 import DraggableImageList from "./draggable-images";
 
 import { ProductImage } from "@/schemas";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useUploadImages } from "@/lib/hooks/useProduct";
 
 interface ProductImageManagerProps {
     productId: number;
@@ -15,8 +15,7 @@ interface ProductImageManagerProps {
 }
 
 const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, initialImages = [] }) => {
-    const invalidate = useInvalidate();
-    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const uploadImages = useUploadImages();
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
@@ -32,8 +31,7 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
                     const fileName = `images/${Date.now()}-${file.name}`;
 
                     void (async () => {
-                        setIsUploading(true);
-                        const { error } = await api.product.uploadImages({
+                        uploadImages.mutate({
                             id: productId,
                             data: {
                                 file: base64.split(",")[1]!,
@@ -41,18 +39,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
                                 content_type: file.type,
                             },
                         });
-
-                        if (error) {
-                            toast.error(`Error - ${error}`);
-                            setIsUploading(false);
-
-                            return;
-                        }
-
-                        toast.success("Image uploaded successfully");
-                        invalidate("products");
-                        invalidate("product-search");
-                        setIsUploading(false);
                     })();
                 };
                 reader.readAsDataURL(file);
@@ -62,7 +48,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
 
     return (
         <div className="space-y-6">
-            {/* Upload Area */}
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
@@ -73,8 +58,7 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
                     <Upload className="w-8 h-8 text-default-500" />
                     <p className="text-default-600">{isDragActive ? "Drop the images here" : "Drag & drop images or click to upload"}</p>
                     <p className="text-sm text-default-400">(Max 5MB, JPG/PNG/GIF only)</p>
-                    {/* Upload progress */}
-                    {isUploading && (
+                    {uploadImages.isPending && (
                         <div className="mb-4">
                             <div className="w-full bg-default-200 rounded-full h-2.5">
                                 <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />
@@ -89,7 +73,6 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
 
             {initialImages.length === 0 && <p className="text-center text-default-500">No images uploaded yet</p>}
 
-            {/* Help text */}
             <div className="text-xs text-default-500">
                 <p>• Drag and drop images to reorder them</p>
                 <p>• The primary image will be displayed first in the product listing</p>

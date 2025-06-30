@@ -1,22 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CreditCard, Pencil } from "nui-react-icons";
 import { paymentInfoMap } from "@lib/constants";
-import { toast } from "sonner";
 import { CreditCardIcon } from "lucide-react";
 
 import PaymentContainer from "../payment-container";
-import ErrorMessage from "../error-message";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Cart, PaymentMethod } from "@/schemas";
-import { api } from "@/apis";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useStore } from "@/app/store/use-store";
+import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
@@ -27,8 +25,7 @@ const payMethods: { id: string; provider_id: PaymentMethod }[] = [
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
     const invalidate = useInvalidate();
     const { shopSettings } = useStore();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const updateCartDetails = useUpdateCartDetails();
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -52,22 +49,10 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
     );
 
     const set = async (providerId: PaymentMethod) => {
-        setIsLoading(true);
-
-        const { error } = await api.cart.updateDetails({ payment_method: providerId });
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-        invalidate("checkout-cart");
-
-        setIsLoading(false);
+        updateCartDetails.mutateAsync({ payment_method: providerId });
     };
 
     const handleChange = (providerId: PaymentMethod) => {
-        setError(null);
         set(providerId);
     };
 
@@ -78,16 +63,10 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
     };
 
     const handleSubmit = () => {
-        setIsLoading(true);
         router.push(pathname + "?" + createQueryString("step", "review"), {
             scroll: false,
         });
     };
-
-    useEffect(() => {
-        setIsLoading(false);
-        setError(null);
-    }, [isOpen]);
 
     return (
         <div
@@ -146,13 +125,11 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     </RadioGroup>
                 )}
 
-                <ErrorMessage data-testid="payment-method-error-message" error={error} />
-
                 <Button
                     className="mt-4 font-semibold"
                     data-testid="submit-payment-button"
                     disabled={!hasPaymentMethod && !paidByGiftcard}
-                    isLoading={isLoading}
+                    isLoading={updateCartDetails.isPending}
                     size="sm"
                     variant="primary"
                     onClick={handleSubmit}
@@ -161,7 +138,6 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                 </Button>
             </div>
 
-            {/* Payment Method Section */}
             {!isOpen && hasPaymentMethod && (
                 <div className="text-xs md:text-sm mt-6" data-testid="payment-method-summary">
                     <p className="font-medium mb-1 text-base">Payment method</p>

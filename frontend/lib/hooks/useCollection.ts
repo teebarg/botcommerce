@@ -13,17 +13,17 @@ interface SearchParams {
     limit?: number;
 }
 
-export const useCollections = (searchParams: SearchParams) => {
+export const useCollectionsSearch = (searchParams: SearchParams) => {
     return useQuery({
         queryKey: ["collections", JSON.stringify(searchParams)],
         queryFn: async () => await api.get<PaginatedCollection>("/collection/", { params: { ...searchParams } }),
     });
 };
 
-export const useCollectionsAll = (search?: string) => {
+export const useCollections = (query?: string) => {
     return useQuery({
-        queryKey: ["collections", "all", search],
-        queryFn: async () => await api.get<Collection[]>("/collection/all", { params: { search: search || "" } }),
+        queryKey: ["collections", "all", query],
+        queryFn: async () => await api.get<Collection[]>("/collection/all", { params: { query: query || "" } }),
     });
 };
 

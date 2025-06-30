@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { toast } from "sonner";
 import { Trash } from "lucide-react";
 
 import { ProductImage } from "@/schemas";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
+import { useDeleteImages, useReorderImages } from "@/lib/hooks/useProduct";
 
 interface DraggableImageListProps {
     initialImages: ProductImage[];
@@ -20,34 +18,27 @@ interface Position {
 }
 
 const DeleteButton: React.FC<{ image: ProductImage; productId: number }> = ({ image, productId }) => {
-    const invalidate = useInvalidate();
-    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const deleteImages = useDeleteImages();
+
     const handleDelete = async () => {
-        setIsDeleting(true);
-
-        const { error } = await api.product.deleteImages(productId, image.id);
-
-        if (error) {
-            toast.error(`Error - ${error as string}`);
-            setIsDeleting(false);
-
-            return;
-        }
-        invalidate("products");
-        invalidate("product-search");
-        api.product.revalidate();
-        setIsDeleting(false);
+        deleteImages.mutate({ id: productId, imageId: image.id });
     };
 
     return (
-        <Button className="absolute top-12 right-6" disabled={isDeleting} size="iconOnly" title="Delete" variant="ghost" onClick={handleDelete}>
+        <Button
+            className="absolute top-12 right-6"
+            disabled={deleteImages.isPending}
+            size="iconOnly"
+            title="Delete"
+            variant="ghost"
+            onClick={handleDelete}
+        >
             <Trash className="text-red-500 h-6 w-6" />
         </Button>
     );
 };
 
 export default function DraggableImageList({ initialImages, productId }: DraggableImageListProps): JSX.Element {
-    const invalidate = useInvalidate();
     const [images, setImages] = useState<ProductImage[]>(initialImages);
 
     const [draggedItem, setDraggedItem] = useState<number | null>(null);
@@ -57,6 +48,8 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
 
     const listRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const reorderImages = useReorderImages();
 
     useEffect(() => {
         itemRefs.current = itemRefs.current.slice(0, images.length);
@@ -148,19 +141,14 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
 
             setImages(newItems);
 
-            const { error } = await api.product.reorderImages(
-                productId,
-                newItems.map((img) => img.id)
-            );
+            const { error } = await reorderImages.mutateAsync({
+                id: productId,
+                imageIds: newItems.map((img) => img.id),
+            });
 
             if (error) {
-                toast.error(`Error - ${error}`);
                 setImages(initialImages);
             }
-
-            invalidate("products");
-            invalidate("product-search");
-            api.product.revalidate();
         }
     };
 

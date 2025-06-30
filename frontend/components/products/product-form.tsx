@@ -15,6 +15,7 @@ import { api } from "@/apis";
 import MultiSelect from "@/components/ui/multi-select";
 import { Brand, Category, Collection, Product } from "@/schemas/product";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -40,6 +41,8 @@ interface ProductFormProps {
 const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections, categories, brands }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
     const invalidate = useInvalidate();
+    const createProduct = useCreateProduct();
+    const updateProduct = useUpdateProduct();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -53,50 +56,36 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         const { brand, categories, collections, ...data } = values;
         const categoryIds = categories.map((category) => category.value);
         const collectionIds = collections.map((collection) => collection.value);
-
         setIsPending(true);
-
-        void (async () => {
-            try {
-                let res = null;
-
-                if (product?.id) {
-                    res = await api.product.update(product.id, {
+        try {
+            if (product?.id) {
+                await updateProduct.mutateAsync({
+                    id: product.id,
+                    input: {
                         ...data,
                         category_ids: categoryIds,
                         collection_ids: collectionIds,
                         brand_id: brand,
-                    });
-                } else {
-                    res = await api.product.create({
-                        ...data,
-                        category_ids: categoryIds,
-                        collection_ids: collectionIds,
-                        brand_id: brand,
-                    });
-                }
-                if (res.error) {
-                    throw new Error(res.error);
-                }
-
-                toast.success(`Product ${product?.id ? "updated" : "created"} successfully`);
-
-                invalidate("products");
-                invalidate("product-search");
-
-                if (!product?.id) {
-                    onClose?.();
-                }
-            } catch (error) {
-                toast.error(`Error - ${error as string}`);
-            } finally {
-                setIsPending(false);
+                    },
+                });
+            } else {
+                await createProduct.mutateAsync({
+                    ...data,
+                    category_ids: categoryIds,
+                    collection_ids: collectionIds,
+                    brand_id: brand,
+                });
             }
-        })();
+            if (!product?.id) {
+                onClose?.();
+            }
+        } finally {
+            setIsPending(false);
+        }
     }
 
     return (

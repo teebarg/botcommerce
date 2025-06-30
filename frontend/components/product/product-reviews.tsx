@@ -4,14 +4,14 @@ import React from "react";
 import { MessageSquare, Star } from "nui-react-icons";
 import { PencilLine } from "lucide-react";
 
-import { Badge } from "../ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 import ReviewForm from "./review-form";
 
 import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/utils";
 import { Review } from "@/schemas";
-import { useProductReviews } from "@/lib/hooks/useApi";
+import { useProductReviews } from "@/lib/hooks/useProduct";
 
 interface Prop {
     product_id: number;

@@ -1,17 +1,15 @@
 "use client";
 
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { api } from "@/apis";
 import { Product } from "@/schemas/product";
 import { ProductView } from "@/components/products/product-view";
 import { Confirm } from "@/components/generic/confirm";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
+import { useDeleteProduct } from "@/lib/hooks/useProduct";
 
 interface ProductActionsProps {
     product: Product;
@@ -20,22 +18,12 @@ interface ProductActionsProps {
 export function ProductActions({ product }: ProductActionsProps) {
     const deleteState = useOverlayTriggerState({});
     const viewState = useOverlayTriggerState({});
-    const invalidate = useInvalidate();
+    const deleteProductMutation = useDeleteProduct();
 
     const deleteProduct = async (id: number) => {
-        // "use server";
-        const { error } = await api.product.delete(id);
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-
-        invalidate("products");
-        invalidate("product-search");
-        toast.success(`Product deleted successfully`);
-        deleteState.close();
+        deleteProductMutation.mutateAsync(id).then(() => {
+            deleteState.close();
+        });
     };
 
     return (

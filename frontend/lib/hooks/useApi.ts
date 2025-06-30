@@ -11,11 +11,9 @@ import {
     PaginatedConversation,
     PaginatedReview,
     PaginatedUser,
-    Review,
     User,
     Wishlist,
 } from "@/schemas";
-import { Brand, Category, Collection, PaginatedProduct, PaginatedProductSearch } from "@/schemas/product";
 import { StatsTrends } from "@/types/models";
 import { CarouselBanner } from "@/schemas/carousel";
 
@@ -44,69 +42,6 @@ export const useAddress = (addressId: number) => {
         queryKey: ["cart-address", addressId],
         queryFn: async () => await api.get<Address>(`/address/${addressId}`),
         enabled: !!addressId, // prevents running when addressId is null
-    });
-};
-
-export const useProductReviews = (productId: number) => {
-    return useQuery({
-        queryKey: ["product-reviews", productId],
-        queryFn: async () => await api.get<Review[]>(`/product/${productId}/reviews`),
-        enabled: !!productId, // prevents running when productId is null
-    });
-};
-
-interface SearchParams {
-    query?: string;
-    categories?: string;
-    collections?: string;
-    min_price?: number | string;
-    max_price?: number | string;
-    page?: number;
-    limit?: number;
-    sort?: string;
-}
-
-export const useProductSearch = (searchParams: SearchParams) => {
-    return useQuery({
-        queryKey: ["product-search", searchParams],
-        queryFn: async () => await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams } }),
-        enabled: !!searchParams,
-    });
-};
-
-interface ProductParams {
-    query?: string;
-    status?: string;
-    page?: number;
-    limit?: number;
-    sort?: string;
-}
-
-export const useProducts = (searchParams: ProductParams) => {
-    return useQuery({
-        queryKey: ["products", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedProduct>(`/product/`, { params: { ...searchParams } }),
-    });
-};
-
-export const useBrands = (query?: string) => {
-    return useQuery({
-        queryKey: ["brands", query],
-        queryFn: async () => await api.get<Brand[]>(`/brand/all`, { params: { query: query ?? "" } }),
-    });
-};
-
-export const useCategories = (query?: string) => {
-    return useQuery({
-        queryKey: ["categories", query],
-        queryFn: async () => await api.get<Category[]>(`/category/`, { params: { query: query ?? "" } }),
-    });
-};
-
-export const useCollections = (query?: string) => {
-    return useQuery({
-        queryKey: ["collections", query],
-        queryFn: async () => await api.get<Collection[]>(`/collection/all`, { params: { query: query ?? "" } }),
     });
 };
 

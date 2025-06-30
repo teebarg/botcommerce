@@ -5,10 +5,9 @@ import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
-import { bulkUpload } from "@/modules/account/actions";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useWebSocket } from "@/providers/websocket";
-import { api } from "@/apis";
+import { getCookie } from "@/lib/util/server-utils";
 
 interface ProductUploadProps {}
 
@@ -20,7 +19,6 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
         if (!currentMessage) return;
         if (currentMessage.status === "completed") {
             toast.success("Products uploaded successfully");
-            void api.product.revalidate();
             invalidate("products");
             invalidate("product-search");
         }
@@ -42,14 +40,23 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
 
             void (async () => {
                 const toastId = toast.loading("Uploading products...");
-                const res = await bulkUpload(formData);
+                const accessToken = await getCookie("access_token");
 
-                if (!res.success) {
-                    toast.error(res.message, { id: toastId });
-                    return;
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {
+                        method: "POST",
+                        body: formData,
+                        headers: { "X-Auth": accessToken ?? "" },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Failed to upload products");
+                    }
+
+                    toast.success("Product upload started", { id: toastId });
+                } catch (error: any) {
+                    toast.error(error.toString(), { id: toastId });
                 }
-
-                toast.success("Product upload started", { id: toastId });
             })();
         },
     });

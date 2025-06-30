@@ -91,7 +91,6 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
 };
 
 export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
-
     if (!activities.length) {
         return (
             <div className="text-center py-12 bg-content1">

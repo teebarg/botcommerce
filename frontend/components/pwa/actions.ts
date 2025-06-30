@@ -51,7 +51,6 @@ export async function saveSubscription(subscriptionData: PushSubscriptionData) {
 }
 
 export async function unsubscribeUser() {
-    // In a production environment, you would want to remove the subscription from the database
-    // For example: await db.subscriptions.delete({ where: { ... } })
+    // TODO: unsubscribe
     return { success: true };
 }

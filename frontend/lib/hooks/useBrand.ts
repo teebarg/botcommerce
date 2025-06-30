@@ -13,17 +13,17 @@ interface SearchParams {
     limit?: number;
 }
 
-export const useBrands = (searchParams: SearchParams) => {
+export const useBrands = (query?: string) => {
     return useQuery({
-        queryKey: ["brands", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedBrand>("/brand/", { params: { ...searchParams } }),
+        queryKey: ["brands", query],
+        queryFn: async () => await api.get<Brand[]>(`/brand/all`, { params: { query: query ?? "" } }),
     });
 };
 
-export const useBrandsAll = (search?: string) => {
+export const useBrandsSearch = (searchParams: SearchParams) => {
     return useQuery({
-        queryKey: ["brands", "all", search],
-        queryFn: async () => await api.get<Brand[]>("/brand/all", { params: { search: search || "" } }),
+        queryKey: ["brands", JSON.stringify(searchParams)],
+        queryFn: async () => await api.get<PaginatedBrand>("/brand/", { params: { ...searchParams } }),
     });
 };
 

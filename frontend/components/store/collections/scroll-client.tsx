@@ -15,7 +15,9 @@ import { CollectionsTopBar } from "@/components/store/collections/checkout-topba
 import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
 import { cn } from "@/lib/utils";
-import { useBrands, useCategories, useCollections } from "@/lib/hooks/useApi";
+import { useBrands } from "@/lib/hooks/useBrand";
+import { useCategories } from "@/lib/hooks/useCategories";
+import { useCollections } from "@/lib/hooks/useCollection";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { api } from "@/apis/client";
 import { Category, Collection, Facet, PaginatedProductSearch, ProductSearch } from "@/schemas/product";

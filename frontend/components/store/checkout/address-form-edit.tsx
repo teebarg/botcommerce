@@ -1,77 +1,58 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Input } from "@components/ui/input";
-import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-
-import { Address, AddressType } from "@/schemas";
+import { Address, AddressSchema } from "@/schemas/address";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useUpdateAddress } from "@/lib/hooks/useAddress";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { states } from "@/components/store/collections/data";
+
+const addressEditSchema = AddressSchema.omit({
+    id: true,
+    created_at: true,
+    updated_at: true,
+}).extend({
+    address_2: z.string().optional(),
+    is_billing: z.boolean().optional(),
+});
+
+type AddressEditFormValues = z.infer<typeof addressEditSchema>;
 
 const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onClose?: () => void }) => {
     const queryClient = useQueryClient();
-    const [isPending, setIsPending] = useState<boolean>(false);
-    const [formData, setFormData] = useState({
+    const updateAddress = useUpdateAddress();
+
+    const defaultValues: AddressEditFormValues = {
         label: address?.label || "",
         address_type: address?.address_type || "HOME",
         first_name: address?.first_name || "",
         last_name: address?.last_name || "",
         address_1: address?.address_1 || "",
+        address_2: address?.address_2 || "",
         postal_code: address?.postal_code || "",
         city: address?.city || "",
         state: address?.state || "",
         phone: address?.phone || "",
+        is_billing: address?.is_billing ?? false,
+    };
+
+    const form = useForm<AddressEditFormValues>({
+        resolver: zodResolver(addressEditSchema),
+        defaultValues,
     });
 
     useEffect(() => {
-        setFormData({
-            label: address?.label || "",
-            address_type: address?.address_type || "HOME",
-            first_name: address?.first_name || "",
-            last_name: address?.last_name || "",
-            address_1: address?.address_1 || "",
-            postal_code: address?.postal_code || "",
-            city: address?.city || "",
-            state: address?.state || "",
-            phone: address?.phone || "",
-        });
+        form.reset(defaultValues);
     }, [address]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
-        setFormData({
-            ...formData,
-            [name]: e.target.value,
-        });
-    };
-
-    const handleSubmit = async () => {
-        setIsPending(true);
-
-        const updateData = {
-            first_name: formData["first_name"],
-            last_name: formData["last_name"],
-            address_type: formData["address_type"],
-            label: formData["label"],
-            address_1: formData["address_1"],
-            address_2: "",
-            postal_code: formData["postal_code"],
-            city: formData["city"],
-            state: formData["state"],
-            phone: formData["phone"],
-            is_billing: false,
-        };
-
-        const { error } = await api.address.update(address?.id!, updateData);
-
-        setIsPending(false);
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
+    const onSubmit = async (values: AddressEditFormValues) => {
+        await updateAddress.mutateAsync({ id: address?.id!, input: values });
         queryClient.invalidateQueries({ queryKey: ["user-address"] });
         queryClient.invalidateQueries({ queryKey: ["cart-address", address?.id] });
         onClose?.();
@@ -80,120 +61,162 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
     return (
         <div className="py-6 px-4 overflow-y-auto">
             <h2 className="text-lg font-semibold mb-4">Address</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label className="text-sm font-medium text-default-500 mb-0.5 block">Address Type</label>
-                    <Select
-                        value={formData["address_type"]}
-                        onValueChange={(value) => setFormData({ ...formData, address_type: value as AddressType })}
+            <Form {...form}>
+                <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="address_type"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Address Type</FormLabel>
+                                    <Select value={field.value} onValueChange={field.onChange}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select type" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="HOME">Home</SelectItem>
+                                            <SelectItem value="WORK">Work</SelectItem>
+                                            <SelectItem value="BILLING">Billing</SelectItem>
+                                            <SelectItem value="SHIPPING">Shipping</SelectItem>
+                                            <SelectItem value="OTHER">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="label"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Label (Optional)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g., Home, Office" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="first_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>First name</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="given-name" data-testid="shipping-first_name-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="last_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Last name</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="family-name" data-testid="shipping-last_name-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="address_1"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Address</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="address-line1" data-testid="shipping-address-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="postal_code"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Postal code</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="postal-code" data-testid="shipping-postal-code-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="city"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>City</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="address-level2" data-testid="shipping-city-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="state"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>State</FormLabel>
+                                    <Select value={field.value} onValueChange={field.onChange}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select state" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {states.map((item) => (
+                                                <SelectItem key={item.id} value={item.id}>
+                                                    {item.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Phone</FormLabel>
+                                    <FormControl>
+                                        <Input autoComplete="tel" data-testid="shipping-phone-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <Button
+                        aria-label="continue"
+                        className="mt-6"
+                        data-testid="submit-address-button"
+                        disabled={updateAddress.isPending}
+                        isLoading={updateAddress.isPending}
+                        variant="primary"
+                        type="submit"
                     >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="HOME">Home</SelectItem>
-                            <SelectItem value="WORK">Work</SelectItem>
-                            <SelectItem value="BILLING">Billing</SelectItem>
-                            <SelectItem value="SHIPPING">Shipping</SelectItem>
-                            <SelectItem value="OTHER">Other</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <Input
-                    required
-                    data-testid="shipping-first_name-input"
-                    label="Label (Optional)"
-                    name="label"
-                    placeholder="e.g., Home, Office"
-                    value={formData["label"]}
-                    onChange={(e) => handleChange(e, "label")}
-                />
-                <Input
-                    required
-                    autoComplete="given-name"
-                    data-testid="shipping-first_name-input"
-                    label="First name"
-                    name="first_name"
-                    value={formData["first_name"]}
-                    onChange={(e) => handleChange(e, "first_name")}
-                />
-                <Input
-                    required
-                    autoComplete="family-name"
-                    data-testid="shipping-last_name-input"
-                    label="Last name"
-                    name="last_name"
-                    value={formData["last_name"]}
-                    onChange={(e) => handleChange(e, "last_name")}
-                />
-                <Input
-                    required
-                    autoComplete="address-line1"
-                    data-testid="shipping-address-input"
-                    label="Address"
-                    name="address_1"
-                    value={formData["address_1"]}
-                    onChange={(e) => handleChange(e, "address_1")}
-                />
-                <Input
-                    required
-                    autoComplete="postal-code"
-                    data-testid="shipping-postal-code-input"
-                    label="Postal code"
-                    name="postal_code"
-                    value={formData["postal_code"]}
-                    onChange={(e) => handleChange(e, "postal_code")}
-                />
-                <Input
-                    required
-                    autoComplete="address-level2"
-                    data-testid="shipping-city-input"
-                    label="City"
-                    name="city"
-                    value={formData["city"]}
-                    onChange={(e) => handleChange(e, "city")}
-                />
-                <div>
-                    <label className="text-sm font-medium text-default-500 mb-0.5 block">State</label>
-                    <Select
-                        data-testid="shipping-state-input"
-                        value={formData["state"]}
-                        onValueChange={(value) => setFormData({ ...formData, state: value })}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select state" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {["Abuja", "Lagos", "Rivers", "Oyo"].map((item: string, idx: number) => (
-                                <SelectItem key={idx} value={item}>
-                                    {item}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <Input
-                    autoComplete="tel"
-                    data-testid="shipping-phone-input"
-                    label="Phone"
-                    name="phone"
-                    value={formData["phone"]}
-                    onChange={(e) => handleChange(e, "phone")}
-                />
-            </div>
-            <Button
-                aria-label="continue"
-                className="mt-6"
-                data-testid="submit-address-button"
-                disabled={isPending}
-                isLoading={isPending}
-                variant="primary"
-                onClick={handleSubmit}
-            >
-                Update
-            </Button>
+                        Update
+                    </Button>
+                </form>
+            </Form>
         </div>
     );
 };

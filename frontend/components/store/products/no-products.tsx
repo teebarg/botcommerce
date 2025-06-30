@@ -4,7 +4,7 @@ import React from "react";
 import { Home, PackageSearch, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useCollections } from "@/lib/hooks/useApi";
+import { useCollections } from "@/lib/hooks/useCollection";
 import { Collection } from "@/schemas/product";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Separator } from "@/components/ui/separator";

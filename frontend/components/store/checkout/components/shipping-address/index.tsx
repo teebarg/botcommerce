@@ -3,43 +3,34 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@components/ui/input";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import AddressSelect from "../address-select";
 
 import { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import { Skeleton } from "@/components/ui/skeletons";
 import { useAuth } from "@/providers/auth-provider";
+import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 
 const ShippingAddress = ({ address, email }: { address: Address | null; email: string }) => {
     const router = useRouter();
-    const [isPending, setIsPending] = useState<boolean>(false);
     const [cartEmail, setCartEmail] = useState<string>(email);
     const { user, loading: meLoading } = useAuth();
+    const updateCartDetails = useUpdateCartDetails();
 
     useEffect(() => {
         setCartEmail(email);
     }, [email]);
 
     const handleSubmit = async () => {
-        setIsPending(true);
-
-        const { error } = await api.cart.updateDetails({
-            email: cartEmail,
-        });
-
-        setIsPending(false);
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-
-        router.push(`/checkout?step=delivery`);
+        updateCartDetails
+            .mutateAsync({
+                email: cartEmail,
+            })
+            .then(() => {
+                router.push(`/checkout?step=delivery`);
+            });
     };
 
     if (meLoading) {
@@ -72,8 +63,8 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
                     aria-label="continue"
                     className="mt-6"
                     data-testid="submit-address-button"
-                    disabled={isPending || cartEmail === ""}
-                    isLoading={isPending}
+                    disabled={updateCartDetails.isPending || cartEmail === ""}
+                    isLoading={updateCartDetails.isPending}
                     type="button"
                     variant="primary"
                     onClick={handleSubmit}

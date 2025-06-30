@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { BrandActions } from "@/components/admin/brands/brand-actions";
 import { CreateBrand } from "@/components/admin/brands/create-brand";
-import { useBrands } from "@/lib/hooks/useApi";
+import { useBrands } from "@/lib/hooks/useBrand";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
 const BrandView: React.FC = () => {

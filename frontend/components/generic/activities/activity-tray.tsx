@@ -11,13 +11,13 @@ import { useMyActivities } from "@/lib/hooks/useActivities";
 import { useInvalidate } from "@/lib/hooks/useApi";
 
 const ActivityTray: React.FC = () => {
-    const invalidate = useInvalidate()
+    const invalidate = useInvalidate();
     const { currentMessage, messages } = useWebSocket();
     const { data: activities, isLoading } = useMyActivities();
 
     useEffect(() => {
         if (currentMessage?.type === "activities") {
-            invalidate("activities")
+            invalidate("activities");
         }
     }, [messages]);
 

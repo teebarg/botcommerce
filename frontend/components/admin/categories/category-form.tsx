@@ -1,71 +1,111 @@
 "use client";
 
-import React, { forwardRef, useActionState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import type { Category } from "@/schemas/product";
+
+import React, { forwardRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@components/ui/input";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Category } from "@/schemas/product";
-import { mutateCategory } from "@/actions/category";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useCreateCategory, useUpdateCategory } from "@/lib/hooks/useCategories";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+const CategoryFormSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    is_active: z.boolean().default(true),
+    parent_id: z.number().nullable().optional(),
+});
+
+export type CategoryFormValues = z.infer<typeof CategoryFormSchema>;
 
 interface Props {
     current?: Category;
     type?: "create" | "update";
     onClose?: () => void;
     hasParent?: boolean;
-    parent_id?: number;
+    parent_id?: number | null;
 }
 
-interface ChildRef {
-    // submit: () => void;
-}
+interface ChildRef {}
 
-const CategoryForm = forwardRef<ChildRef, Props>(
-    ({ type = "create", onClose, current = { name: "", is_active: true, parent_id: null }, hasParent = false, parent_id = null }, ref) => {
-        const router = useRouter();
-        const isCreate = type === "create";
-        const invalidate = useInvalidate();
+const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current, hasParent = false, parent_id = null }, ref) => {
+    const isCreate = type === "create";
+    const defaultValues: CategoryFormValues = {
+        name: current?.name || "",
+        is_active: current?.is_active ?? true,
+        parent_id: hasParent && parent_id ? parent_id : (current?.parent_id ?? null),
+    };
 
-        const [state, formAction, isPending] = useActionState(mutateCategory, {
-            success: false,
-            message: "",
-            data: null,
-        });
+    const form = useForm<CategoryFormValues>({
+        resolver: zodResolver(CategoryFormSchema),
+        defaultValues,
+    });
 
-        const formRef = useRef<HTMLFormElement>(null);
+    const { handleSubmit, reset, control } = form;
 
-        useEffect(() => {
-            if (state.success) {
-                toast.success(state.message || "Category created successfully");
-                // Leave the slider open and clear form
-                if (formRef.current) {
-                    formRef.current.reset();
-                }
-                invalidate("categories");
-                router.refresh();
-                onClose?.();
-            }
-        }, [state.success, state.message, state.data]);
+    const createMutation = useCreateCategory();
+    const updateMutation = useUpdateCategory();
+    const isPending = createMutation.isPending || updateMutation.isPending;
 
-        return (
-            <div className="mx-auto w-full px-2 py-6">
-                <h2 className="text-lg font-semibold mb-6">{isCreate ? "Create Category" : "Update Category"}</h2>
-                <form ref={formRef} action={formAction} className="h-full flex flex-col">
-                    <input readOnly className="hidden" name="type" type="text" value={type} />
-                    <input readOnly className="hidden" name="id" type="text" value={current.id} />
+    useEffect(() => {
+        reset(defaultValues);
+    }, [current, parent_id]);
+
+    useEffect(() => {
+        if (createMutation.isSuccess || updateMutation.isSuccess) {
+            reset();
+            onClose?.();
+        }
+    }, [createMutation.isSuccess, updateMutation.isSuccess]);
+
+    const onSubmit = async (data: CategoryFormValues) => {
+        if (isCreate) {
+            createMutation.mutate(data);
+        } else if (current?.id) {
+            updateMutation.mutate({ id: current.id, data });
+        }
+    };
+
+    return (
+        <div className="mx-auto w-full px-2 py-6">
+            <h2 className="text-xl font-semibold mb-4">{isCreate ? "Create Category" : "Update Category"}</h2>
+            <Form {...form}>
+                <form className="h-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>
                     <div className="space-y-6">
-                        {hasParent && parent_id && <input readOnly className="hidden" name="parent_id" type="text" value={parent_id} />}
-                        <Input required defaultValue={current.name} label="Name" name="name" placeholder="Ex. Gown" />
-                        <div className="flex items-center gap-1">
-                            <Switch defaultChecked={current.is_active} name="is_active" />
-                            <label>Is Active</label>
-                        </div>
+                        <FormField
+                            control={control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Ex. Gown" {...field} disabled={isPending} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={control}
+                            name="is_active"
+                            render={({ field }) => (
+                                <FormItem className="flex items-center justify-between rounded-lg border border-divider px-4 py-2">
+                                    <div className="space-y-0.5">
+                                        <FormLabel>Active</FormLabel>
+                                    </div>
+                                    <FormControl>
+                                        <Switch checked={field.value} disabled={isPending} onCheckedChange={field.onChange} />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        {/* {hasParent && parent_id && <input type="hidden" {...form.register("parent_id", { value: parent_id })} />} */}
                     </div>
-                    <div className="flex justify-end space-x-2 mt-6">
-                        <Button aria-label="cancel" className="min-w-32" type="button" variant="destructive" onClick={onClose}>
+                    <div className="flex items-center justify-end space-x-2 mt-6">
+                        <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit" variant="primary">
@@ -73,10 +113,10 @@ const CategoryForm = forwardRef<ChildRef, Props>(
                         </Button>
                     </div>
                 </form>
-            </div>
-        );
-    }
-);
+            </Form>
+        </div>
+    );
+});
 
 CategoryForm.displayName = "CategoryForm";
 

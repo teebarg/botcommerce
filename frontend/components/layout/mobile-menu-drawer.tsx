@@ -12,7 +12,6 @@ const MenuComp: React.FC = () => {
     const pathname = usePathname();
     const state = useOverlayTriggerState({});
 
-    // 🧼 Close drawer on route change
     useEffect(() => {
         state.close();
     }, [pathname]);

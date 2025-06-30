@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 import { currency } from "@/lib/utils";
-import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
+import { useAddToCart } from "./useCart";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
-    const invalidate = useInvalidate();
     const { shopSettings } = useStore();
 
     const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0]?.color || null);
@@ -55,27 +52,17 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedColor((prev) => (prev === color ? null : color));
     };
 
+    const addToCart = useAddToCart();
+
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
 
         setLoading(true);
 
-        const response = await api.cart.add({
+        await addToCart.mutateAsync({
             variant_id: selectedVariant.id,
             quantity,
         });
-
-        if (response.error) {
-            toast.error(response.error);
-            setLoading(false);
-
-            return;
-        }
-
-        invalidate("cart");
-        invalidate("cart-items");
-
-        toast.success("Added to cart successfully");
         setLoading(false);
     };
 

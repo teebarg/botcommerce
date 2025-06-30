@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { toast } from "sonner";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Cart } from "@/schemas";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
-import { api } from "@/apis";
 import { PaystackPayment } from "@/components/store/payment/paystack-payment";
 import BankTransfer from "@/components/store/payment/bank-transfer";
 import Pickup from "@/components/store/payment/pickup";
+import { useCompleteCart } from "@/lib/hooks/useCart";
 
 type PaymentButtonProps = {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -58,28 +57,17 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, isLoggedIn, "data-t
 };
 
 const GiftCardPaymentButton = () => {
-    const router = useRouter();
-    const [submitting, setSubmitting] = useState(false);
+    const completeCart = useCompleteCart();
 
     const handleOrder = async () => {
-        setSubmitting(true);
-        const { data, error } = await api.cart.complete({
+        completeCart.mutate({
             payment_status: "SUCCESS",
             status: "PAID",
         });
-
-        if (error) {
-            toast.error(error);
-            setSubmitting(false);
-
-            return;
-        }
-
-        router.push(`/order/confirmed/${data?.order_number}`);
     };
 
     return (
-        <Button aria-label="place order" data-testid="submit-order-button" isLoading={submitting} onClick={handleOrder}>
+        <Button aria-label="place order" data-testid="submit-order-button" isLoading={completeCart.isPending} onClick={handleOrder}>
             Place order
         </Button>
     );

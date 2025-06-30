@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Input } from "@components/ui/input";
-import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,9 +9,9 @@ import * as z from "zod";
 
 import { CartUpdate } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 
 const formSchema = z.object({
     label: z.string().optional(),
@@ -30,7 +29,7 @@ type AddressFormValues = z.infer<typeof formSchema>;
 
 const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
     const queryClient = useQueryClient();
-    const [isPending, setIsPending] = useState<boolean>(false);
+    const updateCartDetails = useUpdateCartDetails();
 
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(formSchema),
@@ -48,8 +47,6 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
     });
 
     const onSubmit = async (values: AddressFormValues) => {
-        setIsPending(true);
-
         const updateData: CartUpdate = {
             shipping_address: {
                 ...values,
@@ -60,19 +57,10 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
 
         updateData.billing_address = updateData.shipping_address;
 
-        const { error } = await api.cart.updateDetails(updateData);
-
-        setIsPending(false);
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-
-        queryClient.invalidateQueries({ queryKey: ["user-address"] });
-        queryClient.invalidateQueries({ queryKey: ["checkout-cart"] });
-        onClose?.();
+        updateCartDetails.mutateAsync(updateData).then(() => {
+            queryClient.invalidateQueries({ queryKey: ["user-address"] });
+            onClose?.();
+        });
     };
 
     return (
@@ -234,7 +222,13 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                         <Button aria-label="cancel" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="continue" data-testid="submit-address-button" isLoading={isPending} type="submit" variant="primary">
+                        <Button
+                            aria-label="continue"
+                            data-testid="submit-address-button"
+                            isLoading={updateCartDetails.isPending}
+                            type="submit"
+                            variant="primary"
+                        >
                             Create
                         </Button>
                     </div>

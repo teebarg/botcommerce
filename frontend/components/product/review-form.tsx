@@ -1,13 +1,11 @@
 "use client";
 
-import { Star } from "nui-react-icons";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useAddReview } from "@/lib/hooks/useProduct";
+import { Star } from "lucide-react";
 
 interface ReviewFormProps {
     className?: string;
@@ -17,25 +15,14 @@ interface ReviewFormProps {
 export default function ReviewForm({ product_id, className = "" }: ReviewFormProps) {
     const [rating, setRating] = useState<number>(1);
     const [comment, setComment] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
-    const invalidate = useInvalidate();
+    const addReview = useAddReview();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        const { error } = await api.product.addReview({ product_id, rating, comment });
-
-        setLoading(false);
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-        invalidate("product-reviews");
-        // Reset form
-        setRating(1);
-        setComment("");
-        toast.success("Review successfully added");
+        addReview.mutateAsync({ product_id, rating, comment }).then(() => {
+            setRating(1);
+            setComment("");
+        });
     };
 
     return (
@@ -71,7 +58,7 @@ export default function ReviewForm({ product_id, className = "" }: ReviewFormPro
                 />
             </div>
 
-            <Button aria-label="submit review" isLoading={loading} size="lg" type="submit" variant="primary">
+            <Button aria-label="submit review" isLoading={addReview.isPending} size="lg" type="submit" variant="primary">
                 Submit Review
             </Button>
         </form>

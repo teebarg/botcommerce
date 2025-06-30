@@ -9,9 +9,6 @@ import StoreNavbar from "@/components/layout/store-nav";
 import ButtonNav from "@/components/layout/bottom-navbar";
 import ClientOnly from "@/components/generic/client-only";
 
-// const Banner = dynamic(() => import("@modules/common/components/banner"), { loading: () => <p>Loading...</p> });
-// const Cookie = dynamic(() => import("@modules/store/components/cookie"));
-
 export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
         <div className="flex flex-col min-h-screen">

@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/utils";
-import { api } from "@/apis";
 import { useBank } from "@/lib/hooks/useApi";
+import { useCompleteCart } from "@/lib/hooks/useCart";
 
 interface BankTransferProps {
     amount: number;
@@ -15,26 +11,15 @@ interface BankTransferProps {
 }
 
 const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
-    const [loading, setLoading] = useState<boolean>(false);
-    const router = useRouter();
+    const completeCart = useCompleteCart();
 
     const { data: bankDetails } = useBank();
 
     const onPaymentCompleted = async () => {
-        setLoading(true);
-        const { data, error } = await api.cart.complete({
-            payment_status: "PENDING",
-            status: "PENDING",
+        completeCart.mutate({
+            payment_status: "SUCCESS",
+            status: "PAID",
         });
-
-        if (error) {
-            toast.error(error);
-            setLoading(false);
-
-            return;
-        }
-
-        router.push(`/order/confirmed/${data?.order_number}`);
     };
 
     return (
@@ -55,10 +40,15 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
                 <p className="text-xs text-default-500 mt-2">Please use your order number as reference when making the transfer.</p>
             </div>
 
-            <Button className="w-full" disabled={loading} isLoading={loading} variant="primary" onClick={onPaymentCompleted}>
+            <Button
+                className="w-full"
+                disabled={completeCart.isPending}
+                isLoading={completeCart.isPending}
+                variant="primary"
+                onClick={onPaymentCompleted}
+            >
                 Pay {currency(amount)} via Bank Transfer
             </Button>
-            {/* Security message */}
             <div className="mt-4 flex items-center justify-center text-xs text-default-500">
                 <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

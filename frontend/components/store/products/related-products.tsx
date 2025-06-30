@@ -3,7 +3,7 @@
 import { Product, ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/generic/server-error";
-import { useProductSearch } from "@/lib/hooks/useApi";
+import { useProductSearch } from "@/lib/hooks/useProduct";
 
 type RelatedProductsProps = {
     product: Product;
