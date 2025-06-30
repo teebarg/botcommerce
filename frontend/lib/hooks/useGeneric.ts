@@ -1,26 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import {
-    Address,
-    BankDetails,
-    ChatMessage,
-    ConversationStatus,
-    DeliveryOption,
-    FAQ,
-    Message,
-    PaginatedConversation,
-    PaginatedOrder,
-    PaginatedReview,
-    PaginatedUser,
-    Review,
-    User,
-    Wishlist,
-} from "@/schemas";
-import { Brand, Category, Collection, PaginatedProduct, PaginatedProductSearch } from "@/schemas/product";
-import { StatsTrends } from "@/types/models";
-import { CarouselBanner } from "@/schemas/carousel";
+import { Message } from "@/schemas";
 import { ContactFormValues } from "@/components/store/contact-form";
 
 export const useSubscribeNewsletter = () => {

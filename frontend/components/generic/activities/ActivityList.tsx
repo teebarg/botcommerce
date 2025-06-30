@@ -35,6 +35,7 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     const handleDeleteActivity = async (id: number) => {
         deleteActivity(id);
     };
+
     return (
         <div className="group bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-border">
             <div className="p-4 sm:p-6">

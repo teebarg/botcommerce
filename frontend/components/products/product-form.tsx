@@ -4,14 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import MultiSelect from "@/components/ui/multi-select";
 import { Brand, Category, Collection, Product } from "@/schemas/product";
 import { useInvalidate } from "@/lib/hooks/useApi";
@@ -60,6 +58,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
         const { brand, categories, collections, ...data } = values;
         const categoryIds = categories.map((category) => category.value);
         const collectionIds = collections.map((collection) => collection.value);
+
         setIsPending(true);
         try {
             if (product?.id) {

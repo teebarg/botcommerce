@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext } from "react";
+
 import { User } from "@/schemas";
 import { useMe } from "@/lib/hooks/useApi";
 
@@ -20,6 +21,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
     const ctx = useContext(AuthContext);
+
     if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+
     return ctx;
 };

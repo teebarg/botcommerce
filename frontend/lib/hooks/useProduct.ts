@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 import { api } from "@/apis/client";
 import { Product, PaginatedProductSearch, Message, Review, PaginatedReview, ProductVariant, PaginatedProduct } from "@/schemas";
 
@@ -46,6 +47,7 @@ export const useProduct = (slug: string) => {
 
 export const useCreateProduct = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (input: any) => await api.post<Product>("/product", input),
         onSuccess: () => {
@@ -60,6 +62,7 @@ export const useCreateProduct = () => {
 
 export const useUpdateProduct = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id, input }: { id: number; input: any }) => await api.put<Product>(`/product/${id}`, input),
         onSuccess: () => {
@@ -74,6 +77,7 @@ export const useUpdateProduct = () => {
 
 export const useDeleteProduct = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/product/${id}`),
         onSuccess: () => {
@@ -104,6 +108,7 @@ export const useProductReviewsSearch = (product_id: number, page = 1, limit = 20
 
 export const useAddReview = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (input: { product_id: number; rating: number; comment: string }) => await api.post<Review>(`/reviews/`, input),
         onSuccess: () => {
@@ -118,6 +123,7 @@ export const useAddReview = () => {
 
 export const useCreateVariant = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (input: {
             productId: number;
@@ -145,6 +151,7 @@ export const useCreateVariant = () => {
 
 export const useUpdateVariant = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (input: {
             id: number;
@@ -171,6 +178,7 @@ export const useUpdateVariant = () => {
 
 export const useDeleteVariant = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/product/variants/${id}`),
         onSuccess: () => {
@@ -185,6 +193,7 @@ export const useDeleteVariant = () => {
 
 export const useExportProducts = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async () => await api.post<Message>(`/product/export`, {}),
         onSuccess: () => {
@@ -199,6 +208,7 @@ export const useExportProducts = () => {
 
 export const useReIndexProducts = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async () => await api.post<Message>(`/product/reindex`),
         onSuccess: () => {
@@ -213,6 +223,7 @@ export const useReIndexProducts = () => {
 
 export const useUploadImage = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: any }) => await api.patch<Message>(`/product/${id}/image`, data),
         onSuccess: () => {
@@ -227,6 +238,7 @@ export const useUploadImage = () => {
 
 export const useUploadImages = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: any }) => await api.post<Message>(`/product/${id}/images`, data),
         onSuccess: () => {
@@ -241,6 +253,7 @@ export const useUploadImages = () => {
 
 export const useDeleteImage = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/product/${id}/image`),
         onSuccess: () => {
@@ -255,6 +268,7 @@ export const useDeleteImage = () => {
 
 export const useDeleteImages = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id, imageId }: { id: number; imageId: number }) => await api.delete<Message>(`/product/${id}/images/${imageId}`),
         onSuccess: () => {
@@ -269,6 +283,7 @@ export const useDeleteImages = () => {
 
 export const useReorderImages = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id, imageIds }: { id: number; imageIds: number[] }) =>
             await api.patch<Message>(`/product/${id}/images/reorder`, imageIds),

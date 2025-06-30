@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Star } from "lucide-react";
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useAddReview } from "@/lib/hooks/useProduct";
-import { Star } from "lucide-react";
 
 interface ReviewFormProps {
     className?: string;

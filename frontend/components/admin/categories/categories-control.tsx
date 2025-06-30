@@ -43,8 +43,8 @@ const CategoryAction: React.FC<Props> = ({ category }) => {
                 onOpenChange={editState.setOpen}
             >
                 <CategoryForm
-                    hasParent={!!category?.parent_id}
                     current={category}
+                    hasParent={!!category?.parent_id}
                     parent_id={category?.parent_id}
                     type="update"
                     onClose={editState.close}

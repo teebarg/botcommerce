@@ -5,10 +5,10 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Download } from "lucide-react";
 
 import { ProductDetails } from "../admin/product/product-details";
-import Overlay from "@/components/overlay";
 
 import ProductUpload from "./product-upload";
 
+import Overlay from "@/components/overlay";
 import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
 import { useExportProducts, useReIndexProducts } from "@/lib/hooks/useProduct";

@@ -4,10 +4,9 @@ import React from "react";
 import { MessageSquare, Star } from "nui-react-icons";
 import { PencilLine } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-
 import ReviewForm from "./review-form";
 
+import { Badge } from "@/components/ui/badge";
 import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/utils";
 import { Review } from "@/schemas";

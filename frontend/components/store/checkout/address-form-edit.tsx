@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@components/ui/input";
 import { useQueryClient } from "@tanstack/react-query";
+
 import { Address, AddressSchema } from "@/schemas/address";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -210,8 +211,8 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
                         data-testid="submit-address-button"
                         disabled={updateAddress.isPending}
                         isLoading={updateAddress.isPending}
-                        variant="primary"
                         type="submit"
+                        variant="primary"
                     >
                         Update
                     </Button>

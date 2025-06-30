@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis/client";
 import { tryCatch } from "@/lib/try-catch";
-import { toast } from "sonner";
 
 type Props = {
     callbackUrl?: string;

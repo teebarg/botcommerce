@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
-import { Mail, Send } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis";
@@ -45,6 +45,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
             <div className="w-full">
                 <Input
                     required
+                    className="bg-content2"
                     data-testid="email-input"
                     label="Email"
                     name="email"
@@ -53,7 +54,6 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-content2"
                 />
                 <Button
                     aria-label="send magic link"

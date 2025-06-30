@@ -47,6 +47,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     const removeActivity = async (id: number) => {
         deleteActivity(id);
     };
+
     return (
         <div className="px-6 py-4 hover:bg-content1 transition-colors duration-150">
             <div className="flex items-start justify-between">

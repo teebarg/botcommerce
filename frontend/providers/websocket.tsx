@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { useAuth } from "./auth-provider";
+
 import { useInvalidate } from "@/lib/hooks/useApi";
 
 type WebSocketContextType = {

@@ -52,9 +52,9 @@ const SignUpForm: React.FC<Props> = () => {
                         data-testid="password-input"
                         endContent={
                             show ? (
-                                <EyeSlashFilled onClick={() => setShow(false)} className="h-6 w-6" />
+                                <EyeSlashFilled className="h-6 w-6" onClick={() => setShow(false)} />
                             ) : (
-                                <EyeFilled onClick={() => setShow(true)} className="h-6 w-6" />
+                                <EyeFilled className="h-6 w-6" onClick={() => setShow(true)} />
                             )
                         }
                         label="Password"

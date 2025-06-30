@@ -1,5 +1,6 @@
-import OnlineUsersWidget from "@/components/admin/online/OnlineUsersWidget";
 import { Metadata } from "next";
+
+import OnlineUsersWidget from "@/components/admin/online/OnlineUsersWidget";
 
 export const metadata: Metadata = {
     title: "Online Users",

@@ -9,7 +9,7 @@ export const TokenSchema = z.object({
 
 export const PagSchema = z.object({
     page: z.number(),
-    skip: z.number(),
+    skip: z.number().optional(),
     limit: z.number(),
     total_count: z.number(),
     total_pages: z.number(),

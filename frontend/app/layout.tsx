@@ -2,6 +2,7 @@ import "./globals.css";
 import { Lexend, Outfit } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import TanstackProviders from "./query-provider";
 
@@ -14,7 +15,6 @@ import SetShopSettings from "@/components/set-shop-settings";
 import { WebSocketProvider } from "@/providers/websocket";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/auth-provider";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 

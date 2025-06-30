@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 
+import { useAddToCart } from "./useCart";
+
 import { currency } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
-import { useAddToCart } from "./useCart";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { shopSettings } = useStore();

@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Address } from "@/schemas";
 import Overlay from "@/components/overlay";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Button } from "@/components/ui/button";
-import { Pencil, Plus, Trash2 } from "lucide-react";
 import AddAddressForm from "@/components/store/account/address/add-address-form";
 import { cn } from "@/lib/utils";
 import EditAddressForm from "@/components/store/account/address/edit-address-form";
@@ -58,6 +58,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
             <div className="flex items-center gap-x-2">
                 <Overlay
                     open={editState.isOpen}
+                    sheetClassName="min-w-[30vw]"
                     title="Edit address"
                     trigger={
                         <Button aria-label="edit address" data-testid="address-edit-button" size="iconOnly" onClick={editState.open}>
@@ -65,7 +66,6 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                         </Button>
                     }
                     onOpenChange={editState.setOpen}
-                    sheetClassName="min-w-[30vw]"
                 >
                     <EditAddressForm address={address} onClose={editState.close} />
                 </Overlay>
@@ -96,11 +96,13 @@ const AddressBook: React.FC = () => {
     if (isLoading) {
         return <Skeleton className="h-[200px]" />;
     }
+
     return (
         <div className="w-full">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 mt-4">
                 <Overlay
                     open={addState.isOpen}
+                    sheetClassName="min-w-[30vw]"
                     title="Add new address"
                     trigger={
                         <Button variant="primary" onClick={addState.open}>
@@ -109,7 +111,6 @@ const AddressBook: React.FC = () => {
                         </Button>
                     }
                     onOpenChange={addState.setOpen}
-                    sheetClassName="min-w-[30vw]"
                 >
                     <AddAddressForm onClose={addState.close} />
                 </Overlay>
