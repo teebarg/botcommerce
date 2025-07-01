@@ -1,7 +1,7 @@
-import { api } from "./base";
+import { api } from "@/apis/client";
 
-import { ApiResult } from "@/lib/try-catch";
-import { PaginatedProductSearch, Product } from "@/schemas/product";
+import { ApiResult, tryCatch } from "@/lib/try-catch";
+import { PaginatedProductSearch } from "@/schemas/product";
 
 interface SearchParams {
     query?: string;
@@ -14,12 +14,8 @@ interface SearchParams {
     sort?: string;
 }
 
-// Product API methods
 export const productApi = {
     async search(searchParams: SearchParams): ApiResult<PaginatedProductSearch> {
-        return await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams }, cache: "default" });
-    },
-    async get(slug: string): ApiResult<Product> {
-        return await api.get<Product>(`/product/${slug}`, { next: { tags: ["product"] } });
+        return await tryCatch<PaginatedProductSearch>(api.get("/product/search", { params: { ...searchParams } }));
     },
 };

@@ -48,8 +48,8 @@ export function ProductActions({ product }: ProductActionsProps) {
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="sr-only">Delete</DialogTitle>
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Delete</DialogTitle>
                     </DialogHeader>
                     <Confirm onClose={deleteState.close} onConfirm={() => deleteProduct(product.id)} />
                 </DialogContent>

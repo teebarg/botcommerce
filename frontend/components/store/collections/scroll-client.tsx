@@ -9,7 +9,6 @@ import { useSearchParams } from "next/navigation";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { WishItem } from "@/schemas";
 import { CollectionsSideBar } from "@/components/store/collections/checkbox-sidebar";
 import { CollectionsTopBar } from "@/components/store/collections/checkout-topbar";
 import NoProductsFound from "@/components/store/products/no-products";
@@ -35,14 +34,10 @@ export default function InfiniteScrollClient({
     initialSearchParams,
     data,
     collection,
-    wishlist,
-    user,
 }: {
     initialSearchParams: SearchParams;
     data: PaginatedProductSearch;
     collection?: Collection;
-    wishlist: WishItem[];
-    user?: any;
 }) {
     const { data: brands } = useBrands();
     const { data: categories } = useCategories();
@@ -184,7 +179,7 @@ export default function InfiniteScrollClient({
                                                     delay: index * 0.05,
                                                 }}
                                             >
-                                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
+                                                <ProductCard key={index} product={product} />
                                             </motion.div>
                                         ))}
                                     </div>

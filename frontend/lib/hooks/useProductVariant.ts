@@ -9,12 +9,12 @@ import { Product, ProductSearch } from "@/schemas/product";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { shopSettings } = useStore();
+    const { mutate: addToCart, isPending: loading } = useAddToCart();
 
     const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0]?.color || null);
     const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0]?.size || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
-    const [loading, setLoading] = useState<boolean>(false);
 
     const sizes = [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
     const colors = [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
@@ -53,18 +53,12 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedColor((prev) => (prev === color ? null : color));
     };
 
-    const addToCart = useAddToCart();
-
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
-
-        setLoading(true);
-
-        await addToCart.mutateAsync({
+        addToCart({
             variant_id: selectedVariant.id,
             quantity,
         });
-        setLoading(false);
     };
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {

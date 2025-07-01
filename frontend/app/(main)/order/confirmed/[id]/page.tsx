@@ -15,5 +15,5 @@ interface OrderConfirmationPageProps {
 export default async function OrderConfirmationPage({ params }: OrderConfirmationPageProps) {
     const { id } = await params;
 
-    return <OrderConfirmation orderId={Number(id)} />;
+    return <OrderConfirmation orderNumber={id} />;
 }

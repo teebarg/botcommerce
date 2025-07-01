@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from "react";
 
 import { User } from "@/schemas";
-import { useMe } from "@/lib/hooks/useApi";
+import { useMe } from "@/lib/hooks/useUser";
 
 type AuthContextType = {
     user?: User | null;

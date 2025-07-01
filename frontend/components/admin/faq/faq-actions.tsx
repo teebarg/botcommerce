@@ -61,8 +61,8 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="sr-only">Delete</DialogTitle>
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Delete</DialogTitle>
                     </DialogHeader>
                     <Confirm onClose={state.close} onConfirm={handleDelete} />
                 </DialogContent>

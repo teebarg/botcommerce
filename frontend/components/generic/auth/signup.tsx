@@ -1,90 +1,169 @@
 "use client";
 
-import React, { useActionState, useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
-import { signUp } from "@/actions/auth";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { useStore } from "@/app/store/use-store";
 import { Separator } from "@/components/ui/separator";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { api } from "@/apis";
+
+const signUpSchema = z.object({
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().optional(),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 type Props = {};
 
 const SignUpForm: React.FC<Props> = () => {
-    const [state, formAction, isPending] = useActionState(signUp, null);
     const [show, setShow] = useState<boolean>(false);
     const { shopSettings } = useStore();
+    const form = useForm<SignUpFormValues>({
+        resolver: zodResolver(signUpSchema),
+        defaultValues: {
+            first_name: "",
+            last_name: "",
+            email: "",
+            phone: "",
+            password: "",
+        },
+    });
+    const { handleSubmit, control } = form;
+    const [isPending, setIsPending] = useState(false);
 
-    useEffect(() => {
-        if (!state) return;
-        if (state?.error) {
-            toast.error(state.message);
-
+    const onSubmit = async (values: SignUpFormValues) => {
+        setIsPending(true);
+        const { error } = await api.auth.signUp(values);
+        setIsPending(false);
+        if (error) {
+            toast.error(error || "Sign up failed");
             return;
         }
         toast.success("Please check your email to verify your account");
         window.location.href = "/";
-    }, [state]);
+    };
 
     return (
         <React.Fragment>
-            <form action={formAction} className="w-full flex flex-col">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <Input required autoComplete="given-name" data-testid="first-name-input" label="First name" name="first_name" />
-                    <Input required autoComplete="family-name" data-testid="last-name-input" label="Last name" name="last_name" />
-                    <Input
-                        required
-                        autoComplete="email"
-                        data-testid="email-input"
-                        label="Email"
-                        name="email"
-                        type="email"
-                        wrapperClass="md:col-span-2"
-                    />
-                    <Input autoComplete="tel" data-testid="phone-input" label="Phone" name="phone" type="tel" />
-                    <Input
-                        required
-                        autoComplete="new-password"
-                        data-testid="password-input"
-                        endContent={
-                            show ? (
-                                <EyeSlashFilled className="h-6 w-6" onClick={() => setShow(false)} />
-                            ) : (
-                                <EyeFilled className="h-6 w-6" onClick={() => setShow(true)} />
-                            )
-                        }
-                        label="Password"
-                        name="password"
-                        type={show ? "text" : "password"}
-                    />
-                </div>
-                <span className="text-center text-default-500 text-xs mt-6">
-                    By creating an account, you agree to {shopSettings.shop_name} Store&apos;s{" "}
-                    <LocalizedClientLink className="underline" href="/content/privacy-policy">
-                        Privacy Policy
-                    </LocalizedClientLink>{" "}
-                    and{" "}
-                    <LocalizedClientLink className="underline" href="/content/terms-of-use">
-                        Terms of Use
-                    </LocalizedClientLink>
-                    .
-                </span>
-                <Button
-                    aria-label="join us"
-                    className="w-full mt-6"
-                    data-testid="register-button"
-                    isLoading={isPending}
-                    size="lg"
-                    type="submit"
-                    variant="primary"
-                >
-                    Join Us
-                </Button>
-            </form>
+            <Form {...form}>
+                <form className="w-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <FormField
+                            control={control}
+                            name="first_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>First name</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="given-name" data-testid="first-name-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={control}
+                            name="last_name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Last name</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="family-name" data-testid="last-name-input" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem className="md:col-span-2">
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input required autoComplete="email" data-testid="email-input" type="email" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={control}
+                            name="phone"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Phone</FormLabel>
+                                    <FormControl>
+                                        <Input autoComplete="tel" data-testid="phone-input" type="tel" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem className="md:col-span-2">
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            required
+                                            autoComplete="new-password"
+                                            data-testid="password-input"
+                                            endContent={
+                                                show ? (
+                                                    <EyeSlashFilled className="h-6 w-6" onClick={() => setShow(false)} />
+                                                ) : (
+                                                    <EyeFilled className="h-6 w-6" onClick={() => setShow(true)} />
+                                                )
+                                            }
+                                            type={show ? "text" : "password"}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <span className="text-center text-default-500 text-xs mt-6">
+                        By creating an account, you agree to {shopSettings.shop_name} Store&apos;s{" "}
+                        <LocalizedClientLink className="underline" href="/content/privacy-policy">
+                            Privacy Policy
+                        </LocalizedClientLink>{" "}
+                        and{" "}
+                        <LocalizedClientLink className="underline" href="/content/terms-of-use">
+                            Terms of Use
+                        </LocalizedClientLink>
+                        .
+                    </span>
+                    <Button
+                        aria-label="join us"
+                        className="w-full mt-6"
+                        data-testid="register-button"
+                        isLoading={isPending}
+                        size="lg"
+                        type="submit"
+                        variant="primary"
+                    >
+                        Join Us
+                    </Button>
+                </form>
+            </Form>
             <Separator className="my-6" />
             <SocialLoginButtons />
         </React.Fragment>

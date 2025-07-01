@@ -7,9 +7,8 @@ import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import { api as clientApi } from "@/apis/client";
 import ServerError from "@/components/generic/server-error";
-import { auth } from "@/actions/auth";
 import NoProductsFound from "@/components/store/products/no-products";
-import { Collection, WishItem } from "@/schemas";
+import { Collection } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { api } from "@/apis";
 
@@ -36,21 +35,12 @@ export async function generateMetadata({ params }: { params: Params }) {
 }
 
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
-    const user = await auth();
     const { minPrice, maxPrice, brand_id, cat_ids, page, sortBy } = (await searchParams) || {};
     const { slug } = await params;
     const { data: collection } = await tryCatch<Collection>(clientApi.get(`/collection/slug/${slug}`));
 
     if (!collection) {
         notFound();
-    }
-
-    let wishlist: WishItem[] = [];
-
-    if (user) {
-        const { data } = await api.user.wishlist();
-
-        wishlist = data ? data.wishlists : [];
     }
 
     const queryParams: any = {
@@ -77,7 +67,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
     return (
         <div className="container mx-auto py-4 px-2">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient data={data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
+                <InfiniteScrollClient data={data} initialSearchParams={queryParams} />
             </Suspense>
         </div>
     );

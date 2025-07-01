@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
-import { toast } from "sonner";
 
-import { useInvalidate } from "@/lib/hooks/useApi";
-import { api } from "@/apis";
+import { useUploadCarouselImage } from "@/lib/hooks/useCarousel";
 
 interface BannerImageManagerProps {
     bannerId: number;
@@ -14,8 +12,7 @@ interface BannerImageManagerProps {
 }
 
 const BannerImageManager: React.FC<BannerImageManagerProps> = ({ bannerId, onClose }) => {
-    const [isUploading, setIsUploading] = useState<boolean>(false);
-    const invalidate = useInvalidate();
+    const uploadImage = useUploadCarouselImage();
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
@@ -33,30 +30,18 @@ const BannerImageManager: React.FC<BannerImageManagerProps> = ({ bannerId, onClo
                 const base64 = reader.result as string;
                 const fileName = `images/${Date.now()}-${file.name}`;
 
-                void (async () => {
-                    try {
-                        setIsUploading(true);
-                        const { error } = await api.admin.carousel.uploadImage(bannerId, {
+                uploadImage
+                    .mutateAsync({
+                        id: bannerId,
+                        data: {
                             file: base64.split(",")[1]!,
                             file_name: fileName,
                             content_type: file.type,
-                        });
-
-                        if (error) {
-                            toast.error(error);
-
-                            return;
-                        }
-
-                        invalidate("carousel-banners");
-                        toast.success("Image uploaded successfully");
+                        },
+                    })
+                    .then(() => {
                         onClose?.();
-                    } catch (error) {
-                        toast.error(`Error - ${error as string}`);
-                    } finally {
-                        setIsUploading(false);
-                    }
-                })();
+                    });
             };
             reader.readAsDataURL(file);
         },
@@ -73,7 +58,7 @@ const BannerImageManager: React.FC<BannerImageManagerProps> = ({ bannerId, onClo
                 <Upload className="w-8 h-8 text-default-500" />
                 <p className="text-default-600">{isDragActive ? "Drop the image here" : "Drag & drop image or click to upload"}</p>
                 <p className="text-sm text-default-400">(Max 5MB, JPG/PNG/GIF only)</p>
-                {isUploading && (
+                {uploadImage.isPending && (
                     <div className="mb-4">
                         <div className="w-full bg-default-200 rounded-full h-2.5">
                             <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />

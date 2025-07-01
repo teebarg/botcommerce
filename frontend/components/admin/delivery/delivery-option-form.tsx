@@ -48,23 +48,13 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
     });
 
     useEffect(() => {
-        if (initialData) {
-            form.reset({
-                name: initialData.name,
-                description: initialData.description || "",
-                method: initialData.method,
-                amount: initialData.amount,
-                is_active: initialData.is_active,
-            });
-        } else {
-            form.reset({
-                name: "",
-                description: "",
-                method: "STANDARD",
-                amount: 0,
-                is_active: true,
-            });
-        }
+        form.reset({
+            name: initialData?.name || "",
+            description: initialData?.description || "",
+            method: initialData?.method || "STANDARD",
+            amount: initialData?.amount || 0,
+            is_active: initialData?.is_active || true,
+        });
     }, [initialData, form]);
 
     const handleSubmit = async (data: FormValues) => {
@@ -83,14 +73,13 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
         }
 
         toast.success(`${initialData ? "Updated" : "Created"} delivery option successfully`);
-        invalidate("all-delivery");
-        invalidate("available-delivery");
+        invalidate("delivery");
         onClose();
     };
 
     return (
-        <div>
-            <h3>{initialData ? "Edit" : "Add"} Delivery Option</h3>
+        <div className="px-2 md:px-4 py-8">
+            <h3 className="text-xl font-semibold">{initialData ? "Edit" : "Add"} Delivery Option</h3>
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
                     <FormField
@@ -100,7 +89,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                             <FormItem>
                                 <FormLabel>Name</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} placeholder="Ex: Express Delivery" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -114,7 +103,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} />
+                                    <Textarea {...field} placeholder="Ex: This is a description" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

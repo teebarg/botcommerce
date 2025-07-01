@@ -3,8 +3,7 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
-import { api } from "@/apis";
-import { deleteCookie, setCookie } from "@/lib/util/cookie";
+import { deleteCookie } from "@/lib/util/cookie";
 import { Session } from "@/schemas";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
@@ -65,55 +64,6 @@ export async function auth(): Promise<Session | null> {
             role: user.role,
         };
     } catch (error) {
-        return null; // Token is invalid or expired
+        return null;
     }
-}
-
-export async function signUp(_currentState: unknown, formData: FormData) {
-    const customer = {
-        email: formData.get("email"),
-        password: formData.get("password"),
-        first_name: formData.get("first_name"),
-        last_name: formData.get("last_name"),
-        phone: formData.get("phone"),
-    } as any;
-
-    const { data, error } = await api.auth.signUp(customer);
-
-    if (error || !data) return { error: true, message: error };
-
-    const { access_token } = data;
-
-    await setCookie("access_token", access_token);
-
-    return { error: false, message: "Successful" };
-}
-
-export async function requestMagicLink(_prevState: unknown, formData: FormData) {
-    const email = formData.get("email") as string;
-    const callbackUrl = formData.get("callbackUrl") as string;
-
-    try {
-        const { data, error } = await api.auth.requestMagicLink(email, callbackUrl);
-
-        if (error || !data) {
-            return { error: true, message: error?.toString() };
-        }
-
-        return { error: false, message: data.message };
-    } catch (error: any) {
-        return { error: true, message: error.toString() };
-    }
-}
-
-export async function verifyMagicLink(token: string) {
-    const { data, error } = await api.auth.verifyMagicLink(token);
-
-    if (error || !data) {
-        return { error: true, message: error?.toString() };
-    }
-
-    await setCookie("access_token", data.access_token);
-
-    return { error: false, message: "Successfully signed in" };
 }

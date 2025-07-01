@@ -46,6 +46,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
                 isLoading={completeCart.isPending}
                 variant="primary"
                 onClick={onPaymentCompleted}
+                size="lg"
             >
                 Pay {currency(amount)} via Bank Transfer
             </Button>

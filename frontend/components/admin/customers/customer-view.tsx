@@ -12,7 +12,7 @@ import CustomerCard from "./customer-card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Order, Status, User } from "@/schemas";
-import { useCustomers } from "@/lib/hooks/useApi";
+import { useUsers } from "@/lib/hooks/useUser";
 import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/utils";
 import { CardSkeleton } from "@/components/ui/skeletons";
@@ -32,7 +32,7 @@ const CustomerView: React.FC = () => {
         status,
     };
 
-    const { data, isLoading } = useCustomers({
+    const { data, isLoading } = useUsers({
         page: (page - 1) * LIMIT,
         limit: LIMIT,
         ...filters,

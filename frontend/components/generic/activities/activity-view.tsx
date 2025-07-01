@@ -20,8 +20,8 @@ const ActivityView: React.FC = () => {
 
     if (isPending) {
         return (
-            <div className="max-w-6xl mx-auto py-4 px-1 md:px-6 md:py-12 bg-content1">
-                <Skeleton className="h-20" />
+            <div className="max-w-6xl mx-auto py-4 px-1 md:px-6 md:py-12">
+                <Skeleton className="h-[400px]" />
             </div>
         );
     }

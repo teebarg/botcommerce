@@ -3,7 +3,6 @@
 import React from "react";
 import { Edit3, Trash2, Eye, EyeOff, ExternalLink, Edit2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { toast } from "sonner";
 
 import BannerForm from "./banner-form";
 import BannerImageManager from "./banner-image-upload";
@@ -13,41 +12,26 @@ import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { cn, formatDate } from "@/lib/utils";
+import { useDeleteCarouselBanner, useUpdateCarouselBanner } from "@/lib/hooks/useCarousel";
 
 interface BannerItemProps {
     banner: CarouselBanner;
-    onSuccess?: () => void;
 }
 
-const BannerItem: React.FC<BannerItemProps> = ({ banner, onSuccess }) => {
+const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const updateImageState = useOverlayTriggerState({});
-    const invalidate = useInvalidate();
+    const deleteBanner = useDeleteCarouselBanner();
+    const updateBanner = useUpdateCarouselBanner();
 
     const handleDelete = async () => {
-        const { error } = await api.admin.carousel.delete(banner.id);
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-        toast.success("Banner deleted successfully");
-        invalidate("carousel-banners");
+        await deleteBanner.mutateAsync(banner.id);
     };
 
-    const handleToggleActive = async () => {
-        try {
-            await api.admin.carousel.update(banner.id, { is_active: !banner.is_active });
-            toast.success("Banner status updated successfully");
-            invalidate("carousel-banners");
-        } catch (error) {
-            toast.error("Failed to update banner status");
-        }
+    const handleUpdate = async () => {
+        await updateBanner.mutateAsync({ id: banner.id, data: { is_active: !banner.is_active } });
     };
 
     return (
@@ -119,7 +103,7 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner, onSuccess }) => {
                                         className={cn(banner.is_active && "text-green-600 hover:bg-green-50")}
                                         size="icon"
                                         variant="ghost"
-                                        onClick={handleToggleActive}
+                                        onClick={handleUpdate}
                                     >
                                         {banner.is_active ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                     </Button>
@@ -134,7 +118,7 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner, onSuccess }) => {
                                         }
                                         onOpenChange={editState.setOpen}
                                     >
-                                        <BannerForm banner={banner} onClose={editState.close} onSuccess={onSuccess} />
+                                        <BannerForm banner={banner} onClose={editState.close} />
                                     </Overlay>
 
                                     <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
@@ -144,8 +128,8 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner, onSuccess }) => {
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle className="sr-only">Delete</DialogTitle>
+                                            <DialogHeader className="sr-only">
+                                                <DialogTitle>Delete</DialogTitle>
                                             </DialogHeader>
                                             <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
                                         </DialogContent>

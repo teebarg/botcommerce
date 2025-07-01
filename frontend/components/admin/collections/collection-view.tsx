@@ -22,15 +22,16 @@ interface Props {
 const CollectionView: React.FC<Props> = ({ search }) => {
     const { data: collections, error, isLoading } = useCollections(search);
 
-    if (error || !collections) {
-        return <ServerError />;
-    }
     if (isLoading) {
         return (
             <div className="px-2 md:px-10 py-8">
                 <Skeleton className="h-192" />
             </div>
         );
+    }
+
+    if (error) {
+        return <ServerError />;
     }
 
     return (

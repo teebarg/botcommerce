@@ -106,21 +106,6 @@ export const useProductReviewsSearch = (product_id: number, page = 1, limit = 20
     });
 };
 
-export const useAddReview = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (input: { product_id: number; rating: number; comment: string }) => await api.post<Review>(`/reviews/`, input),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["product-reviews"] });
-            toast.success("Review added successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to add review");
-        },
-    });
-};
-
 export const useCreateVariant = () => {
     const queryClient = useQueryClient();
 

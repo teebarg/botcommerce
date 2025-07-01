@@ -5,11 +5,9 @@ import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis";
-import { auth } from "@/actions/auth";
 import ServerError from "@/components/generic/server-error";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import NoProductsFound from "@/components/store/products/no-products";
-import { WishItem } from "@/schemas";
 
 export const metadata: Metadata = {
     title: "Search",
@@ -28,15 +26,6 @@ type SearchParams = Promise<{
 export default async function SearchResults({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
     const { query } = await params;
     const { minPrice, maxPrice, brand_id, cat_ids, page, sortBy } = (await searchParams) || {};
-    const user = await auth();
-
-    let wishlist: WishItem[] = [];
-
-    if (user) {
-        const { data } = await api.user.wishlist();
-
-        wishlist = data ? data.wishlists : [];
-    }
 
     const queryParams: any = {
         search: query,
@@ -71,7 +60,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
                 </LocalizedClientLink>
             </div>
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient data={data} initialSearchParams={queryParams} user={user} wishlist={wishlist} />
+                <InfiniteScrollClient data={data} initialSearchParams={queryParams} />
             </Suspense>
         </div>
     );

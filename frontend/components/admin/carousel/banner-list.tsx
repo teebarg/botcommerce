@@ -1,37 +1,26 @@
 "use client";
 
 import { Plus, Upload } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import BannerForm from "./banner-form";
 import BannerItem from "./banner-item";
 
-import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import { CarouselBanner } from "@/schemas/carousel";
 import Overlay from "@/components/overlay";
 import { Skeleton } from "@/components/ui/skeletons";
 import ClientOnly from "@/components/generic/client-only";
+import { useCarouselBanners } from "@/lib/hooks/useCarousel";
 
-interface CarouselBannerListProps {
-    initialBanners: CarouselBanner[];
-}
-
-export default function CarouselBannerList({ initialBanners }: CarouselBannerListProps) {
+export default function CarouselBannerList() {
     const addState = useOverlayTriggerState({});
 
-    const { data, refetch, isLoading } = useQuery({
-        queryKey: ["carousel-banners"],
-        queryFn: async () => await api.admin.carousel.list(),
-        initialData: { data: initialBanners, error: null },
-    });
+    const { data: banners, isLoading } = useCarouselBanners();
 
     if (isLoading) {
         return <Skeleton className="h-[200px]" />;
     }
-
-    const banners = data?.data;
 
     return (
         <ClientOnly>
@@ -52,14 +41,13 @@ export default function CarouselBannerList({ initialBanners }: CarouselBannerLis
                         }
                         onOpenChange={addState.setOpen}
                     >
-                        <BannerForm onClose={addState.close} onSuccess={refetch} />
+                        <BannerForm onClose={addState.close} />
                     </Overlay>
                 </div>
             </div>
 
             <div className="space-y-4">
-                {banners &&
-                    banners?.map((banner: CarouselBanner, idx: number) => <BannerItem key={idx} banner={banner} onSuccess={() => refetch()} />)}
+                {banners && banners?.map((banner: CarouselBanner, idx: number) => <BannerItem key={idx} banner={banner} />)}
 
                 {(!banners || banners?.length === 0) && (
                     <div className="bg-card rounded-2xl shadow-sm border border-default-200 p-12 text-center">

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { ArrowLeft, Heart, Star, Plus, Minus, ShoppingCart, MessageCircle } from "lucide-react";
-import { toast } from "sonner";
 import Image from "next/image";
 
 import ProductDetails from "./product-details";
@@ -8,10 +7,10 @@ import ProductDetails from "./product-details";
 import { ProductSearch } from "@/schemas/product";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import LocalizedClientLink from "@/components/ui/link";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
+import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -34,33 +33,18 @@ const ProductOverview: React.FC<{
         loading,
     } = useProductVariant(product);
 
-    const invalidate = useInvalidate();
+    const { mutate: createWishlist } = useUserCreateWishlist();
+    const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
     const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
     const selectedImage = product.images[selectedImageIdx];
 
     const addWishlist = async () => {
-        const { error } = await api.user.addWishlist(product.id);
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-        invalidate("user-wishlist");
-        toast.success("Added to favorites");
+        createWishlist(product.id);
     };
 
     const removeWishlist = async () => {
-        const { error } = await api.user.deleteWishlist(product.id);
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-        invalidate("user-wishlist");
-        toast.success("Removed from favorites");
+        deleteWishlist(product.id);
     };
 
     return (
@@ -229,7 +213,7 @@ const ProductOverview: React.FC<{
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-default-500">Total</p>
-                            <p className="text-2xl font-bold text-default-900">{currency(selectedVariant?.price * quantity)}</p>
+                            <p className="text-2xl font-bold text-default-900">{currency((selectedVariant?.price * quantity) || 0)}</p>
                         </div>
                         <div className="text-right">
                             <p className="text-sm text-default-500">Quantity</p>

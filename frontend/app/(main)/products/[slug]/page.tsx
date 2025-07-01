@@ -2,17 +2,18 @@ import { notFound } from "next/navigation";
 import React from "react";
 
 import RelatedProducts from "@/components/store/products/related-products";
-import { api } from "@/apis";
+import { api } from "@/apis/client";
 import ServerError from "@/components/generic/server-error";
 import ProductView from "@/components/store/products/product-view";
 import ReviewsSection from "@/components/product/product-reviews";
-import { auth } from "@/actions/auth";
+import { tryCatch } from "@/lib/try-catch";
+import { Product } from "@/schemas";
 
 type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: product, error } = await api.product.get(slug);
+    const { data: product, error } = await tryCatch<Product>(api.get(`/product/${slug}`));
 
     if (error || !product) {
         return {};
@@ -32,9 +33,8 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
-    const user = await auth();
 
-    const { data: product, error } = await api.product.get(slug);
+    const { data: product, error } = await tryCatch<Product>(api.get(`/product/${slug}`));
 
     if (error) {
         return <ServerError />;
@@ -47,7 +47,7 @@ export default async function ProductPage({ params }: { params: Params }) {
     return (
         <div className="flex flex-col gap-y-8">
             <ProductView product={product} />
-            {user && <ReviewsSection product_id={product.id} />}
+            <ReviewsSection product_id={product.id} />
 
             <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products">
                 <RelatedProducts product={product} />

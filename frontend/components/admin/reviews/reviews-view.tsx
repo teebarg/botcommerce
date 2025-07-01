@@ -13,15 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { timeAgo } from "@/lib/utils";
 import PaginationUI from "@/components/pagination";
-import { useReviews } from "@/lib/hooks/useApi";
+import { useReviews } from "@/lib/hooks/useReview";
 import ServerError from "@/components/generic/server-error";
 import { Skeleton } from "@/components/ui/skeletons";
 
-interface Props {
-    deleteAction: (id: number) => void;
-}
-
-const ReviewView: React.FC<Props> = ({ deleteAction }) => {
+const ReviewView: React.FC = () => {
     const searchParams = useSearchParams();
     const skip = parseInt(searchParams.get("skip") || "0", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
@@ -32,8 +28,12 @@ const ReviewView: React.FC<Props> = ({ deleteAction }) => {
         return <Skeleton />;
     }
 
-    if (error || !data) {
+    if (error) {
         return <ServerError />;
+    }
+
+    if (!data) {
+        return <div className="px-2 md:px-12 py-8">No reviews found</div>;
     }
 
     const { reviews, ...pagination } = data;
@@ -85,7 +85,7 @@ const ReviewView: React.FC<Props> = ({ deleteAction }) => {
                                 </TableCell>
                                 <TableCell>{timeAgo(review.created_at)}</TableCell>
                                 <TableCell className="flex justify-end">
-                                    <ReviewActions deleteAction={deleteAction} review={review} />
+                                    <ReviewActions review={review} />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -102,7 +102,7 @@ const ReviewView: React.FC<Props> = ({ deleteAction }) => {
             <div className="md:hidden">
                 <div>
                     <div className="flex flex-col gap-3">
-                        {reviews?.map((review: Review, idx: number) => <ReviewItem key={idx} deleteAction={deleteAction} review={review} />)}
+                        {reviews?.map((review: Review, idx: number) => <ReviewItem key={idx} review={review} />)}
                     </div>
 
                     {reviews?.length === 0 && (

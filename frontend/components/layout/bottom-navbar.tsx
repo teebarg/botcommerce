@@ -6,11 +6,8 @@ import StoreMenuComp from "./store-mobile-menu-drawer";
 import { cn } from "@/lib/utils";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
-import { auth } from "@/actions/auth";
 
 const ButtonNav = async ({ className }: { className?: string }) => {
-    const user = await auth();
-
     interface NavLink {
         icon: React.ReactNode;
         label: string;
@@ -54,7 +51,7 @@ const ButtonNav = async ({ className }: { className?: string }) => {
                 Cart
             </span>
 
-            <StoreMenuComp user={user} />
+            <StoreMenuComp />
         </nav>
     );
 };

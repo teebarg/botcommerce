@@ -346,12 +346,10 @@ async def delete_product(id: int) -> Message:
     """
     Delete a product.
     """
-    # Delete related data first due to foreign key constraints
     await db.productimage.delete_many(where={"product_id": id})
     await db.review.delete_many(where={"product_id": id})
     await db.productvariant.delete_many(where={"product_id": id})
 
-    # Delete the product
     await db.product.delete(where={"id": id})
 
     try:
@@ -393,12 +391,10 @@ async def create_variant(id: int, variant: VariantWithStatus):
 
 @router.put("/variants/{variant_id}")
 async def update_variant(variant_id: int, variant: VariantWithStatus):
-    # Check if variant exists
     existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
 
-    # Prepare update data
     update_data = {}
 
     if variant.price:
@@ -419,7 +415,6 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
     if variant.color is not None:
         update_data["color"] = variant.color
 
-    # Update the variant
     updated_variant = await db.productvariant.update(
         where={"id": variant_id},
         data=update_data,

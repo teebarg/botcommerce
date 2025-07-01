@@ -23,11 +23,11 @@ export const useOrders = (searchParams: OrderSearchParams) => {
     });
 };
 
-export const useOrder = (id: number) => {
+export const useOrder = (orderNumber: string) => {
     return useQuery({
-        queryKey: ["order", id],
-        queryFn: async () => await api.get<Order>(`/order/${id}`),
-        enabled: !!id, // prevents running when id is null
+        queryKey: ["order", orderNumber],
+        queryFn: async () => await api.get<Order>(`/order/${orderNumber}`),
+        enabled: !!orderNumber,
     });
 };
 

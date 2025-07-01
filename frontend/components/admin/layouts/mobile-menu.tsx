@@ -45,7 +45,6 @@ const AdminMobileMenu: React.FC = () => {
 
     return (
         <div className="h-full bg-content1 rounded-[inherit] overflow-hidden">
-            {/* User Profile Section */}
             <div className="p-4 bg-primary text-white">
                 <div className="flex items-center space-x-3">
                     <Avatar>

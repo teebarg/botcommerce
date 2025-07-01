@@ -47,15 +47,17 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     const { mutateAsync: createFaq, isPending: createLoading } = useCreateFaq();
     const { mutateAsync: updateFaq, isPending: updateLoading } = useUpdateFaq();
 
-    const onSubmit = async (values: FaqFormValues) => {
-        if (faq) {
-            await updateFaq({ id: faq.id, data: values });
-        } else {
-            await createFaq(values);
-            form.reset();
-        }
+    const loading = createLoading || updateLoading;
 
-        onCancel();
+    const onSubmit = (values: FaqFormValues) => {
+        if (faq) {
+            updateFaq({ id: faq.id, data: values });
+        } else {
+            createFaq(values).then(() => {
+                form.reset();
+                onCancel();
+            });
+        }
     };
 
     return (
@@ -137,7 +139,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                         <Button className="min-w-32" type="button" variant="outline" onClick={onCancel}>
                             Cancel
                         </Button>
-                        <Button disabled={createLoading || updateLoading} isLoading={createLoading || updateLoading} type="submit" variant="primary">
+                        <Button disabled={loading} isLoading={loading} type="submit" variant="primary">
                             {faq ? "Update FAQ" : "Create FAQ"}
                         </Button>
                     </div>

@@ -5,7 +5,6 @@ import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { useWebSocket } from "@/providers/websocket";
 import { getCookie } from "@/lib/util/server-utils";
 
@@ -13,14 +12,11 @@ interface ProductUploadProps {}
 
 const ProductUpload: React.FC<ProductUploadProps> = () => {
     const { currentMessage } = useWebSocket();
-    const invalidate = useInvalidate();
 
     useEffect(() => {
         if (!currentMessage) return;
-        if (currentMessage.status === "completed") {
+        if (currentMessage?.message_type === "sheet-processor" && currentMessage?.status === "completed") {
             toast.success("Products uploaded successfully");
-            invalidate("products");
-            invalidate("product-search");
         }
     }, [currentMessage]);
 

@@ -68,7 +68,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
                 if (data?.type === "product-index" && data?.status === "completed") {
                     invalidate("products");
-                    invalidate("product-search");
                 }
 
                 setMessages((prev) => [...prev, data]);

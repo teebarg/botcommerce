@@ -7,10 +7,9 @@ import { Review } from "@/schemas";
 
 interface ReviewListProps {
     review: Review;
-    deleteAction: (id: number) => void;
 }
 
-const ReviewItem = ({ review, deleteAction }: ReviewListProps) => {
+const ReviewItem = ({ review }: ReviewListProps) => {
     return (
         <div className="space-y-4">
             <Card key={review.id} className="p-4 hover:shadow-md transition-shadow">
@@ -34,7 +33,7 @@ const ReviewItem = ({ review, deleteAction }: ReviewListProps) => {
 
                 <p className="mt-2 text-sm text-default-900">{review.comment}</p>
                 <p className="mt-2 text-xs text-default-500 mb-4">Posted on {new Date(review.created_at).toLocaleDateString()}</p>
-                <ReviewActions deleteAction={deleteAction} review={review} />
+                <ReviewActions review={review} />
             </Card>
         </div>
     );

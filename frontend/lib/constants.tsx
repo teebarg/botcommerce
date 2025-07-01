@@ -23,5 +23,4 @@ export const paymentInfoMap: Record<string, { title: string; description: string
         description: "Pay in cash or card when you collect your order",
         icon: <ShoppingBag className="text-indigo-600" size={20} />,
     },
-    // Add more payment providers here
 };

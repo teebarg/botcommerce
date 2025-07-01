@@ -44,11 +44,11 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
             </Overlay>
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                 <DialogTrigger>
-                    <Trash2 className="h-5 w-5 text-danger" />
+                    <Trash2 className="h-5 w-5 text-danger cursor-pointer" />
                 </DialogTrigger>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="sr-only">Delete</DialogTitle>
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Delete</DialogTitle>
                     </DialogHeader>
                     <Confirm onClose={state.close} onConfirm={onConfirmDelete} />
                 </DialogContent>

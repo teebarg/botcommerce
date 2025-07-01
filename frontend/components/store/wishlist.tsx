@@ -3,12 +3,11 @@
 import { HeartFilled } from "nui-react-icons";
 import React from "react";
 import Image from "next/image";
-import { toast } from "sonner";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { api } from "@/apis";
 import { ProductImage } from "@/schemas";
+import { useUserDeleteWishlist } from "@/lib/hooks/useUser";
 
 interface WishlistItemProps {
     id: number;
@@ -18,20 +17,9 @@ interface WishlistItemProps {
 }
 
 const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) => {
+    const { mutate: deleteWishlist } = useUserDeleteWishlist();
     const onRemove = async () => {
-        try {
-            const { error } = await api.user.deleteWishlist(id);
-
-            if (error) {
-                toast.error(error);
-
-                return;
-            }
-
-            toast.success("Product Successfully removed from wishlist");
-        } catch (error: any) {
-            toast.error("An error occurred, please contact support");
-        }
+        deleteWishlist(id);
     };
 
     return (

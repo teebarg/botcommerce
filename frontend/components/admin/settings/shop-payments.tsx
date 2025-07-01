@@ -53,7 +53,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/bank-details/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["bank-details"] });
             toast.success("Bank details deleted successfully");
         },
         onError: (error: any) => {
