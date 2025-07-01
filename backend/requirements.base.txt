@@ -3,7 +3,7 @@ passlib[bcrypt]>=1.7.4,<2.0.0
 pyjwt>=2.8.0,<3.0.0
 python-multipart>=0.0.7,<1.0.0
 openpyxl==3.1.5
-meilisearch==0.34.1
+meilisearch==0.36.0
 redis==6.2.0
 
 email-validator>=2.1.0.post1,<3.0.0.0
