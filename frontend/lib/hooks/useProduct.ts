@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
@@ -34,6 +34,20 @@ export const useProductSearch = (params: SearchParams) => {
     return useQuery({
         queryKey: ["products", "search", JSON.stringify(params)],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/search", { params }),
+    });
+};
+
+export const useProductInfiniteSearch = (params: SearchParams) => {
+    return useInfiniteQuery({
+        queryKey: ["products", "infinite-search", JSON.stringify(params)],
+        queryFn: async ({ pageParam = 1 }) => await api.get<PaginatedProductSearch>("/product/search", { params: { page: pageParam, limit: 12, ...params } }),
+        getNextPageParam: (lastPage: PaginatedProductSearch) => {
+            const nextSkip = lastPage.page + 1;
+            const hasMore = nextSkip < lastPage.total_count;
+
+            return hasMore ? nextSkip : undefined;
+        },
+        initialPageParam: 1,
     });
 };
 

@@ -50,7 +50,7 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
             <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-6 gap-y-8">
                 {productPreviews.slice(0, 4).map((product: ProductSearch, idx: number) => (
                     <li key={idx}>
-                        <ProductCard product={product} wishlist={[]} />
+                        <ProductCard product={product} />
                     </li>
                 ))}
             </ul>

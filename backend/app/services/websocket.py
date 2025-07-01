@@ -12,18 +12,13 @@ class RedisConnectionManager:
     def __init__(self):
         self.redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
-        # Local connections for this server instance
         self.local_connections: Dict[str, WebSocket] = {}
 
-        # Unique server ID to identify this instance
         self.server_id = str(uuid.uuid4())
 
-        # Redis keys
         self.connections_key = "ws:connections"
-        self.messages_key = f"ws:messages:{self.server_id}"  # Server-specific message queue
+        self.messages_key = f"ws:messages:{self.server_id}"
         self.broadcast_key = "ws:broadcast_messages"
-
-        # Start message polling
         self._polling_task = None
         logger.info(f"Initialized Redis WebSocket manager for server {self.server_id}")
 
@@ -54,7 +49,6 @@ class RedisConnectionManager:
                     except json.JSONDecodeError:
                         logger.error(f"Invalid server message format: {server_message}")
 
-                # Small delay to prevent busy polling
                 await asyncio.sleep(0.1)
 
             except Exception as e:
@@ -66,16 +60,13 @@ class RedisConnectionManager:
         try:
             await websocket.accept()
 
-            # Start polling if not already started
             self._start_polling()
 
-            # Store connection locally
             self.local_connections[user_id] = websocket
 
-            # Register in Redis with this server's ID
             connection_data = {
                 "server_id": self.server_id,
-                "connected_at": datetime.utcnow().isoformat(),
+                "connected_at": datetime.now(timezone.utc).isoformat(),
                 "metadata": metadata or {}
             }
 
@@ -103,7 +94,6 @@ class RedisConnectionManager:
                     pass
                 del self.local_connections[user_id]
 
-            # Remove from Redis
             self.redis_client.hdel(self.connections_key, user_id)
 
             logger.info(f"User {user_id} disconnected from server {self.server_id}")

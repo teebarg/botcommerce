@@ -76,11 +76,7 @@ serve-backend: ## Serve the backend in terminal
 serve-frontend: ## Serve the frontend in terminal
 	@cd frontend; npm run dev-https-t
 
-serve-celery:
-	@cd backend; celery -A celery_app worker -l info
-
 serve-huey:
-	# @cd backend; python -m huey_consumer.py huey_instance.huey --loglevel INFO
 	@cd backend; huey_consumer.py huey_instance.huey
 
 sync: ## Sync dependencies

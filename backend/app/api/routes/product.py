@@ -250,7 +250,7 @@ async def create_product(product: ProductCreate):
 async def reindex_products():
     """
     Re-index all products in the database to Meilisearch.
-    This operation is performed asynchronously via Celery.
+    This operation is performed asynchronously via Huey.
     """
     try:
         task = index_products_task()

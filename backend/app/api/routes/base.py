@@ -5,40 +5,11 @@ from fastapi import (
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role
-from app.core.deps import get_current_superuser, CacheService
+from app.core.deps import get_current_superuser
 from typing import Literal, Optional
 from datetime import timedelta, datetime
-import time
 
 router = APIRouter()
-
-@router.get("/sync-disconnected")
-async def sync_disconnected(cache: CacheService):
-    now = datetime.utcnow()
-    max_age = int(time.time()) - 120  # anything not seen in the last 2 mins
-
-    keys = cache.keys("session:*")
-    disconnected = []
-
-    for key in keys:
-        session_data = cache.hgetall(key)
-        last_seen = int(session_data.get("updated_at", 0))
-
-        if last_seen < max_age:
-            session_id = key.replace("session:", "")
-
-            # mark as disconnected in DB
-            # await db.usersession.update(
-            #     where={"id": session_id},
-            #     data={"disconnectedAt": now}
-            # )
-
-            # remove from Redis
-            cache.delete(key)
-
-            disconnected.append(session_id)
-
-    return {"disconnected_sessions": disconnected}
 
 @router.get("/stats", dependencies=[Depends(get_current_superuser)])
 async def admin_dashboard_stats():
