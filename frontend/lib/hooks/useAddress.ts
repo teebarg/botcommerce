@@ -15,7 +15,6 @@ export const useAddress = (id: number) => {
     return useQuery({
         queryKey: ["address", id],
         queryFn: async () => await api.get<Address>(`/address/${id}`),
-        enabled: !!id,
     });
 };
 

@@ -89,12 +89,12 @@ const AddressBook: React.FC = () => {
     const addState = useOverlayTriggerState({});
     const { data, isLoading, error } = useAddresses();
 
-    if (!data || error) {
-        return <ServerError />;
-    }
-
     if (isLoading) {
         return <Skeleton className="h-[200px]" />;
+    }
+
+    if (error) {
+        return <ServerError />;
     }
 
     return (

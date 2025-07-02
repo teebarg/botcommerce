@@ -30,13 +30,13 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
         return <Skeleton className="min-h-[400px]" />;
     }
 
-    if (error || !data) {
+    if (error) {
         return <ServerError />;
     }
 
-    const productPreviews = data.products?.filter((item: ProductSearch) => item.id !== product.id);
+    const productPreviews = data?.products?.filter((item: ProductSearch) => item.id !== product.id);
 
-    if (!productPreviews.length) {
+    if (!productPreviews?.length) {
         return null;
     }
 

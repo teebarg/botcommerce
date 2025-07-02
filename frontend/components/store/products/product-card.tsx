@@ -26,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
     const { user } = useAuth();
 
-    const { data } = useUserWishlist(user?.id);
+    const { data } = useUserWishlist();
 
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
 

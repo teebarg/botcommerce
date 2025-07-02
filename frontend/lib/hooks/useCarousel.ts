@@ -15,7 +15,6 @@ export const useCarouselBanner = (id: number) => {
     return useQuery({
         queryKey: ["carousel-banner", id],
         queryFn: async () => await api.get<CarouselBanner>(`/carousel/${id}`),
-        enabled: !!id,
     });
 };
 

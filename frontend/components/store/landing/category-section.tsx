@@ -17,7 +17,7 @@ const CategoriesSection: React.FC = () => {
     if (isLoading) {
         return (
             <div className="max-w-8xl mx-auto w-full mt-4">
-                <Skeleton className="h-48" />
+                <Skeleton className="h-72" />
             </div>
         );
     }

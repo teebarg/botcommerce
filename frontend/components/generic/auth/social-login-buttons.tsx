@@ -20,8 +20,15 @@ export default function SocialLoginButtons({ callbackUrl }: Props) {
         setIsLoading(provider);
         const { data, error } = await tryCatch<{ url: string }>(api.get(`/auth/oauth/${provider}`));
 
-        if (error || !data?.url) {
+        if (error) {
             toast.error(error);
+            setIsLoading(null);
+
+            return;
+        }
+
+        if (!data?.url) {
+            toast.error("No URL received");
             setIsLoading(null);
 
             return;

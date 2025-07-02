@@ -69,7 +69,7 @@ export default async function Home() {
                 title="Big Sale on Top Brands!"
             />
 
-            <section className="py-16 bg-content3">
+            <section className="py-16 bg-content2">
                 <div className="max-w-8xl mx-auto px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold text-default-foreground mb-2">Trending Products</h2>

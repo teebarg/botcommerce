@@ -63,7 +63,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
     const getMessages = async (id: string) => {
         const { data, error } = await tryCatch<ChatMessage[]>(api.get(`/conversation/conversations/${id}/messages`));
 
-        if (error || !data) {
+        if (error) {
             toast.error("Failed to fetch messages.");
 
             return;
@@ -71,10 +71,10 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
 
         setMessages((prev) => [
             ...prev,
-            ...data.map((message: ChatMessage) => ({
+            ...(data?.map((message: ChatMessage) => ({
                 text: message.content,
                 isUser: message.sender === "USER",
-            })),
+            })) ?? []),
         ]);
     };
 

@@ -10,7 +10,7 @@ export const useMe = () => {
         queryFn: async () => {
             return await api.get<User>("/users/me");
         },
-        enabled: typeof window !== "undefined", // prevent server fetch
+        enabled: typeof window !== "undefined",
     });
 };
 
@@ -75,11 +75,11 @@ export const useDeleteUser = () => {
     });
 };
 
-export const useUserWishlist = (userid?: number) => {
+export const useUserWishlist = () => {
     return useQuery({
-        queryKey: ["user-wishlist"],
+        queryKey: ["wishlist"],
         queryFn: async () => await api.get<Wishlist>(`/users/wishlist`),
-        enabled: typeof window !== "undefined" && !!userid,
+        enabled: typeof window !== "undefined",
     });
 };
 
@@ -89,7 +89,7 @@ export const useUserCreateWishlist = () => {
     return useMutation({
         mutationFn: async (product_id: number) => await api.post<Wishlist>("/users/wishlist", { product_id }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["user-wishlist"] });
+            queryClient.invalidateQueries({ queryKey: ["wishlist"] });
             toast.success("Wishlist created successfully");
         },
         onError: (error) => {
@@ -104,7 +104,7 @@ export const useUserDeleteWishlist = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Wishlist>(`/users/wishlist/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["user-wishlist"] });
+            queryClient.invalidateQueries({ queryKey: ["wishlist"] });
             toast.success("Wishlist deleted successfully");
         },
         onError: (error) => {

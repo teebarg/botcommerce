@@ -1,13 +1,16 @@
+import { Separator } from "@/components/ui/separator";
 import { AlertCircle, CheckCircle } from "lucide-react";
 
 const ReturnsPage = () => (
-    <div className="bg-content2">
-        <div className="bg-content3 border-b border-divider">
+    <div>
+        <div className="bg-content1">
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold text-default-foreground">Returns & Exchanges</h1>
                 <p className="text-default-600 mt-1">Easy returns within 30 days of purchase</p>
             </div>
         </div>
+
+        <Separator />
 
         <div className="max-w-4xl mx-auto px-4 py-12">
             <div className="space-y-8">
@@ -23,7 +26,7 @@ const ReturnsPage = () => (
                     </div>
                 </div>
 
-                <div className="bg-content1 rounded-xl shadow-sm border border-divider p-8">
+                <div className="bg-content2 rounded-xl shadow-sm border border-divider p-8">
                     <h2 className="text-xl font-semibold text-default-900 mb-6">Return Process</h2>
                     <div className="space-y-6">
                         <div className="flex items-start">

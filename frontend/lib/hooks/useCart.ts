@@ -13,7 +13,6 @@ export const useCart = () => {
         queryFn: async () => {
             return await api.get<Cart>("/cart/");
         },
-        // enabled: !!cartId, // prevents running when cartId is null
     });
 };
 
@@ -39,7 +38,6 @@ export const useAddress = (addressId: number) => {
     return useQuery({
         queryKey: ["cart-address", addressId],
         queryFn: async () => await api.get<Address>(`/address/${addressId}`),
-        enabled: !!addressId, // prevents running when addressId is null
     });
 };
 
@@ -122,8 +120,6 @@ export const useUpdateCartDetails = () => {
             return await api.put<Cart>("/cart/", update);
         },
         onSuccess: () => {
-            // queryClient.invalidateQueries({ queryKey: ["cart"] });
-            // queryClient.invalidateQueries({ queryKey: ["user-address"] });
             queryClient.invalidateQueries({ queryKey: ["checkout-cart"] });
             toast.success("Cart details updated");
         },

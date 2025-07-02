@@ -52,7 +52,6 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
 
             if (data?.access_token) {
                 setCookie("access_token", data.access_token);
-                // Redirect to the intended destination or dashboard
                 const callbackUrl = searchParams.get("state") || "/";
 
                 router.push(callbackUrl);

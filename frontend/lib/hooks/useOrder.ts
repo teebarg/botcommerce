@@ -19,7 +19,6 @@ export const useOrders = (searchParams: OrderSearchParams) => {
     return useQuery({
         queryKey: ["orders", JSON.stringify(searchParams)],
         queryFn: async () => await api.get<PaginatedOrder>(`/order/`, { params: { ...searchParams } }),
-        enabled: !!searchParams, // prevents running when searchParams is null
     });
 };
 
@@ -27,7 +26,6 @@ export const useOrder = (orderNumber: string) => {
     return useQuery({
         queryKey: ["order", orderNumber],
         queryFn: async () => await api.get<Order>(`/order/${orderNumber}`),
-        enabled: !!orderNumber,
     });
 };
 

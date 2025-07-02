@@ -15,7 +15,6 @@ export const useReview = (id: number) => {
     return useQuery({
         queryKey: ["review", id],
         queryFn: async () => await api.get<Review>(`/reviews/${id}`),
-        enabled: !!id,
     });
 };
 
