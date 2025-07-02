@@ -76,15 +76,12 @@ serve-backend: ## Serve the backend in terminal
 serve-frontend: ## Serve the frontend in terminal
 	@cd frontend; npm run dev-https-t
 
-serve-huey:
-	@cd backend; huey_consumer.py huey_instance.huey
-
 sync: ## Sync dependencies
 	@cd backend; uv sync && source .venv/bin/activate
 
 dev: ## Serve the project in terminal
 	@echo "$(YELLOW)Running development in terminal...$(RESET)"
-	make -j 3 serve-backend serve-frontend serve-huey
+	make -j 2 serve-backend serve-frontend
 
 
 # Backend Deployment

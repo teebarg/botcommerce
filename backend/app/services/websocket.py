@@ -67,7 +67,7 @@ class InMemoryWebSocketManager:
 
         sent = 0
         for user_id in list(self.connections.keys()):
-            if await self.send_to_user(user_id, message, message_type="online-users"):
+            if await self.send_to_user(user_id, message, message_type=message_type):
                 sent += 1
 
         return sent

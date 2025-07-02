@@ -1,6 +1,3 @@
-from app.core.config import settings
-
-# tasks/sync_tasks.py
 from huey_instance import huey
 
 @huey.task()

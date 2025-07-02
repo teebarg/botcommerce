@@ -181,20 +181,20 @@ services:
     volumes:
       - redis-data:/data
 
-  worker:
-    image: 'shop-backend:${TAG-latest}'
-    depends_on:
-      - backend
-      - redis
-    command: huey_consumer.py huey_instance.huey
-    volumes:
-      - ./backend:/app
-      - /app/.venv
-    env_file:
-      - ./backend/.env
-    networks:
-      - traefik-public
-      - default
+  # worker:
+  #   image: 'shop-backend:${TAG-latest}'
+  #   depends_on:
+  #     - backend
+  #     - redis
+  #   command: huey_consumer.py huey.huey
+  #   volumes:
+  #     - ./backend:/app
+  #     - /app/.venv
+  #   env_file:
+  #     - ./backend/.env
+  #   networks:
+  #     - traefik-public
+  #     - default
 
 volumes:
   pg-data:

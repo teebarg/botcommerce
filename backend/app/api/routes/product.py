@@ -6,7 +6,8 @@ from fastapi import (
     File,
     HTTPException,
     Query,
-    UploadFile
+    UploadFile,
+    BackgroundTasks
 )
 from app.core.deps import (
     CurrentUser,
@@ -38,8 +39,7 @@ from app.core.deps import supabase
 from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
-from tasks.product_tasks import index_products_task, product_upload_task, product_export_task, reindex_product_task
-from app.services.product import reindex_product
+from app.services.product import index_products, reindex_product, product_upload, product_export
 
 router = APIRouter()
 
@@ -85,9 +85,10 @@ async def get_landing_products() -> LandingProducts:
 @router.post("/export")
 async def export_products(
     current_user: CurrentUser,
+    background_tasks: BackgroundTasks,
 ) -> Any:
     try:
-        product_export_task(email=current_user.email, user_id=current_user.id)
+        background_tasks.add_task(product_export, email=current_user.email, user_id=current_user.id)
 
         return {
             "message": "Data Export successful. Please check your email"
@@ -209,7 +210,7 @@ async def search(
 
 
 @router.post("/")
-async def create_product(product: ProductCreate):
+async def create_product(product: ProductCreate, background_tasks: BackgroundTasks):
     slugified_name = slugify(product.name)
 
     data = {
@@ -241,20 +242,18 @@ async def create_product(product: ProductCreate):
         raise HTTPException(
             status_code=400, detail="Product with this name already exists")
 
-    reindex_product_task(product_id=created_product.id)
+    background_tasks.add_task(reindex_product, product_id=created_product.id)
 
     return created_product
 
 
 @router.post("/reindex", response_model=Message)
-async def reindex_products():
+async def reindex_products(background_tasks: BackgroundTasks):
     """
     Re-index all products in the database to Meilisearch.
-    This operation is performed asynchronously via Huey.
     """
     try:
-        task = index_products_task()
-        logger.info(f"Task enqueued with ID: {task.id}")
+        background_tasks.add_task(index_products)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
@@ -291,7 +290,7 @@ async def read_reviews(id: int):
 
 
 @router.put("/{id}")
-async def update_product(id: int, product: ProductUpdate):
+async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
     existing_product = await db.product.find_unique(where={"id": id})
     if not existing_product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -312,17 +311,13 @@ async def update_product(id: int, product: ProductUpdate):
     if product.description is not None:
         update_data["description"] = product.description
 
-    # Handle category updates if provided
     if product.category_ids is not None:
         category_ids = [{"id": id} for id in product.category_ids]
         update_data["categories"] = {"set": category_ids}
 
-    # Handle collection updates if provided
     if product.collection_ids is not None:
         collection_ids = [{"id": id} for id in product.collection_ids]
         update_data["collections"] = {"set": collection_ids}
-
-    # Handle brand updates if provided
     if product.brand_id is not None:
         update_data["brand"] = {"connect": {"id": product.brand_id}}
 
@@ -336,7 +331,7 @@ async def update_product(id: int, product: ProductUpdate):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    reindex_product_task(product_id=id)
+    background_tasks.add_task(reindex_product, product_id=id)
 
     return updated_product
 
@@ -361,7 +356,7 @@ async def delete_product(id: int) -> Message:
 
 
 @router.post("/{id}/variants")
-async def create_variant(id: int, variant: VariantWithStatus):
+async def create_variant(id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -384,13 +379,13 @@ async def create_variant(id: int, variant: VariantWithStatus):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    reindex_product_task(product_id=id)
+    background_tasks.add_task(reindex_product, product_id=id)
 
     return created_variant
 
 
 @router.put("/variants/{variant_id}")
-async def update_variant(variant_id: int, variant: VariantWithStatus):
+async def update_variant(variant_id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
@@ -420,22 +415,22 @@ async def update_variant(variant_id: int, variant: VariantWithStatus):
         data=update_data,
     )
 
-    reindex_product_task(product_id=existing_variant.product_id)
+    background_tasks.add_task(reindex_product, product_id=existing_variant.product_id)
 
     return updated_variant
 
 
 @router.delete("/variants/{variant_id}")
-async def delete_variant(variant_id: int):
+async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
     variant = await db.productvariant.delete(where={"id": variant_id})
 
-    reindex_product_task(product_id=variant.product_id)
+    background_tasks.add_task(reindex_product, product_id=variant.product_id)
 
     return {"success": True}
 
 
 @router.patch("/{id}/image")
-async def add_image(id: int, image_data: ImageUpload) -> Product:
+async def add_image(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks) -> Product:
     """
     Add an image to a product.
     """
@@ -453,7 +448,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Product:
             data={"image": image_url}
         )
 
-        reindex_product_task(product_id=id)
+        background_tasks.add_task(reindex_product, product_id=id)
 
         return updated_product
 
@@ -465,7 +460,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Product:
 
 
 @router.post("/{id}/images")
-async def upload_images(id: int, image_data: ImageUpload):
+async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks):
     """
     Upload images to a product.
     """
@@ -482,13 +477,13 @@ async def upload_images(id: int, image_data: ImageUpload):
             "order": len(product.images)
         }
     )
-    reindex_product_task(product_id=id)
+    background_tasks.add_task(reindex_product, product_id=id)
 
     return image
 
 
 @router.delete("/{id}/image")
-async def delete_image(id: int):
+async def delete_image(id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product.
     """
@@ -507,13 +502,13 @@ async def delete_image(id: int):
 
     await db.product.update(where={"id": id}, data={"image": None})
 
-    reindex_product_task(product_id=id)
+    background_tasks.add_task(reindex_product, product_id=id)
 
     return {"success": True}
 
 
 @router.delete("/{id}/images/{image_id}")
-async def delete_images(id: int, image_id: int):
+async def delete_images(id: int, image_id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product images.
     """
@@ -541,7 +536,7 @@ async def delete_images(id: int, image_id: int):
             data={"order": index}
         )
 
-    reindex_product_task(product_id=id)
+    background_tasks.add_task(reindex_product, product_id=id)
 
     return {"success": True}
 
@@ -550,6 +545,7 @@ async def delete_images(id: int, image_id: int):
 async def upload_products(
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
+    background_tasks: BackgroundTasks,
 ):
     logger.info(f"File uploaded: {file.filename}")
     content_type = file.content_type
@@ -567,7 +563,7 @@ async def upload_products(
     await validate_file(file=file)
 
     contents = await file.read()
-    product_upload_task(user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
+    background_tasks.add_task(product_upload, user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
     return {"message": "Upload started"}
 
 
