@@ -1,12 +1,12 @@
 import UserDropDown from "@modules/account/components/user-menu";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
+import ThemeToggle from "@lib/theme/theme-button";
 
 import ActivityTray from "@/components/generic/activities/activity-tray";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 import MenuComp from "@/components/layout/mobile-menu-drawer";
-import ThemeToggle from "@lib/theme/theme-button";
 
 const AdminNavbar = async () => {
     const siteConfig = await getSiteConfig();

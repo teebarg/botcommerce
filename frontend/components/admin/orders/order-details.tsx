@@ -31,10 +31,11 @@ interface OrderDetailsProps {
 }
 
 const getStatusBadge = (status?: OrderStatus) => {
-    const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success" | "emerald"> = {
+    const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success" | "emerald" | "blue"> = {
         ["PENDING"]: "warning",
         ["PROCESSING"]: "default",
         ["SHIPPED"]: "secondary",
+        ["OUT_FOR_DELIVERY"]: "blue",
         ["CANCELED"]: "destructive",
         ["DELIVERED"]: "success",
         ["PAID"]: "emerald",
@@ -81,6 +82,11 @@ const orderStatusMap = {
     SHIPPED: {
         icon: <Truck className="h-5 w-5 text-white" />,
         label: "Shipped",
+        color: "bg-primary",
+    },
+    OUT_FOR_DELIVERY: {
+        icon: <Truck className="h-5 w-5 text-white" />,
+        label: "Out for Delivery",
         color: "bg-primary",
     },
     DELIVERED: {
