@@ -114,8 +114,9 @@ const WaveLoader: React.FC<{ className?: string }> = ({ className }) => {
             {[0, 1, 2, 3, 4].map((i) => (
                 <div
                     key={i}
-                    className="w-1 h-8 bg-gradient-to-t from-zinc-600 to-zinc-400 rounded-full animate-wave"
+                    className="w-1 h-8 rounded-full animate-wave"
                     style={{
+                        background: "linear-gradient(to top, hsl(var(--default-400)), hsl(var(--default-600)))",
                         animationDelay: `${i * 0.1}s`,
                         animationDuration: "1.2s",
                     }}
@@ -129,10 +130,11 @@ const MinimalProgressBar: React.FC<{
     progress: number;
 }> = ({ progress }) => {
     return (
-        <div className="w-48 h-0.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div className="w-48 h-0.5 bg-default-200 rounded-full overflow-hidden">
             <div
-                className="h-full bg-gradient-to-r from-zinc-500 to-zinc-400 rounded-full transition-all duration-300 ease-out"
+                className="h-full rounded-full transition-all duration-300 ease-out"
                 style={{
+                    background: "linear-gradient(to right, hsl(var(--default-500)), hsl(var(--default-400)))",
                     width: `${progress}%`,
                 }}
             />
@@ -189,7 +191,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps })
             title: title || preset.title || "Loading",
             subtitle: subtitle || preset.subtitle || "Please wait...",
             steps: steps || preset.steps || [],
-            duration: type === "page" ? 1000 : 3000, // Faster for page loads
+            duration: type === "page" ? 500 : 3000,
         };
     }, [type, title, subtitle, steps]);
 
@@ -298,5 +300,4 @@ const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps })
         </div>
     );
 };
-
 export default PageLoader;

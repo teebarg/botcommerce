@@ -56,7 +56,6 @@ export const useProduct = (slug: string) => {
     return useQuery({
         queryKey: ["product", slug],
         queryFn: async () => await api.get<Product>(`/product/${slug}`),
-        enabled: !!slug,
     });
 };
 
@@ -109,7 +108,6 @@ export const useProductReviews = (productId: number) => {
     return useQuery({
         queryKey: ["product-reviews", productId],
         queryFn: async () => await api.get<Review[]>(`/product/${productId}/reviews`),
-        enabled: !!productId,
     });
 };
 
@@ -117,7 +115,6 @@ export const useProductReviewsSearch = (product_id: number, page = 1, limit = 20
     return useQuery({
         queryKey: ["product-reviews", "search", product_id, page, limit],
         queryFn: async () => await api.get<PaginatedReview>(`/reviews/`, { params: { product_id, page, limit } }),
-        enabled: !!product_id,
     });
 };
 

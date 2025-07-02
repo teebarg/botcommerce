@@ -10,7 +10,7 @@ export const useMe = () => {
         queryFn: async () => {
             return await api.get<User>("/users/me");
         },
-        enabled: typeof window !== "undefined", // prevent server fetch
+        enabled: typeof window !== "undefined",
     });
 };
 
