@@ -1,9 +1,9 @@
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.core.logging import logger
-from app.core import deps
 import json, time, httpx
 from app.services.websocket import manager
+from app.services.session_store import session_store, SessionStore
 
 router = APIRouter()
 
@@ -17,12 +17,10 @@ async def get_city(ip: str) -> str:
         logger.error(f"An error occurred in get_city - {e}")
         return "Unknown"
 
-async def broadcast_sessions(cache: deps.CacheService):
-    """Broadcast current session data to all connected users."""
-    keys = cache.keys("session:*")
+async def broadcast_sessions(session_store: SessionStore):
     sessions = []
-    for key in keys:
-        data = cache.hgetall(key)
+    all_sessions = session_store.get_all_with_prefix("session:")
+    for key, data in all_sessions.items():
         sessions.append({
             "id": key.replace("session:", ""),
             "type": data.get("type", "guest"),
@@ -35,7 +33,7 @@ async def broadcast_sessions(cache: deps.CacheService):
     await manager.broadcast_to_all({"users": sessions}, "online-users")
 
 @router.websocket("/")
-async def websocket(ws: WebSocket, cache: deps.CacheService):
+async def websocket(ws: WebSocket):
     """
     Handles the WebSocket endpoint with RedisConnectionManager.
 
@@ -49,28 +47,25 @@ async def websocket(ws: WebSocket, cache: deps.CacheService):
     ip = ws.client.host
     session_key = f"session:{ip}"
     user_id = None
-    # location = "Nigeria"
     location = await get_city(ip)
 
-    # Create initial guest session
-    cache.hset(session_key, mapping={
+    session_store.set(session_key, {
         "type": "guest",
         "path": "/",
-        "location": location,
+        "location": location if location else "Unknown",
         "updated_at": str(int(time.time()))
     })
-    cache.expire(session_key, seconds=120)
 
     if not await manager.connect(ip, ws, metadata={"ip": ip, "location": location}):
         logger.error(f"Failed to establish WebSocket connection for IP {ip}")
         return
 
-    await broadcast_sessions(cache)
+    await broadcast_sessions(session_store)
 
     try:
         while True:
             msg = await ws.receive_text()
-
+            logger.info(f"Received message: {msg}")
             try:
                 payload = json.loads(msg)
                 message_type = payload.get("type")
@@ -80,16 +75,14 @@ async def websocket(ws: WebSocket, cache: deps.CacheService):
                     email = payload.get("email")
 
                     if user_id:
-                        # Create new user session
                         user_session_key = f"session:{user_id}"
-                        cache.hset(user_session_key, mapping={
+                        session_store.set(user_session_key, {
                             "type": "user",
                             "email": email or "Unknown",
-                            "location": location,
+                            "location": location if location else "Unknown",
                             "path": "/",
                             "updated_at": str(int(time.time()))
                         })
-                        cache.expire(user_session_key, seconds=120)
 
                         if await manager.promote_connection(ip, user_id, metadata={
                             "ip": ip,
@@ -102,19 +95,19 @@ async def websocket(ws: WebSocket, cache: deps.CacheService):
                             continue
 
                 elif message_type == "ping":
-                    cache.hset_field(key=session_key, field="updated_at", value=str(int(time.time())))
-
-                    if user_id:
-                        await manager.handle_heartbeat_response(user_id)
-                    else:
-                        await manager.handle_heartbeat_response(ip)
+                    await manager.handle_heartbeat(user_id if user_id else ip)
 
                 elif message_type == "path":
                     path = payload.get("path", "/")
-                    cache.hset_field(key=session_key, field="path", value=path)
+                    session_store.update_field(
+                        f"session:{user_id or ip}", "path", path
+                    )
 
-                cache.expire(session_key, seconds=120)
-                await broadcast_sessions(cache)
+                session_store.update_field(
+                    f"session:{user_id or ip}", "updated_at", str(int(time.time()))
+                )
+
+                await broadcast_sessions(session_store)
 
             except json.JSONDecodeError:
                 logger.error(f"Invalid JSON received: {msg}")
@@ -128,11 +121,7 @@ async def websocket(ws: WebSocket, cache: deps.CacheService):
     except Exception as e:
         logger.error(f"Unexpected error in websocket handler: {e}")
     finally:
-        if user_id:
-            await manager.disconnect(user_id)
-            cache.delete(f"session:{user_id}")
-        else:
-            await manager.disconnect(ip)
-            cache.delete(f"session:{ip}")
-
-        await broadcast_sessions(cache)
+        final_key = f"session:{user_id or ip}"
+        await manager.disconnect(user_id or ip)
+        session_store.delete(final_key)
+        await broadcast_sessions(session_store)

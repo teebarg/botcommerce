@@ -6,7 +6,6 @@ import Image from "next/image";
 import ProfileAvatar from "@/public/profile.svg";
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/schemas";
-import { api } from "@/apis";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,10 +14,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { authApi } from "@/apis/auth";
 
 export default function UserDropDown({ user }: { user: Session }) {
     const handleLogout = async () => {
-        await api.auth.logOut();
+        await authApi.logOut();
         window.location.href = "/";
     };
 

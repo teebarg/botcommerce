@@ -8,7 +8,6 @@ import { ProductSearch } from "@/schemas/product";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
 
@@ -213,7 +212,7 @@ const ProductOverview: React.FC<{
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-default-500">Total</p>
-                            <p className="text-2xl font-bold text-default-900">{currency((selectedVariant?.price * quantity) || 0)}</p>
+                            <p className="text-2xl font-bold text-default-900">{currency(selectedVariant?.price * quantity || 0)}</p>
                         </div>
                         <div className="text-right">
                             <p className="text-sm text-default-500">Quantity</p>

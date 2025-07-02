@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -56,7 +57,7 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
                             <FormItem>
                                 <FormLabel>Rating</FormLabel>
                                 <FormControl>
-                                    <Input type="number" min={1} max={5} {...field} />
+                                    <Input max={5} min={1} type="number" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -76,7 +77,7 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
                         )}
                     />
                     <div className="flex items-center justify-end py-4 space-x-2 mt-4">
-                        <Button aria-label="cancel" className="min-w-32" variant="destructive" type="button" onClick={onClose}>
+                        <Button aria-label="cancel" className="min-w-32" type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit" variant="primary">

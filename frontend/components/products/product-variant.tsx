@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { Edit, Trash2 } from "lucide-react";
+
+import ProductVariantForm from "./product-variant-form";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useDeleteVariant } from "@/lib/hooks/useProduct";
-import ProductVariantForm from "./product-variant-form";
 
 interface ProductVariantsProps {
     variants: ProductVariant[];
@@ -74,7 +76,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                         </tbody>
                     </table>
                 </div>
-                <ProductVariantForm variant={editingVariant} productId={productId} onCancel={() => setEditingVariant(null)} />
+                <ProductVariantForm productId={productId} variant={editingVariant} onCancel={() => setEditingVariant(null)} />
             </div>
         </div>
     );

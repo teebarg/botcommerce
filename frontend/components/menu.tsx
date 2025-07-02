@@ -8,8 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
-import { api } from "@/apis";
 import { useAuth } from "@/providers/auth-provider";
+import { authApi } from "@/apis/auth";
 
 interface NavLinkProp {
     href: string;
@@ -30,7 +30,7 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 const Menu: React.FC = () => {
     const { user } = useAuth();
     const handleLogout = async () => {
-        await api.auth.logOut();
+        await authApi.logOut();
         window.location.href = "/";
     };
 

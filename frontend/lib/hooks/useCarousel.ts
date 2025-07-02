@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 import { api } from "@/apis/client";
 import { CarouselBanner, ImageUpload, Message } from "@/schemas";
 
@@ -20,6 +21,7 @@ export const useCarouselBanner = (id: number) => {
 
 export const useCreateCarouselBanner = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (data: Partial<CarouselBanner>) => await api.post<CarouselBanner>("/carousel", data),
         onSuccess: () => {
@@ -34,6 +36,7 @@ export const useCreateCarouselBanner = () => {
 
 export const useUpdateCarouselBanner = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: Partial<CarouselBanner> }) => await api.put<CarouselBanner>(`/carousel/${id}`, data),
         onSuccess: () => {
@@ -48,6 +51,7 @@ export const useUpdateCarouselBanner = () => {
 
 export const useDeleteCarouselBanner = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/carousel/${id}`),
         onSuccess: () => {
@@ -62,6 +66,7 @@ export const useDeleteCarouselBanner = () => {
 
 export const useUploadCarouselImage = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: ImageUpload }) => await api.patch<CarouselBanner>(`/carousel/${id}/image`, data),
         onSuccess: () => {
@@ -76,6 +81,7 @@ export const useUploadCarouselImage = () => {
 
 export const useDeleteCarouselImage = () => {
     const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/carousel/${id}/image`),
         onSuccess: () => {
@@ -86,4 +92,4 @@ export const useDeleteCarouselImage = () => {
             toast.error(error.message || "Failed to delete image");
         },
     });
-}; 
+};

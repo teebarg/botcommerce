@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import LocalizedClientLink from "@/components/ui/link";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { authApi } from "@/apis/auth";
 
 export default function VerifyMagicLink() {
     const [authState, setAuthState] = useState<"loading" | "success" | "expired">("loading");
@@ -31,7 +31,7 @@ export default function VerifyMagicLink() {
                 return;
             }
 
-            const { error } = await api.auth.verifyMagicLink(token);
+            const { error } = await authApi.verifyMagicLink(token);
 
             if (error) {
                 toast.error(error);

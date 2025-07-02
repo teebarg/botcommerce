@@ -99,10 +99,10 @@ const BankDetailsForm: React.FC<BankDetailsFormProps> = ({ onClose }) => {
                         />
                     </div>
                     <div className="flex justify-end space-x-2 mt-8 w-full">
-                        <Button aria-label="close" className="min-w-36" variant="outline" type="button" onClick={onClose}>
+                        <Button aria-label="close" className="min-w-36" type="button" variant="outline" onClick={onClose}>
                             Close
                         </Button>
-                        <Button aria-label="delete" className="min-w-36" isLoading={isPending} variant="primary" type="submit">
+                        <Button aria-label="delete" className="min-w-36" isLoading={isPending} type="submit" variant="primary">
                             Submit
                         </Button>
                     </div>

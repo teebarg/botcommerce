@@ -40,7 +40,8 @@ export const useProductSearch = (params: SearchParams) => {
 export const useProductInfiniteSearch = (params: SearchParams) => {
     return useInfiniteQuery({
         queryKey: ["products", "infinite-search", JSON.stringify(params)],
-        queryFn: async ({ pageParam = 1 }) => await api.get<PaginatedProductSearch>("/product/search", { params: { page: pageParam, limit: 12, ...params } }),
+        queryFn: async ({ pageParam = 1 }) =>
+            await api.get<PaginatedProductSearch>("/product/search", { params: { page: pageParam, limit: 12, ...params } }),
         getNextPageParam: (lastPage: PaginatedProductSearch) => {
             const nextSkip = lastPage.page + 1;
             const hasMore = nextSkip < lastPage.total_count;

@@ -2,14 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import {
-    BankDetails,
-    ChatMessage,
-    ConversationStatus,
-    DeliveryOption,
-    PaginatedConversation,
-    User,
-} from "@/schemas";
+import { BankDetails, ChatMessage, ConversationStatus, DeliveryOption, PaginatedConversation, User } from "@/schemas";
 import { StatsTrends } from "@/types/models";
 
 interface ConversationParams {

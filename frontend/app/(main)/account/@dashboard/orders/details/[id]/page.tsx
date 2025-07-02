@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 export default async function OrderDetailPage({ params }: { params: Params }) {
     const { id } = await params;
 
-    return <OrderConfirmation orderId={Number(id)} />;
+    return <OrderConfirmation orderNumber={id} />;
 }

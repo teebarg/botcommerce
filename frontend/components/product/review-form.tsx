@@ -51,8 +51,8 @@ export default function CreateReviewForm({ product_id, className = "" }: ReviewF
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <button
                                             key={star}
-                                            type="button"
                                             className={`${star <= field.value ? "text-yellow-400" : "text-gray-300"} hover:text-yellow-400`}
+                                            type="button"
                                             onClick={() => setValue("rating", star)}
                                         >
                                             <Star className="h-8 w-8" />

@@ -8,7 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default async function ActivitiesPage() {
-    return (
-        <ActivityView />
-    );
+    return <ActivityView />;
 }

@@ -14,7 +14,7 @@ import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { useStore } from "@/app/store/use-store";
 import { Separator } from "@/components/ui/separator";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { api } from "@/apis";
+import { authApi } from "@/apis/auth";
 
 const signUpSchema = z.object({
     first_name: z.string().min(1, "First name is required"),
@@ -46,10 +46,12 @@ const SignUpForm: React.FC<Props> = () => {
 
     const onSubmit = async (values: SignUpFormValues) => {
         setIsPending(true);
-        const { error } = await api.auth.signUp(values);
+        const { error } = await authApi.signUp(values);
+
         setIsPending(false);
         if (error) {
             toast.error(error || "Sign up failed");
+
             return;
         }
         toast.success("Please check your email to verify your account");

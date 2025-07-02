@@ -16,6 +16,7 @@ from fastapi import BackgroundTasks, FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from datetime import datetime
+from app.services.websocket import manager
 
 
 @asynccontextmanager
@@ -219,3 +220,8 @@ async def generate_sitemap(cache: deps.CacheService):
 #                 aio_pika.Message(body=order_data.encode()),
 #                 routing_key=product_queue.name,
 #             )
+
+
+@app.on_event("startup")
+async def start_websocket_manager():
+    await manager.start()

@@ -4,13 +4,13 @@ import { Product, ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/generic/server-error";
 import { useProductSearch } from "@/lib/hooks/useProduct";
+import { Skeleton } from "@/components/ui/skeletons";
 
 type RelatedProductsProps = {
     product: Product;
 };
 
 export default function RelatedProducts({ product }: RelatedProductsProps) {
-    // edit this function to define your related products logic
     const setQueryParams = (): any => {
         const params: any = {};
 
@@ -27,7 +27,7 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
     const { data, isLoading, error } = useProductSearch(queryParams);
 
     if (isLoading) {
-        return <div className="flex items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">Loading........</div>;
+        return <Skeleton className="min-h-[400px]" />;
     }
 
     if (error || !data) {

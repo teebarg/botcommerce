@@ -53,7 +53,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                 pingIntervalRef.current = setInterval(() => {
                     if (socket.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({ type: "ping" }));
-                        socket.send(JSON.stringify({ type: "path", path: pathname }));
 
                         if (!userInitSentRef.current && userRef.current) {
                             socket.send(JSON.stringify({ type: "init", id: userRef.current.id, email: userRef.current.email }));

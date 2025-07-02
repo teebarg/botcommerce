@@ -188,9 +188,9 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
                                     className="min-w-32"
                                     disabled={loading}
                                     isLoading={loading}
+                                    type="button"
                                     variant="outline"
                                     onClick={onCancel}
-                                    type="button"
                                 >
                                     Cancel
                                 </Button>

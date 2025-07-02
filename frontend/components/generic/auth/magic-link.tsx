@@ -7,9 +7,9 @@ import { useSearchParams } from "next/navigation";
 import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { Separator } from "@/components/ui/separator";
+import { authApi } from "@/apis/auth";
 
 type Props = {
     callbackUrl?: string;
@@ -27,7 +27,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
             return;
         }
         setLoading(true);
-        const { data, error } = await api.auth.requestMagicLink(email, (callbackUrl || searchParams.get("callbackUrl")) ?? "/");
+        const { data, error } = await authApi.requestMagicLink(email, (callbackUrl || searchParams.get("callbackUrl")) ?? "/");
 
         if (error) {
             toast.error(error);

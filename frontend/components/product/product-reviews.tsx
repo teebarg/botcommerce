@@ -4,12 +4,14 @@ import React from "react";
 import { MessageSquare, Star } from "nui-react-icons";
 import { PencilLine } from "lucide-react";
 
+import CreateReviewForm from "./review-form";
+
 import { Badge } from "@/components/ui/badge";
 import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/utils";
 import { Review } from "@/schemas";
-import CreateReviewForm from "./review-form";
 import { useProductReviews } from "@/lib/hooks/useProduct";
+import { Skeleton } from "@/components/ui/skeletons";
 
 interface Prop {
     product_id: number;
@@ -24,7 +26,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
     const { data: reviews, isLoading } = useProductReviews(product_id);
 
     if (isLoading) {
-        return <div className="flex items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">Loading........</div>;
+        return <Skeleton className="min-h-[400px]" />;
     }
 
     if (!reviews || reviews?.length == 0) {
