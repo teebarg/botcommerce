@@ -15,17 +15,17 @@ export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
     const { data: product, error } = await tryCatch<Product>(api.get(`/product/${slug}`));
 
-    if (error || !product) {
+    if (error) {
         return {};
     }
 
     return {
-        title: product.name,
-        description: product.description,
+        title: product?.name,
+        description: product?.description,
         openGraph: {
-            title: product.name,
-            description: product.description,
-            images: product.images?.[0]?.image ? [product.images?.[0]?.image] : [],
+            title: product?.name,
+            description: product?.description,
+            images: product?.images?.[0]?.image ? [product?.images?.[0]?.image] : [],
             url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${slug}`,
         },
     };
@@ -47,7 +47,7 @@ export default async function ProductPage({ params }: { params: Params }) {
     return (
         <div className="flex flex-col gap-y-8">
             <ProductView product={product} />
-            <ReviewsSection product_id={product.id} />
+            <ReviewsSection product_id={product?.id} />
 
             <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products">
                 <RelatedProducts product={product} />

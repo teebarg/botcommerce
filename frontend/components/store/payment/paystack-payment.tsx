@@ -22,19 +22,22 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
         setLoading(true);
         const { data, error } = await tryCatch<PaymentInitialize>(api.post(`/payment/initialize/${cartNumber}`));
 
-        if (error || !data) {
-            toast.error(error || "Failed to initialize payment");
+        if (error) {
+            toast.error(error);
 
             return;
         }
-        // Redirect to Paystack payment page
+        if (!data?.authorization_url) {
+            toast.error("Authorization URL not found");
+
+            return;
+        }
         window.location.href = data?.authorization_url ?? "/";
         setLoading(false);
     };
 
     return (
         <div className="space-y-4">
-            {/* Details based on selected method */}
             <div className="bg-content1 p-4 rounded-lg">
                 <p className="text-sm text-default-500 mb-2">{`You'll be redirected to Paystack to complete your payment securely.`}</p>
                 <div className="flex items-center">

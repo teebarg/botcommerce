@@ -12,7 +12,7 @@ type RecommendedProductsProps = {
 export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
     const { data, isLoading, error } = useProductSearch({ limit: 40 });
 
-    if (error || !data) {
+    if (error) {
         return null;
     }
 
@@ -21,8 +21,8 @@ export default function RecommendedProducts({ exclude = [] }: RecommendedProduct
     }
 
     const filteredProducts = exclude?.length
-        ? data.products.filter((product: ProductSearch) => !exclude.includes(product.variants?.[0].id!))
-        : data.products;
+        ? (data?.products?.filter((product: ProductSearch) => !exclude.includes(product.variants?.[0].id!)) ?? [])
+        : (data?.products ?? []);
 
     return (
         <div>

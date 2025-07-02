@@ -6,6 +6,7 @@ import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/lib/utils";
 import { useStatsTrends } from "@/lib/hooks/useApi";
 import { CardSkeleton } from "@/components/ui/skeletons";
+import ServerError from "@/components/generic/server-error";
 
 const StatComponent: React.FC = () => {
     const { data, isLoading, error } = useStatsTrends();
@@ -29,8 +30,16 @@ const StatComponent: React.FC = () => {
         );
     }
 
-    if (error || !data) {
-        return;
+    if (error) {
+        return <ServerError />;
+    }
+
+    if (!data) {
+        return (
+            <div className="px-2 md:px-10 py-8 text-center">
+                <p>Stats not found</p>
+            </div>
+        );
     }
 
     const { summary } = data;

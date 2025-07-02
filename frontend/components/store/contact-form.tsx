@@ -159,7 +159,7 @@ export default function ContactForm() {
                             <Send className="h-4 w-4 mr-2" />
                             Send Message
                         </Button>
-                        <Button className="flex-1 border-divider hover:bg-content3" type="button" variant="outline" onClick={() => form.reset()}>
+                        <Button className="flex-1 border-divider hover:bg-content2" type="button" variant="outline" onClick={() => form.reset()}>
                             Clear Form
                         </Button>
                     </div>
