@@ -13,18 +13,19 @@ import {
     Image,
     Activity,
     MessageSquare,
+    User,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DocumentText } from "nui-react-icons";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useMe } from "@/lib/hooks/useApi";
+import { useAuth } from "@/providers/auth-provider";
 
 const AdminMobileMenu: React.FC = () => {
     const pathname = usePathname();
 
-    const { data: user } = useMe();
+    const { user } = useAuth();
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
@@ -39,11 +40,11 @@ const AdminMobileMenu: React.FC = () => {
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
         { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
         { id: "faqs", label: "FAQs", icon: <DocumentText size={20} />, href: "/admin/faqs" },
+        { id: "online", label: "Online", icon: <User size={20} />, href: "/admin/online" },
     ];
 
     return (
         <div className="h-full bg-content1 rounded-[inherit] overflow-hidden">
-            {/* User Profile Section */}
             <div className="p-4 bg-primary text-white">
                 <div className="flex items-center space-x-3">
                     <Avatar>
@@ -60,7 +61,6 @@ const AdminMobileMenu: React.FC = () => {
                 </div>
             </div>
 
-            {/* Search Bar */}
             <div className="p-4 border-b border-content2">
                 <div className="relative">
                     <input
@@ -72,7 +72,6 @@ const AdminMobileMenu: React.FC = () => {
                 </div>
             </div>
 
-            {/* Menu Items */}
             <nav className="py-2">
                 {menuItems.map((item) => (
                     <Link
@@ -91,7 +90,6 @@ const AdminMobileMenu: React.FC = () => {
                 ))}
             </nav>
 
-            {/* Logout Button */}
             <div className="p-4 border-t border-content2">
                 <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
                     <LogOut size={20} />

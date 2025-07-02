@@ -8,17 +8,11 @@ import { MenuIcon } from "lucide-react";
 import Menu from "../menu";
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Session } from "@/schemas";
 
-interface StoreMenuCompProps {
-    user: Session | null;
-}
-
-const StoreMenuComp: React.FC<StoreMenuCompProps> = ({ user }) => {
+const StoreMenuComp: React.FC = () => {
     const pathname = usePathname();
     const state = useOverlayTriggerState({});
 
-    // 🧼 Close drawer on route change
     useEffect(() => {
         state.close();
     }, [pathname]);
@@ -35,7 +29,7 @@ const StoreMenuComp: React.FC<StoreMenuCompProps> = ({ user }) => {
                 <DrawerHeader>
                     <DrawerTitle className="sr-only">Menu</DrawerTitle>
                 </DrawerHeader>
-                <Menu user={user} />
+                <Menu />
             </DrawerContent>
         </Drawer>
     );

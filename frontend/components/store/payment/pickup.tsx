@@ -1,13 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
+import { useCompleteCart } from "@/lib/hooks/useCart";
 
 interface PickupProps {
     amount: number;
@@ -15,25 +12,14 @@ interface PickupProps {
 }
 
 const Pickup: React.FC<PickupProps> = ({ amount }) => {
-    const [loading, setLoading] = useState<boolean>(false);
-    const router = useRouter();
     const { shopSettings } = useStore();
+    const completeCart = useCompleteCart();
 
     const onPaymentCompleted = async () => {
-        setLoading(true);
-        const { data, error } = await api.cart.complete({
-            payment_status: "PENDING",
-            status: "PENDING",
+        completeCart.mutate({
+            payment_status: "SUCCESS",
+            status: "PAID",
         });
-
-        if (error) {
-            toast.error(error);
-            setLoading(false);
-
-            return;
-        }
-
-        router.push(`/order/confirmed/${data?.order_number}`);
     };
 
     return (
@@ -58,7 +44,13 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                 </div>
             </div>
 
-            <Button className="w-full" disabled={loading} isLoading={loading} variant="primary" onClick={onPaymentCompleted}>
+            <Button
+                className="w-full"
+                disabled={completeCart.isPending}
+                isLoading={completeCart.isPending}
+                variant="primary"
+                onClick={onPaymentCompleted}
+            >
                 Confirm Order for Pickup
             </Button>
             {/* Security message */}

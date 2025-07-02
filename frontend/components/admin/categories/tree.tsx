@@ -89,7 +89,6 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                             key={category.id}
                             className="bg-card rounded-2xl shadow-sm border border-divider overflow-hidden hover:shadow-md transition-shadow"
                         >
-                            {/* Main Category */}
                             <div className="group">
                                 <div className="p-6">
                                     <div className="flex items-center gap-4">
@@ -154,7 +153,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                                 <h4 className="font-medium text-default-900 truncate mb-1">{subcategory.name}</h4>
                                                                 <Badge variant={subcategory.is_active ? "emerald" : "destructive"} />
                                                             </div>
-                                                            <CategoryAction canAdd={false} category={subcategory} />
+                                                            <CategoryAction category={subcategory} />
                                                         </div>
                                                     </div>
                                                 ))}

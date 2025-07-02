@@ -4,14 +4,14 @@ import React from "react";
 import { MessageSquare, Star } from "nui-react-icons";
 import { PencilLine } from "lucide-react";
 
-import { Badge } from "../ui/badge";
+import CreateReviewForm from "./review-form";
 
-import ReviewForm from "./review-form";
-
+import { Badge } from "@/components/ui/badge";
 import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/utils";
 import { Review } from "@/schemas";
-import { useProductReviews } from "@/lib/hooks/useApi";
+import { useProductReviews } from "@/lib/hooks/useProduct";
+import { Skeleton } from "@/components/ui/skeletons";
 
 interface Prop {
     product_id: number;
@@ -26,7 +26,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
     const { data: reviews, isLoading } = useProductReviews(product_id);
 
     if (isLoading) {
-        return <div className="flex items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">Loading........</div>;
+        return <Skeleton className="min-h-[400px]" />;
     }
 
     if (!reviews || reviews?.length == 0) {
@@ -49,11 +49,11 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
                 <p className="text-default-500 mb-6 max-w-sm">
                     Be the first to share your experience with this product and help others make informed decisions!
                 </p>
-                {product_id && <ReviewForm product_id={product_id} />}
+                {product_id && <CreateReviewForm product_id={product_id} />}
             </div>
         );
     }
-    // Calculate rating distribution
+
     const ratingDistribution: RatingDistribution[] = Array.from({ length: 5 }, (_, index) => ({
         stars: 5 - index, // 5 to 1
         percentage: 0,
@@ -64,17 +64,15 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
 
     reviews.forEach((review: Review) => {
         if (review.rating >= 1 && review.rating <= 5) {
-            ratingDistribution[5 - review.rating].percentage += 1; // Increment count for the corresponding rating
-            totalRating += review.rating; // Sum up the ratings
+            ratingDistribution[5 - review.rating].percentage += 1;
+            totalRating += review.rating;
         }
     });
 
-    // Calculate percentage
     ratingDistribution.forEach((rating: RatingDistribution) => {
         rating.percentage = Math.round((rating.percentage / totalReviews) * 100);
     });
 
-    // Calculate average rating
     const averageRating = (totalRating / reviews.length).toFixed(1);
 
     const RatingBreakdown = () => (
@@ -132,7 +130,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
                 </h2>
                 <RatingBreakdown />
                 <div className="mb-8">{reviews?.slice(0, 5).map((review: Review, index: number) => <ReviewCard key={index} review={review} />)}</div>
-                {product_id && <ReviewForm product_id={product_id} />}
+                {product_id && <CreateReviewForm product_id={product_id} />}
                 {/* <Button className="mt-4" endContent={<ChevronDown className="ml-2 h-4 w-4" viewBox="0 0 20 20" />}>
                 Load More Reviews
             </Button> */}

@@ -16,17 +16,20 @@ from fastapi import BackgroundTasks, FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from datetime import datetime
+from app.services.websocket import manager
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # app.state.redis_client.ping()
-    print("🚀 ~ connecting to prisma......:")
+    logger.info("🚀 ~ connecting to prisma......:")
     await db.connect()
-    print("🚀 ~ connecting to prisma......: done")
+    logger.info("🚀 ~ connecting to prisma......: done")
+
     yield
     await db.disconnect()
 
-app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", lifespan=lifespan)
+app = FastAPI(title="Botcommerce",
+              openapi_url="/api/openapi.json", lifespan=lifespan)
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):
@@ -44,26 +47,13 @@ logger = logging.getLogger("api")
 
 class TimingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Record start time
         start_time = time.time()
-
-        # Process the request
         response = await call_next(request)
-
-        # Calculate duration
         duration = time.time() - start_time
-
-        # Format for pretty printing (milliseconds with 2 decimal places)
         duration_ms = round(duration * 1000, 2)
-
-        # Log the request method, path, and duration
         logger.info(f"{request.method} {request.url.path} - {duration_ms}ms")
 
         return response
-
-# Add the timing middleware only in development
-# if app.debug:  # If you have a way to detect dev environment
-#     app.add_middleware(TimingMiddleware)
 
 
 app.add_middleware(TimingMiddleware)
@@ -81,7 +71,6 @@ if settings.all_cors_origins:
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
-# Root path
 @app.get("/")
 async def root():
     return {"message": "This is root"}
@@ -89,11 +78,11 @@ async def root():
 
 @app.get("/api/health")
 async def health():
-    # ping database
     await db.user.find_unique(
         where={"id": 1}
     )
     return {"message": "Server is running"}
+
 
 @app.post("/api/contact-form")
 async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreate):
@@ -138,7 +127,6 @@ async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
 @app.post("/api/log-error")
 @limit("10/minute")
 async def log_error(error: dict, notification: deps.Notification):
-    # Send the error to Slack
     slack_message = {
         "text": f"🚨 *Error Logged* 🚨\n"
         f"*Message:* {error.get('message', 'N/A')}\n"
@@ -156,12 +144,10 @@ async def log_error(error: dict, notification: deps.Notification):
 async def generate_sitemap(cache: deps.CacheService):
     base_url = settings.FRONTEND_HOST
 
-    # Try to get sitemap from cache first
     cached_sitemap = cache.get("sitemap")
     if cached_sitemap:
         return Response(content=cached_sitemap, media_type="application/xml")
 
-    # If not in cache, fetch from database
     products = await db.product.find_many()
     categories = await db.category.find_many()
     collections = await db.collection.find_many()
@@ -169,13 +155,11 @@ async def generate_sitemap(cache: deps.CacheService):
     urlset = Element(
         "urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
-    # Add the home page
     home = SubElement(urlset, "url")
     SubElement(home, "loc").text = f"{base_url}/"
     SubElement(home, "priority").text = "1.0"
     SubElement(home, "changefreq").text = "daily"
 
-    # Add collections pages
     for collection in collections:
         url = SubElement(urlset, "url")
         SubElement(
@@ -183,7 +167,6 @@ async def generate_sitemap(cache: deps.CacheService):
         SubElement(url, "priority").text = "0.9"
         SubElement(url, "changefreq").text = "monthly"
 
-    # Add category pages
     for category in categories:
         url = SubElement(urlset, "url")
         SubElement(
@@ -191,7 +174,6 @@ async def generate_sitemap(cache: deps.CacheService):
         SubElement(url, "priority").text = "0.8"
         SubElement(url, "changefreq").text = "monthly"
 
-    # Add product pages
     for product in products:
         url = SubElement(urlset, "url")
         SubElement(url, "loc").text = f"{base_url}/product/{product.slug}"
@@ -200,7 +182,6 @@ async def generate_sitemap(cache: deps.CacheService):
 
     sitemap = tostring(urlset, encoding="utf-8", method="xml")
 
-    # Cache the sitemap for 1 hour (3600 seconds)
     cache.set("sitemap", sitemap, expire=3600)
 
     return Response(content=sitemap, media_type="application/xml")
@@ -239,3 +220,8 @@ async def generate_sitemap(cache: deps.CacheService):
 #                 aio_pika.Message(body=order_data.encode()),
 #                 routing_key=product_queue.name,
 #             )
+
+
+@app.on_event("startup")
+async def start_websocket_manager():
+    await manager.start()

@@ -4,15 +4,14 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { toast } from "sonner";
 
 import { CarouselBanner } from "@/schemas/carousel";
-import { api } from "@/apis";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useCreateCarouselBanner, useUpdateCarouselBanner } from "@/lib/hooks/useCarousel";
 
 const bannerSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -27,13 +26,11 @@ const bannerSchema = z.object({
 type BannerFormValues = z.infer<typeof bannerSchema>;
 
 interface BannerFormProps {
-    open?: boolean;
     banner?: CarouselBanner | null;
-    onSuccess?: () => void;
     onClose: () => void;
 }
 
-export default function BannerForm({ banner, onSuccess, onClose }: BannerFormProps) {
+export default function BannerForm({ banner, onClose }: BannerFormProps) {
     const form = useForm<BannerFormValues>({
         resolver: zodResolver(bannerSchema),
         defaultValues: {
@@ -49,43 +46,30 @@ export default function BannerForm({ banner, onSuccess, onClose }: BannerFormPro
 
     const { handleSubmit, reset, formState } = form;
 
+    const createBanner = useCreateCarouselBanner();
+    const updateBanner = useUpdateCarouselBanner();
+
     useEffect(() => {
-        if (banner) {
-            reset({
-                title: banner.title,
-                subtitle: banner.subtitle || "",
-                description: banner.description || "",
-                buttonText: banner.buttonText || "",
-                link: banner.link || "",
-                order: banner.order,
-                is_active: banner.is_active,
-            });
-        } else {
-            reset({
-                title: "",
-                subtitle: "",
-                description: "",
-                buttonText: "",
-                link: "",
-                order: 0,
-                is_active: true,
-            });
-        }
+        reset({
+            title: banner?.title || "",
+            subtitle: banner?.subtitle || "",
+            description: banner?.description || "",
+            buttonText: banner?.buttonText || "",
+            link: banner?.link || "",
+            order: banner?.order || 0,
+            is_active: banner?.is_active || true,
+        });
     }, [banner, form]);
 
     const onSubmit = async (values: BannerFormValues) => {
         try {
-            if (banner) {
-                await api.admin.carousel.update(banner.id, values);
+            if (banner?.id) {
+                await updateBanner.mutateAsync({ id: banner.id, data: values });
             } else {
-                await api.admin.carousel.create(values);
+                await createBanner.mutateAsync(values);
                 onClose();
             }
-            toast.success("Banner saved successfully");
-            onSuccess?.();
-        } catch (error) {
-            toast.error("Failed to save banner");
-        }
+        } catch {}
     };
 
     return (

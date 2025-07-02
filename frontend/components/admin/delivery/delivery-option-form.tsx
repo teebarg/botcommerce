@@ -14,8 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { DeliveryOption } from "@/schemas";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 import { ShippingMethodSchema } from "@/schemas";
+import { tryCatch } from "@/lib/try-catch";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -47,32 +48,22 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
     });
 
     useEffect(() => {
-        if (initialData) {
-            form.reset({
-                name: initialData.name,
-                description: initialData.description || "",
-                method: initialData.method,
-                amount: initialData.amount,
-                is_active: initialData.is_active,
-            });
-        } else {
-            form.reset({
-                name: "",
-                description: "",
-                method: "STANDARD",
-                amount: 0,
-                is_active: true,
-            });
-        }
+        form.reset({
+            name: initialData?.name || "",
+            description: initialData?.description || "",
+            method: initialData?.method || "STANDARD",
+            amount: initialData?.amount || 0,
+            is_active: initialData?.is_active || true,
+        });
     }, [initialData, form]);
 
     const handleSubmit = async (data: FormValues) => {
         let response = null;
 
         if (initialData?.id) {
-            response = await api.patch<DeliveryOption>(`/delivery/${initialData.id}`, data);
+            response = await tryCatch<DeliveryOption>(api.patch(`/delivery/${initialData.id}`, data));
         } else {
-            response = await api.post<DeliveryOption>("/delivery", data);
+            response = await tryCatch<DeliveryOption>(api.post("/delivery", data));
         }
 
         if (response.error) {
@@ -82,14 +73,13 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
         }
 
         toast.success(`${initialData ? "Updated" : "Created"} delivery option successfully`);
-        invalidate("all-delivery");
-        invalidate("available-delivery");
+        invalidate("delivery");
         onClose();
     };
 
     return (
-        <div>
-            <h3>{initialData ? "Edit" : "Add"} Delivery Option</h3>
+        <div className="px-2 md:px-4 py-8">
+            <h3 className="text-xl font-semibold">{initialData ? "Edit" : "Add"} Delivery Option</h3>
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
                     <FormField
@@ -99,7 +89,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                             <FormItem>
                                 <FormLabel>Name</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} placeholder="Ex: Express Delivery" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -113,7 +103,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} />
+                                    <Textarea {...field} placeholder="Ex: This is a description" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

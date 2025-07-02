@@ -1,23 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
-import { toast } from "sonner";
+import React from "react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Button } from "@/components/ui/button";
 import { Order, OrderStatus } from "@/schemas";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useChangeOrderStatus } from "@/lib/hooks/useOrder";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 
 interface OrderProcessingActionProps {
     order: Order;
 }
 
 const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) => {
-    const invalidate = useInvalidate();
-    const [loading, setLoading] = useState<boolean>(false);
-
     const statusConfig: Record<
-        "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELED" | "PAID" | "REFUNDED",
+        "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "PAID" | "REFUNDED",
         {
             color: string;
             label: string;
@@ -57,6 +55,13 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
         SHIPPED: {
             color: "bg-blue-100 text-blue-700",
             label: "Shipped",
+            nextStatus: "OUT_FOR_DELIVERY" as const,
+            actionLabel: "Mark Out for Delivery",
+            variant: "default",
+        },
+        OUT_FOR_DELIVERY: {
+            color: "bg-success/20 text-success",
+            label: "Out for Delivery",
             nextStatus: "DELIVERED" as const,
             actionLabel: "Mark Delivered",
             variant: "default",
@@ -66,7 +71,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             label: "Delivered",
             nextStatus: null,
             actionLabel: "",
-            variant: "success",
+            variant: "destructive",
         },
         CANCELED: {
             color: "bg-danger/20 text-danger",
@@ -77,37 +82,53 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
         },
     };
 
+    const stateState = useOverlayTriggerState({});
     const config = statusConfig[order.status];
+
+    const { mutateAsync: changeOrderStatus, isPending } = useChangeOrderStatus();
 
     const handleStatusChange = async (orderId: number, newStatus: OrderStatus | null) => {
         if (!newStatus) return;
-        setLoading(true);
-        const { error } = await api.order.status(orderId, newStatus);
-
-        if (error) {
-            toast.error(error);
-            setLoading(false);
-
-            return;
-        }
-
-        invalidate("orders");
-        toast.success("Order status updated successfully");
-        setLoading(false);
+        await changeOrderStatus({ id: orderId, status: newStatus });
+        stateState.close();
     };
 
     return (
         <>
             {config.nextStatus && (
-                <Button
-                    className="flex-1 w-full"
-                    disabled={loading}
-                    isLoading={loading}
-                    variant={config.variant}
-                    onClick={() => handleStatusChange(order.id, config.nextStatus)}
-                >
-                    {config.actionLabel}
-                </Button>
+                <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="flex-1 w-full" disabled={isPending} isLoading={isPending} variant={config.variant}>
+                            {config.actionLabel}
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-content1">
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>Update Order Status</DialogTitle>
+                        </DialogHeader>
+                        <div className="mx-auto w-full">
+                            <div>
+                                <h2 className="text-lg font-semibold leading-6 text-default-900">Update Order Status</h2>
+                                <Separator />
+                                <p className="text-sm text-default-500 mt-2 font-medium">Are you sure you want to change the status of this order?</p>
+                                <div className="flex justify-end gap-2 mt-8">
+                                    <Button aria-label="close" className="min-w-36" variant="outline" onClick={stateState.close}>
+                                        Close
+                                    </Button>
+                                    <Button
+                                        aria-label="confirm"
+                                        className="min-w-36"
+                                        isLoading={isPending}
+                                        variant="primary"
+                                        onClick={() => handleStatusChange(order.id, config.nextStatus)}
+                                    >
+                                        Confirm
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             )}
         </>
     );

@@ -3,7 +3,7 @@
 import React from "react";
 
 import ServerError from "@/components/generic/server-error";
-import { useCategories } from "@/lib/hooks/useApi";
+import { useCategories } from "@/lib/hooks/useCategories";
 import { Skeleton } from "@/components/ui/skeletons";
 import CategoryTree from "@/components/admin/categories/tree";
 import { Category } from "@/schemas/product";
@@ -16,7 +16,11 @@ const CategoryView: React.FC = () => {
     }
 
     if (isLoading) {
-        return <Skeleton className="h-[400px]" />;
+        return (
+            <div className="max-w-7xl mx-auto">
+                <Skeleton className="h-[400px]" />
+            </div>
+        );
     }
 
     const categories = data?.filter((cat: Category) => !cat.parent_id);

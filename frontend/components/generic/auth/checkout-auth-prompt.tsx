@@ -2,13 +2,13 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import { Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
 import ClientOnly from "@/components/generic/client-only";
 import { SignUpForm } from "@/components/generic/auth/signup";
-import { Lock } from "lucide-react";
 
 const CheckoutLoginPrompt: React.FC = () => {
     const pathname = usePathname();

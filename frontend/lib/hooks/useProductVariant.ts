@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
+
+import { useAddToCart } from "./useCart";
 
 import { currency } from "@/lib/utils";
-import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
-    const invalidate = useInvalidate();
     const { shopSettings } = useStore();
+    const { mutate: addToCart, isPending: loading } = useAddToCart();
 
-    const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0].color || null);
-    const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0].size || null);
+    const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0]?.color || null);
+    const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0]?.size || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
-    const [loading, setLoading] = useState<boolean>(false);
 
     const sizes = [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
     const colors = [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
@@ -57,26 +55,10 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
-
-        setLoading(true);
-
-        const response = await api.cart.add({
+        addToCart({
             variant_id: selectedVariant.id,
             quantity,
         });
-
-        if (response.error) {
-            toast.error(response.error);
-            setLoading(false);
-
-            return;
-        }
-
-        invalidate("cart");
-        invalidate("cart-items");
-
-        toast.success("Added to cart successfully");
-        setLoading(false);
     };
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {

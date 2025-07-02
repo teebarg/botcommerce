@@ -2,7 +2,7 @@ import React from "react";
 import UserDropDown from "@modules/account/components/user-menu";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
 import { HeartFilled, Heart } from "nui-react-icons";
-import dynamic from "next/dynamic";
+import ThemeButton from "@lib/theme/theme-button";
 
 import { CartComponent } from "@/components/store/cart/cart-component";
 import Search from "@/components/store/search";
@@ -10,14 +10,8 @@ import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 import { getSiteConfig } from "@/lib/config";
 
-const getThemeToggler = () =>
-    dynamic(() => import("@lib/theme/theme-button"), {
-        loading: () => <div className="w-6 h-6" />,
-    });
-
 const StoreNavbar = async () => {
     const user = await auth();
-    const ThemeButton = getThemeToggler();
     const siteConfig = await getSiteConfig();
 
     return (

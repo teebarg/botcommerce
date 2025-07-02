@@ -9,23 +9,26 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import ProductOverview from "./product-overview";
 
-import { WishItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Overlay from "@/components/overlay";
 import { ProductSearch } from "@/schemas/product";
+import { useUserWishlist } from "@/lib/hooks/useUser";
+import { useAuth } from "@/providers/auth-provider";
 
 interface ProductCardProps {
     product: ProductSearch;
-    showWishlist?: boolean;
-    wishlist?: WishItem[];
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishlist = false }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const { name, image, images } = product;
     const dialogState = useOverlayTriggerState({});
 
-    const inWishlist = !!wishlist?.find((wishlist) => wishlist.product_id === product.id);
+    const { user } = useAuth();
+
+    const { data } = useUserWishlist(user?.id);
+
+    const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
 
     return (
         <motion.div
@@ -53,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, wishlist, showWishli
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 src={images?.[0] || image || "/placeholder.jpg"}
                             />
-                            {showWishlist && (
+                            {Boolean(user) && (
                                 <Button
                                     className={cn(
                                         "absolute top-3 right-3 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100",

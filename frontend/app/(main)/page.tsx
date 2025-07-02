@@ -5,16 +5,14 @@ import Image from "next/image";
 
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/apis";
-import { api as baseApi } from "@/apis/base";
-import { WishItem } from "@/schemas";
-import { auth } from "@/actions/auth";
+import { api } from "@/apis/client";
 import ProductCard from "@/components/store/products/product-card";
 import CategoriesSection from "@/components/store/landing/category-section";
 import { ProductSearch } from "@/schemas/product";
 import CarouselSection from "@/components/store/carousel";
 import { ContactSection } from "@/components/store/landing/contact-section";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
+import { tryCatch } from "@/lib/try-catch";
 
 export const metadata: Metadata = {
     title: "Home",
@@ -22,23 +20,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-    const user = await auth();
     const siteConfig = await getSiteConfig();
-    const { data } = await baseApi.get<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
-        "/product/landing-products",
-        { next: { tags: ["featured"] }, cache: "default" }
+    const { data } = await tryCatch<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
+        api.get("/product/landing-products")
     );
 
-    let wishlist: WishItem[] = [];
-
-    if (user) {
-        const { data } = await api.user.wishlist();
-
-        wishlist = data?.wishlists || [];
-    }
-
     return (
-        <div className="">
+        <div>
             <CarouselSection />
 
             <CategoriesSection />
@@ -68,9 +56,7 @@ export default async function Home() {
                     <div className="col-span-3">
                         <h2 className="text-lg text-default-700 mb-2 font-semibold">Featured products</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                            {data?.featured?.map((product: ProductSearch, index: number) => (
-                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
-                            ))}
+                            {data?.featured?.map((product: ProductSearch, index: number) => <ProductCard key={index} product={product} />)}
                         </div>
                     </div>
                 </div>
@@ -91,9 +77,7 @@ export default async function Home() {
                     </div>
 
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {data?.trending?.map((product: ProductSearch, index: number) => (
-                            <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
-                        ))}
+                        {data?.trending?.map((product: ProductSearch, index: number) => <ProductCard key={index} product={product} />)}
                     </div>
                 </div>
             </section>
@@ -110,9 +94,7 @@ export default async function Home() {
                     <p className="text-3xl font-bold">New Arrivals</p>
                     <p className="text-default-600">Find the best thrifts for your kids</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
-                        {data?.latest?.map((product: ProductSearch, index: number) => (
-                            <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
-                        ))}
+                        {data?.latest?.map((product: ProductSearch, index: number) => <ProductCard key={index} product={product} />)}
                     </div>
                 </div>
             </section>

@@ -5,7 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductForm from "@/components/products/product-form";
 import ProductImagesManager from "@/components/admin/product/product-images";
 import { Product } from "@/schemas/product";
-import { useCollections, useCategories, useBrands } from "@/lib/hooks/useApi";
+import { useCollections } from "@/lib/hooks/useCollection";
+import { useCategories } from "@/lib/hooks/useCategories";
+import { useBrands } from "@/lib/hooks/useBrand";
 
 export function ProductView({ product, onClose }: { product?: Product; onClose: () => void }) {
     const { data: collections } = useCollections();

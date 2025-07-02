@@ -6,8 +6,8 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Button } from "@/components/ui/button";
 import { FaqForm } from "@/components/admin/faq/faq-form";
 import { FaqList } from "@/components/admin/faq/faq-list";
-import { useFaqs } from "@/lib/hooks/useApi";
 import Overlay from "@/components/overlay";
+import { useFaqs } from "@/lib/hooks/useFaq";
 
 const FaqView: React.FC = () => {
     const { data, isLoading } = useFaqs();

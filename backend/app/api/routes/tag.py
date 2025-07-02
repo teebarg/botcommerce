@@ -1,14 +1,10 @@
-from typing import Annotated, Any
+from typing import Any
 
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Depends,
-    File,
-    Form,
     HTTPException,
     Query,
-    UploadFile,
 )
 from math import ceil
 from prisma.errors import PrismaError
@@ -21,7 +17,6 @@ from app.models.tag import (
     Tag,
     TagUpdate,
 )
-from app.services.export import validate_file
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 
@@ -134,20 +129,6 @@ async def delete(id: int) -> Message:
         return Message(message="Tag deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.post("/excel/{task_id}")
-async def upload_tags(
-    file: Annotated[UploadFile, File()],
-    batch: Annotated[str, Form()],
-    task_id: str,
-    background_tasks: BackgroundTasks,
-):
-    await validate_file(file=file)
-
-    contents = await file.read()
-    background_tasks.add_task(process_file, contents, task_id, db)
-    return {"batch": batch, "message": "File upload started"}
 
 
 @router.get("/autocomplete/")

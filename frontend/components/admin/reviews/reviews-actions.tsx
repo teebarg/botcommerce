@@ -1,60 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
 
-import { ReviewForm } from "./reviews-form";
+import { UpdateReviewForm } from "./reviews-form";
 
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Review } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { publishReview } from "@/actions/reviews";
 import Overlay from "@/components/overlay";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useDeleteReview, useUpdateReview } from "@/lib/hooks/useReview";
 
 interface Props {
     review: Review;
-    deleteAction: (id: number) => void;
 }
 
-const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
+const ReviewActions: React.FC<Props> = ({ review }) => {
     const editState = useOverlayTriggerState({});
     const state = useOverlayTriggerState({});
-    const [publishing, setPublishing] = useState<boolean>(false);
-    const invalidate = useInvalidate();
+    const { mutate: updateReview, isPending } = useUpdateReview();
+    const { mutateAsync: deleteReview } = useDeleteReview();
 
     const onConfirmDelete = async () => {
-        try {
-            await deleteAction(review.id);
-            invalidate("reviews");
-            toast.success("Review deleted successfully");
+        deleteReview(review.id).then(() => {
             state.close();
-        } catch (error) {
-            toast.error("Error deleting review");
-        }
+        });
     };
 
     const handlePublish = async (publish: boolean) => {
-        try {
-            setPublishing(true);
-            const res = await publishReview(review.id, publish);
-
-            if (res.error) {
-                toast.error(res.error);
-
-                return;
-            }
-
-            invalidate("reviews");
-            toast.success("Review published successfully");
-        } catch (error) {
-            toast.error("Error publishing review");
-        } finally {
-            setPublishing(false);
-        }
+        updateReview({ id: review.id, input: { verified: publish } });
     };
 
     return (
@@ -63,21 +39,21 @@ const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
                 open={editState.isOpen}
                 title="Edit Review"
                 trigger={
-                    <Button size="iconOnly" variant="ghost" onClick={editState.open}>
+                    <Button size="iconOnly" onClick={editState.open}>
                         <Pencil className="h-5 w-5" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
             >
-                <ReviewForm review={review} onClose={editState.close} />
+                <UpdateReviewForm review={review} onClose={editState.close} />
             </Overlay>
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                 <DialogTrigger>
                     <Trash2 className="h-5 w-5 text-danger" />
                 </DialogTrigger>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="sr-only">Delete</DialogTitle>
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Delete</DialogTitle>
                     </DialogHeader>
                     <Confirm onClose={state.close} onConfirm={onConfirmDelete} />
                 </DialogContent>
@@ -86,8 +62,8 @@ const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
                 <Button
                     aria-label="unpublish"
                     className="min-w-32"
-                    disabled={publishing}
-                    isLoading={publishing}
+                    disabled={isPending}
+                    isLoading={isPending}
                     variant="emerald"
                     onClick={() => handlePublish(false)}
                 >
@@ -97,8 +73,8 @@ const ReviewActions: React.FC<Props> = ({ review, deleteAction }) => {
                 <Button
                     aria-label="publish"
                     className="min-w-32"
-                    disabled={publishing}
-                    isLoading={publishing}
+                    disabled={isPending}
+                    isLoading={isPending}
                     variant="outline"
                     onClick={() => handlePublish(true)}
                 >

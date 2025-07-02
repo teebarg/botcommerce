@@ -2,7 +2,6 @@ import { Order } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
-// Address & Payment Summary Component
 const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {
     return (
         <div className="bg-card rounded-xl shadow-sm p-4 mb-6">

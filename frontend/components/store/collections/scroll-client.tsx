@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import React from "react";
 import { ChevronRight, Loader, Tag } from "nui-react-icons";
 import { motion } from "framer-motion";
@@ -9,86 +8,56 @@ import { useSearchParams } from "next/navigation";
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
 import PromotionalBanner from "@/components/promotion";
-import { WishItem } from "@/schemas";
 import { CollectionsSideBar } from "@/components/store/collections/checkbox-sidebar";
 import { CollectionsTopBar } from "@/components/store/collections/checkout-topbar";
 import NoProductsFound from "@/components/store/products/no-products";
 import ProductCard from "@/components/store/products/product-card";
 import { cn } from "@/lib/utils";
-import { useBrands, useCategories, useCollections } from "@/lib/hooks/useApi";
+import { useBrands } from "@/lib/hooks/useBrand";
+import { useCategories } from "@/lib/hooks/useCategories";
+import { useCollections } from "@/lib/hooks/useCollection";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
-import { api } from "@/apis/client";
-import { Category, Collection, Facet, PaginatedProductSearch, ProductSearch } from "@/schemas/product";
+import { Category, Collection, ProductSearch } from "@/schemas/product";
+import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
+import { Skeleton } from "@/components/ui/skeletons";
 
 interface SearchParams {
-    page?: number;
     sortBy?: string;
     cat_ids?: string;
     maxPrice?: string;
     minPrice?: string;
     search?: string;
+    limit?: number;
 }
 
-export default function InfiniteScrollClient({
-    initialSearchParams,
-    data,
-    collection,
-    wishlist,
-    user,
-}: {
-    initialSearchParams: SearchParams;
-    data: PaginatedProductSearch;
-    collection?: Collection;
-    wishlist: WishItem[];
-    user?: any;
-}) {
+export default function InfiniteScrollClient({ initialSearchParams, collection }: { initialSearchParams: SearchParams; collection?: Collection }) {
+    const searchParams = useSearchParams();
     const { data: brands } = useBrands();
     const { data: categories } = useCategories();
     const { data: collections } = useCollections();
-    const [products, setProducts] = useState<ProductSearch[]>(data.products);
-    const [facets, setFacets] = useState<Facet>();
-    const [hasNext, setHasNext] = useState<boolean>(data.page < data.total_pages);
-    const [page, setPage] = useState<number>(data.page ?? 1);
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const searchParams = useSearchParams();
-
-    const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
-
-    const fetchItems = async (page: number) => {
-        setLoading(true);
-        const data = await api.get<PaginatedProductSearch>("/product/search", { params: { ...initialSearchParams, page } });
-
-        if (!data) {
-            return;
-        }
-        setProducts((prev) => [...prev, ...data.products]);
-        setHasNext(data.page < data.total_pages);
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        setProducts(data.products);
-        setPage(data.page);
-        setHasNext(data.page < data.total_pages);
-        setFacets(data.facets);
-    }, [data]);
-
-    useEffect(() => {
-        if (page === 1) {
-            return;
-        }
-        fetchItems(page);
-    }, [page]);
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useProductInfiniteSearch(initialSearchParams);
 
     const { lastElementRef } = useInfiniteScroll({
         onIntersect: () => {
-            if (hasNext) {
-                setPage((prev) => prev + 1);
+            if (!isFetchingNextPage && hasNextPage) {
+                fetchNextPage();
             }
         },
-        isFetching: loading,
+        isFetching: isFetchingNextPage,
     });
+
+    if (isPending) {
+        return (
+            <div className="flex gap-2">
+                <Skeleton className="min-h-[700px] w-[25%] hidden md:block" />
+                <Skeleton className="min-h-[700px] flex-1" />
+            </div>
+        );
+    }
+
+    const products = data?.pages?.flatMap((page) => page.products) || [];
+    const facets = data?.pages?.flatMap((page) => page.facets) || {};
+    const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
 
     return (
         <div className="flex gap-6">
@@ -103,7 +72,6 @@ export default function InfiniteScrollClient({
                     subtitle="Get 20% Off Today"
                     title="Exclusive Offer!"
                 />
-                {/* Categories */}
                 <div className="px-4 my-6 md:hidden">
                     <div className="flex overflow-x-auto gap-3 pb-2">
                         <BtnLink
@@ -182,7 +150,7 @@ export default function InfiniteScrollClient({
                                                     delay: index * 0.05,
                                                 }}
                                             >
-                                                <ProductCard key={index} product={product} showWishlist={Boolean(user)} wishlist={wishlist} />
+                                                <ProductCard key={index} product={product} />
                                             </motion.div>
                                         ))}
                                     </div>
@@ -191,14 +159,13 @@ export default function InfiniteScrollClient({
                         </div>
                     </div>
                 </div>
-                <div className="w-full">
-                    {hasNext && (
-                        <div ref={lastElementRef} className="flex flex-col items-center justify-center text-blue-600">
-                            <Loader className="h-8 w-8 animate-spin mb-2" />
-                            <p className="text-sm font-medium text-default-500">Loading more products...</p>
-                        </div>
-                    )}
-                </div>
+                <div className="w-full absolute bottom-52">{hasNextPage && <div ref={lastElementRef} className="h-2" />}</div>
+                {isFetchingNextPage && (
+                    <div className="flex flex-col items-center justify-center text-blue-600">
+                        <Loader className="h-8 w-8 animate-spin mb-2" />
+                        <p className="text-sm font-medium text-default-500">Loading more products...</p>
+                    </div>
+                )}
             </div>
         </div>
     );

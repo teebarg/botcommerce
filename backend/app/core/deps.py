@@ -26,7 +26,6 @@ supabase_url = settings.SUPABASE_URL
 supabase_key = settings.SUPABASE_KEY
 supabase: Client = create_client(supabase_url, supabase_key)
 
-
 # SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 

@@ -44,8 +44,6 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
         // TODO
     };
 
-    // const [message, formAction, isPending] = useActionState(submitDiscountForm, null);
-
     return (
         <div className="w-full flex flex-col">
             <div className="txt-medium">

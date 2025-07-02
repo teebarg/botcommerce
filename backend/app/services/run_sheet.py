@@ -8,7 +8,7 @@ from fastapi import (
 )
 from openpyxl import Workbook, load_workbook
 
-from app.api.routes.websocket import manager
+from app.services.websocket import manager
 from app.core.logging import logger
 from app.core.utils import generate_data_export_email, send_email
 
@@ -19,10 +19,10 @@ from app.core.deps import supabase
 
 
 async def broadcast_channel(data, user_id: int):
-    await manager.broadcast(
-        id=str(user_id),
+    await manager.send_to_user(
+        user_id=user_id,
         data=data,
-        type="sheet-processor",
+        message_type="sheet-processor",
     )
 
 
@@ -36,6 +36,7 @@ async def generate_excel_file(email: str) -> str:
             "collections": True,
             "brand": True,
             "images": True,
+            "variants": True,
         }
     )
 
@@ -63,6 +64,7 @@ async def generate_excel_file(email: str) -> str:
         "collections",
         "brand",
         "images",
+        "variants",
     ]
     sheet.append(headers)
 
@@ -82,9 +84,9 @@ async def generate_excel_file(email: str) -> str:
                 product.name,
                 product.slug,
                 product.description,
-                product.price,
-                product.old_price,
-                0,
+                product.variants[0].price if product.variants else 0,
+                product.variants[0].old_price if product.variants else 0,
+                product.variants[0].inventory if product.variants else 0,
                 product.ratings,
                 product.image,
                 True,
@@ -92,6 +94,7 @@ async def generate_excel_file(email: str) -> str:
                 collections_str,
                 product.brand.name if product.brand else "",
                 images_str,
+                "|".join([variant.sku for variant in product.variants]),
             ]
         )
 
@@ -399,15 +402,15 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
         logger.info(
             f"Total processing time: {end_time - start_time:.2f} seconds"
         )
-        
+
         return len(products)
     except Exception as e:
         logger.error(f"An error occurred while processing. Error{e}")
-        await manager.broadcast(
-            id="sheet",
+        await manager.send_to_user(
+            user_id=str(user_id),
             data={
                 "message": f"An error occurred while processing. Error{e}",
                 "status": "error",
             },
-            type="sheet-processor",
+            message_type="sheet-processor",
         )

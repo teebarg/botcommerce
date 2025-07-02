@@ -6,10 +6,11 @@ import { toast } from "sonner";
 
 import ChatBody from "./chatbody";
 
-import { api } from "@/apis/base";
+import { api } from "@/apis/client";
 import { ChatMessage, Conversation } from "@/schemas";
+import { tryCatch } from "@/lib/try-catch";
 
-const profilePic = "https://i.pravatar.cc/50?img=12"; // Placeholder profile photo of assistant
+const profilePic = "https://i.pravatar.cc/50?img=12";
 
 interface Message {
     text: string;
@@ -47,7 +48,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
     }, []);
 
     const createConversation = async () => {
-        const { data, error } = await api.post<Conversation>("/conversation/conversations");
+        const { data, error } = await tryCatch<Conversation>(api.post("/conversation/conversations"));
 
         if (error || !data?.conversation_uuid) {
             toast.error("Failed to start a new conversation.");
@@ -60,7 +61,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
     };
 
     const getMessages = async (id: string) => {
-        const { data, error } = await api.get<ChatMessage[]>(`/conversation/conversations/${id}/messages`);
+        const { data, error } = await tryCatch<ChatMessage[]>(api.get(`/conversation/conversations/${id}/messages`));
 
         if (error || !data) {
             toast.error("Failed to fetch messages.");
@@ -89,7 +90,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
         setMessages([...messages, { text: input, isUser: true }]);
         setInput("");
 
-        const { data, error } = await api.post<ChatMessage>(`/conversation/conversations/${conversationId}/messages`, { content: input });
+        const { data, error } = await tryCatch<ChatMessage>(api.post(`/conversation/conversations/${conversationId}/messages`, { content: input }));
 
         if (error) {
             toast.error(error);

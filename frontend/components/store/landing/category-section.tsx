@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { useCategories } from "@/lib/hooks/useApi";
+import { useCategories } from "@/lib/hooks/useCategories";
 import { Category } from "@/schemas/product";
 import { Skeleton } from "@/components/ui/skeletons";
 import ClientOnly from "@/components/generic/client-only";

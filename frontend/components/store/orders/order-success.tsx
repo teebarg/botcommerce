@@ -7,18 +7,16 @@ import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 
-import { Order, PaymentStatus } from "@/schemas";
+import { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Button } from "@/components/ui/button";
 
 type OrderConfirmationProps = {
-    status: PaymentStatus;
     order: Order;
     onRetry?: () => void;
     onContinueShopping?: () => void;
 };
 
-// Success Confirmation Component
 const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
     return (
         <div className="w-full max-w-2xl mx-auto">

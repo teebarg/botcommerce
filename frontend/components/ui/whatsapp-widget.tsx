@@ -31,7 +31,6 @@ const WhatsAppWidget: React.FC = () => {
 
     return (
         <>
-            {/* WhatsApp Button */}
             <button
                 className="fixed bottom-40 right-6 md:right-12 bg-[#25D366] rounded-full p-2 shadow-lg hover:bg-[#128C7E] transition-colors z-50 text-white"
                 onClick={() => setIsOpen(true)}
@@ -41,10 +40,8 @@ const WhatsAppWidget: React.FC = () => {
                 </svg>
             </button>
 
-            {/* Chat Widget */}
             {isOpen && (
                 <div className="fixed bottom-24 right-6 w-[calc(100%-48px)] md:w-[400px] bg-white rounded-lg shadow-xl z-50 overflow-hidden">
-                    {/* Header */}
                     <div className="bg-[#075E54] p-4 flex justify-between items-center">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
@@ -62,7 +59,6 @@ const WhatsAppWidget: React.FC = () => {
                         </Button>
                     </div>
 
-                    {/* Chat Content */}
                     <div className="p-4 bg-[#E5DDD5]">
                         <div className="bg-white rounded-lg p-3 inline-block max-w-[80%]">
                             <p className="text-gray-800">Hi, welcome to {shopSettings?.shop_name}, how can we help you today 😊</p>
@@ -70,7 +66,6 @@ const WhatsAppWidget: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Input Area */}
                     <form className="p-4 bg-white" onSubmit={handleSubmit}>
                         <div className="flex gap-2">
                             <input

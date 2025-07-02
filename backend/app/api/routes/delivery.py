@@ -10,13 +10,14 @@ router = APIRouter()
 @router.get("/", response_model=List[DeliveryOption], dependencies=[Depends(get_current_superuser)])
 async def get_delivery_options():
     """Get all delivery options"""
-    return await db.deliveryoption.find_many()
+    return await db.deliveryoption.find_many(order={"created_at": "desc"})
 
 @router.get("/available", response_model=List[DeliveryOption])
 async def get_available_delivery_options():
     """Get all active delivery options"""
     return await db.deliveryoption.find_many(
-        where={"is_active": True}
+        where={"is_active": True},
+        order={"created_at": "desc"}
     )
 
 @router.post("/", dependencies=[Depends(get_current_superuser)])

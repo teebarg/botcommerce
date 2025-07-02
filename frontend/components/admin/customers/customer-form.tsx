@@ -1,18 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { User } from "@/schemas";
+import { useCreateUser, useUpdateUser } from "@/lib/hooks/useUser";
 
 interface ReviewFormProps {
     user?: User;
@@ -31,8 +28,10 @@ const formSchema = z.object({
 });
 
 export default function CustomerForm({ user, onClose }: ReviewFormProps) {
-    const [loading, setLoading] = useState<boolean>(false);
-    const invalidate = useInvalidate();
+    const { mutate: update, isPending: updateLoading } = useUpdateUser();
+    const { mutate: create, isPending: createLoading } = useCreateUser();
+
+    const loading = updateLoading || createLoading;
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -47,30 +46,13 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
     function onSubmit(values: z.infer<typeof formSchema>) {
         const { ...data } = values;
 
-        setLoading(true);
-
-        void (async () => {
-            let res = null;
-
-            if (user?.id) {
-                res = await api.user.update(user.id, {
-                    ...data,
-                });
-            } else {
-                res = await api.user.create({
-                    ...data,
-                });
-            }
-
-            if (res.error) {
-                toast.error(`Error - ${res.error}`);
-            } else {
-                invalidate("customers");
-                toast.success(`User ${user?.id ? "updated" : "created"} successfully`);
-            }
-            // onClose?.();
-            setLoading(false);
-        })();
+        if (user?.id) {
+            update({ id: user.id, input: data });
+        } else {
+            create({
+                ...data,
+            });
+        }
     }
 
     return (
@@ -79,7 +61,6 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="w-full h-full">
-                        {/* Product Form */}
                         <div className="space-y-4">
                             <FormField
                                 control={form.control}

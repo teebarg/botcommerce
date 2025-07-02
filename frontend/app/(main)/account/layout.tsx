@@ -1,11 +1,13 @@
+"use client";
+
 import { Package, User } from "nui-react-icons";
 import { MapPin } from "lucide-react";
 
 import RecommendedProducts from "@/components/store/products/recommended";
 import AccountNav from "@/modules/account/components/account-nav";
 import LocalizedClientLink from "@/components/ui/link";
-import { auth } from "@/actions/auth";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/providers/auth-provider";
 
 const navLinks = [
     {
@@ -34,8 +36,8 @@ const navLinks = [
     },
 ];
 
-export default async function AccountPageLayout({ dashboard }: { dashboard?: React.ReactNode }) {
-    const user = await auth();
+export default function AccountPageLayout({ dashboard }: { dashboard?: React.ReactNode }) {
+    const { user } = useAuth();
 
     return (
         <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">

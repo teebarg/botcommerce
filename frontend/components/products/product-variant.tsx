@@ -1,103 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { Edit, Trash2 } from "lucide-react";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import ProductVariantForm from "./product-variant-form";
+
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/schemas";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { currency } from "@/lib/utils";
+import { useDeleteVariant } from "@/lib/hooks/useProduct";
 
 interface ProductVariantsProps {
     variants: ProductVariant[];
     productId: number;
 }
 
-const variantFormSchema = z.object({
-    status: z.enum(["IN_STOCK", "OUT_OF_STOCK"]),
-    price: z.number().min(1, {
-        message: "Price must be at least 1.",
-    }),
-    old_price: z.number().optional(),
-    inventory: z.number().min(0, {
-        message: "Inventory must be at least 0.",
-    }),
-    size: z.string().optional(),
-    color: z.string().optional(),
-});
-
 const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants = [] }) => {
     const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
-    const invalidate = useInvalidate();
-
-    const form = useForm<z.infer<typeof variantFormSchema>>({
-        resolver: zodResolver(variantFormSchema),
-        defaultValues: {
-            status: "IN_STOCK",
-            price: 0,
-            old_price: 0,
-            inventory: 0,
-            size: "",
-            color: "",
-        },
-    });
-
-    async function onSubmit(values: z.infer<typeof variantFormSchema>) {
-        let response;
-
-        setLoading(true);
-        if (editingVariant?.id) {
-            response = await api.product.updateVariant({ ...values, id: editingVariant.id });
-        } else {
-            response = await api.product.createVariant({ productId, ...values });
-        }
-
-        if (response.error) {
-            toast.error(`Error - ${response.error}`);
-            setLoading(false);
-
-            return;
-        }
-
-        toast.success(`Variant ${editingVariant?.id ? "updated" : "created"} successfully`);
-        invalidate("products");
-        invalidate("product-search");
-        form.reset();
-        setLoading(false);
-        setEditingVariant(null);
-    }
+    const deleteVariantMutation = useDeleteVariant();
 
     const handleEdit = (variant: ProductVariant) => {
         setEditingVariant(variant);
-        form.setValue("status", variant.status);
-        form.setValue("price", variant.price);
-        form.setValue("old_price", variant.old_price);
-        form.setValue("inventory", variant.inventory);
-        form.setValue("size", variant.size || "");
-        form.setValue("color", variant.color || "");
     };
 
     const deleteVariant = (id: number) => {
-        api.product
-            .deleteVariant(id)
-            .then(() => {
-                toast.success(`Variant deleted successfully`);
-                invalidate("products");
-                invalidate("product-search");
-            })
-            .catch((error) => {
-                toast.error(`Error - ${error as string}`);
-            });
+        deleteVariantMutation.mutate(id);
     };
 
     return (
@@ -148,122 +76,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                         </tbody>
                     </table>
                 </div>
-
-                <p className="text-default-500 mt-8 font-semibold">Add new variant</p>
-                <div className="bg-content1 p-4 rounded-lg">
-                    <Form {...form}>
-                        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name="inventory"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Inventory</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Enter inventory"
-                                                    type="number"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="status"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Status</FormLabel>
-                                            <FormControl>
-                                                <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select status" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="IN_STOCK">In Stock</SelectItem>
-                                                        <SelectItem value="OUT_OF_STOCK">Out of Stock</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="size"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Size</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter size" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="color"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Color</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter color" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="price"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Price</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Enter price"
-                                                    type="number"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="old_price"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Old Price</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Enter old price"
-                                                    type="number"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className="flex justify-end">
-                                <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit" variant="primary">
-                                    {editingVariant ? "Update" : "Create"}
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
-                </div>
+                <ProductVariantForm productId={productId} variant={editingVariant} onCancel={() => setEditingVariant(null)} />
             </div>
         </div>
     );

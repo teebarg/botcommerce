@@ -1,30 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
-import { bulkUpload } from "@/modules/account/actions";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { useWebSocket } from "@/providers/websocket";
-import { api } from "@/apis";
+import { getCookie } from "@/lib/util/server-utils";
 
 interface ProductUploadProps {}
 
 const ProductUpload: React.FC<ProductUploadProps> = () => {
-    const [isUploading, setIsUploading] = useState<boolean>(false);
     const { currentMessage } = useWebSocket();
-    const invalidate = useInvalidate();
 
     useEffect(() => {
         if (!currentMessage) return;
-        if (currentMessage.status === "completed") {
-            setIsUploading(false);
+        if (currentMessage?.message_type === "sheet-processor" && currentMessage?.status === "completed") {
             toast.success("Products uploaded successfully");
-            void api.product.revalidate();
-            invalidate("products");
-            invalidate("product-search");
         }
     }, [currentMessage]);
 
@@ -43,24 +35,30 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
             formData.append("file", file);
 
             void (async () => {
-                setIsUploading(true);
-                const res = await bulkUpload(formData);
+                const toastId = toast.loading("Uploading products...");
+                const accessToken = await getCookie("access_token");
 
-                if (!res.success) {
-                    toast.error(res.message);
-                    setIsUploading(false);
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {
+                        method: "POST",
+                        body: formData,
+                        headers: { "X-Auth": accessToken ?? "" },
+                    });
 
-                    return;
+                    if (!response.ok) {
+                        throw new Error("Failed to upload products");
+                    }
+
+                    toast.success("Product upload started", { id: toastId });
+                } catch (error: any) {
+                    toast.error(error.toString(), { id: toastId });
                 }
-
-                toast.success("Product upload started");
             })();
         },
     });
 
     return (
         <div className="space-y-2">
-            {/* Upload Area */}
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
@@ -71,8 +69,7 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
                     <Upload className="w-8 h-8 text-default-500" />
                     <p className="text-default-900">{isDragActive ? "Drop the file here" : "Drag & drop file or click to upload"}</p>
                     <p className="text-sm text-default-500">(Max 5MB, XLSX/CSV only)</p>
-                    {/* Upload progress */}
-                    {(isUploading || currentMessage?.processed_rows < currentMessage?.total_rows) && (
+                    {currentMessage?.processed_rows < currentMessage?.total_rows && (
                         <div>
                             <div className="w-full bg-gray-200 rounded-full h-2.5">
                                 <div
@@ -87,8 +84,6 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
                     )}
                 </div>
             </div>
-
-            {/* Help text */}
             <div className="text-xs text-default-500">
                 <p>• Only .xlsx files are allowed</p>
             </div>

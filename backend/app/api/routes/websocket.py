@@ -1,100 +1,126 @@
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.core.logging import logger
-
-
-class ConnectionManager:
-    def __init__(self):
-        self.connections: dict[str, WebSocket] = {}
-
-    async def connect(self, id: str, websocket: WebSocket) -> None:
-        """
-        Establishes a WebSocket connection and adds it to the list of active connections.
-
-        Parameters:
-        - websocket: The WebSocket object representing the connection.
-
-        Returns:
-        - None
-        """
-        await websocket.accept()
-        self.connections[id] = websocket
-        logger.info(f"WebSocket connection established for user {id}")
-
-    def disconnect(self, id: str) -> None:
-        """
-        Disconnects a WebSocket connection.
-
-        Parameters:
-        - websocket (WebSocket): The WebSocket connection to be disconnected.
-
-        Returns:
-        None
-        """
-        if id in self.connections:
-            del self.connections[id]
-
-    async def broadcast(self, id: str, data: dict, type: str = "general") -> None:
-        """
-        Broadcasts the given data to all active connections.
-
-        Args:
-            data (dict): The data to be sent as a JSON object.
-
-        Returns:
-            None
-        """
-        if id in self.connections:
-            websocket = self.connections[id]
-            await websocket.send_json({**data, "type": type})
-
-
-manager = ConnectionManager()
+import json, time, httpx
+from app.services.websocket import manager
+from app.services.session_store import session_store, SessionStore
 
 router = APIRouter()
 
 
-# WebSocket route for clients to listen for real-time updates
-@router.websocket("/{id}/")
-async def websocket(id: str, websocket: WebSocket):
+async def get_city(ip: str) -> str:
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.get(f"https://ipapi.co/{ip}/city")
+            return res.text.strip()
+    except Exception as e:
+        logger.error(f"An error occurred in get_city - {e}")
+        return "Unknown"
+
+async def broadcast_sessions(session_store: SessionStore):
+    sessions = []
+    all_sessions = session_store.get_all_with_prefix("session:")
+    for key, data in all_sessions.items():
+        sessions.append({
+            "id": key.replace("session:", ""),
+            "type": data.get("type", "guest"),
+            "email": data.get("email", "Unknown"),
+            "location": data.get("location", "Unknown"),
+            "path": data.get("path", "/"),
+            "last_seen": int(time.time()) - int(data.get("updated_at", 0))
+        })
+
+    await manager.broadcast_to_all({"users": sessions}, "online-users")
+
+@router.websocket("/")
+async def websocket(ws: WebSocket):
     """
-    Handles the WebSocket endpoint.
+    Handles the WebSocket endpoint with RedisConnectionManager.
 
     Args:
-        id (str): User id.
-        websocket (WebSocket): The WebSocket connection.
+        ws (WebSocket): The WebSocket connection.
+        cache (CacheService): Cache service dependency.
 
     Returns:
         None
     """
-    await manager.connect(id=id, websocket=websocket)
+    ip = ws.client.host
+    session_key = f"session:{ip}"
+    user_id = None
+    location = await get_city(ip)
+
+    session_store.set(session_key, {
+        "type": "guest",
+        "path": "/",
+        "location": location if location else "Unknown",
+        "updated_at": str(int(time.time()))
+    })
+
+    if not await manager.connect(ip, ws, metadata={"ip": ip, "location": location}):
+        logger.error(f"Failed to establish WebSocket connection for IP {ip}")
+        return
+
+    await broadcast_sessions(session_store)
+
     try:
         while True:
-            await websocket.receive_text()  # WebSocket remains open
+            msg = await ws.receive_text()
+            try:
+                payload = json.loads(msg)
+                message_type = payload.get("type")
+
+                if message_type == "init":
+                    user_id = payload.get("id")
+                    email = payload.get("email")
+
+                    if user_id:
+                        user_session_key = f"session:{user_id}"
+                        session_store.set(user_session_key, {
+                            "type": "user",
+                            "email": email or "Unknown",
+                            "location": location if location else "Unknown",
+                            "path": "/",
+                            "updated_at": str(int(time.time()))
+                        })
+
+                        if await manager.promote_connection(ip, user_id, metadata={
+                            "ip": ip,
+                            "email": email,
+                            "location": location
+                        }):
+                            logger.info(f"Promoted connection from {ip} to {user_id}")
+                        else:
+                            logger.error(f"Failed to promote connection from {ip} to {user_id}")
+                            continue
+
+                elif message_type == "ping":
+                    await manager.handle_heartbeat(user_id if user_id else ip)
+
+                elif message_type == "path":
+                    path = payload.get("path", "/")
+                    session_store.update_field(
+                        f"session:{user_id or ip}", "path", path
+                    )
+
+                session_store.update_field(
+                    f"session:{user_id or ip}", "updated_at", str(int(time.time()))
+                )
+
+                await broadcast_sessions(session_store)
+
+            except json.JSONDecodeError:
+                logger.error(f"Invalid JSON received: {msg}")
+                continue
+            except Exception as e:
+                logger.error(f"An error occurred processing message: {e}")
+                continue
+
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-
-
-# async def relay_notifications(queue_name: str):
-#     try:
-#         connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
-#         channel = await connection.channel()
-#         queue = await channel.declare_queue(queue_name)
-#         async for message in queue:
-#             await manager.broadcast(
-#                 id="test", data={"message": message.body.decode()}, type=queue.name
-#             )
-#             # await message.ack()
-#     except Exception as e:
-#         logger.error(f"An error occurred in relay_notifications - {e}")
-
-
-# @router.websocket("/notifications/test")
-# async def websocket_endpoint(websocket: WebSocket):
-#     await manager.connect(id="test", websocket=websocket)
-#     try:
-#         while True:
-#             await relay_notifications("notifications")
-#     except WebSocketDisconnect as e:
-#         logger.error(f"An error occurred - {e}")
-#         manager.disconnect(websocket)
+        logger.info(f"WebSocket disconnected for user {user_id or ip}")
+    except Exception as e:
+        logger.error(f"Unexpected error in websocket handler: {e}")
+    finally:
+        final_key = f"session:{user_id or ip}"
+        await manager.disconnect(user_id or ip)
+        session_store.delete(final_key)
+        await broadcast_sessions(session_store)

@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -9,12 +7,11 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { api } from "@/apis/base";
 import { FAQ } from "@/schemas";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useCreateFaq, useUpdateFaq } from "@/lib/hooks/useFaq";
 
 interface FaqFormProps {
     faq?: FAQ | null;
@@ -34,12 +31,9 @@ const formSchema = z.object({
     }),
 });
 
-type FaqFormValues = z.infer<typeof formSchema>;
+export type FaqFormValues = z.infer<typeof formSchema>;
 
 export function FaqForm({ faq, onCancel }: FaqFormProps) {
-    const invalidate = useInvalidate();
-    const [loading, setLoading] = useState<boolean>(false);
-
     const form = useForm<FaqFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -50,28 +44,19 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
         },
     });
 
-    const onSubmit = async (values: FaqFormValues) => {
-        setLoading(true);
-        try {
-            if (faq) {
-                const { error } = await api.patch<FAQ>(`/faq/${faq.id}`, values);
+    const { mutateAsync: createFaq, isPending: createLoading } = useCreateFaq();
+    const { mutateAsync: updateFaq, isPending: updateLoading } = useUpdateFaq();
 
-                if (error) throw error;
-                toast.success("FAQ updated successfully");
-            } else {
-                const { error } = await api.post<FAQ>(`/faq`, values);
+    const loading = createLoading || updateLoading;
 
-                if (error) throw error;
-                toast.success("FAQ created successfully");
-            }
-
-            onCancel();
-            form.reset();
-            invalidate("faqs");
-        } catch (error) {
-            toast.error("Failed to save FAQ");
-        } finally {
-            setLoading(false);
+    const onSubmit = (values: FaqFormValues) => {
+        if (faq) {
+            updateFaq({ id: faq.id, data: values });
+        } else {
+            createFaq(values).then(() => {
+                form.reset();
+                onCancel();
+            });
         }
     };
 

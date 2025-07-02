@@ -44,11 +44,7 @@ async def create(*, data: CategoryCreate) -> Category:
     """
     try:
         category = await db.category.create(
-            data={
-                "name": data.name,
-                "slug": slugify(data.name),
-                "parent_id": data.parent_id
-            }
+            data={**data.model_dump(), "slug": slugify(data.name)}
         )
         return category
     except PrismaError as e:

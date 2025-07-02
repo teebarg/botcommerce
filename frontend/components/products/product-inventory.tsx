@@ -3,55 +3,28 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Download } from "lucide-react";
-import { toast } from "sonner";
-import { useState } from "react";
 
 import { ProductDetails } from "../admin/product/product-details";
-import Overlay from "../overlay";
 
 import ProductUpload from "./product-upload";
 
+import Overlay from "@/components/overlay";
 import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useExportProducts, useReIndexProducts } from "@/lib/hooks/useProduct";
 
 export function ProductInventory() {
     const addState = useOverlayTriggerState({});
-    const [isExporting, setIsExporting] = useState<boolean>(false);
-    const [isIndexing, setIsIndexing] = useState<boolean>(false);
-    const invalidate = useInvalidate();
 
-    const handleExport = async () => {
-        setIsExporting(true);
-        const { error } = await api.product.export();
+    const exportProducts = useExportProducts();
+    const reIndexProducts = useReIndexProducts();
 
-        if (error) {
-            toast.error(error);
-            setIsExporting(false);
-
-            return;
-        }
-
-        toast.success("Products exported successfully");
-        setIsExporting(false);
+    const handleExport = () => {
+        exportProducts.mutate();
     };
 
-    const handleIndex = async () => {
-        setIsIndexing(true);
-        const { error } = await api.product.reIndex();
-
-        if (error) {
-            toast.error(error);
-            setIsIndexing(false);
-
-            return;
-        }
-        invalidate("products");
-        invalidate("product-search");
-
-        toast.success("Products indexed successfully");
-        setIsIndexing(false);
+    const handleReIndex = () => {
+        reIndexProducts.mutate();
     };
 
     return (
@@ -75,10 +48,16 @@ export function ProductInventory() {
                         >
                             <ProductView onClose={addState.close} />
                         </Overlay>
-                        <Button disabled={isExporting} isLoading={isExporting} variant="outline" onClick={handleExport}>
+                        <Button disabled={exportProducts.isPending} isLoading={exportProducts.isPending} variant="outline" onClick={handleExport}>
                             <Download className="mr-2 h-4 w-4" /> Export Products
                         </Button>
-                        <Button className="min-w-32" disabled={isIndexing} isLoading={isIndexing} variant="outline" onClick={handleIndex}>
+                        <Button
+                            className="min-w-32"
+                            disabled={reIndexProducts.isPending}
+                            isLoading={reIndexProducts.isPending}
+                            variant="outline"
+                            onClick={handleReIndex}
+                        >
                             Re-index
                         </Button>
                     </div>

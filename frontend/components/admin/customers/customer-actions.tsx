@@ -7,7 +7,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import CustomerForm from "./customer-form";
 
 import { User } from "@/schemas";
-import { useDeleteCustomer } from "@/lib/hooks/useApi";
+import { useDeleteUser } from "@/lib/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 
@@ -16,7 +16,7 @@ interface CustomerActionsProps {
 }
 
 const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
-    const { mutate, isPending } = useDeleteCustomer();
+    const { mutate, isPending } = useDeleteUser();
     const editState = useOverlayTriggerState({});
 
     const onDelete = (id: number) => {

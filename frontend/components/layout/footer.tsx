@@ -7,7 +7,8 @@ import { Instagram } from "lucide-react";
 import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/schemas/product";
 import { useStore } from "@/app/store/use-store";
-import { useCategories, useCollections } from "@/lib/hooks/useApi";
+import { useCategories } from "@/lib/hooks/useCategories";
+import { useCollections } from "@/lib/hooks/useCollection";
 
 const company = [
     {

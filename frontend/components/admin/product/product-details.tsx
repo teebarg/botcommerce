@@ -14,9 +14,11 @@ import { ProductActions } from "@/components/admin/product/product-actions";
 import { Brand, Collection, Product } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
-import { useBrands, useCollections, useProducts } from "@/lib/hooks/useApi";
+import { useProducts } from "@/lib/hooks/useProduct";
 import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
+import { useCollections } from "@/lib/hooks/useCollection";
+import { useBrands } from "@/lib/hooks/useBrand";
 
 const LIMIT = 10;
 

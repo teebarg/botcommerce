@@ -3,17 +3,15 @@
 import { omit } from "@lib/utils";
 import { Building, Check, Edit3, Home, MapPin, Phone, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { toast } from "sonner";
 
 import ShippingAddressFormEdit from "../address-form-edit";
 
 import { Address } from "@/schemas";
-import { api } from "@/apis";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 
 interface AddressItemProp {
     address: Address;
@@ -34,25 +32,18 @@ const getTypeIcon = (type: string) => {
 
 export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, selectedAddress }) => {
     const isSelected = selectedAddress?.id === address.id;
+    const updateCartDetails = useUpdateCartDetails();
 
     const state = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-    const invalidate = useInvalidate();
 
     const handleSelect = async (id: number) => {
         const savedAddress = addresses.find((a) => a.id === id);
 
         if (savedAddress) {
-            const res = await api.cart.updateDetails({
+            updateCartDetails.mutateAsync({
                 shipping_address: omit(savedAddress, ["created_at", "updated_at"]) as any,
             });
-
-            if (res.error) {
-                toast.error(res.error);
-
-                return;
-            }
-            invalidate("checkout-cart");
         }
     };
 

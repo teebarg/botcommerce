@@ -6,8 +6,10 @@ import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { api } from "@/apis";
+import { api } from "@/apis/client";
 import { Button } from "@/components/ui/button";
+import { Message } from "@/schemas";
+import { tryCatch } from "@/lib/try-catch";
 
 interface ProductImageManagerProps {
     categoryId: number;
@@ -23,7 +25,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
         setIsDeleting(true);
         void (async () => {
             try {
-                const { error } = await api.category.deleteImage(categoryId);
+                const { error } = await tryCatch<Message>(api.delete(`/category/${categoryId}/image`));
 
                 if (error) {
                     toast.error(error);
@@ -60,14 +62,13 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 void (async () => {
                     setIsUploading(true);
                     try {
-                        const { error } = await api.category.uploadImage({
-                            id: categoryId,
-                            data: {
+                        const { error } = await tryCatch<Message>(
+                            api.patch(`/category/${categoryId}/image`, {
                                 file: base64.split(",")[1]!, // Remove the data URL prefix
                                 file_name: fileName,
                                 content_type: file.type,
-                            },
-                        });
+                            })
+                        );
 
                         if (error) {
                             toast.error(error);

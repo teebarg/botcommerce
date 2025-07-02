@@ -2,30 +2,24 @@
 
 import { Delivery, Pencil } from "nui-react-icons";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-
-import ErrorMessage from "../error-message";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { api } from "@/apis";
 import { currency } from "@/lib/utils";
 import { Cart, DeliveryOption } from "@/schemas";
-import { useDeliveryOptions, useInvalidate } from "@/lib/hooks/useApi";
+import { useDeliveryOptions } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
+import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount">;
 };
 
 const Shipping: React.FC<ShippingProps> = ({ cart }) => {
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const invalidate = useInvalidate();
+    const updateCartDetails = useUpdateCartDetails();
 
     const { data: deliveryOptions } = useDeliveryOptions();
 
@@ -40,22 +34,11 @@ const Shipping: React.FC<ShippingProps> = ({ cart }) => {
     };
 
     const handleSubmit = () => {
-        setIsLoading(true);
         router.push(pathname + "?step=payment", { scroll: false });
     };
 
     const set = async (option: DeliveryOption) => {
-        setIsLoading(true);
-        const { error } = await api.cart.updateDetails({ shipping_method: option.method, shipping_fee: option.amount });
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-        invalidate("checkout-cart");
-
-        setIsLoading(false);
+        updateCartDetails.mutateAsync({ shipping_method: option.method, shipping_fee: option.amount });
     };
 
     const handleChange = (value: string) => {
@@ -67,11 +50,6 @@ const Shipping: React.FC<ShippingProps> = ({ cart }) => {
 
         set(item);
     };
-
-    useEffect(() => {
-        setIsLoading(false);
-        setError(null);
-    }, [isOpen]);
 
     return (
         <div
@@ -133,13 +111,11 @@ const Shipping: React.FC<ShippingProps> = ({ cart }) => {
                     ))}
                 </RadioGroup>
 
-                <ErrorMessage data-testid="delivery-option-error-message" error={error} />
-
                 <Button
                     className="font-semibold mt-2"
                     data-testid="shipping-method-button"
                     disabled={!hasShippingMethod}
-                    isLoading={isLoading}
+                    isLoading={updateCartDetails.isPending}
                     size="sm"
                     variant="primary"
                     onClick={handleSubmit}
@@ -148,7 +124,6 @@ const Shipping: React.FC<ShippingProps> = ({ cart }) => {
                 </Button>
             </div>
 
-            {/* Shipping Information Section */}
             {!isOpen && hasShippingMethod && (
                 <div className="text-xs md:text-sm mt-6" data-testid="shipping-method-summary">
                     <p className="font-medium mb-1 text-base">Method</p>

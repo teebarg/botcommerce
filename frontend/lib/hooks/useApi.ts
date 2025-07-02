@@ -2,148 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import {
-    Address,
-    BankDetails,
-    ChatMessage,
-    ConversationStatus,
-    DeliveryOption,
-    FAQ,
-    PaginatedConversation,
-    PaginatedOrder,
-    PaginatedReview,
-    PaginatedUser,
-    Review,
-    User,
-    Wishlist,
-} from "@/schemas";
-import { Brand, Category, Collection, PaginatedProduct, PaginatedProductSearch } from "@/schemas/product";
+import { BankDetails, ChatMessage, ConversationStatus, DeliveryOption, PaginatedConversation, User } from "@/schemas";
 import { StatsTrends } from "@/types/models";
-import { CarouselBanner } from "@/schemas/carousel";
-
-export const useMe = () => {
-    return useQuery({
-        queryKey: ["me"],
-        queryFn: async () => {
-            return await api.get<User>("/users/me");
-        },
-        enabled: typeof window !== "undefined", // prevent server fetch
-    });
-};
-
-export const useBank = () => {
-    return useQuery({
-        queryKey: ["bank"],
-        queryFn: async () => {
-            return await api.get<BankDetails[]>("/bank-details/");
-        },
-        enabled: typeof window !== "undefined",
-    });
-};
-
-export const useAddress = (addressId: number) => {
-    return useQuery({
-        queryKey: ["cart-address", addressId],
-        queryFn: async () => await api.get<Address>(`/address/${addressId}`),
-        enabled: !!addressId, // prevents running when addressId is null
-    });
-};
-
-export const useProductReviews = (productId: number) => {
-    return useQuery({
-        queryKey: ["product-reviews", productId],
-        queryFn: async () => await api.get<Review[]>(`/product/${productId}/reviews`),
-        enabled: !!productId, // prevents running when productId is null
-    });
-};
-
-interface SearchParams {
-    query?: string;
-    categories?: string;
-    collections?: string;
-    min_price?: number | string;
-    max_price?: number | string;
-    page?: number;
-    limit?: number;
-    sort?: string;
-}
-
-export const useProductSearch = (searchParams: SearchParams) => {
-    return useQuery({
-        queryKey: ["product-search", searchParams],
-        queryFn: async () => await api.get<PaginatedProductSearch>("/product/search", { params: { ...searchParams } }),
-        enabled: !!searchParams, // prevents running when searchParams is null
-    });
-};
-
-interface OrderSearchParams {
-    query?: string;
-    status?: string;
-    skip?: number;
-    take?: number;
-    customer_id?: number;
-    sort?: string;
-}
-
-export const useOrders = (searchParams: OrderSearchParams) => {
-    return useQuery({
-        queryKey: ["orders", { ...searchParams }],
-        queryFn: async () => await api.get<PaginatedOrder>(`/order/`, { params: { ...searchParams } }),
-        enabled: !!searchParams, // prevents running when searchParams is null
-    });
-};
-
-interface ProductParams {
-    query?: string;
-    status?: string;
-    page?: number;
-    limit?: number;
-    sort?: string;
-}
-
-export const useProducts = (searchParams: ProductParams) => {
-    return useQuery({
-        queryKey: ["products", { ...searchParams }],
-        queryFn: async () => await api.get<PaginatedProduct>(`/product/`, { params: { ...searchParams } }),
-    });
-};
-
-export const useBrands = (query?: string) => {
-    return useQuery({
-        queryKey: ["brands", query],
-        queryFn: async () => await api.get<Brand[]>(`/brand/all`, { params: { query: query ?? "" } }),
-    });
-};
-
-export const useCategories = (query?: string) => {
-    return useQuery({
-        queryKey: ["categories", query],
-        queryFn: async () => await api.get<Category[]>(`/category/`, { params: { query: query ?? "" } }),
-    });
-};
-
-export const useCollections = (query?: string) => {
-    return useQuery({
-        queryKey: ["collections", query],
-        queryFn: async () => await api.get<Collection[]>(`/collection/all`, { params: { query: query ?? "" } }),
-    });
-};
-
-interface CustomerParams {
-    query?: string;
-    role?: "ADMIN" | "CUSTOMER";
-    status?: "ACTIVE" | "INACTIVE" | "PENDING";
-    page?: number;
-    limit?: number;
-    sort?: string;
-}
-
-export const useCustomers = (searchParams: CustomerParams) => {
-    return useQuery({
-        queryKey: ["customers", { ...searchParams }],
-        queryFn: async () => await api.get<PaginatedUser>(`/users/`, { params: { ...searchParams } }),
-    });
-};
 
 interface ConversationParams {
     user_id?: number;
@@ -151,6 +11,16 @@ interface ConversationParams {
     skip?: number;
     limit?: number;
 }
+
+export const useBankDetails = () => {
+    return useQuery({
+        queryKey: ["bank-details"],
+        queryFn: async () => {
+            return await api.get<BankDetails[]>("/bank-details/");
+        },
+        enabled: typeof window !== "undefined",
+    });
+};
 
 export const useConversations = (searchParams: ConversationParams) => {
     return useQuery({
@@ -181,42 +51,6 @@ export const useConversationMessages = (uid: string) => {
     });
 };
 
-export const useDeleteCustomer = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (id: number) => await api.delete<User>(`/users/${id}`),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["customers"] });
-            toast.success("Customer deleted successfully");
-        },
-        onError: (error) => {
-            toast.error("Failed to delete customer" + error);
-        },
-    });
-};
-
-export const useUserWishlist = () => {
-    return useQuery({
-        queryKey: ["user-wishlist"],
-        queryFn: async () => await api.get<Wishlist>(`/users/wishlist`),
-    });
-};
-
-interface Stat {
-    orders_count?: number;
-    total_revenue?: number;
-    products_count?: number;
-    customers_count?: number;
-}
-
-export const useStats = () => {
-    return useQuery({
-        queryKey: ["stats"],
-        queryFn: async () => await api.get<Stat>("/stats"),
-    });
-};
-
 export const useStatsTrends = () => {
     return useQuery({
         queryKey: ["stats-trends"],
@@ -224,71 +58,19 @@ export const useStatsTrends = () => {
     });
 };
 
-export const useFaqs = () => {
-    return useQuery({
-        queryKey: ["faqs"],
-        queryFn: async () => await api.get<FAQ[]>("/faq/"),
-    });
-};
-
-export const useDeleteFaq = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (id: number) => await api.delete<FAQ>(`/faq/${id}`),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["faqs"] });
-            toast.success("FAQ deleted successfully");
-        },
-        onError: (error) => {
-            toast.error("Failed to delete FAQ" + error);
-        },
-    });
-};
-
-export const useReviews = (params: { skip?: number; limit?: number }) => {
-    return useQuery({
-        queryKey: ["reviews"],
-        queryFn: async () => await api.get<PaginatedReview>("/reviews/", { params: { ...params } }),
-    });
-};
-
 export const useDeliveryOptions = () => {
     return useQuery({
-        queryKey: ["available-delivery"],
+        queryKey: ["delivery", "available"],
         queryFn: async () => await api.get<DeliveryOption[]>("/delivery/available"),
     });
 };
 
 export const useAdminDeliveryOptions = () => {
     return useQuery({
-        queryKey: ["all-delivery"],
+        queryKey: ["delivery"],
         queryFn: async () => await api.get<DeliveryOption[]>("/delivery"),
     });
 };
-
-export const useCarouselBanners = () => {
-    return useQuery({
-        queryKey: ["carousel-banners"],
-        queryFn: async () => await api.get<CarouselBanner[]>("/carousel/active"),
-    });
-};
-
-// export const useDeleteCustomer = () => {
-//     const queryClient = useQueryClient();
-//     const { mutateAsync } = useMutation({
-//         mutationFn: async (id: number) => await api.delete<User>(`/users/${id}`),
-//         onSuccess: () => {
-//             queryClient.invalidateQueries({ queryKey: ["customers"] });
-//             toast.success("Customer deleted successfully");
-//         },
-//         onError: (error) => {
-//             toast.error("Failed to delete customer");
-//         },
-//     });
-
-//     return mutateAsync;
-// };
 
 export const useInvalidate = () => {
     const queryClient = useQueryClient();

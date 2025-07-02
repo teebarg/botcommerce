@@ -3,7 +3,7 @@ passlib[bcrypt]>=1.7.4,<2.0.0
 pyjwt>=2.8.0,<3.0.0
 python-multipart>=0.0.7,<1.0.0
 openpyxl==3.1.5
-meilisearch==0.34.1
+meilisearch==0.36.0
 redis==6.2.0
 
 email-validator>=2.1.0.post1,<3.0.0.0
@@ -17,7 +17,7 @@ pydantic-settings>=2.2.1,<3.0.0
 httpx>=0.25.1,<1.0.0
 
 prisma<1.0.0,>=0.11.0
-supabase==2.15.2
+supabase==2.16.0
 
-google-genai==1.20.0
+google-genai==1.23.0
 # aio-pika==9.4.3

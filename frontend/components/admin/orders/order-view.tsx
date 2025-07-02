@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Order, OrderStatus } from "@/schemas";
 import { currency } from "@/lib/utils";
-import { useOrders } from "@/lib/hooks/useApi";
+import { useOrders } from "@/lib/hooks/useOrder";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import PaginationUI from "@/components/pagination";
@@ -46,10 +46,11 @@ const OrderView: React.FC = () => {
     const { orders, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     const getStatusBadge = (status?: OrderStatus) => {
-        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "yellow" | "success" | "emerald"> = {
+        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "yellow" | "success" | "emerald" | "blue"> = {
             ["PENDING"]: "yellow",
             ["PROCESSING"]: "default",
             ["SHIPPED"]: "secondary",
+            ["OUT_FOR_DELIVERY"]: "blue",
             ["CANCELED"]: "destructive",
             ["DELIVERED"]: "success",
             ["PAID"]: "emerald",

@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import LocalizedClientLink from "@/components/ui/link";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis";
 import { useStore } from "@/app/store/use-store";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { authApi } from "@/apis/auth";
 
 export default function VerifyMagicLink() {
     const [authState, setAuthState] = useState<"loading" | "success" | "expired">("loading");
@@ -31,12 +31,11 @@ export default function VerifyMagicLink() {
                 return;
             }
 
-            const { error } = await api.auth.verifyMagicLink(token);
+            const { error } = await authApi.verifyMagicLink(token);
 
             if (error) {
                 toast.error(error);
                 setAuthState("expired");
-                // router.push("/sign-in");
 
                 return;
             }
@@ -60,7 +59,6 @@ export default function VerifyMagicLink() {
                 <p className="text-sm opacity-80">Simple, secure, passwordless login</p>
             </div>
             <div className="p-8 text-center">
-                {/* Loading State */}
                 {authState === "loading" && (
                     <div>
                         <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-5">
@@ -90,7 +88,6 @@ export default function VerifyMagicLink() {
                     </div>
                 )}
 
-                {/* Success State */}
                 {authState === "success" && (
                     <div>
                         <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
@@ -122,7 +119,6 @@ export default function VerifyMagicLink() {
                     </div>
                 )}
 
-                {/* Expired State */}
                 {authState === "expired" && (
                     <div>
                         <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-5">

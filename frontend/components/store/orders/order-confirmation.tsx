@@ -7,35 +7,48 @@ import PendingPayment from "./order-pending";
 import OrderPickup from "./order-pickup";
 import SuccessConfirmation from "./order-success";
 
-import { Order, PaymentStatus } from "@/schemas";
+import { useOrder } from "@/lib/hooks/useOrder";
+import { Skeleton } from "@/components/ui/skeletons";
+import ServerError from "@/components/generic/server-error";
 
 type OrderConfirmationProps = {
-    status: PaymentStatus;
-    order: Order;
+    orderNumber: string;
     onRetry?: () => void;
 };
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
-    const { status } = props;
     const router = useRouter();
+    const { data: order, isLoading, error } = useOrder(props.orderNumber);
 
     const onContinueShopping = () => {
         router.push("/collections");
     };
 
-    if (props.order.payment_method === "CASH_ON_DELIVERY") {
+    if (isLoading) {
+        return <Skeleton className="h-192" />;
+    }
+
+    if (error) {
+        return <ServerError />;
+    }
+
+    if (!order) {
+        return <div className="flex items-center justify-center py-12 px-2 bg-content1">Order not found</div>;
+    }
+
+    if (order?.payment_method === "CASH_ON_DELIVERY") {
         return (
             <div className="min-h-screen flex items-center justify-center py-12 px-2 bg-content1">
-                <OrderPickup onContinueShopping={onContinueShopping} {...props} />
+                <OrderPickup onContinueShopping={onContinueShopping} {...props} order={order} />
             </div>
         );
     }
 
     return (
         <div className="min-h-screen flex items-center justify-center py-12 px-2 bg-content1">
-            {status === "SUCCESS" && <SuccessConfirmation onContinueShopping={onContinueShopping} {...props} />}
-            {status === "PENDING" && <PendingPayment onContinueShopping={onContinueShopping} {...props} />}
-            {status === "FAILED" && <FailedPayment onContinueShopping={onContinueShopping} {...props} />}
+            {order?.payment_status === "SUCCESS" && <SuccessConfirmation onContinueShopping={onContinueShopping} {...props} order={order} />}
+            {order?.payment_status === "PENDING" && <PendingPayment onContinueShopping={onContinueShopping} {...props} order={order} />}
+            {order?.payment_status === "FAILED" && <FailedPayment onContinueShopping={onContinueShopping} {...props} order={order} />}
         </div>
     );
 };

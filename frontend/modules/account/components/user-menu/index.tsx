@@ -6,7 +6,6 @@ import Image from "next/image";
 import ProfileAvatar from "@/public/profile.svg";
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/schemas";
-import { api } from "@/apis";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,10 +14,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { authApi } from "@/apis/auth";
 
 export default function UserDropDown({ user }: { user: Session }) {
     const handleLogout = async () => {
-        await api.auth.logOut();
+        await authApi.logOut();
         window.location.href = "/";
     };
 
@@ -52,7 +52,7 @@ export default function UserDropDown({ user }: { user: Session }) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-default cursor-pointer">
+                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-green-200 cursor-pointer">
                     <Image fill alt="avatar" src={user?.image || ProfileAvatar} />
                 </span>
             </DropdownMenuTrigger>

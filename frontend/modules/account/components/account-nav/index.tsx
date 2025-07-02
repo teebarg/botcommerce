@@ -6,13 +6,13 @@ import { MapPin, Package } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/apis";
+import { authApi } from "@/apis/auth";
 
 const AccountNav = () => {
     const route = usePathname();
 
     const handleLogout = async () => {
-        await api.auth.logOut();
+        await authApi.logOut();
         window.location.href = "/";
     };
 
