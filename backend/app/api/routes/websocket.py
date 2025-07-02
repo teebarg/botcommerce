@@ -65,7 +65,6 @@ async def websocket(ws: WebSocket):
     try:
         while True:
             msg = await ws.receive_text()
-            logger.info(f"Received message: {msg}")
             try:
                 payload = json.loads(msg)
                 message_type = payload.get("type")

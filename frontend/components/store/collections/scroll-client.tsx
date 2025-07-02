@@ -47,7 +47,12 @@ export default function InfiniteScrollClient({ initialSearchParams, collection }
     });
 
     if (isPending) {
-        return <Skeleton className="min-h-[400px]" />;
+        return (
+            <div className="flex gap-2">
+                <Skeleton className="min-h-[700px] w-[25%] hidden md:block" />
+                <Skeleton className="min-h-[700px] flex-1" />
+            </div>
+        );
     }
 
     const products = data?.pages?.flatMap((page) => page.products) || [];

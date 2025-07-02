@@ -1,22 +1,16 @@
 import UserDropDown from "@modules/account/components/user-menu";
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
-import dynamic from "next/dynamic";
 
 import ActivityTray from "@/components/generic/activities/activity-tray";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 import MenuComp from "@/components/layout/mobile-menu-drawer";
-
-const getThemeToggler = () =>
-    dynamic(() => import("@lib/theme/theme-button"), {
-        loading: () => <div className="w-6 h-6" />,
-    });
+import ThemeToggle from "@lib/theme/theme-button";
 
 const AdminNavbar = async () => {
     const siteConfig = await getSiteConfig();
     const user = await auth();
-    const ThemeButton = getThemeToggler();
 
     return (
         <NavigationBar>
@@ -35,7 +29,7 @@ const AdminNavbar = async () => {
                 </NavbarItem>
                 <NavbarItem className="flex items-center gap-2.5">
                     {/* <Notification /> */}
-                    <ThemeButton />
+                    <ThemeToggle />
                     <ActivityTray />
                 </NavbarItem>
                 <NavbarItem className="flex">

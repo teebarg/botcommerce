@@ -5,15 +5,6 @@ from datetime import datetime
 from prisma.models import Address, Payment, OrderItem, User
 from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
 
-# class OrderStatus(str, Enum):
-#     PENDING = "PENDING"
-#     PAID = "PAID"
-#     PROCESSING = "PROCESSING"
-#     SHIPPED = "SHIPPED"
-#     DELIVERED = "DELIVERED"
-#     CANCELED = "CANCELED"
-#     REFUNDED = "REFUNDED"
-
 class OrderItemCreate(BaseModel):
     variant_id: int
     quantity: int

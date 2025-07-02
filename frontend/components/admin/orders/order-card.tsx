@@ -11,7 +11,7 @@ interface OrderCardProps {
 
 const OrderCard = ({ order, actions }: OrderCardProps) => {
     const statusConfig: Record<
-        "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELED" | "PAID" | "REFUNDED",
+        "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "PAID" | "REFUNDED",
         { color: string; icon: any; label: string }
     > = {
         PAID: {
@@ -38,6 +38,11 @@ const OrderCard = ({ order, actions }: OrderCardProps) => {
             color: "bg-blue-100 text-blue-700",
             icon: Truck,
             label: "Shipped",
+        },
+        OUT_FOR_DELIVERY: {
+            color: "bg-blue-100 text-blue-700",
+            icon: Truck,
+            label: "Out for Delivery",
         },
         DELIVERED: {
             color: "bg-success/20 text-success",
