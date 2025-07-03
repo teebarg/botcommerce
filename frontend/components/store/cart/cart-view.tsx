@@ -5,22 +5,22 @@ import { Shield } from "nui-react-icons";
 
 import EmptyCartMessage from "./empty-message";
 
-import { useCart } from "@/lib/hooks/useCart";
 import ServerError from "@/components/generic/server-error";
-import { Skeleton } from "@/components/ui/skeletons";
 import SummaryMobile from "@/components/store/cart/summary-mobile";
 import RecommendedProducts from "@/components/store/products/recommended";
 import PromotionalBanner from "@/components/promotion";
 import { CartItem } from "@/schemas";
 import CartPageDetails from "@/components/store/cart/cart-page-details";
+import { useCart } from "@/providers/cart-provider";
+import ComponentLoader from "@/components/component-loader";
 
 interface Props {}
 
 const CartView: React.FC<Props> = () => {
-    const { data: cart, isLoading, error } = useCart();
+    const { cart, isLoading, error } = useCart();
 
     if (isLoading) {
-        return <Skeleton className="h-[400px]" />;
+        return <ComponentLoader className="h-[400px]" />;
     }
 
     if (error) {

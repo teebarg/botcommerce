@@ -17,16 +17,22 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from datetime import datetime
 from app.services.websocket import manager
+import redis.asyncio as redis
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀 ~ connecting to prisma......:")
+    redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+    logger.info("connecting to dbs......:")
     await db.connect()
-    logger.info("🚀 ~ connecting to prisma......: done")
+    logger.info("🚀 ~ connected to prisma......:")
+    await redis_client.ping()
+    app.state.redis = redis_client
+    logger.info("🚀 ~ connected to redis......:")
 
     yield
     await db.disconnect()
+    await redis_client.close()
 
 app = FastAPI(title="Botcommerce",
               openapi_url="/api/openapi.json", lifespan=lifespan)

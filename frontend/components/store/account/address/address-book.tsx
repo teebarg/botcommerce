@@ -13,8 +13,8 @@ import EditAddressForm from "@/components/store/account/address/edit-address-for
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAddresses, useDeleteAddress } from "@/lib/hooks/useAddress";
 import { Confirm } from "@/components/generic/confirm";
-import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
+import ComponentLoader from "@/components/component-loader";
 
 type AddressItemProps = {
     address: Address;
@@ -90,7 +90,7 @@ const AddressBook: React.FC = () => {
     const { data, isLoading, error } = useAddresses();
 
     if (isLoading) {
-        return <Skeleton className="h-[200px]" />;
+        return <ComponentLoader className="h-[400px]" />;
     }
 
     if (error) {

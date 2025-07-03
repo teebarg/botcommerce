@@ -6,7 +6,6 @@ from redis import Redis
 from app.core.config import settings
 from app.core.logging import logger
 
-# Initialize Redis client
 redis_client = Redis(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,

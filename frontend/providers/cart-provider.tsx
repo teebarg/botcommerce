@@ -8,20 +8,21 @@ import { api } from "@/apis/client";
 import { addToOfflineCart, clearOfflineCart, getOfflineCart } from "@/lib/indexeddb/offline-cart";
 import { getCookie } from "@/lib/util/server-utils";
 import { setCookie } from "@/lib/util/cookie";
-import { Cart } from "@/schemas";
+import { Cart, CartItem } from "@/schemas";
 
-type CartItem = {
+type AddItem = {
     variant_id: number;
     quantity: number;
 };
 
 interface CartContextType {
-    addItem: (item: CartItem) => Promise<void>;
+    addItem: (item: AddItem) => Promise<void>;
     syncOfflineCart: () => Promise<void>;
     isSyncing: boolean;
     cart?: Cart;
     cartItems?: CartItem[];
     isLoading: boolean;
+    error?: any;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -37,25 +38,25 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-    // const [cart, setCart] = useState<Cart | null>(null);
-    // const [cartItems, setCartItems] = useState<CartItem[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
     const queryClient = useQueryClient();
 
-    const { data: cart } = useQuery({
+    const { data: cart, isLoading: cartLoading, error: cartError } = useQuery({
         queryKey: ["cart"],
         queryFn: async () => {
             return await api.get<Cart>("/cart/");
         },
     });
 
-    const { data: cartItems } = useQuery({
+    const { data: cartItems, isLoading: cartItemsLoading, error: cartItemsError } = useQuery({
         queryKey: ["cart-items"],
         queryFn: async () => {
             return await api.get<CartItem[]>("/cart/items");
         },
     });
+
+    const isLoading = cartLoading || cartItemsLoading;
+    const error = cartError || cartItemsError;
 
     // const loadCart = async () => {
     //     setIsLoading(true);
@@ -78,7 +79,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     //     loadCart();
     // }, []);
 
-    const addItem = async (item: CartItem) => {
+    const addItem = async (item: AddItem) => {
         if (!navigator.onLine) {
             await addToOfflineCart(item);
             toast.success("Added to cart (offline)");
@@ -142,6 +143,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 cart,
                 cartItems,
                 isLoading,
+                error,
             }}
         >
             {children}

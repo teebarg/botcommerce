@@ -3,7 +3,6 @@ import React from "react";
 
 import RecentOrdersList from "@/components/admin/dashboard";
 import StatComponent from "@/components/admin/dashboard/stat-component";
-import ClientOnly from "@/components/generic/client-only";
 
 export const metadata: Metadata = {
     title: "Admin",
@@ -12,9 +11,9 @@ export const metadata: Metadata = {
 
 export default async function AdminPage() {
     return (
-        <ClientOnly>
+        <div>
             <StatComponent />
             <RecentOrdersList />
-        </ClientOnly>
+        </div>
     );
 }

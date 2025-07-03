@@ -7,7 +7,8 @@ from fastapi import (
     HTTPException,
     Query,
     UploadFile,
-    BackgroundTasks
+    BackgroundTasks,
+    Request
 )
 from app.core.deps import (
     CurrentUser,
@@ -40,6 +41,7 @@ from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export
+from app.services.redis import cache_response
 
 router = APIRouter()
 
@@ -99,7 +101,9 @@ async def export_products(
 
 
 @router.get("/")
+@cache_response("products", expire=600)
 async def index(
+    request: Request,
     query: str = "",
     brand: str = Query(default=""),
     page: int = Query(default=1, gt=0),
@@ -133,7 +137,6 @@ async def index(
             "tags": True,
             "variants": True,
             "images": True,
-            # "reviews": {"include": {"user": True}},
         }
     )
     total = await db.product.count(where=where_clause)
@@ -147,6 +150,7 @@ async def index(
 
 
 @router.get("/search")
+@cache_response("search", expire=600)
 async def search(
     search: str = "",
     sort: str = "created_at:desc",

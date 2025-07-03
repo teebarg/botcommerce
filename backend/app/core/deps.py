@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
@@ -15,6 +15,7 @@ from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from prisma.models import User
 from supabase import create_client, Client
+import redis.asyncio as redis
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -30,6 +31,11 @@ supabase: Client = create_client(supabase_url, supabase_key)
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 
 CacheService = Annotated[CacheService, Depends(get_cache_service)]
+
+def get_redis_client(request: Request) -> redis.Redis:
+    return request.app.state.redis
+
+RedisClient = Annotated[redis.Redis, Depends(get_redis_client)]
 
 async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
     try:

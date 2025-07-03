@@ -39,7 +39,6 @@ export default function Checkout() {
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Mobile header */}
             <div className="sticky top-0 md:hidden p-4 flex items-center justify-between gap-4 bg-background z-20 shadow-2xl pr-8">
                 <div className="flex items-center gap-2">
                     <BackButton />
@@ -50,7 +49,6 @@ export default function Checkout() {
                 </div>
                 <CartComponent />
             </div>
-            {/* Desktop Header */}
             <header className="hidden md:flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
                 <LocalizedClientLink className="text-xl font-semibold" href="/">
                     {shopSettings.shop_name}
