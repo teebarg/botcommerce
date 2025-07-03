@@ -12,29 +12,29 @@ interface UserCounterProps {
 
 const UserCounter: React.FC<UserCounterProps> = ({ icon, label, count, trend, color }) => {
     const colorClasses = {
-        blue: "bg-blue-50 text-blue-600 border-blue-200",
-        green: "bg-green-50 text-green-600 border-green-200",
-        purple: "bg-purple-50 text-purple-600 border-purple-200",
-        orange: "bg-orange-50 text-orange-600 border-orange-200",
+        blue: "bg-blue-100 dark:bg-blue-500 text-blue-600 dark:text-white",
+        green: "bg-green-100 dark:bg-green-500 text-green-600 dark:text-white",
+        purple: "bg-purple-100 dark:bg-purple-500 text-purple-600 dark:text-white",
+        orange: "bg-orange-100 dark:bg-orange-500 text-orange-600 dark:text-white",
     };
 
     const trendColorClasses = {
-        blue: "text-blue-500",
-        green: "text-green-500",
-        purple: "text-purple-500",
-        orange: "text-orange-500",
+        blue: "text-blue-500 dark:text-blue-900",
+        green: "text-green-500 dark:text-green-900",
+        purple: "text-purple-500 dark:text-purple-900",
+        orange: "text-orange-500 dark:text-orange-900",
     };
 
     return (
-        <Card className={`border-2 ${colorClasses[color]} hover:shadow-md transition-all duration-200 hover:scale-105`}>
+        <Card className={`${colorClasses[color]} hover:shadow-md transition-all duration-200 hover:scale-105`}>
             <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                    <div className="p-2 rounded-lg bg-white/50">{icon}</div>
+                    <div className="p-2 rounded-lg bg-white/50 dark:bg-white/10">{icon}</div>
                     <span className={`text-xs font-medium ${trendColorClasses[color]}`}>{trend}</span>
                 </div>
                 <div className="space-y-1">
-                    <p className="text-2xl font-bold text-gray-900 animate-pulse">{count}</p>
-                    <p className="text-sm text-gray-600 font-medium">{label}</p>
+                    <p className="text-2xl font-bold text-default-900 animate-pulse">{count}</p>
+                    <p className="text-sm text-default-600 dark:text-default-800 font-medium">{label}</p>
                 </div>
             </CardContent>
         </Card>

@@ -9,18 +9,14 @@ import BannerItem from "./banner-item";
 import { Button } from "@/components/ui/button";
 import { CarouselBanner } from "@/schemas/carousel";
 import Overlay from "@/components/overlay";
-import { Skeleton } from "@/components/ui/skeletons";
 import ClientOnly from "@/components/generic/client-only";
 import { useCarouselBanners } from "@/lib/hooks/useCarousel";
+import ComponentLoader from "@/components/component-loader";
 
 export default function CarouselBannerList() {
     const addState = useOverlayTriggerState({});
 
     const { data: banners, isLoading } = useCarouselBanners();
-
-    if (isLoading) {
-        return <Skeleton className="h-[200px]" />;
-    }
 
     return (
         <ClientOnly>
@@ -48,8 +44,8 @@ export default function CarouselBannerList() {
 
             <div className="space-y-4">
                 {banners && banners?.map((banner: CarouselBanner, idx: number) => <BannerItem key={idx} banner={banner} />)}
-
-                {(!banners || banners?.length === 0) && (
+                {isLoading && <ComponentLoader className="h-[200px]" />}
+                {!isLoading && banners?.length === 0 && (
                     <div className="bg-card rounded-2xl shadow-sm border border-default-200 p-12 text-center">
                         <div className="text-default-400 mb-4">
                             <Upload className="w-12 h-12 mx-auto" />

@@ -66,7 +66,7 @@ export const useAddToCart = () => {
 
             return res;
         },
-        onSuccess: (data) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             queryClient.invalidateQueries({ queryKey: ["cart-items"] });
 

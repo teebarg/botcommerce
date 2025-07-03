@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { CheckCircle, Shield, Package, User, Zap, CreditCard, Truck, Search } from "lucide-react";
+import { CheckCircle, Shield, Package, User, CreditCard, Truck, Search } from "lucide-react";
 
 import FadeInComponent from "./generic/fade-in-component";
 
@@ -210,6 +210,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps })
 
                 if (config.steps.length > 0) {
                     const stepIndex = Math.floor((newProgress / 100) * config.steps.length);
+
                     setCurrentStepIndex(Math.min(stepIndex, config.steps.length - 1));
                 }
 
@@ -300,4 +301,5 @@ const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps })
         </div>
     );
 };
+
 export default PageLoader;
