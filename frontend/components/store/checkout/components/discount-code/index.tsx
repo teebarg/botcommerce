@@ -10,13 +10,16 @@ import ErrorMessage from "../error-message";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/providers/cart-provider";
+import ComponentLoader from "@/components/component-loader";
 
-type DiscountCodeProps = {
-    cart: Omit<any, "refundable_amount" | "refunded_total">;
-};
-
-const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
+const DiscountCode: React.FC = () => {
+    const { cart, isLoading } = useCart();
     const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    if (isLoading) return <ComponentLoader className="h-[100px]" />;
+
+    if (!cart) return null;
 
     const { discounts, gift_cards } = cart;
 

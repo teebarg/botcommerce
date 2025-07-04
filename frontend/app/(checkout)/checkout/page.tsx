@@ -8,18 +8,18 @@ import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import ServerError from "@/components/generic/server-error";
 import ClientOnly from "@/components/generic/client-only";
-import { useCheckoutCart } from "@/lib/hooks/useCart";
 import { useStore } from "@/app/store/use-store";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import CheckoutSkeleton from "@/components/store/checkout/checkout-skeleton";
 import CheckoutForm from "@/components/store/checkout/checkout-form";
 import CheckoutSummary from "@/components/store/checkout/checkout-summary";
+import { useCart } from "@/providers/cart-provider";
 
 export default function Checkout() {
     const { shopSettings } = useStore();
 
-    const { data: cart, error, isLoading } = useCheckoutCart();
+    const { cart, error, isLoading } = useCart();
 
     if (isLoading) {
         return <CheckoutSkeleton />;
@@ -78,7 +78,7 @@ export default function Checkout() {
                     </div>
 
                     <div className="mb-24 md:mb-0 hidden md:block">
-                        <CheckoutSummary cart={cart} />
+                        <CheckoutSummary />
                     </div>
                 </div>
             </main>

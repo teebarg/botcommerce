@@ -5,6 +5,8 @@ import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import LocalizedClientLink from "@/components/ui/link";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
+import { PaginatedProductSearch } from "@/schemas";
+import { api } from "@/apis/client";
 
 export const metadata: Metadata = {
     title: "Search",
@@ -33,6 +35,8 @@ export default async function SearchResults({ params, searchParams }: { params: 
         brand_id: brand_id,
     };
 
+    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } })
+
     return (
         <div className="container mx-auto mt-4 py-4 px-1">
             <div className="flex justify-between border-b border-divider w-full items-center px-4 mb-4">
@@ -45,7 +49,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
                 </LocalizedClientLink>
             </div>
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient initialSearchParams={queryParams} />
+                <InfiniteScrollClient initialSearchParams={queryParams} initialData={initialData.products} />
             </Suspense>
         </div>
     );

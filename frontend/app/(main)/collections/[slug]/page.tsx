@@ -6,7 +6,7 @@ import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import { api } from "@/apis/client";
-import { Collection } from "@/schemas";
+import { Collection, PaginatedProductSearch } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 
 type Params = Promise<{ slug: string }>;
@@ -49,10 +49,12 @@ export default async function CollectionPage({ params, searchParams }: { params:
         brand_id: brand_id,
     };
 
+    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } })
+
     return (
         <div className="container mx-auto py-4 px-2">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient initialSearchParams={queryParams} />
+                <InfiniteScrollClient initialSearchParams={queryParams} initialData={initialData.products} />
             </Suspense>
         </div>
     );

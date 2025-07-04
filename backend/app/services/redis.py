@@ -75,7 +75,7 @@ class CacheService:
         # await self.redis.set(key, value, ex=expire)
         await self.redis.setex(key, expire, value)
         if tag:
-            await self.redis.sadd(f"cache_tag:{tag}", key)
+            await self.redis.sadd(tag, key)
 
     @handle_redis_errors()
     async def get(self, key: str) -> str | None:
@@ -83,12 +83,10 @@ class CacheService:
 
     @handle_redis_errors(default=False)
     async def bust_tag(self, tag: str):
-        # tag_key = f"cache_tag:{tag}"
-        tag_key = tag
-        keys = await self.redis.smembers(tag_key)
+        keys = await self.redis.smembers(tag)
         if keys:
             await self.redis.delete(*keys)
-        await self.redis.delete(tag_key)
+        await self.redis.delete(tag)
 
     @handle_redis_errors(default=False)
     async def invalidate_list_cache(self, entity: str):
@@ -96,12 +94,8 @@ class CacheService:
         Invalidate all list/search cache entries for a given entity (e.g., "product", "collection").
         This should match the prefix used in @cache_response for list views.
         """
-        async for tag in self.redis.scan_iter(match=f"cache_tag:{entity}:*"):
-            print("🚀 ~ tag:", tag)
-            # Remove tag prefix
-            # tag_str = tag.decode().replace("cache_tag:", "")
-            tag_str = tag
-            await self.bust_tag(tag_str)
+        async for tag in self.redis.scan_iter(match=f"{entity}:*"):
+            await self.bust_tag(tag)
 
     @handle_redis_errors(default=False)
     def delete(self, key: str) -> bool:
@@ -165,7 +159,6 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
             redis_key = hashlib.md5(raw_key.encode()).hexdigest()
-            # print("🚀 ~ redis_key:---------------------", raw_key)
 
             cached = await cache.get(redis_key)
             if cached:

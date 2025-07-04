@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import CartItems from "./cart-items";
 
 import EmptyCartMessage from "@/components/store/cart/empty-message";
-import { Cart } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import Summary from "@/components/store/cart/summary";
 import SignInPrompt from "@/components/generic/auth/sign-in-prompt";
@@ -15,14 +14,10 @@ import ClientOnly from "@/components/generic/client-only";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";
 
-interface Props {
-    cart: Cart | null;
-}
-
-const CartPageDetails: React.FC<Props> = ({ cart }) => {
+const CartPageDetails: React.FC = () => {
     const { user } = useStore();
     const pathname = usePathname();
-    const { cartItems, isLoading } = useCart();
+    const { cart, isLoading } = useCart();
 
     if (isLoading) {
         return <ComponentLoader className="h-[400px]" />;
@@ -37,7 +32,7 @@ const CartPageDetails: React.FC<Props> = ({ cart }) => {
                     initial={{ y: "100%" }}
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 >
-                    {cartItems?.length === 0 ? (
+                    {cart?.items?.length === 0 ? (
                         <EmptyCartMessage />
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8 pt-4">

@@ -36,12 +36,12 @@ from math import ceil
 from prisma.enums import ProductStatus
 from pydantic import BaseModel
 from app.core.storage import upload
-from app.core.deps import supabase
+from app.core.deps import supabase, RedisClient
 from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export
-from app.services.redis import cache_response, get_redis_dependency, CacheService
+from app.services.redis import cache_response
 
 router = APIRouter()
 
@@ -52,7 +52,8 @@ class LandingProducts(BaseModel):
 
 
 @router.get("/landing-products")
-async def get_landing_products() -> LandingProducts:
+@cache_response("products", key="landing-products", expire=86400)
+async def get_landing_products(request: Request) -> LandingProducts:
     """
     Retrieve multiple product categories in a single request.
     """
@@ -150,7 +151,7 @@ async def index(
 
 
 @router.get("/search")
-@cache_response("search", expire=600)
+@cache_response("products", expire=600)
 async def search(
     request: Request,
     search: str = "",
@@ -215,7 +216,7 @@ async def search(
 
 
 @router.post("/")
-async def create_product(product: ProductCreate, background_tasks: BackgroundTasks):
+async def create_product(product: ProductCreate, background_tasks: BackgroundTasks, redis: RedisClient):
     slugified_name = slugify(product.name)
 
     data = {
@@ -247,13 +248,13 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         raise HTTPException(
             status_code=400, detail="Product with this name already exists")
 
-    background_tasks.add_task(reindex_product, product_id=created_product.id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=created_product.id)
 
     return created_product
 
 
 @router.post("/reindex", response_model=Message)
-async def reindex_products(background_tasks: BackgroundTasks, redis: CacheService = Depends(get_redis_dependency)):
+async def reindex_products(background_tasks: BackgroundTasks, redis: RedisClient):
     """
     Re-index all products in the database to Meilisearch.
     """
@@ -267,9 +268,11 @@ async def reindex_products(background_tasks: BackgroundTasks, redis: CacheServic
             detail="Failed to queue the re-indexing task.",
         )
 
+# def extract_product_key(request: Request, slug: str, **kwargs):
+#     return slug
 
 @router.get("/{slug}")
-@cache_response("product", expire=86400)
+@cache_response("product", expire=86400, key=lambda request, slug, **kwargs: slug)
 async def read(slug: str, request: Request):
     """
     Get a specific product by slug with Redis caching.
@@ -296,7 +299,7 @@ async def read_reviews(id: int):
 
 
 @router.put("/{id}")
-async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
+async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks, redis: RedisClient):
     existing_product = await db.product.find_unique(where={"id": id})
     if not existing_product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -337,16 +340,20 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    background_tasks.add_task(reindex_product, product_id=id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
     return updated_product
 
 
 @router.delete("/{id}", dependencies=[Depends(get_current_user)])
-async def delete_product(id: int) -> Message:
+async def delete_product(id: int, redis: RedisClient) -> Message:
     """
     Delete a product.
     """
+    product = await db.product.find_unique(where={"id": id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
     await db.productimage.delete_many(where={"product_id": id})
     await db.review.delete_many(where={"product_id": id})
     await db.productvariant.delete_many(where={"product_id": id})
@@ -358,11 +365,14 @@ async def delete_product(id: int) -> Message:
                         document_id=str(id))
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
+    
+    await redis.invalidate_list_cache("products")
+    await redis.bust_tag(f"product:{product.slug}")
     return Message(message="Product deleted successfully")
 
 
 @router.post("/{id}/variants")
-async def create_variant(id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
+async def create_variant(id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks, redis: RedisClient):
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -385,13 +395,13 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    background_tasks.add_task(reindex_product, product_id=id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
     return created_variant
 
 
 @router.put("/variants/{variant_id}")
-async def update_variant(variant_id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
+async def update_variant(variant_id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks, redis: RedisClient):
     existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
@@ -421,22 +431,22 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
         data=update_data,
     )
 
-    background_tasks.add_task(reindex_product, product_id=existing_variant.product_id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=existing_variant.product_id)
 
     return updated_variant
 
 
 @router.delete("/variants/{variant_id}")
-async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
+async def delete_variant(variant_id: int, background_tasks: BackgroundTasks, redis: RedisClient):
     variant = await db.productvariant.delete(where={"id": variant_id})
 
-    background_tasks.add_task(reindex_product, product_id=variant.product_id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=variant.product_id)
 
     return {"success": True}
 
 
 @router.patch("/{id}/image")
-async def add_image(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks) -> Product:
+async def add_image(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks, redis: RedisClient) -> Product:
     """
     Add an image to a product.
     """
@@ -454,7 +464,7 @@ async def add_image(id: int, image_data: ImageUpload, background_tasks: Backgrou
             data={"image": image_url}
         )
 
-        background_tasks.add_task(reindex_product, product_id=id)
+        background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
         return updated_product
 
@@ -466,7 +476,7 @@ async def add_image(id: int, image_data: ImageUpload, background_tasks: Backgrou
 
 
 @router.post("/{id}/images")
-async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks):
+async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks, redis: RedisClient):
     """
     Upload images to a product.
     """
@@ -483,13 +493,13 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
             "order": len(product.images)
         }
     )
-    background_tasks.add_task(reindex_product, product_id=id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
     return image
 
 
 @router.delete("/{id}/image")
-async def delete_image(id: int, background_tasks: BackgroundTasks):
+async def delete_image(id: int, background_tasks: BackgroundTasks, redis: RedisClient):
     """
     Delete an image from a product.
     """
@@ -508,13 +518,13 @@ async def delete_image(id: int, background_tasks: BackgroundTasks):
 
     await db.product.update(where={"id": id}, data={"image": None})
 
-    background_tasks.add_task(reindex_product, product_id=id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
     return {"success": True}
 
 
 @router.delete("/{id}/images/{image_id}")
-async def delete_images(id: int, image_id: int, background_tasks: BackgroundTasks):
+async def delete_images(id: int, image_id: int, background_tasks: BackgroundTasks, redis: RedisClient):
     """
     Delete an image from a product images.
     """
@@ -542,7 +552,7 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
             data={"order": index}
         )
 
-    background_tasks.add_task(reindex_product, product_id=id)
+    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
     return {"success": True}
 
@@ -552,6 +562,7 @@ async def upload_products(
     user: CurrentUser,
     file: Annotated[UploadFile, File()],
     background_tasks: BackgroundTasks,
+    redis: RedisClient,
 ):
     logger.info(f"File uploaded: {file.filename}")
     content_type = file.content_type
@@ -569,7 +580,7 @@ async def upload_products(
     await validate_file(file=file)
 
     contents = await file.read()
-    background_tasks.add_task(product_upload, user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
+    background_tasks.add_task(product_upload, cache=redis, user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
     return {"message": "Upload started"}
 
 
@@ -582,12 +593,10 @@ async def configure_filterable_attributes(
     """
     try:
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-        # Update the filterable attributes
         index.update_filterable_attributes(
             ["brand", "categories", "collections", "name", "variants", "average_rating",
                 "review_count", "max_variant_price", "min_variant_price"]
         )
-        # Update the sortable attributes
         index.update_sortable_attributes(
             ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"])
 
@@ -634,11 +643,10 @@ async def config_delete_index() -> dict:
 
 
 @router.patch("/{id}/images/reorder")
-async def reorder_images(id: int, image_ids: list[int]):
+async def reorder_images(id: int, image_ids: list[int], redis: RedisClient):
     """
     Reorder product images.
     """
-    # Check if product exists
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -650,6 +658,6 @@ async def reorder_images(id: int, image_ids: list[int]):
             data={"order": index}
         )
 
-    await reindex_product(product_id=id)
+    await reindex_product(cache=redis, product_id=id)
 
     return {"success": True}

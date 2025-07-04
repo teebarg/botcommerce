@@ -14,14 +14,14 @@ type ItemsTemplateProps = {
 };
 
 const CartItems: React.FC<ItemsTemplateProps> = ({ className }) => {
-    const { cartItems, isLoading } = useCart();
+    const { cart, isLoading } = useCart();
 
     if (isLoading) return <Skeleton className="h-[400px]" />;
 
     return (
         <div className={cn("flex flex-col gap-y-4 overflow-y-auto", className)}>
-            {cartItems?.map((item: CartItem, idx: number) => <CartItemComponent key={idx} item={item} />)}
-            {cartItems?.length === 0 && <div className="text-center">No items in cart</div>}
+            {cart?.items?.map((item: CartItem, idx: number) => <CartItemComponent key={idx} item={item} />)}
+            {cart?.items?.length === 0 && <div className="text-center">No items in cart</div>}
         </div>
     );
 };

@@ -19,7 +19,6 @@ import { useCollections } from "@/lib/hooks/useCollection";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { Category, Collection, ProductSearch } from "@/schemas/product";
 import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
-import { Skeleton } from "@/components/ui/skeletons";
 
 interface SearchParams {
     sortBy?: string;
@@ -30,12 +29,18 @@ interface SearchParams {
     limit?: number;
 }
 
-export default function InfiniteScrollClient({ initialSearchParams, collection }: { initialSearchParams: SearchParams; collection?: Collection }) {
+interface Props {
+    initialSearchParams: SearchParams;
+    collection?: Collection;
+    initialData?: ProductSearch[];
+}
+
+export default function InfiniteScrollClient({ initialSearchParams, collection, initialData }: Props) {
     const searchParams = useSearchParams();
     const { data: brands } = useBrands();
     const { data: categories } = useCategories();
     const { data: collections } = useCollections();
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useProductInfiniteSearch(initialSearchParams);
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductInfiniteSearch(initialSearchParams);
 
     const { lastElementRef } = useInfiniteScroll({
         onIntersect: () => {
@@ -46,16 +51,8 @@ export default function InfiniteScrollClient({ initialSearchParams, collection }
         isFetching: isFetchingNextPage,
     });
 
-    if (isPending) {
-        return (
-            <div className="flex gap-2">
-                <Skeleton className="min-h-[700px] w-[25%] hidden md:block" />
-                <Skeleton className="min-h-[700px] flex-1" />
-            </div>
-        );
-    }
 
-    const products = data?.pages?.flatMap((page) => page.products) || [];
+    const products = data?.pages?.flatMap((page) => page.products) ?? initialData;
     const facets = data?.pages?.flatMap((page) => page.facets) || {};
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
 

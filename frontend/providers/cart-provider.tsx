@@ -8,7 +8,7 @@ import { api } from "@/apis/client";
 import { addToOfflineCart, clearOfflineCart, getOfflineCart } from "@/lib/indexeddb/offline-cart";
 import { getCookie } from "@/lib/util/server-utils";
 import { setCookie } from "@/lib/util/cookie";
-import { Cart, CartItem } from "@/schemas";
+import { Cart } from "@/schemas";
 
 type AddItem = {
     variant_id: number;
@@ -20,7 +20,6 @@ interface CartContextType {
     syncOfflineCart: () => Promise<void>;
     isSyncing: boolean;
     cart?: Cart;
-    cartItems?: CartItem[];
     isLoading: boolean;
     error?: any;
 }
@@ -43,28 +42,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
     const {
         data: cart,
-        isLoading: cartLoading,
-        error: cartError,
+        isLoading,
+        error,
     } = useQuery({
         queryKey: ["cart"],
         queryFn: async () => {
             return await api.get<Cart>("/cart/");
         },
     });
-
-    const {
-        data: cartItems,
-        isLoading: cartItemsLoading,
-        error: cartItemsError,
-    } = useQuery({
-        queryKey: ["cart-items"],
-        queryFn: async () => {
-            return await api.get<CartItem[]>("/cart/items");
-        },
-    });
-
-    const isLoading = cartLoading || cartItemsLoading;
-    const error = cartError || cartItemsError;
 
     // const loadCart = async () => {
     //     setIsLoading(true);
@@ -104,7 +89,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             }
 
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            queryClient.invalidateQueries({ queryKey: ["cart-items"] });
             toast.success("Added to cart");
         } catch (e: any) {
             toast.error(e.message || "Failed to add to cart");
@@ -123,7 +107,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             }
             await clearOfflineCart();
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            queryClient.invalidateQueries({ queryKey: ["cart-items"] });
             toast.success("Offline cart synced");
         } catch (err) {
             toast.error("Failed to sync offline cart");
@@ -149,7 +132,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 syncOfflineCart,
                 isSyncing,
                 cart,
-                cartItems,
                 isLoading,
                 error,
             }}

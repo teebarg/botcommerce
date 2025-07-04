@@ -23,12 +23,12 @@ import redis.asyncio as redis
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
-    logger.info("connecting to dbs......:")
+    logger.info("🚀connecting to dbs......:")
     await db.connect()
-    logger.info("🚀 ~ connected to prisma......:")
+    logger.info("✅ ~ connected to prisma......:")
     await redis_client.ping()
     app.state.redis = redis_client
-    logger.info("🚀 ~ connected to redis......:")
+    logger.info("✅ ~ connected to redis......:")
 
     yield
     await db.disconnect()

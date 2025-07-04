@@ -8,7 +8,6 @@ from meilisearch import Client
 from app.core.config import settings
 from app.core.logging import logger
 
-# Initialize Meilisearch client
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
 
@@ -50,7 +49,7 @@ def get_document_by_id(index_name: str, doc_id: str):
         logger.error(f"Error fetching document by ID: {e}")
 
 
-def update_document(index_name: str, document: dict) -> None:
+async def update_document(index_name: str, document: dict) -> None:
     """
     Update a document in a Meilisearch index.
     """

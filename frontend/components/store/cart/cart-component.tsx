@@ -11,10 +11,10 @@ import Overlay from "@/components/overlay";
 import { useCart } from "@/providers/cart-provider";
 
 const CartComponent: React.FC = () => {
-    const { cart, cartItems } = useCart();
+    const { cart } = useCart();
 
     const totalItems =
-        cartItems?.reduce((acc: number, item: CartItem) => {
+        cart?.items?.reduce((acc: number, item: CartItem) => {
             return acc + item.quantity;
         }, 0) || 0;
 
@@ -35,7 +35,7 @@ const CartComponent: React.FC = () => {
             }
             onOpenChange={state.setOpen}
         >
-            <CartDetails cart={cart!} items={cartItems ?? []} shippingFee={cart?.shipping_fee} />
+            <CartDetails cart={cart!} shippingFee={cart?.shipping_fee} />
         </Overlay>
     );
 };
