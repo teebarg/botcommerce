@@ -3,6 +3,7 @@
 import { notFound } from "next/navigation";
 import { currency } from "@lib/utils";
 import { ChevronDown } from "nui-react-icons";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import PromotionalBanner from "@/components/promotion";
 import { Order, User } from "@/schemas";
@@ -10,7 +11,6 @@ import { useAuth } from "@/providers/auth-provider";
 import { useOrders } from "@/lib/hooks/useOrder";
 import { Skeleton } from "@/components/ui/skeletons";
 import Overlay from "@/components/overlay";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 import OrderDetails from "@/components/store/orders/order-details";
 
 const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
@@ -41,6 +41,8 @@ const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
     return (
         <li>
             <Overlay
+                open={state.isOpen}
+                sheetClassName="min-w-[70vw]"
                 trigger={
                     <div className="shadow-lg bg-content2 flex justify-between items-center p-4 rounded-lg cursor-pointer">
                         <div className="grid grid-cols-3 grid-rows-2 text-sm gap-x-4 flex-1">
@@ -58,9 +60,7 @@ const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
                         </button>
                     </div>
                 }
-                open={state.isOpen}
                 onOpenChange={state.setOpen}
-                sheetClassName="min-w-[70vw]"
             >
                 <OrderDetails order={order} onBack={state.close} />
             </Overlay>
@@ -131,7 +131,7 @@ const OverviewTemplate: React.FC = () => {
                             <ul className="flex flex-col gap-y-4" data-testid="orders-wrapper">
                                 {data?.orders.length > 0 ? (
                                     data.orders.slice(0, 5).map((order: Order, idx: number) => {
-                                        return <OrderItem key={idx} order={order} data-testid="order-wrapper" data-value={order.order_number} />;
+                                        return <OrderItem key={idx} data-testid="order-wrapper" data-value={order.order_number} order={order} />;
                                     })
                                 ) : (
                                     <span data-testid="no-orders-message">No recent orders</span>

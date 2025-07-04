@@ -7,9 +7,10 @@ from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
 from app.services.websocket import manager
 from app.services.activity import log_activity
+from app.services.redis import CacheService
 
 @with_prisma_connection
-async def reindex_product(product_id: int):
+async def reindex_product(cache: CacheService, product_id: int):
     try:
         product = await db.product.find_unique(
             where={"id": product_id},
@@ -35,6 +36,7 @@ async def reindex_product(product_id: int):
                         document=product_data)
 
         logger.info(f"Successfully reindexed product {product_id}")
+        await cache.invalidate_list_cache("search")
         await manager.broadcast_to_all(
             data={
                 "message": "Product re-indexed successfully",
@@ -47,7 +49,7 @@ async def reindex_product(product_id: int):
         logger.error(f"Error re-indexing product {product_id}: {e}")
 
 @with_prisma_connection
-async def index_products():
+async def index_products(cache: CacheService):
     """
     Re-index all products in the database to Meilisearch.
     """
@@ -73,6 +75,7 @@ async def index_products():
             index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
+        await cache.invalidate_list_cache("search")
         await manager.broadcast_to_all(
             data={
                 "message": "Products re-indexed successfully",

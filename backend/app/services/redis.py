@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Callable
+from typing import Any, Callable, Union
 
 import asyncio
 import hashlib
@@ -10,7 +10,6 @@ from fastapi import Request
 from redis import Redis
 
 from app.core.logging import logger
-from app.core.deps import RedisClient
 import json
 from datetime import datetime
 
@@ -68,14 +67,41 @@ class CacheService:
         return self.redis.hgetall(key)
 
     @handle_redis_errors(default=False)
-    async def set(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION) -> bool:
+    async def set(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION, tag: str = None) -> bool:
+        print("🚀 ~ tag:", tag)
+        print("🚀 ~ key:", key)
         if isinstance(expire, timedelta):
             expire = int(expire.total_seconds())
-        return await self.redis.set(key, value, ex=expire)
+        # await self.redis.set(key, value, ex=expire)
+        await self.redis.setex(key, expire, value)
+        if tag:
+            await self.redis.sadd(f"cache_tag:{tag}", key)
 
     @handle_redis_errors()
     async def get(self, key: str) -> str | None:
         return await self.redis.get(key)
+
+    @handle_redis_errors(default=False)
+    async def bust_tag(self, tag: str):
+        # tag_key = f"cache_tag:{tag}"
+        tag_key = tag
+        keys = await self.redis.smembers(tag_key)
+        if keys:
+            await self.redis.delete(*keys)
+        await self.redis.delete(tag_key)
+
+    @handle_redis_errors(default=False)
+    async def invalidate_list_cache(self, entity: str):
+        """
+        Invalidate all list/search cache entries for a given entity (e.g., "product", "collection").
+        This should match the prefix used in @cache_response for list views.
+        """
+        async for tag in self.redis.scan_iter(match=f"cache_tag:{entity}:*"):
+            print("🚀 ~ tag:", tag)
+            # Remove tag prefix
+            # tag_str = tag.decode().replace("cache_tag:", "")
+            tag_str = tag
+            await self.bust_tag(tag_str)
 
     @handle_redis_errors(default=False)
     def delete(self, key: str) -> bool:
@@ -112,33 +138,41 @@ class CacheService:
     def expire(self, key: str, seconds: int) -> bool:
         return self.redis.expire(key, seconds)
 
-
-async def get_cache_service(redis_client: RedisClient):
-    return CacheService(redis_client)
+async def get_redis_dependency(request: Request):
+    return CacheService(request.app.state.redis)
 
 async def invalidate_cache(cache: CacheService, keys: list[str]):
     for key in keys:
         await cache.delete_pattern(key)
 
 
-def cache_response(key_prefix: str, expire: int = DEFAULT_EXPIRATION):
+def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = None, expire: int = DEFAULT_EXPIRATION):
     def decorator(func: Callable):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             request: Request = kwargs["request"]
-            cache = CacheService(request.app.state.redis)
             if not request:
                 raise ValueError("FastAPI Request not found")
 
-            raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
-            key = hashlib.md5(raw_key.encode()).hexdigest()
+            cache = CacheService(request.app.state.redis)
 
-            cached = await cache.get(key)
+            if isinstance(key, str):
+                raw_key = f"{key_prefix}:{key}"
+            elif callable(key):
+                dynamic_key = key(*args, **kwargs)
+                raw_key = f"{key_prefix}:{dynamic_key}"
+            else:
+                raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
+
+            redis_key = hashlib.md5(raw_key.encode()).hexdigest()
+            # print("🚀 ~ redis_key:---------------------", raw_key)
+
+            cached = await cache.get(redis_key)
             if cached:
                 return json.loads(cached)
 
             result = await func(*args, **kwargs)
-            await cache.set(key, json.dumps(result, cls=EnhancedJSONEncoder), expire)
+            await cache.set(redis_key, json.dumps(result, cls=EnhancedJSONEncoder), expire, tag=raw_key)
             return result
         return wrapper
     return decorator

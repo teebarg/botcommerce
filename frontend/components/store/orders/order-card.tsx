@@ -1,15 +1,17 @@
+import { Calendar, Eye, Package } from "lucide-react";
+import { useMemo } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+
+import OrderDetails from "./order-details";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Order, OrderItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Eye, Package } from "lucide-react";
 import { currency, formatDate } from "@/lib/utils";
-import { useMemo } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Overlay from "@/components/overlay";
-import OrderDetails from "./order-details";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
 const statusConfig: Record<Order["status"], { label: string; color: string }> = {
     PENDING: { label: "Pending", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" },
@@ -50,15 +52,15 @@ const OrderCard = ({ order }: { order: Order }) => {
                     <div className="flex items-center gap-3">
                         <Badge className={statusConfig[order.status].color}>{statusConfig[order.status].label}</Badge>
                         <Overlay
+                            open={state.isOpen}
+                            sheetClassName="min-w-[70vw]"
                             trigger={
-                                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                <Button className="flex items-center gap-2" size="sm" variant="outline">
                                     <Eye className="h-4 w-4" />
                                     <span className="hidden sm:inline">See details</span>
                                 </Button>
                             }
-                            open={state.isOpen}
                             onOpenChange={state.setOpen}
-                            sheetClassName="min-w-[70vw]"
                         >
                             <OrderDetails order={order} onBack={state.close} />
                         </Overlay>

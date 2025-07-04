@@ -12,7 +12,7 @@ export default function ThemeToggle() {
 
     return (
         <Button aria-label="theme" className="text-secondary hover:text-secondary" size="iconOnly" type="button" onClick={toggleTheme}>
-                {icon}
-            </Button>
+            {icon}
+        </Button>
     );
 }

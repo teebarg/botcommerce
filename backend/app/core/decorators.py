@@ -10,7 +10,6 @@ from app.services.cache import get_cache_service
 import time
 from typing import Callable, TypeVar, ParamSpec
 import logging
-from app.services.cache import get_cache_service
 
 # Type variables for generic function signatures
 T = TypeVar('T')

@@ -1,12 +1,13 @@
 import React from "react";
+import { ArrowLeft, Package, Calendar, MapPin, Truck } from "lucide-react";
+import Image from "next/image";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Package, Calendar, MapPin, Truck } from "lucide-react";
 import { Order, OrderItem } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
-import Image from "next/image";
 
 interface OrderDetailsProps {
     order: Order;
@@ -60,7 +61,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
     return (
         <div className="space-y-6 px-4 md:px-8 py-8 overflow-auto">
             <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" onClick={onBack} className="flex items-center gap-2">
+                <Button className="flex items-center gap-2" size="sm" variant="outline" onClick={onBack}>
                     <ArrowLeft className="h-4 w-4" />
                     Back to Orders
                 </Button>
@@ -117,7 +118,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         {item.variant.color && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-default-600">Color:</span>
-                                                                <Badge variant="outline" className="text-sm px-2 py-0.5">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
                                                                     {item.variant.color}
                                                                 </Badge>
                                                             </div>
@@ -125,7 +126,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         {item.variant.size && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-default-600">Size:</span>
-                                                                <Badge variant="outline" className="text-sm px-2 py-0.5">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
                                                                     {item.variant.size}
                                                                 </Badge>
                                                             </div>

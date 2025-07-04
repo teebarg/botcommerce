@@ -41,14 +41,22 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
     const queryClient = useQueryClient();
 
-    const { data: cart, isLoading: cartLoading, error: cartError } = useQuery({
+    const {
+        data: cart,
+        isLoading: cartLoading,
+        error: cartError,
+    } = useQuery({
         queryKey: ["cart"],
         queryFn: async () => {
             return await api.get<Cart>("/cart/");
         },
     });
 
-    const { data: cartItems, isLoading: cartItemsLoading, error: cartItemsError } = useQuery({
+    const {
+        data: cartItems,
+        isLoading: cartItemsLoading,
+        error: cartItemsError,
+    } = useQuery({
         queryKey: ["cart-items"],
         queryFn: async () => {
             return await api.get<CartItem[]>("/cart/items");

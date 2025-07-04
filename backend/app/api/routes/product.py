@@ -41,7 +41,7 @@ from app.core.config import settings
 from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export
-from app.services.redis import cache_response
+from app.services.redis import cache_response, get_redis_dependency, CacheService
 
 router = APIRouter()
 
@@ -101,7 +101,7 @@ async def export_products(
 
 
 @router.get("/")
-@cache_response("products", expire=600)
+@cache_response("products", expire=86400)
 async def index(
     request: Request,
     query: str = "",
@@ -152,6 +152,7 @@ async def index(
 @router.get("/search")
 @cache_response("search", expire=600)
 async def search(
+    request: Request,
     search: str = "",
     sort: str = "created_at:desc",
     brand_id: str = Query(default=""),
@@ -252,12 +253,12 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
 
 
 @router.post("/reindex", response_model=Message)
-async def reindex_products(background_tasks: BackgroundTasks):
+async def reindex_products(background_tasks: BackgroundTasks, redis: CacheService = Depends(get_redis_dependency)):
     """
     Re-index all products in the database to Meilisearch.
     """
     try:
-        background_tasks.add_task(index_products)
+        background_tasks.add_task(index_products, redis)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
@@ -268,7 +269,8 @@ async def reindex_products(background_tasks: BackgroundTasks):
 
 
 @router.get("/{slug}")
-async def read(slug: str):
+@cache_response("product", expire=86400)
+async def read(slug: str, request: Request):
     """
     Get a specific product by slug with Redis caching.
     """
