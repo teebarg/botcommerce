@@ -44,6 +44,8 @@ class OrderResponse(BaseModel):
     order_items: Optional[list[OrderItem]]
     created_at: datetime
     updated_at: datetime
+    order_notes: Optional[str] = None
+    invoice_url: Optional[str] = None
 
 class Order(BaseModel):
     id: int
@@ -67,7 +69,8 @@ class Order(BaseModel):
     order_items: list[OrderItem]
     created_at: datetime
     updated_at: datetime
-
+    order_notes: Optional[str] = None
+    invoice_url: Optional[str] = None
 
 class Orders(BaseModel):
     orders: list[Order]
@@ -75,3 +78,9 @@ class Orders(BaseModel):
     limit: int
     total_count: int
     total_pages: int
+
+
+class InvoiceDownloadResponse(BaseModel):
+    invoice_url: str
+    filename: str
+    order_number: str

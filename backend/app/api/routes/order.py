@@ -1,21 +1,22 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request, Response
-
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request
+import uuid
+from datetime import datetime
 from app.core.deps import (
     CurrentUser,
     Notification,
-    get_current_superuser
+    get_current_superuser,
+    RedisClient,
+    supabase
 )
 from app.core.logging import logger
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
-from prisma.enums import OrderStatus
+from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders, InvoiceDownloadResponse
+from prisma.enums import OrderStatus, PaymentStatus
 from app.services.order import create_order, send_notification, get_order, list_orders
-from prisma.enums import PaymentStatus
-from app.core.deps import RedisClient
 from app.services.redis import cache_response
 from app.services.invoice import invoice_service
-from app.models.user import User
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -145,12 +146,62 @@ async def fulfill_order(cache: RedisClient, order_id: int):
     await cache.bust_tag(f"order:{order_id}")
     return updated_order
 
-@router.get("/{order_id}/invoice", response_class=Response)
+@router.get("/{order_id}/invoice", response_model=InvoiceDownloadResponse)
 async def download_invoice(order_id: int, user: CurrentUser):
-    order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
+    """Generate and upload invoice PDF to Supabase storage, returning the download URL"""
+    try:
+        order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
+        if not order or order.user_id != user.id:
+            raise HTTPException(status_code=404, detail="Order not found")
+        settings = await db.shopsettings.find_many()
+        settings_dict = {setting.key: setting.value for setting in settings}
+
+        pdf_bytes = invoice_service.generate_invoice_pdf(order=order, user=user, company_info=settings_dict)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
+        
+        try:
+            result = supabase.storage.from_("invoices").upload(filename, pdf_bytes, {
+                "contentType": "application/pdf"
+            })
+            
+            if not result:
+                raise HTTPException(status_code=500, detail="Failed to upload invoice to storage")
+        except Exception as e:
+            logger.error(f"Error uploading invoice to Supabase: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to upload invoice to storage. Please ensure the 'invoices' bucket exists in Supabase.")
+        
+        public_url = supabase.storage.from_("invoices").get_public_url(filename)
+        
+        await db.order.update(
+            where={"id": order_id},
+            data={"invoice_url": public_url}
+        )
+        
+        return {
+            "invoice_url": public_url,
+            "filename": filename,
+            "order_number": order.order_number
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in download_invoice: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred while generating the invoice")
+
+class OrderNotesUpdate(BaseModel):
+    order_notes: str
+
+@router.patch("/{order_id}/notes", response_model=OrderResponse)
+async def update_order_notes(cache: RedisClient, order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None):
+    order = await db.order.find_unique(where={"id": order_id})
     if not order or order.user_id != user.id:
         raise HTTPException(status_code=404, detail="Order not found")
-    pdf_bytes = invoice_service.generate_invoice_pdf(order, user)
-    return Response(content=pdf_bytes, media_type="application/pdf", headers={
-        "Content-Disposition": f"attachment; filename=invoice_{order.order_number}.pdf"
-    })
+    updated_order = await db.order.update(
+        where={"id": order_id},
+        data={"order_notes": notes_update.order_notes}
+    )
+    await cache.invalidate_list_cache("orders")
+    await cache.bust_tag(f"order:{order_id}")
+    return updated_order

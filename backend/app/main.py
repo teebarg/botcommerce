@@ -19,7 +19,6 @@ from datetime import datetime
 from app.services.websocket import manager
 import redis.asyncio as redis
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
@@ -46,7 +45,6 @@ app = FastAPI(title="Botcommerce",
 #         print(f"Client host: {client_host}")  # Log the client IP
 #         return await call_next(request)
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("api")
 
@@ -61,10 +59,8 @@ class TimingMiddleware(BaseHTTPMiddleware):
 
         return response
 
-
 app.add_middleware(TimingMiddleware)
 
-# Set all CORS enabled origins
 if settings.all_cors_origins:
     app.add_middleware(
         CORSMiddleware,
@@ -131,8 +127,8 @@ async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
 
 
 @app.post("/api/log-error")
-@limit("10/minute")
-async def log_error(error: dict, notification: deps.Notification):
+@limit("5/minute")
+async def log_error(error: dict, notification: deps.Notification, request: Request):
     slack_message = {
         "text": f"🚨 *Error Logged* 🚨\n"
         f"*Message:* {error.get('message', 'N/A')}\n"
@@ -147,10 +143,10 @@ async def log_error(error: dict, notification: deps.Notification):
 
 
 @app.get("/sitemap.xml", response_class=Response)
-async def generate_sitemap(cache: deps.CacheService):
+async def generate_sitemap(cache: deps.RedisClient):
     base_url = settings.FRONTEND_HOST
 
-    cached_sitemap = cache.get("sitemap")
+    cached_sitemap = await cache.get("sitemap")
     if cached_sitemap:
         return Response(content=cached_sitemap, media_type="application/xml")
 
@@ -188,7 +184,7 @@ async def generate_sitemap(cache: deps.CacheService):
 
     sitemap = tostring(urlset, encoding="utf-8", method="xml")
 
-    cache.set("sitemap", sitemap, expire=3600)
+    await cache.set("sitemap", sitemap, expire=3600)
 
     return Response(content=sitemap, media_type="application/xml")
 

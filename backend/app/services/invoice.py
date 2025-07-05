@@ -1,83 +1,133 @@
 import io
-from datetime import datetime
 from typing import Optional
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
 from reportlab.lib.colors import HexColor
-
-from app.models.order import OrderResponse
-from app.models.user import User
+from reportlab.platypus.flowables import HRFlowable
 
 
 class InvoiceService:
     def __init__(self):
         self.styles = getSampleStyleSheet()
+        self._register_fonts()
         self._setup_custom_styles()
+        
+    def _register_fonts(self):
+        """Register fonts for better typography"""
+        try:
+            self.primary_font = 'Helvetica'
+            self.primary_font_bold = 'Helvetica-Bold'
+        except:
+            self.primary_font = 'Helvetica'
+            self.primary_font_bold = 'Helvetica-Bold'
 
     def _setup_custom_styles(self):
         """Setup custom paragraph styles for the invoice"""
+        # Company name style
+        self.styles.add(ParagraphStyle(
+            name='CompanyName',
+            parent=self.styles['Heading1'],
+            fontSize=20,
+            spaceAfter=4,
+            alignment=TA_LEFT,
+            textColor=HexColor('#000000'),
+            fontName=self.primary_font_bold
+        ))
+        
+        # Company subtitle style
+        self.styles.add(ParagraphStyle(
+            name='CompanySubtitle',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            spaceAfter=20,
+            alignment=TA_LEFT,
+            textColor=HexColor('#666666'),
+            fontName=self.primary_font
+        ))
+
+        # Invoice title style
         self.styles.add(ParagraphStyle(
             name='InvoiceTitle',
             parent=self.styles['Heading1'],
-            fontSize=24,
+            fontSize=36,
             spaceAfter=30,
-            alignment=TA_CENTER,
-            textColor=HexColor('#1f2937')
+            alignment=TA_RIGHT,
+            textColor=HexColor('#000000'),
+            fontName=self.primary_font_bold
         ))
 
+        # Section header style
         self.styles.add(ParagraphStyle(
-            name='InvoiceSubtitle',
-            parent=self.styles['Heading2'],
-            fontSize=16,
-            spaceAfter=20,
-            textColor=HexColor('#374151')
+            name='SectionHeader',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            spaceAfter=8,
+            textColor=HexColor('#000000'),
+            fontName=self.primary_font_bold
         ))
 
+        # Regular text style
         self.styles.add(ParagraphStyle(
             name='InvoiceText',
             parent=self.styles['Normal'],
-            fontSize=12,
-            spaceAfter=6,
-            textColor=HexColor('#4b5563')
+            fontSize=11,
+            spaceAfter=4,
+            textColor=HexColor('#333333'),
+            fontName=self.primary_font
+        ))
+        
+        # Product name style with text wrapping
+        self.styles.add(ParagraphStyle(
+            name='ProductName',
+            parent=self.styles['Normal'],
+            fontSize=10,
+            spaceAfter=2,
+            textColor=HexColor('#333333'),
+            fontName=self.primary_font,
+            wordWrap='CJK'  # Enable word wrapping
+        ))
+        
+        # Thank you style
+        self.styles.add(ParagraphStyle(
+            name='ThankYou',
+            parent=self.styles['Normal'],
+            fontSize=18,
+            spaceAfter=10,
+            alignment=TA_RIGHT,
+            textColor=HexColor('#000000'),
+            fontName=self.primary_font_bold
         ))
 
-    def generate_invoice_pdf(self, order: OrderResponse, user: User, company_info: Optional[dict] = None) -> bytes:
+    def generate_invoice_pdf(self, order, user, company_info: Optional[dict] = None) -> bytes:
         """Generate a PDF invoice for the given order"""
         buffer = io.BytesIO()
 
         doc = SimpleDocTemplate(
             buffer,
             pagesize=A4,
-            rightMargin=72,
-            leftMargin=72,
-            topMargin=72,
-            bottomMargin=72
+            rightMargin=40,
+            leftMargin=40,
+            topMargin=40,
+            bottomMargin=40
         )
 
         story = []
 
-        # Add company header
-        if company_info:
-            story.extend(self._create_company_header(company_info))
+        story.extend(self._create_header(company_info, order))
+        
+        story.append(HRFlowable(width="100%", thickness=1, color=HexColor('#000000')))
+        story.append(Spacer(1, 20))
 
-        # Add invoice title and details
-        story.extend(self._create_invoice_header(order))
+        story.extend(self._create_customer_and_invoice_info(user, order))
 
-        # Add customer information
-        story.extend(self._create_customer_info(user, order))
-
-        # Add order items table
         story.extend(self._create_items_table(order))
 
-        # Add totals
-        story.extend(self._create_totals_section(order))
+        story.extend(self._create_totals(order))
 
-        # Add footer
-        story.extend(self._create_footer())
+        story.extend(self._create_footer(company_info))
 
         doc.build(story)
         pdf_bytes = buffer.getvalue()
@@ -85,85 +135,82 @@ class InvoiceService:
 
         return pdf_bytes
 
-    def _create_company_header(self, company_info: dict) -> list:
-        """Create the company header section"""
+    def _create_header(self, company_info: dict, order) -> list:
+        """Create the header with company logo area and invoice title"""
         elements = []
-
-        if company_info.get('name'):
-            elements.append(Paragraph(company_info['name'], self.styles['InvoiceTitle']))
-
-        if company_info.get('address'):
-            elements.append(Paragraph(company_info['address'], self.styles['InvoiceText']))
-
-        contact_info = []
-        if company_info.get('phone'):
-            contact_info.append(f"Phone: {company_info['phone']}")
-        if company_info.get('email'):
-            contact_info.append(f"Email: {company_info['email']}")
-
-        if contact_info:
-            elements.append(Paragraph(" | ".join(contact_info), self.styles['InvoiceText']))
-
-        elements.append(Spacer(1, 20))
-        return elements
-
-    def _create_invoice_header(self, order: OrderResponse) -> list:
-        """Create the invoice header section"""
-        elements = []
-
-        elements.append(Paragraph("INVOICE", self.styles['InvoiceTitle']))
-
-        invoice_data = [
-            ["Invoice Number:", order.order_number],
-            ["Invoice Date:", order.created_at.strftime("%B %d, %Y")],
-        ]
-
-        invoice_table = Table(invoice_data, colWidths=[2*inch, 3*inch])
-        invoice_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        
+        # Left side - Company info
+        left_content = [Paragraph(company_info.get('shop_name', 'Shop'), self.styles['CompanyName'])]
+        
+        # Right side - Invoice title
+        right_content = [Paragraph("INVOICE", self.styles['InvoiceTitle'])]
+        
+        # Create header table
+        header_table = Table([[left_content, right_content]], colWidths=[3.5*inch, 3.5*inch])
+        header_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]))
-
-        elements.append(invoice_table)
+        
+        elements.append(header_table)
         elements.append(Spacer(1, 20))
+        
         return elements
 
-    def _create_customer_info(self, user: User, order: OrderResponse) -> list:
-        """Create the customer information section"""
+    def _create_customer_and_invoice_info(self, user, order) -> list:
+        """Create customer info and invoice details side by side"""
         elements = []
-
-        elements.append(Paragraph("Bill To:", self.styles['InvoiceSubtitle']))
-
+        
+        customer_content = []
+        customer_content.append(Paragraph("INVOICE TO :", self.styles['SectionHeader']))
+        
         customer_name = f"{user.first_name} {user.last_name}"
-        elements.append(Paragraph(customer_name, self.styles['InvoiceText']))
-        elements.append(Paragraph(user.email, self.styles['InvoiceText']))
-
+        customer_content.append(Paragraph(customer_name, self.styles['InvoiceText']))
+        
         if hasattr(order, 'shipping_address') and order.shipping_address:
             addr = order.shipping_address
-            if addr.get('address_line1'):
-                elements.append(Paragraph(addr['address_line1'], self.styles['InvoiceText']))
-            if addr.get('city') and addr.get('state'):
-                city_state = f"{addr['city']}, {addr['state']}"
-                if addr.get('postal_code'):
-                    city_state += f" {addr['postal_code']}"
-                elements.append(Paragraph(city_state, self.styles['InvoiceText']))
-
-        elements.append(Spacer(1, 20))
+            if addr.address_1:
+                customer_content.append(Paragraph(addr.address_1, self.styles['InvoiceText']))
+            if addr.city and addr.state:
+                city_state = f"{addr.city}, {addr.state}"
+                if addr.postal_code:
+                    city_state += f" {addr.postal_code}"
+                customer_content.append(Paragraph(city_state, self.styles['InvoiceText']))
+        
+        customer_content.append(Paragraph(user.email, self.styles['InvoiceText']))
+        
+        # Invoice details
+        invoice_content = []
+        invoice_content.append(Paragraph(f"Invoice No : #{order.order_number}", self.styles['InvoiceText']))
+        invoice_content.append(Paragraph(f"Invoice Date : {order.created_at.strftime('%B %d, %Y')}", self.styles['InvoiceText']))
+        
+        # Create info table
+        info_table = Table([[customer_content, invoice_content]], colWidths=[3.5*inch, 3.5*inch])
+        info_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        
+        elements.append(info_table)
+        elements.append(Spacer(1, 30))
+        
         return elements
 
-    def _create_items_table(self, order: OrderResponse) -> list:
-        """Create the order items table"""
+    def _create_items_table(self, order) -> list:
+        """Create the order items table with modern styling"""
         elements = []
 
-        elements.append(Paragraph("Order Items:", self.styles['InvoiceSubtitle']))
-
-        headers = ["Item", "Description", "Qty", "Unit Price", "Total"]
+        headers = ["NAME", "QTY", "PRICE", "TOTAL"]
         data = [headers]
 
         for item in order.order_items:
-            variant_info = ""
+            item_name = item.name
+
+            if len(item_name) > 50:
+                item_name = item_name[:47] + "..."
+            
             if hasattr(item, 'variant') and item.variant:
                 variant_parts = []
                 if item.variant.get('size'):
@@ -171,72 +218,114 @@ class InvoiceService:
                 if item.variant.get('color'):
                     variant_parts.append(f"Color: {item.variant['color']}")
                 if variant_parts:
-                    variant_info = f" ({', '.join(variant_parts)})"
+                    item_name += f" ({', '.join(variant_parts)})"
+            
+            item_paragraph = Paragraph(item_name, self.styles['ProductName'])
 
             data.append([
-                item.name,
-                variant_info,
+                item_paragraph,
                 str(item.quantity),
-                f"₦{item.price:,.2f}",
-                f"₦{(item.price * item.quantity):,.2f}"
+                f"₦{item.price:,.0f}",
+                f"₦{(item.price * item.quantity):,.0f}"
             ])
 
-        table = Table(data, colWidths=[1.5*inch, 2*inch, 0.5*inch, 1*inch, 1*inch])
+        # Create table with wider layout
+        table = Table(data, colWidths=[4*inch, 0.8*inch, 1.2*inch, 1.2*inch])
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            # Header row styling
+            ('BACKGROUND', (0, 0), (-1, 0), HexColor('#f0f0f0')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), HexColor('#000000')),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), self.primary_font_bold),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('ALIGN', (2, 1), (-1, -1), 'RIGHT'),
-            ('ALIGN', (0, 1), (1, -1), 'LEFT'),
+            ('TOPPADDING', (0, 0), (-1, 0), 12),
+            
+            # Data rows styling
+            ('BACKGROUND', (0, 1), (-1, -1), HexColor('#ffffff')),
+            ('TEXTCOLOR', (0, 1), (-1, -1), HexColor('#333333')),
+            ('FONTNAME', (0, 1), (-1, -1), self.primary_font),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+            ('TOPPADDING', (0, 1), (-1, -1), 8),
+            
+            # Alignment
+            ('ALIGN', (0, 1), (0, -1), 'LEFT'),    # NAME column
+            ('ALIGN', (1, 1), (-1, -1), 'CENTER'), # QTY, PRICE, TOTAL columns
+            ('VALIGN', (0, 1), (-1, -1), 'TOP'),   # Vertical alignment for wrapped text
+            
+            # Grid lines
+            ('LINEBELOW', (0, 0), (-1, 0), 1, HexColor('#cccccc')),
+            ('LINEBELOW', (0, 1), (-1, -1), 0.5, HexColor('#e0e0e0')),
+            
+            # Alternate row colors
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [HexColor('#ffffff'), HexColor('#f8f8f8')]),
         ]))
 
         elements.append(table)
-        elements.append(Spacer(1, 20))
-        return elements
-
-    def _create_totals_section(self, order: OrderResponse) -> list:
-        """Create the totals section"""
-        elements = []
-
-        totals_data = [
-            ["Subtotal:", f"₦{order.subtotal:,.2f}"],
-            ["Tax:", f"₦{order.tax:,.2f}"],
-        ]
-
-        if hasattr(order, 'shipping_fee') and order.shipping_fee:
-            totals_data.append(["Shipping:", f"₦{order.shipping_fee:,.2f}"])
-
-        totals_data.append(["Total:", f"₦{order.total:,.2f}"])
-
-        totals_table = Table(totals_data, colWidths=[4*inch, 1.5*inch])
-        totals_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (1, -1), (1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 12),
-            ('LINEABOVE', (0, -1), (1, -1), 1, colors.black),
-            ('LINEBELOW', (0, -1), (1, -1), 1, colors.black),
-        ]))
-
-        elements.append(totals_table)
         elements.append(Spacer(1, 30))
         return elements
 
-    def _create_footer(self) -> list:
-        """Create the invoice footer"""
+    def _create_totals(self, order) -> list:
+        """Create totals section and signature area"""
         elements = []
-
-        footer_text = "Thank you for your business!"
-        elements.append(Paragraph(footer_text, self.styles['InvoiceText']))
-
+        
+        # Totals data
+        totals_data = []
+        totals_data.append(["Sub-total :", f"₦{order.subtotal:,.0f}"])
+        totals_data.append(["Tax :", f"₦{order.tax:,.0f}"])
+        
+        if hasattr(order, 'shipping_fee') and order.shipping_fee:
+            totals_data.append(["Shipping :", f"₦{order.shipping_fee:,.0f}"])
+        
+        totals_data.append(["Total :", f"₦{order.total:,.0f}"])
+        
+        signature_content = []
+        signature_content.append(Spacer(1, 40))
+        
+        totals_table = Table(totals_data, colWidths=[1.8*inch, 1.5*inch])
+        totals_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, -2), self.primary_font),
+            ('FONTNAME', (0, -1), (-1, -1), self.primary_font_bold),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('LINEABOVE', (0, -1), (-1, -1), 1, HexColor('#000000')),
+            ('LINEBELOW', (0, -1), (-1, -1), 1, HexColor('#000000')),
+        ]))
+        
+        # Create final layout with wider columns
+        final_layout = Table([[signature_content, totals_table]], colWidths=[3.5*inch, 3.5*inch])
+        final_layout.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        
+        elements.append(final_layout)
+        elements.append(Spacer(1, 40))
+        
+        elements.append(Paragraph("THANK YOU!", self.styles['ThankYou']))
+        
         return elements
 
+    def _create_footer(self, company_info: dict) -> list:
+        """Create the invoice footer with contact information"""
+        elements = []
+        
+        elements.append(Spacer(1, 20))
+        elements.append(HRFlowable(width="100%", thickness=1, color=HexColor('#000000')))
+        elements.append(Spacer(1, 10))
+        
+        phone = company_info.get('contact_phone', '+123-456-7890')
+        email = company_info.get('contact_email', 'hello@reallygreatsite.com')
+        address = company_info.get('address', '123 Anywhere St., Any City')
+        
+        footer_info = f"{phone}    {email}    {address}"
+        elements.append(Paragraph(footer_info, self.styles['InvoiceText']))
+        
+        return elements
 
-# Create a singleton instance
 invoice_service = InvoiceService()

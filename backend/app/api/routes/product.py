@@ -13,16 +13,18 @@ from fastapi import (
 from app.core.deps import (
     CurrentUser,
     get_current_user,
-    meilisearch_client
+    meilisearch_client,
+    supabase,
+    RedisClient
 )
 from app.core.logging import logger
 from app.core.utils import slugify, url_to_list, generate_sku
-from app.models.product import Product, Products, SearchProducts, SearchProduct
-from app.models.generic import Message
+from app.models.generic import Message, ImageUpload
 from app.models.product import (
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
+    Product, Products, SearchProducts, SearchProduct
 )
 from app.services.export import validate_file
 from app.services.meilisearch import (
@@ -36,9 +38,7 @@ from math import ceil
 from prisma.enums import ProductStatus
 from pydantic import BaseModel
 from app.core.storage import upload
-from app.core.deps import supabase, RedisClient
 from app.core.config import settings
-from app.models.generic import ImageUpload
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export
 from app.services.redis import cache_response

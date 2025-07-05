@@ -1,15 +1,11 @@
-import hashlib
-import json
 import re
 from collections.abc import Callable
 from functools import wraps
 
 from fastapi import HTTPException
 
-from app.services.cache import get_cache_service
 import time
 from typing import Callable, TypeVar, ParamSpec
-import logging
 
 # Type variables for generic function signatures
 T = TypeVar('T')
@@ -30,7 +26,6 @@ def limit(rate_string: str):
     max_requests = int(match.group(1))
     period = match.group(2).lower()
 
-    # Convert period to seconds
     time_periods = {
         "second": 1,
         "minute": 60,
@@ -41,31 +36,23 @@ def limit(rate_string: str):
     if period not in time_periods and period + "s" not in time_periods:
         raise ValueError(f"Invalid time period. Must be one of: {', '.join(time_periods.keys())}")
 
-    # Handle both singular and plural forms
     period_seconds = time_periods.get(period) or time_periods.get(period[:-1])
 
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            cache = await get_cache_service()
-            # Extract request
-            # request = kwargs.get("request")
+            request: Request = kwargs["request"]
+            if not request:
+                raise ValueError("FastAPI Request not found")
 
-            # if not request:
-            #     raise ValueError("Rate limiting requires 'request' parameter")
+            cache = request.app.state.redis
+            client_ip = request.client.host
+            key = f"rate_limit:{client_ip}:{func.__name__}"
 
-            # client_ip = request.state.client_host
-
-            # client_ip = request.client.host
-            # key = f"rate_limit:{client_ip}:{func.__name__}"
-            key = f"rate_limit:{func.__name__}"
-
-            # Increment the request count
-            current_count = cache.redis.incr(key)
+            current_count = await cache.incr(key)
 
             if current_count == 1:
-                # Set the expiration for the first request
-                cache.redis.expire(key, period_seconds)
+                await cache.expire(key, period_seconds)
 
             if current_count > max_requests:
                 raise HTTPException(
@@ -76,66 +63,6 @@ def limit(rate_string: str):
             return await func(*args, **kwargs)
         return wrapper
     return decorator
-
-
-def cache(expire: int = 86400, key: str | None = None, hash: bool = True):
-    """
-    Decorator to cache the result of a function.
-    Args:
-        expire: Expiration time in seconds for the cache.
-        key: Optional custom key for caching. If not provided, a key is generated.
-    """
-    def generate_cache_key(key: str, func_name: str, args: tuple, kwargs: dict) -> str:
-        """
-        Generate a consistent cache key based on the function name and normalized arguments.
-        Args:
-            func_name: The name of the function.
-            args: Positional arguments.
-            kwargs: Keyword arguments.
-        Returns:
-            str: A hash representing the cache key.
-        """
-        temp_kwargs = ":".join([str(v.id) if k == "user" else str(v) for k, v in kwargs.items() if k not in ["db", "redis", "cache", "cart_in"]])
-        if hash:
-            temp_kwargs = hashlib.sha256(temp_kwargs.encode()).hexdigest()
-
-        return f"{key or func_name}:{temp_kwargs}"
-
-    def decorator(func: Callable):
-        @wraps(func)
-        async def wrapped(*args, **kwargs):
-            # Initialize cache service
-            cache_service = await get_cache_service()
-
-            # Use the provided key or generate one
-            cache_key = generate_cache_key(key=key, func_name=func.__name__, args=args, kwargs=kwargs)
-
-            # Try to get the result from the cache
-            cached_result = cache_service.get(cache_key)
-            if cached_result is not None:
-                return json.loads(cached_result)
-
-            # Compute the result, cache it, and return it
-            result = await func(*args, **kwargs)
-
-            try:
-                if isinstance(result, dict):
-                    serialized_result = json.dumps(result, default=str)
-                elif hasattr(result, "model_dump_json"):
-                    serialized_result = result.model_dump_json()  # For Pydantic v2.x
-                elif hasattr(result, "json"):
-                    serialized_result = result.json()  # For Pydantic v1.x
-                else:
-                    raise Exception("Cannot serialize result")
-                cache_service.set(cache_key, serialized_result, expire)
-            except Exception as e:
-                raise ValueError(f"Failed to serialize result: {e}")
-            return result
-
-        return wrapped
-
-    return decorator
-
 
 def with_retry(
     retries: int = 3,
@@ -175,6 +102,6 @@ def with_retry(
                     time.sleep(current_delay)
                     current_delay *= backoff
 
-            raise last_exception  # This line should never be reached
+            raise last_exception
         return wrapper
     return decorator

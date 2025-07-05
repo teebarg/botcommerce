@@ -190,7 +190,22 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <Button className="w-full" variant="outline">
                             Contact Support
                         </Button>
-                        <Button className="w-full" variant="outline" onClick={() => window.open(`/api/orders/${order.id}/invoice`, "_blank")}>
+                        {order.invoice_url && (
+                            <a href={order.invoice_url} download>
+                                Download Invoice
+                            </a>
+                        )}
+                        <Button
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => {
+                                if (order.invoice_url) {
+                                    window.open(order.invoice_url, "_blank");
+                                } else {
+                                    alert("Invoice not available yet. Please try again later.");
+                                }
+                            }}
+                        >
                             Download Invoice (PDF)
                         </Button>
                     </div>
