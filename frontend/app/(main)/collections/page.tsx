@@ -37,11 +37,12 @@ export default async function Collections({ searchParams }: Props) {
         brand_id: brand_id,
     };
 
-    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } })
+    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } });
+
     return (
         <div className="container mx-auto py-4 px-1">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient initialSearchParams={queryParams} initialData={initialData.products} />
+                <InfiniteScrollClient initialData={initialData.products} initialSearchParams={queryParams} />
             </Suspense>
         </div>
     );

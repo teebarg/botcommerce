@@ -48,7 +48,7 @@ const CartView: React.FC<Props> = () => {
                     title="Big Sale on Top Brands!"
                 />
                 <div className="max-w-7xl mx-auto" data-testid="cart-container">
-                    <CartPageDetails cart={cart} />
+                    <CartPageDetails />
                     <div className="px-2 py-4 mt-4">
                         <div className="flex gap-2 items-center">
                             <Shield />

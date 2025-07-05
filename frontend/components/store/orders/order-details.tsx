@@ -190,6 +190,9 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <Button className="w-full" variant="outline">
                             Contact Support
                         </Button>
+                        <Button className="w-full" variant="outline" onClick={() => window.open(`/api/orders/${order.id}/invoice`, "_blank")}>
+                            Download Invoice (PDF)
+                        </Button>
                     </div>
                 </div>
             </div>

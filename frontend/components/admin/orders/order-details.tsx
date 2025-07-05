@@ -253,9 +253,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             <div className="p-6 space-y-4">
                                 <OrderProcessingAction order={order} />
 
-                                <Button className="w-full" size="lg" variant="outline">
+                                <Button
+                                    className="w-full"
+                                    size="lg"
+                                    variant="outline"
+                                    onClick={() => window.open(`/api/orders/${order.id}/invoice`, "_blank")}
+                                >
                                     <Eye className="w-4 h-4 mr-2" />
-                                    View Invoice
+                                    Download Invoice (PDF)
                                 </Button>
                             </div>
                         </div>

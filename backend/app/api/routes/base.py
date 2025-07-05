@@ -2,6 +2,7 @@ from fastapi import (
     APIRouter,
     Depends,
     Query,
+    Request,
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role
@@ -35,6 +36,7 @@ async def admin_dashboard_stats():
 @router.get("/stats/trends", dependencies=[Depends(get_current_superuser)])
 @cache_response("stats-trends", expire=86400)
 async def stats_trends(
+    request: Request,
     range: Literal["day", "week", "month"] = Query("day"),
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,

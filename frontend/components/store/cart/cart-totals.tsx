@@ -11,6 +11,7 @@ import ComponentLoader from "@/components/component-loader";
 
 const CartTotals: React.FC = () => {
     const { cart, isLoading } = useCart();
+
     if (isLoading) return <ComponentLoader className="h-[100px]" />;
 
     if (!cart) return null;

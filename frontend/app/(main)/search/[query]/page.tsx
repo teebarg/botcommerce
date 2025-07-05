@@ -35,7 +35,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
         brand_id: brand_id,
     };
 
-    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } })
+    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } });
 
     return (
         <div className="container mx-auto mt-4 py-4 px-1">
@@ -49,7 +49,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
                 </LocalizedClientLink>
             </div>
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient initialSearchParams={queryParams} initialData={initialData.products} />
+                <InfiniteScrollClient initialData={initialData.products} initialSearchParams={queryParams} />
             </Suspense>
         </div>
     );

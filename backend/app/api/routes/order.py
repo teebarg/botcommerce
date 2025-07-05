@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request, Response
 
 from app.core.deps import (
     CurrentUser,
@@ -14,6 +14,8 @@ from app.services.order import create_order, send_notification, get_order, list_
 from prisma.enums import PaymentStatus
 from app.core.deps import RedisClient
 from app.services.redis import cache_response
+from app.services.invoice import invoice_service
+from app.models.user import User
 
 router = APIRouter()
 
@@ -142,3 +144,13 @@ async def fulfill_order(cache: RedisClient, order_id: int):
     await cache.invalidate_list_cache("orders")
     await cache.bust_tag(f"order:{order_id}")
     return updated_order
+
+@router.get("/{order_id}/invoice", response_class=Response)
+async def download_invoice(order_id: int, user: CurrentUser):
+    order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
+    if not order or order.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Order not found")
+    pdf_bytes = invoice_service.generate_invoice_pdf(order, user)
+    return Response(content=pdf_bytes, media_type="application/pdf", headers={
+        "Content-Disposition": f"attachment; filename=invoice_{order.order_number}.pdf"
+    })

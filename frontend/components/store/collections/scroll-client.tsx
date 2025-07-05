@@ -51,7 +51,6 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
         isFetching: isFetchingNextPage,
     });
 
-
     const products = data?.pages?.flatMap((page) => page.products) ?? initialData;
     const facets = data?.pages?.flatMap((page) => page.facets) || {};
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
@@ -131,7 +130,7 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                             <main className="w-full overflow-visible px-1">
                                 <div className="block md:rounded-xl py-4 min-h-[50vh]">
                                     <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 pb-4">
-                                        {products.length == 0 && (
+                                        {products?.length == 0 && (
                                             <div className="col-span-2 md:col-span-3">
                                                 <NoProductsFound />
                                             </div>
