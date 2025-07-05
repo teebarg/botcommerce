@@ -1,5 +1,6 @@
 from typing import Any
-from fastapi import APIRouter, HTTPException
+from app.core.deps import RedisClient
+from fastapi import APIRouter, HTTPException, Request
 from app.models.shop_settings import (
     ShopSettingsCreate,
     ShopSettingsUpdate
@@ -7,11 +8,13 @@ from app.models.shop_settings import (
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.models import ShopSettings
+from app.services.redis import cache_response
 
 router = APIRouter()
 
 @router.get("/")
-async def get_settings() -> list[ShopSettings]:
+@cache_response(key_prefix="shop-settings", expire=864000)
+async def get_settings(request: Request) -> list[ShopSettings]:
     """
     Get shop settings with optional filtering
     """
@@ -19,18 +22,19 @@ async def get_settings() -> list[ShopSettings]:
 
 
 @router.get("/public")
-async def get_public_settings() -> dict[str, str]:
+@cache_response(key_prefix="shop-settings", key="public", expire=864000)
+async def get_public_settings(request: Request) -> dict[str, str]:
     """
     Get all public settings
     """
     settings = await db.shopsettings.find_many()
 
-    # Convert to a key-value dictionary
     return {setting.key: setting.value for setting in settings}
 
 
 @router.get("/{id}")
-async def get_setting(id: int) -> ShopSettings:
+@cache_response(key_prefix="shop-settings", key=lambda request, id: id, expire=864000)
+async def get_setting(request: Request, id: int) -> ShopSettings:
     """
     Get a specific setting by id
     """
@@ -66,18 +70,19 @@ async def get_setting(id: int) -> ShopSettings:
 #         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/")
-async def create_setting(setting: ShopSettingsCreate) -> ShopSettings:
+async def create_setting(cache: RedisClient, setting: ShopSettingsCreate) -> ShopSettings:
     """
     Create a new shop setting
     """
     try:
+        await cache.invalidate_list_cache("shop-settings")
         return await db.shopsettings.create(data=setting.model_dump())
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.patch("/sync-shop-details")
-async def sync_shop_details(form_data: dict[str, Any]):
+async def sync_shop_details(cache: RedisClient, form_data: dict[str, Any]):
     """
     Sync shop details
     """
@@ -92,19 +97,20 @@ async def sync_shop_details(form_data: dict[str, Any]):
                     "create": {
                         "key": key,
                         "value": str(value),
-                        "type": "SHOP_DETAIL",  # or whatever fits
+                        "type": "SHOP_DETAIL",
                     },
                     "update": {
                         "value": value
                     },
                 }
             )
+        await cache.invalidate_list_cache("shop-settings")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.patch("/{id}", response_model=ShopSettings)
-async def update_setting(id: int, setting: ShopSettingsUpdate) -> Any:
+async def update_setting(cache: RedisClient, id: int, setting: ShopSettingsUpdate) -> Any:
     """
     Update an existing shop setting
     """
@@ -113,6 +119,7 @@ async def update_setting(id: int, setting: ShopSettingsUpdate) -> Any:
         raise HTTPException(status_code=404, detail="Setting not found")
 
     try:
+        await cache.invalidate_list_cache("shop-settings")
         return await db.shopsettings.update(
             where={"id": id},
             data=setting.model_dump(exclude_unset=True)
@@ -122,7 +129,7 @@ async def update_setting(id: int, setting: ShopSettingsUpdate) -> Any:
 
 
 @router.delete("/{id}", response_model=Message)
-async def delete_setting(id: int) -> Any:
+async def delete_setting(cache: RedisClient, id: int) -> Any:
     """
     Delete a shop setting
     """
@@ -132,6 +139,7 @@ async def delete_setting(id: int) -> Any:
 
     try:
         await db.shopsettings.delete(where={"id": id})
+        await cache.invalidate_list_cache("shop-settings")
         return {"message": "Setting deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

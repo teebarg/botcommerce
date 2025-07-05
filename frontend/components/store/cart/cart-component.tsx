@@ -7,15 +7,14 @@ import React from "react";
 import { CartItem } from "@/schemas";
 import CartDetails from "@/components/store/cart/cart-details";
 import { Button } from "@/components/ui/button";
-import { useCart, useCartItem } from "@/lib/hooks/useCart";
 import Overlay from "@/components/overlay";
+import { useCart } from "@/providers/cart-provider";
 
 const CartComponent: React.FC = () => {
-    const { data: items } = useCartItem();
-    const { data: cart } = useCart();
+    const { cart } = useCart();
 
     const totalItems =
-        items?.reduce((acc: number, item: CartItem) => {
+        cart?.items?.reduce((acc: number, item: CartItem) => {
             return acc + item.quantity;
         }, 0) || 0;
 
@@ -36,7 +35,7 @@ const CartComponent: React.FC = () => {
             }
             onOpenChange={state.setOpen}
         >
-            <CartDetails cart={cart!} items={items ?? []} shippingFee={cart?.shipping_fee} />
+            <CartDetails cart={cart!} shippingFee={cart?.shipping_fee} />
         </Overlay>
     );
 };

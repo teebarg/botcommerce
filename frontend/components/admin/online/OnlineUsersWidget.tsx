@@ -44,9 +44,9 @@ const OnlineUsersWidget: React.FC = () => {
                 <UserCounter color="orange" count={active} icon={<TrendingUp className="h-5 w-5" />} label="Active Now" trend="+5%" />
             </div>
 
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-content1">
                 <CardHeader className="pb-4">
-                    <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                    <CardTitle className="text-xl font-semibold text-default-900 flex items-center gap-2">
                         <ActivityIndicator />
                         Live User Activity
                     </CardTitle>
@@ -56,18 +56,20 @@ const OnlineUsersWidget: React.FC = () => {
                         {sessions.map((user: Session, idx: number) => (
                             <div
                                 key={idx}
-                                className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors duration-200"
+                                className="flex items-center justify-between p-3 rounded-lg border border-content3 hover:bg-content2 transition-colors duration-200"
                             >
                                 <div className="flex items-center gap-3">
                                     <UserAvatar user={user} />
                                     <div>
-                                        <div className="font-medium text-gray-900">{user.email !== "Unknown" ? user.email : "Anonymous Visitor"}</div>
-                                        <div className="text-sm text-gray-500">Viewing: {user.path}</div>
+                                        <div className="font-medium text-default-900">
+                                            {user.email !== "Unknown" ? user.email : "Anonymous Visitor"}
+                                        </div>
+                                        <div className="text-sm text-default-600">Viewing: {user.path}</div>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="text-xs text-gray-400">{user.location}</div>
-                                    <div className="text-xs text-gray-400">{user.last_seen}s ago</div>
+                                    <div className="text-xs text-default-500">{user.location}</div>
+                                    <div className="text-xs text-default-500">{user.last_seen}s ago</div>
                                 </div>
                             </div>
                         ))}

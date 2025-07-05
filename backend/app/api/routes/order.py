@@ -1,42 +1,54 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks
-
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request
+import uuid
+from datetime import datetime
 from app.core.deps import (
     CurrentUser,
     Notification,
-    get_current_superuser
+    get_current_superuser,
+    RedisClient,
+    supabase
 )
 from app.core.logging import logger
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
-from prisma.enums import OrderStatus
-from app.services.order import OrderService
-from prisma.enums import PaymentStatus
+from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders, InvoiceDownloadResponse
+from prisma.enums import OrderStatus, PaymentStatus
+from app.services.order import create_order, send_notification, get_order, list_orders
+from app.services.redis import cache_response
+from app.services.invoice import invoice_service
+from pydantic import BaseModel
 
 router = APIRouter()
 
-def get_order_service(notification: Notification) -> OrderService:
-    return OrderService(notification)
-
 @router.post("/", response_model=OrderResponse)
 async def create_order(
+    cache: RedisClient,
     background_tasks: BackgroundTasks,
     order_in: OrderCreate,
     user: CurrentUser,
+    notification: Notification,
     cartId: str = Header(default=None),
-    order_service: OrderService = Depends(get_order_service)
 ):
-    return await order_service.create_order(order_in, user.id, cartId, background_tasks)
+    try:
+        order = await create_order(order_in, user.id, cartId)
+        background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
+        await cache.invalidate_list_cache("orders")
+        return order
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{order_id}", response_model=OrderResponse)
+@cache_response(key_prefix="order", key=lambda request, order_id: order_id, expire=864000)
 async def get_order(
+    request: Request,
     order_id: str,
-    order_service: OrderService = Depends(get_order_service)
 ):
-    return await order_service.get_order(order_id)
+    return await get_order(order_id)
 
 @router.get("/")
+@cache_response(key_prefix="orders", expire=864000)
 async def get_orders(
+    request: Request,
     user: CurrentUser,
     skip: int = Query(0, ge=0),
     take: int = Query(20, ge=1, le=100),
@@ -46,9 +58,8 @@ async def get_orders(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
-    order_service: OrderService = Depends(get_order_service)
 ) -> Orders:
-    return await order_service.list_orders(
+    return await list_orders(
         user_id=user.id,
         skip=skip,
         take=take,
@@ -62,7 +73,7 @@ async def get_orders(
     )
 
 @router.put("/orders/{order_id}", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
-async def update_order(order_id: int, order_update: OrderUpdate):
+async def update_order(cache: RedisClient, order_id: int, order_update: OrderUpdate):
     """
     Update a order.
     """
@@ -83,35 +94,25 @@ async def update_order(order_id: int, order_update: OrderUpdate):
     updated_order = await db.order.update(
         where={"id": order_id},
         data=update_data,
-        include={"order_items": True}
     )
+    await cache.invalidate_list_cache("orders")
+    await cache.bust_tag(f"order:{order_id}")
     return updated_order
 
 @router.delete("/{order_id}")
-async def delete_order(order_id: int):
+async def delete_order(cache: RedisClient, order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
     await db.order.delete(where={"id": order_id})
+    await cache.invalidate_list_cache("orders")
+    await cache.bust_tag(f"order:{order_id}")
     return {"message": "Order deleted successfully"}
-
-@router.post("/export")
-async def export_orders(current_user: CurrentUser):
-    try:
-        orders = await db.order.find_many()
-        file_url = await export(
-            data=orders, name="Order", email=current_user.email
-        )
-
-        return {"message": "Data Export successful", "file_url": file_url}
-    except Exception as e:
-        logger.error(f"Export orders error: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.patch("/{id}/status", response_model=OrderResponse)
-async def order_status(id: int, status: OrderStatus):
+async def order_status(cache: RedisClient, id: int, status: OrderStatus):
     """Change order status"""
     order = await db.order.find_unique(where={"id": id})
     if not order:
@@ -122,10 +123,13 @@ async def order_status(id: int, status: OrderStatus):
     if status == OrderStatus.PAID:
         data["payment_status"] = PaymentStatus.SUCCESS
 
-    return await db.order.update(where={"id": id}, data=data)
+    updated_order = await db.order.update(where={"id": id}, data=data)
+    await cache.invalidate_list_cache("orders")
+    await cache.bust_tag(f"order:{id}")
+    return updated_order
 
 @router.post("/{order_id}/fulfill", response_model=OrderResponse)
-async def fulfill_order(order_id: int):
+async def fulfill_order(cache: RedisClient, order_id: int):
     """Mark an order as fulfilled"""
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
@@ -136,7 +140,68 @@ async def fulfill_order(order_id: int):
 
     updated_order = await db.order.update(
         where={"id": order_id},
-        data={"status": OrderStatus.FULFILLED},
-        # include={"order_items": True}
+        data={"status": OrderStatus.FULFILLED}
     )
+    await cache.invalidate_list_cache("orders")
+    await cache.bust_tag(f"order:{order_id}")
+    return updated_order
+
+@router.get("/{order_id}/invoice", response_model=InvoiceDownloadResponse)
+async def download_invoice(order_id: int, user: CurrentUser):
+    """Generate and upload invoice PDF to Supabase storage, returning the download URL"""
+    try:
+        order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
+        if not order or order.user_id != user.id:
+            raise HTTPException(status_code=404, detail="Order not found")
+        settings = await db.shopsettings.find_many()
+        settings_dict = {setting.key: setting.value for setting in settings}
+
+        pdf_bytes = invoice_service.generate_invoice_pdf(order=order, user=user, company_info=settings_dict)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
+        
+        try:
+            result = supabase.storage.from_("invoices").upload(filename, pdf_bytes, {
+                "contentType": "application/pdf"
+            })
+            
+            if not result:
+                raise HTTPException(status_code=500, detail="Failed to upload invoice to storage")
+        except Exception as e:
+            logger.error(f"Error uploading invoice to Supabase: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to upload invoice to storage. Please ensure the 'invoices' bucket exists in Supabase.")
+        
+        public_url = supabase.storage.from_("invoices").get_public_url(filename)
+        
+        await db.order.update(
+            where={"id": order_id},
+            data={"invoice_url": public_url}
+        )
+        
+        return {
+            "invoice_url": public_url,
+            "filename": filename,
+            "order_number": order.order_number
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in download_invoice: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred while generating the invoice")
+
+class OrderNotesUpdate(BaseModel):
+    order_notes: str
+
+@router.patch("/{order_id}/notes", response_model=OrderResponse)
+async def update_order_notes(cache: RedisClient, order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None):
+    order = await db.order.find_unique(where={"id": order_id})
+    if not order or order.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Order not found")
+    updated_order = await db.order.update(
+        where={"id": order_id},
+        data={"order_notes": notes_update.order_notes}
+    )
+    await cache.invalidate_list_cache("orders")
+    await cache.bust_tag(f"order:{order_id}")
     return updated_order

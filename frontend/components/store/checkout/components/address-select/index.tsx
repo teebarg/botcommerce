@@ -9,15 +9,14 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import ShippingAddressForm from "../../address-form";
 import { AddressCard } from "../address-item";
 
-import { Address, User } from "@/schemas";
+import { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useUserAddresses } from "@/lib/hooks/useCart";
 import Overlay from "@/components/overlay";
-import { Skeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
 
 type AddressSelectProps = {
     address: Address | null;
-    user: User | null;
 };
 
 const EmptyState = () => {
@@ -34,7 +33,7 @@ const EmptyState = () => {
     );
 };
 
-const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
+const AddressSelect: React.FC<AddressSelectProps> = ({ address }) => {
     const { data, isLoading } = useUserAddresses();
     const addresses = data?.addresses ?? [];
 
@@ -49,7 +48,7 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address, user }) => {
     const selectedAddress = useMemo(() => addresses.find((a) => a.id === address?.id), [addresses, address]);
 
     if (isLoading) {
-        return <Skeleton className="h-24" />;
+        return <ComponentLoader className="h-24" />;
     }
 
     return (

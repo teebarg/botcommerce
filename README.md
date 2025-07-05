@@ -57,6 +57,14 @@ Shop is an e-commerce platform that leverages modern web technologies to provide
    - Create a `.env` file in both the frontend and backend directories
    - Add necessary environment variables (e.g., API keys, database URLs)
 
+5. Set up Supabase Storage Buckets
+   - Create the following buckets in your Supabase project:
+     - `images` - for general images
+     - `product-images` - for product images
+     - `exports` - for exported files
+     - `invoices` - for invoice PDFs
+   - Ensure all buckets have public access enabled for file downloads
+
 ### Running the Application
 
 1. Start the backend server

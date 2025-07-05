@@ -56,7 +56,7 @@ export default async function Home() {
                     <div className="col-span-3">
                         <h2 className="text-lg text-default-700 mb-2 font-semibold">Featured products</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                            {data?.featured?.map((product: ProductSearch, index: number) => <ProductCard key={index} product={product} />)}
+                            {data?.featured?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                         </div>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ export default async function Home() {
                     </div>
 
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {data?.trending?.map((product: ProductSearch, index: number) => <ProductCard key={index} product={product} />)}
+                        {data?.trending?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                     </div>
                 </div>
             </section>
@@ -89,7 +89,7 @@ export default async function Home() {
                 title="Big Sale on Top Brands!"
             />
 
-            <section className="py- bg-content1">
+            <section className="bg-content1">
                 <div className="max-w-8xl mx-auto px-1 md:px-0">
                     <p className="text-3xl font-bold">New Arrivals</p>
                     <p className="text-default-600">Find the best thrifts for your kids</p>

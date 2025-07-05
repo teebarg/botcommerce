@@ -28,7 +28,7 @@ const ActivityTray: React.FC = () => {
                     <Bell size={22} />
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[450px] p-0" sideOffset={5}>
+            <DropdownMenuContent align="end" className="md:w-[450px] w-full p-0" sideOffset={5}>
                 <div className="max-h-[calc(100vh-100px)] overflow-y-auto overflow-x-hidden">
                     {isLoading ? <div className="h-full p-4">Loading...</div> : <ActivityView activities={activities} />}
                 </div>

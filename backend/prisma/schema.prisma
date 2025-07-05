@@ -292,6 +292,8 @@ model Order {
   coupon_id       Int?
   cart            Cart?           @relation(fields: [cart_id], references: [id], onDelete: NoAction) // Optional link to originating cart
   cart_id         Int?            @unique // Added relation to Cart
+  order_notes     String?         @db.Text
+  invoice_url     String?         @db.Text
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt
 

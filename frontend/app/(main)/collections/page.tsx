@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
+import { api } from "@/apis/client";
+import { PaginatedProductSearch } from "@/schemas";
 
 type SearchParams = Promise<{
     sortBy?: SortOptions;
@@ -35,10 +37,12 @@ export default async function Collections({ searchParams }: Props) {
         brand_id: brand_id,
     };
 
+    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } });
+
     return (
         <div className="container mx-auto py-4 px-1">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient initialSearchParams={queryParams} />
+                <InfiniteScrollClient initialData={initialData.products} initialSearchParams={queryParams} />
             </Suspense>
         </div>
     );

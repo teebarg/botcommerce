@@ -39,7 +39,6 @@ async def websocket(ws: WebSocket):
 
     Args:
         ws (WebSocket): The WebSocket connection.
-        cache (CacheService): Cache service dependency.
 
     Returns:
         None

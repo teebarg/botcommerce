@@ -2,15 +2,16 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
-    Query
+    Query,
+    Request
 )
 
 
 from app.core.deps import (
-    CurrentUser,
     get_current_user,
+    RedisClient
+    
 )
-from app.core.logging import logger
 from app.models.collection import (
     CollectionCreate,
     Collection,
@@ -19,18 +20,18 @@ from app.models.collection import (
     Search,
 )
 from app.models.generic import Message
-from app.services.export import export
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
 from typing import Optional
 from math import ceil
+from app.services.redis import cache_response
 
-# Create a router for collections
 router = APIRouter()
 
 @router.get("/all")
-async def all_collections(query: str = "") -> Optional[list[Collection]]:
+@cache_response(key_prefix="collections", expire=864000)
+async def all_collections(request: Request, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
     """
@@ -46,7 +47,9 @@ async def all_collections(query: str = "") -> Optional[list[Collection]]:
 
 
 @router.get("/")
+@cache_response(key_prefix="collections", expire=864000)
 async def index(
+    request: Request,
     query: str = "",
     page: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
@@ -79,7 +82,7 @@ async def index(
 
 
 @router.post("/")
-async def create(*, create_data: CollectionCreate) -> Collection:
+async def create(*, create_data: CollectionCreate, cache: RedisClient) -> Collection:
     """
     Create new collection.
     """
@@ -90,13 +93,15 @@ async def create(*, create_data: CollectionCreate) -> Collection:
                 "slug": slugify(create_data.name)
             }
         )
+        await cache.invalidate_list_cache("collections")
         return collection
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{id}")
-async def read(id: int) -> Collection:
+@cache_response(key_prefix="collection", key=lambda request, id: id, expire=864000)
+async def read(request: Request, id: int) -> Collection:
     """
     Get a specific collection by id with Redis caching.
     """
@@ -110,7 +115,8 @@ async def read(id: int) -> Collection:
 
 
 @router.get("/slug/{slug}")
-async def get_by_slug(slug: str) -> Collection:
+@cache_response(key_prefix="collection", key=lambda request, slug: slug, expire=864000)
+async def get_by_slug(request: Request, slug: str) -> Collection:
     """
     Get a collection by its slug.
     """
@@ -128,6 +134,7 @@ async def update(
     *,
     id: int,
     update_data: CollectionUpdate,
+    cache: RedisClient,
 ) -> Collection:
     """
     Update a collection and invalidate cache.
@@ -143,13 +150,16 @@ async def update(
             where={"id": id},
             data=update_data.model_dump()
         )
+        await cache.invalidate_list_cache("collections")
+        await cache.bust_tag(f"collection:{id}")
+        await cache.bust_tag(f"collection:{update.slug}")
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}")
-async def delete(id: int) -> Message:
+async def delete(id: int, cache: RedisClient) -> Message:
     """
     Delete a collection.
     """
@@ -163,29 +173,15 @@ async def delete(id: int) -> Message:
         await db.collection.delete(
             where={"id": id}
         )
+        await cache.invalidate_list_cache("collections")
+        await cache.bust_tag(f"collection:{id}")
+        await cache.bust_tag(f"collection:{existing.slug}")
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-
-@router.post("/export")
-async def export_collections(current_user: CurrentUser):
-    try:
-        collections = await db.collection.find_many()
-
-        file_url = await export(
-            columns=["name", "slug"],
-            data=collections,
-            name="Collection",
-            email=current_user.email,
-        )
-
-        return {"message": "Data Export successful", "file_url": file_url}
-    except Exception as e:
-        logger.error(f"Collections exports failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) from e
-
 @router.get("/autocomplete/")
+@cache_response(key_prefix="collections", expire=864000)
 async def autocomplete(search: str = "") -> Search:
     """
     Retrieve collections for autocomplete.

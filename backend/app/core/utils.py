@@ -53,7 +53,6 @@ def url_to_list(url: str) -> list[str]:
 def slugify(text) -> str:
     """
     Convert a string into a URL-friendly slug.
-    Removes special characters, converts to lowercase, and replaces spaces with hyphens.
 
     Args:
         text (str): The input string to convert
@@ -61,20 +60,10 @@ def slugify(text) -> str:
     Returns:
         str: The slugified string
     """
-    # Convert to lowercase
-    text = text.lower()
-
-    # Replace spaces with hyphens
-    text = text.replace(' ', '-')
-
-    # Remove special characters, keeping only alphanumeric and hyphens
+    text = text.lower().replace(' ', '-')
     slug = ''.join(char for char in text if char.isalnum() or char == '-')
-
-    # Remove multiple consecutive hyphens
     while '--' in slug:
         slug = slug.replace('--', '-')
-
-    # Remove leading/trailing hyphens
     slug = slug.strip('-')
 
     return slug
@@ -153,14 +142,17 @@ def generate_test_email(email_to: str) -> EmailData:
 
 
 async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
-    # Determine the template based on payment status
     template_name = "paid_invoice.html"
+    description = "Your order has been processed"
     if order.payment_method == "CASH_ON_DELIVERY":
         template_name = "pickup_invoice.html"
+        description = "Your order has been processed"
     elif order.payment_status == "PENDING":
         template_name = "pending_invoice.html"
+        description = "Your order is pending payment"
     elif order.payment_status == "FAILED":
         template_name = "failed_invoice.html"
+        description = "Your order payment failed"
 
     html_content = render_email_template(
         template_name=template_name,
@@ -168,7 +160,7 @@ async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
             "order": order,
             "user": user,
             "current_year": datetime.now().year,
-            **(await merge_metadata({"description": "Your order has been processed"}))
+            **(await merge_metadata({"description": description}))
         },
     )
     return EmailData(html_content=html_content, subject="Order Confirmation")
@@ -232,11 +224,8 @@ async def generate_newsletter_email(email: str) -> EmailData:
 
 
 def generate_slug(name: str) -> str:
-    # Convert to lowercase
-    name = name.lower()
-
     # Remove accents
-    name = unicodedata.normalize("NFKD", name).encode("ASCII", "ignore").decode("ASCII")
+    name = unicodedata.normalize("NFKD", name.lower()).encode("ASCII", "ignore").decode("ASCII")
 
     # Replace spaces with hyphens
     name = re.sub(r"\s+", "-", name)
@@ -246,15 +235,13 @@ def generate_slug(name: str) -> str:
 
     # Remove multiple hyphens
     name = re.sub(r"-+", "-", name)
-
-    # Remove leading and trailing hyphens
     name = name.strip("-")
 
     return name
 
 def generate_sku(product_name: str, rand_digits: int = 3) -> str:
     def sanitize(text, length=3):
-        text = re.sub(r'\W+', '', text)  # Remove non-alphanumeric
+        text = re.sub(r'\W+', '', text)
         return text[:length].upper()
 
     name_part = sanitize(product_name)

@@ -5,15 +5,18 @@ import React from "react";
 import { currency } from "@lib/utils";
 import { Tooltip } from "@components/ui/tooltip";
 
-import { Cart } from "@/schemas";
 import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/providers/cart-provider";
+import ComponentLoader from "@/components/component-loader";
 
-type CartTotalsProps = {
-    data: Omit<Cart, "refundable_amount">;
-};
+const CartTotals: React.FC = () => {
+    const { cart, isLoading } = useCart();
 
-const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
-    const { discount_total, tax, total, subtotal } = data;
+    if (isLoading) return <ComponentLoader className="h-[100px]" />;
+
+    if (!cart) return null;
+
+    const { discount_total, tax, total, subtotal } = cart;
 
     return (
         <>
@@ -39,8 +42,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ data }) => {
                     <div className="flex justify-between">
                         <dt className="text-sm text-default-500">Delivery</dt>
                         <dd className="text-sm font-semibold text-default-900">
-                            <span data-testid="cart-shipping" data-value={data.shipping_fee || 0}>
-                                {currency(data.shipping_fee)}
+                            <span data-testid="cart-shipping" data-value={cart.shipping_fee || 0}>
+                                {currency(cart.shipping_fee)}
                             </span>
                         </dd>
                     </div>

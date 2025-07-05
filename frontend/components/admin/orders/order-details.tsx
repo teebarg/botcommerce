@@ -252,11 +252,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             </div>
                             <div className="p-6 space-y-4">
                                 <OrderProcessingAction order={order} />
-
-                                <Button className="w-full" size="lg" variant="outline">
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    View Invoice
-                                </Button>
+                                {order.invoice_url && (
+                                    <a href={order.invoice_url} download>
+                                        Download Invoice
+                                    </a>
+                                )}
                             </div>
                         </div>
 

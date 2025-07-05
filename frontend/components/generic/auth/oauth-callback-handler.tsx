@@ -62,7 +62,7 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
         handleCallback();
     }, [code, error, provider, router, searchParams]);
 
-    return <PageLoader type="authentication" />;
+    return <PageLoader />;
 };
 
 export default OAuthCallbackHandler;

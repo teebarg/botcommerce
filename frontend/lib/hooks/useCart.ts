@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
 import { getCookie } from "@/lib/util/server-utils";
-import { Address, Cart, CartItem, CartComplete, CartUpdate, Order, Message } from "@/schemas";
+import { Address, Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
 import { api } from "@/apis/client";
 
 export const useCart = () => {
@@ -12,24 +12,6 @@ export const useCart = () => {
         queryKey: ["cart"],
         queryFn: async () => {
             return await api.get<Cart>("/cart/");
-        },
-    });
-};
-
-export const useCheckoutCart = () => {
-    return useQuery({
-        queryKey: ["checkout-cart"],
-        queryFn: async () => {
-            return await api.get<Cart>("/cart/checkout");
-        },
-    });
-};
-
-export const useCartItem = () => {
-    return useQuery({
-        queryKey: ["cart-items"],
-        queryFn: async () => {
-            return await api.get<CartItem[]>("/cart/items");
         },
     });
 };
@@ -66,10 +48,8 @@ export const useAddToCart = () => {
 
             return res;
         },
-        onSuccess: (data) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            queryClient.invalidateQueries({ queryKey: ["cart-items"] });
-
             toast.success("Added to cart");
         },
         onError: (error: any) => {
@@ -86,7 +66,7 @@ export const useChangeCartQuantity = () => {
             return await api.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart-items"] });
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Cart updated");
         },
         onError: (error: any) => {
@@ -120,7 +100,7 @@ export const useUpdateCartDetails = () => {
             return await api.put<Cart>("/cart/", update);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["checkout-cart"] });
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Cart details updated");
         },
         onError: (error: any) => {
@@ -138,7 +118,6 @@ export const useDeleteCartItem = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            queryClient.invalidateQueries({ queryKey: ["cart-items"] });
             toast.success("Item removed from cart");
         },
         onError: (error: any) => {

@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
 import { useAuth } from "@/providers/auth-provider";
+import { Separator } from "@/components/ui/separator";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -122,30 +123,29 @@ const ProfilePage: React.FC = () => {
             <div className="border-border border-b transition-colors duration-300">
                 <div className="max-w-5xl mx-auto py-4 flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-default-500">Profile Settings</h1>
-                        <p className="text-sm text-default-500 mt-1">Manage your account information and preferences</p>
+                        <h1 className="text-2xl font-bold text-default-800">Profile Settings</h1>
+                        <p className="text-sm text-default-600 mt-1">Manage your account information and preferences</p>
                     </div>
                 </div>
             </div>
 
             <div className="max-w-5xl mx-auto py-8">
                 <div className="bg-card rounded-xl shadow-sm border border-border mb-6 transition-colors duration-300">
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <div className="md:flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                                <User className="w-5 h-5" />
-                                <div>
-                                    <h3 className={`text-lg font-semibold text-default-900`}>Profile Information</h3>
-                                    <p className={`text-sm text-default-500`}>Update your personal details</p>
-                                </div>
+                    <div className="md:flex items-center justify-between p-6">
+                        <div className="flex items-center space-x-3">
+                            <User className="w-5 h-5" />
+                            <div>
+                                <h3 className={`text-lg font-semibold text-default-900`}>Profile Information</h3>
+                                <p className={`text-sm text-default-500`}>Update your personal details</p>
                             </div>
-                            {editingSection !== "profile" && (
-                                <Button className="mt-2 md:mt-0" variant="primary" onClick={() => handleEdit("profile")}>
-                                    Edit
-                                </Button>
-                            )}
                         </div>
+                        {editingSection !== "profile" && (
+                            <Button className="mt-2 md:mt-0" variant="primary" onClick={() => handleEdit("profile")}>
+                                Edit
+                            </Button>
+                        )}
                     </div>
+                    <Separator />
 
                     <div className="p-6">
                         <Form {...profileForm}>
@@ -161,7 +161,7 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter first name" {...field} />
                                                     ) : (
-                                                        <div className={`px-4 py-3 rounded-lg text-default-500 bg-content1`}>{field.value}</div>
+                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{field.value}</div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />
@@ -179,7 +179,7 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter last name" {...field} />
                                                     ) : (
-                                                        <div className={`px-4 py-3 rounded-lg bg-content1 text-default-500`}>{field.value}</div>
+                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{field.value}</div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />
@@ -190,7 +190,7 @@ const ProfilePage: React.FC = () => {
 
                                 <div>
                                     <label className="block text-sm font-medium text-default-500 mb-2">Email Address</label>
-                                    <div className="px-4 py-3 rounded-lg bg-content1 text-default-500">{user?.email}</div>
+                                    <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{user?.email}</div>
                                 </div>
 
                                 {editingSection === "profile" && (

@@ -1,5 +1,6 @@
-import { Separator } from "@/components/ui/separator";
 import { AlertCircle, CheckCircle } from "lucide-react";
+
+import { Separator } from "@/components/ui/separator";
 
 const ReturnsPage = () => (
     <div>

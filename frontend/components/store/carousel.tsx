@@ -3,22 +3,22 @@
 import React from "react";
 
 import { CarouselBanner } from "@/schemas/carousel";
-import { Skeleton } from "@/components/ui/skeletons";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { BtnLink } from "@/components/ui/btnLink";
 import ClientOnly from "@/components/generic/client-only";
 import { useCarouselBanners } from "@/lib/hooks/useCarousel";
+import ComponentLoader from "@/components/component-loader";
 
 const CarouselSection: React.FC = () => {
     const { data, isLoading, error } = useCarouselBanners();
 
     if (isLoading) {
-        return <Skeleton className="h-[60vh] w-full" />;
+        return <ComponentLoader className="h-[60vh]" />;
     }
 
     const banners = data;
 
-    if (!banners || error) {
+    if (error) {
         return;
     }
 

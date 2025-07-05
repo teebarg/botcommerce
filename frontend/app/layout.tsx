@@ -16,6 +16,7 @@ import { WebSocketProvider } from "@/providers/websocket";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/auth-provider";
 import { tryCatch } from "@/lib/try-catch";
+import { CartProvider } from "@/providers/cart-provider";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -77,7 +78,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <Toaster closeButton richColors duration={4000} expand={false} position="top-right" />
                         <TanstackProviders>
                             <AuthProvider>
-                                <WebSocketProvider>{children}</WebSocketProvider>
+                                <CartProvider>
+                                    <WebSocketProvider>{children}</WebSocketProvider>
+                                </CartProvider>
                             </AuthProvider>
                             <ReactQueryDevtools initialIsOpen={false} />
                         </TanstackProviders>

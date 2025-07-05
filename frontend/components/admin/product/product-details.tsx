@@ -15,10 +15,10 @@ import { Brand, Collection, Product } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/lib/hooks/useProduct";
-import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useBrands } from "@/lib/hooks/useBrand";
+import ComponentLoader from "@/components/component-loader";
 
 const LIMIT = 10;
 
@@ -40,12 +40,7 @@ export function ProductDetails() {
         setSelectedCollections(collectionIdsFromURL.map(Number));
     }, [searchParams]);
 
-    if (isLoading)
-        return (
-            <div>
-                <Skeleton className="h-[400px]" />
-            </div>
-        );
+    if (isLoading) return <ComponentLoader className="h-[300px]" />;
 
     if (!data) return <ServerError />;
 
