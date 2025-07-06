@@ -14,7 +14,7 @@ from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from prisma.errors import PrismaError
 from pydantic import BaseModel
 from prisma.models import Cart
-from app.services.order import create_order, send_notification
+from app.services.order import create_order_from_cart, send_notification
 
 router = APIRouter()
 
@@ -97,7 +97,7 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await create_order(order_in=order_in, user_id=user.id, cart_number=cart_number)
+            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
             background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
 
             await db.payment.create(

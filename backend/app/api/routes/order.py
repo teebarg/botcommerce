@@ -1,19 +1,16 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request
-import uuid
-from datetime import datetime
 from app.core.deps import (
     CurrentUser,
     Notification,
     get_current_superuser,
     RedisClient,
-    supabase
 )
 from app.core.logging import logger
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders, InvoiceDownloadResponse
+from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus, PaymentStatus
-from app.services.order import create_order, send_notification, get_order, list_orders
+from app.services.order import create_order_from_cart, send_notification, retrieve_order, list_orders
 from app.services.redis import cache_response
 from pydantic import BaseModel
 from app.services.order import create_invoice
@@ -30,7 +27,7 @@ async def create_order(
     cartId: str = Header(default=None),
 ):
     try:
-        order = await create_order(order_in, user.id, cartId)
+        order = await create_order_from_cart(order_in, user.id, cartId)
         background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
         await cache.invalidate_list_cache("orders")
         return order
@@ -38,12 +35,12 @@ async def create_order(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{order_id}", response_model=OrderResponse)
-@cache_response(key_prefix="order", key=lambda request, order_id: order_id, expire=864000)
+@cache_response(key_prefix="order", expire=86400, key=lambda request, order_id: order_id)
 async def get_order(
     request: Request,
     order_id: str,
 ):
-    return await get_order(order_id)
+    return await retrieve_order(order_id)
 
 @router.get("/")
 @cache_response(key_prefix="orders", expire=864000)
@@ -155,7 +152,7 @@ async def download_invoice(order_id: int, user: CurrentUser, cache: RedisClient)
     return {"invoice_url": public_url}
 
 class OrderNotesUpdate(BaseModel):
-    order_notes: str
+    notes: str
 
 @router.patch("/{order_id}/notes", response_model=OrderResponse)
 async def update_order_notes(cache: RedisClient, order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None):
@@ -164,8 +161,8 @@ async def update_order_notes(cache: RedisClient, order_id: int, notes_update: Or
         raise HTTPException(status_code=404, detail="Order not found")
     updated_order = await db.order.update(
         where={"id": order_id},
-        data={"order_notes": notes_update.order_notes}
+        data={"order_notes": notes_update.notes}
     )
     await cache.invalidate_list_cache("orders")
-    await cache.bust_tag(f"order:{order_id}")
+    await cache.bust_tag(f"order:{order.order_number}")
     return updated_order

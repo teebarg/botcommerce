@@ -78,9 +78,3 @@ class Orders(BaseModel):
     limit: int
     total_count: int
     total_pages: int
-
-
-class InvoiceDownloadResponse(BaseModel):
-    invoice_url: str
-    filename: str
-    order_number: str

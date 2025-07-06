@@ -13,7 +13,7 @@ from app.core.deps import (
 )
 
 
-async def create_order(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
+async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
     """
     Create a new order from a cart
     """
@@ -58,7 +58,7 @@ async def create_order(order_in: OrderCreate, user_id: int, cart_number: str) ->
 
     return new_order
 
-async def get_order(order_id: str) -> OrderResponse:
+async def retrieve_order(order_id: str) -> OrderResponse:
     """
     Get a specific order by order_number
     """
@@ -152,7 +152,6 @@ async def send_notification(id: int, user_id: int, notification):
             }
         )
 
-        # Send invoice email
         try:
             email_data = await generate_invoice_email(order=order, user=user)
             notification.send_notification(
@@ -166,7 +165,6 @@ async def send_notification(id: int, user_id: int, notification):
             logger.error(f"Failed to generate invoice email: {e}")
             return
 
-        # Send to slack
         slack_message = {
             "text": f"🛍️ *New Order Created* 🛍️\n"
                     f"*Order ID:* {order.order_number}\n"
@@ -207,10 +205,10 @@ async def create_invoice(order_id: int, user) -> str:
             if not result:
                 raise HTTPException(status_code=500, detail="Failed to upload invoice to storage")
         except Exception as e:
-            logger.error(f"Error uploading invoice to Supabase: {str(e)}")
-            raise HTTPException(status_code=500, detail="Failed to upload invoice to storage. Please ensure the 'invoices' bucket exists in Supabase.")
+            logger.error(e)
+            raise HTTPException(status_code=500, detail="Failed to upload invoice to storage.")
 
-        public_url = supabase.storage.from_("invoices").get_public_url(filename)
+        public_url = supabase.storage.from_("invoices").get_public_url(filename, {"download": filename})
 
         await db.order.update(
             where={"id": order_id},
@@ -218,12 +216,6 @@ async def create_invoice(order_id: int, user) -> str:
         )
 
         return public_url
-
-        # return {
-        #     "invoice_url": public_url,
-        #     "filename": filename,
-        #     "order_number": order.order_number
-        # }
     except HTTPException:
         raise
     except Exception as e:

@@ -182,7 +182,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({ type, title, subtitle, steps })
     }, [config.duration, config.steps.length]);
 
     return (
-        <div suppressHydrationWarning className="fixed inset-0 bg-zinc-950 z-50">
+        <div className="fixed inset-0 bg-zinc-950 z-50">
             <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 max-w-xl mx-auto">
                 <FadeInComponent delay="10ms">
                     <div className="mb-8 text-center">

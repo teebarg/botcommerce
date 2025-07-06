@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, Package, Calendar, MapPin, Truck } from "lucide-react";
+import { ArrowLeft, Package, Calendar, MapPin, Truck, Download } from "lucide-react";
 import Image from "next/image";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -191,23 +191,15 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                             Contact Support
                         </Button>
                         {order.invoice_url && (
-                            <a href={order.invoice_url} download>
+                            <a
+                                download
+                                className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2 px-4 rounded-lg w-full"
+                                href={order.invoice_url}
+                            >
+                                <Download className="w-4 h-4 mr-2 group-hover/link:translate-y-[-1px] transition-transform" />
                                 Download Invoice
                             </a>
                         )}
-                        <Button
-                            className="w-full"
-                            variant="outline"
-                            onClick={() => {
-                                if (order.invoice_url) {
-                                    window.open(order.invoice_url, "_blank");
-                                } else {
-                                    alert("Invoice not available yet. Please try again later.");
-                                }
-                            }}
-                        >
-                            Download Invoice (PDF)
-                        </Button>
                     </div>
                 </div>
             </div>

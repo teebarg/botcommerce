@@ -1,6 +1,5 @@
 import { Calendar, Eye, Package } from "lucide-react";
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
@@ -26,7 +25,6 @@ const statusConfig: Record<Order["status"], { label: string; color: string }> = 
 
 const OrderCard = ({ order }: { order: Order }) => {
     const state = useOverlayTriggerState({});
-    const router = useRouter();
     const numberOfProducts = useMemo(() => {
         return order.order_items.length;
     }, [order]);
