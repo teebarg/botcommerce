@@ -5,6 +5,13 @@ from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderCreate
 from app.core.utils import generate_invoice_email
 from app.core.logging import logger
+from app.services.invoice import invoice_service
+
+from datetime import datetime
+from app.core.deps import (
+    supabase
+)
+
 
 async def create_order(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
     """
@@ -176,3 +183,49 @@ async def send_notification(id: int, user_id: int, notification):
         logger.info(f"Slack notification sent to user: {user_id}")
     except Exception as e:
         logger.error(f"Failed to send notification: {e}")
+
+
+async def create_invoice(order_id: int, user) -> str:
+    """Generate and upload invoice PDF to Supabase storage, returning the download URL"""
+    try:
+        order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
+        if not order or order.user_id != user.id:
+            raise HTTPException(status_code=404, detail="Order not found")
+        settings = await db.shopsettings.find_many()
+        settings_dict = {setting.key: setting.value for setting in settings}
+
+        pdf_bytes = invoice_service.generate_invoice_pdf(order=order, user=user, company_info=settings_dict)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
+
+        try:
+            result = supabase.storage.from_("invoices").upload(filename, pdf_bytes, {
+                "contentType": "application/pdf"
+            })
+
+            if not result:
+                raise HTTPException(status_code=500, detail="Failed to upload invoice to storage")
+        except Exception as e:
+            logger.error(f"Error uploading invoice to Supabase: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to upload invoice to storage. Please ensure the 'invoices' bucket exists in Supabase.")
+
+        public_url = supabase.storage.from_("invoices").get_public_url(filename)
+
+        await db.order.update(
+            where={"id": order_id},
+            data={"invoice_url": public_url}
+        )
+
+        return public_url
+
+        # return {
+        #     "invoice_url": public_url,
+        #     "filename": filename,
+        #     "order_number": order.order_number
+        # }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in download_invoice: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred while generating the invoice")

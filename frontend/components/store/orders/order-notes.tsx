@@ -1,48 +1,25 @@
+"use client";
+
 import React, { useState } from "react";
+import { Save, Package, Clock, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Save, Package, Clock, CheckCircle, Star } from "lucide-react";
-import { toast } from "sonner";
+import { Order } from "@/schemas";
 
-interface OrderItem {
-    id: string;
-    name: string;
-    quantity: number;
-    price: number;
-    image?: string;
+interface OrderNotesProp {
+    order: Order;
 }
 
-interface Order {
-    id: string;
-    items: OrderItem[];
-    total: number;
-    status: "confirmed" | "processing" | "shipped" | "delivered";
-    orderDate: string;
-    estimatedDelivery: string;
-}
-
-const OrderNotes = () => {
+const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
     const [notes, setNotes] = useState("");
     const [savedNotes, setSavedNotes] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-
-    // Mock order data
-    const order: Order = {
-        id: "ORD-2024-001",
-        items: [
-            { id: "1", name: "Premium Wireless Headphones", quantity: 1, price: 299.99 },
-            { id: "2", name: "Bluetooth Speaker", quantity: 2, price: 89.99 },
-            { id: "3", name: "Phone Case", quantity: 1, price: 24.99 },
-        ],
-        total: 504.96,
-        status: "confirmed",
-        orderDate: "2024-01-15",
-        estimatedDelivery: "2024-01-20",
-    };
 
     const handleSaveNote = async () => {
         if (!notes.trim()) return;
@@ -82,23 +59,23 @@ const OrderNotes = () => {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="notes" className="text-sm font-medium">
+                                <Label className="text-sm font-medium" htmlFor="notes">
                                     Your Notes
                                 </Label>
                                 <Textarea
+                                    className="min-h-32 resize-none border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                     id="notes"
                                     placeholder="e.g., Please leave at the front door, fragile items, call before delivery..."
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
-                                    className="min-h-32 resize-none border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                                 />
                                 <p className="text-xs text-muted-foreground">{notes.length}/500 characters</p>
                             </div>
 
                             <Button
-                                onClick={handleSaveNote}
-                                disabled={!notes.trim() || isLoading}
                                 className="w-full gradient-blue hover:opacity-90 transition-opacity"
+                                disabled={!notes.trim() || isLoading}
+                                onClick={handleSaveNote}
                             >
                                 <Save className="w-4 h-4 mr-2" />
                                 {isLoading ? "Saving..." : "Save Note"}

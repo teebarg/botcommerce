@@ -6,6 +6,7 @@ import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
+import OrderNotes from "./order-notes";
 
 import { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
@@ -30,6 +31,10 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
 
                     <p className="text-default-600">{`Thank you for your purchase. We've sent a confirmation to ${order.email}.`}</p>
                 </div>
+            </FadeInComponent>
+
+            <FadeInComponent delay="100ms">
+                <OrderNotes order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="200ms">

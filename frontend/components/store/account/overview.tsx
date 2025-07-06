@@ -9,9 +9,9 @@ import PromotionalBanner from "@/components/promotion";
 import { Order, User } from "@/schemas";
 import { useAuth } from "@/providers/auth-provider";
 import { useOrders } from "@/lib/hooks/useOrder";
-import { Skeleton } from "@/components/ui/skeletons";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
+import ComponentLoader from "@/components/component-loader";
 
 const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
     let count = 0;
@@ -73,7 +73,7 @@ const OverviewTemplate: React.FC = () => {
     const { data, isPending } = useOrders({});
 
     if (loading || isPending) {
-        return <Skeleton className="h-192" />;
+        return <ComponentLoader className="h-192" />;
     }
 
     if (!user || !data?.orders) {
