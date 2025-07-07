@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Order } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { api } from "@/apis/client";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface OrderNotesProp {
     order: Order;
@@ -27,10 +27,12 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
 
         setIsLoading(true);
         const { error } = await tryCatch(api.patch(`/order/${order.id}/notes`, { notes }));
+
         setIsLoading(false);
 
         if (error) {
             toast.error(error);
+
             return;
         }
         queryClient.invalidateQueries({ queryKey: ["order", order.order_number] });
@@ -46,12 +48,13 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
         return null;
     }
 
-
     if (order.order_notes) {
-        return <div className="py-12 px-2 bg-content1">
-            <h2 className="text-lg font-semibold">Notes</h2>
-            <p className="text-sm text-muted-foreground">{order.order_notes}</p>
-        </div>;
+        return (
+            <div className="py-12 px-2 bg-content1">
+                <h2 className="text-lg font-semibold">Notes</h2>
+                <p className="text-sm text-muted-foreground">{order.order_notes}</p>
+            </div>
+        );
     }
 
     return (
@@ -75,7 +78,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
                     <p className="text-xs text-muted-foreground">{notes.length}/500 characters</p>
                 </div>
 
-                <Button className="w-full" disabled={!notes.trim() || isLoading} onClick={handleSaveNote} variant="primary">
+                <Button className="w-full" disabled={!notes.trim() || isLoading} variant="primary" onClick={handleSaveNote}>
                     <Save className="w-4 h-4 mr-2" />
                     {isLoading ? "Saving..." : "Save Note"}
                 </Button>

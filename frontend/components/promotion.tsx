@@ -29,7 +29,13 @@ const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass,
                         <p className="text-white/80 text-xs animate-fade-in-up delay-100">{subtitle}</p>
                     </div>
                 </div>
-                <BtnLink className={cn("bg-white text-blue-600 hover:bg-white hover:text-blue-600 py-2 rounded-full! flex items-center text-sm font-semibold", btnClass)} href={href}>
+                <BtnLink
+                    className={cn(
+                        "bg-white text-blue-600 hover:bg-white hover:text-blue-600 py-2 rounded-full! flex items-center text-sm font-semibold",
+                        btnClass
+                    )}
+                    href={href}
+                >
                     <span>Shop Now</span>
                 </BtnLink>
             </div>

@@ -5,7 +5,7 @@ from app.schemas.payment import (
     PaymentListResponse,
 )
 from app.models.order import OrderCreate, OrderResponse
-from app.core.deps import CurrentUser, Notification
+from app.core.deps import CurrentUser, Notification, RedisClient
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -14,7 +14,7 @@ from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from prisma.errors import PrismaError
 from pydantic import BaseModel
 from prisma.models import Cart
-from app.services.order import create_order_from_cart, send_notification
+from app.services.order import create_order_from_cart, send_notification, create_invoice
 
 router = APIRouter()
 
@@ -77,7 +77,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}", response_model=OrderResponse)
-async def verify_payment(background_tasks: BackgroundTasks, reference: str, user: CurrentUser, notification: Notification):
+async def verify_payment(background_tasks: BackgroundTasks, reference: str, user: CurrentUser, notification: Notification, cache: RedisClient):
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -99,6 +99,7 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
 
             order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
             background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
+            background_tasks.add_task(create_invoice, cache=cache, order_id=order.id)
 
             await db.payment.create(
                 data={

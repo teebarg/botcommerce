@@ -6,7 +6,6 @@ import {
     CreditCard,
     Truck,
     Calendar,
-    Eye,
     Clock,
     ArrowLeft,
     ShieldAlert,
@@ -15,6 +14,7 @@ import {
     PackageCheck,
     CircleX,
     CircleSlash,
+    Download,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -23,7 +23,6 @@ import OrderProcessingAction from "./order-processing-actions";
 import { Order, OrderItem, OrderStatus } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 interface OrderDetailsProps {
     order: Order;
@@ -253,7 +252,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             <div className="p-6 space-y-4">
                                 <OrderProcessingAction order={order} />
                                 {order.invoice_url && (
-                                    <a href={order.invoice_url} download>
+                                    <a
+                                        download
+                                        className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2 px-4 rounded-lg w-full"
+                                        href={order.invoice_url}
+                                    >
+                                        <Download className="w-4 h-4 mr-2 group-hover/link:translate-y-[-1px] transition-transform" />
                                         Download Invoice
                                     </a>
                                 )}

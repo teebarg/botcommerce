@@ -183,16 +183,17 @@ async def send_notification(id: int, user_id: int, notification):
         logger.error(f"Failed to send notification: {e}")
 
 
-async def create_invoice(order_id: int, user) -> str:
+async def create_invoice(cache, order_id: int) -> str:
     """Generate and upload invoice PDF to Supabase storage, returning the download URL"""
     try:
         order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
-        if not order or order.user_id != user.id:
+        if not order:
+            logger.error(f"Order not found for ID: {order_id}")
             raise HTTPException(status_code=404, detail="Order not found")
         settings = await db.shopsettings.find_many()
         settings_dict = {setting.key: setting.value for setting in settings}
 
-        pdf_bytes = invoice_service.generate_invoice_pdf(order=order, user=user, company_info=settings_dict)
+        pdf_bytes = invoice_service.generate_invoice_pdf(order=order, company_info=settings_dict)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
@@ -214,6 +215,9 @@ async def create_invoice(order_id: int, user) -> str:
             where={"id": order_id},
             data={"invoice_url": public_url}
         )
+
+        await cache.invalidate_list_cache("orders")
+        await cache.bust_tag(f"order:{order_id}")
 
         return public_url
     except HTTPException:
