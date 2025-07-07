@@ -7,9 +7,10 @@ from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
 from app.services.websocket import manager
 from app.services.activity import log_activity
+from app.services.redis import CacheService
 
 @with_prisma_connection
-async def reindex_product(product_id: int):
+async def reindex_product(cache: CacheService, product_id: int):
     try:
         product = await db.product.find_unique(
             where={"id": product_id},
@@ -31,10 +32,11 @@ async def reindex_product(product_id: int):
 
         product_data = prepare_product_data_for_indexing(product)
 
-        update_document(index_name=settings.MEILI_PRODUCTS_INDEX,
-                        document=product_data)
+        await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
 
         logger.info(f"Successfully reindexed product {product_id}")
+        await cache.invalidate_list_cache("products")
+        await cache.bust_tag(f"product:{product.slug}")
         await manager.broadcast_to_all(
             data={
                 "message": "Product re-indexed successfully",
@@ -47,7 +49,7 @@ async def reindex_product(product_id: int):
         logger.error(f"Error re-indexing product {product_id}: {e}")
 
 @with_prisma_connection
-async def index_products():
+async def index_products(cache: CacheService):
     """
     Re-index all products in the database to Meilisearch.
     """
@@ -73,6 +75,8 @@ async def index_products():
             index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
+        await cache.invalidate_list_cache("products")
+        await cache.invalidate_list_cache("product")
         await manager.broadcast_to_all(
             data={
                 "message": "Products re-indexed successfully",
@@ -85,14 +89,13 @@ async def index_products():
 
 
 @with_prisma_connection
-async def product_upload(user_id: str, contents: bytes, content_type: str, filename: str):
+async def product_upload(cache: CacheService, user_id: str, contents: bytes, content_type: str, filename: str):
     logger.info("Starting product upload processing...")
     try:
         num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user_id)
 
-        await index_products()
+        await index_products(cache=cache)
         logger.info("Re-indexing completed.")
-        logger.info("Broadcasting message to user...")
         await manager.send_to_user(
             user_id=user_id,
             data={

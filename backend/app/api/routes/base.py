@@ -2,12 +2,14 @@ from fastapi import (
     APIRouter,
     Depends,
     Query,
+    Request,
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role
 from app.core.deps import get_current_superuser
 from typing import Literal, Optional
 from datetime import timedelta, datetime
+from app.services.redis import cache_response
 
 router = APIRouter()
 
@@ -32,7 +34,9 @@ async def admin_dashboard_stats():
     }
 
 @router.get("/stats/trends", dependencies=[Depends(get_current_superuser)])
+@cache_response("stats-trends", expire=86400)
 async def stats_trends(
+    request: Request,
     range: Literal["day", "week", "month"] = Query("day"),
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,

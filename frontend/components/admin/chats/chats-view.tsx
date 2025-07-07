@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { SlidersHorizontal } from "lucide-react";
 
 import CustomerFilter from "./chats-filter";
 import ChatsActions from "./chats-actions";
@@ -15,6 +14,7 @@ import { Conversation, ConversationStatus } from "@/schemas";
 import { useConversations } from "@/lib/hooks/useApi";
 import PaginationUI from "@/components/pagination";
 import { formatDate } from "@/lib/utils";
+import ComponentLoader from "@/components/component-loader";
 
 const LIMIT = 10;
 
@@ -103,15 +103,19 @@ const ChatsView: React.FC = () => {
                 <div key="mobile" className="md:hidden">
                     <div className="pb-4">
                         <div>
-                            <div className="relative mb-2 py-4 flex justify-end">
+                            {/* <div className="relative mb-2 py-4 flex justify-end">
                                 <button className="flex items-center bg-content1 rounded-md p-4" onClick={() => setFilterOpen(true)}>
                                     <SlidersHorizontal className="text-default-500" size={18} />
                                 </button>
-                            </div>
+                            </div> */}
                             <div>
-                                {conversations?.map((conversation: Conversation, idx: number) => (
-                                    <ChatsCard key={idx} actions={<ChatsActions conversation={conversation} />} conversation={conversation} />
-                                ))}
+                                {isLoading ? (
+                                    <ComponentLoader className="h-[calc(100vh-200px)]" />
+                                ) : (
+                                    conversations?.map((conversation: Conversation, idx: number) => (
+                                        <ChatsCard key={idx} actions={<ChatsActions conversation={conversation} />} conversation={conversation} />
+                                    ))
+                                )}
                             </div>
 
                             {conversations?.length === 0 && (

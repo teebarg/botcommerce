@@ -8,8 +8,8 @@ import OrderPickup from "./order-pickup";
 import SuccessConfirmation from "./order-success";
 
 import { useOrder } from "@/lib/hooks/useOrder";
-import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
+import ComponentLoader from "@/components/component-loader";
 
 type OrderConfirmationProps = {
     orderNumber: string;
@@ -25,7 +25,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
     };
 
     if (isLoading) {
-        return <Skeleton className="h-192" />;
+        return <ComponentLoader className="h-192" />;
     }
 
     if (error) {

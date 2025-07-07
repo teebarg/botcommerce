@@ -78,7 +78,7 @@ const RecentOrdersList = () => {
                     View all
                 </Link>
             </div>
-            <div className="hidden md:block bg-background py-6 px-2 rounded-xl">
+            <div className="hidden md:block py-6 px-2 rounded-xl">
                 <Table>
                     <TableHeader>
                         <TableRow>

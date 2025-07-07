@@ -41,6 +41,8 @@ export const OrderSchema = z
         shipping_method: ShippingMethodSchema,
         payment_method: PaymentMethodSchema,
         payment_status: PaymentStatusSchema,
+        invoice_url: z.string().optional(),
+        order_notes: z.string().optional(),
     })
     .merge(AuditSchema);
 

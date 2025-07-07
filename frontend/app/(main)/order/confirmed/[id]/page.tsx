@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 
 import OrderConfirmation from "@/components/store/orders/order-confirmation";
+import ClientOnly from "@/components/generic/client-only";
 
 export const metadata: Metadata = {
     title: "Order Confirmation",
@@ -15,5 +16,9 @@ interface OrderConfirmationPageProps {
 export default async function OrderConfirmationPage({ params }: OrderConfirmationPageProps) {
     const { id } = await params;
 
-    return <OrderConfirmation orderNumber={id} />;
+    return (
+        <ClientOnly>
+            <OrderConfirmation orderNumber={id} />
+        </ClientOnly>
+    );
 }

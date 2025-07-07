@@ -1,11 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from app.core.config import settings
 from app.schemas.payment import (
     PaymentInitialize,
     PaymentListResponse,
 )
 from app.models.order import OrderCreate, OrderResponse
-from app.core.deps import CurrentUser, Notification
+from app.core.deps import CurrentUser, Notification, RedisClient
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -14,7 +14,7 @@ from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from prisma.errors import PrismaError
 from pydantic import BaseModel
 from prisma.models import Cart
-from app.services.order import OrderService
+from app.services.order import create_order_from_cart, send_notification, create_invoice
 
 router = APIRouter()
 
@@ -26,9 +26,6 @@ class PaymentCreate(BaseModel):
     amount: float
     reference: str
     transaction_id: str
-
-def get_order_service(notification: Notification) -> OrderService:
-    return OrderService(notification)
 
 async def initialize_payment(cart: Cart, user: User) -> PaymentInitialize:
     """Initialize a Paystack payment"""
@@ -80,7 +77,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}", response_model=OrderResponse)
-async def verify_payment(background_tasks: BackgroundTasks, reference: str, user: CurrentUser, order_service: OrderService = Depends(get_order_service)):
+async def verify_payment(background_tasks: BackgroundTasks, reference: str, user: CurrentUser, notification: Notification, cache: RedisClient):
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -100,9 +97,10 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await order_service.create_order(order_in=order_in, user_id=user.id, cart_number=cart_number, background_tasks=background_tasks)
+            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
+            background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
+            background_tasks.add_task(create_invoice, cache=cache, order_id=order.id)
 
-            # Create payment record
             await db.payment.create(
                 data={
                     "order": {"connect": {"id": order.id}},
@@ -133,7 +131,6 @@ async def create(*, create: PaymentCreate, user: CurrentUser):
             data={"status": OrderStatus.PAID}
         )
 
-        # Create payment record
         payment = await db.payment.create(
             data={
                 "order": {"connect": {"id": create.order_id}},

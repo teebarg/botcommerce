@@ -3,13 +3,15 @@
 import { notFound } from "next/navigation";
 import { currency } from "@lib/utils";
 import { ChevronDown } from "nui-react-icons";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import PromotionalBanner from "@/components/promotion";
-import LocalizedClientLink from "@/components/ui/link";
 import { Order, User } from "@/schemas";
 import { useAuth } from "@/providers/auth-provider";
 import { useOrders } from "@/lib/hooks/useOrder";
-import { Skeleton } from "@/components/ui/skeletons";
+import Overlay from "@/components/overlay";
+import OrderDetails from "@/components/store/orders/order-details";
+import ComponentLoader from "@/components/component-loader";
 
 const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
     let count = 0;
@@ -33,12 +35,45 @@ const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
     return (count / 3) * 100;
 };
 
+const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
+    const state = useOverlayTriggerState({});
+
+    return (
+        <li>
+            <Overlay
+                open={state.isOpen}
+                sheetClassName="min-w-[70vw]"
+                trigger={
+                    <div className="shadow-lg bg-content2 flex justify-between items-center p-4 rounded-lg cursor-pointer">
+                        <div className="grid grid-cols-3 grid-rows-2 text-sm gap-x-4 flex-1">
+                            <span className="font-semibold">Date placed</span>
+                            <span className="font-semibold">Order number</span>
+                            <span className="font-semibold">Total amount</span>
+                            <span data-testid="order-created-date">{new Date(order.created_at).toDateString()}</span>
+                            <span data-testid="order-id" data-value={order.order_number}>
+                                #{order.order_number}
+                            </span>
+                            <span data-testid="order-amount">{currency(order.total)}</span>
+                        </div>
+                        <button aria-label="open" className="flex items-center justify-between" data-testid="open-order-button">
+                            <ChevronDown className="-rotate-90" />
+                        </button>
+                    </div>
+                }
+                onOpenChange={state.setOpen}
+            >
+                <OrderDetails order={order} onBack={state.close} />
+            </Overlay>
+        </li>
+    );
+};
+
 const OverviewTemplate: React.FC = () => {
     const { user, loading } = useAuth();
     const { data, isPending } = useOrders({});
 
     if (loading || isPending) {
-        return <Skeleton className="h-192" />;
+        return <ComponentLoader className="h-192" />;
     }
 
     if (!user || !data?.orders) {
@@ -68,7 +103,7 @@ const OverviewTemplate: React.FC = () => {
                 <div className="flex flex-col py-2 border-t border-gray-200 mt-2">
                     <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
                         <div className="grid grid-cols-2 gap-x-2 max-w-xl">
-                            <div className="flex flex-col bg-pink-100 rounded-lg py-2 px-4 text-default-900 ">
+                            <div className="flex flex-col bg-pink-100 dark:bg-pink-900 rounded-lg py-2 px-4 text-default-900 ">
                                 <h3 className="font-semibold">Profile</h3>
                                 <div className="flex items-center gap-x-2">
                                     <span data-testid="customer-profile-completion" data-value={getProfileCompletion(user)}>
@@ -78,7 +113,7 @@ const OverviewTemplate: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col bg-yellow-100 rounded-lg py-2 px-4 text-default-900">
+                            <div className="flex flex-col bg-yellow-100 dark:bg-yellow-900 rounded-lg py-2 px-4 text-default-900">
                                 <h3 className="font-semibold">Addresses</h3>
                                 <div className="flex items-center gap-x-2">
                                     <span data-testid="addresses-count" data-value={user?.addresses?.length || 0}>
@@ -96,31 +131,7 @@ const OverviewTemplate: React.FC = () => {
                             <ul className="flex flex-col gap-y-4" data-testid="orders-wrapper">
                                 {data?.orders.length > 0 ? (
                                     data.orders.slice(0, 5).map((order: Order, idx: number) => {
-                                        return (
-                                            <li key={idx} data-testid="order-wrapper" data-value={order.order_number}>
-                                                <LocalizedClientLink href={`/account/orders/details/${order.order_number}`}>
-                                                    <div className="shadow-lg bg-default-100 flex justify-between items-center p-4">
-                                                        <div className="grid grid-cols-3 grid-rows-2 text-sm gap-x-4 flex-1">
-                                                            <span className="font-semibold">Date placed</span>
-                                                            <span className="font-semibold">Order number</span>
-                                                            <span className="font-semibold">Total amount</span>
-                                                            <span data-testid="order-created-date">{new Date(order.created_at).toDateString()}</span>
-                                                            <span data-testid="order-id" data-value={order.order_number}>
-                                                                #{order.order_number}
-                                                            </span>
-                                                            <span data-testid="order-amount">{currency(order.total)}</span>
-                                                        </div>
-                                                        <button
-                                                            aria-label="open"
-                                                            className="flex items-center justify-between"
-                                                            data-testid="open-order-button"
-                                                        >
-                                                            <ChevronDown className="-rotate-90" />
-                                                        </button>
-                                                    </div>
-                                                </LocalizedClientLink>
-                                            </li>
-                                        );
+                                        return <OrderItem key={idx} data-testid="order-wrapper" data-value={order.order_number} order={order} />;
                                     })
                                 ) : (
                                     <span data-testid="no-orders-message">No recent orders</span>

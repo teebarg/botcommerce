@@ -10,15 +10,14 @@ import ErrorMessage from "../error-message";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/providers/cart-provider";
+import ComponentLoader from "@/components/component-loader";
 
-type DiscountCodeProps = {
-    cart: Omit<any, "refundable_amount" | "refunded_total">;
-};
-
-const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
+const DiscountCode: React.FC = () => {
+    const { cart, isLoading } = useCart();
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    const { discounts, gift_cards } = cart;
+    const { discounts, gift_cards } = cart || {};
 
     const appliedDiscount = useMemo(() => {
         if (!discounts || !discounts.length) {
@@ -44,14 +43,16 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
         // TODO
     };
 
+    if (isLoading) return <ComponentLoader className="h-[100px]" />;
+
     return (
         <div className="w-full flex flex-col">
             <div className="txt-medium">
                 {gift_cards?.length > 0 && (
                     <div className="flex flex-col mb-4">
                         <h2 className="text-lg font-medium">Gift card(s) applied:</h2>
-                        {gift_cards?.map((gc: any) => (
-                            <div key={gc.id} className="flex items-center justify-between txt-small-plus" data-testid="gift-card">
+                        {gift_cards?.map((gc: any, idx: number) => (
+                            <div key={idx} className="flex items-center justify-between txt-small-plus" data-testid="gift-card">
                                 <p className="flex gap-x-1 items-baseline">
                                     <span>Code: </span>
                                     <span className="truncate" data-testid="gift-card-code">

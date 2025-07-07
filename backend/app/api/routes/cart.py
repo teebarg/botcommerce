@@ -3,12 +3,12 @@ from typing import Optional
 from app.core.utils import generate_id
 from app.models.generic import Message
 from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException, Request
 from app.prisma_client import prisma as db
-from app.core.deps import TokenUser
+from app.core.deps import TokenUser, RedisClient
 from prisma.models import Cart
+from app.services.redis import cache_response
 
-# Create a router for carts
 router = APIRouter()
 
 async def calculate_cart_totals(cart: Cart):
@@ -16,7 +16,7 @@ async def calculate_cart_totals(cart: Cart):
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
 
     subtotal = sum(item.price * item.quantity for item in cart_items)
-    tax = subtotal * 0.05  # 5% tax rate
+    tax = subtotal * 0.075  # 7.5% tax rate
 
     total = subtotal + tax + cart.shipping_fee
 
@@ -40,7 +40,7 @@ async def get_or_create_cart(cartId: Optional[str]):
 
 
 @router.post("/items")
-async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=None)) -> CartResponse:
+async def add_item_to_cart(cache: RedisClient, item: CartItemCreate, cartId: str = Header(default=None)) -> CartResponse:
     """Add an item to cart"""
     cart = await get_or_create_cart(cartId)
 
@@ -54,19 +54,16 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
     if variant.status != "IN_STOCK":
         raise HTTPException(status_code=400, detail="Variant is out of stock")
 
-    # Check if item already exists in cart
     existing_item = await db.cartitem.find_first(
         where={"cart_id": cart.id, "variant_id": item.variant_id}
     )
 
     if existing_item:
-        # Update quantity if item exists
         await db.cartitem.update(
             where={"id": existing_item.id},
             data={"quantity": existing_item.quantity + item.quantity},
         )
     else:
-        # Create new cart item
         await db.cartitem.create(
             data={
                 "cart_id": cart.id,
@@ -80,29 +77,21 @@ async def add_item_to_cart(item: CartItemCreate, cartId: str = Header(default=No
             },
         )
 
-    # Update cart totals
     await calculate_cart_totals(cart=cart)
+
+    await cache.bust_tag(f"cart:{cartId}")
 
     return cart
 
 
-# Endpoints
 @router.get("/", response_model=Optional[CartResponse])
-async def get_cart(cartId: str = Header()):
+@cache_response(key_prefix="cart", expire=86400, key=lambda request, cartId, **kwargs: cartId)
+async def get_cart(request: Request, cartId: str = Header()):
     """Get a specific cart by ID"""
     if not cartId:
         return None
 
-    return await db.cart.find_unique(where={"cart_number": cartId})
-
-
-@router.get("/checkout", response_model=Optional[CartResponse])
-async def get_checkout_cart(cartId: str = Header()):
-    """Get a specific cart by ID"""
-    if not cartId:
-        return None
-
-    return await db.cart.find_unique(where={"cart_number": cartId}, include={"shipping_address": True})
+    return await db.cart.find_unique(where={"cart_number": cartId}, include={"items": {"include": {"variant": True}}, "shipping_address": True})
 
 
 @router.get("/items", response_model=Optional[list[CartItemResponse]])
@@ -114,7 +103,7 @@ async def get_cart_items(cartId: str = Header()):
 
 
 @router.put("/", response_model=CartResponse)
-async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: str = Header(default=None)):
+async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cache: RedisClient, cartId: str = Header(default=None)):
     """Update cart status"""
     cart = await db.cart.find_unique(where={"cart_number": cartId})
     if not cart:
@@ -180,11 +169,14 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
         where={"cart_number": cartId},
         data=update_data,
     )
+
+    await cache.bust_tag(f"cart:{cartId}")
+
     return updated_cart
 
 
 @router.delete("/")
-async def delete(cartId: str = Header(default=None)) -> Message:
+async def delete(cache: RedisClient, cartId: str = Header(default=None)) -> Message:
     """
     Delete item from cart.
     """
@@ -193,11 +185,12 @@ async def delete(cartId: str = Header(default=None)) -> Message:
         raise HTTPException(status_code=404, detail="Cart not found")
 
     await db.cart.delete(where={"cart_number": cartId})
+    await cache.bust_tag(f"cart:{cartId}")
     return {"message": "Cart deleted successfully"}
 
 
 @router.delete("/items/{item_id}")
-async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)):
+async def remove_item_from_cart(cache: RedisClient, item_id: int, cartId: str = Header(default=None)):
     """Remove an item from cart"""
     cart_item = await db.cartitem.find_unique(where={"id": item_id}, include={"cart": True})
     if not cart_item or cart_item.cart_number != cartId:
@@ -206,14 +199,14 @@ async def remove_item_from_cart(item_id: int, cartId: str = Header(default=None)
     try:
         await db.cartitem.delete(where={"id": item_id})
         await calculate_cart_totals(cart=cart_item.cart)
-
+        await cache.bust_tag(f"cart:{cartId}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return {"message": "Item removed from cart successfully"}
 
 
 @router.put("/items/{item_id}")
-async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = Header(default=None)):
+async def update_cart_item_quantity(cache: RedisClient, item_id: int, quantity: int, cartId: str = Header(default=None)):
     """Update quantity of an item in cart"""
     cart_item = await db.cartitem.find_unique(where={"id": item_id}, include={"cart": True})
 
@@ -228,6 +221,6 @@ async def update_cart_item_quantity(item_id: int, quantity: int, cartId: str = H
         where={"id": item_id},
         data={"quantity": quantity},
     )
-    # Update cart totals
     await calculate_cart_totals(cart=cart_item.cart)
+    await cache.bust_tag(f"cart:{cartId}")
     return updated_item

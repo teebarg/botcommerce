@@ -18,7 +18,6 @@ export const useBankDetails = () => {
         queryFn: async () => {
             return await api.get<BankDetails[]>("/bank-details/");
         },
-        enabled: typeof window !== "undefined",
     });
 };
 

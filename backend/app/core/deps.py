@@ -9,27 +9,24 @@ from pydantic import ValidationError
 from app.core import security
 from app.core.config import settings
 from app.models.generic import TokenPayload
-from app.services.cache import CacheService, get_cache_service
 from app.services.notification import EmailChannel, NotificationService, SlackChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from prisma.models import User
 from supabase import create_client, Client
+from app.services.redis import get_redis_dependency, CacheService
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
 )
 
 meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
-
-supabase_url = settings.SUPABASE_URL
-supabase_key = settings.SUPABASE_KEY
-supabase: Client = create_client(supabase_url, supabase_key)
+supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 # SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 
-CacheService = Annotated[CacheService, Depends(get_cache_service)]
+RedisClient = Annotated[CacheService, Depends(get_redis_dependency)]
 
 async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
     try:

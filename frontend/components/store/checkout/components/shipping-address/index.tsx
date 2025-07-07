@@ -9,9 +9,9 @@ import AddressSelect from "../address-select";
 import { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
-import { Skeleton } from "@/components/ui/skeletons";
 import { useAuth } from "@/providers/auth-provider";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import ComponentLoader from "@/components/component-loader";
 
 const ShippingAddress = ({ address, email }: { address: Address | null; email: string }) => {
     const router = useRouter();
@@ -34,7 +34,7 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
     };
 
     if (meLoading) {
-        return <Skeleton className="h-24" />;
+        return <ComponentLoader className="h-24" />;
     }
 
     if (!user) {
@@ -44,7 +44,7 @@ const ShippingAddress = ({ address, email }: { address: Address | null; email: s
     return (
         <React.Fragment>
             <div className="w-full rounded-lg mb-6">
-                <AddressSelect address={address} user={user} />
+                <AddressSelect address={address} />
             </div>
             <React.Fragment>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">

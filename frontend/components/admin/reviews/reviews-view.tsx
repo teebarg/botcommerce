@@ -15,7 +15,7 @@ import { timeAgo } from "@/lib/utils";
 import PaginationUI from "@/components/pagination";
 import { useReviews } from "@/lib/hooks/useReview";
 import ServerError from "@/components/generic/server-error";
-import { Skeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
 
 const ReviewView: React.FC = () => {
     const searchParams = useSearchParams();
@@ -25,7 +25,7 @@ const ReviewView: React.FC = () => {
     const { data, isLoading, error } = useReviews({ skip, limit });
 
     if (isLoading) {
-        return <Skeleton />;
+        return <ComponentLoader className="h-[80vh]" />;
     }
 
     if (error) {
@@ -33,7 +33,7 @@ const ReviewView: React.FC = () => {
     }
 
     if (!data) {
-        return <div className="px-2 md:px-12 py-8">No reviews found</div>;
+        return <div className="px-2 md:px-12 py-48">No reviews found</div>;
     }
 
     const { reviews, ...pagination } = data;

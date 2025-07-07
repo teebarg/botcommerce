@@ -30,6 +30,7 @@ export const CartSchema = z.object({
     tax: z.number(),
     shipping_fee: z.number(),
     discount_total: z.number(),
+    discounts: z.any().optional(),
     total: z.number(),
     billing_address: AddressSchema,
     shipping_address_id: z.number(),

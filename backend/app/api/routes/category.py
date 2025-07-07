@@ -1,32 +1,32 @@
 from typing import Any, Optional
 
-from app.core.deps import (get_current_superuser)
 from app.models.category import Category, CategoryCreate, CategoryUpdate
 from app.models.generic import Message
 from app.core.utils import slugify
-from fastapi import (APIRouter, Depends, HTTPException)
+from fastapi import (APIRouter, Depends, HTTPException, Request)
 from pydantic import BaseModel
 from app.core.storage import upload, delete_image
 from app.models.generic import ImageUpload
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
+from app.services.redis import cache_response
+from app.core.deps import get_current_superuser, RedisClient
 
-# Create a router for categories
 router = APIRouter()
-
 
 class Search(BaseModel):
     results: list[Category]
 
 @router.get("/")
+@cache_response(key_prefix="categories", expire=864000)
 async def index(
+    request: Request,
     query: str = "",
 ) -> Optional[list[Category]]:
     """
     Retrieve all categories.
     """
-    # Define the where clause based on query parameter
     where_clause = {"parent_id": None}
     if query:
         where_clause = {
@@ -38,7 +38,7 @@ async def index(
     return await db.category.find_many(where=where_clause, order={"created_at": "desc"},include={"subcategories": True})
 
 @router.post("/")
-async def create(*, data: CategoryCreate) -> Category:
+async def create(*, data: CategoryCreate, cache: RedisClient) -> Category:
     """
     Create new category.
     """
@@ -46,13 +46,15 @@ async def create(*, data: CategoryCreate) -> Category:
         category = await db.category.create(
             data={**data.model_dump(), "slug": slugify(data.name)}
         )
+        await cache.invalidate_list_cache("categories")
         return category
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{id}")
-async def read(id: int) -> Any:
+@cache_response(key_prefix="category", key=lambda request, id: id, expire=864000)
+async def read(id: int, request: Request) -> Any:
     """
     Get a specific category by id with Redis caching.
     """
@@ -67,7 +69,8 @@ async def read(id: int) -> Any:
 
 
 @router.get("/slug/{slug}")
-async def get_by_slug(slug: str) -> Category:
+@cache_response(key_prefix="category", key=lambda request, slug: slug, expire=864000)
+async def get_by_slug(slug: str, request: Request) -> Category:
     """
     Get a category by its slug.
     """
@@ -86,6 +89,7 @@ async def update(
     *,
     id: int,
     update_data: CategoryUpdate,
+    cache: RedisClient,
 ) -> Category:
     """
     Update a category and invalidate cache.
@@ -101,13 +105,16 @@ async def update(
             where={"id": id},
             data=update_data.model_dump()
         )
+        await cache.invalidate_list_cache("categories")
+        await cache.bust_tag(f"category:{id}")
+        await cache.bust_tag(f"category:{update.slug}")
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}")
-async def delete(id: int) -> Message:
+async def delete(id: int, cache: RedisClient) -> Message:
     """
     Delete a category.
     """
@@ -121,17 +128,20 @@ async def delete(id: int) -> Message:
         await db.category.delete(
             where={"id": id}
         )
+        await cache.invalidate_list_cache("categories")
+        await cache.bust_tag(f"category:{id}")
+        await cache.bust_tag(f"category:{existing.slug}")
         return Message(message="Category deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/autocomplete/")
-async def autocomplete(query: str = "") -> Any:
+@cache_response(key_prefix="categories", expire=864000)
+async def autocomplete(request: Request, query: str = "") -> Any:
     """
     Retrieve categories for autocomplete.
     """
-    # Define the where clause based on query parameter
     where_clause = None
     if query:
         where_clause = {
@@ -148,7 +158,7 @@ async def autocomplete(query: str = "") -> Any:
 
 
 @router.patch("/{id}/image")
-async def add_image(id: int, image_data: ImageUpload) -> Category:
+async def add_image(id: int, image_data: ImageUpload, cache: RedisClient) -> Category:
     """
     Add an image to a category.
     """
@@ -166,6 +176,9 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
             where={"id": id},
             data={"image": image_url}
         )
+        await cache.invalidate_list_cache("categories")
+        await cache.bust_tag(f"category:{id}")
+        await cache.bust_tag(f"category:{updated_category.slug}")
         return updated_category
 
     except Exception as e:
@@ -178,6 +191,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
 @router.delete("/{id}/image", dependencies=[Depends(get_current_superuser)])
 async def delete_image(
     id: int,
+    cache: RedisClient
 ) -> Message:
     """
     Delete the image of a category.
@@ -196,11 +210,13 @@ async def delete_image(
         file_path = category.image.split("/storage/v1/object/public/images/")[1]
         delete_image(bucket="images", file_path=file_path)
 
-        # Update category to remove image URL
         await db.category.update(
             where={"id": id},
             data={"image": None}
         )
+        await cache.invalidate_list_cache("categories")
+        await cache.bust_tag(f"category:{id}")
+        await cache.bust_tag(f"category:{category.slug}")
         return Message(message="Category image deleted successfully")
 
     except Exception as e:

@@ -6,8 +6,8 @@ import FaqActions from "./faq-actions";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FAQ } from "@/schemas";
-import { TextSkeleton } from "@/components/ui/skeletons";
 import { Badge } from "@/components/ui/badge";
+import ComponentLoader from "@/components/component-loader";
 
 interface FaqListProps {
     faqs: FAQ[];
@@ -16,20 +16,7 @@ interface FaqListProps {
 
 export function FaqList({ faqs, isLoading }: FaqListProps) {
     if (isLoading) {
-        return (
-            <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                    <Card key={i} className="animate-pulse">
-                        <CardHeader>
-                            <TextSkeleton className="h-4 w-3/4" lines={1} />
-                        </CardHeader>
-                        <CardContent>
-                            <TextSkeleton className="h-4" lines={2} />
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        );
+        return <ComponentLoader className="h-[calc(100vh-200px)]" />;
     }
 
     if (faqs.length === 0) {

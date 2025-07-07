@@ -72,9 +72,6 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: EmailStr = "admin@email.com"
     FIRST_SUPERUSER_PASSWORD: str = "password"
 
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
-    REDIS_PASSWORD: str = "password"
     REDIS_URL: str = "redis://localhost:6379/0"
 
     SMTP_TLS: bool = True
