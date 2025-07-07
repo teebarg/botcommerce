@@ -80,6 +80,32 @@ enum Status {
   @@map("statuses")
 }
 
+enum ShopSettingsType {
+  FEATURE
+  SHOP_DETAIL
+  CUSTOM
+}
+
+
+enum ConversationStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum InteractionType {
+  VIEW @map("view")
+  PURCHASE @map("purchase")
+  CART_ADD @map("cart_add")
+  WISHLIST @map("wishlist")
+}
+
+enum MessageSender {
+  USER
+  BOT
+  SYSTEM
+}
+
 model ActivityLog {
   id                  Int      @id @default(autoincrement())
   user_id             Int
@@ -185,6 +211,7 @@ model Product {
   images      ProductImage[]
   reviews     Review[]
   favorites   Favorite[]
+  user_interactions UserInteraction[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -411,8 +438,10 @@ model User {
   addresses                  Address[]
   reviews                    Review[]
   favorites                  Favorite[]
-  carts                      Cart[] // Added relation to Cart
+  carts                      Cart[]
   activity_logs              ActivityLog[]
+  interactions               UserInteraction[]
+  preferences                UserPreference[]
 
   created_at   DateTime?      @default(now())
   updated_at   DateTime?      @updatedAt
@@ -433,12 +462,6 @@ model Favorite {
 
   @@unique([user_id, product_id])
   @@map("favorites")
-}
-
-enum ShopSettingsType {
-  FEATURE
-  SHOP_DETAIL
-  CUSTOM
 }
 
 model ShopSettings {
@@ -464,12 +487,6 @@ model BankDetails {
   @@map("bank_details")
 }
 
-enum ConversationStatus {
-  ACTIVE
-  COMPLETED
-  ABANDONED
-}
-
 model Conversation {
   id                Int                @id @default(autoincrement())
   conversation_uuid String             @unique
@@ -483,12 +500,6 @@ model Conversation {
   @@index([user_id, status])
   @@index([conversation_uuid])
   @@map("conversations")
-}
-
-enum MessageSender {
-  USER
-  BOT
-  SYSTEM
 }
 
 model Message {
@@ -542,4 +553,31 @@ model DeliveryOption {
   updated_at  DateTime       @updatedAt
 
   @@map("delivery_options")
+}
+
+model UserInteraction {
+  id          Int            @id @default(autoincrement())
+  user_id     Int
+  product_id  Int
+  type        InteractionType
+  timestamp   DateTime       @default(now())
+  metadata    Json?          // Additional context (time spent, etc.)
+  
+  user      User     @relation(fields: [user_id], references: [id])
+  product   Product  @relation(fields: [product_id], references: [id])
+  
+  @@index([user_id, timestamp])
+  @@index([product_id, timestamp])
+}
+
+model UserPreference {
+  id         Int @id @default(autoincrement())
+  user_id             Int
+  category   String
+  brand      String?
+  priceRange String?
+  score      Float  @default(1.0)
+  
+  user User @relation(fields: [user_id], references: [id])
+  @@unique([user_id, category, brand])
 }

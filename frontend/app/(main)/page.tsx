@@ -39,7 +39,7 @@ export default async function Home() {
             />
 
             <div className="bg-content1">
-                <div className="max-w-8xl mx-auto relative px-1 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="max-w-8xl mx-auto relative px-1 py-6 md:px-0 min-h-96 grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="relative hidden md:block rounded-lg overflow-hidden h-fit">
                         <div className="absolute top-0 left-0 w-full p-5 mt-5 text-center z-10">
                             <span className="text-gray-800 text-3xl font-semibold">{siteConfig.name}</span>
@@ -72,7 +72,7 @@ export default async function Home() {
             <section className="py-16 bg-content2">
                 <div className="max-w-8xl mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-default-foreground mb-2">Trending Products</h2>
+                        <h2 className="text-3xl font-bold text-default-foreground mb-1">Trending Products</h2>
                         <p className="text-default-600">Discover our handpicked selection of premium products</p>
                     </div>
 
@@ -90,7 +90,7 @@ export default async function Home() {
             />
 
             <section className="bg-content1">
-                <div className="max-w-8xl mx-auto px-1 md:px-0">
+                <div className="max-w-8xl mx-auto px-1 md:px-0 py-8">
                     <p className="text-3xl font-bold">New Arrivals</p>
                     <p className="text-default-600">Find the best thrifts for your kids</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
