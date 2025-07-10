@@ -80,3 +80,10 @@ export const useInvalidate = () => {
 
     return invalidate;
 };
+
+// send errors
+export const useSendError = () => {
+    return useMutation({
+        mutationFn: async (error: Error) => await api.post("/log-error", error),
+    });
+};

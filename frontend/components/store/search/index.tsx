@@ -14,8 +14,8 @@ import ProductCard from "@/components/store/products/product-card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SearchInput from "@/components/store/search/search-input";
 import { useProductSearch } from "@/lib/hooks/useProduct";
-import { Skeleton } from "@/components/ui/skeletons";
-import ServerError from "@/components/generic/server-error";
+import ComponentLoader from "@/components/component-loader";
+import { useSendError } from "@/lib/hooks/useApi";
 
 interface Props {
     className?: string;
@@ -43,7 +43,8 @@ const Search: React.FC<Props> = ({ className }) => {
     };
 
     if (error) {
-        return <ServerError />;
+        useSendError().mutate(error);
+        return null;
     }
 
     return (
@@ -72,7 +73,7 @@ const Search: React.FC<Props> = ({ className }) => {
                         </button>
                     </div>
                     {isLoading ? (
-                        <Skeleton className="h-[70vh]" />
+                        <ComponentLoader className="h-[70vh]" />
                     ) : (
                         <div className="h-[70vh] overflow-y-auto">
                             {data?.products.length == 0 && <NoProductsFound />}
