@@ -2,6 +2,7 @@
 
 import React from "react";
 
+import ClientOnly from "@/components/generic/client-only";
 import { cn } from "@/lib/utils";
 
 const WaveLoader: React.FC<{ className?: string }> = ({ className }) => {
@@ -24,11 +25,13 @@ const WaveLoader: React.FC<{ className?: string }> = ({ className }) => {
 
 const ComponentLoader: React.FC<{ className?: string }> = ({ className }) => {
     return (
-        <div className={cn("dark:bg-content1/80 bg-default-200 backdrop-blur-sm z-50 flex items-center justify-center", className)}>
-            <div className="flex flex-col items-center space-y-6">
-                <WaveLoader />
+        <ClientOnly>
+            <div className={cn("dark:bg-content1/80 bg-default-200 backdrop-blur-sm z-50 flex items-center justify-center", className)}>
+                <div className="flex flex-col items-center space-y-6">
+                    <WaveLoader />
+                </div>
             </div>
-        </div>
+        </ClientOnly>
     );
 };
 

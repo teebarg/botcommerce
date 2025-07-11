@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import SearchInput from "@/components/store/search/search-input";
 import { useProductSearch } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
-import { useSendError } from "@/lib/hooks/useApi";
+// import { useSendError } from "@/lib/hooks/useApi";
 
 interface Props {
     className?: string;
@@ -27,6 +27,7 @@ const Search: React.FC<Props> = ({ className }) => {
     const modalState = useOverlayTriggerState({});
     const [value, setValue] = useState("");
     const { data, error, isLoading } = useProductSearch({ search: value, limit: 15, page: 1 });
+    // const sendError = useSendError();
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValue(event?.target?.value);
@@ -41,11 +42,6 @@ const Search: React.FC<Props> = ({ className }) => {
     const onReset = () => {
         setValue("");
     };
-
-    if (error) {
-        useSendError().mutate(error);
-        return null;
-    }
 
     return (
         <Dialog open={state.isOpen} onOpenChange={state.setOpen}>

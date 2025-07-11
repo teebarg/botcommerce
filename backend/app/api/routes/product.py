@@ -45,6 +45,7 @@ from app.services.redis import cache_response
 
 router = APIRouter()
 
+
 class LandingProducts(BaseModel):
     trending: list[SearchProduct]
     latest: list[SearchProduct]
@@ -91,7 +92,8 @@ async def export_products(
     background_tasks: BackgroundTasks,
 ) -> Any:
     try:
-        background_tasks.add_task(product_export, email=current_user.email, user_id=current_user.id)
+        background_tasks.add_task(
+            product_export, email=current_user.email, user_id=current_user.id)
 
         return {
             "message": "Data Export successful. Please check your email"
@@ -197,9 +199,10 @@ async def search(
             }
         )
     except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=400,
-            detail=f"Error searching products: {str(e)}"
+            detail=e.message
         )
 
     total_count = search_results["estimatedTotalHits"]
@@ -248,7 +251,8 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         raise HTTPException(
             status_code=400, detail="Product with this name already exists")
 
-    background_tasks.add_task(reindex_product, cache=redis, product_id=created_product.id)
+    background_tasks.add_task(
+        reindex_product, cache=redis, product_id=created_product.id)
 
     return created_product
 
@@ -270,6 +274,7 @@ async def reindex_products(background_tasks: BackgroundTasks, redis: RedisClient
 
 # def extract_product_key(request: Request, slug: str, **kwargs):
 #     return slug
+
 
 @router.get("/{slug}")
 @cache_response("product", expire=86400, key=lambda request, slug, **kwargs: slug)
@@ -336,7 +341,8 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
             data=update_data,
         )
     except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Product with this name already exists")
+        raise HTTPException(
+            status_code=400, detail="Product with this name already exists")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -365,7 +371,7 @@ async def delete_product(id: int, redis: RedisClient) -> Message:
                         document_id=str(id))
     except Exception as e:
         logger.error(f"Error deleting document from Meilisearch: {e}")
-    
+
     await redis.invalidate_list_cache("products")
     await redis.bust_tag(f"product:{product.slug}")
     return Message(message="Product deleted successfully")
@@ -391,7 +397,8 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
             }
         )
     except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Variant with this details already exists")
+        raise HTTPException(
+            status_code=400, detail="Variant with this details already exists")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -431,7 +438,8 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
         data=update_data,
     )
 
-    background_tasks.add_task(reindex_product, cache=redis, product_id=existing_variant.product_id)
+    background_tasks.add_task(
+        reindex_product, cache=redis, product_id=existing_variant.product_id)
 
     return updated_variant
 
@@ -440,7 +448,8 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 async def delete_variant(variant_id: int, background_tasks: BackgroundTasks, redis: RedisClient):
     variant = await db.productvariant.delete(where={"id": variant_id})
 
-    background_tasks.add_task(reindex_product, cache=redis, product_id=variant.product_id)
+    background_tasks.add_task(
+        reindex_product, cache=redis, product_id=variant.product_id)
 
     return {"success": True}
 
@@ -580,7 +589,8 @@ async def upload_products(
     await validate_file(file=file)
 
     contents = await file.read()
-    background_tasks.add_task(product_upload, cache=redis, user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
+    background_tasks.add_task(product_upload, cache=redis, user_id=user.id,
+                              contents=contents, content_type=content_type, filename=file.filename)
     return {"message": "Upload started"}
 
 

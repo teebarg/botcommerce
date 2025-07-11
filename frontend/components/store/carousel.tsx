@@ -6,12 +6,13 @@ import { CarouselBanner } from "@/schemas/carousel";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { BtnLink } from "@/components/ui/btnLink";
 import ClientOnly from "@/components/generic/client-only";
-import { useCarouselBanners } from "@/lib/hooks/useCarousel";
+import { useCarouselBannerActive } from "@/lib/hooks/useCarousel";
 import ComponentLoader from "@/components/component-loader";
-import { useSendError } from "@/lib/hooks/useApi";
+// import { useSendError } from "@/lib/hooks/useApi";
 
 const CarouselSection: React.FC = () => {
-    const { data, isLoading, error } = useCarouselBanners();
+    const { data, isLoading, error } = useCarouselBannerActive();
+    // const sendError = useSendError();
 
     if (isLoading) {
         return <ComponentLoader className="h-[60vh]" />;
@@ -19,10 +20,15 @@ const CarouselSection: React.FC = () => {
 
     const banners = data;
 
-    if (error) {
-        useSendError().mutate(error);
+    if (banners?.length === 0) {
         return null;
     }
+
+    // if (error) {
+    //     sendError.mutate(error);
+
+    //     return null;
+    // }
 
     return (
         <ClientOnly>

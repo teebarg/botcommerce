@@ -75,7 +75,8 @@ serve-backend: ## Serve the backend in terminal
 
 
 serve-recommendation: ## Serve the recommendation in terminal
-	@cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4
+	# @cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4
+	@echo "Recommendation service is not running"
 
 serve-frontend: ## Serve the frontend in terminal
 	@cd frontend; npm run dev-https-t

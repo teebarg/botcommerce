@@ -18,6 +18,13 @@ export const useCarouselBanner = (id: number) => {
     });
 };
 
+export const useCarouselBannerActive = () => {
+    return useQuery({
+        queryKey: ["carousel-banner", "active"],
+        queryFn: async () => await api.get<CarouselBanner[]>(`/carousel/active`),
+    });
+};
+
 export const useCreateCarouselBanner = () => {
     const queryClient = useQueryClient();
 
