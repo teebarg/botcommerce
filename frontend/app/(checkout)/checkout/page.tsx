@@ -26,7 +26,7 @@ export default function Checkout() {
     }
 
     if (error) {
-        return <ServerError />;
+        return <ServerError error={error.message} scenario="checkout" stack={error.stack} />;
     }
 
     if (!cart) {

@@ -6,7 +6,7 @@ import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";
 import { WishItem } from "@/schemas";
 import { useUserWishlist } from "@/lib/hooks/useUser";
-import { Skeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
 
 export default function Wishlist() {
     const { data, isLoading, error } = useUserWishlist();
@@ -14,13 +14,13 @@ export default function Wishlist() {
     if (isLoading) {
         return (
             <div className="max-w-7xl mx-auto mt-2 mb-4">
-                <Skeleton className="h-[55vh]" />
+                <ComponentLoader className="h-[55vh]" />
             </div>
         );
     }
 
     if (error) {
-        return <ServerError />;
+        return <ServerError error={error.message} scenario="wishlist" stack={error.stack} />;
     }
 
     const wishlists = data ? data.wishlists : [];

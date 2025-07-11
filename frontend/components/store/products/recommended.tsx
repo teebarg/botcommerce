@@ -1,9 +1,10 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeletons";
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas/product";
 import { useProductSearch } from "@/lib/hooks/useProduct";
+import ComponentLoader from "@/components/component-loader";
+import ServerError from "@/components/generic/server-error";
 
 type RecommendedProductsProps = {
     exclude?: number[];
@@ -13,11 +14,11 @@ export default function RecommendedProducts({ exclude = [] }: RecommendedProduct
     const { data, isLoading, error } = useProductSearch({ limit: 40 });
 
     if (error) {
-        return null;
+        return <ServerError error={error.message} scenario="recommended-products" stack={error.stack} />;
     }
 
     if (isLoading) {
-        return <Skeleton className="h-[400px]" />;
+        return <ComponentLoader className="h-[400px]" />;
     }
 
     const filteredProducts = exclude?.length
