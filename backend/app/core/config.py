@@ -4,6 +4,7 @@ from pydantic import (
     AnyUrl,
     BeforeValidator,
     EmailStr,
+    HttpUrl,
     PostgresDsn,
     ValidationInfo,
     computed_field,
@@ -73,6 +74,7 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = "password"
 
     REDIS_URL: str = "redis://localhost:6379/0"
+    SENTRY_DSN: HttpUrl | None = None
 
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False

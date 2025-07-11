@@ -1,4 +1,5 @@
 import logging
+import sentry_sdk
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -38,6 +39,10 @@ async def lifespan(app: FastAPI):
         await redis_client.close()
     except Exception as e:
         logger.error(f"❌ ~ failed to close redis connection......: {e}")
+
+
+if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
+    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
 app = FastAPI(title="Botcommerce",
               openapi_url="/api/openapi.json", lifespan=lifespan)
