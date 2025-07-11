@@ -75,8 +75,7 @@ serve-backend: ## Serve the backend in terminal
 
 
 serve-recommendation: ## Serve the recommendation in terminal
-	# @cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4
-	@echo "Recommendation service is not running"
+	@cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4
 
 serve-frontend: ## Serve the frontend in terminal
 	@cd frontend; npm run dev-https-t
@@ -86,7 +85,7 @@ sync: ## Sync dependencies
 
 dev: ## Serve the project in terminal
 	@echo "$(YELLOW)Running development in terminal...$(RESET)"
-	make -j 3 serve-backend serve-recommendation serve-frontend
+	make -j 2 serve-backend serve-frontend
 
 
 # Backend Deployment

@@ -8,11 +8,9 @@ import { BtnLink } from "@/components/ui/btnLink";
 import ClientOnly from "@/components/generic/client-only";
 import { useCarouselBannerActive } from "@/lib/hooks/useCarousel";
 import ComponentLoader from "@/components/component-loader";
-// import { useSendError } from "@/lib/hooks/useApi";
 
 const CarouselSection: React.FC = () => {
     const { data, isLoading, error } = useCarouselBannerActive();
-    // const sendError = useSendError();
 
     if (isLoading) {
         return <ComponentLoader className="h-[60vh]" />;
@@ -20,15 +18,9 @@ const CarouselSection: React.FC = () => {
 
     const banners = data;
 
-    if (banners?.length === 0) {
+    if (error || banners?.length === 0) {
         return null;
     }
-
-    // if (error) {
-    //     sendError.mutate(error);
-
-    //     return null;
-    // }
 
     return (
         <ClientOnly>
