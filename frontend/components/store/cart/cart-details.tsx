@@ -19,7 +19,6 @@ interface Props {
 }
 
 const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
-    console.log("🚀 ~ file: cart-details.tsx:22 ~ cart:", cart)
     const path = usePathname();
 
     return (
