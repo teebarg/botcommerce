@@ -13,6 +13,7 @@ import CarouselSection from "@/components/store/carousel";
 import { ContactSection } from "@/components/store/landing/contact-section";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
 import { tryCatch } from "@/lib/try-catch";
+import PCard from "@/components/p-card";
 
 export const metadata: Metadata = {
     title: "Home",
@@ -77,7 +78,7 @@ export default async function Home() {
                     </div>
 
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {data?.trending?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
+                        {data?.trending?.map((product: ProductSearch, idx: number) => <PCard key={idx} product={product} />)}
                     </div>
                 </div>
             </section>

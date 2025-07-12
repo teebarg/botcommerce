@@ -14,7 +14,7 @@ import ProductCard from "@/components/store/products/product-card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SearchInput from "@/components/store/search/search-input";
 import { useProductSearch } from "@/lib/hooks/useProduct";
-import ComponentLoader from "@/components/component-loader";
+import { Skeleton } from "@/components/ui/skeletons";
 
 interface Props {
     className?: string;
@@ -26,6 +26,10 @@ const Search: React.FC<Props> = ({ className }) => {
     const modalState = useOverlayTriggerState({});
     const [value, setValue] = useState("");
     const { data, error, isLoading } = useProductSearch({ search: value, limit: 15, page: 1 });
+
+    if (error) {
+        return <div className="text-center">Server error</div>;
+    }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValue(event?.target?.value);
@@ -40,10 +44,6 @@ const Search: React.FC<Props> = ({ className }) => {
     const onReset = () => {
         setValue("");
     };
-
-    if (error) {
-        return null;
-    }
 
     return (
         <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
@@ -71,7 +71,7 @@ const Search: React.FC<Props> = ({ className }) => {
                         </button>
                     </div>
                     {isLoading ? (
-                        <ComponentLoader className="h-[70vh]" />
+                        <Skeleton className="h-[70vh]" />
                     ) : (
                         <div className="h-[70vh] overflow-y-auto">
                             {data?.products.length == 0 && <NoProductsFound />}

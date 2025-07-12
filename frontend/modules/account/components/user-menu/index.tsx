@@ -24,7 +24,7 @@ export default function UserDropDown({ user }: { user: Session }) {
 
     const links = [
         {
-            dataKey: "admin",
+            dataKey: "profile",
             child: (
                 <span className="flex-1 text-sm font-normal truncate">
                     <LocalizedClientLink href="/account/profile">Profile</LocalizedClientLink>
@@ -42,12 +42,23 @@ export default function UserDropDown({ user }: { user: Session }) {
         {
             dataKey: "account",
             child: (
-                <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
+                <button aria-label="log out" className="text-red-500 cursor-pointer" data-testid="logout-button" type="button" onClick={handleLogout}>
                     Log out
                 </button>
             ),
         },
     ];
+
+    if (user.role === "ADMIN") {
+        links.unshift({
+            dataKey: "admin",
+            child: (
+                <span className="flex-1 text-sm font-normal truncate">
+                    <LocalizedClientLink href="/admin">Admin</LocalizedClientLink>
+                </span>
+            ),
+        });
+    }
 
     return (
         <DropdownMenu>

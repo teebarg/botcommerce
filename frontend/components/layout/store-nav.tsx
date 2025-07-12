@@ -4,6 +4,8 @@ import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from 
 import { HeartFilled, Heart } from "nui-react-icons";
 import ThemeButton from "@lib/theme/theme-button";
 
+import GetApp from "../get-app";
+
 import { CartComponent } from "@/components/store/cart/cart-component";
 import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
@@ -24,11 +26,6 @@ const StoreNavbar = async () => {
                     <LocalizedClientLink className="hidden md:block" href={"/collections"}>
                         Collections
                     </LocalizedClientLink>
-                    {user?.isAdmin && (
-                        <LocalizedClientLink className="hidden md:block" href={"/admin"}>
-                            Admin
-                        </LocalizedClientLink>
-                    )}
                 </NavbarBrand>
                 <NavbarItem className="hidden md:flex justify-center flex-1">
                     <Search className="w-full justify-between max-w-lg" />
@@ -45,6 +42,7 @@ const StoreNavbar = async () => {
                             <Heart className="h-8 w-8 text-default-500" />
                         )}
                     </div>
+                    <GetApp />
                     <div className="hidden sm:flex">
                         {user ? (
                             <UserDropDown user={user} />
