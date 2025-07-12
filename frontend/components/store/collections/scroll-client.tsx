@@ -131,9 +131,9 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                                 </div>
                                 <main className="w-full overflow-visible px-1">
                                     <div className="block md:rounded-xl py-4 min-h-[50vh]">
-                                        <div className="grid w-full gap-2 grid-cols-2 md:grid-cols-3 pb-4">
+                                        <div className="grid w-full gap-2 grid-cols-1 md:grid-cols-3 pb-4">
                                             {products?.length == 0 && (
-                                                <div className="col-span-2 md:col-span-3">
+                                                <div className="col-span-1 md:col-span-3">
                                                     <NoProductsFound />
                                                 </div>
                                             )}

@@ -19,6 +19,7 @@ interface Props {
 }
 
 const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
+    console.log("🚀 ~ file: cart-details.tsx:22 ~ cart:", cart)
     const path = usePathname();
 
     return (
@@ -33,7 +34,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4">
-                        {cart?.items?.length === 0 ? (
+                        {!cart || cart?.items?.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-64 text-center">
                                 <ShoppingCart className="h-12 w-12 text-default-300 mb-4" />
                                 <p className="text-default-500">Your cart is empty</p>

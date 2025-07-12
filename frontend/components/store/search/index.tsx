@@ -75,7 +75,7 @@ const Search: React.FC<Props> = ({ className }) => {
                     ) : (
                         <div className="h-[70vh] overflow-y-auto">
                             {data?.products.length == 0 && <NoProductsFound />}
-                            <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
+                            <div className="grid w-full gap-2 md:gap-4 grid-cols-1 md:grid-cols-3">
                                 {data?.products.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                             </div>
                         </div>

@@ -10,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useCreateCarouselBanner, useUpdateCarouselBanner } from "@/lib/hooks/useCarousel";
 
 const bannerSchema = z.object({
@@ -20,7 +19,6 @@ const bannerSchema = z.object({
     buttonText: z.string().optional(),
     link: z.string().optional(),
     order: z.number().default(0),
-    is_active: z.boolean().default(true),
 });
 
 type BannerFormValues = z.infer<typeof bannerSchema>;
@@ -40,7 +38,6 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
             buttonText: "",
             link: "",
             order: 0,
-            is_active: true,
         },
     });
 
@@ -57,7 +54,6 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
             buttonText: banner?.buttonText || "",
             link: banner?.link || "",
             order: banner?.order || 0,
-            is_active: banner?.is_active || true,
         });
     }, [banner, form]);
 
@@ -151,20 +147,6 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                                     <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
                                 </FormControl>
                                 <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="is_active"
-                        render={({ field }) => (
-                            <FormItem className="flex items-center justify-between rounded-lg border border-divider px-4 py-2">
-                                <div className="space-y-0.5">
-                                    <FormLabel>Active</FormLabel>
-                                </div>
-                                <FormControl>
-                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                </FormControl>
                             </FormItem>
                         )}
                     />

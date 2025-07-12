@@ -27,7 +27,7 @@ export default function RecommendedProducts({ exclude = [] }: RecommendedProduct
 
     return (
         <div>
-            <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-4 gap-y-8">
+            <ul className="grid grid-cols-1 md:grid-cols-4 gap-x-2 md:gap-x-4 gap-y-8">
                 {filteredProducts.map((product: ProductSearch, idx: number) => (
                     <li key={idx}>
                         <ProductCard product={product} />

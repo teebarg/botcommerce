@@ -28,7 +28,7 @@ const CarouselSection: React.FC = () => {
                 <CarouselContent>
                     {banners?.map((banner: CarouselBanner, idx: number) => (
                         <CarouselItem key={idx}>
-                            <div className="relative h-[60vh] w-full">
+                            <div className="relative h-[calc(100vh-4rem)] w-full">
                                 <img alt={banner.title} className="object-cover w-full h-full" src={banner.image || "/placeholder.jpg"} />
                                 <div className="absolute inset-0 bg-linear-to-r from-black/50 to-transparent flex items-center">
                                     <div className="container mx-auto px-4 md:px-8 lg:px-12">
