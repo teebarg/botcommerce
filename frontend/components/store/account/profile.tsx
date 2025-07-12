@@ -13,11 +13,11 @@ import { api } from "@/apis/client";
 import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { Skeleton } from "@/components/ui/skeletons";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
 import { useAuth } from "@/providers/auth-provider";
 import { Separator } from "@/components/ui/separator";
+import ComponentLoader from "@/components/component-loader";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -111,11 +111,11 @@ const ProfilePage: React.FC = () => {
     };
 
     if (error) {
-        return <ServerError />;
+        return <ServerError error={error.message} scenario="profile" stack={error.stack} />;
     }
 
     if (loading) {
-        return <Skeleton className="h-[600px]" />;
+        return <ComponentLoader className="h-[600px]" />;
     }
 
     return (

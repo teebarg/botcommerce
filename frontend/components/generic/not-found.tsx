@@ -80,12 +80,11 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     return (
         <div
             className={cn(
-                "transition-all duration-300 bg-linear-to-br from-background to-content1 flex items-center justify-center p-4 w-full",
+                "transition-all duration-300 bg-linear-to-br from-background to-content1 flex items-center justify-center px-4 py-24 w-full",
                 className
             )}
         >
             <div className="max-w-md w-full text-center">
-                {/* Main Content */}
                 <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-content1 border-divider">
                     <div className="mb-6 flex justify-center">
                         <div className="relative">

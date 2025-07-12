@@ -45,6 +45,7 @@ from app.services.redis import cache_response
 
 router = APIRouter()
 
+
 class LandingProducts(BaseModel):
     trending: list[SearchProduct]
     latest: list[SearchProduct]
@@ -76,9 +77,10 @@ async def get_landing_products(request: Request) -> LandingProducts:
                 }
             )
         except Exception as e:
+            logger.error(e)
             raise HTTPException(
                 status_code=400,
-                detail=f"Error searching products: {str(e)}"
+                detail=str(e)
             )
         result[product_type] = search_results["hits"]
 
@@ -91,13 +93,14 @@ async def export_products(
     background_tasks: BackgroundTasks,
 ) -> Any:
     try:
-        background_tasks.add_task(product_export, email=current_user.email, user_id=current_user.id)
+        background_tasks.add_task(
+            product_export, email=current_user.email, user_id=current_user.id)
 
         return {
             "message": "Data Export successful. Please check your email"
         }
     except Exception as e:
-        logger.error(f"Export products error: {e}")
+        logger.error(e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -197,9 +200,10 @@ async def search(
             }
         )
     except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=400,
-            detail=f"Error searching products: {str(e)}"
+            detail=e.message
         )
 
     total_count = search_results["estimatedTotalHits"]
@@ -244,11 +248,13 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         created_product = await db.product.create(
             data=data,
         )
-    except UniqueViolationError:
+    except UniqueViolationError as e:
+        logger.error(e)
         raise HTTPException(
             status_code=400, detail="Product with this name already exists")
 
-    background_tasks.add_task(reindex_product, cache=redis, product_id=created_product.id)
+    background_tasks.add_task(
+        reindex_product, cache=redis, product_id=created_product.id)
 
     return created_product
 
@@ -262,14 +268,12 @@ async def reindex_products(background_tasks: BackgroundTasks, redis: RedisClient
         background_tasks.add_task(index_products, redis)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
-        logger.error(f"Error during product re-indexing: {e}")
+        logger.error(e)
         raise HTTPException(
             status_code=500,
-            detail="Failed to queue the re-indexing task.",
+            detail=str(e),
         )
 
-# def extract_product_key(request: Request, slug: str, **kwargs):
-#     return slug
 
 @router.get("/{slug}")
 @cache_response("product", expire=86400, key=lambda request, slug, **kwargs: slug)
@@ -335,9 +339,12 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
             where={"id": id},
             data=update_data,
         )
-    except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Product with this name already exists")
+    except UniqueViolationError as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=400, detail="Product with this name already exists")
     except Exception as e:
+        logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
 
     background_tasks.add_task(reindex_product, cache=redis, product_id=id)
@@ -354,18 +361,18 @@ async def delete_product(id: int, redis: RedisClient) -> Message:
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    await db.productimage.delete_many(where={"product_id": id})
-    await db.review.delete_many(where={"product_id": id})
-    await db.productvariant.delete_many(where={"product_id": id})
-
-    await db.product.delete(where={"id": id})
-
     try:
+        await db.productimage.delete_many(where={"product_id": id})
+        await db.review.delete_many(where={"product_id": id})
+        await db.productvariant.delete_many(where={"product_id": id})
+
+        await db.product.delete(where={"id": id})
+
         delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
                         document_id=str(id))
     except Exception as e:
-        logger.error(f"Error deleting document from Meilisearch: {e}")
-    
+        logger.error(e)
+
     await redis.invalidate_list_cache("products")
     await redis.bust_tag(f"product:{product.slug}")
     return Message(message="Product deleted successfully")
@@ -390,9 +397,12 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
                 "color": variant.color
             }
         )
-    except UniqueViolationError:
-        raise HTTPException(status_code=400, detail="Variant with this details already exists")
+    except UniqueViolationError as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=400, detail="Variant with this details already exists")
     except Exception as e:
+        logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
 
     background_tasks.add_task(reindex_product, cache=redis, product_id=id)
@@ -426,21 +436,30 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
     if variant.color is not None:
         update_data["color"] = variant.color
 
-    updated_variant = await db.productvariant.update(
-        where={"id": variant_id},
-        data=update_data,
-    )
-
-    background_tasks.add_task(reindex_product, cache=redis, product_id=existing_variant.product_id)
+    try:
+        updated_variant = await db.productvariant.update(
+            where={"id": variant_id},
+            data=update_data,
+        )
+        background_tasks.add_task(
+            reindex_product, cache=redis, product_id=existing_variant.product_id)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
 
     return updated_variant
 
 
 @router.delete("/variants/{variant_id}")
 async def delete_variant(variant_id: int, background_tasks: BackgroundTasks, redis: RedisClient):
-    variant = await db.productvariant.delete(where={"id": variant_id})
+    try:
+        variant = await db.productvariant.delete(where={"id": variant_id})
 
-    background_tasks.add_task(reindex_product, cache=redis, product_id=variant.product_id)
+        background_tasks.add_task(
+            reindex_product, cache=redis, product_id=variant.product_id)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
 
     return {"success": True}
 
@@ -450,9 +469,7 @@ async def add_image(id: int, image_data: ImageUpload, background_tasks: Backgrou
     """
     Add an image to a product.
     """
-    product = await db.product.find_unique(
-        where={"id": id}
-    )
+    product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
@@ -469,9 +486,10 @@ async def add_image(id: int, image_data: ImageUpload, background_tasks: Backgrou
         return updated_product
 
     except Exception as e:
+        logger.error(e)
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to upload image: {str(e)}"
+            status_code=400,
+            detail=str(e)
         )
 
 
@@ -484,18 +502,22 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    image_url = upload(bucket="product-images", data=image_data)
+    try:
+        image_url = upload(bucket="product-images", data=image_data)
 
-    image = await db.productimage.create(
-        data={
-            "image": image_url,
-            "product_id": product.id,
-            "order": len(product.images)
-        }
-    )
-    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
+        image = await db.productimage.create(
+            data={
+                "image": image_url,
+                "product_id": product.id,
+                "order": len(product.images)
+            }
+        )
+        background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
-    return image
+        return image
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.delete("/{id}/image")
@@ -511,16 +533,20 @@ async def delete_image(id: int, background_tasks: BackgroundTasks, redis: RedisC
         file_path = product.image.split(
             "/storage/v1/object/public/product-images/")[1]
 
-        result = supabase.storage.from_("product-images").remove([file_path])
-        logger.info(f"Delete result: {result}")
+        supabase.storage.from_("product-images").remove([file_path])
     except Exception as e:
-        logger.error(f"Error deleting image: {e}")
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
 
-    await db.product.update(where={"id": id}, data={"image": None})
+    try:
+        await db.product.update(where={"id": id}, data={"image": None})
 
-    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
+        background_tasks.add_task(reindex_product, cache=redis, product_id=id)
 
-    return {"success": True}
+        return {"success": True}
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.delete("/{id}/images/{image_id}")
@@ -536,13 +562,21 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
     image = await db.productimage.find_unique(where={"id": image_id})
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
-    file_path = image.image.split(
-        "/storage/v1/object/public/product-images/")[1]
 
-    result = supabase.storage.from_("product-images").remove([file_path])
-    logger.info(f"Delete result: {result}")
+    try:
+        file_path = image.image.split(
+            "/storage/v1/object/public/product-images/")[1]
 
-    await db.productimage.delete(where={"id": image_id})
+        supabase.storage.from_("product-images").remove([file_path])
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
+
+    try:
+        await db.productimage.delete(where={"id": image_id})
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Reorder images
     images = await db.productimage.find_many(where={"product_id": id}, order={"order": "asc"})
@@ -580,7 +614,8 @@ async def upload_products(
     await validate_file(file=file)
 
     contents = await file.read()
-    background_tasks.add_task(product_upload, cache=redis, user_id=user.id, contents=contents, content_type=content_type, filename=file.filename)
+    background_tasks.add_task(product_upload, cache=redis, user_id=user.id,
+                              contents=contents, content_type=content_type, filename=file.filename)
     return {"message": "Upload started"}
 
 
@@ -621,9 +656,9 @@ async def config_clear_index():
         clear_index(settings.MEILI_PRODUCTS_INDEX)
         return {"message": "Index cleared"}
     except Exception as e:
-        logger.error(f"Error clearing index: {e}")
+        logger.error(e)
         raise HTTPException(
-            status_code=500, detail="An error occurred while clearing index"
+            status_code=500, detail=str(e)
         ) from e
 
 
@@ -636,9 +671,9 @@ async def config_delete_index() -> dict:
         delete_index(settings.MEILI_PRODUCTS_INDEX)
         return {"message": "Index dropping"}
     except Exception as e:
-        logger.error(f"Error dropping index: {e}")
+        logger.error(e)
         raise HTTPException(
-            status_code=500, detail="An error occurred while dropping index"
+            status_code=500, detail=str(e)
         ) from e
 
 
@@ -651,12 +686,15 @@ async def reorder_images(id: int, image_ids: list[int], redis: RedisClient):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Update image order
     for index, image_id in enumerate(image_ids):
-        await db.productimage.update(
-            where={"id": image_id},
-            data={"order": index}
-        )
+        try:
+            await db.productimage.update(
+                where={"id": image_id},
+                data={"order": index}
+            )
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=400, detail=str(e))
 
     await reindex_product(cache=redis, product_id=id)
 

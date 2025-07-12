@@ -11,7 +11,7 @@ import Progress from "@/components/ui/progress";
 import { timeAgo } from "@/lib/utils";
 import { Review } from "@/schemas";
 import { useProductReviews } from "@/lib/hooks/useProduct";
-import { Skeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
 
 interface Prop {
     product_id: number;
@@ -26,13 +26,12 @@ const ReviewsSection: React.FC<Prop> = ({ product_id }) => {
     const { data: reviews, isLoading } = useProductReviews(product_id);
 
     if (isLoading) {
-        return <Skeleton className="min-h-[400px]" />;
+        return <ComponentLoader className="min-h-[400px]" />;
     }
 
     if (!reviews || reviews?.length == 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] bg-content1 rounded-lg px-8 py-16 text-center">
-                {/* Decorative elements */}
                 <div className="relative mb-6">
                     <div className="absolute -top-3 -right-3 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                         <Star className="w-6 h-6 text-blue-600" />

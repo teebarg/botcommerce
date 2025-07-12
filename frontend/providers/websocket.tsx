@@ -74,7 +74,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             };
 
             socket.onerror = (err) => {
-                console.error("WebSocket error", err);
                 setError(err);
             };
 
@@ -109,7 +108,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     };
 
     const retryConnection = () => {
-        console.log("Manually retrying WebSocket connection...");
         clearTimeout(reconnectTimeoutRef.current!);
         setReconnectAttempts(0);
         connect();

@@ -10,7 +10,6 @@ const ASSETS_TO_CACHE = [
     "/shipping",
     "/avatar_ai.png",
     "/bot.svg",
-    "/side-banner.webp",
     "/offline", // A fallback page for offline users
     "/favicon.ico", // Favicon
     // "/_next/static/", // Next.js static files

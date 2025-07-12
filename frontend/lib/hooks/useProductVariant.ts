@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
 
 import { useAddToCart } from "./useCart";
-
 import { currency } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 import { ProductVariant } from "@/schemas";
@@ -16,8 +17,38 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
 
-    const sizes = [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
-    const colors = [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
+    const sizes = useMemo(() => {
+        return [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
+    }, [product.variants]);
+
+    const colors = useMemo(() => {
+        return [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
+    }, [product.variants]);
+
+    const priceInfo = useMemo(() => {
+        const prices = product.variants?.map((v: ProductVariant) => v.price) || [];
+        const comparePrices = product.variants?.map((v: ProductVariant) => v.old_price || v.price) || [];
+
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        const minCompareAtPrice = Math.min(...comparePrices);
+        const maxCompareAtPrice = Math.max(...comparePrices);
+
+        const hasDiscount = product.variants?.some((v) => v.old_price && v.old_price > v.price);
+        const allDiscounted = product.variants?.every((v) => v.old_price && v.old_price > v.price);
+
+        const maxDiscountPercent = Math.round(((maxCompareAtPrice - minPrice) / maxCompareAtPrice) * 100);
+
+        return {
+            minPrice,
+            maxPrice,
+            minCompareAtPrice,
+            maxCompareAtPrice,
+            hasDiscount,
+            allDiscounted,
+            maxDiscountPercent,
+        };
+    }, [product.variants]);
 
     const findMatchingVariant = (size: string | null, color: string | null) => {
         return product.variants?.find((variant) => variant.size === size && variant.color === color);
@@ -29,7 +60,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     useEffect(() => {
         const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
-
         setSelectedVariant(matchingVariant ?? undefined);
     }, [selectedSize, selectedColor]);
 
@@ -63,6 +93,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {
         e.stopPropagation();
+
         const variantInfo = selectedVariant
             ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(
                   selectedVariant.price
@@ -74,7 +105,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         }/products/${product.slug}`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
-
         window.open(whatsappUrl, "_blank");
     };
 
@@ -93,6 +123,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         toggleColorSelect,
         handleAddToCart,
         handleWhatsAppPurchase,
+        priceInfo,
         loading,
     };
 };

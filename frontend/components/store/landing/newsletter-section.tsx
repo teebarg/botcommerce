@@ -104,7 +104,7 @@ const NewsletterSection: React.FC = () => {
                             <Mail className="h-4 w-4 text-primary" />
                             <span className="text-sm font-medium text-default-foreground">Newsletter</span>
                         </div>
-                        <h2 className="text-3xl font-bold text-default-foreground mb-4">Stay in the Loop</h2>
+                        <h2 className="text-3xl font-bold text-default-foreground mb-2">Stay in the Loop</h2>
                         <p className="text-default-600 text-lg max-w-2xl mx-auto">
                             Join over 50,000+ subscribers and get exclusive deals, product updates, and insider tips delivered straight to your inbox.
                         </p>

@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import SearchInput from "@/components/store/search/search-input";
 import { useProductSearch } from "@/lib/hooks/useProduct";
 import { Skeleton } from "@/components/ui/skeletons";
-import ServerError from "@/components/generic/server-error";
 
 interface Props {
     className?: string;
@@ -27,6 +26,10 @@ const Search: React.FC<Props> = ({ className }) => {
     const modalState = useOverlayTriggerState({});
     const [value, setValue] = useState("");
     const { data, error, isLoading } = useProductSearch({ search: value, limit: 15, page: 1 });
+
+    if (error) {
+        return <div className="text-center">Server error</div>;
+    }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValue(event?.target?.value);
@@ -41,10 +44,6 @@ const Search: React.FC<Props> = ({ className }) => {
     const onReset = () => {
         setValue("");
     };
-
-    if (error) {
-        return <ServerError />;
-    }
 
     return (
         <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
@@ -76,7 +75,7 @@ const Search: React.FC<Props> = ({ className }) => {
                     ) : (
                         <div className="h-[70vh] overflow-y-auto">
                             {data?.products.length == 0 && <NoProductsFound />}
-                            <div className="grid w-full gap-2 md:gap-4 grid-cols-2 md:grid-cols-3">
+                            <div className="grid w-full gap-2 md:gap-4 grid-cols-1 md:grid-cols-3">
                                 {data?.products.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                             </div>
                         </div>

@@ -3,8 +3,6 @@ from typing import Annotated, Any, Literal
 from pydantic import (
     AnyUrl,
     BeforeValidator,
-    EmailStr,
-    HttpUrl,
     PostgresDsn,
     ValidationInfo,
     computed_field,
@@ -22,16 +20,9 @@ def parse_cors(v: Any) -> list[str] | str:
 
 
 class Settings(BaseSettings):
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = (
-        60 * 24 * 8
-    )  # 60 minutes * 24 hours * 8 days = 8 days
-    API_V1_STR: str = "/api"
     SECRET_KEY: str = "specialsecret"
 
-    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     DATABASE_URL: str = ""
-
-    PAYSTACK_SECRET_KEY: str = "Pk_test_5029925955255255"
 
     POSTGRES_SERVER: str
     POSTGRES_USER: str = "postgres"
@@ -67,25 +58,7 @@ class Settings(BaseSettings):
             )
         )
 
-    EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
-    FIRST_SUPERUSER_FIRSTNAME: str = "admin"
-    FIRST_SUPERUSER_LASTNAME: str = "admin"
-    FIRST_SUPERUSER: EmailStr = "admin@email.com"
-    FIRST_SUPERUSER_PASSWORD: str = "password"
-
     REDIS_URL: str = "redis://localhost:6379/0"
-    SENTRY_DSN: HttpUrl | None = None
-
-    SMTP_TLS: bool = True
-    SMTP_SSL: bool = False
-    SMTP_PORT: int = 587
-    SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_USER: str = "your-email@gmail.com"
-    SMTP_PASSWORD: str = "your-password"
-
-    EMAILS_FROM_EMAIL: EmailStr | None = None
-    EMAILS_FROM_NAME: str | None = None
-    EMAILS_ENABLED: bool = False
 
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost"]'
@@ -99,23 +72,6 @@ class Settings(BaseSettings):
         return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS] + [
             self.FRONTEND_HOST
         ]
-
-    RABBITMQ_HOST: str = "rabbitmq"
-
-    MEILI_MASTER_KEY: str = "masterKey"
-    MEILI_HOST: str = "http://meilisearch:7700"
-    MEILI_PRODUCTS_INDEX: str = "products"
-
-    SUPABASE_URL: str = ""
-    SUPABASE_KEY: str = ""
-
-    SLACK_WEBHOOK_URL: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-
-    # OAuth Settings
-    GOOGLE_CLIENT_ID: str = ""
-    GOOGLE_CLIENT_SECRET: str = ""
-
-    GEMINI_API_KEY: str = ""
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

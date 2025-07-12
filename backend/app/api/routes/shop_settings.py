@@ -27,9 +27,13 @@ async def get_public_settings(request: Request) -> dict[str, str]:
     """
     Get all public settings
     """
-    settings = await db.shopsettings.find_many()
+    try:
+        settings = await db.shopsettings.find_many()
 
-    return {setting.key: setting.value for setting in settings}
+        return {setting.key: setting.value for setting in settings}
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=e.detail)
 
 
 @router.get("/{id}")

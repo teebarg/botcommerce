@@ -6,7 +6,7 @@ import CartItemComponent from "./cart-item";
 
 import { cn } from "@/lib/utils";
 import { CartItem } from "@/schemas";
-import { Skeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
 import { useCart } from "@/providers/cart-provider";
 
 type ItemsTemplateProps = {
@@ -16,7 +16,7 @@ type ItemsTemplateProps = {
 const CartItems: React.FC<ItemsTemplateProps> = ({ className }) => {
     const { cart, isLoading } = useCart();
 
-    if (isLoading) return <Skeleton className="h-[400px]" />;
+    if (isLoading) return <ComponentLoader className="h-[400px]" />;
 
     return (
         <div className={cn("flex flex-col gap-y-4 overflow-y-auto", className)}>

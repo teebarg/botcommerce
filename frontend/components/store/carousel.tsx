@@ -6,11 +6,11 @@ import { CarouselBanner } from "@/schemas/carousel";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { BtnLink } from "@/components/ui/btnLink";
 import ClientOnly from "@/components/generic/client-only";
-import { useCarouselBanners } from "@/lib/hooks/useCarousel";
+import { useCarouselBannerActive } from "@/lib/hooks/useCarousel";
 import ComponentLoader from "@/components/component-loader";
 
 const CarouselSection: React.FC = () => {
-    const { data, isLoading, error } = useCarouselBanners();
+    const { data, isLoading, error } = useCarouselBannerActive();
 
     if (isLoading) {
         return <ComponentLoader className="h-[60vh]" />;
@@ -18,8 +18,8 @@ const CarouselSection: React.FC = () => {
 
     const banners = data;
 
-    if (error) {
-        return;
+    if (error || banners?.length === 0) {
+        return null;
     }
 
     return (
@@ -28,7 +28,7 @@ const CarouselSection: React.FC = () => {
                 <CarouselContent>
                     {banners?.map((banner: CarouselBanner, idx: number) => (
                         <CarouselItem key={idx}>
-                            <div className="relative h-[60vh] w-full">
+                            <div className="relative h-[calc(100vh-4rem)] w-full">
                                 <img alt={banner.title} className="object-cover w-full h-full" src={banner.image || "/placeholder.jpg"} />
                                 <div className="absolute inset-0 bg-linear-to-r from-black/50 to-transparent flex items-center">
                                     <div className="container mx-auto px-4 md:px-8 lg:px-12">

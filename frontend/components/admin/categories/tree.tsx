@@ -84,9 +84,9 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                 </div>
 
                 <div className="space-y-4">
-                    {categories?.map((category) => (
+                    {categories?.map((category: Category, idx: number) => (
                         <div
-                            key={category.id}
+                            key={idx}
                             className="bg-card rounded-2xl shadow-sm border border-divider overflow-hidden hover:shadow-md transition-shadow"
                         >
                             <div className="group">

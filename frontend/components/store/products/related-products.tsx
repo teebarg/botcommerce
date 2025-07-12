@@ -4,7 +4,7 @@ import { Product, ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/generic/server-error";
 import { useProductSearch } from "@/lib/hooks/useProduct";
-import { Skeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
 
 type RelatedProductsProps = {
     product: Product;
@@ -27,11 +27,11 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
     const { data, isLoading, error } = useProductSearch(queryParams);
 
     if (isLoading) {
-        return <Skeleton className="min-h-[400px]" />;
+        return <ComponentLoader className="min-h-[400px]" />;
     }
 
     if (error) {
-        return <ServerError />;
+        return <ServerError error={error.message} scenario="related-products" stack={error.stack} />;
     }
 
     const productPreviews = data?.products?.filter((item: ProductSearch) => item.id !== product.id);

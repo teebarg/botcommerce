@@ -17,9 +17,9 @@ import { Confirm } from "@/components/generic/confirm";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/lib/utils";
 import ServerError from "@/components/generic/server-error";
-import { Skeleton } from "@/components/ui/skeletons";
 import { tryCatch } from "@/lib/try-catch";
 import Overlay from "@/components/overlay";
+import ComponentLoader from "@/components/component-loader";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -110,11 +110,11 @@ const DeliveryOverview: React.FC = () => {
     const { data: deliveryOptions, isLoading, error } = useAdminDeliveryOptions();
 
     if (error) {
-        return <ServerError />;
+        return <ServerError error={error.message} scenario="delivery" stack={error.stack} />;
     }
 
     if (isLoading) {
-        return <Skeleton className="h-[400px]" />;
+        return <ComponentLoader className="h-[400px]" />;
     }
 
     return (

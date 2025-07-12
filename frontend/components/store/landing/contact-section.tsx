@@ -13,7 +13,7 @@ export function ContactSection() {
         <section className="py-16 bg-content2">
             <div className="max-w-8xl mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-default-foreground mb-4">Get in Touch</h2>
+                    <h2 className="text-3xl font-bold text-default-foreground mb-2">Get in Touch</h2>
                     <p className="text-default-600 max-w-2xl mx-auto">
                         {`Have questions about our products or need support? We're here to help. Visit our store or reach out through any of the
                         channels below.`}
