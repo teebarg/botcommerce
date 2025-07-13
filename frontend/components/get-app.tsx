@@ -45,11 +45,11 @@ const GetApp: React.FC = () => {
 
     return (
         <button
-            className="flex items-center text-default-800 hover:text-default-500 cursor-pointer bg-content2 transition-colors rounded-full px-2 py-1.5"
+            className="flex items-center text-default-800 hover:text-default-500 cursor-pointer bg-content2 transition-colors rounded-full md:px-2 py-1.5"
             onClick={handleInstallClick}
         >
             <RectangleVertical />
-            <span className="text-sm font-medium">Get App</span>
+            <span className="text-sm font-medium md:block hidden">Get App</span>
         </button>
     );
 };

@@ -24,13 +24,6 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = ""
 
-    POSTGRES_SERVER: str
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_DB: str = "postgres"
-    POSTGRES_PORT: int = 5432
-    DATABASE_URI: str | None = None
-
     DOMAIN: str = "localhost"
     FRONTEND_HOST: str = "http://localhost:3000"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
@@ -42,21 +35,6 @@ class Settings(BaseSettings):
         if self.ENVIRONMENT == "local":
             return f"http://{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
-
-    @field_validator("DATABASE_URI", mode="before")
-    def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
-        if isinstance(v, str):
-            return v
-        return str(
-            PostgresDsn.build(
-                scheme="postgresql",
-                username=info.data.get("POSTGRES_USER"),
-                password=info.data.get("POSTGRES_PASSWORD"),
-                host=info.data.get("POSTGRES_SERVER"),
-                port=info.data.get("POSTGRES_PORT"),
-                path=f"{info.data.get('POSTGRES_DB') or ''}",
-            )
-        )
 
     REDIS_URL: str = "redis://localhost:6379/0"
 
