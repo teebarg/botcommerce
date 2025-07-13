@@ -10,6 +10,7 @@ import { api } from "@/apis/client";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
+import Image from "next/image";
 
 interface ProductImageManagerProps {
     categoryId: number;
@@ -18,7 +19,6 @@ interface ProductImageManagerProps {
 
 const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "" }) => {
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
-    const [isUploading, setIsUploading] = useState<boolean>(false);
     const invalidate = useInvalidate();
 
     const deleteImage = () => {
@@ -60,7 +60,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 const fileName = `images/${Date.now()}-${file.name}`;
 
                 void (async () => {
-                    setIsUploading(true);
+                    const toastId = toast.loading("Uploading image...");
                     try {
                         const { error } = await tryCatch<Message>(
                             api.patch(`/category/${categoryId}/image`, {
@@ -76,12 +76,10 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                             return;
                         }
 
-                        toast.success("Image uploaded successfully");
+                        toast.success("Image uploaded successfully", { id: toastId });
                         invalidate("categories");
                     } catch (error) {
-                        toast.error(`Error - ${error as string}`);
-                    } finally {
-                        setIsUploading(false);
+                        toast.error(`Error - ${error as string}`, { id: toastId });
                     }
                 })();
             };
@@ -91,7 +89,6 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
     return (
         <div className="space-y-6">
-            {/* Upload Area */}
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
@@ -102,22 +99,20 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                     <Upload className="w-8 h-8 text-default-500" />
                     <p className="text-default-600">{isDragActive ? "Drop the image here" : "Drag & drop image or click to upload"}</p>
                     <p className="text-sm text-default-400">(Max 5MB, JPG/PNG/GIF only)</p>
-                    {/* Upload progress */}
-                    {isUploading && (
-                        <div className="mb-4">
-                            <div className="w-full bg-default-200 rounded-full h-2.5">
-                                <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />
-                            </div>
-                            <p className="text-sm text-blue-500 mt-1">Uploading...</p>
-                        </div>
-                    )}
                 </div>
             </div>
 
-            {/* Image */}
             {initialImage && (
                 <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                    <img alt={`Category image`} className="w-full h-48 object-cover" src={initialImage} />
+                    <Image
+                        src={initialImage || "/placeholder.jpg"}
+                        alt="Category image"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover"
+                        placeholder="blur"
+                        blurDataURL="/placeholder.jpg"
+                    />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
                         <Button className="rounded-full" size="icon" variant="destructive" onClick={deleteImage}>
                             <Trash2 className="w-5 h-5" />
@@ -133,7 +128,6 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
             {!initialImage && <p className="text-center text-default-500">No image uploaded yet</p>}
 
-            {/* Help text */}
             <div className="text-xs text-default-500">
                 <p>• Recommended image size: 1000 x 1000 pixels</p>
             </div>

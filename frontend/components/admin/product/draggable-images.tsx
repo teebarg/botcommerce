@@ -6,6 +6,7 @@ import { Trash } from "lucide-react";
 import { ProductImage } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useDeleteImages, useReorderImages } from "@/lib/hooks/useProduct";
+import Image from "next/image";
 
 interface DraggableImageListProps {
     initialImages: ProductImage[];
@@ -193,7 +194,16 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                             </div>
 
                             <div className="shrink-0 mr-4">
-                                <img alt={image.image} className="w-24 h-24 object-cover rounded" draggable={false} src={image.image} />
+                                <Image
+                                    src={image.image}
+                                    alt={image.image}
+                                    width={96}
+                                    height={96}
+                                    className="object-cover rounded"
+                                    placeholder="blur"
+                                    blurDataURL="/placeholder.jpg"
+                                    draggable={false}
+                                />
                             </div>
 
                             <div className="grow hidden md:block">

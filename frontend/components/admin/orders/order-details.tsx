@@ -23,6 +23,7 @@ import OrderProcessingAction from "./order-processing-actions";
 import { Order, OrderItem, OrderStatus } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface OrderDetailsProps {
     order: Order;
@@ -145,7 +146,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                     <div key={idx} className="px-6 py-4">
                                         <div className="flex flex-col sm:flex-row">
                                             <div className="shrink-0 mr-4 mb-4 sm:mb-0">
-                                                <img alt={item.name} className="w-20 h-20 object-cover rounded" src={item.image} />
+                                                <Image
+                                                    alt={item.name}
+                                                    className="object-cover rounded"
+                                                    src={item.image || "/placeholder.jpg"}
+                                                    width={80}
+                                                    height={80}
+                                                    placeholder="blur"
+                                                    blurDataURL="/placeholder.jpg"
+                                                />
                                             </div>
                                             <div className="grow">
                                                 <h3 className="text-sm font-medium text-default-900">{item.name}</h3>

@@ -14,6 +14,7 @@ import { useUserWishlist } from "@/lib/hooks/useUser";
 import ClientOnly from "@/components/generic/client-only";
 import ProductOverview from "@/components/store/products/product-overview";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -36,22 +37,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "bg-conten
             showCloseButton={false}
             title="Details"
             trigger={
-                <div className="group cursor-pointer">
+                <div role="button" tabIndex={0} className="group cursor-pointer">
                     <ClientOnly>
                         <div
                             className={`relative overflow-hidden rounded-2xl ${variant} shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2`}
                         >
                             <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
 
-                            <div className="relative overflow-hidden">
-                                <img
+                            <div
+                                className={cn("relative overflow-hidden", {
+                                    "h-60": size === "sm",
+                                    "h-80": size === "md",
+                                    "h-96": size === "lg",
+                                })}
+                            >
+                                <Image
                                     src={product.images[0] || product.image || "/placeholder.jpg"}
-                                    alt={product.name}
-                                    className={cn("w-full object-cover group-hover:scale-110 transition-transform duration-700", {
-                                        "h-60": size === "sm",
-                                        "h-80": size === "md",
-                                        "h-96": size === "lg",
-                                    })}
+                                    alt=""
+                                    aria-hidden="true"
+                                    className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    priority={false}
                                 />
                             </div>
 
