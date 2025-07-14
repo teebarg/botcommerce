@@ -11,14 +11,12 @@ import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
 import { getSiteConfig } from "@/lib/config";
-import ClientOnly from "@/components/generic/client-only";
 
 const StoreNavbar = async () => {
     const user = await auth();
     const siteConfig = await getSiteConfig();
 
     return (
-        <ClientOnly>
             <NavigationBar className="my-2 hidden md:flex">
                 <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                     <NavbarBrand className="flex items-center font-semibold">
@@ -57,7 +55,6 @@ const StoreNavbar = async () => {
                     </NavbarItem>
                 </NavbarContent>
             </NavigationBar>
-        </ClientOnly>
     );
 };
 

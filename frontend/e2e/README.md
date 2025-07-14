@@ -32,12 +32,7 @@ Note that **these tests drop and reset the database** after each test run. This 
 
 ### Environment variables
 
-- `TEST_POSTGRES_USER` - user for connecting to the test database, for example, `postgres`
-- `TEST_POSTGRES_PASSWORD` - password for connecting to the test database, for example `my_secret_password`
-- `TEST_POSTGRES_DATABASE` - name of the test database, must start with the prefix `test*`, for example `test_db`
-- `TEST_POSTGRES_HOST` - optional - host for the postgres database, defaults to `localhost`
-- `TEST_POSTGREST_PORT` - optional - host for the postgres
-- `PRODUCTION_POSTGRES_DATABASE` - name of the production database, for example `db`
+- `TEST_DATABASE_URL` - optional - database url for the test database, defaults to `postgres://postgres:postgres@localhost:5432/test_db`
 
 in addition, there are environment variables for connecting to the database as a superuser, so we can efficiently reset the database.
 

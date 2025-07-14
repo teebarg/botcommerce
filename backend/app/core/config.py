@@ -28,7 +28,6 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     SECRET_KEY: str = "specialsecret"
 
-    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     DATABASE_URL: str = ""
 
     PAYSTACK_SECRET_KEY: str = "Pk_test_5029925955255255"

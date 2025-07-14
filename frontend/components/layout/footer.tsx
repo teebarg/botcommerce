@@ -9,6 +9,7 @@ import { Category } from "@/schemas/product";
 import { useStore } from "@/app/store/use-store";
 import { useCategories } from "@/lib/hooks/useCategories";
 import { useCollections } from "@/lib/hooks/useCollection";
+import { Separator } from "@/components/ui/separator";
 
 const company = [
     {
@@ -164,7 +165,8 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-wrap justify-between gap-2 md:pt-8">
+                <Separator className="my-4" />
+                <div>
                     <p className="text-sm text-default-500">
                         &copy; {new Date().getFullYear()} {shopSettings?.shop_name}. All rights reserved.
                     </p>

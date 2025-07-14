@@ -55,8 +55,8 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
     }, [searchParams]);
 
     return (
-        <ClientOnly>
-            <div className="h-full min-w-[20rem] md:max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-content1 rounded-xl">
+        <div className="h-full min-w-[20rem] md:max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-content1 rounded-xl">
+            <ClientOnly>
                 <div className="w-full max-w-sm p-6">
                     <div>
                         <span className="text-sm">Collections</span>
@@ -78,30 +78,34 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                         step={500}
                         onChange={onPriceChange}
                     />
-                    <div className="flex flex-col mt-2">
+                    <div className="flex flex-col mt-6">
                         <span className="mb-2 text-sm">Categories</span>
-                        {categories?.map((item: Category, index: number) => (
-                            <CheckboxGroup key={index} checkboxes={item.subcategories} facets={facets} groupName={item.name} item={item} />
-                        ))}
+                        <div className="max-h-[20vh] overflow-y-scroll">
+                            {categories?.map((item: Category, index: number) => (
+                                <CheckboxGroup key={index} checkboxes={item.subcategories} facets={facets} groupName={item.name} item={item} />
+                            ))}
+                        </div>
                     </div>
-                    <div className="flex flex-col mt-2">
+                    <div className="flex flex-col mt-6">
                         <span className="text-sm">Brands</span>
-                        {brands?.map((item: Brand, index: number) => (
-                            <div key={`brand-${index}`} className="flex justify-between mt-2">
-                                <div className="flex items-center gap-1">
-                                    <Checkbox
-                                        checked={dataSet.has(item.slug)}
-                                        onCheckedChange={(checked) => onBrandChange(checked == "indeterminate" ? false : checked, item.slug)}
-                                    />
-                                    <label>{item.name}</label>
+                        <div className="max-h-[20vh] overflow-y-scroll">
+                            {brands?.map((item: Brand, index: number) => (
+                                <div key={`brand-${index}`} className="flex justify-between mt-2">
+                                    <div className="flex items-center gap-1">
+                                        <Checkbox
+                                            checked={dataSet.has(item.slug)}
+                                            onCheckedChange={(checked) => onBrandChange(checked == "indeterminate" ? false : checked, item.slug)}
+                                        />
+                                        <label>{item.name}</label>
+                                    </div>
+                                    {facets?.brand && <span>({facets["brand"][item.name] ?? 0})</span>}
                                 </div>
-                                {facets?.brand && <span>({facets["brand"][item.name] ?? 0})</span>}
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </ClientOnly>
+            </ClientOnly>
+        </div>
     );
 };
 

@@ -18,7 +18,6 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
 
     const searchParams = useSearchParams();
 
-    // Handle parent checkbox change
     const handleParentChange = (checked: boolean) => {
         const newSet = new Set(dataSet);
 
@@ -58,7 +57,6 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
         updateQuery([{ key: "cat_ids", value: Array.from(newSet).join(",") }]);
     };
 
-    // Sync the checked state with URL on component mount
     useEffect(() => {
         const catIdsFromURL = searchParams.get("cat_ids")?.split(",") || [];
         const newSet = new Set(catIdsFromURL);
@@ -69,7 +67,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
     return (
         <div>
             <div className="flex items-center justify-between">
-                <div>
+                <div className="flex items-center gap-1">
                     <Checkbox
                         checked={dataSet.has(item.slug)}
                         onCheckedChange={(checked) => handleParentChange(checked == "indeterminate" ? false : checked)}
