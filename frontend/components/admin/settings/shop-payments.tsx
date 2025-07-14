@@ -38,8 +38,8 @@ const defaultFeatures = [
     },
     {
         key: "payment_cash",
-        label: "Cash on Delivery",
-        description: "Enable cash on delivery payment gateway",
+        label: "Cash at Pickup",
+        description: "Enable cash at pickup",
     },
 ];
 
@@ -66,7 +66,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-card rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-background rounded-lg">
             <div>
                 <h3 className="font-medium text-sm">{bank.bank_name}</h3>
                 <p className="text-default-900 font-semibold">{bank.account_name}</p>

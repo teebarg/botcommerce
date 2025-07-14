@@ -1,4 +1,5 @@
 import React from "react";
+
 import ComponentLoader from "@/components/component-loader";
 
 const CollectionTemplateSkeleton = () => {

@@ -4,20 +4,21 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
+import Image from "next/image";
 
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { api } from "@/apis/client";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import Image from "next/image";
 
 interface ProductImageManagerProps {
     categoryId: number;
     initialImage?: string;
+    onClose?: () => void;
 }
 
-const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "" }) => {
+const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "", onClose }) => {
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const invalidate = useInvalidate();
 
@@ -35,6 +36,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                 toast.success("Image deleted successfully");
                 invalidate("categories");
+                onClose?.();
             } catch (error) {
                 toast.error(`Error - ${error as string}`);
             } finally {
@@ -61,6 +63,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                 void (async () => {
                     const toastId = toast.loading("Uploading image...");
+
                     try {
                         const { error } = await tryCatch<Message>(
                             api.patch(`/category/${categoryId}/image`, {
@@ -78,6 +81,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                         toast.success("Image uploaded successfully", { id: toastId });
                         invalidate("categories");
+                        onClose?.();
                     } catch (error) {
                         toast.error(`Error - ${error as string}`, { id: toastId });
                     }
@@ -105,13 +109,13 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
             {initialImage && (
                 <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                     <Image
-                        src={initialImage || "/placeholder.jpg"}
-                        alt="Category image"
                         fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
+                        alt="Category image"
+                        blurDataURL="/placeholder.jpg"
                         className="object-cover"
                         placeholder="blur"
-                        blurDataURL="/placeholder.jpg"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        src={initialImage || "/placeholder.jpg"}
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
                         <Button className="rounded-full" size="icon" variant="destructive" onClick={deleteImage}>

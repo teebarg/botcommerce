@@ -73,7 +73,9 @@ export default async function Home() {
                         </div>
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {data?.trending?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} size="lg" />)}
+                            {data?.trending?.map((product: ProductSearch, idx: number) => (
+                                <ProductCard key={idx} product={product} size="lg" variant="bg-content1" />
+                            ))}
                         </div>
                     </div>
                 </section>

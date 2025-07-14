@@ -37,7 +37,10 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
     return (
         <div
             key={banner.id}
-            className={cn("bg-content1 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md", banner.is_active ? "bg-emerald-100 dark:bg-emerald-700 text-default-800" : "")}
+            className={cn(
+                "bg-content1 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md",
+                banner.is_active ? "bg-emerald-100 dark:bg-emerald-700 text-default-800" : ""
+            )}
         >
             <div className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">

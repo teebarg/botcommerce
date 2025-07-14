@@ -53,18 +53,6 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
             >
                 Confirm Order for Pickup
             </Button>
-            {/* Security message */}
-            <div className="mt-4 flex items-center justify-center text-xs text-default-500">
-                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                    />
-                </svg>
-                Secure 256-bit SSL encrypted payment
-            </div>
         </div>
     );
 };

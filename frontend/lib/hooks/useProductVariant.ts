@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { useAddToCart } from "./useCart";
+
 import { currency } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 import { ProductVariant } from "@/schemas";
@@ -60,6 +61,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     useEffect(() => {
         const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
+
         setSelectedVariant(matchingVariant ?? undefined);
     }, [selectedSize, selectedColor]);
 
@@ -100,11 +102,12 @@ export const useProductVariant = (product: Product | ProductSearch) => {
               )}`
             : "";
 
-        const message = `Hi! I'm interested in purchasing:\n\n*${product.name}*${variantInfo}\nProduct Link: ${
+        const message = `Hi! I'd like to order:\n\n*${product.name}*\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
             typeof window !== "undefined" ? window.location.origin : ""
-        }/products/${product.slug}`;
+        }/products/${product.slug}\n\nPlease let me know the next steps for payment and delivery. Thank you!`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
         window.open(whatsappUrl, "_blank");
     };
 

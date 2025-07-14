@@ -1,8 +1,9 @@
+import Image from "next/image";
+
 import { CollectionActions } from "./collection-actions";
 
 import { Badge } from "@/components/ui/badge";
 import { Collection } from "@/schemas/product";
-import Image from "next/image";
 
 interface CollectionItemProps {
     collection: Collection;
@@ -14,12 +15,12 @@ const CollectionItem = ({ collection }: CollectionItemProps) => {
             <div className="aspect-video w-full relative">
                 <Image
                     alt={collection.name}
+                    blurDataURL="/placeholder.jpg"
                     className="object-cover rounded"
-                    src="/placeholder.jpg"
-                    width={100}
                     height={100}
                     placeholder="blur"
-                    blurDataURL="/placeholder.jpg"
+                    src="/placeholder.jpg"
+                    width={100}
                 />
             </div>
             <div className="p-3">

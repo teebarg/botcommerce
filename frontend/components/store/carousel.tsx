@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 import { CarouselBanner } from "@/schemas/carousel";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -8,7 +9,6 @@ import { BtnLink } from "@/components/ui/btnLink";
 import ClientOnly from "@/components/generic/client-only";
 import { useCarouselBannerActive } from "@/lib/hooks/useCarousel";
 import ComponentLoader from "@/components/component-loader";
-import Image from "next/image";
 
 const CarouselSection: React.FC = () => {
     const { data, isLoading, error } = useCarouselBannerActive();
@@ -31,14 +31,14 @@ const CarouselSection: React.FC = () => {
                         <CarouselItem key={idx}>
                             <div className="relative h-[calc(100vh-4rem)] w-full">
                                 <Image
-                                    src={banner.image || "/placeholder.jpg"}
-                                    alt={banner.title}
                                     fill
-                                    sizes="100vw"
+                                    priority
+                                    alt={banner.title}
+                                    blurDataURL="/placeholder.jpg"
                                     className="object-cover w-full h-full"
                                     placeholder="blur"
-                                    blurDataURL="/placeholder.jpg"
-                                    priority
+                                    sizes="100vw"
+                                    src={banner.image || "/placeholder.jpg"}
                                 />
 
                                 <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">

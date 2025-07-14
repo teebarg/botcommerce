@@ -18,7 +18,7 @@ interface OrderSearchParams {
 export const useOrders = (searchParams: OrderSearchParams) => {
     return useQuery({
         queryKey: ["orders", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedOrder>(`/order/`, { params: { ...searchParams } }),
+        queryFn: async () => await api.get<PaginatedOrder>("/order/", { params: { ...searchParams } }),
     });
 };
 

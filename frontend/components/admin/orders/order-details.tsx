@@ -17,13 +17,13 @@ import {
     Download,
 } from "lucide-react";
 import { format } from "date-fns";
+import Image from "next/image";
 
 import OrderProcessingAction from "./order-processing-actions";
 
 import { Order, OrderItem, OrderStatus } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
 
 interface OrderDetailsProps {
     order: Order;
@@ -148,12 +148,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                             <div className="shrink-0 mr-4 mb-4 sm:mb-0">
                                                 <Image
                                                     alt={item.name}
+                                                    blurDataURL="/placeholder.jpg"
                                                     className="object-cover rounded"
-                                                    src={item.image || "/placeholder.jpg"}
-                                                    width={80}
                                                     height={80}
                                                     placeholder="blur"
-                                                    blurDataURL="/placeholder.jpg"
+                                                    src={item.image || "/placeholder.jpg"}
+                                                    width={80}
                                                 />
                                             </div>
                                             <div className="grow">

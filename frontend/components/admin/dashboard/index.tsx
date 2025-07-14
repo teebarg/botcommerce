@@ -9,7 +9,9 @@ import { useOrders } from "@/lib/hooks/useOrder";
 import { Order } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
+import ClientOnly from "@/components/generic/client-only";
+import ServerError from "@/components/generic/server-error";
 
 const OrderStatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<string, { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "emerald" }> = {
@@ -51,18 +53,24 @@ const OrderStatusBadge = ({ status }: { status: string }) => {
 };
 
 const RecentOrdersList = () => {
-    const { data, isLoading } = useOrders({ take: 5 });
+    const { data, isLoading, error } = useOrders({ take: 5 });
 
     if (isLoading)
         return (
-            <div className="px-2 md:px-10 py-8">
-                <TableSkeleton />
-            </div>
+            <ClientOnly>
+                <div className="px-2 md:px-10">
+                    <ComponentLoader className="h-100" />
+                </div>
+            </ClientOnly>
         );
 
-    const { orders } = data || {};
+    if (error) {
+        return <ServerError />;
+    }
 
-    if (orders?.length === 0) {
+    const { orders } = data || { orders: [] };
+
+    if (!orders) {
         return (
             <div className="px-2 md:px-10 py-8">
                 <p>No orders found!</p>

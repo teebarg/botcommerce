@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 import { ProductQuery } from "./product-query";
 
@@ -19,7 +20,6 @@ import ServerError from "@/components/generic/server-error";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useBrands } from "@/lib/hooks/useBrand";
 import ComponentLoader from "@/components/component-loader";
-import Image from "next/image";
 
 const LIMIT = 10;
 
@@ -86,13 +86,13 @@ export function ProductDetails() {
                                 </TableCell>
                                 <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
                                     <Image
-                                        src={product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"}
                                         alt={product.name}
-                                        width={40}
-                                        height={40}
-                                        className="rounded"
-                                        placeholder="blur"
                                         blurDataURL="/placeholder.jpg"
+                                        className="rounded"
+                                        height={40}
+                                        placeholder="blur"
+                                        src={product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"}
+                                        width={40}
                                     />
                                 </TableCell>
                                 <TableCell className="font-medium">{product.name}</TableCell>
