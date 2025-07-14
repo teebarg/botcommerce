@@ -72,7 +72,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                         <span className="text-sm text-default-500">({count})</span>
                     </div>
                 </div>
-                <div className="flex-1p">
+                <div>
                     <Select defaultValue={value} onValueChange={handleSortChange}>
                         <SelectTrigger className="bg-content1 border-divider focus:border-primary">
                             <SelectValue placeholder="Select status" />

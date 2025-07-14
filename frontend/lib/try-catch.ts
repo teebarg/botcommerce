@@ -24,9 +24,7 @@ export async function tryCatch<T, E = string>(promise: Promise<T>): Promise<Resu
 
         return { data, error: null };
     } catch (err) {
-        // return handleError(error);
         return { data: null, error: (err as Error).message || "An error occurred" };
-        // return { data: null, error: error as E };
     }
 }
 
@@ -37,8 +35,6 @@ export async function tryCatchApi<T>(promise: Promise<Response>, callbackUrl?: s
         if (!response.ok) {
             if (response.status === 401) {
                 deleteCookie("access_token");
-                // Use redirect for server components instead of window.location
-                // redirect(`/sign-in?callbackUrl=${encodeURIComponent(url.pathname)}`);
                 redirect(`/sign-in${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`);
             }
 
