@@ -134,11 +134,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                         className="bg-card rounded-xl p-4 border border-divider hover:shadow-sm transition-shadow group"
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <CategoryImage
-                                                                categoryId={subcategory.id}
-                                                                className="w-12 h-12 rounded-lg flex-shrink-0"
-                                                                image={subcategory.image}
-                                                            />
+                                                            <CategoryImage categoryId={subcategory.id} image={subcategory.image} />
 
                                                             <div className="flex-1 min-w-0">
                                                                 <h4 className="font-medium text-default-900 truncate mb-1">{subcategory.name}</h4>

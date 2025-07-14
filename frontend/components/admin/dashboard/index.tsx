@@ -70,7 +70,6 @@ const RecentOrdersList = () => {
 
     const { orders } = data || { orders: [] };
 
-
     if (!orders) {
         return (
             <div className="px-2 md:px-10 py-8">

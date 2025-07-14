@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { useAddToCart } from "./useCart";
+
 import { currency } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 import { ProductVariant } from "@/schemas";
@@ -60,6 +61,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     useEffect(() => {
         const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
+
         setSelectedVariant(matchingVariant ?? undefined);
     }, [selectedSize, selectedColor]);
 
@@ -105,6 +107,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         }/products/${product.slug}\n\nPlease let me know the next steps for payment and delivery. Thank you!`;
 
         const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+
         window.open(whatsappUrl, "_blank");
     };
 

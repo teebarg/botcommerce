@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
-import { ProductSearch } from "@/schemas/product";
 import { useInView } from "react-intersection-observer";
+
 import ProductCard from "./product-card";
+
+import { ProductSearch } from "@/schemas/product";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {

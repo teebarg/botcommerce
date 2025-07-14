@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
 import Image from "next/image";
 
+import { DiscountBadge } from "./discount-badge";
+
 import { ProductSearch } from "@/schemas/product";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
-import { DiscountBadge } from "./discount-badge";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -50,10 +51,10 @@ const ProductOverview: React.FC<{
         <div className="bg-content1 z-50 overflow-y-auto duration-300 w-full rounded-[inherit] overflow-hiddenp">
             <div className="sticky top-0 z-10">
                 <button
-                    onClick={onClose}
                     className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg"
+                    onClick={onClose}
                 >
-                    <X size={20} className="text-gray-600 dark:text-gray-300" />
+                    <X className="text-gray-600 dark:text-gray-300" size={20} />
                 </button>
 
                 <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
@@ -112,11 +113,11 @@ const ProductOverview: React.FC<{
                         )}
                     </div>
                     <button
+                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
                         onClick={(e) => {
                             e.stopPropagation();
                             isLiked ? removeWishlist() : addWishlist();
                         }}
-                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
                     >
                         <Heart className={`w-6 h-6 ${isLiked ? "text-red-500 fill-current" : "text-default-600"}`} />
                     </button>
@@ -146,8 +147,8 @@ const ProductOverview: React.FC<{
                                     data-state={isSelected ? "checked" : "unchecked"}
                                     disabled={!available}
                                     style={{ backgroundColor: color.toLowerCase() }}
-                                    onClick={() => available && toggleColorSelect(color)}
                                     title={color}
+                                    onClick={() => available && toggleColorSelect(color)}
                                 >
                                     {!available && (
                                         <div className="absolute inset-0 flex items-center justify-center">

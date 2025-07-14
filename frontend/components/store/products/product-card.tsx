@@ -2,19 +2,18 @@
 
 import React from "react";
 import { Star } from "lucide-react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+import Image from "next/image";
 
 import { ProductSearch } from "@/schemas/product";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
-import { useOverlayTriggerState } from "@react-stately/overlays";
-
 import Overlay from "@/components/overlay";
 import { useUserWishlist } from "@/lib/hooks/useUser";
 import ClientOnly from "@/components/generic/client-only";
 import ProductOverview from "@/components/store/products/product-overview";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -37,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "bg-conten
             showCloseButton={false}
             title="Details"
             trigger={
-                <div role="button" tabIndex={0} className="group cursor-pointer">
+                <div className="group cursor-pointer" role="button" tabIndex={0}>
                     <ClientOnly>
                         <div
                             className={`relative overflow-hidden rounded-2xl ${variant} shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2`}
@@ -52,13 +51,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "bg-conten
                                 })}
                             >
                                 <Image
-                                    src={product.images[0] || product.image || "/placeholder.jpg"}
+                                    fill
                                     alt=""
                                     aria-hidden="true"
                                     className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 33vw"
                                     priority={false}
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    src={product.images[0] || product.image || "/placeholder.jpg"}
                                 />
                             </div>
 

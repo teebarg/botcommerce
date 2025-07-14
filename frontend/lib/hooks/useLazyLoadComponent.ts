@@ -21,6 +21,7 @@ export const useLazyLoadComponent = (options?: LazyLoadOptions) => {
         if (inView && !hasEnteredView) {
             if (delay > 0) {
                 const timeout = setTimeout(() => setHasEnteredView(true), delay);
+
                 return () => clearTimeout(timeout);
             }
             setHasEnteredView(true);
