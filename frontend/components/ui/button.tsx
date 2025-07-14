@@ -29,7 +29,7 @@ const buttonVariants = cva(
                 default: "h-10 px-4 py-2 min-w-32",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
-                lg: "h-11 rounded-md px-8 text-base font-normal min-w-32",
+                lg: "h-12 rounded-md px-8 text-base font-normal min-w-32",
                 icon: "p-2",
                 iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent",
             },
@@ -51,6 +51,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant, size, asChild = false, isLoading = false, children, startContent, endContent, ...props }, ref) => {
         const Comp = asChild ? Slot : "button";
+        const [isClient, setIsClient] = React.useState<boolean>(false);
+
+        React.useEffect(() => {
+            setIsClient(true);
+        }, []);
+
+        if (!isClient) return null;
 
         return (
             <Comp

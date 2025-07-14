@@ -9,8 +9,7 @@ import ChatBody from "./chatbody";
 import { api } from "@/apis/client";
 import { ChatMessage, Conversation } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-
-const profilePic = "https://i.pravatar.cc/50?img=12";
+import Image from "next/image";
 
 interface Message {
     text: string;
@@ -105,25 +104,33 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
 
     return (
         <div className="w-full md:max-w-md flex flex-col h-[90vh] rounded-xl rounded-b-none md:rounded-b-xl shadow-2xl animate-fade-in z-70">
-            {/* <ChatHeader /> */}
             <header className="flex items-center px-4 py-3 bg-[#222d31] rounded-t-xl border-b border-[#232930]">
-                <img alt="AI Assistant" className="w-10 h-10 rounded-full mr-4" src={profilePic} />
+                <Image
+                    src="/profile-1.jpeg"
+                    alt="AI Assistant"
+                    width={40}
+                    height={40}
+                    className="rounded-full mr-4"
+                    placeholder="blur"
+                    blurDataURL="/placeholder.jpg"
+                    priority={false}
+                />
                 <div className="flex-1">
                     <div className="font-semibold text-white text-base">Online Assistant</div>
                     <div className="text-xs text-[#b2b8bd]">Online</div>
                 </div>
                 <div className="flex gap-3">
-                    <button className="p-1.5 rounded-full hover:bg-[#2a393f] transition" onClick={onMinimize}>
+                    <button className="p-1.5 rounded-full hover:bg-[#2a393f] transition" onClick={onMinimize} aria-label="Minimize chat">
                         <Minus color="#b2b8bd" size={20} />
                     </button>
-                    <button className="p-1.5 rounded-full hover:bg-[#2a393f] transition" onClick={onClose}>
+                    <button className="p-1.5 rounded-full hover:bg-[#2a393f] transition" onClick={onClose} aria-label="Close chat">
                         <X color="#b2b8bd" size={20} />
                     </button>
                 </div>
             </header>
             <ChatBody isLoading={isLoading} messages={messages} />
             <form className="flex items-center px-3 py-2 bg-[#222d31] rounded-b-none md:rounded-b-xl border-t border-[#232930]" onSubmit={handleSend}>
-                <button className="p-2 rounded-full hover:bg-[#2a393f] transition" tabIndex={-1} type="button">
+                <button className="p-2 rounded-full hover:bg-[#2a393f] transition" tabIndex={-1} type="button" aria-label="Attach file">
                     <Paperclip color="#b2b8bd" size={20} />
                 </button>
                 <input

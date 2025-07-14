@@ -5,13 +5,20 @@ import React from "react";
 import { currency } from "@/lib/utils";
 import { OrderItem } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
     return (
         <div className="flex gap-3 p-4">
             <div className="relative">
-                <div className="h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
-                    <img alt={item.name} className="h-full w-full object-cover object-center" src={item?.image || "/placeholder.jpg"} />
+                <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
+                    <Image
+                        src={item?.image || "/placeholder.jpg"}
+                        alt={item.name}
+                        fill
+                        sizes="(max-width: 768px) 64px, 80px"
+                        className="object-cover object-center rounded-lg"
+                    />
                 </div>
             </div>
 

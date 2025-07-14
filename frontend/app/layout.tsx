@@ -1,5 +1,5 @@
 import "./globals.css";
-import { Lexend, Outfit } from "next/font/google";
+import { Lexend, Outfit, Nunito_Sans } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -20,12 +20,18 @@ import { CartProvider } from "@/providers/cart-provider";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
-const outfit = Outfit({ weight: ["400", "500", "600"], subsets: ["latin"] });
+const outfit = Outfit({ weight: ["400", "500", "600"], subsets: ["latin"], variable: "--font-outfit", display: "swap" });
 
 const lexend = Lexend({
     subsets: ["latin"],
     display: "swap",
     variable: "--font-lexend",
+});
+
+export const nunitoSans = Nunito_Sans({
+    subsets: ["latin"],
+    variable: "--font-nunito",
+    display: "swap",
 });
 
 export async function generateMetadata() {
@@ -60,7 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     const { data: shopSettings } = await tryCatch<Record<string, string>>(api.get("/shop-settings/public"));
 
     return (
-        <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className)} lang="en">
+        <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className, nunitoSans.variable)} lang="en">
             <head>
                 <ThemeScript />
                 <link href="/favicon-96x96.png" rel="icon" sizes="96x96" type="image/png" />

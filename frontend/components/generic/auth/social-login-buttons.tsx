@@ -50,6 +50,7 @@ export default function SocialLoginButtons({ callbackUrl }: Props) {
                 className="w-full"
                 disabled={isLoading !== null}
                 isLoading={isLoading === "google"}
+                size="lg"
                 variant="outline"
                 onClick={() => handleSocialLogin("google")}
             >

@@ -4,8 +4,9 @@ import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { BtnLink } from "@/components/ui/btnLink";
+import { api } from "@/apis/client2";
 
-export default function Error({ error, reset }: { error: Error; reset: () => void }) {
+export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
     useEffect(() => {
         if (error) {
             // Prepare the error data
@@ -13,17 +14,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
                 message: error.message || "An error occurred",
                 name: error.name || "Error",
                 stack: error.stack || "",
-                timestamp: new Date().toISOString(),
+                scenario: "error-boundary",
             };
 
-            // Send the error to the server
-            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/log-error`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(errorData),
-            });
+            api.post("/log-error", errorData);
         }
     }, [error]);
 

@@ -2,6 +2,7 @@ import { CollectionActions } from "./collection-actions";
 
 import { Badge } from "@/components/ui/badge";
 import { Collection } from "@/schemas/product";
+import Image from "next/image";
 
 interface CollectionItemProps {
     collection: Collection;
@@ -11,7 +12,15 @@ const CollectionItem = ({ collection }: CollectionItemProps) => {
     return (
         <div className="border border-default rounded-lg overflow-hidden bg-content1">
             <div className="aspect-video w-full relative">
-                <img alt={collection.name} className="w-full h-full object-cover" src="/placeholder.jpg" />
+                <Image
+                    alt={collection.name}
+                    className="object-cover rounded"
+                    src="/placeholder.jpg"
+                    width={100}
+                    height={100}
+                    placeholder="blur"
+                    blurDataURL="/placeholder.jpg"
+                />
             </div>
             <div className="p-3">
                 <div className="flex items-center justify-between">

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useCollections } from "@/lib/hooks/useCollection";
 import ServerError from "@/components/generic/server-error";
-import { Skeleton } from "@/components/ui/skeletons";
+import ComponentLoader from "@/components/component-loader";
 
 interface Props {
     search?: string;
@@ -25,7 +25,7 @@ const CollectionView: React.FC<Props> = ({ search }) => {
     if (isLoading) {
         return (
             <div className="px-2 md:px-10 py-8">
-                <Skeleton className="h-192" />
+                <ComponentLoader className="h-192" />
             </div>
         );
     }

@@ -1,4 +1,5 @@
 import logging
+import sentry_sdk
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -21,17 +22,27 @@ import redis.asyncio as redis
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
     logger.info("🚀connecting to dbs......:")
     await db.connect()
     logger.info("✅ ~ connected to prisma......:")
-    await redis_client.ping()
-    app.state.redis = redis_client
-    logger.info("✅ ~ connected to redis......:")
+    try:
+        redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+        await redis_client.ping()
+        app.state.redis = redis_client
+        logger.info("✅ ~ connected to redis......:")
+    except Exception as e:
+        logger.error(f"❌ ~ failed to connect to redis......: {e}")
 
     yield
     await db.disconnect()
-    await redis_client.close()
+    try:
+        await redis_client.close()
+    except Exception as e:
+        logger.error(f"❌ ~ failed to close redis connection......: {e}")
+
+
+if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
+    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
 app = FastAPI(title="Botcommerce",
               openapi_url="/api/openapi.json", lifespan=lifespan)
@@ -134,7 +145,8 @@ async def log_error(error: dict, notification: deps.Notification, request: Reque
         f"*Message:* {error.get('message', 'N/A')}\n"
         f"*Source:* {error.get('source', 'N/A')}\n"
         f"*Timestamp:* {datetime.now().isoformat()}\n"
-        f"*Stack:* {error.get('stack', 'N/A')}"
+        f"*Stack:* {error.get('stack', 'N/A')}\n"
+        f"*Scenario:* {error.get('scenario', 'N/A')}\n"
     }
     notification.send_notification(
         channel_name="slack",

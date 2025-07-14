@@ -1,6 +1,7 @@
 import { Category, Product } from "@/schemas/product";
 import { currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface ProductListItemProps {
     product: Product;
@@ -10,12 +11,17 @@ interface ProductListItemProps {
 const ProductListItem = ({ product, actions }: ProductListItemProps) => {
     return (
         <div className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col">
-            <div className="h-40 w-full bg-content1 overflow-hidden relative">
-                <img
-                    alt={product.name}
-                    className="h-full w-full object-cover"
+            <div className="relative h-40 w-full bg-content1 overflow-hidden">
+                <Image
                     src={product.images?.[0]?.image || product?.image || "/placeholder.jpg"}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
+                    placeholder="blur"
+                    blurDataURL="/placeholder.jpg"
                 />
+
                 <Badge className="absolute top-2 right-2 shadow-sm" variant={product.status === "IN_STOCK" ? "emerald" : "destructive"}>
                     {product.variants?.[0]?.inventory ?? 0} in stock
                 </Badge>

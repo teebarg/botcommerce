@@ -4,6 +4,7 @@ from pydantic import (
     AnyUrl,
     BeforeValidator,
     EmailStr,
+    HttpUrl,
     PostgresDsn,
     ValidationInfo,
     computed_field,
@@ -27,17 +28,9 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     SECRET_KEY: str = "specialsecret"
 
-    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     DATABASE_URL: str = ""
 
     PAYSTACK_SECRET_KEY: str = "Pk_test_5029925955255255"
-
-    POSTGRES_SERVER: str
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_DB: str = "postgres"
-    POSTGRES_PORT: int = 5432
-    DATABASE_URI: str | None = None
 
     DOMAIN: str = "localhost"
     FRONTEND_HOST: str = "http://localhost:3000"
@@ -51,21 +44,6 @@ class Settings(BaseSettings):
             return f"http://{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
 
-    @field_validator("DATABASE_URI", mode="before")
-    def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
-        if isinstance(v, str):
-            return v
-        return str(
-            PostgresDsn.build(
-                scheme="postgresql",
-                username=info.data.get("POSTGRES_USER"),
-                password=info.data.get("POSTGRES_PASSWORD"),
-                host=info.data.get("POSTGRES_SERVER"),
-                port=info.data.get("POSTGRES_PORT"),
-                path=f"{info.data.get('POSTGRES_DB') or ''}",
-            )
-        )
-
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
     FIRST_SUPERUSER_FIRSTNAME: str = "admin"
     FIRST_SUPERUSER_LASTNAME: str = "admin"
@@ -73,6 +51,7 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = "password"
 
     REDIS_URL: str = "redis://localhost:6379/0"
+    SENTRY_DSN: HttpUrl | None = None
 
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False

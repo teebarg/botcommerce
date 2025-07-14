@@ -36,9 +36,9 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
     };
 
     return (
-        <header className="relative z-20 flex flex-col sm:gap-2 rounded-xl px-1">
-            <div className="flex items-center justify-between gap-2 bg-background">
-                <div className="flex flex-row gap-2">
+        <header className="relative z-20 overflow-hidden px-1">
+            <div className="flex items-center justify-between gap-2">
+                <div className="flex gap-2">
                     <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
                         <DrawerTrigger asChild>
                             <Button
@@ -72,7 +72,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                         <span className="text-sm text-default-500">({count})</span>
                     </div>
                 </div>
-                <div className="flex items-center flex-1 sm:flex-initial">
+                <div>
                     <Select defaultValue={value} onValueChange={handleSortChange}>
                         <SelectTrigger className="bg-content1 border-divider focus:border-primary">
                             <SelectValue placeholder="Select status" />
