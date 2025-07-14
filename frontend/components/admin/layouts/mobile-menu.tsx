@@ -32,7 +32,6 @@ const AdminMobileMenu: React.FC = () => {
         { id: "orders", label: "Orders", icon: <ShoppingCart size={20} />, href: "/admin/orders" },
         { id: "products", label: "Products", icon: <Package size={20} />, href: "/admin/products" },
         { id: "customers", label: "Customers", icon: <Users size={20} />, href: "/admin/users" },
-        // { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} />, href: "/admin/analytics" },
         { id: "categories", label: "Categories", icon: <Image size={20} />, href: "/admin/categories" },
         { id: "reviews", label: "Reviews", icon: <Notebook size={20} />, href: "/admin/reviews" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
@@ -44,7 +43,7 @@ const AdminMobileMenu: React.FC = () => {
     ];
 
     return (
-        <div className="h-full bg-content1 rounded-[inherit] overflow-hidden">
+        <div className="h-full bg-content1 rounded-[inherit] overflow-hidden overflow-y-auto">
             <div className="p-4 bg-primary text-white">
                 <div className="flex items-center space-x-3">
                     <Avatar>
@@ -73,9 +72,9 @@ const AdminMobileMenu: React.FC = () => {
             </div>
 
             <nav className="py-2">
-                {menuItems.map((item) => (
+                {menuItems.map((item, idx: number) => (
                     <Link
-                        key={item.id}
+                        key={idx}
                         className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
                             pathname === item.href ? "text-blue-600 bg-background" : ""
                         }`}
@@ -90,7 +89,7 @@ const AdminMobileMenu: React.FC = () => {
                 ))}
             </nav>
 
-            <div className="p-4 border-t border-content2">
+            <div className="p-4 border-t border-content2 sticky bottom-0 bg-content1">
                 <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
                     <LogOut size={20} />
                     <span>Logout</span>

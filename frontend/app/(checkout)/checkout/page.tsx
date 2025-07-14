@@ -55,7 +55,7 @@ export default function Checkout() {
                 </LocalizedClientLink>
                 <ThemeButton />
             </header>{" "}
-            <main className="max-w-8xl mx-auto px-4 md:px-8 md:py-8">
+            <main className="max-w-8xl mx-auto px-4 md:px-8 md:pt-4 pb-8">
                 <div className="flex flex-col md:flex-row md:gap-8">
                     <div className="w-full">
                         <nav aria-label="Breadcrumbs" data-slot="base">

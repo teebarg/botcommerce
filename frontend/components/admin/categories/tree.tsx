@@ -19,25 +19,20 @@ interface Props {
     categories?: Category[];
 }
 
-const CategoryImage: React.FC<{ image: string | undefined; className: string; categoryId: number }> = ({ image, className = "", categoryId }) => {
+const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }> = ({ image, categoryId }) => {
     const stateState = useOverlayTriggerState({});
 
     return (
-        <div className={`relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 ${className}`}>
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
             <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
                 <DialogTrigger>
-                    <Image
-                        fill
-                        alt={image || "placeholder"}
-                        className="w-full h-full cursor-pointer text-gray-400"
-                        src={image || "/placeholder.jpg"}
-                    />
+                    <Image fill alt={image || "placeholder"} className="cursor-pointer" src={image || "/placeholder.jpg"} />
                 </DialogTrigger>
                 <DialogContent className="bg-content1">
                     <DialogHeader className="sr-only">
                         <DialogTitle>Update Category Image</DialogTitle>
                     </DialogHeader>
-                    <CategoryImageManager categoryId={categoryId} initialImage={image} />
+                    <CategoryImageManager categoryId={categoryId} initialImage={image} onClose={stateState.close} />
                 </DialogContent>
             </Dialog>
         </div>
@@ -92,11 +87,7 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                             <div className="group">
                                 <div className="p-6">
                                     <div className="flex items-center gap-4">
-                                        <CategoryImage
-                                            categoryId={category.id}
-                                            className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl flex-shrink-0"
-                                            image={category.image}
-                                        />
+                                        <CategoryImage categoryId={category.id} image={category.image} />
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-4">

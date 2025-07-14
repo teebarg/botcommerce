@@ -15,9 +15,10 @@ import Image from "next/image";
 interface ProductImageManagerProps {
     categoryId: number;
     initialImage?: string;
+    onClose?: () => void;
 }
 
-const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "" }) => {
+const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "", onClose }) => {
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const invalidate = useInvalidate();
 
@@ -35,6 +36,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                 toast.success("Image deleted successfully");
                 invalidate("categories");
+                onClose?.();
             } catch (error) {
                 toast.error(`Error - ${error as string}`);
             } finally {
@@ -78,6 +80,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                         toast.success("Image uploaded successfully", { id: toastId });
                         invalidate("categories");
+                        onClose?.();
                     } catch (error) {
                         toast.error(`Error - ${error as string}`, { id: toastId });
                     }

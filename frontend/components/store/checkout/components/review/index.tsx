@@ -23,7 +23,7 @@ const Review = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_tot
     }
 
     return (
-        <div className="mb-4 md:mb-0">
+        <div>
             <h2
                 className={cn("text-xl", {
                     "opacity-50": !isOpen,

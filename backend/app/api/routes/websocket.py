@@ -1,21 +1,11 @@
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.core.logging import logger
-import json, time, httpx
+import json, time
 from app.services.websocket import manager
 from app.services.session_store import session_store, SessionStore
 
 router = APIRouter()
-
-
-async def get_city(ip: str) -> str:
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.get(f"https://ipapi.co/{ip}/city")
-            return res.text.strip()
-    except Exception as e:
-        logger.error(f"An error occurred in get_city - {e}")
-        return "Unknown"
 
 async def broadcast_sessions(session_store: SessionStore):
     sessions = []
@@ -46,16 +36,15 @@ async def websocket(ws: WebSocket):
     ip = ws.client.host
     session_key = f"session:{ip}"
     user_id = None
-    location = await get_city(ip)
 
     session_store.set(session_key, {
         "type": "guest",
         "path": "/",
-        "location": location if location else "Unknown",
+        "location": "Unknown",
         "updated_at": str(int(time.time()))
     })
 
-    if not await manager.connect(ip, ws, metadata={"ip": ip, "location": location}):
+    if not await manager.connect(ip, ws, metadata={"ip": ip, "location": "Unknown"}):
         logger.error(f"Failed to establish WebSocket connection for IP {ip}")
         return
 
@@ -77,7 +66,7 @@ async def websocket(ws: WebSocket):
                         session_store.set(user_session_key, {
                             "type": "user",
                             "email": email or "Unknown",
-                            "location": location if location else "Unknown",
+                            "location": "Unknown",
                             "path": "/",
                             "updated_at": str(int(time.time()))
                         })
@@ -85,7 +74,7 @@ async def websocket(ws: WebSocket):
                         if await manager.promote_connection(ip, user_id, metadata={
                             "ip": ip,
                             "email": email,
-                            "location": location
+                            "location": "Unknown"
                         }):
                             logger.info(f"Promoted connection from {ip} to {user_id}")
                         else:

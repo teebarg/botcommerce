@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { ArrowLeft, Heart, Star, Plus, Minus, ShoppingCart, MessageCircle } from "lucide-react";
+import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
 import Image from "next/image";
-
-import ProductDetails from "./product-details";
 
 import { ProductSearch } from "@/schemas/product";
 import { cn, currency } from "@/lib/utils";
@@ -10,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
+import { DiscountBadge } from "./discount-badge";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -17,6 +16,7 @@ const ProductOverview: React.FC<{
     onClose: () => void;
 }> = ({ product, onClose, isLiked = false }) => {
     const {
+        priceInfo,
         selectedColor,
         selectedSize,
         quantity,
@@ -47,75 +47,79 @@ const ProductOverview: React.FC<{
     };
 
     return (
-        <div className="bg-content1 z-50 overflow-y-auto duration-300 w-full">
-            <div className="sticky top-0 bg-content1/95 backdrop-blur-sm border-b border-default-200 px-4 py-2 flex items-center justify-between z-10">
-                <Button size="icon" variant="ghost" onClick={onClose}>
-                    <ArrowLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                    className="rounded-full"
-                    size="icon"
-                    variant="ghost"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        isLiked ? removeWishlist() : addWishlist();
-                    }}
+        <div className="bg-content1 z-50 overflow-y-auto duration-300 w-full rounded-[inherit] overflow-hiddenp">
+            <div className="sticky top-0 z-10">
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg"
                 >
-                    <Heart className={`w-6 h-6 ${isLiked ? "text-red-500 fill-current" : "text-default-600"}`} />
-                </Button>
-            </div>
-            <div className="relative pt-4">
-                <div className="relative h-full w-full flex-none flex flex-col-reverse md:flex-row gap-2 md:gap-4 px-0 md:px-8">
-                    <div className="flex flex-wrap md:flex-col gap-4 px-2 md:px-0">
-                        {product.images.map((image: string, idx: number) => (
-                            <button
-                                key={idx}
-                                className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${
-                                    selectedImageIdx === idx ? "border-indigo-500" : "border-gray-200"
-                                }`}
-                                onClick={() => setSelectedImageIdx(idx)}
-                            >
-                                <Image fill alt={`Thumbnail - ${image}`} className="object-cover w-full h-full" src={image} />
-                            </button>
-                        ))}
-                    </div>
-                    <div className="flex-1">
-                        <div className="h-[60vh] flex items-center justify-center p-4 relative">
-                            <Image
-                                fill
-                                alt={selectedImage || product.image || "placeholder"}
-                                className="object-contain h-full w-full rounded"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                src={selectedImage || product.image || "/placeholder.jpg"}
-                            />
+                    <X size={20} className="text-gray-600 dark:text-gray-300" />
+                </button>
+
+                <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
+                    <Image
+                        fill
+                        alt={selectedImage || product.image || "placeholder"}
+                        className="object-cover h-full w-full rounded"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        src={selectedImage || product.image || "/placeholder.jpg"}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+                    <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
+
+                    <div className="absolute bottom-4 left-4 right-4">
+                        <LocalizedClientLink href={`/products/${product.slug}`}>
+                            <h2 className="text-white text-2xl font-bold mb-1">{product.name}</h2>
+                        </LocalizedClientLink>
+                        <div className="flex items-center space-x-2">
+                            <div className="flex items-center">
+                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                <span className="text-white text-sm ml-1">{product.average_rating}</span>
+                                <span className="text-white/80 text-sm ml-1">({product.review_count} reviews)</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                {selectedVariant?.old_price > selectedVariant?.price && (
-                    <div className="absolute top-4 right-8 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        -{Math.round((1 - selectedVariant?.price / selectedVariant?.old_price) * 100)}% OFF
-                    </div>
-                )}
+            </div>
+            <div className="flex flex-wrap gap-4 px-2 mt-4">
+                {product.images.map((image: string, idx: number) => (
+                    <button
+                        key={idx}
+                        className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${
+                            selectedImageIdx === idx ? "border-indigo-500" : "border-gray-200"
+                        }`}
+                        onClick={() => setSelectedImageIdx(idx)}
+                    >
+                        <Image fill alt={`Thumbnail - ${image}`} className="object-cover w-full h-full" src={image} />
+                    </button>
+                ))}
             </div>
 
-            <div className="p-6 space-y-6">
-                <div>
-                    <LocalizedClientLink className="text-2xl font-bold text-default-900 mb-2" href={`/products/${product.slug}`}>
-                        {product.name}
-                    </LocalizedClientLink>
-                    <div className="flex items-center mb-3">
-                        <div className="flex items-center">
-                            <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                            <span className="text-lg font-medium text-default-900 ml-1">{product.average_rating}</span>
+            <div className="py-6 px-4 space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency(selectedVariant?.price)}</span>
+                            {selectedVariant?.old_price > selectedVariant?.price && (
+                                <span className="text-lg text-gray-500 dark:text-gray-400 line-through">{currency(selectedVariant?.old_price)}</span>
+                            )}
                         </div>
-                        <span className="text-default-500 ml-2">({product.review_count} reviews)</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                        <span className="text-3xl font-bold text-default-900">{currency(selectedVariant?.price)}</span>
                         {selectedVariant?.old_price > selectedVariant?.price && (
-                            <span className="text-xl text-default-400 line-through">{currency(selectedVariant?.old_price)}</span>
+                            <p className="text-green-600 dark:text-green-400 text-sm font-medium">
+                                You save {currency(selectedVariant?.old_price - selectedVariant?.price)}
+                            </p>
                         )}
                     </div>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            isLiked ? removeWishlist() : addWishlist();
+                        }}
+                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                    >
+                        <Heart className={`w-6 h-6 ${isLiked ? "text-red-500 fill-current" : "text-default-600"}`} />
+                    </button>
                 </div>
 
                 <div>
@@ -123,7 +127,7 @@ const ProductOverview: React.FC<{
                 </div>
 
                 <div className={cn("hidden", colors?.length > 1 && "block")}>
-                    <h3 className="text-lg font-semibold text-default-900 mb-3">Color</h3>
+                    <h3 className="font-semibold text-default-900 mb-3">Color: {selectedColor}</h3>
                     <div className="flex space-x-3">
                         {colors?.map((color: string, idx: number) => {
                             const available = isOptionAvailable("color", color!);
@@ -133,7 +137,8 @@ const ProductOverview: React.FC<{
                                 <button
                                     key={idx}
                                     className={cn(
-                                        "relative w-10 h-10 rounded-full transition-all border border-divider focus:outline-hidden ring-offset-2 data-[state=checked]:ring-3 data-[state=checked]:ring-blue-500",
+                                        "relative w-10 h-10 rounded-full transition-all border border-divider focus:outline-hidden",
+                                        "ring-offset-1 data-[state=checked]:ring-2 data-[state=checked]:ring-blue-500",
                                         {
                                             "cursor-not-allowed opacity-60": !available,
                                         }
@@ -142,6 +147,7 @@ const ProductOverview: React.FC<{
                                     disabled={!available}
                                     style={{ backgroundColor: color.toLowerCase() }}
                                     onClick={() => available && toggleColorSelect(color)}
+                                    title={color}
                                 >
                                     {!available && (
                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -156,7 +162,7 @@ const ProductOverview: React.FC<{
 
                 {sizes?.length > 1 && (
                     <div>
-                        <h3 className="text-lg font-semibold text-default-900 mb-3">Size</h3>
+                        <h3 className="font-semibold text-default-900 mb-3">Size: {selectedSize}</h3>
                         <div className="flex flex-wrap gap-2">
                             {sizes?.map((size: string, idx: number) => {
                                 const available = isOptionAvailable("size", size!);
@@ -166,9 +172,10 @@ const ProductOverview: React.FC<{
                                     <button
                                         key={idx}
                                         className={cn(
-                                            "relative px-4 py-2 rounded-lg border border-default-200 transition-all data-[state=checked]:ring-1 data-[state=checked]:ring-blue-500 data-[state=checked]:text-blue-600 data-[state=checked]:bg-blue-50",
+                                            "relative flex-1 px-4 py-2 rounded-lg border border-default-200 transition-all data-[state=checked]:ring-1 ring-offset-1",
+                                            "data-[state=checked]:ring-blue-500 data-[state=checked]:text-blue-600 data-[state=checked]:bg-blue-50",
                                             {
-                                                "cursor-not-allowed opacity-60 bg-default-400": !available,
+                                                "cursor-not-allowed opacity-60 bg-default-300": !available,
                                             }
                                         )}
                                         data-state={isSelected ? "checked" : "unchecked"}
@@ -202,9 +209,19 @@ const ProductOverview: React.FC<{
                     </div>
                 </div>
             </div>
-
-            <div className="px-8 my-2">
-                <ProductDetails />
+            <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-default-200">
+                <div className="text-center">
+                    <Truck className="w-6 h-6 text-green-500 mx-auto mb-1" />
+                    <p className="text-xs text-default-600">Fast Shipping</p>
+                </div>
+                <div className="text-center">
+                    <Shield className="w-6 h-6 text-blue-500 mx-auto mb-1" />
+                    <p className="text-xs text-default-600">Secure Payment</p>
+                </div>
+                <div className="text-center">
+                    <RotateCcw className="w-6 h-6 text-purple-500 mx-auto mb-1" />
+                    <p className="text-xs text-default-600">Easy Returns</p>
+                </div>
             </div>
 
             <div className="sticky bottom-0 bg-content1 border-t border-default-200 p-4">
@@ -222,14 +239,14 @@ const ProductOverview: React.FC<{
                         </div>
                     </div>
 
-                    <div className={cn("flex gap-3 flex-col md:flex-row")}>
+                    <div className={cn("flex gap-3 flex-row md:flex-row")}>
                         <Button disabled={loading || !selectedVariant} isLoading={loading} size="lg" variant="primary" onClick={handleAddToCart}>
                             <ShoppingCart className="w-5 h-5 relative z-10 hover:rotate-12 transition-transform duration-300 mr-2" />
                             <span className="relative z-10">Add to Cart</span>
                         </Button>
                         <Button disabled={loading || !selectedVariant} size="lg" variant="emerald" onClick={handleWhatsAppPurchase}>
                             <MessageCircle className="w-5 h-5 relative z-10 hover:animate-bounce mr-2" />
-                            <span className="relative z-10">Buy on WhatsApp</span>
+                            <span className="relative z-10">WhatsApp Buy</span>
                         </Button>
                     </div>
                 </div>
