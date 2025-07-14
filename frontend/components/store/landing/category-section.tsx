@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { useCategories } from "@/lib/hooks/useCategories";
 import { Category } from "@/schemas/product";
 import ComponentLoader from "@/components/component-loader";
 import ClientOnly from "@/components/generic/client-only";
-import Image from "next/image";
 
 const CategoriesSection: React.FC = () => {
     const { data: categories, isLoading } = useCategories();
@@ -26,14 +26,14 @@ const CategoriesSection: React.FC = () => {
                                     <Link key={idx} className="flex flex-col items-center min-w-max" href={`/collections?cat_ids=${category.slug}`}>
                                         <div className="relative w-24 h-24 rounded-full flex items-center justify-center mb-2 overflow-hidden">
                                             <Image
-                                                src={category.image || "/placeholder.jpg"}
+                                                fill
                                                 alt=""
                                                 aria-hidden="true"
-                                                fill
-                                                sizes="(max-width: 1024px) 96px"
+                                                blurDataURL="/placeholder.jpg"
                                                 className="object-cover rounded-full"
                                                 placeholder="blur"
-                                                blurDataURL="/placeholder.jpg"
+                                                sizes="(max-width: 1024px) 96px"
+                                                src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>
                                         <span className="text-base font-medium">{category.name}</span>
@@ -46,14 +46,14 @@ const CategoriesSection: React.FC = () => {
                                     <Link key={idx} className="flex flex-col items-center" href={`/collections?cat_ids=${category.slug}`}>
                                         <div className="relative w-32 h-32 lg:w-40 lg:h-40 rounded-full flex items-center justify-center mb-3 overflow-hidden transition-transform hover:scale-105">
                                             <Image
-                                                src={category.image || "/placeholder.jpg"}
+                                                fill
                                                 alt=""
                                                 aria-hidden="true"
-                                                fill
-                                                sizes="(max-width: 1024px) 128px, 160px"
+                                                blurDataURL="/placeholder.jpg"
                                                 className="object-cover rounded-full"
                                                 placeholder="blur"
-                                                blurDataURL="/placeholder.jpg"
+                                                sizes="(max-width: 1024px) 128px, 160px"
+                                                src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>
                                         <span className="text-lg font-medium">{category.name}</span>

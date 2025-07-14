@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import React from "react";
-import { getSiteConfig } from "@lib/config";
+import { TrendingUp } from "lucide-react";
 
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
@@ -12,7 +12,6 @@ import CarouselSection from "@/components/store/carousel";
 import { ContactSection } from "@/components/store/landing/contact-section";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
 import { tryCatch } from "@/lib/try-catch";
-import { TrendingUp } from "lucide-react";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
 
 export const metadata: Metadata = {
@@ -21,7 +20,6 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-    const siteConfig = await getSiteConfig();
     const { data } = await tryCatch<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
         api.get("/product/landing-products")
     );
@@ -57,8 +55,8 @@ export default async function Home() {
 
                         <div className="text-center mt-12">
                             <LocalizedClientLink
-                                href="/collections/trending"
                                 className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg hover:from-yellow-500 hover:to-orange-600 transition-all duration-300 transform hover:scale-105"
+                                href="/collections/trending"
                             >
                                 Visit Shop
                             </LocalizedClientLink>

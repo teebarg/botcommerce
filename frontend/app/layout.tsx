@@ -20,7 +20,7 @@ import { CartProvider } from "@/providers/cart-provider";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
-const outfit = Outfit({ weight: ["400", "500", "600"], subsets: ["latin"] });
+const outfit = Outfit({ weight: ["400", "500", "600"], subsets: ["latin"], variable: "--font-outfit", display: "swap" });
 
 const lexend = Lexend({
     subsets: ["latin"],
