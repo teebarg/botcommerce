@@ -23,7 +23,6 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
 
     return (
         <div>
-            {/* Account Information Section */}
             <div className="bg-content1 shadow-md py-6 px-2 md:px-4 rounded border-l-2 border-l-indigo-500">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
@@ -41,7 +40,6 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                 <div className={cn("hidden", isOpen && "block")}>
                     <ShippingAddress address={address ?? null} email={cart?.email ?? ""} />
                 </div>
-                {/* Account Information Section */}
                 {!isOpen && address?.address_1 && (
                     <div className="space-y-4">
                         <div className="text-xs md:text-sm" data-testid="shipping-address-summary">

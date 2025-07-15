@@ -1,115 +1,104 @@
-import type { CustomRadioGroupProps, RadioItemProps, RadioGroupProps, RadioOptionProps } from "../../types/radio";
+"use client";
 
-import React from "react";
+import * as React from "react";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { Circle, Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-export function CustomRadioGroup({ options, value, onChange, name, className }: CustomRadioGroupProps) {
-    return (
-        <div aria-label="radio" className={cn("grid gap-4", className)} role="radiogroup">
-            {options.map((option) => (
-                <RadioItem
-                    key={option.id}
-                    isSelected={value === option.id}
-                    name={name}
-                    option={option}
-                    onSelect={() => !option.disabled && onChange(option.id)}
-                />
-            ))}
-        </div>
-    );
+const radioVariants = {
+    default: {
+        container: "grid gap-3",
+        item: "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        indicator: "relative flex items-center justify-center",
+        icon: "fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2",
+    },
+    card: {
+        container: "grid gap-3",
+        item: "group relative flex items-center gap-3 rounded-lg border-2 border-default-200 bg-content1 p-4 transition-all duration-200 hover:border-blue-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-50 data-[state=checked]:dark:bg-blue-900/20",
+        indicator: "absolute right-4 top-4 flex items-center justify-center",
+        icon: "size-5 text-blue-500 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+    },
+    pill: {
+        container: "flex flex-wrap gap-2",
+        item: "group relative flex items-center gap-2 rounded-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium transition-all duration-200 hover:border-blue-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white",
+        indicator: "flex items-center justify-center",
+        icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+    },
+    button: {
+        container: "grid gap-2",
+        item: "group relative flex items-center justify-center gap-2 rounded-md border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm font-medium transition-all duration-200 hover:border-blue-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-blue-500 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600 data-[state=checked]:text-white data-[state=checked]:shadow-md",
+        indicator: "flex items-center justify-center",
+        icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+    },
+};
+
+function RadioGroup({
+    className,
+    variant = "default",
+    ...props
+}: React.ComponentProps<typeof RadioGroupPrimitive.Root> & {
+    variant?: keyof typeof radioVariants;
+}) {
+    const variantStyles = radioVariants[variant];
+
+    return <RadioGroupPrimitive.Root className={cn(variantStyles.container, className)} {...props} />;
 }
 
-export function RadioItem({ option, isSelected, name, onSelect }: RadioItemProps) {
-    return (
-        <label
-            className={cn(
-                "group relative flex cursor-pointer rounded-lg border p-4 hover:bg-secondary/50 transition-all",
-                isSelected && "border-primary bg-secondary/30",
-                option.disabled && "cursor-not-allowed opacity-50 hover:bg-transparent"
-            )}
-        >
-            <input
-                aria-label={option.label}
-                checked={isSelected}
-                className="peer sr-only"
-                disabled={option.disabled}
-                name={name}
-                type="radio"
-                value={option.id}
-                onChange={onSelect}
-            />
-            <span className="absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-full border">
-                <span
-                    className={cn("h-2.5 w-2.5 rounded-full bg-primary transition-all", isSelected ? "scale-100 opacity-100" : "scale-0 opacity-0")}
-                />
-            </span>
-            <div className="flex items-start gap-4">
-                {option.icon && <option.icon className={cn("h-5 w-5 transition-colors", isSelected ? "text-primary" : "text-default-500")} />}
-                <div className="space-y-1">
-                    <p className={cn("font-medium leading-none", isSelected && "text-primary")}>{option.label}</p>
-                    {option.description && <p className="text-sm text-default-500">{option.description}</p>}
-                </div>
-            </div>
-        </label>
-    );
-}
+function RadioGroupItem({
+    className,
+    children,
+    variant = "default",
+    ...props
+}: React.ComponentProps<typeof RadioGroupPrimitive.Item> & {
+    variant?: keyof typeof radioVariants;
+    children?: React.ReactNode;
+}) {
+    const variantStyles = radioVariants[variant];
 
-const RadioGroupContext = React.createContext<{
-    value?: string;
-    onChange: (value: string) => void;
-    name: string;
-} | null>(null);
-
-function useRadioGroupContext() {
-    const context = React.useContext(RadioGroupContext);
-
-    if (!context) {
-        throw new Error("RadioGroup.Option must be used within a RadioGroup");
+    if (variant === "default") {
+        return (
+            <RadioGroupPrimitive.Item className={cn(variantStyles.item, className)} {...props}>
+                <RadioGroupPrimitive.Indicator className={variantStyles.indicator}>
+                    <Circle className={variantStyles.icon} />
+                </RadioGroupPrimitive.Indicator>
+            </RadioGroupPrimitive.Item>
+        );
     }
 
-    return context;
-}
-
-function Option({ value, children, className }: RadioOptionProps) {
-    const { value: selectedValue, onChange, name } = useRadioGroupContext();
-    const isSelected = value === selectedValue;
-
     return (
-        <label
-            className={cn(
-                "flex items-center justify-between text-sm cursor-pointer py-4 border rounded-lg px-2 md:px-8 mb-2",
-                isSelected && "border-primary",
-                className
-            )}
-        >
-            <input checked={isSelected} className="sr-only" name={name} type="radio" value={value} onChange={() => onChange(value)} />
+        <RadioGroupPrimitive.Item className={cn(variantStyles.item, className)} {...props}>
             {children}
-        </label>
+            <RadioGroupPrimitive.Indicator className={variantStyles.indicator}>
+                <Check className={variantStyles.icon} />
+            </RadioGroupPrimitive.Indicator>
+        </RadioGroupPrimitive.Item>
     );
 }
 
-function Radio({ checked }: { checked: boolean }) {
+// Enhanced radio group with label support
+function RadioGroupWithLabel({
+    className,
+    variant = "default",
+    label,
+    description,
+    ...props
+}: React.ComponentProps<typeof RadioGroupPrimitive.Root> & {
+    variant?: keyof typeof radioVariants;
+    label?: string;
+    description?: string;
+}) {
     return (
-        <div className="relative flex h-5 w-5 items-center justify-center">
-            <div className="h-full w-full rounded-full border border-primary" />
-            {checked && <div className="absolute h-3 w-3 rounded-full bg-primary" />}
+        <div className="space-y-3">
+            {label && (
+                <div className="space-y-1">
+                    <h3 className="text-sm font-medium text-default-900">{label}</h3>
+                    {description && <p className="text-sm text-default-600">{description}</p>}
+                </div>
+            )}
+            <RadioGroup className={className} variant={variant} {...props} />
         </div>
     );
 }
 
-function RadioGroup({ value, onChange, name, children, className }: RadioGroupProps) {
-    return (
-        <RadioGroupContext.Provider value={{ value, onChange, name }}>
-            <div aria-label="group" className={cn("", className)} role="radiogroup">
-                {children}
-            </div>
-        </RadioGroupContext.Provider>
-    );
-}
-
-// Attach subcomponents
-RadioGroup.Option = Option;
-RadioGroup.Radio = Radio;
-
-export { RadioGroup };
+export { RadioGroup, RadioGroupItem, RadioGroupWithLabel };

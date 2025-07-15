@@ -50,7 +50,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
 
     if (order.order_notes) {
         return (
-            <div className="py-12 px-2 bg-content1">
+            <div className="py-8 px-4 bg-content1 rounded-xl">
                 <h2 className="text-lg font-semibold">Notes</h2>
                 <p className="text-sm text-muted-foreground">{order.order_notes}</p>
             </div>

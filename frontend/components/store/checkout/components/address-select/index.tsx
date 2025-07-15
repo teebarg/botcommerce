@@ -67,30 +67,19 @@ const AddressSelect: React.FC<AddressSelectProps> = ({ address }) => {
                     </div>
                 )}
 
-                <div className="space-y-3 max-h-[40vh] overflow-y-auto">
-                    <AnimatePresence>
-                        {filteredAddresses.length === 0 ? (
-                            <motion.div
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                initial={{ opacity: 0, y: 20 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <EmptyState />
-                            </motion.div>
-                        ) : (
-                            filteredAddresses.map((address: Address, idx: number) => (
-                                <div key={idx}>
-                                    <AddressCard address={address} addresses={addresses} selectedAddress={selectedAddress} />
-                                </div>
-                            ))
-                        )}
-                    </AnimatePresence>
+                <div className="space-y-3 max-h-[40vh] overflow-y-auto px-2 py-1.5">
+                    {filteredAddresses.length === 0 ? (
+                        <EmptyState />
+                    ) : (
+                        filteredAddresses.map((address: Address, idx: number) => (
+                            <AddressCard key={idx} address={address} addresses={addresses} selectedAddress={selectedAddress} />
+                        ))
+                    )}
                 </div>
             </div>
             <Overlay
                 open={state.isOpen}
-                sheetClassName="min-w-[500px]"
+                sheetClassName="min-w-[600px]"
                 title="Create Address"
                 trigger={
                     <Button className="w-full mt-6" variant="primary" onClick={state.open}>

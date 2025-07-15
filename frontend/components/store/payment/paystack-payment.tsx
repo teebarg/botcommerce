@@ -73,7 +73,6 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
             <Button className="w-full" disabled={loading} isLoading={loading} variant="primary" onClick={handlePayment}>
                 Pay {currency(amount)} Now
             </Button>
-            {/* Security message */}
             <div className="mt-4 flex items-center justify-center text-xs text-gray-500">
                 <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

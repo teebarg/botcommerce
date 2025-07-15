@@ -40,6 +40,8 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
     const handleSelect = async (id: number) => {
         const savedAddress = addresses.find((a) => a.id === id);
 
+        if (updateCartDetails.isPending) return;
+
         if (savedAddress) {
             updateCartDetails.mutateAsync({
                 shipping_address: omit(savedAddress, ["created_at", "updated_at"]) as any,
@@ -53,17 +55,17 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
 
     return (
         <div
-            className={`relative p-4 border rounded-xl cursor-pointer transition-all duration-300 group ${
+            className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group ${
                 isSelected
-                    ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950"
-                    : "border-default-200 bg-card hover:border-default-300 hover:shadow-md"
+                    ? "ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    : "border border-default-200 bg-content2 hover:border-default-300 hover:shadow-md"
             }`}
-            onClick={() => handleSelect(address.id)}
+            onClick={() => !isSelected && handleSelect(address.id)}
         >
             <div className="absolute top-3 right-3 flex items-center gap-2">
                 <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                        isSelected ? "border-emerald-500 bg-emerald-500 shadow-sm" : "border-slate-300 group-hover:border-slate-400"
+                        isSelected ? "border-blue-400 bg-blue-500 shadow-sm" : "border-slate-300 group-hover:border-slate-400"
                     }`}
                 >
                     {isSelected && <Check className="w-4 h-4 text-white" />}
@@ -74,7 +76,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 <div className="flex items-center gap-3 mb-3">
                     <div
                         className={`p-2.5 rounded-lg transition-colors ${
-                            isSelected ? "bg-emerald-100 text-emerald-600" : "bg-content1 text-default-500 group-hover:bg-content2"
+                            isSelected ? "bg-blue-100 text-blue-800" : "bg-content1 text-default-500 group-hover:bg-content2"
                         }`}
                     >
                         {getTypeIcon(address.address_type)}
@@ -102,7 +104,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
             <div className="absolute bottom-3 right-3 flex gap-1.5 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <Overlay
                     open={state.isOpen}
-                    sheetClassName="min-w-[500px]"
+                    sheetClassName="min-w-[600px]"
                     title="Address"
                     trigger={
                         <Button
