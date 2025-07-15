@@ -40,6 +40,8 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
     const handleSelect = async (id: number) => {
         const savedAddress = addresses.find((a) => a.id === id);
 
+        if (updateCartDetails.isPending) return;
+
         if (savedAddress) {
             updateCartDetails.mutateAsync({
                 shipping_address: omit(savedAddress, ["created_at", "updated_at"]) as any,
@@ -58,7 +60,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950"
                     : "border-default-200 bg-card hover:border-default-300 hover:shadow-md"
             }`}
-            onClick={() => handleSelect(address.id)}
+            onClick={() => !isSelected && handleSelect(address.id)}
         >
             <div className="absolute top-3 right-3 flex items-center gap-2">
                 <div

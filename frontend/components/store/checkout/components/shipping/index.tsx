@@ -2,14 +2,15 @@
 
 import { Delivery, Pencil } from "nui-react-icons";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import React from "react";
 
-import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { currency } from "@/lib/utils";
 import { Cart, DeliveryOption } from "@/schemas";
 import { useDeliveryOptions } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";
 
 type ShippingProps = {
     cart: Omit<Cart, "refundable_amount">;
@@ -37,18 +38,13 @@ const Shipping: React.FC<ShippingProps> = ({ cart }) => {
         router.push(pathname + "?step=payment", { scroll: false });
     };
 
-    const set = async (option: DeliveryOption) => {
-        updateCartDetails.mutateAsync({ shipping_method: option.method, shipping_fee: option.amount });
-    };
-
     const handleChange = (value: string) => {
         const item: DeliveryOption | undefined = deliveryOptions?.find((item: DeliveryOption) => item.method == value);
 
         if (!item) {
             return;
         }
-
-        set(item);
+        updateCartDetails.mutate({ shipping_method: item.method, shipping_fee: item.amount });
     };
 
     return (
@@ -74,43 +70,24 @@ const Shipping: React.FC<ShippingProps> = ({ cart }) => {
             </div>
 
             <div className={cn("mt-6", isOpen ? "block" : "hidden")} data-testid="delivery-options-container">
-                <RadioGroup
+                <RadioGroupWithLabel
                     className="grid grid-cols-1 md:grid-cols-3 gap-2"
-                    name="shipping-method"
+                    label="How do you want to receive your order?"
                     value={cart.shipping_method}
-                    onChange={(value: string) => handleChange(value)}
+                    variant="card"
+                    onValueChange={(value: string) => handleChange(value)}
                 >
-                    {deliveryOptions?.map((option) => (
-                        <RadioGroup.Option
-                            key={option.id}
-                            className={cn(
-                                `flex items-center justify-between px-4 py-4 md:px-3 rounded-lg border cursor-pointer transition-all ${
-                                    option.method === cart.shipping_method
-                                        ? "border-blue-500 bg-transparent"
-                                        : "border-default-200 hover:border-default-300"
-                                }`
-                            )}
-                            value={option.method}
-                        >
-                            <div>
-                                <h3
-                                    className={`text-sm font-medium ${option.method === cart.shipping_method ? "text-blue-600" : "text-default-700"}`}
-                                >
-                                    {option.name}
-                                </h3>
-                                <p className="text-sm text-default-500">{option.description}</p>
+                    {deliveryOptions?.map((option, idx: number) => (
+                        <RadioGroupItem key={idx} value={option.method} variant="card">
+                            <div className="text-left">
+                                <div className="font-medium">
+                                    {option.name} ({option.amount === 0 ? "Free" : currency(option.amount)})
+                                </div>
+                                <div className="text-sm text-default-500">{option.description}</div>
                             </div>
-                            <span
-                                className={`text-sm font-semibold ml-2 ${
-                                    option.method === cart.shipping_method ? "text-blue-600" : "text-default-800"
-                                }`}
-                            >
-                                {option.amount === 0 ? "Free" : currency(option.amount)}
-                            </span>
-                        </RadioGroup.Option>
+                        </RadioGroupItem>
                     ))}
-                </RadioGroup>
-
+                </RadioGroupWithLabel>
                 <Button
                     className="font-semibold mt-2"
                     data-testid="shipping-method-button"

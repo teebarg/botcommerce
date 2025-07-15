@@ -6,13 +6,10 @@ import { CreditCard, Pencil } from "nui-react-icons";
 import { paymentInfoMap } from "@lib/constants";
 import { CreditCardIcon } from "lucide-react";
 
-import PaymentContainer from "../payment-container";
-
-import { RadioGroup } from "@/components/ui/radio-group";
+import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Cart, PaymentMethod } from "@/schemas";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { useStore } from "@/app/store/use-store";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 
@@ -23,7 +20,6 @@ const payMethods: { id: string; provider_id: PaymentMethod }[] = [
 ];
 
 const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_total"> | null }) => {
-    const invalidate = useInvalidate();
     const { shopSettings } = useStore();
     const updateCartDetails = useUpdateCartDetails();
 
@@ -48,12 +44,8 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
         [searchParams]
     );
 
-    const set = async (providerId: PaymentMethod) => {
-        updateCartDetails.mutateAsync({ payment_method: providerId });
-    };
-
     const handleChange = (providerId: PaymentMethod) => {
-        set(providerId);
+        updateCartDetails.mutate({ payment_method: providerId });
     };
 
     const handleEdit = () => {
@@ -90,7 +82,6 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                 </button>
             </div>
 
-            {/* Form */}
             <div className={isOpen ? "block mt-4" : "hidden"}>
                 <div className={cn("hidden flex-col w-1/3", { flex: paidByGiftcard })}>
                     <p className="font-medium text-base mb-1">Payment method</p>
@@ -99,7 +90,11 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                     </p>
                 </div>
                 {!paidByGiftcard && (
-                    <RadioGroup name="payment" value={cart?.payment_method || ""} onChange={(value: string) => handleChange(value as PaymentMethod)}>
+                    <RadioGroupWithLabel
+                        className="grid grid-cols-1 md:grid-cols-3 gap-2"
+                        value={cart?.payment_method || ""}
+                        onValueChange={(value: string) => handleChange(value as PaymentMethod)}
+                    >
                         {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
                             if (item.provider_id === "PAYSTACK" && shopSettings?.payment_paystack != "true") {
                                 return null;
@@ -114,15 +109,18 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                             }
 
                             return (
-                                <PaymentContainer
-                                    key={idx}
-                                    paymentInfoMap={paymentInfoMap}
-                                    paymentSession={item}
-                                    selectedPaymentOptionId={cart?.payment_method || null}
-                                />
+                                <RadioGroupItem key={idx} value={item.provider_id} variant="card">
+                                    <div className="flex items-center gap-3">
+                                        <div className="shrink-0 mt-0.5">{paymentInfoMap[item.provider_id]?.icon}</div>
+                                        <div className="text-left">
+                                            <div className="font-medium text-default-900">{paymentInfoMap[item.provider_id]?.title}</div>
+                                            <div className="text-sm text-default-500">{paymentInfoMap[item.provider_id]?.description}</div>
+                                        </div>
+                                    </div>
+                                </RadioGroupItem>
                             );
                         })}
-                    </RadioGroup>
+                    </RadioGroupWithLabel>
                 )}
 
                 <Button

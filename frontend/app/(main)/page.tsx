@@ -49,7 +49,7 @@ export default async function Home() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {data?.featured?.map((product: ProductSearch, idx: number) => (
-                                <ProductCard key={idx} product={product} variant="bg-content3" />
+                                <ProductCard key={idx} product={product} variant="bg-content1" />
                             ))}
                         </div>
 
