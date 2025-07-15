@@ -68,11 +68,8 @@ class CacheService:
 
     @handle_redis_errors(default=False)
     async def set(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION, tag: str = None) -> bool:
-        print("🚀 ~ tag:", tag)
-        print("🚀 ~ key:", key)
         if isinstance(expire, timedelta):
             expire = int(expire.total_seconds())
-        # await self.redis.set(key, value, ex=expire)
         await self.redis.setex(key, expire, value)
         if tag:
             await self.redis.sadd(tag, key)

@@ -26,7 +26,13 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
             <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
                 <DialogTrigger>
-                    <Image fill alt={image || "placeholder"} className="cursor-pointer" src={image || "/placeholder.jpg"} />
+                    <Image
+                        fill
+                        alt={image || "placeholder"}
+                        sizes="(max-width: 768px) 64px, 80px"
+                        className="cursor-pointer"
+                        src={image || "/placeholder.jpg"}
+                    />
                 </DialogTrigger>
                 <DialogContent className="bg-content1">
                     <DialogHeader className="sr-only">

@@ -70,7 +70,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                     {order.order_items.slice(0, 6).map((item: OrderItem, idx: number) => (
                         <div key={idx} className="flex flex-col items-center group">
                             <div className="h-20 w-20 relative group-hover:scale-105 transition-transform duration-200 rounded-lg">
-                                {item.image && <Image fill alt={item.variant?.product?.name || item.image} src={item.image} />}
+                                {item.image && <Image fill alt={item.variant?.product?.name || item.image} sizes="80px" src={item.image} />}
                             </div>
                             <span className="text-xs font-medium text-center text-default-500">x{item.quantity}</span>
                         </div>

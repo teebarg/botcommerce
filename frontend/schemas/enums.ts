@@ -13,6 +13,7 @@ export const StatusSchema = z.enum(["PENDING", "ACTIVE", "INACTIVE"]);
 export const ShopSettingsTypeSchema = z.enum(["FEATURE", "SHOP_DETAIL", "CUSTOM"]);
 export const ConversationStatusSchema = z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]);
 export const MessageSenderSchema = z.enum(["USER", "BOT", "SYSTEM"]);
+export const InteractionTypeSchema = z.enum(["VIEW", "PURCHASE", "CART_ADD", "WISHLIST_ADD", "WISHLIST_REMOVE"]);
 
 export type OrderStatus = z.infer<typeof OrderStatusSchema>;
 export type DiscountType = z.infer<typeof DiscountTypeSchema>;
@@ -27,3 +28,4 @@ export type ShopSettingsType = z.infer<typeof ShopSettingsTypeSchema>;
 export type ConversationStatus = z.infer<typeof ConversationStatusSchema>;
 export type MessageSender = z.infer<typeof MessageSenderSchema>;
 export type AddressType = z.infer<typeof AddressTypeSchema>;
+export type InteractionType = z.infer<typeof InteractionTypeSchema>;
