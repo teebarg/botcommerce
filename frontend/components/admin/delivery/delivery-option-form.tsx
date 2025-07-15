@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -39,23 +38,13 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            description: "",
-            method: "STANDARD",
-            amount: 0,
-            is_active: true,
-        },
-    });
-
-    useEffect(() => {
-        form.reset({
             name: initialData?.name || "",
             description: initialData?.description || "",
             method: initialData?.method || "STANDARD",
             amount: initialData?.amount || 0,
             is_active: initialData?.is_active || true,
-        });
-    }, [initialData, form]);
+        },
+    });
 
     const handleSubmit = async (data: FormValues) => {
         let response = null;

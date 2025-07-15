@@ -61,7 +61,7 @@ async def get_landing_products(request: Request) -> LandingProducts:
     result = {}
 
     for product_type in ["trending", "latest", "featured"]:
-        filters = [f"collections IN [{product_type}]"]
+        filters = [f"collections IN [{product_type}]", "min_variant_price >= 1"]
         search_params = {
             "limit": 6 if product_type == "featured" else 4,
             "offset": 0,

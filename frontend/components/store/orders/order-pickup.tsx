@@ -11,6 +11,7 @@ import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import { Button } from "@/components/ui/button";
+import OrderNotes from "./order-notes";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -21,7 +22,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
     const { shopSettings } = useStore();
 
     return (
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-6 py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
@@ -34,7 +35,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
                 </div>
             </FadeInComponent>
 
-            <FadeInComponent delay="200ms">
+            <FadeInComponent delay="100ms">
                 <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
                     <h3 className="text-lg font-medium text-default-900 mb-4">Collection Point</h3>
                     <div className="space-y-2">
@@ -48,6 +49,10 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
                         </div>
                     </div>
                 </div>
+            </FadeInComponent>
+
+            <FadeInComponent delay="200ms">
+                <OrderNotes order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="300ms">

@@ -18,6 +18,7 @@ class DeliveryOptionUpdate(BaseModel):
     description: Optional[str] = None
     amount: Optional[float] = Field(None, ge=0)
     is_active: Optional[bool] = None
+    method: Optional[ShippingMethod] = None
 
 class DeliveryOption(DeliveryOptionBase):
     id: int

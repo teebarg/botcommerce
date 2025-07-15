@@ -96,15 +96,12 @@ const Payment = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_to
                         onValueChange={(value: string) => handleChange(value as PaymentMethod)}
                     >
                         {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
-                            if (item.provider_id === "PAYSTACK" && shopSettings?.payment_paystack != "true") {
-                                return null;
-                            }
-
-                            if (item.provider_id === "BANK_TRANSFER" && shopSettings?.payment_bank != "true") {
-                                return null;
-                            }
-
-                            if (item.provider_id === "CASH_ON_DELIVERY" && shopSettings?.payment_cash != "true") {
+                            if (
+                                (item.provider_id === "CASH_ON_DELIVERY" && shopSettings?.payment_cash != "true") ||
+                                (item.provider_id === "BANK_TRANSFER" && shopSettings?.payment_bank != "true") ||
+                                (item.provider_id === "PAYSTACK" && shopSettings?.payment_paystack != "true") ||
+                                (cart?.shipping_method !== "PICKUP" && item.provider_id === "CASH_ON_DELIVERY")
+                            ) {
                                 return null;
                             }
 

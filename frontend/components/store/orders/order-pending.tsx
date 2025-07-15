@@ -11,6 +11,7 @@ import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useBankDetails } from "@/lib/hooks/useApi";
+import OrderNotes from "./order-notes";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -22,7 +23,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
     const { data: bankDetails } = useBankDetails();
 
     return (
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-6 py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
@@ -35,8 +36,8 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
                 </div>
             </FadeInComponent>
 
-            <FadeInComponent delay="200ms">
-                <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
+            <FadeInComponent delay="100ms">
+                <div className="bg-card rounded-xl shadow-sm p-4 mb-6 mt-4">
                     <h3 className="text-lg font-medium text-default-900 mb-4">Bank Transfer Details</h3>
                     <div className="space-y-3">
                         <div className="flex justify-between">
@@ -57,6 +58,10 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
                         </div>
                     </div>
                 </div>
+            </FadeInComponent>
+
+            <FadeInComponent delay="200ms">
+                <OrderNotes order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="300ms">

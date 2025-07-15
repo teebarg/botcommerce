@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
 import { Brand, Category, Collection, Product } from "@/schemas/product";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
 
 const formSchema = z.object({
@@ -38,7 +37,6 @@ interface ProductFormProps {
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections, categories, brands }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
-    const invalidate = useInvalidate();
     const createProduct = useCreateProduct();
     const updateProduct = useUpdateProduct();
 

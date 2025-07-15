@@ -5,12 +5,12 @@ import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import Image from "next/image";
 
 import { cn, currency } from "@/lib/utils";
-import ProductDetails from "@/components/store/products/product-details";
 import LocalizedClientLink from "@/components/ui/link";
 import ProductShare from "@/components/product/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/product/product-variant-selection";
 import { Product } from "@/schemas/product";
+import { RefreshCw, Truck } from "lucide-react";
 
 interface Props {
     product: Product;
@@ -48,7 +48,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
             </nav>
             <div className="relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
                 <div className="relative h-full w-full flex-none flex flex-col-reverse md:flex-row gap-2 md:gap-4">
-                    {/* Image Gallery */}
                     <div className="flex flex-wrap md:flex-col gap-4 px-2 md:px-0">
                         {product.images
                             ?.sort((a, b) => a.order - b.order)
@@ -119,7 +118,38 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             <ArrowUpRightMini />
                         </LocalizedClientLink>
                     </div>
-                    <ProductDetails />
+                    <div className="text-sm py-8 bg-yellow-50 text-yellow-950 dark:bg-zinc-800 dark:text-yellow-50 -mx-4 px-2 rounded-none md:rounded-lg">
+                        <div className="grid grid-cols-1 gap-y-8">
+                            <div className="flex items-start gap-x-2">
+                                <Truck className="h-6 w-6" />
+                                <div>
+                                    <span className="font-semibold">Fast delivery</span>
+                                    <p className="max-w-sm">
+                                        Your package will arrive in 3-5 business days at your pick up location or in the comfort of your home.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-x-2">
+                                <RefreshCw className="h-6 w-6" />
+                                <div>
+                                    <span className="font-semibold">Simple exchanges</span>
+                                    <p className="max-w-sm">
+                                        Is the fit not quite right? No worries - we&apos;ll exchange your product for a new one.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-x-2">
+                                {/* <Back /> */}
+                                <div>
+                                    <span className="font-semibold">Easy returns</span>
+                                    <p className="max-w-sm">
+                                        Just return your product and we&apos;ll refund your money. No questions asked – we&apos;ll do our best to make
+                                        sure your return is hassle-free.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

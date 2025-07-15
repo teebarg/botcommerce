@@ -17,8 +17,8 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
 
     const onPaymentCompleted = async () => {
         completeCart.mutate({
-            payment_status: "SUCCESS",
-            status: "PAID",
+            payment_status: "PENDING",
+            status: "PENDING",
         });
     };
 
