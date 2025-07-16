@@ -29,22 +29,11 @@ ENV PYTHONPATH=/app
 
 COPY ./pyproject.toml ./uv.lock /app/
 
-# COPY ./prisma /app/prisma
-
 COPY ./ /app
 
 # Sync the project
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
-
-# RUN prisma generate
-
-# COPY requirements.txt ./
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# COPY . .
-
-# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
 
 CMD ["fastapi", "run", "--workers", "4", "main.py"]

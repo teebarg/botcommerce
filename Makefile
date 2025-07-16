@@ -85,7 +85,7 @@ sync: ## Sync dependencies
 
 dev: ## Serve the project in terminal
 	@echo "$(YELLOW)Running development in terminal...$(RESET)"
-	make -j 2 serve-backend serve-frontend
+	make -j 3 serve-backend serve-recommendation serve-frontend
 
 
 # Backend Deployment

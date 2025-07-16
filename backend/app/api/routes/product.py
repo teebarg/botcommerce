@@ -629,7 +629,7 @@ async def configure_filterable_attributes(
     try:
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         index.update_filterable_attributes(
-            ["brand", "categories", "collections", "name", "variants", "average_rating",
+            ["id", "brand", "categories", "collections", "name", "variants", "average_rating",
                 "review_count", "max_variant_price", "min_variant_price"]
         )
         index.update_sortable_attributes(
