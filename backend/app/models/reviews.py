@@ -13,6 +13,8 @@ class Review(ReviewBase):
 
 class ReviewCreate(ReviewBase):
     product_id: int
+    author: str
+    title: str
 
 
 class ReviewUpdate(BaseModel):

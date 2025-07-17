@@ -22,7 +22,8 @@ export const useCreateReview = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: { product_id: number; rating: number; comment: string }) => await api.post<Review>(`/reviews/`, input),
+        mutationFn: async (input: { product_id: number; author: string; title: string; rating: number; comment: string }) =>
+            await api.post<Review>(`/reviews/`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
             toast.success("Review successfully created");

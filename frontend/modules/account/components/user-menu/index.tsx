@@ -15,10 +15,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/apis/auth";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 export default function UserDropDown({ user }: { user: Session }) {
+    const invalidate = useInvalidate();
     const handleLogout = async () => {
         await authApi.logOut();
+        invalidate("me");
         window.location.href = "/";
     };
 

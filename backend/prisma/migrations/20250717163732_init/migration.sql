@@ -163,6 +163,8 @@ CREATE TABLE "product_images" (
 -- CreateTable
 CREATE TABLE "reviews" (
     "id" SERIAL NOT NULL,
+    "author" TEXT,
+    "title" TEXT,
     "comment" TEXT NOT NULL,
     "rating" INTEGER NOT NULL,
     "verified" BOOLEAN NOT NULL DEFAULT false,
@@ -503,6 +505,9 @@ CREATE INDEX "products_name_slug_idx" ON "products"("name", "slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "product_variants_sku_key" ON "product_variants"("sku");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "reviews_user_id_product_id_key" ON "reviews"("user_id", "product_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "site_config_key_key" ON "site_config"("key");

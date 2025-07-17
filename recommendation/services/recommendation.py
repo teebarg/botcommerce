@@ -97,8 +97,7 @@ class RecommendationEngine:
                 """
 
                 preferences = await conn.fetch(preferences_query)
-                print("preferences......................................................")
-                print(preferences)
+                logger.info(f"preferences: {preferences}")
 
                 for pref in preferences:
                     user_id = pref['user_id']
@@ -110,8 +109,7 @@ class RecommendationEngine:
                     if pref['brand']:
                         self.user_profiles[user_id]['brands'][pref['brand']] = float(pref['score'])
 
-                print("self.user_profiles......................................................")
-                print(self.user_profiles)
+                logger.info(f"self.user_profiles: {self.user_profiles}")
 
                 logger.info(f"Loaded {len(self.products_data)} products and {len(user_items)} user profiles")
 
@@ -138,8 +136,8 @@ class RecommendationEngine:
         """
         try:
             time_spent = metadata.get("timeSpent", 0)
-            seconds = min(time_spent / 1000.0, 60)  # cap at 60s
-            scaled_weight = base_weight + (seconds / 60) * 2.0  # scale from 1.0 to 3.0
+            seconds = min(time_spent / 1000.0, 60)
+            scaled_weight = base_weight + (seconds / 60) * 2.0
             return scaled_weight
         except Exception as e:
             logger.warning(f"Invalid metadata format for view weighting: {metadata} - {e}")
@@ -209,7 +207,7 @@ class RecommendationEngine:
             product_ids.append(product_id)
 
         self.tfidf_vectorizer = TfidfVectorizer(
-            max_features=1000,  # Limit features for memory efficiency
+            max_features=1000,
             stop_words='english',
             lowercase=True
         )

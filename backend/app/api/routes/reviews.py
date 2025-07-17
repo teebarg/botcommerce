@@ -60,6 +60,26 @@ async def read(id: int) -> Review:
 
 @router.post("/")
 async def create(review: ReviewCreate, user: CurrentUser) -> Review:
+    # Check if user already reviewed this product
+    existing_review = await db.review.find_first(
+        where={"user_id": user.id, "product_id": review.product_id}
+    )
+    if existing_review:
+        raise HTTPException(status_code=400, detail="You have already reviewed this product.")
+
+    # Check if user has purchased this product
+    # Find any order by this user that contains an order item for this product
+    user_orders = await db.order.find_many(
+        where={"user_id": user.id, "status": {"in": ["PAID", "DELIVERED", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY"]}},
+        include={"order_items": True}
+    )
+    has_purchased = any(
+        any(item.variant.product_id == review.product_id for item in order.order_items)
+        for order in user_orders
+    )
+    if not has_purchased:
+        raise HTTPException(status_code=403, detail="You can only review products you have purchased.")
+
     try:
         review = await db.review.create(
             data={

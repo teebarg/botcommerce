@@ -253,6 +253,8 @@ model ProductImage {
 
 model Review {
   id         Int     @id @default(autoincrement())
+  author     String?
+  title      String?
   comment    String
   rating     Int
   verified   Boolean @default(false)
@@ -265,6 +267,7 @@ model Review {
   product Product @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user    User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([user_id, product_id])
   @@map("reviews")
 }
 
@@ -571,18 +574,18 @@ model UserInteraction {
 }
 
 model UserPreference {
-  id           Int      @id @default(autoincrement())
-  user_id      Int
-  category     String?  // Make nullable for brand-only preferences
-  brand        String?
-  priceRange   String?
-  score        Float    @default(1.0)
-  source       String   @default("implicit") // "explicit", "implicit", "inferred"
-  confidence   Float    @default(0.5) // How confident we are in this preference
-  lastUpdated  DateTime @default(now()) @updatedAt
-  
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  category    String? // Make nullable for brand-only preferences
+  brand       String?
+  priceRange  String?
+  score       Float    @default(1.0)
+  source      String   @default("implicit") // "explicit", "implicit", "inferred"
+  confidence  Float    @default(0.5) // How confident we are in this preference
+  lastUpdated DateTime @default(now()) @updatedAt
+
   user User @relation(fields: [user_id], references: [id])
-  
+
   @@unique([user_id, category, brand])
   @@map("user_preferences")
 }
