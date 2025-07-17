@@ -13,10 +13,12 @@ import redis.asyncio as redis
 from deps import RecommendationClient
 from meilisearch import Client
 from services.product_hydrator import ProductHydrator
+from starlette.middleware.cors import CORSMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,11 +26,13 @@ async def lifespan(app: FastAPI):
     await database.connect()
     logger.info("✅ ~ connected to pyscopg......:")
     try:
-        redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+        redis_client = redis.from_url(
+            settings.REDIS_URL, decode_responses=True)
         await redis_client.ping()
         app.state.redis = redis_client
         logger.info("✅ ~ connected to redis......:")
-        meilisearch_client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
+        meilisearch_client = Client(
+            settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
         app.state.meilisearch = meilisearch_client
         logger.info("✅ ~ connected to meilisearch......:")
         recommendation_engine = RecommendationEngine()
@@ -37,17 +41,29 @@ async def lifespan(app: FastAPI):
         app.state.recommendation_engine = recommendation_engine
         logger.info("Recommendation service started successfully")
     except Exception as e:
-        logger.error(f"❌ ~ failed to connect to recommendation service......: {e}")
+        logger.error(
+            f"❌ ~ failed to connect to recommendation service......: {e}")
     yield
     await database.disconnect()
 
 
-app = FastAPI(title="Recommendation Service", prefix="/api/recommendation", lifespan=lifespan)
+app = FastAPI(title="Recommendation Service",
+              prefix="/api/recommendation", lifespan=lifespan)
+
+if settings.all_cors_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.all_cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 @app.get("/")
 async def root():
     return {"message": "Recommendation Service", "status": "running"}
+
 
 @app.get("/health")
 async def health_check(recommendation: RecommendationClient):
@@ -58,8 +74,44 @@ async def health_check(recommendation: RecommendationClient):
         "total_users": len(recommendation.user_profiles)
     }
 
+
+@app.get("/recommendations/{user_id}")
+async def get_recommendations(user_id: int, num: int = 16, rec_type: str = "hybrid") -> RecommendationResponse:
+    """Get personalized recommendations for a user"""
+    try:
+        if rec_type == "collaborative":
+            recommendations = app.state.recommendation_engine.get_collaborative_recommendations(
+                user_id, num
+            )
+        elif rec_type == "content":
+            recommendations = app.state.recommendation_engine.get_content_based_recommendations(
+                user_id, num
+            )
+        else:
+            recommendations = app.state.recommendation_engine.get_hybrid_recommendations(
+                user_id, num
+            )
+
+        product_ids = [r['product_id'] for r in recommendations]
+        product_hydrator = ProductHydrator(
+            app.state.redis, app.state.meilisearch)
+        recommendations = await product_hydrator.hydrate_products(product_ids=product_ids)
+
+        return RecommendationResponse(
+            user_id=request.user_id,
+            recommendations=recommendations,
+            recommendation_type=request.recommendation_type,
+            generated_at=datetime.now()
+        )
+
+    except Exception as e:
+        logger.error(f"Error generating recommendations: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail="Failed to generate recommendations")
+
+
 @app.post("/recommendations")
-async def get_recommendations(request: RecommendationRequest) -> RecommendationResponse:
+async def get_recommendations2(request: RecommendationRequest) -> RecommendationResponse:
     """Get personalized recommendations for a user"""
     try:
         if request.recommendation_type == "collaborative":
@@ -76,7 +128,8 @@ async def get_recommendations(request: RecommendationRequest) -> RecommendationR
             )
 
         product_ids = [r['product_id'] for r in recommendations]
-        product_hydrator = ProductHydrator(app.state.redis, app.state.meilisearch)
+        product_hydrator = ProductHydrator(
+            app.state.redis, app.state.meilisearch)
         recommendations = await product_hydrator.hydrate_products(product_ids=product_ids)
 
         return RecommendationResponse(
@@ -88,13 +141,16 @@ async def get_recommendations(request: RecommendationRequest) -> RecommendationR
 
     except Exception as e:
         logger.error(f"Error generating recommendations: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to generate recommendations")
+        raise HTTPException(
+            status_code=500, detail="Failed to generate recommendations")
+
 
 @app.post("/update-models")
 async def trigger_model_update(background_tasks: BackgroundTasks):
     """Manually trigger model update"""
     background_tasks.add_task(update_models_background)
     return {"message": "Model update triggered"}
+
 
 async def update_models_background():
     """Background task to update models"""
@@ -105,12 +161,14 @@ async def update_models_background():
     except Exception as e:
         logger.error(f"Error in manual model update: {str(e)}")
 
+
 @app.get("/similar-products/{product_id}")
 async def get_similar_products(product_id: int, num_recommendations: int = 5):
     """Get products similar to a given product"""
     try:
         if not app.state.recommendation_engine.item_features_matrix:
-            raise HTTPException(status_code=503, detail="Content features not available")
+            raise HTTPException(
+                status_code=503, detail="Content features not available")
 
         product_ids = app.state.recommendation_engine.item_features_matrix['product_ids']
 
@@ -121,7 +179,8 @@ async def get_similar_products(product_id: int, num_recommendations: int = 5):
         similarities = app.state.recommendation_engine.item_similarity_matrix[product_idx]
 
         # Get most similar products
-        similar_indices = np.argsort(similarities)[-num_recommendations-1:-1][::-1]
+        similar_indices = np.argsort(
+            similarities)[-num_recommendations-1:-1][::-1]
 
         recommendations = []
         for idx in similar_indices:
@@ -137,7 +196,8 @@ async def get_similar_products(product_id: int, num_recommendations: int = 5):
                 })
 
         product_ids = [r['product_id'] for r in recommendations]
-        product_hydrator = ProductHydrator(app.state.redis, app.state.meilisearch)
+        product_hydrator = ProductHydrator(
+            app.state.redis, app.state.meilisearch)
         recommendations = await product_hydrator.hydrate_products(product_ids=product_ids)
 
         return {
@@ -150,4 +210,5 @@ async def get_similar_products(product_id: int, num_recommendations: int = 5):
         raise
     except Exception as e:
         logger.error(f"Error getting similar products: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to get similar products")
+        raise HTTPException(
+            status_code=500, detail="Failed to get similar products")

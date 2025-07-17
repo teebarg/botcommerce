@@ -2,7 +2,7 @@
 
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas/product";
-import { useProductSearch } from "@/lib/hooks/useProduct";
+import { useProductRecommendations, useProductSearch } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
 
@@ -12,6 +12,11 @@ type RecommendedProductsProps = {
 
 export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
     const { data, isLoading, error } = useProductSearch({ limit: 40 });
+    const { data: recommendations, isLoading: recommendationsLoading, error: recommendationsError } = useProductRecommendations(1);
+
+    console.log("🚀 ~ RecommendedProducts ~ recommendationsError:", recommendationsError);
+    console.log("🚀 ~ RecommendedProducts ~ recommendationsLoading:", recommendationsLoading);
+    console.log("🚀 ~ RecommendedProducts ~ recommendations:", recommendations);
 
     if (error) {
         return <ServerError error={error.message} scenario="recommended-products" stack={error.stack} />;

@@ -59,6 +59,40 @@ export const useProduct = (slug: string) => {
     });
 };
 
+export const useProductRecommendations = (productId: number, num_recommendations: number = 16) => {
+    return useQuery({
+        queryKey: ["products", "recommendations", productId],
+        queryFn: async () => {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num_recommendations=${num_recommendations}`
+            );
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            return response.json();
+        },
+    });
+};
+
+export const useSimilarProducts = (productId: number, num_recommendations: number = 16) => {
+    return useQuery({
+        queryKey: ["products", "recommendations", productId],
+        queryFn: async () => {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num_recommendations=${num_recommendations}`
+            );
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            return response.json();
+        },
+    });
+};
+
 export const useCreateProduct = () => {
     const queryClient = useQueryClient();
 
