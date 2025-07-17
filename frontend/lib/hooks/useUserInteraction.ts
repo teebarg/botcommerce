@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
+
 import { api } from "@/apis/client2";
-import { useQuery } from "@tanstack/react-query";
-import { UserInteraction } from "@/schemas";
 
 export type UserInteractionType = "VIEW" | "PURCHASE" | "CART_ADD" | "WISHLIST_ADD" | "WISHLIST_REMOVE";
 
@@ -20,6 +19,7 @@ let retryCount = 0;
 const flushBuffer = async () => {
     if (buffer.length === 0) return;
     const batch = [...buffer];
+
     buffer = [];
     try {
         await api.post("/user-interactions/batch", batch);
@@ -47,8 +47,10 @@ export const useTrackUserInteraction = () => {
         const handleVisibility = () => {
             if (document.visibilityState === "hidden") flushBuffer();
         };
+
         window.addEventListener("visibilitychange", handleVisibility);
         window.addEventListener("beforeunload", flushBuffer);
+
         return () => {
             window.removeEventListener("visibilitychange", handleVisibility);
             window.removeEventListener("beforeunload", flushBuffer);

@@ -52,8 +52,10 @@ const ProductOverview: React.FC<{
         }
 
         const startTime = Date.now();
+
         return () => {
             const timeSpent = Date.now() - startTime;
+
             if (user && product?.id) {
                 trackInteraction.mutate({
                     user_id: user.id,
@@ -150,7 +152,7 @@ const ProductOverview: React.FC<{
                         }`}
                         onClick={() => setSelectedImageIdx(idx)}
                     >
-                        <Image fill alt={`Thumbnail - ${image}`} className="object-cover" src={image} sizes="64px" />
+                        <Image fill alt={`Thumbnail - ${image}`} className="object-cover" sizes="64px" src={image} />
                     </button>
                 ))}
             </div>

@@ -29,8 +29,8 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
                     <Image
                         fill
                         alt={image || "placeholder"}
-                        sizes="(max-width: 768px) 64px, 80px"
                         className="cursor-pointer"
+                        sizes="(max-width: 768px) 64px, 80px"
                         src={image || "/placeholder.jpg"}
                     />
                 </DialogTrigger>

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+
 import { api } from "@/apis/client2";
 import { tryCatchApi } from "@/lib/try-catch";
 import { UserInteraction } from "@/schemas";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import ComponentLoader from "@/components/component-loader";
 
 // interface UserInteraction {
@@ -23,6 +24,7 @@ const eventTypes = ["VIEW", "CART_ADD", "PURCHASE", "WISHLIST_ADD", "WISHLIST_RE
 function toCSV(rows: any[], columns: string[]): string {
     const header = columns.join(",");
     const body = rows.map((row) => columns.map((col) => JSON.stringify(row[col] ?? "")).join(",")).join("\n");
+
     return header + "\n" + body;
 }
 
@@ -30,6 +32,7 @@ function downloadCSV(filename: string, csv: string) {
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
+
     a.href = url;
     a.download = filename;
     a.click();
@@ -64,13 +67,16 @@ const AnalyticsDashboard: React.FC = () => {
         const fetchData = async () => {
             setLoading(true);
             const { data, error } = await tryCatchApi<UserInteraction[]>(api.get("/user-interactions"));
+
             setLoading(false);
             if (error) {
                 toast.error(error);
+
                 return;
             }
             setInteractions(data);
         };
+
         fetchData();
     }, []);
 
@@ -86,28 +92,34 @@ const AnalyticsDashboard: React.FC = () => {
 
     // Heatmap data: 24x7 grid (hour x day)
     const heatmapGrid = Array.from({ length: 7 }, () => Array(24).fill(0));
+
     filtered?.forEach((i) => {
         const date = new Date(i.timestamp!);
         const day = date.getDay(); // 0=Sunday
         const hour = date.getHours();
+
         heatmapGrid[day][hour]++;
     });
 
     // Per-user breakdown
     const userBreakdown = (() => {
         const map: Record<string, number> = {};
+
         filtered?.forEach((i) => {
             map[i.user_id] = (map[i.user_id] || 0) + 1;
         });
+
         return Object.entries(map).sort((a, b) => b[1] - a[1]);
     })();
 
     // Per-product breakdown
     const productBreakdown = (() => {
         const map: Record<string, number> = {};
+
         filtered?.forEach((i) => {
             map[i.product_id] = (map[i.product_id] || 0) + 1;
         });
+
         return Object.entries(map).sort((a, b) => b[1] - a[1]);
     })();
 
@@ -120,6 +132,7 @@ const AnalyticsDashboard: React.FC = () => {
                     onClick={() => {
                         const columns = ["id", "user_id", "product_id", "type", "timestamp", "metadata"];
                         const csv = toCSV(filtered!, columns);
+
                         downloadCSV("user_interactions.csv", csv);
                     }}
                 >
@@ -129,6 +142,7 @@ const AnalyticsDashboard: React.FC = () => {
                     variant="success"
                     onClick={() => {
                         const columns = ["id", "user_id", "product_id", "type", "timestamp", "metadata"];
+
                         downloadExcel("user_interactions.xlsx", filtered!, columns);
                     }}
                 >
@@ -152,7 +166,7 @@ const AnalyticsDashboard: React.FC = () => {
             <div className="mb-6 flex flex-wrap gap-4 items-end">
                 <div>
                     <label className="block text-sm font-medium">Type</label>
-                    <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="border rounded px-2 py-1">
+                    <select className="border rounded px-2 py-1" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
                         <option value="">All</option>
                         {eventTypes.map((t, idx: number) => (
                             <option key={idx} value={t}>
@@ -164,24 +178,24 @@ const AnalyticsDashboard: React.FC = () => {
                 <div>
                     <label className="block text-sm font-medium">User ID</label>
                     <input
-                        value={userFilter}
-                        onChange={(e) => setUserFilter(e.target.value)}
                         className="border rounded px-2 py-1"
                         placeholder="User ID"
+                        value={userFilter}
+                        onChange={(e) => setUserFilter(e.target.value)}
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-medium">Product ID</label>
                     <input
-                        value={productFilter}
-                        onChange={(e) => setProductFilter(e.target.value)}
                         className="border rounded px-2 py-1"
                         placeholder="Product ID"
+                        value={productFilter}
+                        onChange={(e) => setProductFilter(e.target.value)}
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-medium">Date</label>
-                    <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="border rounded px-2 py-1" />
+                    <input className="border rounded px-2 py-1" type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} />
                 </div>
             </div>
             <div className="mb-8 bg-content1 rounded shadow p-4">

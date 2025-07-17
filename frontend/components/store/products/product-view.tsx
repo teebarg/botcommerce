@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import Image from "next/image";
+import { RefreshCw, Truck } from "lucide-react";
 
 import { cn, currency } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
@@ -10,7 +11,6 @@ import ProductShare from "@/components/product/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/product/product-variant-selection";
 import { Product } from "@/schemas/product";
-import { RefreshCw, Truck } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 
@@ -39,8 +39,10 @@ const ProductView: React.FC<Props> = ({ product }) => {
         }
 
         const startTime = Date.now();
+
         return () => {
             const timeSpent = Date.now() - startTime;
+
             if (user && product?.id) {
                 trackInteraction.mutate({
                     user_id: user.id,
@@ -89,7 +91,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                     }`}
                                     onClick={() => setSelectedImageId(image.id)}
                                 >
-                                    <Image fill alt={`Thumbnail - ${image.image}`} className="object-cover" src={image.image} sizes="64px" />
+                                    <Image fill alt={`Thumbnail - ${image.image}`} className="object-cover" sizes="64px" src={image.image} />
                                 </button>
                             ))}
                     </div>

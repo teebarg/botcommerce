@@ -6,12 +6,12 @@ import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
+import OrderNotes from "./order-notes";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useBankDetails } from "@/lib/hooks/useApi";
-import OrderNotes from "./order-notes";
 
 type OrderConfirmationProps = {
     order: Order;

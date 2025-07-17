@@ -6,12 +6,12 @@ import { ShoppingBag } from "lucide-react";
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
+import OrderNotes from "./order-notes";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import { Button } from "@/components/ui/button";
-import OrderNotes from "./order-notes";
 
 type OrderConfirmationProps = {
     order: Order;

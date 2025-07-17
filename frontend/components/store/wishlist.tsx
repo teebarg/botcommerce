@@ -30,8 +30,8 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
                         <Image
                             fill
                             alt={name}
-                            sizes="(max-width: 768px) 320px, 256px"
                             className="hover:scale-105 transition-all"
+                            sizes="(max-width: 768px) 320px, 256px"
                             src={images.sort((a, b) => a.order - b.order)[0].image}
                         />
                     )}

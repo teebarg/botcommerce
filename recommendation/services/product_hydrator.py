@@ -5,7 +5,6 @@ from meilisearch import Client as MeiliClient
 import json
 import logging
 from config import settings
-from services.redis import cache
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +18,12 @@ class ProductHydrator:
     def _cache_key(self, product_id: int) -> str:
         return f"product:{product_id}"
 
-    def cache_product(self, product: SearchProduct, ttl: int = 3600):
+    async def cache_product(self, product: SearchProduct, ttl: int = 3600):
         key = self._cache_key(product.id)
-        self.redis.setex(key, ttl, json.dumps(product.dict()))
+        await self.redis.setex(key, ttl, json.dumps(product.dict()))
 
-    def get_from_cache(self, product_id: int) -> SearchProduct | None:
-        cached = self.redis.get(self._cache_key(product_id))
+    async def get_from_cache(self, product_id: int) -> SearchProduct | None:
+        cached = await self.redis.get(self._cache_key(product_id))
         if cached:
             try:
                 return SearchProduct(**json.loads(cached))
@@ -32,18 +31,16 @@ class ProductHydrator:
                 logger.warning(f"Failed to parse cached product {product_id}: {e}")
         return None
 
-    def hydrate_products(self, product_ids: List[int]) -> List[SearchProduct]:
+    async def hydrate_products(self, product_ids: List[int]) -> List[SearchProduct]:
         results = []
 
         # Try Redis first
         for pid in product_ids:
-            product = self.get_from_cache(pid)
+            product = await self.get_from_cache(pid)
             if product:
                 results.append(product)
 
         missing_ids = [pid for pid in product_ids if pid not in [p.id for p in results]]
-        print("missing_ids......................................................")
-        print(missing_ids)
 
         if len(missing_ids) > 0:
             try:
@@ -65,7 +62,7 @@ class ProductHydrator:
                         try:
                             product = SearchProduct(**products_map[pid])
                             results.append(product)
-                            self.cache_product(product)
+                            await self.cache_product(product)
                         except Exception as e:
                             logger.warning(f"Error parsing Meili product {pid}: {e}")
             except Exception as e:

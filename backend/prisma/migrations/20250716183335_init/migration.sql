@@ -2,7 +2,7 @@
 CREATE TYPE "AddressType" AS ENUM ('HOME', 'WORK', 'BILLING', 'SHIPPING', 'OTHER');
 
 -- CreateEnum
-CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELED', 'REFUNDED');
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELED', 'REFUNDED');
 
 -- CreateEnum
 CREATE TYPE "DiscountType" AS ENUM ('PERCENTAGE', 'FIXED_AMOUNT');
@@ -30,6 +30,15 @@ CREATE TYPE "statuses" AS ENUM ('pending', 'active', 'inactive');
 
 -- CreateEnum
 CREATE TYPE "ShopSettingsType" AS ENUM ('FEATURE', 'SHOP_DETAIL', 'CUSTOM');
+
+-- CreateEnum
+CREATE TYPE "ConversationStatus" AS ENUM ('ACTIVE', 'COMPLETED', 'ABANDONED');
+
+-- CreateEnum
+CREATE TYPE "InteractionType" AS ENUM ('view', 'purchase', 'cart_add', 'wishlist');
+
+-- CreateEnum
+CREATE TYPE "MessageSender" AS ENUM ('USER', 'BOT', 'SYSTEM');
 
 -- CreateTable
 CREATE TABLE "activity_logs" (
@@ -112,8 +121,6 @@ CREATE TABLE "products" (
     "sku" TEXT NOT NULL,
     "description" TEXT,
     "features" TEXT[],
-    "price" DOUBLE PRECISION NOT NULL,
-    "old_price" DOUBLE PRECISION,
     "image" VARCHAR(255),
     "status" "ProductStatus" NOT NULL DEFAULT 'IN_STOCK',
     "ratings" DOUBLE PRECISION DEFAULT 0,
@@ -128,14 +135,13 @@ CREATE TABLE "products" (
 CREATE TABLE "product_variants" (
     "id" SERIAL NOT NULL,
     "product_id" INTEGER NOT NULL,
-    "name" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
-    "image" TEXT,
     "sku" TEXT NOT NULL,
     "status" "ProductStatus" NOT NULL DEFAULT 'IN_STOCK',
     "price" DOUBLE PRECISION NOT NULL,
     "old_price" DOUBLE PRECISION,
     "inventory" INTEGER NOT NULL,
+    "size" TEXT,
+    "color" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -147,6 +153,7 @@ CREATE TABLE "product_images" (
     "id" SERIAL NOT NULL,
     "image" VARCHAR(255),
     "product_id" INTEGER NOT NULL,
+    "order" INTEGER NOT NULL DEFAULT 1,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -208,6 +215,8 @@ CREATE TABLE "orders" (
     "shipping_fee" DOUBLE PRECISION NOT NULL,
     "coupon_id" INTEGER,
     "cart_id" INTEGER,
+    "order_notes" TEXT,
+    "invoice_url" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -351,6 +360,100 @@ CREATE TABLE "bank_details" (
 );
 
 -- CreateTable
+CREATE TABLE "conversations" (
+    "id" SERIAL NOT NULL,
+    "conversation_uuid" TEXT NOT NULL,
+    "user_id" INTEGER,
+    "status" "ConversationStatus" NOT NULL DEFAULT 'ACTIVE',
+    "started_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_active" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "conversations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "messages" (
+    "id" SERIAL NOT NULL,
+    "conversation_id" INTEGER NOT NULL,
+    "content" TEXT NOT NULL,
+    "sender" "MessageSender" NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "messages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "faqs" (
+    "id" SERIAL NOT NULL,
+    "question" TEXT NOT NULL,
+    "answer" TEXT NOT NULL,
+    "category" TEXT,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "faqs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "carousel_banners" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "subtitle" TEXT,
+    "description" TEXT,
+    "buttonText" TEXT,
+    "image" VARCHAR(255),
+    "link" TEXT,
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "carousel_banners_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "delivery_options" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "description" TEXT,
+    "method" "ShippingMethod" NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "delivery_options_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_interactions" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "product_id" INTEGER NOT NULL,
+    "type" "InteractionType" NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "metadata" JSONB,
+
+    CONSTRAINT "user_interactions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_preferences" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "category" TEXT,
+    "brand" TEXT,
+    "priceRange" TEXT,
+    "score" DOUBLE PRECISION NOT NULL DEFAULT 1.0,
+    "source" TEXT NOT NULL DEFAULT 'implicit',
+    "confidence" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+    "lastUpdated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "user_preferences_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_ProductCategories" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -399,12 +502,6 @@ CREATE UNIQUE INDEX "products_sku_key" ON "products"("sku");
 CREATE INDEX "products_name_slug_idx" ON "products"("name", "slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "product_variants_name_key" ON "product_variants"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "product_variants_slug_key" ON "product_variants"("slug");
-
--- CreateIndex
 CREATE UNIQUE INDEX "product_variants_sku_key" ON "product_variants"("sku");
 
 -- CreateIndex
@@ -445,6 +542,30 @@ CREATE UNIQUE INDEX "shop_settings_key_key" ON "shop_settings"("key");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "bank_details_account_number_key" ON "bank_details"("account_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "conversations_conversation_uuid_key" ON "conversations"("conversation_uuid");
+
+-- CreateIndex
+CREATE INDEX "conversations_user_id_status_idx" ON "conversations"("user_id", "status");
+
+-- CreateIndex
+CREATE INDEX "conversations_conversation_uuid_idx" ON "conversations"("conversation_uuid");
+
+-- CreateIndex
+CREATE INDEX "messages_conversation_id_timestamp_idx" ON "messages"("conversation_id", "timestamp");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "faqs_question_key" ON "faqs"("question");
+
+-- CreateIndex
+CREATE INDEX "user_interactions_user_id_timestamp_idx" ON "user_interactions"("user_id", "timestamp");
+
+-- CreateIndex
+CREATE INDEX "user_interactions_product_id_timestamp_idx" ON "user_interactions"("product_id", "timestamp");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_preferences_user_id_category_brand_key" ON "user_preferences"("user_id", "category", "brand");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ProductCategories_AB_unique" ON "_ProductCategories"("A", "B");
@@ -532,6 +653,21 @@ ALTER TABLE "favorites" ADD CONSTRAINT "favorites_user_id_fkey" FOREIGN KEY ("us
 
 -- AddForeignKey
 ALTER TABLE "favorites" ADD CONSTRAINT "favorites_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "conversations" ADD CONSTRAINT "conversations_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "messages" ADD CONSTRAINT "messages_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_interactions" ADD CONSTRAINT "user_interactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_interactions" ADD CONSTRAINT "user_interactions_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_preferences" ADD CONSTRAINT "user_preferences_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ProductCategories" ADD CONSTRAINT "_ProductCategories_A_fkey" FOREIGN KEY ("A") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;

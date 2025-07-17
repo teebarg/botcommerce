@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional, Any
+from typing import List, Optional, Any
 from datetime import datetime
 
 class UserInteraction(BaseModel):
@@ -12,12 +12,6 @@ class RecommendationRequest(BaseModel):
     user_id: int
     num_recommendations: int = Field(default=10, le=50)
     recommendation_type: str = Field(default="hybrid", pattern="^(collaborative|content|hybrid)$")
-
-class RecommendationResponse(BaseModel):
-    user_id: int
-    recommendations: List[Dict[str, Any]]
-    recommendation_type: str
-    generated_at: datetime
 
 class Product(BaseModel):
     id: int
@@ -39,7 +33,6 @@ class ProductVariant(BaseModel):
     size: Optional[str]
     color: Optional[str]
 
-
 class SearchProduct(BaseModel):
     id: int
     name: str
@@ -58,3 +51,13 @@ class SearchProduct(BaseModel):
     variants: Optional[List[ProductVariant]] = []
     average_rating: Optional[float] = None
     review_count: Optional[int] = None
+    average_rating: Optional[float] = None
+    review_count: Optional[int] = None
+    user_interactions: Any
+
+
+class RecommendationResponse(BaseModel):
+    user_id: int
+    recommendations: List[SearchProduct]
+    recommendation_type: str
+    generated_at: datetime

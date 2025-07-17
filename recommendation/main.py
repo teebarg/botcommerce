@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from contextlib import asynccontextmanager
 import numpy as np
 
@@ -8,7 +8,6 @@ from db import database
 
 from models import RecommendationResponse, RecommendationRequest
 from services.recommendation import RecommendationEngine
-from services.redis import cache
 from config import settings
 import redis.asyncio as redis
 from deps import RecommendationClient
@@ -59,8 +58,8 @@ async def health_check(recommendation: RecommendationClient):
         "total_users": len(recommendation.user_profiles)
     }
 
-@app.post("/recommendations", response_model=RecommendationResponse)
-async def get_recommendations(request: RecommendationRequest):
+@app.post("/recommendations")
+async def get_recommendations(request: RecommendationRequest) -> RecommendationResponse:
     """Get personalized recommendations for a user"""
     try:
         if request.recommendation_type == "collaborative":
@@ -76,20 +75,17 @@ async def get_recommendations(request: RecommendationRequest):
                 request.user_id, request.num_recommendations
             )
 
-        print("recommendations......................................................")
-        print(recommendations)
-
         product_ids = [r['product_id'] for r in recommendations]
         product_hydrator = ProductHydrator(app.state.redis, app.state.meilisearch)
-        recommendations = product_hydrator.hydrate_products(product_ids=product_ids)
-        
+        recommendations = await product_hydrator.hydrate_products(product_ids=product_ids)
+
         return RecommendationResponse(
             user_id=request.user_id,
             recommendations=recommendations,
             recommendation_type=request.recommendation_type,
             generated_at=datetime.now()
         )
-    
+
     except Exception as e:
         logger.error(f"Error generating recommendations: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to generate recommendations")
@@ -110,24 +106,23 @@ async def update_models_background():
         logger.error(f"Error in manual model update: {str(e)}")
 
 @app.get("/similar-products/{product_id}")
-# @cache("similar-products")
-async def get_similar_products(request: Request, product_id: int, num_recommendations: int = 5):
+async def get_similar_products(product_id: int, num_recommendations: int = 5):
     """Get products similar to a given product"""
     try:
         if not app.state.recommendation_engine.item_features_matrix:
             raise HTTPException(status_code=503, detail="Content features not available")
-        
+
         product_ids = app.state.recommendation_engine.item_features_matrix['product_ids']
-        
+
         if product_id not in product_ids:
             raise HTTPException(status_code=404, detail="Product not found")
-        
+
         product_idx = product_ids.index(product_id)
         similarities = app.state.recommendation_engine.item_similarity_matrix[product_idx]
-        
+
         # Get most similar products
         similar_indices = np.argsort(similarities)[-num_recommendations-1:-1][::-1]
-        
+
         recommendations = []
         for idx in similar_indices:
             similar_product_id = product_ids[idx]
@@ -140,22 +135,17 @@ async def get_similar_products(request: Request, product_id: int, num_recommenda
                     'price': product_data['price'],
                     'ratings': product_data['ratings']
                 })
-        
-        print("recommendations......................................................")
-        print(recommendations)
-        
+
         product_ids = [r['product_id'] for r in recommendations]
-        print("product_ids......................................................")
-        print(product_ids)
         product_hydrator = ProductHydrator(app.state.redis, app.state.meilisearch)
-        recommendations = product_hydrator.hydrate_products(product_ids=product_ids)
-        
+        recommendations = await product_hydrator.hydrate_products(product_ids=product_ids)
+
         return {
             "product_id": product_id,
             "similar_products": recommendations,
             "generated_at": datetime.now()
         }
-    
+
     except HTTPException:
         raise
     except Exception as e:
