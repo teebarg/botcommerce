@@ -9,6 +9,7 @@ from datetime import datetime
 import logging
 from collections import defaultdict
 from db import database
+import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -68,7 +69,7 @@ class RecommendationEngine:
 
 
                 interactions_query = """
-                    SELECT user_id, product_id, type, timestamp
+                    SELECT user_id, product_id, type, timestamp, metadata
                     FROM user_interactions
                     WHERE timestamp >= NOW() - INTERVAL '90 days'
                     ORDER BY timestamp DESC
@@ -83,8 +84,8 @@ class RecommendationEngine:
                     user_id = interaction['user_id']
                     product_id = interaction['product_id']
                     interaction_type = interaction['type']
-                    weight = self.interaction_weights.get(interaction_type, 1.0)
-
+                    metadata = json.loads(interaction['metadata'])
+                    weight = self._get_weight(interaction_type=interaction_type.upper(), metadata=metadata)
                     user_items[user_id][product_id] += weight
 
                 # Convert to numpy arrays for efficient computation
@@ -117,6 +118,32 @@ class RecommendationEngine:
         except Exception as e:
             logger.error(f"Error loading data: {str(e)}")
             raise
+
+
+    def _get_weight(self, interaction_type: str, metadata: dict) -> float:
+        """
+        Compute interaction weight based on type and timeSpent if VIEW.
+        """
+        base_weights = self.interaction_weights
+
+        if interaction_type == 'VIEW':
+            return self.compute_view_weight(metadata, base_weight=base_weights['VIEW'])
+        
+        return base_weights.get(interaction_type, 1.0)
+
+
+    def compute_view_weight(self, metadata: dict, base_weight: float = 1.0) -> float:
+        """
+        Adjust VIEW weight using time spent in milliseconds (max 60 seconds considered).
+        """
+        try:
+            time_spent = metadata.get("timeSpent", 0)
+            seconds = min(time_spent / 1000.0, 60)  # cap at 60s
+            scaled_weight = base_weight + (seconds / 60) * 2.0  # scale from 1.0 to 3.0
+            return scaled_weight
+        except Exception as e:
+            logger.warning(f"Invalid metadata format for view weighting: {metadata} - {e}")
+            return base_weight
 
     def _create_sparse_matrix(self, user_items):
         """Create sparse user-item matrix"""

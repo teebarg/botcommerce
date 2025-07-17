@@ -59,12 +59,12 @@ export const useProduct = (slug: string) => {
     });
 };
 
-export const useProductRecommendations = (productId: number, num_recommendations: number = 16) => {
+export const useProductRecommendations = (userId?: number, num: number = 16) => {
     return useQuery({
-        queryKey: ["products", "recommendations", productId],
+        queryKey: ["products", "recommendations", userId],
         queryFn: async () => {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num_recommendations=${num_recommendations}`
+                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/recommendations/${userId}?num=${num}`
             );
 
             if (!response.ok) {
@@ -73,15 +73,16 @@ export const useProductRecommendations = (productId: number, num_recommendations
 
             return response.json();
         },
+        enabled: !!userId,
     });
 };
 
-export const useSimilarProducts = (productId: number, num_recommendations: number = 16) => {
+export const useSimilarProducts = (productId: number, num: number = 16) => {
     return useQuery({
-        queryKey: ["products", "recommendations", productId],
+        queryKey: ["products", "similar", productId],
         queryFn: async () => {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num_recommendations=${num_recommendations}`
+                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num=${num}`
             );
 
             if (!response.ok) {
@@ -90,6 +91,7 @@ export const useSimilarProducts = (productId: number, num_recommendations: numbe
 
             return response.json();
         },
+        enabled: !!productId,
     });
 };
 

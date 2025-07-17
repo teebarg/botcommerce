@@ -6,7 +6,7 @@ from datetime import datetime
 import logging
 from db import database
 
-from models import RecommendationResponse, RecommendationRequest
+from models import RecommendationResponse
 from services.recommendation import RecommendationEngine
 from config import settings
 import redis.asyncio as redis
@@ -14,6 +14,7 @@ from deps import RecommendationClient
 from meilisearch import Client
 from services.product_hydrator import ProductHydrator
 from starlette.middleware.cors import CORSMiddleware
+from services.redis import CacheService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,16 +30,17 @@ async def lifespan(app: FastAPI):
         redis_client = redis.from_url(
             settings.REDIS_URL, decode_responses=True)
         await redis_client.ping()
-        app.state.redis = redis_client
+        cache_service = CacheService(redis_client)
+        app.state.redis = cache_service
         logger.info("✅ ~ connected to redis......:")
         meilisearch_client = Client(
             settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
         app.state.meilisearch = meilisearch_client
         logger.info("✅ ~ connected to meilisearch......:")
-        recommendation_engine = RecommendationEngine()
-        await recommendation_engine.load_data_from_db()
-        await recommendation_engine.update_models()
-        app.state.recommendation_engine = recommendation_engine
+        engine = RecommendationEngine()
+        await engine.load_data_from_db()
+        await engine.update_models()
+        app.state.engine = engine
         logger.info("Recommendation service started successfully")
     except Exception as e:
         logger.error(
@@ -80,15 +82,15 @@ async def get_recommendations(user_id: int, num: int = 16, rec_type: str = "hybr
     """Get personalized recommendations for a user"""
     try:
         if rec_type == "collaborative":
-            recommendations = app.state.recommendation_engine.get_collaborative_recommendations(
+            recommendations = app.state.engine.get_collaborative_recommendations(
                 user_id, num
             )
         elif rec_type == "content":
-            recommendations = app.state.recommendation_engine.get_content_based_recommendations(
+            recommendations = app.state.engine.get_content_based_recommendations(
                 user_id, num
             )
         else:
-            recommendations = app.state.recommendation_engine.get_hybrid_recommendations(
+            recommendations = app.state.engine.get_hybrid_recommendations(
                 user_id, num
             )
 
@@ -98,44 +100,9 @@ async def get_recommendations(user_id: int, num: int = 16, rec_type: str = "hybr
         recommendations = await product_hydrator.hydrate_products(product_ids=product_ids)
 
         return RecommendationResponse(
-            user_id=request.user_id,
+            user_id=user_id,
             recommendations=recommendations,
-            recommendation_type=request.recommendation_type,
-            generated_at=datetime.now()
-        )
-
-    except Exception as e:
-        logger.error(f"Error generating recommendations: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail="Failed to generate recommendations")
-
-
-@app.post("/recommendations")
-async def get_recommendations2(request: RecommendationRequest) -> RecommendationResponse:
-    """Get personalized recommendations for a user"""
-    try:
-        if request.recommendation_type == "collaborative":
-            recommendations = app.state.recommendation_engine.get_collaborative_recommendations(
-                request.user_id, request.num_recommendations
-            )
-        elif request.recommendation_type == "content":
-            recommendations = app.state.recommendation_engine.get_content_based_recommendations(
-                request.user_id, request.num_recommendations
-            )
-        else:
-            recommendations = app.state.recommendation_engine.get_hybrid_recommendations(
-                request.user_id, request.num_recommendations
-            )
-
-        product_ids = [r['product_id'] for r in recommendations]
-        product_hydrator = ProductHydrator(
-            app.state.redis, app.state.meilisearch)
-        recommendations = await product_hydrator.hydrate_products(product_ids=product_ids)
-
-        return RecommendationResponse(
-            user_id=request.user_id,
-            recommendations=recommendations,
-            recommendation_type=request.recommendation_type,
+            recommendation_type=rec_type,
             generated_at=datetime.now()
         )
 
@@ -155,38 +122,38 @@ async def trigger_model_update(background_tasks: BackgroundTasks):
 async def update_models_background():
     """Background task to update models"""
     try:
-        await app.state.recommendation_engine.load_data_from_db()
-        await app.state.recommendation_engine.update_models()
+        await app.state.engine.load_data_from_db()
+        await app.state.engine.update_models()
         logger.info("Models updated via manual trigger")
     except Exception as e:
         logger.error(f"Error in manual model update: {str(e)}")
 
 
 @app.get("/similar-products/{product_id}")
-async def get_similar_products(product_id: int, num_recommendations: int = 5):
+async def get_similar_products(product_id: int, num: int = 5):
     """Get products similar to a given product"""
     try:
-        if not app.state.recommendation_engine.item_features_matrix:
+        if not app.state.engine.item_features_matrix:
             raise HTTPException(
                 status_code=503, detail="Content features not available")
 
-        product_ids = app.state.recommendation_engine.item_features_matrix['product_ids']
+        product_ids = app.state.engine.item_features_matrix['product_ids']
 
         if product_id not in product_ids:
             raise HTTPException(status_code=404, detail="Product not found")
 
         product_idx = product_ids.index(product_id)
-        similarities = app.state.recommendation_engine.item_similarity_matrix[product_idx]
+        similarities = app.state.engine.item_similarity_matrix[product_idx]
 
         # Get most similar products
         similar_indices = np.argsort(
-            similarities)[-num_recommendations-1:-1][::-1]
+            similarities)[-num-1:-1][::-1]
 
         recommendations = []
         for idx in similar_indices:
             similar_product_id = product_ids[idx]
-            if similar_product_id in app.state.recommendation_engine.products_data:
-                product_data = app.state.recommendation_engine.products_data[similar_product_id]
+            if similar_product_id in app.state.engine.products_data:
+                product_data = app.state.engine.products_data[similar_product_id]
                 recommendations.append({
                     'product_id': similar_product_id,
                     'similarity_score': float(similarities[idx]),

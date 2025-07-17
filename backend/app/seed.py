@@ -54,7 +54,7 @@ async def seed_database():
             "created_at": datetime.now(),
         })
 
-    admin = await create_user("teebarg@gmail.com", "ADMIN")
+    admin = await create_user("teebarg01@gmail.com", "ADMIN")
     customers = [
         await create_user(f"customer{i}@email.com")
         for i in range(1, 6)

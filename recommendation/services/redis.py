@@ -44,30 +44,6 @@ class CacheService:
     def __init__(self, redis: Redis):
         self.redis = redis
 
-    @handle_redis_errors(default=[])
-    def keys(self, pattern: str) -> list[str]:
-        return self.redis.keys(pattern)
-
-    @handle_redis_errors(default=False)
-    def ping(self) -> bool:
-        return self.redis.ping()
-
-    @handle_redis_errors(default=False)
-    def hset(self, key: str, mapping: dict) -> bool:
-        return self.redis.hset(key, mapping=mapping)
-
-    @handle_redis_errors(default=False)
-    def hset_field(self, key: str, field: str, value: Any) -> bool:
-        return self.redis.hset(key, field, value)
-
-    @handle_redis_errors()
-    def hget(self, key: str, field: str) -> str | None:
-        return self.redis.hget(key, field)
-
-    @handle_redis_errors()
-    def hgetall(self, key: str) -> dict[str, str] | None:
-        return self.redis.hgetall(key)
-
     @handle_redis_errors(default=False)
     async def set(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION, tag: str = None) -> bool:
         if isinstance(expire, timedelta):
@@ -80,63 +56,9 @@ class CacheService:
     async def get(self, key: str) -> str | None:
         return await self.redis.get(key)
 
-    @handle_redis_errors(default=False)
-    async def bust_tag(self, tag: str):
-        keys = await self.redis.smembers(tag)
-        if keys:
-            await self.redis.delete(*keys)
-        await self.redis.delete(tag)
-
-    @handle_redis_errors(default=False)
-    async def invalidate_list_cache(self, entity: str):
-        """
-        Invalidate all list/search cache entries for a given entity (e.g., "product", "collection").
-        This should match the prefix used in @cache_response for list views.
-        """
-        async for tag in self.redis.scan_iter(match=f"{entity}:*"):
-            await self.bust_tag(tag)
-
-    @handle_redis_errors(default=False)
-    def delete(self, key: str) -> bool:
-        return bool(self.redis.delete(key))
-
-    @handle_redis_errors(default=False)
-    def exists(self, key: str) -> bool:
-        return bool(self.redis.exists(key))
-
-    @handle_redis_errors(default=False)
-    def clear(self) -> bool:
-        return bool(self.redis.flushdb())
-
-    @handle_redis_errors(default=False)
-    def invalidate(self, key: str) -> bool:
-        return self.delete_pattern(f"{key}:*")
-
-    @handle_redis_errors(default=False)
-    def delete_pattern(self, pattern: str) -> bool:
-        cursor = 0
-        while True:
-            cursor, keys = self.redis.scan(cursor, pattern, count=100)
-            if keys:
-                self.redis.delete(*keys)
-            if cursor == 0:
-                break
-        return True
-
-    @handle_redis_errors(default=0)
-    def incr(self, key: str) -> int:
-        return self.redis.incr(key)
-
-    @handle_redis_errors(default=False)
-    def expire(self, key: str, seconds: int) -> bool:
-        return self.redis.expire(key, seconds)
 
 async def get_redis_dependency(request: Request):
     return CacheService(request.app.state.redis)
-
-async def invalidate_cache(cache: CacheService, keys: list[str]):
-    for key in keys:
-        await cache.delete_pattern(key)
 
 
 def cache(key_prefix: str, key: Union[str, Callable[..., str], None] = None, expire: int = DEFAULT_EXPIRATION):

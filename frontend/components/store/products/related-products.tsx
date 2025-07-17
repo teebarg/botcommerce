@@ -3,7 +3,7 @@
 import { Product, ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/generic/server-error";
-import { useProductRecommendations } from "@/lib/hooks/useProduct";
+import { useSimilarProducts } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 
 type RelatedProductsProps = {
@@ -11,7 +11,7 @@ type RelatedProductsProps = {
 };
 
 export default function RelatedProducts({ product }: RelatedProductsProps) {
-    const { data, isLoading, error } = useProductRecommendations(product.id, 5);
+    const { data, isLoading, error } = useSimilarProducts(product.id, 5);
 
     if (isLoading) {
         return <ComponentLoader className="min-h-[400px]" />;

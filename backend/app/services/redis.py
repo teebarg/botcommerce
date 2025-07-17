@@ -11,7 +11,6 @@ from redis import Redis
 
 from app.core.logging import logger
 import json
-from datetime import datetime
 
 DEFAULT_EXPIRATION = int(timedelta(hours=24).total_seconds())
 
@@ -95,28 +94,28 @@ class CacheService:
             await self.bust_tag(tag)
 
     @handle_redis_errors(default=False)
-    def delete(self, key: str) -> bool:
-        return bool(self.redis.delete(key))
+    async def delete(self, key: str) -> bool:
+        return bool(await self.redis.delete(key))
 
     @handle_redis_errors(default=False)
-    def exists(self, key: str) -> bool:
-        return bool(self.redis.exists(key))
+    async def exists(self, key: str) -> bool:
+        return bool(await self.redis.exists(key))
 
     @handle_redis_errors(default=False)
-    def clear(self) -> bool:
-        return bool(self.redis.flushdb())
+    async def clear(self) -> bool:
+        return bool(await self.redis.flushdb())
 
     @handle_redis_errors(default=False)
-    def invalidate(self, key: str) -> bool:
-        return self.delete_pattern(f"{key}:*")
+    async def invalidate(self, key: str) -> bool:
+        return await self.delete_pattern(f"{key}:*")
 
     @handle_redis_errors(default=False)
-    def delete_pattern(self, pattern: str) -> bool:
+    async def delete_pattern(self, pattern: str) -> bool:
         cursor = 0
         while True:
-            cursor, keys = self.redis.scan(cursor, pattern, count=100)
+            cursor, keys = await self.redis.scan(cursor, pattern, count=100)
             if keys:
-                self.redis.delete(*keys)
+                await self.redis.delete(*keys)
             if cursor == 0:
                 break
         return True
