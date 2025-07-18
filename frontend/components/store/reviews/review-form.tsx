@@ -56,7 +56,6 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
             </div>
             <Form {...form}>
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    {/* Rating */}
                     <FormField
                         control={form.control}
                         name="rating"
@@ -88,7 +87,6 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                         )}
                     />
 
-                    {/* Author */}
                     <FormField
                         control={form.control}
                         name="author"
@@ -103,7 +101,6 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                         )}
                     />
 
-                    {/* Title */}
                     <FormField
                         control={form.control}
                         name="title"
@@ -148,10 +145,16 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                     />
 
                     <div className="flex gap-3 pt-4">
-                        <Button className="flex-1" type="button" variant="outline" onClick={onClose}>
+                        <Button className="flex-1" type="button" variant="outline" onClick={onClose} >
                             Cancel
                         </Button>
-                        <Button className="flex-1" disabled={!formState.isValid || addReview.isPending} isLoading={addReview.isPending} type="submit">
+                        <Button
+                            className="flex-1"
+                            disabled={!formState.isValid || addReview.isPending}
+                            isLoading={addReview.isPending}
+                            type="submit"
+                            variant="indigo"
+                        >
                             Submit Review
                         </Button>
                     </div>

@@ -9,7 +9,6 @@ import { Card } from "@/components/ui/card";
 import Overlay from "@/components/overlay";
 import { useAuth } from "@/providers/auth-provider";
 import { BtnLink } from "@/components/ui/btnLink";
-import { LazyFadeIn } from "@/components/LazyFadeIn";
 
 interface ProductReviewsZeroStateProps {
     onWriteReview?: () => void;
@@ -23,10 +22,9 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
     const pathname = usePathname();
 
     return (
-        <Card className="w-full max-w-5xl mx-auto p-8 md:p-12 text-center border-dashed border-2">
-            <div className="space-y-6">
-                {/* Hero Illustration */}
-                <div className="relative w-full h-48 md:h-64 rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 via-accent/10 to-secondary/5 flex items-center justify-center">
+        <Card className="w-full max-w-6xl mx-auto text-center border-dashed border-2">
+            <div className="space-y-6 mb-4">
+                <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 via-accent/10 to-secondary/5 flex items-center justify-center">
                     <div className="relative z-10 text-center space-y-4">
                         <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-primary/20">
                             <Package className="w-10 h-10 text-primary/60" />
@@ -40,7 +38,6 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                     <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
                 </div>
 
-                {/* Content */}
                 <div className="space-y-4">
                     <h3 className="text-2xl md:text-3xl font-bold text-foreground">No reviews yet</h3>
 
@@ -49,7 +46,6 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                     </p>
                 </div>
 
-                {/* Features */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
                     <div className="flex flex-col items-center space-y-2 p-4 bg-content2 rounded-lg">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -77,25 +73,23 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                 </div>
 
                 {user ? (
-                    <LazyFadeIn delay={100}>
-                        <div className="space-y-3">
-                            <Overlay
-                                open={state.isOpen}
-                                sheetClassName="min-w-120"
-                                title="Write the First Review"
-                                trigger={
-                                    <Button className="w-full md:w-auto px-8" size="lg">
-                                        Write the First Review
-                                    </Button>
-                                }
-                                onOpenChange={state.setOpen}
-                            >
-                                <ReviewForm productName={productName} product_id={product_id} onClose={state.close} />
-                            </Overlay>
+                    <div className="space-y-3">
+                        <Overlay
+                            open={state.isOpen}
+                            sheetClassName="min-w-120"
+                            title="Write the First Review"
+                            trigger={
+                                <Button className="w-full md:w-auto px-8" variant="indigo">
+                                    Write the First Review
+                                </Button>
+                            }
+                            onOpenChange={state.setOpen}
+                        >
+                            <ReviewForm productName={productName} product_id={product_id} onClose={state.close} />
+                        </Overlay>
 
-                            <p className="text-xs text-muted-foreground">Takes less than 2 minutes</p>
-                        </div>
-                    </LazyFadeIn>
+                        <p className="text-xs text-default-500">Takes less than 2 minutes</p>
+                    </div>
                 ) : (
                     <div className="space-y-3">
                         <BtnLink className="w-full md:w-auto px-8" href={`/sign-in?callbackUrl=${pathname}`} size="lg">

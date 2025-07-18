@@ -5,6 +5,8 @@ from typing import Optional
 class ReviewBase(BM):
     comment: str = Field(..., min_length=1, description="Comment is required")
     rating: int = 1
+    author: str
+    title: str
 
 class Review(ReviewBase):
     id: int
@@ -13,8 +15,6 @@ class Review(ReviewBase):
 
 class ReviewCreate(ReviewBase):
     product_id: int
-    author: str
-    title: str
 
 
 class ReviewUpdate(BaseModel):
@@ -22,13 +22,19 @@ class ReviewUpdate(BaseModel):
     rating: Optional[int] = 1
     verified: bool = False
 
+class Ratings(BaseModel):
+    average: float
+    count: int
+    breakdown: dict[int, int]
+
 
 class Reviews(BaseModel):
     reviews: list[Review]
-    page: int
+    skip: int
     limit: int
     total_count: int
     total_pages: int
+    ratings: Ratings
 
 
 class Search(BaseModel):

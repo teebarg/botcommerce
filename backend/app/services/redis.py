@@ -157,7 +157,7 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
             redis_key = hashlib.md5(raw_key.encode()).hexdigest()
 
             cached = await cache.get(redis_key)
-            if cached:
+            if cached is not None:
                 return json.loads(cached)
 
             result = await func(*args, **kwargs)

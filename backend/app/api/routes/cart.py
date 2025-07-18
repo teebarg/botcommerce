@@ -33,7 +33,7 @@ async def get_or_create_cart(cartId: Optional[str]):
         return await db.cart.create(data={"cart_number": new_cart_id})
 
     cart = await db.cart.find_unique(where={"cart_number": cartId})
-    if cart:
+    if cart is not None:
         return cart
 
     new_cart_id = generate_id()
@@ -80,7 +80,7 @@ async def add_item_to_cart(cache: RedisClient, item: CartItemCreate, cartId: str
 
     await calculate_cart_totals(cart=cart)
 
-    await cache.bust_tag(f"cart:{cartId}")
+    await cache.bust_tag(f"cart:{cart.cart_number}")
 
     return cart
 

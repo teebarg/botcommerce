@@ -38,7 +38,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
     }, [selectedVariant]);
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 mt-4">
             {sizes?.length > 0 && (
                 <div className="space-y-3">
                     <h3 className="text-sm font-medium text-default-800">Size</h3>
@@ -131,7 +131,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         <Badge variant={selectedVariant.status === "IN_STOCK" ? "emerald" : "destructive"}>
                             {selectedVariant.status ? "In Stock" : "Out of Stock"}
                         </Badge>
-                        <span className="text-xs text-gray-600">{selectedVariant.inventory} available</span>
+                        <span className="text-xs text-gray-400">{selectedVariant.inventory} available</span>
                     </div>
                 </div>
             )}

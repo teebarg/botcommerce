@@ -75,6 +75,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                 <div>
                     <Select defaultValue={value} onValueChange={handleSortChange}>
                         <SelectTrigger className="bg-content1 border-divider focus:border-primary">
+                            <Filter className="w-4 h-4 mr-2" />
                             <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>

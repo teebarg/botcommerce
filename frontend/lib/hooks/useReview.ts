@@ -4,16 +4,16 @@ import { toast } from "sonner";
 import { api } from "@/apis/client";
 import { Message, PaginatedReview, Review } from "@/schemas";
 
-export const useReviews = (params: { skip?: number; limit?: number }) => {
+export const useReviews = (params: { product_id?: number; skip?: number; limit?: number }) => {
     return useQuery({
-        queryKey: ["reviews"],
+        queryKey: ["reviews", JSON.stringify(params)],
         queryFn: async () => await api.get<PaginatedReview>("/reviews/", { params: { ...params } }),
     });
 };
 
 export const useReview = (id: number) => {
     return useQuery({
-        queryKey: ["review", id],
+        queryKey: ["reviews", id],
         queryFn: async () => await api.get<Review>(`/reviews/${id}`),
     });
 };

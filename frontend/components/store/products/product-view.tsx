@@ -113,10 +113,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         <ProductShare name={product.name} />
                     </div>
                     <div className={cn("text-4xl font-bold", selectedVariant ? "hidden md:block" : "hidden")}>{currency(selectedVariant?.price)}</div>
-                    <div className="my-2 flex items-center gap-2">
-                        <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
-                    </div>
-                    <div className={cn("bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4", selectedVariant ? "" : "hidden")}>
+                    <div className={cn("bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4 mt-2", selectedVariant ? "" : "hidden")}>
                         <div className="flex items-center text-white">
                             <span className="text-3xl font-semibold">{currency(selectedVariant?.price)}</span>
                             {selectedVariant?.old_price > selectedVariant?.price && (

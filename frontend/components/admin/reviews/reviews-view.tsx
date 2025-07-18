@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { timeAgo } from "@/lib/utils";
-import PaginationUI from "@/components/pagination";
+import PaginationUI from "@/components/pagination-skip";
 import { useReviews } from "@/lib/hooks/useReview";
 import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";
@@ -20,9 +20,8 @@ import ComponentLoader from "@/components/component-loader";
 const ReviewView: React.FC = () => {
     const searchParams = useSearchParams();
     const skip = parseInt(searchParams.get("skip") || "0", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-    const { data, isLoading, error } = useReviews({ skip, limit });
+    const { data, isLoading, error } = useReviews({ skip, limit: 20 });
 
     if (isLoading) {
         return <ComponentLoader className="h-[80vh]" />;

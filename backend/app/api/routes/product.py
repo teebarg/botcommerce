@@ -294,14 +294,6 @@ async def read(slug: str, request: Request):
     return product
 
 
-@router.get("/{id}/reviews")
-async def read_reviews(id: int):
-    """
-    Get a specific product reviews with Redis caching.
-    """
-    return await db.review.find_many(where={"product_id": id})
-
-
 @router.put("/{id}")
 async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks, redis: RedisClient):
     existing_product = await db.product.find_unique(where={"id": id})

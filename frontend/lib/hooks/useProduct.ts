@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tansta
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, Review, PaginatedReview, ProductVariant, PaginatedProduct } from "@/schemas";
+import { Product, PaginatedProductSearch, Message, ProductVariant, PaginatedProduct } from "@/schemas";
 
 type SearchParams = {
     search?: string;
@@ -133,20 +133,6 @@ export const useDeleteProduct = () => {
         onError: (error: any) => {
             toast.error(error.message || "Failed to delete product");
         },
-    });
-};
-
-export const useProductReviews = (productId: number) => {
-    return useQuery({
-        queryKey: ["product-reviews", productId],
-        queryFn: async () => await api.get<Review[]>(`/product/${productId}/reviews`),
-    });
-};
-
-export const useProductReviewsSearch = (product_id: number, page = 1, limit = 20) => {
-    return useQuery({
-        queryKey: ["product-reviews", "search", product_id, page, limit],
-        queryFn: async () => await api.get<PaginatedReview>(`/reviews/`, { params: { product_id, page, limit } }),
     });
 };
 
