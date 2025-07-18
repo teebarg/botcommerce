@@ -1,4 +1,5 @@
 import { Star, ThumbsUp, Shield } from "lucide-react";
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ export const ReviewCard = ({ review, onHelpful }: ReviewCardProps) => {
                     <h3 className="font-semibold text-foreground">{review.title}</h3>
                 </div>
                 {review.verified && (
-                    <Badge variant="secondary" className="flex items-center space-x-1">
+                    <Badge className="flex items-center space-x-1" variant="secondary">
                         <Shield className="w-3 h-3" />
                         <span>Verified Purchase</span>
                     </Badge>
@@ -54,7 +55,7 @@ export const ReviewCard = ({ review, onHelpful }: ReviewCardProps) => {
                 </div>
 
                 {/* Helpful Button */}
-                <Button variant="ghost" size="sm" onClick={() => onHelpful?.(review.id)} className="text-muted-foreground hover:text-foreground">
+                <Button className="text-muted-foreground hover:text-foreground" size="sm" variant="ghost" onClick={() => onHelpful?.(review.id)}>
                     <ThumbsUp className="w-4 h-4 mr-1" />
                     Helpful ({review.helpful})
                 </Button>

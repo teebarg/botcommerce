@@ -71,7 +71,7 @@ async def create(review: ReviewCreate, user: CurrentUser) -> Review:
     # Find any order by this user that contains an order item for this product
     user_orders = await db.order.find_many(
         where={"user_id": user.id, "status": {"in": ["PAID", "DELIVERED", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY"]}},
-        include={"order_items": True}
+        include={"order_items": {"include": {"variant": True}}}
     )
     has_purchased = any(
         any(item.variant.product_id == review.product_id for item in order.order_items)

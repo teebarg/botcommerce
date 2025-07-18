@@ -564,6 +564,9 @@ CREATE INDEX "messages_conversation_id_timestamp_idx" ON "messages"("conversatio
 CREATE UNIQUE INDEX "faqs_question_key" ON "faqs"("question");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "delivery_options_name_key" ON "delivery_options"("name");
+
+-- CreateIndex
 CREATE INDEX "user_interactions_user_id_timestamp_idx" ON "user_interactions"("user_id", "timestamp");
 
 -- CreateIndex

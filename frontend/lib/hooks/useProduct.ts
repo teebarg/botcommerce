@@ -63,9 +63,7 @@ export const useProductRecommendations = (userId?: number, num: number = 16) => 
     return useQuery({
         queryKey: ["products", "recommendations", userId],
         queryFn: async () => {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/recommendations/${userId}?num=${num}`
-            );
+            const response = await fetch(`${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/recommendations/${userId}?num=${num}`);
 
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -81,9 +79,7 @@ export const useSimilarProducts = (productId: number, num: number = 16) => {
     return useQuery({
         queryKey: ["products", "similar", productId],
         queryFn: async () => {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num=${num}`
-            );
+            const response = await fetch(`${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num=${num}`);
 
             if (!response.ok) {
                 throw new Error("Network response was not ok");

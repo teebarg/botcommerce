@@ -1,9 +1,15 @@
 import { MessageSquare, Star, Users, Package } from "lucide-react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+import { usePathname } from "next/navigation";
+
+import { ReviewForm } from "./review-form";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Overlay from "@/components/overlay";
-import { useOverlayTriggerState } from "@react-stately/overlays";
-import { ReviewForm } from "./review-form";
+import { useAuth } from "@/providers/auth-provider";
+import { BtnLink } from "@/components/ui/btnLink";
+import { LazyFadeIn } from "@/components/LazyFadeIn";
 
 interface ProductReviewsZeroStateProps {
     onWriteReview?: () => void;
@@ -13,6 +19,9 @@ interface ProductReviewsZeroStateProps {
 
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
     const state = useOverlayTriggerState({});
+    const { user } = useAuth();
+    const pathname = usePathname();
+
     return (
         <Card className="w-full max-w-5xl mx-auto p-8 md:p-12 text-center border-dashed border-2">
             <div className="space-y-6">
@@ -67,23 +76,33 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                     </div>
                 </div>
 
-                <div className="space-y-3">
-                    <Overlay
-                        open={state.isOpen}
-                        title="Write the First Review"
-                        trigger={
-                            <Button size="lg" className="w-full md:w-auto px-8">
-                                Write the First Review
-                            </Button>
-                        }
-                        onOpenChange={state.setOpen}
-                        sheetClassName="min-w-120"
-                    >
-                        <ReviewForm onClose={state.close} productName={productName} product_id={product_id} />
-                    </Overlay>
+                {user ? (
+                    <LazyFadeIn delay={100}>
+                        <div className="space-y-3">
+                            <Overlay
+                                open={state.isOpen}
+                                sheetClassName="min-w-120"
+                                title="Write the First Review"
+                                trigger={
+                                    <Button className="w-full md:w-auto px-8" size="lg">
+                                        Write the First Review
+                                    </Button>
+                                }
+                                onOpenChange={state.setOpen}
+                            >
+                                <ReviewForm productName={productName} product_id={product_id} onClose={state.close} />
+                            </Overlay>
 
-                    <p className="text-xs text-muted-foreground">Takes less than 2 minutes</p>
-                </div>
+                            <p className="text-xs text-muted-foreground">Takes less than 2 minutes</p>
+                        </div>
+                    </LazyFadeIn>
+                ) : (
+                    <div className="space-y-3">
+                        <BtnLink className="w-full md:w-auto px-8" href={`/sign-in?callbackUrl=${pathname}`} size="lg">
+                            Login to Write a Review
+                        </BtnLink>
+                    </div>
+                )}
             </div>
         </Card>
     );

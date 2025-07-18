@@ -36,7 +36,8 @@ async def get_or_create_cart(cartId: Optional[str]):
     if cart:
         return cart
 
-    raise HTTPException(status_code=404, detail="Cart not found")
+    new_cart_id = generate_id()
+    return await db.cart.create(data={"cart_number": new_cart_id})
 
 
 @router.post("/items")

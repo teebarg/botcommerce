@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Star } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -54,7 +55,7 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                 <h2 className="text-xl font-semibold text-foreground">Write a Review for {productName}</h2>
             </div>
             <Form {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                     {/* Rating */}
                     <FormField
                         control={form.control}
@@ -67,10 +68,10 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <button
                                                 key={star}
-                                                type="button"
-                                                className="p-1 hover:scale-110 transition-transform"
-                                                onClick={() => setValue("rating", star, { shouldValidate: true })}
                                                 aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
+                                                className="p-1 hover:scale-110 transition-transform"
+                                                type="button"
+                                                onClick={() => setValue("rating", star, { shouldValidate: true })}
                                             >
                                                 <Star
                                                     className={`w-8 h-8 transition-colors ${
@@ -95,7 +96,7 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                             <FormItem>
                                 <FormLabel>Your Name *</FormLabel>
                                 <FormControl>
-                                    <Input {...field} id="author" type="text" placeholder="Enter your name" className="w-full" />
+                                    <Input {...field} className="w-full" id="author" placeholder="Enter your name" type="text" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -112,11 +113,11 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                                 <FormControl>
                                     <Input
                                         {...field}
-                                        id="title"
-                                        type="text"
-                                        placeholder="Summarize your experience"
-                                        maxLength={100}
                                         className="w-full"
+                                        id="title"
+                                        maxLength={100}
+                                        placeholder="Summarize your experience"
+                                        type="text"
                                     />
                                 </FormControl>
                                 <p className="text-xs text-muted-foreground">{title.length}/100 characters</p>
@@ -134,10 +135,10 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                                 <FormControl>
                                     <Textarea
                                         {...field}
+                                        className="w-full resize-none"
                                         id="comment"
                                         placeholder="Share your experience with this product..."
                                         rows={5}
-                                        className="w-full resize-none"
                                     />
                                 </FormControl>
                                 <p className="text-xs text-muted-foreground">Minimum 10 characters ({comment.length} characters)</p>
@@ -147,10 +148,10 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                     />
 
                     <div className="flex gap-3 pt-4">
-                        <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                        <Button className="flex-1" type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={!formState.isValid || addReview.isPending} isLoading={addReview.isPending} className="flex-1">
+                        <Button className="flex-1" disabled={!formState.isValid || addReview.isPending} isLoading={addReview.isPending} type="submit">
                             Submit Review
                         </Button>
                     </div>

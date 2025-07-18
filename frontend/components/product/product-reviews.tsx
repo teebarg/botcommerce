@@ -3,6 +3,8 @@
 import React from "react";
 import { Star } from "lucide-react";
 
+import { ProductReviewsZeroState } from "../store/reviews/review-zero";
+
 import CreateReviewForm from "./review-form";
 
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +15,6 @@ import { useProductReviews } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import { useAuth } from "@/providers/auth-provider";
 import { useOrders } from "@/lib/hooks/useOrder";
-import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 
 interface Prop {
     product_id: number;
@@ -40,6 +41,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     const hasReviewed = isLoggedIn && reviews?.some((r) => r.user?.id === user?.id);
     // Check if user has purchased this product
     let hasPurchased = false;
+
     if (isLoggedIn && orders?.orders) {
         hasPurchased = orders.orders.some((order) => order.order_items.some((item) => item.variant.product_id === product_id));
     }

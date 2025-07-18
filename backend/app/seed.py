@@ -22,6 +22,7 @@ async def seed():
     await db.connect()
 
     # await db.productvariant.delete_many()
+    await db.bankdetails.delete_many()
 
     # 1. Users
     logger.info("Seeding users...")
@@ -210,39 +211,36 @@ async def seed():
             }
         )
 
-    # 8. Skip orders and reviews if they exist
-    logger.info("Seeding orders and reviews...")
-    existing_orders = await db.order.count()
-    if existing_orders == 0:
-        # Create orders
-        await db.order.create_many(data=[
-            {
-                "user_id": user.id,
-                "status": "PENDING",
-                "total": 12000,
-                "created_at": datetime.utcnow()
-            }
-        ])
-        print("Orders seeded.")
-    else:
-        print("Orders already exist — skipping.")
 
-    existing_reviews = await db.review.count()
-    if existing_reviews == 0:
-        # Create reviews
-        product = await db.product.find_unique(where={"slug": "air-max"})
-        await db.review.create_many(data=[
-            {
-                "user_id": user.id,
-                "product_id": product.id,
-                "rating": 5,
-                "comment": "Awesome shoes!",
-                "created_at": datetime.utcnow()
+    # 9. Delivery Options
+    logger.info("Seeding delivery options...")
+    delivery_options = [
+        {"name": "Standard Shipping", "description": "Standard shipping option", "amount": 1000, "method": "STANDARD"},
+        {"name": "Express Shipping", "description": "Express shipping option", "amount": 2000, "method": "EXPRESS"},
+        {"name": "Pickup", "description": "Pickup at store", "amount": 0, "method": "PICKUP"},
+    ]
+    for option in delivery_options:
+        await db.deliveryoption.upsert(
+            where={"name": option["name"]},
+            data={
+                "create": {
+                    "name": option["name"],
+                    "description": option["description"],
+                    "method": option["method"],
+                    "amount": option["amount"],
+                    "is_active": True
+                },
+                "update": {}
             }
-        ])
-        print("Reviews seeded.")
-    else:
-        print("Reviews already exist — skipping.")
+        )
+
+    # 10. Bank Details
+    logger.info("Seeding bank details...")
+    await db.bankdetails.create({
+        "bank_name": "Citi Bank",
+        "account_name": "John Doe",
+        "account_number": "0123456789",
+    })
 
     await db.disconnect()
 
