@@ -15,6 +15,13 @@ export const PagSchema = z.object({
     total_pages: z.number(),
 });
 
+export const PagSkipSchema = z.object({
+    skip: z.number().optional(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
+});
+
 export const MessageSchema = z.object({
     message: z.string(),
     error: z.boolean().default(false),
@@ -98,6 +105,7 @@ export type ImageUpload = z.infer<typeof ImageUploadSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;
 export type Pag = z.infer<typeof PagSchema>;
+export type PagSkip = z.infer<typeof PagSkipSchema>;
 export type Message = z.infer<typeof MessageSchema>;
 export type SiteConfig = z.infer<typeof SiteConfigSchema>;
 export type PaginatedSiteConfig = z.infer<typeof PaginatedSiteConfigSchema>;

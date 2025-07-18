@@ -15,10 +15,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/apis/auth";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 export default function UserDropDown({ user }: { user: Session }) {
+    const invalidate = useInvalidate();
     const handleLogout = async () => {
         await authApi.logOut();
+        invalidate("me");
         window.location.href = "/";
     };
 
@@ -64,7 +67,7 @@ export default function UserDropDown({ user }: { user: Session }) {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-green-200 cursor-pointer">
-                    <Image fill alt="avatar" src={user?.image || ProfileAvatar} />
+                    <Image fill alt="avatar" sizes="40px" src={user?.image || ProfileAvatar} />
                 </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

@@ -8,6 +8,7 @@ import ProductView from "@/components/store/products/product-view";
 import ReviewsSection from "@/components/product/product-reviews";
 import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
+import { LazyFadeIn } from "@/components/LazyFadeIn";
 
 type Params = Promise<{ slug: string }>;
 
@@ -47,10 +48,14 @@ export default async function ProductPage({ params }: { params: Params }) {
     return (
         <div className="flex flex-col gap-y-8">
             <ProductView product={product} />
-            <ReviewsSection product_id={product?.id} />
+            <LazyFadeIn delay={100}>
+                <ReviewsSection product_id={product?.id} productName={product?.name} />
+            </LazyFadeIn>
 
             <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products">
-                <RelatedProducts product={product} />
+                <LazyFadeIn delay={100}>
+                    <RelatedProducts product={product} />
+                </LazyFadeIn>
             </div>
         </div>
     );

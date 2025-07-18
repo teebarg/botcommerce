@@ -6,12 +6,12 @@ import { ShoppingBag } from "lucide-react";
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
+import OrderNotes from "./order-notes";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import { Button } from "@/components/ui/button";
-import OrderNotes from "./order-notes";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -22,7 +22,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
     const { shopSettings } = useStore();
 
     return (
-        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-6 py-12">
+        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import Image from "next/image";
+import { RefreshCw, Truck } from "lucide-react";
 
 import { cn, currency } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
@@ -10,7 +11,8 @@ import ProductShare from "@/components/product/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/product/product-variant-selection";
 import { Product } from "@/schemas/product";
-import { RefreshCw, Truck } from "lucide-react";
+import { useAuth } from "@/providers/auth-provider";
+import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 
 interface Props {
     product: Product;
@@ -22,6 +24,36 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const selectedImage = product.images.find((img: ProductImage) => img.id === selectedImageId) || product.images[0];
 
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
+
+    const { user } = useAuth();
+    const trackInteraction = useTrackUserInteraction();
+
+    useEffect(() => {
+        if (user && product?.id) {
+            trackInteraction.mutate({
+                user_id: user.id,
+                product_id: product.id,
+                type: "VIEW",
+                metadata: { source: "product-view" },
+            });
+        }
+
+        const startTime = Date.now();
+
+        return () => {
+            const timeSpent = Date.now() - startTime;
+
+            if (user && product?.id) {
+                trackInteraction.mutate({
+                    user_id: user.id,
+                    product_id: product.id,
+                    type: "VIEW",
+                    metadata: { timeSpent, source: "product-view" },
+                });
+            }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id, product?.id]);
 
     return (
         <div className="max-w-7xl mx-auto h-full w-full md:my-8">
@@ -59,7 +91,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                     }`}
                                     onClick={() => setSelectedImageId(image.id)}
                                 >
-                                    <Image fill alt={`Thumbnail - ${image.image}`} className="object-cover w-full h-full" src={image.image} />
+                                    <Image fill alt={`Thumbnail - ${image.image}`} className="object-cover" sizes="64px" src={image.image} />
                                 </button>
                             ))}
                     </div>
@@ -81,10 +113,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         <ProductShare name={product.name} />
                     </div>
                     <div className={cn("text-4xl font-bold", selectedVariant ? "hidden md:block" : "hidden")}>{currency(selectedVariant?.price)}</div>
-                    <div className="my-2 flex items-center gap-2">
-                        <p className="text-sm text-default-500">{product?.reviews?.length || 0} reviews</p>
-                    </div>
-                    <div className={cn("bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4", selectedVariant ? "" : "hidden")}>
+                    <div className={cn("bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4 mt-2", selectedVariant ? "" : "hidden")}>
                         <div className="flex items-center text-white">
                             <span className="text-3xl font-semibold">{currency(selectedVariant?.price)}</span>
                             {selectedVariant?.old_price > selectedVariant?.price && (

@@ -23,6 +23,7 @@ from app.api.routes import (
     shop_settings,
     base,
     carousel,
+    user_interaction,
 )
 
 api_router = APIRouter()
@@ -48,3 +49,4 @@ api_router.include_router(websocket.router, prefix="/ws", tags=["websocket"])
 api_router.include_router(shop_settings.router, prefix="/shop-settings", tags=["shop-settings"])
 api_router.include_router(delivery.router, prefix="/delivery", tags=["delivery"])
 api_router.include_router(carousel.router, prefix="/carousel", tags=["carousel"])
+api_router.include_router(user_interaction.router, prefix="/user-interactions", tags=["user-interactions"])

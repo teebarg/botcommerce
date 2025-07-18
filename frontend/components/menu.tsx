@@ -10,6 +10,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import { useAuth } from "@/providers/auth-provider";
 import { authApi } from "@/apis/auth";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 interface NavLinkProp {
     href: string;
@@ -29,8 +30,10 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 
 const Menu: React.FC = () => {
     const { user } = useAuth();
+    const invalidate = useInvalidate();
     const handleLogout = async () => {
         await authApi.logOut();
+        invalidate("me");
         window.location.href = "/";
     };
 

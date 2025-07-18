@@ -42,7 +42,7 @@ export const useAddToCart = () => {
             const res = await api.post<Cart>("/cart/items", { variant_id, quantity });
             const id = await getCookie("_cart_id");
 
-            if (!id && res.cart_number) {
+            if (res.cart_number) {
                 await setCookie("_cart_id", res.cart_number);
             }
 

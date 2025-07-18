@@ -44,7 +44,7 @@
     </tr>
 </table>
 
-<p>Payment Method: {{order.payment_method == "CASH_ON_DELIVERY" ? "Pickup" : order.payment_method}}</p>
+<p>Payment Method: {{order.payment_method}}</p>
 <p>Shipping Address:</p>
 <p style="margin-left: 20px">
     {{order.user.first_name}} {{order.user.last_name}}<br />

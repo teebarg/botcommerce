@@ -294,14 +294,6 @@ async def read(slug: str, request: Request):
     return product
 
 
-@router.get("/{id}/reviews")
-async def read_reviews(id: int):
-    """
-    Get a specific product reviews with Redis caching.
-    """
-    return await db.review.find_many(where={"product_id": id})
-
-
 @router.put("/{id}")
 async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks, redis: RedisClient):
     existing_product = await db.product.find_unique(where={"id": id})
@@ -629,7 +621,7 @@ async def configure_filterable_attributes(
     try:
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         index.update_filterable_attributes(
-            ["brand", "categories", "collections", "name", "variants", "average_rating",
+            ["id", "brand", "categories", "collections", "name", "variants", "average_rating",
                 "review_count", "max_variant_price", "min_variant_price"]
         )
         index.update_sortable_attributes(

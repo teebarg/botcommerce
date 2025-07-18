@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field
 from app.models.base import BM
 from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review, ProductVariant
 
-# Models
 class VariantWithStatus(BaseModel):
     price: float = Field(..., gt=0)
     old_price: Optional[float] = 0.0
