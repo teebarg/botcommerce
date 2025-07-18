@@ -19,8 +19,9 @@ interface Prop {
 const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     const searchParams = useSearchParams();
     const skip = parseInt(searchParams.get("skip") || "0", 10);
+    const sort = searchParams.get("sort") || "newest";
 
-    const { data, isLoading } = useReviews({ product_id, skip, limit: 5 });
+    const { data, isLoading } = useReviews({ product_id, skip, limit: 5, sort });
     const { user, loading: userLoading } = useAuth();
     const { data: orders, isLoading: ordersLoading } = useOrders({});
 

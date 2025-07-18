@@ -52,6 +52,9 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     }, [product.variants]);
 
     const findMatchingVariant = (size: string | null, color: string | null) => {
+        if (product.variants?.length == 0) {
+            return undefined;
+        }
         return product.variants?.find((variant) => variant.size === size && variant.color === color);
     };
 
@@ -61,7 +64,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     useEffect(() => {
         const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
-
         setSelectedVariant(matchingVariant ?? undefined);
     }, [selectedSize, selectedColor]);
 
@@ -128,5 +130,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         handleWhatsAppPurchase,
         priceInfo,
         loading,
+        outOfStock: product.variants?.length == 0 || product.variants?.every((v) => v.status === "OUT_OF_STOCK"),
     };
 };

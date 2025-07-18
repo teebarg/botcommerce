@@ -8,6 +8,8 @@ import { PaginatedReview, Review } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { ReviewForm } from "./review-form";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import { useSearchParams } from "next/navigation";
 
 interface ReviewsListProps {
     data: PaginatedReview;
@@ -20,8 +22,15 @@ interface ReviewsListProps {
 export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasReviewed }: ReviewsListProps) => {
     const state = useOverlayTriggerState({});
     const { reviews, ratings } = data;
+    const { updateQuery } = useUpdateQuery(200);
+    const searchParams = useSearchParams();
+    const sort = searchParams.get("sort") || "newest";
 
     const getPercentage = (count: number) => (count / ratings?.count) * 100;
+
+    const onSortChange = (sort: string) => {
+        updateQuery([{ key: "sort", value: sort }, { key: "skip", value: "0" }]);
+    };
 
     return (
         <div className="space-y-6">
@@ -69,7 +78,7 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
                     <h2 className="text-xl font-semibold text-foreground">Customer Reviews ({ratings?.count})</h2>
 
                     <div className="flex items-center space-x-3">
-                        <Select defaultValue="newest">
+                        <Select defaultValue={sort} onValueChange={onSortChange}>
                             <SelectTrigger className="w-40">
                                 <Filter className="w-4 h-4 mr-2" />
                                 <SelectValue />
@@ -79,7 +88,6 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
                                 <SelectItem value="oldest">Oldest First</SelectItem>
                                 <SelectItem value="highest">Highest Rated</SelectItem>
                                 <SelectItem value="lowest">Lowest Rated</SelectItem>
-                                <SelectItem value="helpful">Most Helpful</SelectItem>
                             </SelectContent>
                         </Select>
                         {hasPurchased && !hasReviewed && (

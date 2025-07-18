@@ -21,16 +21,24 @@ async def index(
     product_id: int = None,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
+    sort: str = Query(default="newest")
 ) -> Reviews:
     """
     Retrieve reviews with Redis caching.
     """
     where_clause = {"product_id": product_id} if product_id else {}
+    sort_map = {
+        "newest": {"created_at": "desc"},
+        "oldest": {"created_at": "asc"},
+        "highest": {"rating": "desc"},
+        "lowest": {"rating": "asc"},
+    }
+    order_by = sort_map.get(sort, {"created_at": "desc"})
     reviews = await db.review.find_many(
         where=where_clause,
         skip=skip,
         take=limit,
-        order={"created_at": "desc"},
+        order=order_by,
     )
     total = await db.review.count(where=where_clause)
 

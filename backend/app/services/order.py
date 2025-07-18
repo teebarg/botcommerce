@@ -11,6 +11,8 @@ from datetime import datetime
 from app.core.deps import (
     supabase
 )
+from app.services.product import reindex_product
+from app.services.redis import CacheService
 
 
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
@@ -225,3 +227,63 @@ async def create_invoice(cache, order_id: int) -> str:
     except Exception as e:
         logger.error(f"Unexpected error in download_invoice: {str(e)}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred while generating the invoice")
+
+
+async def decrement_variant_inventory_for_order(order_id: int, notification=None, cache: CacheService = None):
+    """
+    Decrement inventory for each variant in the order. If inventory reaches 0, set status to OUT_OF_STOCK and send notification.
+    """
+    order = await db.order.find_unique(
+        where={"id": order_id},
+        include={"order_items": {"include": {"variant": True}}}
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    out_of_stock_variants = []
+
+    for item in order.order_items:
+        variant_id = item.variant_id
+        quantity = item.quantity
+        variant = await db.productvariant.find_unique(where={"id": variant_id})
+        if not variant:
+            continue
+        new_inventory = max(0, variant.inventory - quantity)
+        update_data = {"inventory": new_inventory}
+        out_of_stock = False
+        if new_inventory == 0 and variant.status != "OUT_OF_STOCK":
+            update_data["status"] = "OUT_OF_STOCK"
+            out_of_stock = True
+        await db.productvariant.update(where={"id": variant_id}, data=update_data)
+        if cache:
+            await reindex_product(cache, variant.product_id)
+        if out_of_stock:
+            out_of_stock_variants.append(variant)
+
+    if out_of_stock_variants and notification:
+        subject = f"Product Variants OUT OF STOCK in Order {order_id}"
+        message_lines = [
+            f"The following product variants are now OUT OF STOCK due to order {order_id}:"
+        ]
+        for v in out_of_stock_variants:
+            message_lines.append(f"- SKU: {v.sku}, Product ID: {v.product_id}")
+        message = "\n".join(message_lines)
+        try:
+            notification.send_notification(
+                channel_name="email",
+                recipient="teebarg01@gmail.com",
+                subject=subject,
+                message=message
+            )
+        except Exception as e:
+            logger.error(f"Failed to send out-of-stock email: {e}")
+        try:
+            slack_text = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order_id}\n" + "\n".join([
+                f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants
+            ])
+            notification.send_notification(
+                channel_name="slack",
+                slack_message={"text": slack_text}
+            )
+        except Exception as e:
+            logger.error(f"Failed to send out-of-stock slack: {e}")
