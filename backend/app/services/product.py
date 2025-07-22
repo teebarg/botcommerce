@@ -162,4 +162,9 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["average_rating"] = round(
         sum(ratings) / len(ratings), 2) if ratings else 0
 
+    if any(v["inventory"] > 0 for v in variants):
+        product_dict["status"] = "IN STOCK"
+    else:
+        product_dict["status"] = "OUT OF STOCK"
+
     return product_dict

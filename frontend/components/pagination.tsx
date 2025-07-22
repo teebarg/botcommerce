@@ -3,6 +3,7 @@
 import React from "react";
 
 import { type Pag as PaginationType } from "@/schemas/common";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import {
     Pagination,
     PaginationContent,
@@ -12,7 +13,6 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 
 interface Props {
     pagination: PaginationType;
@@ -38,7 +38,7 @@ const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
 
     const renderPage = (p: number) => (
         <PaginationItem key={p}>
-            <PaginationLink className="cursor-pointer" isActive={page === p} onClick={() => onPageChange(p)}>
+            <PaginationLink className="cursor-pointer px-4" isActive={page === p} onClick={() => onPageChange(p)}>
                 {p}
             </PaginationLink>
         </PaginationItem>
@@ -85,7 +85,7 @@ const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
             </PaginationItem>
 
             <PaginationItem>
-                <PaginationLink isActive>{page}</PaginationLink>
+                <PaginationLink className="px-4" isActive>{page}</PaginationLink>
             </PaginationItem>
 
             <PaginationItem>

@@ -30,7 +30,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         <div className="flex">
             <Overlay
                 open={viewState.isOpen}
-                sheetClassName="min-w-[600px]"
+                sheetClassName="min-w-[700px]"
                 title="Edit Product"
                 trigger={
                     <Button size="icon" variant="ghost">

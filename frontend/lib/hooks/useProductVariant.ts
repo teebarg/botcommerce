@@ -55,11 +55,14 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         if (product.variants?.length == 0) {
             return undefined;
         }
+        if (!size && !color) {
+            return product.variants?.find((variant) => variant.inventory > 0);
+        }
         return product.variants?.find((variant) => variant.size === size && variant.color === color);
     };
 
     useEffect(() => {
-        setSelectedVariant(product.variants?.find((v) => v.status === "IN_STOCK") || product.variants?.[0]);
+        setSelectedVariant(product.variants?.find((v) => v.inventory > 0) || product.variants?.[0]);
     }, []);
 
     useEffect(() => {
@@ -70,11 +73,11 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     const isOptionAvailable = (type: "size" | "color", value: string) => {
         if (type === "size") {
             return product.variants?.some(
-                (v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.status === "IN_STOCK" && v.inventory > 0
+                (v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.inventory > 0
             );
         } else {
             return product.variants?.some(
-                (v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.status === "IN_STOCK" && v.inventory > 0
+                (v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.inventory > 0
             );
         }
     };

@@ -384,7 +384,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
                 "old_price": variant.old_price,
                 "inventory": variant.inventory,
                 "product_id": id,
-                "status": variant.status,
+                "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                 "size": variant.size,
                 "color": variant.color
             }
@@ -418,9 +418,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     if variant.inventory is not None:
         update_data["inventory"] = variant.inventory
-
-    if variant.status:
-        update_data["status"] = variant.status
+        update_data["status"] = variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK"
 
     if variant.size is not None:
         update_data["size"] = variant.size
