@@ -146,7 +146,6 @@ async def seed():
         brand = await db.brand.find_unique(where={"slug": p["brand_slug"]})
         categories = await db.category.find_many(where={"slug": {"in": p["category_slugs"]}})
         collections = await db.collection.find_many(where={"slug": {"in": p["collection_slugs"]}})
-        print(brand)
 
         await db.product.upsert(
             where={"slug": p["slug"]},
@@ -242,6 +241,30 @@ async def seed():
         "account_number": "0123456789",
     })
 
+    # Shared collections
+    logger.info("Seeding shared collections...")
+    shared_collections = [
+        {"title": "Summer Sale", "slug": "summer-sale", "description": "Summer Sale", "is_active": True},
+        {"title": "New Arrivals", "slug": "new-arrivals", "description": "New Arrivals", "is_active": True},
+    ]
+    products = await db.product.find_many()
+    for col in shared_collections:
+        await db.sharedcollection.upsert(
+            where={"slug": col["slug"]},
+            data={
+                "create": {
+                    "title": col["title"],
+                    "slug": col["slug"],
+                    "description": col["description"],
+                    "is_active": col["is_active"],
+                    "products": {"connect": [{"id": p.id} for p in products]},
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
+            }
+        )
+
+    
     await db.disconnect()
 
 

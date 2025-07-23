@@ -131,6 +131,24 @@ export const ProductSearchSchema = z.object({
     min_variant_price: z.number(),
 });
 
+export const SharedSchema = z
+    .object({
+        id: z.number(),
+        title: z.string(),
+        slug: z.string(),
+        description: z.string().optional(),
+        products: z.array(ProductSchema),
+        view_count: z.number(),
+        is_active: z.boolean(),
+        created_at: z.string(),
+        updated_at: z.string(),
+    })
+    .merge(AuditSchema);
+
+export const PaginatedSharedSchema = PagSchema.extend({
+    shared: z.array(SharedSchema),
+});
+
 export const FacetSchema = z.object({
     brand: z.record(z.string()).optional(),
     categories: z.record(z.string()).optional(),
@@ -177,3 +195,6 @@ export type Wishlist = z.infer<typeof WishlistSchema>;
 
 export type ProductImage = z.infer<typeof ProductImageSchema>;
 export type ProductVariant = z.infer<typeof ProductVariantSchema>;
+
+export type Shared = z.infer<typeof SharedSchema>;
+export type PaginatedShared = z.infer<typeof PaginatedSharedSchema>;

@@ -192,25 +192,26 @@ model Collection {
 }
 
 model Product {
-  id                Int               @id @default(autoincrement())
-  name              String            @unique @db.VarChar(255)
-  slug              String            @unique @db.VarChar(255)
-  sku               String            @unique
-  description       String?
-  features          String[]
-  image             String?           @db.VarChar(255)
-  status            ProductStatus     @default(IN_STOCK)
-  variants          ProductVariant[]
-  ratings           Float?            @default(0)
-  categories        Category[]        @relation("ProductCategories")
-  collections       Collection[]      @relation("ProductCollections")
-  brand             Brand?            @relation(fields: [brand_id], references: [id], onDelete: SetNull)
-  brand_id          Int?
-  tags              Tag[]             @relation("ProductTags")
-  images            ProductImage[]
-  reviews           Review[]
-  favorites         Favorite[]
-  user_interactions UserInteraction[]
+  id                 Int                @id @default(autoincrement())
+  name               String             @unique @db.VarChar(255)
+  slug               String             @unique @db.VarChar(255)
+  sku                String             @unique
+  description        String?
+  features           String[]
+  image              String?            @db.VarChar(255)
+  status             ProductStatus      @default(IN_STOCK)
+  variants           ProductVariant[]
+  ratings            Float?             @default(0)
+  categories         Category[]         @relation("ProductCategories")
+  collections        Collection[]       @relation("ProductCollections")
+  brand              Brand?             @relation(fields: [brand_id], references: [id], onDelete: SetNull)
+  brand_id           Int?
+  tags               Tag[]              @relation("ProductTags")
+  images             ProductImage[]
+  reviews            Review[]
+  favorites          Favorite[]
+  user_interactions  UserInteraction[]
+  shared_collections SharedCollection[] @relation("SharedCollectionProducts")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -445,9 +446,10 @@ model User {
   interactions               UserInteraction[]
   preferences                UserPreference[]
 
-  created_at   DateTime?      @default(now())
-  updated_at   DateTime?      @updatedAt
-  Conversation Conversation[]
+  created_at           DateTime?              @default(now())
+  updated_at           DateTime?              @updatedAt
+  Conversation         Conversation[]
+  SharedCollectionView SharedCollectionView[]
 
   @@index([first_name, last_name, email])
   @@map("users")
@@ -588,4 +590,32 @@ model UserPreference {
 
   @@unique([user_id, category, brand])
   @@map("user_preferences")
+}
+
+model SharedCollection {
+  id                   Int                    @id @default(autoincrement())
+  title                String                 @db.VarChar(255)
+  slug                 String                 @unique @db.VarChar(255)
+  description          String?                @db.Text
+  products             Product[]              @relation("SharedCollectionProducts")
+  is_active            Boolean                @default(true)
+  view_count           Int                    @default(0)
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  SharedCollectionView SharedCollectionView[]
+
+  @@map("shared_collections")
+}
+
+model SharedCollectionView {
+  id                   Int              @id @default(autoincrement())
+  shared_collection    SharedCollection @relation(fields: [shared_collection_id], references: [id])
+  shared_collection_id Int
+  user_id              Int?
+  user                 User?            @relation(fields: [user_id], references: [id])
+  ip_address           String?
+  user_agent           String?
+  timestamp            DateTime         @default(now())
+
+  @@map("shared_collection_views")
 }
