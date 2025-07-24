@@ -89,10 +89,10 @@ async def index_products(cache: CacheService):
 
 
 @with_prisma_connection
-async def product_upload(cache: CacheService, user_id: str, contents: bytes, content_type: str, filename: str):
+async def product_upload(cache: CacheService, user_id: str):
     logger.info("Starting product upload processing...")
     try:
-        num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user_id)
+        num_rows = await process_products(user_id=user_id)
 
         await index_products(cache=cache)
         logger.info("Re-indexing completed.")
@@ -109,7 +109,7 @@ async def product_upload(cache: CacheService, user_id: str, contents: bytes, con
         await log_activity(
             user_id=user_id,
             activity_type="PRODUCT_UPLOAD",
-            description=f"Uploaded products from file: {filename}",
+            description=f"Uploaded products from google sheet",
             is_success=True
         )
     except Exception as e:
@@ -117,7 +117,7 @@ async def product_upload(cache: CacheService, user_id: str, contents: bytes, con
         await log_activity(
             user_id=user_id,
             activity_type="PRODUCT_UPLOAD",
-            description=f"Failed to upload products from file: {filename}",
+            description=f"Failed to upload products from google sheet",
             is_success=False
         )
 

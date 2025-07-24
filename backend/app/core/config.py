@@ -94,6 +94,9 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str = ""
 
+    GOOGLE_SPREADSHEET_ID: str = ""
+    GOOGLE_GID: str = ""
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",

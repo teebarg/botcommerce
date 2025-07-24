@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Download } from "lucide-react";
 

@@ -1,12 +1,10 @@
-from typing import Annotated, Any
+from typing import Any
 
 from fastapi import (
     APIRouter,
     Depends,
-    File,
     HTTPException,
     Query,
-    UploadFile,
     BackgroundTasks,
     Request
 )
@@ -580,32 +578,13 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
 
     return {"success": True}
 
-
 @router.post("/upload-products/")
 async def upload_products(
     user: CurrentUser,
-    file: Annotated[UploadFile, File()],
     background_tasks: BackgroundTasks,
     redis: RedisClient,
 ):
-    logger.info(f"File uploaded: {file.filename}")
-    content_type = file.content_type
-
-    if content_type not in [
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/csv",
-    ]:
-        logger.error(f"Invalid file type: {content_type}")
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid file type. Only CSV/Excel files are supported.",
-        )
-
-    await validate_file(file=file)
-
-    contents = await file.read()
-    background_tasks.add_task(product_upload, cache=redis, user_id=user.id,
-                              contents=contents, content_type=content_type, filename=file.filename)
+    background_tasks.add_task(product_upload, cache=redis, user_id=user.id)
     return {"message": "Upload started"}
 
 

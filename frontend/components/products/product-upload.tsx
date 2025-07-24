@@ -1,24 +1,47 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { useWebSocket } from "@/providers/websocket";
 import { getCookie } from "@/lib/util/server-utils";
+import { Button } from "@/components/ui/button";
+import { tryCatchApi } from "@/lib/try-catch";
+import { api } from "@/apis/client2";
+import { Message } from "@/schemas";
 
 interface ProductUploadProps {}
 
 const ProductUpload: React.FC<ProductUploadProps> = () => {
     const { currentMessage } = useWebSocket();
+    const [isSyncing, setIsSyncing] = useState<boolean>(false);
 
     useEffect(() => {
         if (!currentMessage) return;
-        if (currentMessage?.message_type === "sheet-processor" && currentMessage?.status === "completed") {
+        if (currentMessage?.type === "sheet-processor" && currentMessage?.status === "completed") {
             toast.success("Products uploaded successfully");
+            setIsSyncing(false);
+        }
+
+        if (currentMessage?.type === "sheet-processor" && currentMessage?.status === "processing" && !isSyncing) {
+            setIsSyncing(true);
         }
     }, [currentMessage]);
+
+    const handleSyncProducts = async () => {
+        setIsSyncing(true);
+        const { error } = await tryCatchApi<Message>(api.post("/product/upload-products/"));
+
+        if (error) {
+            toast.error(error);
+            setIsSyncing(false);
+
+            return;
+        }
+
+        toast.success("Product update stated");
+    };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
@@ -59,7 +82,23 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
 
     return (
         <div className="space-y-2">
-            <div
+            <Button disabled={isSyncing} isLoading={isSyncing} onClick={handleSyncProducts}>
+                Sync Products from Sheet
+            </Button>
+            {currentMessage?.processed_rows < currentMessage?.total_rows && (
+                <div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 animate-pulse"
+                            style={{ width: `${(currentMessage?.processed_rows / currentMessage?.total_rows) * 100}%` }}
+                        />
+                    </div>
+                    <p className="text-sm text-blue-500 mt-1">
+                        Uploading... {currentMessage?.processed_rows || 0} of {currentMessage?.total_rows || 0}
+                    </p>
+                </div>
+            )}
+            {/* <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
                     ${isDragActive ? "border-blue-500 bg-blue-50" : "border-default-300 hover:border-default-400"}`}
@@ -86,7 +125,7 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
             </div>
             <div className="text-xs text-default-500">
                 <p>• Only .xlsx files are allowed</p>
-            </div>
+            </div> */}
         </div>
     );
 };

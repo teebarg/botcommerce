@@ -1,7 +1,8 @@
 import csv
 import time
 from datetime import datetime
-from io import BytesIO
+from io import StringIO, BytesIO
+import httpx
 
 from fastapi import (
     HTTPException,
@@ -10,12 +11,13 @@ from openpyxl import Workbook, load_workbook
 
 from app.services.websocket import manager
 from app.core.logging import logger
-from app.core.utils import generate_data_export_email, send_email
+from app.core.utils import generate_data_export_email, send_email, generate_sku
 
 from typing import List
 from datetime import datetime
 from app.prisma_client import prisma as db
 from app.core.deps import supabase
+from app.core.config import settings
 
 
 async def broadcast_channel(data, user_id: int):
@@ -52,6 +54,7 @@ async def generate_excel_file(email: str) -> str:
         "id",
         "name",
         "slug",
+        "sku",
         "description",
         "price",
         "old_price",
@@ -82,10 +85,11 @@ async def generate_excel_file(email: str) -> str:
                 product.id,
                 product.name,
                 product.slug,
+                product.variants[0].sku if len(product.variants) > 0 else "",
                 product.description,
-                product.variants[0].price if product.variants else 0,
-                product.variants[0].old_price if product.variants else 0,
-                product.variants[0].inventory if product.variants else 0,
+                product.variants[0].price if len(product.variants) > 0 else 0,
+                product.variants[0].old_price if len(product.variants) > 0 else 0,
+                product.variants[0].inventory if len(product.variants) > 0 else 0,
                 product.ratings,
                 product.image,
                 True,
@@ -226,17 +230,13 @@ async def bulk_upload_products(products: list[dict]):
             # Handle additional images
             image_urls = await parse_images(product_data.get("images", ""))
 
-            # Determine product status based on inventory
-            # status = "IN_STOCK" if product_data["inventory"] > 0 else "OUT_OF_STOCK"
-            status = "IN_STOCK"
-
             create_data = {
                 "name": product_data["name"],
                 "slug": product_data["slug"],
                 "sku": product_data["sku"],
                 "description": product_data["description"],
                 "image": product_data["image"],
-                "status": status,
+                "status": "IN_STOCK",
                 "ratings": float(product_data["ratings"]) if product_data["ratings"] else 0.0,
                 "categories": {"connect": [{"id": cid} for cid in category_ids]},
                 "collections": {"connect": [{"id": cid} for cid in collection_ids]},
@@ -245,56 +245,61 @@ async def bulk_upload_products(products: list[dict]):
             if brand_id:
                 create_data["brand"] = {"connect": {"id": brand_id}}
 
-            # Upsert product
-            product = await db.product.upsert(
-                where={"slug": product_data["slug"]},
-                data={
-                    "create": create_data,
-                    "update": {
-                        "name": product_data["name"],
-                        "description": product_data["description"],
-                        "image": product_data["image"],
-                        "status": status,
-                        "brand": {"connect": {"id": brand_id}} if brand_id else {"disconnect": True},
-                        "ratings": float(product_data["ratings"]) if product_data["ratings"] else 0.0,
-                        "categories": {"set": [{"id": cid} for cid in category_ids]},
-                        "collections": {"set": [{"id": cid} for cid in collection_ids]},
+            try:
+                # Upsert product
+                product = await db.product.upsert(
+                    where={"slug": product_data["slug"]},
+                    data={
+                        "create": create_data,
+                        "update": {
+                            "name": product_data["name"],
+                            "description": product_data["description"],
+                            "image": product_data["image"],
+                            "brand": {"connect": {"id": brand_id}} if brand_id else {"disconnect": True},
+                            "ratings": float(product_data["ratings"]) if product_data["ratings"] else 0.0,
+                            "categories": {"set": [{"id": cid} for cid in category_ids]},
+                            "collections": {"set": [{"id": cid} for cid in collection_ids]},
+                        }
                     }
-                }
-            )
-
-            # Handle product variants (assuming one variant per product for this data)
-            await db.productvariant.upsert(
-                where={"sku": f"{product_data['slug']}-default"},
-                data={
-                    "create": {
-                        "product": {"connect": {"id": product.id}},
-                        "sku": f"{product_data['slug']}-default",
-                        "status": status,
-                        "price": float(product_data["price"]),
-                        "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
-                        "inventory": product_data["inventory"]
-                    },
-                    "update": {
-                        "price": float(product_data["price"]),
-                        "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
-                        "inventory": product_data["inventory"],
-                        "status": status
-                    }
-                }
-            )
-
-            # Handle additional images
-            if image_urls:
-                # Clear existing images
-                await db.productimage.delete_many(where={"product_id": product.id})
-                # Add new images
-                await db.productimage.create_many(
-                    data=[
-                        {"product_id": product.id, "image": url, "order": index}
-                        for index, url in enumerate(image_urls)
-                    ]
                 )
+            except Exception as e:
+                logger.error(f"🚨 Error processing product {product_data['name']}: {str(e)} {str(product_data['slug'])}")
+
+            inventory = int(product_data["inventory"])
+            status = "IN_STOCK" if inventory > 0 else "OUT_OF_STOCK"
+
+            try:
+                await db.productvariant.upsert(
+                    where={"sku": product_data["sku"]},
+                    data={
+                        "create": {
+                        "product": {"connect": {"id": product.id}},
+                        "sku": product_data["sku"],
+                        "status": status,
+                        "price": float(product_data["price"]),
+                        "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
+                        "inventory": inventory,
+                        },
+                        "update": {
+                            "price": float(product_data["price"]),
+                            "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
+                            "inventory": inventory,
+                            "status": status
+                        }
+                    }
+                )
+
+                # Handle additional images
+                if image_urls:
+                    await db.productimage.delete_many(where={"product_id": product.id})
+                    await db.productimage.create_many(
+                        data=[
+                            {"product_id": product.id, "image": url, "order": index}
+                            for index, url in enumerate(image_urls)
+                        ]
+                    )
+            except Exception as e:
+                logger.error(f"🚨 Error processing variant for product {product_data['name']}: {str(e)}")
 
             print(f"Processed product: {product_data['name']}")
         print("Bulk upload completed successfully")
@@ -303,36 +308,43 @@ async def bulk_upload_products(products: list[dict]):
         print(f"Error during bulk upload: {str(e)}")
 
 
-async def process_products(file_content, content_type: str, user_id: int) -> list[dict]:
+async def process_products(user_id: int) -> list[dict]:
     """Load product data from a TSV file."""
-    start_time = time.time()  # Start timing the process
+    csv_url = f"https://docs.google.com/spreadsheets/d/{settings.GOOGLE_SPREADSHEET_ID}/export?format=csv&gid={settings.GOOGLE_GID}"
     try:
-        # Create a BytesIO stream from the file content
-        file_stream = BytesIO(file_content)
+        start_time = time.time()  # Start timing the process
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
 
-        if content_type in [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "text/xlsx",
-        ]:
-            # Read Excel file using openpyxl
-            workbook = load_workbook(file_stream)
-            sheet = workbook.active
-            rows = list(sheet.iter_rows(values_only=True))
-            headers = rows[0]
-            data_rows = rows[1:]
+        async with httpx.AsyncClient(
+            follow_redirects=True,
+            timeout=30.0,
+            headers=headers
+        ) as client:
+            response = await client.get(csv_url)
+            response.raise_for_status()
 
-        elif content_type == "text/csv":
-            # Read CSV file using csv module
-            file_stream.seek(0)
-            csv_reader = csv.reader(file_stream.decode("utf-8").splitlines())
-            rows = list(csv_reader)
-            headers = rows[0]
-            data_rows = rows[1:]
-
-        else:
-            raise ValueError(
-                "Unsupported file format. Please upload a CSV or Excel file."
+        # Check if we got CSV content
+        if 'text/csv' not in response.headers.get('content-type', '') and not response.text.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Unable to fetch CSV data. Make sure the Google Sheet is publicly accessible."
             )
+
+        # Process the CSV content
+        csv_content = response.text
+        csv_reader = csv.reader(StringIO(csv_content))
+        rows = list(csv_reader)
+
+        if not rows:
+            raise HTTPException(
+                status_code=400,
+                detail="No data found in the Google Sheets"
+            )
+
+        headers = rows[0]
+        data_rows = rows[1:]
 
         # Batch size and iteration setup
         batch_size = 20
@@ -357,17 +369,16 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
             for row in batch:
                 row_data = dict(zip(headers, row, strict=False))
                 name = row_data.get("name", "")
-                active = row_data.get("is_active", True)
                 is_active = row_data.get("is_active", True)
 
                 if isinstance(is_active, str):
-                    is_active = True if active == "TRUE" else False
+                    is_active = True if is_active == "TRUE" else False
 
                 product_data = {
                     "id": row_data.get("id", ""),
                     "name": name,
                     "slug": row_data.get("slug", name.lower().replace(" ", "-")),
-                    "sku": row_data.get("sku", f"{name.lower().replace(' ', '-')}-default"),
+                    "sku": row_data.get("sku", generate_sku(product_name=name)),
                     "description": row_data.get("description", ""),
                     "price": float(row_data.get("price", 0.0)),
                     "old_price": float(row_data.get("old_price", 0.0)),
@@ -403,6 +414,13 @@ async def process_products(file_content, content_type: str, user_id: int) -> lis
         )
 
         return len(products)
+
+    except httpx.HTTPError as e:
+        logger.error(f"HTTP error fetching Google Sheets: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to fetch data from Google Sheets: {str(e)}"
+        )
     except Exception as e:
         logger.error(f"An error occurred while processing. Error{e}")
         await manager.send_to_user(
