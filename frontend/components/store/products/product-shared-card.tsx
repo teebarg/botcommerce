@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Eye, ShoppingBag, Star } from "lucide-react";
+import { Check, Eye, ShoppingBag, Star } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Image from "next/image";
 
@@ -10,21 +10,20 @@ import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
 import Overlay from "@/components/overlay";
 import { useUserWishlist } from "@/lib/hooks/useUser";
-import ClientOnly from "@/components/generic/client-only";
 import ProductOverview from "@/components/store/products/product-overview";
-import { cn, currency } from "@/lib/utils";
-import { Product } from "@/schemas/product";
+import { cn } from "@/lib/utils";
+import { ProductSearch } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import ProductSharedOverview from "./product-shared-overview";
 
 interface ProductCardProps {
-    product: Product;
+    product: ProductSearch;
     variant?: "bg-content1" | "bg-content2" | "bg-content3";
     size?: "sm" | "md" | "lg";
+    isSelected?: boolean;
 }
 
-const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-content2", size = "md" }) => {
+const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-content2", size = "md", isSelected = false }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const { priceInfo, outOfStock, selectedVariant } = useProductVariant(product);
     const dialogState = useOverlayTriggerState({});
@@ -38,12 +37,9 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
             <div className="relative aspect-[4/5] overflow-hidden">
                 <Image
                     fill
-                    src={product?.images?.[0]?.image || product.image || "/placeholder.jpg"}
+                    src={product.images[0] || product.image || "/placeholder.jpg"}
                     alt={product.name}
-                    className={cn(
-                        "w-full h-full object-cover transition-all duration-700 group-hover:scale-105",
-                        imageLoaded ? "opacity-100" : "opacity-0"
-                    )}
+                    className={cn("duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
                     onLoad={() => setImageLoaded(true)}
                     sizes="(max-width: 768px) 100vw, 33vw"
                 />
@@ -51,20 +47,10 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
                 {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
                 {/* Always visible gradient overlay for mobile */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 dark:from-black via-transparent to-transparent" />
 
                 <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
                     <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
-
-                    {/* Wishlist Heart */}
-                    {/* <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-10 w-10 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 hover:scale-110 transition-all active:scale-95"
-                        onClick={() => onToggleWishlist(product.id)}
-                    >
-                        <Heart className={cn("h-5 w-5 transition-all", isInWishlist ? "fill-red-500 text-red-500 scale-110" : "text-white")} />
-                    </Button> */}
                 </div>
 
                 {outOfStock && (
@@ -75,7 +61,16 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
                     </div>
                 )}
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white md:transform md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
+                {/* Selection Indicator */}
+                {isSelected && (
+                    <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                        <div className="bg-primary text-primary-foreground rounded-full p-3 animate-scale-in">
+                            <Check className="w-6 h-6" />
+                        </div>
+                    </div>
+                )}
+
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-white md1:transform md1:translate-y-full md1:group-hover:translate-y-0 transition-transform duration-300">
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <div>
@@ -83,10 +78,10 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
                                 <PriceLabel priceInfo={priceInfo} priceClassName="text-gray-100" oldPriceClassName="text-gray-300" />
                             </div>
 
-                            {/* <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                            <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                <span className="font-medium">{product.rating}</span>
-                            </div> */}
+                                <span className="font-medium">{product.average_rating}</span>
+                            </div>
                         </div>
 
                         <div className="flex gap-3">
@@ -111,7 +106,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
                                 }
                                 onOpenChange={dialogState.setOpen}
                             >
-                                <ProductSharedOverview isLiked={inWishlist} product={product} onClose={dialogState.close} />
+                                <ProductOverview isLiked={inWishlist} product={product} onClose={dialogState.close} />
                             </Overlay>
                         </div>
                     </div>

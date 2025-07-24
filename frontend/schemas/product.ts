@@ -137,7 +137,7 @@ export const SharedSchema = z
         title: z.string(),
         slug: z.string(),
         description: z.string().optional(),
-        products: z.array(ProductSchema),
+        products: z.array(ProductSearchSchema),
         view_count: z.number(),
         is_active: z.boolean(),
         created_at: z.string(),

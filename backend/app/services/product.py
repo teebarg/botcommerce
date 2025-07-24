@@ -36,6 +36,7 @@ async def reindex_product(cache: CacheService, product_id: int):
 
         logger.info(f"Successfully reindexed product {product_id}")
         await cache.invalidate_list_cache("products")
+        await cache.invalidate_list_cache("shared")
         await cache.bust_tag(f"product:{product.slug}")
         await manager.broadcast_to_all(
             data={
@@ -77,6 +78,7 @@ async def index_products(cache: CacheService):
         logger.info(f"Reindexed {len(documents)} products successfully.")
         await cache.invalidate_list_cache("products")
         await cache.invalidate_list_cache("product")
+        await cache.invalidate_list_cache("shared")
         await manager.broadcast_to_all(
             data={
                 "message": "Products re-indexed successfully",
@@ -168,3 +170,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         product_dict["status"] = "OUT OF STOCK"
 
     return product_dict
+
+def to_product_card_view(product: Product) -> dict:
+    prepared = prepare_product_data_for_indexing(product)
+    return prepared
+    # return ProductCardOut(**prepared)

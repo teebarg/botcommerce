@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
 
 import { api } from "@/apis/client";
-import { Collection, PaginatedCollection, PaginatedShared } from "@/schemas";
+import { Collection, PaginatedCollection, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
 
 interface SearchParams {
@@ -80,6 +80,22 @@ export const useSharedCollections = (query?: string) => {
     return useQuery({
         queryKey: ["shared-collections", query],
         queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { query: query || "" } }),
+    });
+};
+
+export const useUpdateSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: number; data: Partial<Shared> }) =>
+            await api.patch<Shared>(`/shared/${id}`, data),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Shared collection updated successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to update shared collection: " + error);
+        },
     });
 };
 

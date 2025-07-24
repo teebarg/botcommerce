@@ -10,7 +10,7 @@ const RatingSchema = z.object({
 });
 
 
-export const PagSchema = z.object({
+const PagSchema = z.object({
     skip: z.number().optional(),
     limit: z.number(),
     total_count: z.number(),

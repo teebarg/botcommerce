@@ -275,7 +275,7 @@ async def bulk_upload_products(products: list[dict]):
                         "create": {
                         "product": {"connect": {"id": product.id}},
                         "sku": product_data["sku"],
-                        "status": status,
+                        "status": "IN_STOCK" if inventory > 0 else "OUT_OF_STOCK",
                         "price": float(product_data["price"]),
                         "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
                         "inventory": inventory,
@@ -284,7 +284,7 @@ async def bulk_upload_products(products: list[dict]):
                             "price": float(product_data["price"]),
                             "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
                             "inventory": inventory,
-                            "status": status
+                            "status": "IN_STOCK" if inventory > 0 else "OUT_OF_STOCK"
                         }
                     }
                 )

@@ -55,6 +55,9 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         if (product.variants?.length == 0) {
             return undefined;
         }
+        if (product.variants?.length == 1) {
+            return product.variants[0];
+        }
         if (!size && !color) {
             return product.variants?.find((variant) => variant.inventory > 0);
         }

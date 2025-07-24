@@ -174,7 +174,7 @@ const ProductOverview: React.FC<{
                         )}
                     </div>
                     <button
-                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
                         onClick={(e) => {
                             e.stopPropagation();
                             isLiked ? removeWishlist() : addWishlist();

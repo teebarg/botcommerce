@@ -1,6 +1,7 @@
 from app.models.base import BM
 from pydantic import BaseModel, Field
 from datetime import datetime
+from app.models.product import SearchProduct
 
 
 class CollectionBase(BM):
@@ -40,9 +41,8 @@ class SharedCollectionBase(BM):
 
 class SharedCollection(SharedCollectionBase):
     id: int
+    products: list[SearchProduct]
     view_count: int = 0
-    created_at: datetime
-    updated_at: datetime
 
 class SharedCollections(BaseModel):
     shared: list[SharedCollection]

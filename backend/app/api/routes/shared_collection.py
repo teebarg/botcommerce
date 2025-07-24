@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from typing import List
 from app.models.collection import (
     SharedCollections, SharedCollectionCreate, SharedCollectionUpdate,
@@ -7,6 +7,7 @@ from app.models.collection import (
 from app.prisma_client import prisma as db
 from math import ceil
 from app.services.redis import cache_response
+from app.services.product import to_product_card_view
 
 router = APIRouter()
 
@@ -15,12 +16,12 @@ router = APIRouter()
 async def list_shared_collection_views():
     return await db.sharedcollectionview.find_many()
 
-@router.post("/views", response_model=SharedCollectionView, status_code=status.HTTP_201_CREATED)
+@router.post("/views", response_model=SharedCollectionView)
 async def create_shared_collection_view(data: SharedCollectionViewCreate):
     return await db.sharedcollectionview.create(data=data.model_dump())
 
 
-@router.delete("/views/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/views/{id}")
 async def delete_shared_collection_view(id: int):
     obj = await db.sharedcollectionview.find_unique(where={"id": id})
     if not obj:
@@ -52,10 +53,32 @@ async def list_shared_collections(
         skip=(page - 1) * limit,
         take=limit,
         order={"created_at": "desc"},
+        include={
+            "products": {
+                "include": {
+                    "images": True,
+                    "variants": True,
+                    "collections": True,
+                    "brand": True,
+                    "categories": True,
+                    "reviews": True
+                }
+            }
+        }
     )
+    shared_transformed = [
+        SharedCollection(
+            id=col.id,
+            slug=col.slug,
+            title=col.title,
+            description=col.description,
+            products=[to_product_card_view(p) for p in col.products]
+        )
+        for col in shared
+    ]
     total = await db.sharedcollection.count(where=where_clause)
     return {
-        "shared":shared,
+        "shared":shared_transformed,
         "page":page,
         "limit":limit,
         "total_pages":ceil(total/limit),
@@ -63,14 +86,27 @@ async def list_shared_collections(
     }
 
 @router.get("/{slug}")
-# @cache_response(key_prefix="shared", key=lambda request, slug: slug)
-async def get_shared_collection(request: Request, slug: str):
-    obj = await db.sharedcollection.find_unique(where={"slug": slug}, include={"products": {"include": {"images": True, "variants": True}}})
+@cache_response(key_prefix="shared", key=lambda request, slug: slug)
+async def get_shared_collection(request: Request, slug: str) -> SharedCollection:
+    obj = await db.sharedcollection.find_unique(where={"slug": slug}, include={
+        "products": {
+            "include": {
+                "images": True,
+                "variants": True,
+                "collections": True,
+                "brand": True,
+                "categories": True,
+                "reviews": True
+            }
+        }
+    })
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
+    transformed_products = [to_product_card_view(p) for p in obj.products]
+    obj.products = transformed_products
     return obj
 
-@router.post("/", response_model=SharedCollection, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=SharedCollection)
 async def create_shared_collection(data: SharedCollectionCreate):
     if data.product_ids:
         product_connect = [{"id": id} for id in data.product_ids]
@@ -87,7 +123,7 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate):
         data["products"] = {"connect": product_connect}
     return await db.sharedcollection.update(where={"id": id}, data=data.model_dump(exclude_unset=True))
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}")
 async def delete_shared_collection(id: int):
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
