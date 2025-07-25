@@ -140,8 +140,6 @@ export const SharedSchema = z
         products: z.array(ProductSearchSchema),
         view_count: z.number(),
         is_active: z.boolean(),
-        created_at: z.string(),
-        updated_at: z.string(),
     })
     .merge(AuditSchema);
 
@@ -158,6 +156,7 @@ export const FacetSchema = z.object({
 export const PaginatedProductSearchSchema = PagSchema.extend({
     products: z.array(ProductSearchSchema),
     facets: FacetSchema.optional(),
+    suggestions: z.array(z.string()),
 });
 
 export const WishItemSchema = z.object({

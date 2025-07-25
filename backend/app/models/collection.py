@@ -35,7 +35,6 @@ class Search(BaseModel):
 
 class SharedCollectionBase(BM):
     title: str = Field(..., min_length=1, description="Title is required")
-    slug: str = Field(..., min_length=1, description="Slug is required")
     description: str | None = None
     is_active: bool = True
 
@@ -52,14 +51,13 @@ class SharedCollections(BaseModel):
     total_pages: int
 
 class SharedCollectionCreate(SharedCollectionBase):
-    product_ids: list[int] | None = None
+    products: list[int] | None = None
 
 class SharedCollectionUpdate(BaseModel):
     title: str | None = None
-    slug: str | None = None
     description: str | None = None
     is_active: bool | None = None
-    product_ids: list[int] | None = None
+    products: list[int] | None = None
 
 class SharedCollectionViewBase(BM):
     shared_collection_id: int

@@ -84,7 +84,7 @@ export function SocialShare({ collection, className }: SocialShareProps) {
 
                     <div className="flex gap-2 mb-3 mt-4">
                         {socialLinks.map((social, idx: number) => (
-                            <Button key={idx} className={`${social.color}`} size="iconOnly" onClick={() => handleShare(social.url)}>
+                            <Button key={idx} className={cn("", social.color)} size="iconOnly" onClick={() => handleShare(social.url)}>
                                 <social.icon className="h-8 w-8" />
                             </Button>
                         ))}

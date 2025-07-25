@@ -81,6 +81,7 @@ class Facets(BaseModel):
 class SearchProducts(BaseModel):
     products: List[SearchProduct]
     facets: Facets
+    suggestions: List[str]
     page: int
     limit: int
     total_count: int

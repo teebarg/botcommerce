@@ -152,7 +152,7 @@ async def index(
 
 
 @router.get("/search")
-@cache_response("products", expire=600)
+@cache_response("products", expire=3600)
 async def search(
     request: Request,
     search: str = "",
@@ -197,6 +197,15 @@ async def search(
                 **search_params
             }
         )
+        suggestions_raw = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
+            search,
+            {
+                "limit": 4,
+                "attributesToRetrieve": ["name"],
+                "matchingStrategy": "all"
+            }
+        )
+        suggestions = list({hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -214,6 +223,7 @@ async def search(
         "limit": limit,
         "total_count": total_count,
         "total_pages": total_pages,
+        "suggestions": suggestions,
     }
 
 

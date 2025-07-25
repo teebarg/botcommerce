@@ -37,6 +37,7 @@ async def reindex_product(cache: CacheService, product_id: int):
         logger.info(f"Successfully reindexed product {product_id}")
         await cache.invalidate_list_cache("products")
         await cache.invalidate_list_cache("shared")
+        await cache.invalidate_list_cache("sharedcollection")
         await cache.bust_tag(f"product:{product.slug}")
         await manager.broadcast_to_all(
             data={
@@ -79,6 +80,7 @@ async def index_products(cache: CacheService):
         await cache.invalidate_list_cache("products")
         await cache.invalidate_list_cache("product")
         await cache.invalidate_list_cache("shared")
+        await cache.invalidate_list_cache("sharedcollection")
         await manager.broadcast_to_all(
             data={
                 "message": "Products re-indexed successfully",

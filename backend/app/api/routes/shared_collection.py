@@ -8,6 +8,8 @@ from app.prisma_client import prisma as db
 from math import ceil
 from app.services.redis import cache_response
 from app.services.product import to_product_card_view
+from app.core.utils import slugify
+from app.core.deps import RedisClient
 
 router = APIRouter()
 
@@ -86,7 +88,7 @@ async def list_shared_collections(
     }
 
 @router.get("/{slug}")
-@cache_response(key_prefix="shared", key=lambda request, slug: slug)
+@cache_response(key_prefix="sharedcollection", key=lambda request, slug: slug)
 async def get_shared_collection(request: Request, slug: str) -> SharedCollection:
     obj = await db.sharedcollection.find_unique(where={"slug": slug}, include={
         "products": {
@@ -108,25 +110,33 @@ async def get_shared_collection(request: Request, slug: str) -> SharedCollection
 
 @router.post("/", response_model=SharedCollection)
 async def create_shared_collection(data: SharedCollectionCreate):
-    if data.product_ids:
-        product_connect = [{"id": id} for id in data.product_ids]
+    if data.products:
+        product_connect = [{"id": id} for id in data.products]
         data["products"] = {"connect": product_connect}
+    data["slug"] = slugify(data.title)
     return await db.sharedcollection.create(data=data.model_dump())
 
-@router.put("/{id}", response_model=SharedCollection)
-async def update_shared_collection(id: int, data: SharedCollectionUpdate):
+@router.patch("/{id}")
+async def update_shared_collection(id: int, data: SharedCollectionUpdate, cache: RedisClient):
     obj = await db.sharedcollection.find_unique(where={"id": id})
+    update_data = data.model_dump(exclude_unset=True)
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
-    if data.product_ids is not None:
-        product_connect = [{"id": id} for id in data.product_ids]
-        data["products"] = {"connect": product_connect}
-    return await db.sharedcollection.update(where={"id": id}, data=data.model_dump(exclude_unset=True))
+    if data.products is not None:
+        product_connect = [{"id": id} for id in data.products]
+        update_data["products"] = {"set": product_connect}
+    res = await db.sharedcollection.update(where={"id": id}, data=update_data)
+    await cache.invalidate_list_cache("shared")
+    await cache.bust_tag(f"sharedcollection:{res.slug}")
+    print(res)
+    return res
 
 @router.delete("/{id}")
-async def delete_shared_collection(id: int):
+async def delete_shared_collection(id: int, cache: RedisClient):
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
     await db.sharedcollection.delete(where={"id": id})
+    await cache.invalidate_list_cache("shared")
+    await cache.bust_tag(f"sharedcollection:{obj.slug}")
     return None

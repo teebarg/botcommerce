@@ -6,6 +6,7 @@ import { useInvalidate } from "./useApi";
 import { api } from "@/apis/client";
 import { Collection, PaginatedCollection, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
+import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
 
 interface SearchParams {
     search?: string;
@@ -86,7 +87,7 @@ export const useUpdateSharedCollection = () => {
     const invalidate = useInvalidate();
 
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: Partial<Shared> }) => await api.patch<Shared>(`/shared/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: SharedFormValues }) => await api.patch<Shared>(`/shared/${id}`, data),
         onSuccess: () => {
             invalidate("shared-collections");
             toast.success("Shared collection updated successfully");
