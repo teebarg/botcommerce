@@ -1,4 +1,8 @@
 import { Star, Filter } from "lucide-react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useSearchParams } from "next/navigation";
+
+import { ReviewForm } from "./review-form";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,10 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ReviewCard } from "@/components/store/reviews/review-card";
 import { PaginatedReview, Review } from "@/schemas";
 import Overlay from "@/components/overlay";
-import { useOverlayTriggerState } from "@react-stately/overlays";
-import { ReviewForm } from "./review-form";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
-import { useSearchParams } from "next/navigation";
 
 interface ReviewsListProps {
     data: PaginatedReview;
@@ -29,7 +30,10 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
     const getPercentage = (count: number) => (count / ratings?.count) * 100;
 
     const onSortChange = (sort: string) => {
-        updateQuery([{ key: "sort", value: sort }, { key: "skip", value: "0" }]);
+        updateQuery([
+            { key: "sort", value: sort },
+            { key: "skip", value: "0" },
+        ]);
     };
 
     return (
@@ -46,7 +50,9 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
                                         <Star
                                             key={star}
                                             className={`w-6 h-6 ${
-                                                star <= Math.round(ratings?.average || 0) ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground"
+                                                star <= Math.round(ratings?.average || 0)
+                                                    ? "text-yellow-500 fill-yellow-500"
+                                                    : "text-muted-foreground"
                                             }`}
                                         />
                                     ))}

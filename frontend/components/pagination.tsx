@@ -85,7 +85,9 @@ const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
             </PaginationItem>
 
             <PaginationItem>
-                <PaginationLink className="px-4" isActive>{page}</PaginationLink>
+                <PaginationLink isActive className="px-4">
+                    {page}
+                </PaginationLink>
             </PaginationItem>
 
             <PaginationItem>

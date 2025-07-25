@@ -1,11 +1,13 @@
 "use client";
 
 import React from "react";
+
+import { SharedCard } from "./shared-card";
+
 import { useSharedCollections } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
 // import ServerError from "@/components/generic/server-error";
 import { Shared } from "@/schemas";
-import { SharedCard } from "./shared-card";
 
 export default function SharedCollectionList() {
     const { data, isLoading } = useSharedCollections();

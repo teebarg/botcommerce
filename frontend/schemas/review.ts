@@ -9,7 +9,6 @@ const RatingSchema = z.object({
     breakdown: z.any(),
 });
 
-
 const PagSchema = z.object({
     skip: z.number().optional(),
     limit: z.number(),

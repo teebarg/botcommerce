@@ -145,7 +145,7 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                     />
 
                     <div className="flex gap-3 pt-4">
-                        <Button className="flex-1" type="button" variant="outline" onClick={onClose} >
+                        <Button className="flex-1" type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button

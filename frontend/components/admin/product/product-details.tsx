@@ -58,9 +58,11 @@ export function ProductDetails() {
     const getStatus = (variants: ProductVariant[] | undefined) => {
         if (!variants) return "Out of Stock";
         const variant = variants?.find((v) => v.inventory > 0);
+
         if (variant) {
             return "In Stock";
         }
+
         return "Out of Stock";
     };
 
@@ -109,7 +111,9 @@ export function ProductDetails() {
                                 <TableCell>{product.description}</TableCell>
                                 <TableCell>{product.variants?.length}</TableCell>
                                 <TableCell>
-                                    <Badge variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>{getStatus(product.variants)}</Badge>
+                                    <Badge variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>
+                                        {getStatus(product.variants)}
+                                    </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <ProductActions product={product} />

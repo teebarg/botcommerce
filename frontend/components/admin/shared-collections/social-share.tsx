@@ -1,8 +1,8 @@
 import { Facebook, Twitter, MessageCircle, Link, Share } from "lucide-react";
-// import { Product } from "@/types/product";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { toast } from "sonner";
 import { Shared } from "@/schemas";
 import { cn } from "@/lib/utils";
 
@@ -68,35 +68,35 @@ export function SocialShare({ collection, className }: SocialShareProps) {
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    size="icon"
-                    variant="ghost"
                     className={cn(
                         "h-10 w-10 rounded-full text-default-800 hover:text-default-900 bg-content2 backdrop-blur-sm hover:bg-content3 hover:scale-110 active:scale-95",
                         className
                     )}
+                    size="icon"
+                    variant="ghost"
                 >
                     <Share className="h-5 w-5" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0 relative" align="end">
+            <PopoverContent align="end" className="p-0 relative">
                 <div className="p-4">
                     <h4 className="font-semibold mb-3 text-center">Share this collection</h4>
 
                     <div className="flex gap-2 mb-3 mt-4">
                         {socialLinks.map((social, idx: number) => (
-                            <Button key={idx} className={`${social.color}`} onClick={() => handleShare(social.url)} size="iconOnly">
+                            <Button key={idx} className={`${social.color}`} size="iconOnly" onClick={() => handleShare(social.url)}>
                                 <social.icon className="h-8 w-8" />
                             </Button>
                         ))}
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                        <Button variant="outline" onClick={copyToClipboard} className="w-full">
+                        <Button className="w-full" variant="outline" onClick={copyToClipboard}>
                             <Link className="h-5 w-5 mr-1" />
                             <span className="text-xs">Copy Link</span>
                         </Button>
 
-                        <Button variant="outline" onClick={handleNativeShare} className="w-full">
+                        <Button className="w-full" variant="outline" onClick={handleNativeShare}>
                             <Share className="h-5 w-5 mr-1" />
                             <span className="text-xs">More</span>
                         </Button>

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { DiscountBadge } from "./discount-badge";
 
-import { ProductSearch } from "@/schemas/product";
+import { ProductSearch } from "@/schemas";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";

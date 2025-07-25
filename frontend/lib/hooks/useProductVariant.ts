@@ -61,6 +61,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         if (!size && !color) {
             return product.variants?.find((variant) => variant.inventory > 0);
         }
+
         return product.variants?.find((variant) => variant.size === size && variant.color === color);
     };
 
@@ -70,18 +71,15 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     useEffect(() => {
         const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
+
         setSelectedVariant(matchingVariant ?? undefined);
     }, [selectedSize, selectedColor]);
 
     const isOptionAvailable = (type: "size" | "color", value: string) => {
         if (type === "size") {
-            return product.variants?.some(
-                (v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.inventory > 0
-            );
+            return product.variants?.some((v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.inventory > 0);
         } else {
-            return product.variants?.some(
-                (v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.inventory > 0
-            );
+            return product.variants?.some((v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.inventory > 0);
         }
     };
 

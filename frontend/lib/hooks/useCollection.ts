@@ -75,7 +75,6 @@ export const useDeleteCollection = () => {
     });
 };
 
-
 export const useSharedCollections = (query?: string) => {
     return useQuery({
         queryKey: ["shared-collections", query],
@@ -87,8 +86,7 @@ export const useUpdateSharedCollection = () => {
     const invalidate = useInvalidate();
 
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: Partial<Shared> }) =>
-            await api.patch<Shared>(`/shared/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: Partial<Shared> }) => await api.patch<Shared>(`/shared/${id}`, data),
         onSuccess: () => {
             invalidate("shared-collections");
             toast.success("Shared collection updated successfully");
@@ -98,4 +96,3 @@ export const useUpdateSharedCollection = () => {
         },
     });
 };
-

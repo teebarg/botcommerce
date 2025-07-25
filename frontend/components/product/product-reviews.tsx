@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
+import { useSearchParams } from "next/navigation";
 
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
+import { ReviewsList } from "../store/reviews/reviews-list";
 
 import ComponentLoader from "@/components/component-loader";
 import { useAuth } from "@/providers/auth-provider";
 import { useOrders } from "@/lib/hooks/useOrder";
-import { ReviewsList } from "../store/reviews/reviews-list";
 import { useReviews } from "@/lib/hooks/useReview";
-import { useSearchParams } from "next/navigation";
 
 interface Prop {
     product_id: number;
@@ -46,7 +46,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
         );
     }
 
-    return <ReviewsList data={data!} productName={productName} product_id={product_id} hasPurchased={hasPurchased} hasReviewed={hasReviewed} />;
+    return <ReviewsList data={data!} hasPurchased={hasPurchased} hasReviewed={hasReviewed} productName={productName} product_id={product_id} />;
 };
 
 export default ReviewsSection;

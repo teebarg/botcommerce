@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
+
 import { api } from "@/apis/client2";
 import { Shared } from "@/schemas";
 import { tryCatchApi } from "@/lib/try-catch";
-import { Metadata } from "next";
 import { SocialShare } from "@/components/store/shared/shared-listing";
 import ProductCardBase from "@/components/store/products/product-shared-card";
 
@@ -43,6 +44,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function SharedPage({ params }: { params: Params }) {
     const { slug } = await params;
     const { data: shared } = await tryCatchApi<Shared>(api.get(`/shared/${slug}`));
+
     if (!shared || !shared.is_active) return notFound();
 
     return (
@@ -54,7 +56,7 @@ export default async function SharedPage({ params }: { params: Params }) {
             {shared.products && shared.products.length > 0 ? (
                 <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
                     {shared.products.map((product, index) => (
-                        <div key={product.id} style={{ animationDelay: `${index * 0.1}s` }} className="break-inside-avoid">
+                        <div key={product.id} className="break-inside-avoid" style={{ animationDelay: `${index * 0.1}s` }}>
                             <ProductCardBase product={product} />
                         </div>
                     ))}

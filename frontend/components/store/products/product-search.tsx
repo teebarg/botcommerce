@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { Plus, Package, Search, Check, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Package, Search, Check, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { ProductSearch } from "@/schemas";
 
 interface ProductSelectorProps {
@@ -41,6 +42,7 @@ export const ProductSearchComponent: React.FC<ProductSelectorProps> = ({ onAddPr
         setIsLoading(true);
         try {
             const products = await searchProducts("");
+
             setSearchResults(products);
         } catch (error) {
             console.error("Failed to load products:", error);
@@ -53,6 +55,7 @@ export const ProductSearchComponent: React.FC<ProductSelectorProps> = ({ onAddPr
         setIsLoading(true);
         try {
             const results = await searchProducts(query);
+
             setSearchResults(results);
         } catch (error) {
             console.error("Failed to search products:", error);
@@ -80,10 +83,10 @@ export const ProductSearchComponent: React.FC<ProductSelectorProps> = ({ onAddPr
     if (!isSearching) {
         return (
             <Button
+                className="w-full h-16 border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 group"
                 type="button"
                 variant="outline"
                 onClick={toggleSearch}
-                className="w-full h-16 border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 group"
             >
                 <div className="flex items-center gap-3 text-primary">
                     <Search className="h-5 w-5 group-hover:scale-110 transition-transform" />
@@ -101,7 +104,7 @@ export const ProductSearchComponent: React.FC<ProductSelectorProps> = ({ onAddPr
                         <Package className="h-5 w-5" />
                         Search Products
                     </div>
-                    <Button type="button" variant="ghost" size="sm" onClick={toggleSearch} className="text-muted-foreground hover:text-foreground">
+                    <Button className="text-muted-foreground hover:text-foreground" size="sm" type="button" variant="ghost" onClick={toggleSearch}>
                         Cancel
                     </Button>
                 </div>
@@ -110,11 +113,11 @@ export const ProductSearchComponent: React.FC<ProductSelectorProps> = ({ onAddPr
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                         <Input
+                            autoFocus
+                            className="pl-10 bg-background"
+                            placeholder="Search for products..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search for products..."
-                            className="pl-10 bg-background"
-                            autoFocus
                         />
                     </div>
 
@@ -141,10 +144,10 @@ export const ProductSearchComponent: React.FC<ProductSelectorProps> = ({ onAddPr
                                         {product.images.length > 0 && (
                                             <div className="flex-shrink-0">
                                                 <img
-                                                    src={product.images[0]}
                                                     alt={product.name}
                                                     className="w-16 h-16 object-cover rounded-lg border border-border/30"
                                                     loading="lazy"
+                                                    src={product.images[0]}
                                                 />
                                             </div>
                                         )}
@@ -158,12 +161,12 @@ export const ProductSearchComponent: React.FC<ProductSelectorProps> = ({ onAddPr
                                         </div>
 
                                         <Button
-                                            type="button"
-                                            onClick={() => handleSelectProduct(product)}
+                                            className="ml-4 shrink-0"
                                             disabled={selectedProducts.has(product.id)}
                                             size="sm"
-                                            className="ml-4 shrink-0"
+                                            type="button"
                                             variant={selectedProducts.has(product.id) ? "secondary" : "default"}
+                                            onClick={() => handleSelectProduct(product)}
                                         >
                                             {selectedProducts.has(product.id) ? (
                                                 <>

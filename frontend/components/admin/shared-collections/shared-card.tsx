@@ -1,13 +1,14 @@
+import { Eye, Calendar, Package, Edit } from "lucide-react";
+import Image from "next/image";
+
+import { SocialShare } from "./social-share";
+import { SharedActions } from "./shared-actions";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Calendar, Package, Edit } from "lucide-react";
 import { Shared } from "@/schemas";
 import { formatDate } from "@/lib/utils";
-import Image from "next/image";
-import { SocialShare } from "./social-share";
-import { SharedActions } from "./shared-actions";
 
 export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => (
     <Card className="group hover:shadow-lg transition-all duration-200 border-border bg-card">
@@ -19,7 +20,7 @@ export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => 
                     </CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span className="font-mono bg-muted px-2 py-1 rounded text-xs">/{collection.slug}</span>
-                        <Badge variant={collection.is_active ? "default" : "secondary"} className="text-xs">
+                        <Badge className="text-xs" variant={collection.is_active ? "default" : "secondary"}>
                             {collection.is_active ? "Active" : "Inactive"}
                         </Badge>
                     </div>
@@ -57,10 +58,10 @@ export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => 
                                 {collection.products.slice(0, 4).map((product) => (
                                     <div key={product.id} className="relative w-24 h-24 rounded bg-content3 overflow-hidden p-2">
                                         <Image
-                                            src={product.images[0] || product.image || "/placeholder.jpg"}
+                                            fill
                                             alt={product.name}
                                             className="object-contain"
-                                            fill
+                                            src={product.images[0] || product.image || "/placeholder.jpg"}
                                         />
                                     </div>
                                 ))}
@@ -83,11 +84,11 @@ export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => 
                 <SharedActions item={collection} />
 
                 <div className="flex gap-2 pt-2">
-                    <Button variant="outline" className="flex-1">
+                    <Button className="flex-1" variant="outline">
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
                     </Button>
-                    <Button variant="default" className="flex-1">
+                    <Button className="flex-1" variant="default">
                         <Eye className="h-4 w-4 mr-2" />
                         View
                     </Button>

@@ -20,32 +20,32 @@ export const SocialShare = ({ title }: { title: string }) => {
         <div className="flex gap-2 items-center mb-6">
             <span className="text-gray-500">Share:</span>
             <a
-                href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"
+                href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
+                rel="noopener noreferrer"
+                target="_blank"
             >
                 Twitter
             </a>
             <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-blue-700 hover:underline"
+                href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+                rel="noopener noreferrer"
+                target="_blank"
             >
                 Facebook
             </a>
             <a
-                href={`https://wa.me/?text=${shareText}%20${shareUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-green-600 hover:underline"
+                href={`https://wa.me/?text=${shareText}%20${shareUrl}`}
+                rel="noopener noreferrer"
+                target="_blank"
             >
                 WhatsApp
             </a>
-            <button onClick={handleCopy} className="text-gray-700 hover:underline focus:outline-none">
+            <button className="text-gray-700 hover:underline focus:outline-none" onClick={handleCopy}>
                 {copied ? "Copied!" : "Copy Link"}
             </button>
         </div>
     );
-}
+};

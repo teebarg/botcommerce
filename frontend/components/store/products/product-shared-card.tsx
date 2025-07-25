@@ -37,11 +37,11 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
             <div className="relative aspect-[4/5] overflow-hidden">
                 <Image
                     fill
-                    src={product.images[0] || product.image || "/placeholder.jpg"}
                     alt={product.name}
                     className={cn("duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
-                    onLoad={() => setImageLoaded(true)}
                     sizes="(max-width: 768px) 100vw, 33vw"
+                    src={product.images[0] || product.image || "/placeholder.jpg"}
+                    onLoad={() => setImageLoaded(true)}
                 />
 
                 {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
@@ -55,7 +55,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
 
                 {outOfStock && (
                     <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                        <Badge variant="secondary" className="text-lg px-6 py-2 backdrop-blur-sm">
+                        <Badge className="text-lg px-6 py-2 backdrop-blur-sm" variant="secondary">
                             Out of Stock
                         </Badge>
                     </div>
@@ -75,7 +75,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
                         <div className="flex items-center justify-between">
                             <div>
                                 <h3 className="font-bold text-lg mb-1 line-clamp-1">{product.name}</h3>
-                                <PriceLabel priceInfo={priceInfo} priceClassName="text-gray-100" oldPriceClassName="text-gray-300" />
+                                <PriceLabel oldPriceClassName="text-gray-300" priceClassName="text-gray-100" priceInfo={priceInfo} />
                             </div>
 
                             <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
@@ -97,9 +97,9 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
                                 title="Details"
                                 trigger={
                                     <Button
+                                        className="h-12 w-12 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 rounded-xl"
                                         size="icon"
                                         variant="ghost"
-                                        className="h-12 w-12 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 rounded-xl"
                                     >
                                         <Eye className="h-5 w-5" />
                                     </Button>
