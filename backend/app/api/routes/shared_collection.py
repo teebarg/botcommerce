@@ -10,6 +10,7 @@ from app.services.redis import cache_response
 from app.services.product import to_product_card_view
 from app.core.utils import slugify
 from app.core.deps import RedisClient
+from app.models.generic import Message
 
 router = APIRouter()
 
@@ -128,15 +129,14 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate, cache:
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
     await cache.invalidate_list_cache("shared")
     await cache.bust_tag(f"sharedcollection:{res.slug}")
-    print(res)
     return res
 
 @router.delete("/{id}")
-async def delete_shared_collection(id: int, cache: RedisClient):
+async def delete_shared_collection(id: int, cache: RedisClient) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
     await db.sharedcollection.delete(where={"id": id})
     await cache.invalidate_list_cache("shared")
     await cache.bust_tag(f"sharedcollection:{obj.slug}")
-    return None
+    return {"message": "SharedCollection deleted successfully"}

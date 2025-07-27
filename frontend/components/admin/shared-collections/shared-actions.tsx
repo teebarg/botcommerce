@@ -9,7 +9,7 @@ import { SharedForm } from "./shared-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { useDeleteBrand } from "@/lib/hooks/useBrand";
+import { useDeleteSharedCollection } from "@/lib/hooks/useCollection";
 import { Confirm } from "@/components/generic/confirm";
 import { Shared } from "@/schemas/product";
 
@@ -21,7 +21,7 @@ const SharedActions: React.FC<Props> = ({ item }) => {
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
 
-    const deleteMutation = useDeleteBrand();
+    const deleteMutation = useDeleteSharedCollection();
 
     const onConfirmDelete = async () => {
         deleteMutation.mutateAsync(item.id).then(() => {

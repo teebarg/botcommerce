@@ -66,8 +66,6 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-    const [focusedIndex, setFocusedIndex] = useState<number>(-1);
-
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -90,45 +88,9 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
     }, [recentSearches]);
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (!isOpen) return;
-
-            const items = [...recentSearches, ...trendingData?.products!, ...recommendedData?.products!, ...data?.products!];
-
-            switch (e.key) {
-                case "ArrowDown":
-                    e.preventDefault();
-                    setFocusedIndex((prev) => Math.min(prev + 1, items.length - 1));
-                    break;
-                case "ArrowUp":
-                    e.preventDefault();
-                    setFocusedIndex((prev) => Math.max(prev - 1, -1));
-                    break;
-                case "Enter":
-                    e.preventDefault();
-                    if (focusedIndex >= 0 && focusedIndex < items.length) {
-                        // Handle selection logic
-                    }
-                    break;
-                case "Escape":
-                    setIsOpen(false);
-                    setFocusedIndex(-1);
-                    inputRef.current?.blur();
-                    break;
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isOpen, focusedIndex]);
-
-    // Handle clicks outside
-    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && !inputRef.current?.contains(event.target as Node)) {
                 setIsOpen(false);
-                setFocusedIndex(-1);
             }
         };
 
@@ -140,7 +102,6 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
     const handleProductSelect = (product: ProductSearch) => {
         setQuery(product.name);
         setIsOpen(false);
-        setFocusedIndex(-1);
         onProductSelect?.(product);
     };
 

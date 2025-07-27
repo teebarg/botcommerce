@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Save, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -13,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { ProductSearch, Shared } from "@/schemas";
-import { useUpdateSharedCollection } from "@/lib/hooks/useCollection";
+import { useUpdateSharedCollection, useCreateSharedCollection } from "@/lib/hooks/useCollection";
 import { currency } from "@/lib/utils";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import ProductSearchClient from "@/components/store/products/product-search-client";
@@ -73,25 +72,17 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
         } as any,
     });
 
+    const createShared = useCreateSharedCollection();
     const updateShared = useUpdateSharedCollection();
 
     const { handleSubmit, control, setValue, watch, formState } = form;
     const formProducts = watch("products");
 
     const onSubmit = async (values: SharedFormValues) => {
-        try {
-            if (current?.id) {
-                await updateShared.mutateAsync({ id: current?.id!, data: values });
-                toast.success("Shared collection updated successfully");
-            } else {
-                // TODO: implement create mutation
-                toast.success("Shared collection created successfully");
-            }
-            onClose?.();
-        } catch (error) {
-            toast.error("Error", {
-                description: "Failed to save collection. Please try again.",
-            });
+        if (current?.id) {
+            updateShared.mutateAsync({ id: current?.id!, data: values });
+        } else {
+            createShared.mutateAsync(values).then(() => onClose?.());
         }
     };
 

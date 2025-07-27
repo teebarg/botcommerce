@@ -83,6 +83,24 @@ export const useSharedCollections = (query?: string) => {
     });
 };
 
+export const useCreateSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async (data: SharedFormValues) =>
+            await api.post<Shared>("/shared/", {
+                ...data,
+            }),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Shared collection created successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to create shared collection" + error);
+        },
+    });
+};
+
 export const useUpdateSharedCollection = () => {
     const invalidate = useInvalidate();
 
@@ -94,6 +112,21 @@ export const useUpdateSharedCollection = () => {
         },
         onError: (error) => {
             toast.error("Failed to update shared collection: " + error);
+        },
+    });
+};
+
+export const useDeleteSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async (id: number) => await api.delete<Shared>(`/shared/${id}`),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Shared collection deleted successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to delete shared collection" + error);
         },
     });
 };
