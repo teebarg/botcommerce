@@ -40,6 +40,7 @@ class SharedCollectionBase(BM):
 
 class SharedCollection(SharedCollectionBase):
     id: int
+    slug: str = Field(..., min_length=1)
     products: list[SearchProduct]
     view_count: int = 0
 

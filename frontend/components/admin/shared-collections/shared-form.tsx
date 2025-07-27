@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,6 @@ import { useUpdateSharedCollection } from "@/lib/hooks/useCollection";
 import { currency } from "@/lib/utils";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import ProductSearchClient from "@/components/store/products/product-search-client";
-import { z } from "zod";
 
 interface SharedFormProps {
     current?: Shared;
@@ -112,7 +112,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
         <div className="px-4 pt-4 overflow-y-auto">
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                    <ProductSearchClient onProductSelect={addProduct} enableRecommendations={true} />
+                    <ProductSearchClient enableRecommendations={true} onProductSelect={addProduct} />
                     <Card className="border-0 bg-card/50 backdrop-blur-sm">
                         <CardContent className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-6">

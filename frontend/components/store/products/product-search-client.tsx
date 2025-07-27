@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Search, X, Clock, TrendingUp, Star } from "lucide-react";
+import { useDebounce } from "use-debounce";
 
 import { ProductSearch } from "@/schemas";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useAuth } from "@/providers/auth-provider";
 import { cn, currency } from "@/lib/utils";
 import { useProductRecommendations, useProductSearch } from "@/lib/hooks/useProduct";
-import { useDebounce } from "use-debounce";
 
 const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: ProductSearch) => void }> = ({ product, onProductSelect }) => {
     const { priceInfo } = useProductVariant(product);
@@ -20,9 +20,9 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
         >
             <div className="relative w-12 h-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
                 <img
-                    src={product.images[0] || product.image || "/placeholder.jpg"}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    src={product.images[0] || product.image || "/placeholder.jpg"}
                 />
             </div>
 
@@ -119,6 +119,7 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
         };
 
         document.addEventListener("keydown", handleKeyDown);
+
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [isOpen, focusedIndex]);
 
@@ -132,6 +133,7 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
         };
 
         document.addEventListener("mousedown", handleClickOutside);
+
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
@@ -170,18 +172,18 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
                     <Search className="absolute left-4 w-5 h-5 text-muted-foreground" />
                     <input
                         ref={inputRef}
+                        className={cn(
+                            "w-full pl-12 pr-12 py-4 bg-transparent border-0 outline-0",
+                            "text-foreground placeholder:text-muted-foreground",
+                            "transition-all duration-200"
+                        )}
+                        placeholder={placeholder}
                         type="text"
                         value={query}
                         onChange={(e) => {
                             setQuery(e.target.value);
                             setIsOpen(true);
                         }}
-                        placeholder={placeholder}
-                        className={cn(
-                            "w-full pl-12 pr-12 py-4 bg-transparent border-0 outline-0",
-                            "text-foreground placeholder:text-muted-foreground",
-                            "transition-all duration-200"
-                        )}
                     />
                     {query && (
                         <button
@@ -231,7 +233,7 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
                         {hasNoResults && (
                             <div className="text-center py-8">
                                 <Search className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                                <p className="text-muted-foreground">No products found for "{query}"</p>
+                                <p className="text-muted-foreground">No products found for {query}</p>
                                 <p className="text-sm text-muted-foreground mt-1">Try searching for something else</p>
                             </div>
                         )}
@@ -248,8 +250,8 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
                                             {recentSearches.map((search: string, idx: number) => (
                                                 <button
                                                     key={idx}
-                                                    onClick={() => handleRecentSearchClick(search)}
                                                     className="w-full text-left px-3 py-2 rounded-lg hover:bg-search-hover transition-colors"
+                                                    onClick={() => handleRecentSearchClick(search)}
                                                 >
                                                     <span className="text-sm text-foreground">{search}</span>
                                                 </button>
@@ -267,8 +269,8 @@ const ProductSearchClient: React.FC<ProductSearchClientProps> = ({
                                         {data?.suggestions.map((suggestion: string, idx: number) => (
                                             <button
                                                 key={idx}
-                                                onClick={() => handleSuggestionClick(suggestion)}
                                                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-150 text-left"
+                                                onClick={() => handleSuggestionClick(suggestion)}
                                             >
                                                 <Search className="w-4 h-4 flex-shrink-0 opacity-50" />
                                                 <span className="flex-1">{suggestion}</span>
