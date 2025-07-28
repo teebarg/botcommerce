@@ -86,7 +86,6 @@ enum ShopSettingsType {
   CUSTOM
 }
 
-
 enum ConversationStatus {
   ACTIVE
   COMPLETED
@@ -94,7 +93,7 @@ enum ConversationStatus {
 }
 
 enum InteractionType {
-  VIEW @map("view")
+  VIEW     @map("view")
   PURCHASE @map("purchase")
   CART_ADD @map("cart_add")
   WISHLIST @map("wishlist")
@@ -193,25 +192,26 @@ model Collection {
 }
 
 model Product {
-  id          Int              @id @default(autoincrement())
-  name        String           @unique @db.VarChar(255)
-  slug        String           @unique @db.VarChar(255)
-  sku         String           @unique
-  description String?
-  features    String[]
-  image       String?          @db.VarChar(255)
-  status      ProductStatus    @default(IN_STOCK)
-  variants    ProductVariant[]
-  ratings     Float?           @default(0)
-  categories  Category[]       @relation("ProductCategories")
-  collections Collection[]     @relation("ProductCollections")
-  brand       Brand?           @relation(fields: [brand_id], references: [id], onDelete: SetNull)
-  brand_id    Int?
-  tags        Tag[]            @relation("ProductTags")
-  images      ProductImage[]
-  reviews     Review[]
-  favorites   Favorite[]
-  user_interactions UserInteraction[]
+  id                 Int                @id @default(autoincrement())
+  name               String             @unique @db.VarChar(255)
+  slug               String             @unique @db.VarChar(255)
+  sku                String             @unique
+  description        String?
+  features           String[]
+  image              String?            @db.VarChar(255)
+  status             ProductStatus      @default(IN_STOCK)
+  variants           ProductVariant[]
+  ratings            Float?             @default(0)
+  categories         Category[]         @relation("ProductCategories")
+  collections        Collection[]       @relation("ProductCollections")
+  brand              Brand?             @relation(fields: [brand_id], references: [id], onDelete: SetNull)
+  brand_id           Int?
+  tags               Tag[]              @relation("ProductTags")
+  images             ProductImage[]
+  reviews            Review[]
+  favorites          Favorite[]
+  user_interactions  UserInteraction[]
+  shared_collections SharedCollection[] @relation("SharedCollectionProducts")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -254,6 +254,8 @@ model ProductImage {
 
 model Review {
   id         Int     @id @default(autoincrement())
+  author     String?
+  title      String?
   comment    String
   rating     Int
   verified   Boolean @default(false)
@@ -266,6 +268,7 @@ model Review {
   product Product @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user    User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([user_id, product_id])
   @@map("reviews")
 }
 
@@ -423,13 +426,13 @@ model CartItem {
 
 // User Model
 model User {
-  id                         Int           @id @default(autoincrement())
-  email                      String        @unique
+  id                         Int               @id @default(autoincrement())
+  email                      String            @unique
   hashed_password            String
   first_name                 String?
   last_name                  String?
-  status                     Status        @default(PENDING)
-  role                       Role          @default(CUSTOMER)
+  status                     Status            @default(PENDING)
+  role                       Role              @default(CUSTOMER)
   image                      String?
   email_verified             DateTime?
   email_verification_token   String?
@@ -443,9 +446,10 @@ model User {
   interactions               UserInteraction[]
   preferences                UserPreference[]
 
-  created_at   DateTime?      @default(now())
-  updated_at   DateTime?      @updatedAt
-  Conversation Conversation[]
+  created_at           DateTime?              @default(now())
+  updated_at           DateTime?              @updatedAt
+  Conversation         Conversation[]
+  SharedCollectionView SharedCollectionView[]
 
   @@index([first_name, last_name, email])
   @@map("users")
@@ -532,7 +536,7 @@ model CarouselBanner {
   subtitle    String?
   description String?  @db.Text
   buttonText  String?
-  image       String?   @db.VarChar(255)
+  image       String?  @db.VarChar(255)
   link        String?
   order       Int      @default(0)
   is_active   Boolean  @default(true)
@@ -544,7 +548,7 @@ model CarouselBanner {
 
 model DeliveryOption {
   id          Int            @id @default(autoincrement())
-  name        String         @db.VarChar(255)
+  name        String         @unique @db.VarChar(255)
   description String?        @db.Text
   method      ShippingMethod
   amount      Float          @db.DoublePrecision
@@ -556,28 +560,62 @@ model DeliveryOption {
 }
 
 model UserInteraction {
-  id          Int            @id @default(autoincrement())
-  user_id     Int
-  product_id  Int
-  type        InteractionType
-  timestamp   DateTime       @default(now())
-  metadata    Json?          // Additional context (time spent, etc.)
-  
-  user      User     @relation(fields: [user_id], references: [id])
-  product   Product  @relation(fields: [product_id], references: [id])
-  
+  id         Int             @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  type       InteractionType
+  timestamp  DateTime        @default(now())
+  metadata   Json? // Additional context (time spent, etc.)
+
+  user    User    @relation(fields: [user_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
   @@index([user_id, timestamp])
   @@index([product_id, timestamp])
+  @@map("user_interactions")
 }
 
 model UserPreference {
-  id         Int @id @default(autoincrement())
-  user_id             Int
-  category   String
-  brand      String?
-  priceRange String?
-  score      Float  @default(1.0)
-  
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  category    String? // Make nullable for brand-only preferences
+  brand       String?
+  priceRange  String?
+  score       Float    @default(1.0)
+  source      String   @default("implicit") // "explicit", "implicit", "inferred"
+  confidence  Float    @default(0.5) // How confident we are in this preference
+  lastUpdated DateTime @default(now()) @updatedAt
+
   user User @relation(fields: [user_id], references: [id])
+
   @@unique([user_id, category, brand])
+  @@map("user_preferences")
+}
+
+model SharedCollection {
+  id                   Int                    @id @default(autoincrement())
+  title                String                 @db.VarChar(255)
+  slug                 String                 @unique @db.VarChar(255)
+  description          String?                @db.Text
+  products             Product[]              @relation("SharedCollectionProducts")
+  is_active            Boolean                @default(true)
+  view_count           Int                    @default(0)
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  SharedCollectionView SharedCollectionView[]
+
+  @@map("shared_collections")
+}
+
+model SharedCollectionView {
+  id                   Int              @id @default(autoincrement())
+  shared_collection    SharedCollection @relation(fields: [shared_collection_id], references: [id])
+  shared_collection_id Int
+  user_id              Int?
+  user                 User?            @relation(fields: [user_id], references: [id])
+  ip_address           String?
+  user_agent           String?
+  timestamp            DateTime         @default(now())
+
+  @@map("shared_collection_views")
 }

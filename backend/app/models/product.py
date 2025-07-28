@@ -4,12 +4,10 @@ from pydantic import BaseModel, Field
 from app.models.base import BM
 from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review, ProductVariant
 
-# Models
 class VariantWithStatus(BaseModel):
     price: float = Field(..., gt=0)
     old_price: Optional[float] = 0.0
     inventory: int = Field(..., ge=0)
-    status: Literal["IN_STOCK", "OUT_OF_STOCK"]
     size: Optional[str] = None
     color: Optional[str] = None
 
@@ -83,6 +81,7 @@ class Facets(BaseModel):
 class SearchProducts(BaseModel):
     products: List[SearchProduct]
     facets: Facets
+    suggestions: List[str]
     page: int
     limit: int
     total_count: int

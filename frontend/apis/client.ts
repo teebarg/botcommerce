@@ -26,7 +26,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     // Get auth token
     const headers = {
         "Content-Type": "application/json",
-        ...(token && { "X-Auth": token }),
+        "X-Auth": token ?? "token",
         cartId: cartId ?? "",
         ...options.headers,
     };
@@ -41,7 +41,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         if (response.status === 401) {
             // Handle unauthorized access
             deleteCookie("access_token");
-            window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+            // window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         }
         const error = await response.json();
 

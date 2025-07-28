@@ -1,5 +1,7 @@
 from app.models.base import BM
 from pydantic import BaseModel, Field
+from datetime import datetime
+from app.models.product import SearchProduct
 
 
 class CollectionBase(BM):
@@ -29,3 +31,41 @@ class Collections(BaseModel):
 
 class Search(BaseModel):
     results: list[Collection]
+
+
+class SharedCollectionBase(BM):
+    title: str = Field(..., min_length=1, description="Title is required")
+    description: str | None = None
+    is_active: bool = True
+
+class SharedCollection(SharedCollectionBase):
+    id: int
+    slug: str = Field(..., min_length=1)
+    products: list[SearchProduct]
+    view_count: int = 0
+
+class SharedCollections(BaseModel):
+    shared: list[SharedCollection]
+    page: int
+    limit: int
+    total_count: int
+    total_pages: int
+
+class SharedCollectionCreate(SharedCollectionBase):
+    products: list[int] | None = None
+
+class SharedCollectionUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
+    products: list[int] | None = None
+
+class SharedCollectionViewBase(BM):
+    shared_collection_id: int
+    user_id: int | None = None
+    ip_address: str | None = None
+    user_agent: str | None = None
+
+class SharedCollectionView(SharedCollectionViewBase):
+    id: int
+    timestamp: datetime

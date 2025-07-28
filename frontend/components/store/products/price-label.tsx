@@ -1,6 +1,6 @@
 import React from "react";
 
-import { currency } from "@/lib/utils";
+import { cn, currency } from "@/lib/utils";
 
 type PriceInfo = {
     minPrice: number;
@@ -15,34 +15,41 @@ type PriceInfo = {
 interface PriceLabelProps {
     priceInfo: PriceInfo;
     className?: string;
+    priceClassName?: string;
+    oldPriceClassName?: string;
 }
 
-export const PriceLabel: React.FC<PriceLabelProps> = ({ priceInfo, className }) => {
-    const { minPrice, maxPrice, maxCompareAtPrice, hasDiscount, allDiscounted, maxDiscountPercent } = priceInfo;
+export const PriceLabel: React.FC<PriceLabelProps> = ({
+    priceInfo,
+    className,
+    priceClassName = "text-default-900",
+    oldPriceClassName = "text-default-500",
+}) => {
+    const { minPrice, maxPrice, maxCompareAtPrice, hasDiscount, allDiscounted } = priceInfo;
 
     if (minPrice === maxPrice) {
         if (hasDiscount && allDiscounted) {
             return (
                 <div className="flex items-center space-x-2">
-                    <span className="text-xl font-bold text-default-900">{currency(minPrice)}</span>
-                    <span className="text-sm text-default-500 line-through">{currency(maxCompareAtPrice!)}</span>
+                    <span className={cn("text-xl font-bold", priceClassName)}>{currency(minPrice)}</span>
+                    <span className={cn("text-sm line-through", oldPriceClassName)}>{currency(maxCompareAtPrice!)}</span>
                 </div>
             );
         }
 
         if (hasDiscount) {
             return (
-                <div className={`text-default-900 text-xl font-bold ${className}`}>
+                <div className={cn("text-xl font-bold", className, priceClassName)}>
                     From <span className="font-semibold">{currency(minPrice)}</span>
                 </div>
             );
         }
 
-        return <div className={`text-default-900 text-xl font-bold ${className}`}>{currency(minPrice)}</div>;
+        return <div className={cn("text-xl font-bold", className)}>{currency(minPrice)}</div>;
     }
 
     return (
-        <div className={`text-default-900 text-xl font-bold ${className}`}>
+        <div className={cn("text-lg font-bold", className, priceClassName)}>
             {hasDiscount ? (
                 <span>
                     From {currency(minPrice)} to {currency(maxPrice)}

@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import PaginationUI from "@/components/pagination";
 import { ProductActions } from "@/components/admin/product/product-actions";
-import { Brand, Collection, Product } from "@/schemas/product";
+import { Brand, Collection, Product, ProductVariant } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/lib/hooks/useProduct";
@@ -28,7 +28,7 @@ export function ProductDetails() {
     const { data: collections } = useCollections();
     const { data: brands } = useBrands();
     const searchParams = useSearchParams();
-    const { data, isLoading } = useProducts({ limit: LIMIT, query: searchParams.get("search") || "", page: Number(searchParams.get("page")) });
+    const { data, isLoading } = useProducts({ query: searchParams.get("search") || "", page: Number(searchParams.get("page")) });
 
     const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
@@ -53,6 +53,17 @@ export function ProductDetails() {
 
     const handleManageBrands = () => {
         router.push("/admin/brands");
+    };
+
+    const getStatus = (variants: ProductVariant[] | undefined) => {
+        if (!variants) return "Out of Stock";
+        const variant = variants?.find((v) => v.inventory > 0);
+
+        if (variant) {
+            return "In Stock";
+        }
+
+        return "Out of Stock";
     };
 
     return (
@@ -100,7 +111,9 @@ export function ProductDetails() {
                                 <TableCell>{product.description}</TableCell>
                                 <TableCell>{product.variants?.length}</TableCell>
                                 <TableCell>
-                                    <Badge variant={product.status === "IN_STOCK" ? "emerald" : "destructive"}>{product.status}</Badge>
+                                    <Badge variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>
+                                        {getStatus(product.variants)}
+                                    </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <ProductActions product={product} />

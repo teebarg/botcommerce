@@ -108,7 +108,9 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                     <div key={idx}>
                                         <div className="flex items-center gap-4">
                                             <div className="h-20 w-20 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden">
-                                                {item.image && <Image fill alt={item.variant?.product?.name || item.image} src={item.image} />}
+                                                {item.image && (
+                                                    <Image fill alt={item.variant?.product?.name || item.image} sizes="80px" src={item.image} />
+                                                )}
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-medium text-default-900">{item.name}</h4>

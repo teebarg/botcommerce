@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
 import Image from "next/image";
 
 import { DiscountBadge } from "./discount-badge";
 
-import { ProductSearch } from "@/schemas/product";
+import { ProductSearch } from "@/schemas";
 import { cn, currency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
+import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
+import { useAuth } from "@/providers/auth-provider";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -31,20 +33,79 @@ const ProductOverview: React.FC<{
         handleAddToCart,
         handleWhatsAppPurchase,
         loading,
+        outOfStock,
     } = useProductVariant(product);
 
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
+
+    const { user } = useAuth();
+    const trackInteraction = useTrackUserInteraction();
+
+    useEffect(() => {
+        if (user && product?.id) {
+            trackInteraction.mutate({
+                user_id: user.id,
+                product_id: product.id,
+                type: "VIEW",
+                metadata: { source: "product-overview" },
+            });
+        }
+
+        const startTime = Date.now();
+
+        return () => {
+            const timeSpent = Date.now() - startTime;
+
+            if (user && product?.id) {
+                trackInteraction.mutate({
+                    user_id: user.id,
+                    product_id: product.id,
+                    type: "VIEW",
+                    metadata: { timeSpent, source: "product-overview" },
+                });
+            }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id, product?.id]);
+
+    const handleAddToCartAndTrack = () => {
+        if (user && product?.id) {
+            trackInteraction.mutate({
+                user_id: user.id,
+                product_id: product.id,
+                type: "CART_ADD",
+                metadata: { source: "product-overview" },
+            });
+        }
+        handleAddToCart();
+    };
 
     const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
     const selectedImage = product.images[selectedImageIdx];
 
     const addWishlist = async () => {
         createWishlist(product.id);
+        if (user && product?.id) {
+            trackInteraction.mutate({
+                user_id: user.id,
+                product_id: product.id,
+                type: "WISHLIST_ADD",
+                metadata: { source: "product-overview" },
+            });
+        }
     };
 
     const removeWishlist = async () => {
         deleteWishlist(product.id);
+        if (user && product?.id) {
+            trackInteraction.mutate({
+                user_id: user.id,
+                product_id: product.id,
+                type: "WISHLIST_REMOVE",
+                metadata: { source: "product-overview" },
+            });
+        }
     };
 
     return (
@@ -92,7 +153,7 @@ const ProductOverview: React.FC<{
                         }`}
                         onClick={() => setSelectedImageIdx(idx)}
                     >
-                        <Image fill alt={`Thumbnail - ${image}`} className="object-cover w-full h-full" src={image} />
+                        <Image fill alt={`Thumbnail - ${image}`} className="object-cover" sizes="64px" src={image} />
                     </button>
                 ))}
             </div>
@@ -101,9 +162,9 @@ const ProductOverview: React.FC<{
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="flex items-center space-x-2">
-                            <span className="text-3xl font-bold text-gray-900 dark:text-white">{currency(selectedVariant?.price)}</span>
+                            <span className="text-3xl font-bold text-default-900">{currency(selectedVariant?.price || priceInfo.minPrice)}</span>
                             {selectedVariant?.old_price > selectedVariant?.price && (
-                                <span className="text-lg text-gray-500 dark:text-gray-400 line-through">{currency(selectedVariant?.old_price)}</span>
+                                <span className="text-lg text-default-500 line-through">{currency(selectedVariant?.old_price)}</span>
                             )}
                         </div>
                         {selectedVariant?.old_price > selectedVariant?.price && (
@@ -113,7 +174,7 @@ const ProductOverview: React.FC<{
                         )}
                     </div>
                     <button
-                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
                         onClick={(e) => {
                             e.stopPropagation();
                             isLiked ? removeWishlist() : addWishlist();
@@ -241,11 +302,17 @@ const ProductOverview: React.FC<{
                     </div>
 
                     <div className={cn("flex gap-3 flex-row md:flex-row")}>
-                        <Button disabled={loading || !selectedVariant} isLoading={loading} size="lg" variant="primary" onClick={handleAddToCart}>
+                        <Button
+                            disabled={loading || !selectedVariant || outOfStock}
+                            isLoading={loading}
+                            size="lg"
+                            variant="primary"
+                            onClick={handleAddToCartAndTrack}
+                        >
                             <ShoppingCart className="w-5 h-5 relative z-10 hover:rotate-12 transition-transform duration-300 mr-2" />
-                            <span className="relative z-10">Add to Cart</span>
+                            <span className="relative z-10">{outOfStock ? "Out of Stock" : "Add to Cart"}</span>
                         </Button>
-                        <Button disabled={loading || !selectedVariant} size="lg" variant="emerald" onClick={handleWhatsAppPurchase}>
+                        <Button disabled={loading || !selectedVariant || outOfStock} size="lg" variant="emerald" onClick={handleWhatsAppPurchase}>
                             <MessageCircle className="w-5 h-5 relative z-10 hover:animate-bounce mr-2" />
                             <span className="relative z-10">WhatsApp Buy</span>
                         </Button>

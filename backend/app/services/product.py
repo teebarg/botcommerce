@@ -36,6 +36,8 @@ async def reindex_product(cache: CacheService, product_id: int):
 
         logger.info(f"Successfully reindexed product {product_id}")
         await cache.invalidate_list_cache("products")
+        await cache.invalidate_list_cache("shared")
+        await cache.invalidate_list_cache("sharedcollection")
         await cache.bust_tag(f"product:{product.slug}")
         await manager.broadcast_to_all(
             data={
@@ -77,6 +79,8 @@ async def index_products(cache: CacheService):
         logger.info(f"Reindexed {len(documents)} products successfully.")
         await cache.invalidate_list_cache("products")
         await cache.invalidate_list_cache("product")
+        await cache.invalidate_list_cache("shared")
+        await cache.invalidate_list_cache("sharedcollection")
         await manager.broadcast_to_all(
             data={
                 "message": "Products re-indexed successfully",
@@ -89,10 +93,10 @@ async def index_products(cache: CacheService):
 
 
 @with_prisma_connection
-async def product_upload(cache: CacheService, user_id: str, contents: bytes, content_type: str, filename: str):
+async def product_upload(cache: CacheService, user_id: str):
     logger.info("Starting product upload processing...")
     try:
-        num_rows = await process_products(file_content=contents, content_type=content_type, user_id=user_id)
+        num_rows = await process_products(user_id=user_id)
 
         await index_products(cache=cache)
         logger.info("Re-indexing completed.")
@@ -109,7 +113,7 @@ async def product_upload(cache: CacheService, user_id: str, contents: bytes, con
         await log_activity(
             user_id=user_id,
             activity_type="PRODUCT_UPLOAD",
-            description=f"Uploaded products from file: {filename}",
+            description=f"Uploaded products from google sheet",
             is_success=True
         )
     except Exception as e:
@@ -117,7 +121,7 @@ async def product_upload(cache: CacheService, user_id: str, contents: bytes, con
         await log_activity(
             user_id=user_id,
             activity_type="PRODUCT_UPLOAD",
-            description=f"Failed to upload products from file: {filename}",
+            description=f"Failed to upload products from google sheet",
             is_success=False
         )
 
@@ -162,4 +166,13 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["average_rating"] = round(
         sum(ratings) / len(ratings), 2) if ratings else 0
 
+    if any(v["inventory"] > 0 for v in variants):
+        product_dict["status"] = "IN STOCK"
+    else:
+        product_dict["status"] = "OUT OF STOCK"
+
     return product_dict
+
+def to_product_card_view(product: Product) -> dict:
+    prepared = prepare_product_data_for_indexing(product)
+    return prepared

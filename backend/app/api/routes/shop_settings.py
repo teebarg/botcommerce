@@ -47,32 +47,6 @@ async def get_setting(request: Request, id: int) -> ShopSettings:
         raise HTTPException(status_code=404, detail="Setting not found")
     return setting
 
-# @router.post("/sync")
-# async def sync_setting(settings:  list[ShopSettingsCreate]) -> ShopSettings:
-#     """
-#     Create or update shop settings
-#     """
-#     try:
-#         values_sql = ', '.join(f"({s.id}, '{s.key}', '{s.value}', '{s.type}', '{s.category}', '{s.description}')" for s in settings)
-
-#         query = f'''
-#             INSERT INTO "shop_settings" (id, key, value, type, category, description)
-#             VALUES {values_sql}
-#             ON CONFLICT (id) DO UPDATE SET
-#             key = EXCLUDED.key,
-#             value = EXCLUDED.value,
-#             type = EXCLUDED.type,
-#             category = EXCLUDED.category,
-#             description = EXCLUDED.description;
-#         '''
-#         # await db.execute(query)
-#         res = await db.execute_raw(query)
-#         return res
-#         # return await db.shopsettings.create_many(data=[s.model_dump() for s in settings])
-#     except Exception as e:
-#         print(e)
-#         raise HTTPException(status_code=400, detail=str(e))
-
 @router.post("/")
 async def create_setting(cache: RedisClient, setting: ShopSettingsCreate) -> ShopSettings:
     """

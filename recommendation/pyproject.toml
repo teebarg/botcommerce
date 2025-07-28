@@ -10,6 +10,8 @@ dependencies = [
     "redis==6.2.0",
     "numpy",
     "scikit-learn",
+    "asyncpg==0.30.0",
+    "meilisearch==0.36.0",
 ]
 
 [tool.uv]

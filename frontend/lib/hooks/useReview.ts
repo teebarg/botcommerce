@@ -4,16 +4,16 @@ import { toast } from "sonner";
 import { api } from "@/apis/client";
 import { Message, PaginatedReview, Review } from "@/schemas";
 
-export const useReviews = (params: { skip?: number; limit?: number }) => {
+export const useReviews = (params: { product_id?: number; skip?: number; limit?: number; sort?: string }) => {
     return useQuery({
-        queryKey: ["reviews"],
+        queryKey: ["reviews", JSON.stringify(params)],
         queryFn: async () => await api.get<PaginatedReview>("/reviews/", { params: { ...params } }),
     });
 };
 
 export const useReview = (id: number) => {
     return useQuery({
-        queryKey: ["review", id],
+        queryKey: ["reviews", id],
         queryFn: async () => await api.get<Review>(`/reviews/${id}`),
     });
 };
@@ -22,7 +22,8 @@ export const useCreateReview = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: { product_id: number; rating: number; comment: string }) => await api.post<Review>(`/reviews/`, input),
+        mutationFn: async (input: { product_id: number; author: string; title: string; rating: number; comment: string }) =>
+            await api.post<Review>(`/reviews/`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
             toast.success("Review successfully created");

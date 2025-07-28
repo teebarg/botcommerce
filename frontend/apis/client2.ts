@@ -23,7 +23,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}) {
 
     const headers = {
         "Content-Type": "application/json",
-        ...(token && { "X-Auth": token }),
+        "X-Auth": token ?? "token",
         cartId: cartId ?? "",
         ...options.headers,
     };

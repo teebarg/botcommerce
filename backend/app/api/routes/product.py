@@ -1,12 +1,10 @@
-from typing import Annotated, Any
+from typing import Any
 
 from fastapi import (
     APIRouter,
     Depends,
-    File,
     HTTPException,
     Query,
-    UploadFile,
     BackgroundTasks,
     Request
 )
@@ -26,7 +24,6 @@ from app.models.product import (
     VariantWithStatus,
     Product, Products, SearchProducts, SearchProduct
 )
-from app.services.export import validate_file
 from app.services.meilisearch import (
     clear_index,
     delete_document,
@@ -154,7 +151,7 @@ async def index(
 
 
 @router.get("/search")
-@cache_response("products", expire=600)
+@cache_response("products", expire=3600)
 async def search(
     request: Request,
     search: str = "",
@@ -199,6 +196,15 @@ async def search(
                 **search_params
             }
         )
+        suggestions_raw = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
+            search,
+            {
+                "limit": 4,
+                "attributesToRetrieve": ["name"],
+                "matchingStrategy": "all"
+            }
+        )
+        suggestions = list({hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -216,6 +222,7 @@ async def search(
         "limit": limit,
         "total_count": total_count,
         "total_pages": total_pages,
+        "suggestions": suggestions,
     }
 
 
@@ -292,14 +299,6 @@ async def read(slug: str, request: Request):
         raise HTTPException(status_code=404, detail="Product not found")
 
     return product
-
-
-@router.get("/{id}/reviews")
-async def read_reviews(id: int):
-    """
-    Get a specific product reviews with Redis caching.
-    """
-    return await db.review.find_many(where={"product_id": id})
 
 
 @router.put("/{id}")
@@ -392,7 +391,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
                 "old_price": variant.old_price,
                 "inventory": variant.inventory,
                 "product_id": id,
-                "status": variant.status,
+                "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                 "size": variant.size,
                 "color": variant.color
             }
@@ -426,9 +425,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     if variant.inventory is not None:
         update_data["inventory"] = variant.inventory
-
-    if variant.status:
-        update_data["status"] = variant.status
+        update_data["status"] = variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK"
 
     if variant.size is not None:
         update_data["size"] = variant.size
@@ -590,32 +587,13 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
 
     return {"success": True}
 
-
 @router.post("/upload-products/")
 async def upload_products(
     user: CurrentUser,
-    file: Annotated[UploadFile, File()],
     background_tasks: BackgroundTasks,
     redis: RedisClient,
 ):
-    logger.info(f"File uploaded: {file.filename}")
-    content_type = file.content_type
-
-    if content_type not in [
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "text/csv",
-    ]:
-        logger.error(f"Invalid file type: {content_type}")
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid file type. Only CSV/Excel files are supported.",
-        )
-
-    await validate_file(file=file)
-
-    contents = await file.read()
-    background_tasks.add_task(product_upload, cache=redis, user_id=user.id,
-                              contents=contents, content_type=content_type, filename=file.filename)
+    background_tasks.add_task(product_upload, cache=redis, user_id=user.id)
     return {"message": "Upload started"}
 
 
@@ -629,7 +607,7 @@ async def configure_filterable_attributes(
     try:
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         index.update_filterable_attributes(
-            ["brand", "categories", "collections", "name", "variants", "average_rating",
+            ["id", "brand", "categories", "collections", "name", "variants", "average_rating",
                 "review_count", "max_variant_price", "min_variant_price"]
         )
         index.update_sortable_attributes(

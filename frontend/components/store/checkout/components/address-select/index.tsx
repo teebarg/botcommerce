@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 

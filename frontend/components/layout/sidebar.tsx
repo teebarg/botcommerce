@@ -223,6 +223,10 @@ const SideBar: React.FC = () => {
                     href: "/admin/collections",
                 },
                 {
+                    label: "Shared Collections",
+                    href: "/admin/shared",
+                },
+                {
                     label: "Reviews",
                     href: "/admin/reviews",
                 },

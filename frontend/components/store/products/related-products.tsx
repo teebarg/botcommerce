@@ -1,30 +1,17 @@
 "use client";
 
 import { Product, ProductSearch } from "@/schemas/product";
-import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/generic/server-error";
-import { useProductSearch } from "@/lib/hooks/useProduct";
+import { useSimilarProducts } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
+import ProductCard from "@/components/store/products/product-shared-card";
 
 type RelatedProductsProps = {
     product: Product;
 };
 
 export default function RelatedProducts({ product }: RelatedProductsProps) {
-    const setQueryParams = (): any => {
-        const params: any = {};
-
-        if (product.collections) {
-            params.collections = product.collections.map((p: any) => p.slug).join(",");
-        }
-
-        params.limit = 4;
-
-        return params;
-    };
-
-    const queryParams = setQueryParams();
-    const { data, isLoading, error } = useProductSearch(queryParams);
+    const { data, isLoading, error } = useSimilarProducts(product.id, 5);
 
     if (isLoading) {
         return <ComponentLoader className="min-h-[400px]" />;
@@ -34,7 +21,7 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
         return <ServerError error={error.message} scenario="related-products" stack={error.stack} />;
     }
 
-    const productPreviews = data?.products?.filter((item: ProductSearch) => item.id !== product.id);
+    const productPreviews = data?.similar_products?.filter((item: ProductSearch) => item.id !== product.id);
 
     if (!productPreviews?.length) {
         return null;
@@ -48,7 +35,7 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
             </div>
 
             <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-6 gap-y-8">
-                {productPreviews.slice(0, 4).map((product: ProductSearch, idx: number) => (
+                {productPreviews?.slice(0, 4).map((product: ProductSearch, idx: number) => (
                     <li key={idx}>
                         <ProductCard product={product} />
                     </li>

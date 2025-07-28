@@ -17,10 +17,9 @@ type OrderConfirmationProps = {
     onContinueShopping?: () => void;
 };
 
-// Failed Payment Component
 const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onContinueShopping }) => {
     return (
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-2xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4 animate-pulse">

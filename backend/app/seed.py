@@ -1,4 +1,8 @@
 import asyncio
+from prisma import Prisma
+from datetime import datetime
+
+import asyncio
 from datetime import datetime, timedelta
 import random
 from faker import Faker
@@ -6,194 +10,263 @@ import bcrypt
 from prisma import Prisma
 import logging
 
-# from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
-
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-max_tries = 60 * 5  # 5 minutes
-wait_seconds = 1
-
 fake = Faker()
 
+db = Prisma()
 
-# @retry(
-#     stop=stop_after_attempt(max_tries),
-#     wait=wait_fixed(wait_seconds),
-#     before=before_log(logger, logging.INFO),
-#     after=after_log(logger, logging.WARN),
-# )
-async def seed_database():
-    db = Prisma()
+
+async def seed():
     await db.connect()
 
-    print("Database seeding started...")
+    # await db.productvariant.delete_many()
+    await db.bankdetails.delete_many()
 
-    # Clear existing data
-    await db.user.delete_many()
-    await db.address.delete_many()
-    await db.brand.delete_many()
-    await db.category.delete_many()
-    await db.collection.delete_many()
-    await db.product.delete_many()
-    await db.productvariant.delete_many()
-    await db.coupon.delete_many()
-    await db.deliveryoption.delete_many()
-
-    # Seed Users
-    async def create_user(email, role="CUSTOMER"):
+    # 1. Users
+    logger.info("Seeding users...")
+    async def upsert_user(email, role="CUSTOMER"):
         hashed_password = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        return await db.user.create({
-            "first_name": fake.first_name(),
-            "last_name": fake.last_name(),
-            "email": email,
-            "hashed_password": hashed_password,
-            "role": role,
-            "status": "ACTIVE",
-            "created_at": datetime.now(),
-        })
+        return await db.user.upsert(
+            where={"email": email},
+             data={
+                "create": {
+                    "first_name": fake.first_name(),
+                    "last_name": fake.last_name(),
+                    "email": email,
+                    "hashed_password": hashed_password,
+                    "role": role,
+                    "status": "ACTIVE",
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
+            }
+        )
 
-    admin = await create_user("admin@email.com", "ADMIN")
+
+    admin = await upsert_user("teebarg01@gmail.com", "ADMIN")
     customers = [
-        await create_user(f"customer{i}@email.com")
+        await upsert_user(f"customer{i}@email.com")
         for i in range(1, 6)
     ]
 
-    # Seed Brands
+    # 2. Brands
+    logger.info("Seeding brands...")
     brands = [
-        await db.brand.create({
-            "name": name,
-            "slug": name.lower().replace(" ", "-"),
-            "is_active": True,
-            "created_at": datetime.now()
-        })
-        for name in ["Nike", "Adidas", "Puma", "Under Armour", "Reebok"]
+        {"name": "Nike", "slug": "nike"},
+        {"name": "Adidas", "slug": "adidas"},
     ]
-
-    # Seed Categories
-    categories_data = [
-        {"name": "Clothing", "slug": "clothing"},
-        {"name": "Shoes", "slug": "shoes"},
-        {"name": "Accessories", "slug": "accessories"}
-    ]
-    categories = [
-        await db.category.create({
-            **data,
-            "is_active": True,
-            "created_at": datetime.now()
-        })
-        for data in categories_data
-    ]
-
-    # Seed Collections
-    collections = [
-        await db.collection.create({
-            "name": name,
-            "slug": name.lower().replace(" ", "-"),
-            "is_active": True,
-            "created_at": datetime.now()
-        })
-        for name in ["Summer Sale", "Winter Collection", "Best Sellers"]
-    ]
-
-    # Seed Products
-    products_data = [
-        {"name": "Running Shoes", "sku": "RUN123"},
-        {"name": "Sports T-Shirt", "sku": "TSH123"},
-        {"name": "Gym Bag", "sku": "GMB123"},
-        {"name": "Training Shorts", "sku": "TS123"},
-    ]
-
-    products = []
-    for product_data in products_data:
-        product = await db.product.create({
-            "name": product_data["name"],
-            "sku": product_data["sku"],
-            "slug": product_data["name"].lower().replace(" ", "-"),
-            "description": fake.text(max_nb_chars=200),
-            "image": f"http://localhost/images/{product_data['name'].lower().replace(' ', '-')}.jpg",
-            "status": "IN_STOCK",
-            "ratings": round(random.uniform(3.0, 5.0), 1),
-            "created_at": datetime.now()
-        })
-
-        # Connect relations
-        await db.product.update(
-            where={"id": product.id},
+    for brand in brands:
+        await db.brand.upsert(
+            where={"slug": brand["slug"]},
             data={
-                "brand": {"connect": {"id": random.choice(brands).id}},
-                "categories": {"connect": [{"id": random.choice(categories).id}]},
-                "collections": {"connect": [{"id": random.choice(collections).id}]}
+                "create": {
+                    "name": brand["name"],
+                    "slug": brand["slug"],
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
             }
         )
-        products.append(product)
 
-    # Seed Product Variants
-    for product in products:
-        for size in ["S", "M", "L"]:
-            await db.productvariant.create({
-                "product": {"connect": {"id": product.id}},
-                "sku": f"{product.slug.upper()}-{size}-{random.randint(1000, 9999)}",
-                "status": "IN_STOCK",
-                "price": random.randint(100, 1000),
-                "old_price": random.randint(100, 1000),
-                "size": size,
-                "color": "Black",
-                "inventory": random.randint(10, 100),
-                "created_at": datetime.now()
-            })
+    # 3. Categories
+    logger.info("Seeding categories...")
+    categories = [
+        {"name": "Shoes", "slug": "shoes"},
+        {"name": "Clothing", "slug": "clothing"},
+    ]
+    for cat in categories:
+        await db.category.upsert(
+            where={"slug": cat["slug"]},
+            data={
+                "create": {
+                    "name": cat["name"],
+                    "slug": cat["slug"],
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
+            }
+        )
 
-    # Seed Addresses
-    for customer in customers:
-        await db.address.create({
-            "user": {"connect": {"id": customer.id}},
-            "first_name": customer.first_name,
-            "last_name": customer.last_name,
-            "address_1": fake.street_address(),
-            "city": fake.city(),
-            "state": fake.state(),
-            "postal_code": fake.postcode(),
-            "phone": fake.phone_number(),
-            "is_billing": True,
-            "created_at": datetime.now()
-        })
+    # 4. Collections
+    logger.info("Seeding collections...")
+    collections = [
+        {"name": "Summer Sale", "slug": "summer-sale"},
+        {"name": "New Arrivals", "slug": "new-arrivals"},
+    ]
+    for col in collections:
+        await db.collection.upsert(
+            where={"slug": col["slug"]},
+            data={
+                "create": {
+                    "name": col["name"],
+                    "slug": col["slug"],
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
+            }
+        )
 
-    # Seed Coupons
-    coupons = [
-        await db.coupon.create({
-            "code": code,
-            "discount_type": dtype,
-            "discount_value": value,
-            "expiration_date": datetime.now() + timedelta(days=30),
-            "created_at": datetime.now()
-        })
-        for code, dtype, value in [
+    # 5. Products
+    logger.info("Seeding products...")
+    sample_products = [
+        {
+            "name": "Air Max",
+            "sku": "RUN1233",
+            "slug": "air-max",
+            "description": "Comfy running shoes",
+            "brand_slug": "nike",
+            "category_slugs": ["shoes"],
+            "collection_slugs": ["summer-sale"],
+            "variants": [
+                {"sku": "airmax-42", "price": 12000, "old_price": 15000, "size": "42", "color": "Black", "inventory": 10},
+                {"sku": "airmax-43", "price": 12000, "old_price": 15000, "size": "43", "color": "White", "inventory": 8},
+            ]
+        },
+        {
+            "name": "Sports T-Shirt",
+            "sku": "TSH1234",
+            "slug": "sports-t-shirt",
+            "description": "Comfortable sports t-shirt",
+            "brand_slug": "adidas",
+            "category_slugs": ["clothing"],
+            "collection_slugs": ["new-arrivals"],
+            "variants": [
+                {"sku": "tshirt-m", "price": 5000, "old_price": 6000, "size": "M", "color": "Red", "inventory": 15},
+                {"sku": "tshirt-l", "price": 5000, "old_price": 6000, "size": "L", "color": "Blue", "inventory": 12},
+            ]
+        },
+    ]
+
+    for p in sample_products:
+        brand = await db.brand.find_unique(where={"slug": p["brand_slug"]})
+        categories = await db.category.find_many(where={"slug": {"in": p["category_slugs"]}})
+        collections = await db.collection.find_many(where={"slug": {"in": p["collection_slugs"]}})
+
+        await db.product.upsert(
+            where={"slug": p["slug"]},
+            data={
+                "create": {
+                    "name": p["name"],
+                    "sku": p["sku"],
+                    "slug": p["slug"],
+                    "description": p["description"],
+                    "brand": {"connect": {"id": brand.id}},
+                    "categories": {"connect": [{"id": c.id} for c in categories]},
+                    "collections": {"connect": [{"id": c.id} for c in collections]},
+                    "variants": {"create": p["variants"]},
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
+            }
+        )
+
+    # 6. Coupons
+    logger.info("Seeding coupons...")
+    for code, dtype, value in [
             ("SAVE10", "PERCENTAGE", 10.0),
             ("FLAT5", "FIXED_AMOUNT", 5.0),
             ("WELCOME15", "PERCENTAGE", 15.0)
-        ]
-    ]
+        ]:
+        await db.coupon.upsert(
+            where={"code": code},
+            data={
+                "create": {
+                    "code": code,
+                    "discount_type": dtype,
+                    "discount_value": value,
+                    "expiration_date": datetime.now() + timedelta(days=30),
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
+            }
+        )
 
-    # Seed Delivery Options
+    # 7. Settings
+    logger.info("Seeding settings...")
+    for setting in [
+        {"key": "shop_name", "value": "The Bot Store", "type": "SHOP_DETAIL"},
+        {"key": "address", "value": "123 Main St", "type": "SHOP_DETAIL"},
+        {"key": "contact_phone", "value": "+234123456789", "type": "SHOP_DETAIL"},
+        {"key": "contact_email", "value": "shop@example.com", "type": "SHOP_DETAIL"},
+        {"key": "shop_description", "value": "Shop Description", "type": "SHOP_DETAIL"},
+        {"key": "tax_rate", "value": "7.5", "type": "SHOP_DETAIL"},
+        {"key": "shop_email", "value": "shop@example.com", "type": "SHOP_DETAIL"},
+        {"key": "whatsapp", "value": "+234123456789", "type": "SHOP_DETAIL"},
+        {"key": "facebook", "value": "https://facebook.com", "type": "SHOP_DETAIL"},
+        {"key": "instagram", "value": "https://instagram.com", "type": "SHOP_DETAIL"},
+        {"key": "tiktok", "value": "https://tiktok.com", "type": "SHOP_DETAIL"},
+        {"key": "twitter", "value": "https://twitter.com", "type": "SHOP_DETAIL"},
+    ]:
+        await db.shopsettings.upsert(
+            where={"key": setting["key"]},
+            data={
+                "create": {"key": setting["key"], "value": setting["value"], "type": setting["type"]},
+                "update": {}
+            }
+        )
+
+
+    # 9. Delivery Options
+    logger.info("Seeding delivery options...")
     delivery_options = [
-        await db.deliveryoption.create({
-            "name": name,
-            "description": description,
-            "method": method,
-            "amount": amount,
-            "is_active": True,
-            "created_at": datetime.now()
-        })
-        for name, description, method, amount in [
-            ("Standard Delivery", "Delivery within 3-5 business days.", "STANDARD", 2500),
-            ("Express Delivery", "Delivery within 2 business days.", "EXPRESS", 5000),
-            ("Pickup", "Pickup at store", "PICKUP", 0)
-        ]
+        {"name": "Standard Shipping", "description": "Standard shipping option", "amount": 1000, "method": "STANDARD"},
+        {"name": "Express Shipping", "description": "Express shipping option", "amount": 2000, "method": "EXPRESS"},
+        {"name": "Pickup", "description": "Pickup at store", "amount": 0, "method": "PICKUP"},
     ]
+    for option in delivery_options:
+        await db.deliveryoption.upsert(
+            where={"name": option["name"]},
+            data={
+                "create": {
+                    "name": option["name"],
+                    "description": option["description"],
+                    "method": option["method"],
+                    "amount": option["amount"],
+                    "is_active": True
+                },
+                "update": {}
+            }
+        )
 
-    print("Database seeding completed successfully!")
+    # 10. Bank Details
+    logger.info("Seeding bank details...")
+    await db.bankdetails.create({
+        "bank_name": "Citi Bank",
+        "account_name": "John Doe",
+        "account_number": "0123456789",
+    })
+
+    # Shared collections
+    logger.info("Seeding shared collections...")
+    shared_collections = [
+        {"title": "Summer Sale", "slug": "summer-sale", "description": "Summer Sale", "is_active": True},
+        {"title": "New Arrivals", "slug": "new-arrivals", "description": "New Arrivals", "is_active": True},
+    ]
+    products = await db.product.find_many()
+    for col in shared_collections:
+        await db.sharedcollection.upsert(
+            where={"slug": col["slug"]},
+            data={
+                "create": {
+                    "title": col["title"],
+                    "slug": col["slug"],
+                    "description": col["description"],
+                    "is_active": col["is_active"],
+                    "products": {"connect": [{"id": p.id} for p in products]},
+                    "created_at": datetime.utcnow(),
+                },
+                "update": {}
+            }
+        )
+
+    
     await db.disconnect()
 
+
 if __name__ == "__main__":
-    asyncio.run(seed_database())
+    asyncio.run(seed())

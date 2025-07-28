@@ -14,7 +14,7 @@ from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from prisma.errors import PrismaError
 from pydantic import BaseModel
 from prisma.models import Cart
-from app.services.order import create_order_from_cart, send_notification, create_invoice
+from app.services.order import create_order_from_cart, send_notification, create_invoice, decrement_variant_inventory_for_order
 
 router = APIRouter()
 
@@ -100,6 +100,7 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
             order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
             background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
             background_tasks.add_task(create_invoice, cache=cache, order_id=order.id)
+            background_tasks.add_task(decrement_variant_inventory_for_order, order.id, notification, cache)
 
             await db.payment.create(
                 data={
@@ -118,7 +119,7 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
 
 
 @router.post("/")
-async def create(*, create: PaymentCreate, user: CurrentUser):
+async def create(*, create: PaymentCreate, user: CurrentUser, notification: Notification, cache: RedisClient):
     """
     Create new payment.
     """
@@ -130,6 +131,7 @@ async def create(*, create: PaymentCreate, user: CurrentUser):
             where={"id": create.order_id},
             data={"status": OrderStatus.PAID}
         )
+        await decrement_variant_inventory_for_order(create.order_id, notification, cache)
 
         payment = await db.payment.create(
             data={

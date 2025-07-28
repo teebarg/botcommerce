@@ -3,10 +3,11 @@ from fastapi import (
     Depends,
     Query,
     Request,
+    Body,
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role
-from app.core.deps import get_current_superuser
+from app.core.deps import get_current_superuser, RedisClient
 from typing import Literal, Optional
 from datetime import timedelta, datetime
 from app.services.redis import cache_response
@@ -111,3 +112,24 @@ async def stats_trends(
         "summary": summary,
         "trends": trends
     }
+
+@router.post("/cache/bust", dependencies=[Depends(get_current_superuser)])
+async def bust_redis_cache(
+    cache: RedisClient,
+    pattern: str = Body(..., embed=True, description="Key or pattern to delete from Redis cache"),
+):
+    """Bust Redis cache by key."""
+    try:
+        result = await cache.delete_pattern(pattern)
+        return {"success": result, "pattern": pattern}
+    except Exception as e:
+        return {"success": False, "error": str(e), "pattern": pattern}
+
+@router.post("/cache/clear", dependencies=[Depends(get_current_superuser)])
+async def clear_redis_cache(cache: RedisClient):
+    """Clear the entire Redis database (admin only)."""
+    try:
+        result = await cache.clear()
+        return {"success": result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}

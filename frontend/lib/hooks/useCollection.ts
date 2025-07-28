@@ -4,8 +4,9 @@ import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
 
 import { api } from "@/apis/client";
-import { Collection, PaginatedCollection } from "@/schemas";
+import { Collection, PaginatedCollection, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
+import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
 
 interface SearchParams {
     search?: string;
@@ -71,6 +72,61 @@ export const useDeleteCollection = () => {
         },
         onError: (error) => {
             toast.error("Failed to delete collection" + error);
+        },
+    });
+};
+
+export const useSharedCollections = (query?: string) => {
+    return useQuery({
+        queryKey: ["shared-collections", query],
+        queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { query: query || "" } }),
+    });
+};
+
+export const useCreateSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async (data: SharedFormValues) =>
+            await api.post<Shared>("/shared/", {
+                ...data,
+            }),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Shared collection created successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to create shared collection" + error);
+        },
+    });
+};
+
+export const useUpdateSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async ({ id, data }: { id: number; data: SharedFormValues }) => await api.patch<Shared>(`/shared/${id}`, data),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Shared collection updated successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to update shared collection: " + error);
+        },
+    });
+};
+
+export const useDeleteSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async (id: number) => await api.delete<Shared>(`/shared/${id}`),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Shared collection deleted successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to delete shared collection" + error);
         },
     });
 };

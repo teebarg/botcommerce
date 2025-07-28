@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tansta
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, Review, PaginatedReview, ProductVariant, PaginatedProduct } from "@/schemas";
+import { Product, PaginatedProductSearch, Message, ProductVariant, PaginatedProduct } from "@/schemas";
 
 type SearchParams = {
     search?: string;
@@ -59,6 +59,38 @@ export const useProduct = (slug: string) => {
     });
 };
 
+export const useProductRecommendations = (userId?: number, num: number = 16) => {
+    return useQuery({
+        queryKey: ["products", "recommendations", userId],
+        queryFn: async () => {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/recommendations/${userId}?num=${num}`);
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            return response.json();
+        },
+        enabled: !!userId,
+    });
+};
+
+export const useSimilarProducts = (productId: number, num: number = 16) => {
+    return useQuery({
+        queryKey: ["products", "similar", productId],
+        queryFn: async () => {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num=${num}`);
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            return response.json();
+        },
+        enabled: !!productId,
+    });
+};
+
 export const useCreateProduct = () => {
     const queryClient = useQueryClient();
 
@@ -104,20 +136,6 @@ export const useDeleteProduct = () => {
     });
 };
 
-export const useProductReviews = (productId: number) => {
-    return useQuery({
-        queryKey: ["product-reviews", productId],
-        queryFn: async () => await api.get<Review[]>(`/product/${productId}/reviews`),
-    });
-};
-
-export const useProductReviewsSearch = (product_id: number, page = 1, limit = 20) => {
-    return useQuery({
-        queryKey: ["product-reviews", "search", product_id, page, limit],
-        queryFn: async () => await api.get<PaginatedReview>(`/reviews/`, { params: { product_id, page, limit } }),
-    });
-};
-
 export const useCreateVariant = () => {
     const queryClient = useQueryClient();
 
@@ -128,7 +146,6 @@ export const useCreateVariant = () => {
             price: number;
             old_price?: number;
             inventory: number;
-            status: "IN_STOCK" | "OUT_OF_STOCK";
             size?: string;
             color?: string;
         }) => {

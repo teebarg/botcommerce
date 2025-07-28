@@ -3,10 +3,9 @@
 import React from "react";
 import { useInView } from "react-intersection-observer";
 
-import ProductCard from "./product-card";
-
 import { ProductSearch } from "@/schemas/product";
 import { cn } from "@/lib/utils";
+import ProductCard from "@/components/store/products/product-shared-card";
 
 interface ProductCardProps {
     products: ProductSearch[];

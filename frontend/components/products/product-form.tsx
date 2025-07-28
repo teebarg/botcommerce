@@ -86,41 +86,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
     }
 
     return (
-        <div className="overflow-y-auto flex flex-col pb-4">
+        <div className="overflow-y-auto flex flex-col pb-4 mt-4">
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="w-full h-full">
-                        {/* Product Form */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
                                 name="name"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="md:col-span-2">
                                         <FormLabel>Product Name</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Enter product name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="status"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Status</FormLabel>
-                                        <FormControl>
-                                            <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select status" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="IN_STOCK">In Stock</SelectItem>
-                                                    <SelectItem value="OUT_OF_STOCK">Out of Stock</SelectItem>
-                                                </SelectContent>
-                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

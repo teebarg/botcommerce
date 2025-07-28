@@ -112,3 +112,13 @@ export const useUserDeleteWishlist = () => {
         },
     });
 };
+
+export const useInvalidateMe = () => {
+    const queryClient = useQueryClient();
+
+    const invalidate = () => {
+        queryClient.removeQueries({ queryKey: ["me"] });
+    };
+
+    return invalidate;
+};

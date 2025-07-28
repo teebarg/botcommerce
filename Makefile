@@ -73,17 +73,16 @@ prep-docker: ## Prepare postges database
 serve-backend: ## Serve the backend in terminal
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
 
+serve-recommendation:
+	@cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4 --port 8001
 
-serve-recommendation: ## Serve the recommendation in terminal
-	@cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4
-
-serve-frontend: ## Serve the frontend in terminal
+serve-frontend:
 	@cd frontend; npm run dev-https-t
 
-sync: ## Sync dependencies
+sync:
 	@cd backend; uv sync && source .venv/bin/activate
 
-dev: ## Serve the project in terminal
+dev:
 	@echo "$(YELLOW)Running development in terminal...$(RESET)"
 	make -j 2 serve-backend serve-frontend
 

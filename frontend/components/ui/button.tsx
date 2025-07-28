@@ -8,7 +8,7 @@ import { Loader } from "nui-react-icons";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
+    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
     {
         variants: {
             variant: {
@@ -24,6 +24,7 @@ const buttonVariants = cva(
                 emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
                 bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500 hover:text-white",
                 borderedSecondary: "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary-500 hover:text-white",
+                indigo: "bg-indigo-700 text-white hover:bg-indigo-800",
             },
             size: {
                 default: "h-10 px-4 py-2 min-w-32",
