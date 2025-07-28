@@ -1,8 +1,11 @@
 "use client";
 
 import React from "react";
+import { Plus } from "lucide-react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { SharedCard } from "./shared-card";
+import { SharedForm } from "./shared-form";
 
 import { useSharedCollections } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
@@ -10,9 +13,6 @@ import ComponentLoader from "@/components/component-loader";
 import { Shared } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { SharedForm } from "./shared-form";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
 export default function SharedCollectionList() {
     const state = useOverlayTriggerState({});

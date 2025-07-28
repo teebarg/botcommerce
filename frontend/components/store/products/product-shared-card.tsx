@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check, Eye, ShoppingBag, Star } from "lucide-react";
+import { Check, Eye } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Image from "next/image";
 
@@ -25,7 +25,7 @@ interface ProductCardProps {
 
 const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-content2", size = "md", isSelected = false }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
-    const { priceInfo, outOfStock, selectedVariant } = useProductVariant(product);
+    const { priceInfo, outOfStock } = useProductVariant(product);
     const dialogState = useOverlayTriggerState({});
 
     const { data } = useUserWishlist();
@@ -72,7 +72,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
 
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white md1:transform md1:translate-y-full md1:group-hover:translate-y-0 transition-transform duration-300">
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between">
+                        {/* <div className="flex items-center justify-between">
                             <div>
                                 <h3 className="font-bold text-lg mb-1 line-clamp-1">{product.name}</h3>
                                 <PriceLabel oldPriceClassName="text-gray-300" priceClassName="text-gray-100" priceInfo={priceInfo} />
@@ -82,13 +82,17 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, variant = "bg-co
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                                 <span className="font-medium">{product.average_rating}</span>
                             </div>
-                        </div>
+                        </div> */}
 
-                        <div className="flex gap-3">
-                            <Button className="flex-1 bg-white text-black hover:bg-white/90 font-semibold rounded-xl" disabled={outOfStock} size="lg">
+                        <div className="flex gap-2 items-center justify-between">
+                            {/* <Button className="flex-1 bg-white text-black hover:bg-white/90 font-semibold rounded-xl" disabled={outOfStock} size="lg">
                                 <ShoppingBag className="h-4 w-4 mr-2" />
                                 Add to Cart
-                            </Button>
+                            </Button> */}
+                            <div>
+                                <h3 className="font-bold text-base line-clamp-1">{product.name}</h3>
+                                <PriceLabel oldPriceClassName="text-gray-300" priceClassName="text-gray-100" priceInfo={priceInfo} />
+                            </div>
 
                             <Overlay
                                 open={dialogState.isOpen}

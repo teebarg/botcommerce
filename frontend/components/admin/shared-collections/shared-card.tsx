@@ -20,7 +20,7 @@ export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => 
                     </CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span className="font-mono bg-muted px-2 py-1 rounded text-xs">/{collection.slug}</span>
-                        <Badge className="text-xs" variant={collection.is_active ? "default" : "secondary"}>
+                        <Badge className="text-xs" variant={collection.is_active ? "default" : "destructive"}>
                             {collection.is_active ? "Active" : "Inactive"}
                         </Badge>
                     </div>
