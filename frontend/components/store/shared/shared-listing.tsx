@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import { useAuth } from "@/providers/auth-provider";
 
-export const SocialShare = ({ title, view_count }: { title: string, view_count: number }) => {
+export const SocialShare = ({ title, view_count }: { title: string; view_count: number }) => {
     const [copied, setCopied] = useState<boolean>(false);
     const [url, setUrl] = useState<string>("");
     const { user } = useAuth();

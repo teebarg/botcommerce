@@ -2,15 +2,17 @@ from fastapi import APIRouter, HTTPException, Query, Request, Depends
 from typing import List
 from app.models.collection import (
     SharedCollections, SharedCollectionCreate, SharedCollectionUpdate,
-    SharedCollection, SharedCollectionView, SharedCollectionViewCreate
+    SharedCollection, SharedCollectionView
 )
 from app.prisma_client import prisma as db
+from app.services.shared_collection import SharedCollectionService
 from math import ceil
 from app.services.redis import cache_response
 from app.services.product import to_product_card_view
 from app.core.utils import slugify
-from app.core.deps import RedisClient, get_current_superuser, UserDep, CurrentUser
+from app.core.deps import RedisClient, get_current_superuser, UserDep
 from app.models.generic import Message
+from app.core.logging import logger
 
 router = APIRouter()
 
@@ -18,10 +20,6 @@ router = APIRouter()
 @router.get("/views", response_model=List[SharedCollectionView])
 async def list_shared_collection_views():
     return await db.sharedcollectionview.find_many()
-
-@router.post("/views", response_model=SharedCollectionView)
-async def create_shared_collection_view(data: SharedCollectionViewCreate):
-    return await db.sharedcollectionview.create(data=data.model_dump())
 
 
 @router.delete("/views/{id}")
@@ -91,29 +89,71 @@ async def list_shared_collections(
     }
 
 @router.get("/{slug}")
-# @cache_response(key_prefix="sharedcollection", key=lambda request, slug, user: slug)
+@cache_response(key_prefix="sharedcollection", key=lambda request, slug, user: slug)
 async def get_shared_collection(request: Request, slug: str, user: UserDep) -> SharedCollection:
-    print("🚀 ~ user:", user)
     where={"slug": slug}
     if user is None or user.role != "ADMIN":
         where["is_active"] = True
-    obj = await db.sharedcollection.find_unique(where=where, include={
-        "products": {
-            "include": {
-                "images": True,
-                "variants": True,
-                "collections": True,
-                "brand": True,
-                "categories": True,
-                "reviews": True
-            }
-        }
-    })
+    obj = await db.sharedcollection.find_unique(where=where,
+        include={
+            "products": {
+                "include": {
+                    "images": True,
+                    "variants": True,
+                    "collections": True,
+                    "brand": True,
+                    "categories": True,
+                    "reviews": True
+                }
+            },
+        },
+    )
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
     transformed_products = [to_product_card_view(p) for p in obj.products]
     obj.products = transformed_products
     return obj
+
+
+@router.post("/{slug}/track-visit")
+async def track_shared_collection_visit(
+    request: Request, 
+    slug: str, 
+    user: UserDep,
+    cache: RedisClient
+) -> dict:
+    """
+    Track a unique visit to a shared collection.
+    """
+    where = {"slug": slug}
+    if user is None or user.role != "ADMIN":
+        where["is_active"] = True
+    
+    obj = await db.sharedcollection.find_unique(where=where)
+    if not obj:
+        raise HTTPException(status_code=404, detail="SharedCollection not found")
+    
+    client_ip = request.client.host
+    if "x-forwarded-for" in request.headers:
+        client_ip = request.headers["x-forwarded-for"].split(",")[0].strip()
+    
+    user_agent = request.headers.get("user-agent")
+    
+    is_new_visit = await SharedCollectionService.track_visit(
+        shared_collection_id=obj.id,
+        user_id=user.id if user else None,
+        ip_address=client_ip,
+        user_agent=user_agent
+    )
+
+    if is_new_visit:
+        await cache.invalidate_list_cache("shared")
+        await cache.bust_tag(f"sharedcollection:{slug}")
+    
+    return {
+        "success": True,
+        "is_new_visit": is_new_visit,
+    }
 
 @router.post("/")
 async def create_shared_collection(data: SharedCollectionCreate, cache: RedisClient):

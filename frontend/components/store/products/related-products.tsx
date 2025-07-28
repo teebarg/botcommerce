@@ -1,10 +1,10 @@
 "use client";
 
 import { Product, ProductSearch } from "@/schemas/product";
-import ProductCard from "@/components/store/products/product-card";
 import ServerError from "@/components/generic/server-error";
 import { useSimilarProducts } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
+import ProductCard from "@/components/store/products/product-shared-card";
 
 type RelatedProductsProps = {
     product: Product;

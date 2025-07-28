@@ -134,6 +134,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         handleWhatsAppPurchase,
         priceInfo,
         loading,
-        outOfStock: product.variants?.length == 0 || product.variants?.every((v) => v.status === "OUT_OF_STOCK"),
+        outOfStock: product.variants?.length == 0 || product.variants?.every((v) => v.inventory <= 0),
     };
 };

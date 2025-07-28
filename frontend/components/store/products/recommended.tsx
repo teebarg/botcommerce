@@ -1,6 +1,6 @@
 "use client";
 
-import ProductCard from "@/components/store/products/product-card";
+import ProductCard from "@/components/store/products/product-shared-card";
 import { ProductSearch } from "@/schemas/product";
 import { useProductRecommendations } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";

@@ -3,9 +3,10 @@ import { Metadata } from "next";
 
 import { api } from "@/apis/client";
 import { Shared } from "@/schemas";
-import { tryCatch, tryCatchApi } from "@/lib/try-catch";
+import { tryCatchApi } from "@/lib/try-catch";
 import { SocialShare } from "@/components/store/shared/shared-listing";
 import ProductCardBase from "@/components/store/products/product-shared-card";
+import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 
 type Params = Promise<{ slug: string }>;
 
@@ -43,12 +44,13 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function SharedPage({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: shared, error } = await tryCatch<Shared>(api.get(`/shared/${slug}`));
+    const { data: shared, error } = await tryCatchApi<Shared>(api.get(`/shared/${slug}`));
 
     if (!shared || error) return notFound();
 
     return (
         <div className="container mx-auto p-4">
+            <SharedCollectionVisitTracker slug={slug} />
             <h1 className="text-3xl font-bold mb-2">{shared.title}</h1>
             {shared.description && <p className="mb-4 text-lg text-default-600">{shared.description}</p>}
             <SocialShare title={shared.title} view_count={shared.view_count} />

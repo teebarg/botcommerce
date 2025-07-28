@@ -15,7 +15,7 @@ import { ProductSearch, Shared } from "@/schemas";
 import { useUpdateSharedCollection, useCreateSharedCollection } from "@/lib/hooks/useCollection";
 import { currency } from "@/lib/utils";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
-import ProductSearchClient from "@/components/store/products/product-search-client";
+import ProductSearchClient from "@/components/store/products/product-search";
 
 interface SharedFormProps {
     current?: Shared;
@@ -103,7 +103,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
         <div className="px-4 pt-4 overflow-y-auto">
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                    <ProductSearchClient enableRecommendations={true} onProductSelect={addProduct} />
+                    <ProductSearchClient onProductSelect={addProduct} />
                     <Card className="border-0 bg-card/50 backdrop-blur-sm">
                         <CardContent className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-6">

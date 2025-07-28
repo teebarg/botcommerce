@@ -24,7 +24,6 @@ from app.models.product import (
     VariantWithStatus,
     Product, Products, SearchProducts, SearchProduct
 )
-from app.services.export import validate_file
 from app.services.meilisearch import (
     clear_index,
     delete_document,

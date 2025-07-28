@@ -162,7 +162,7 @@ const ProductOverview: React.FC<{
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="flex items-center space-x-2">
-                            <span className="text-3xl font-bold text-default-900">{currency(selectedVariant?.price)}</span>
+                            <span className="text-3xl font-bold text-default-900">{currency(selectedVariant?.price || priceInfo.minPrice)}</span>
                             {selectedVariant?.old_price > selectedVariant?.price && (
                                 <span className="text-lg text-default-500 line-through">{currency(selectedVariant?.old_price)}</span>
                             )}

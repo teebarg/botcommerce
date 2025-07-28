@@ -10,7 +10,7 @@ export const useMe = () => {
         queryFn: async () => {
             return await api.get<User>("/users/me");
         },
-        enabled: typeof window !== "undefined",
+        enabled: typeof window !== "undefined", 
     });
 };
 
@@ -112,3 +112,14 @@ export const useUserDeleteWishlist = () => {
         },
     });
 };
+
+export const useInvalidateMe = () => {
+    const queryClient = useQueryClient();
+
+    const invalidate = () => {
+        queryClient.removeQueries({ queryKey: ["me"] });
+    };
+
+    return invalidate;
+};
+

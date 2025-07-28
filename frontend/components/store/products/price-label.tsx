@@ -49,7 +49,7 @@ export const PriceLabel: React.FC<PriceLabelProps> = ({
     }
 
     return (
-        <div className={cn("text-xl font-bold", className, priceClassName)}>
+        <div className={cn("text-lg font-bold", className, priceClassName)}>
             {hasDiscount ? (
                 <span>
                     From {currency(minPrice)} to {currency(maxPrice)}

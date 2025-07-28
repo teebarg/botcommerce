@@ -34,6 +34,8 @@ const AdminMobileMenu: React.FC = () => {
         { id: "customers", label: "Customers", icon: <Users size={20} />, href: "/admin/users" },
         { id: "categories", label: "Categories", icon: <Image size={20} />, href: "/admin/categories" },
         { id: "reviews", label: "Reviews", icon: <Notebook size={20} />, href: "/admin/reviews" },
+        { id: "collections", label: "Collections", icon: <Image size={20} />, href: "/admin/collections" },
+        { id: "shared", label: "Shared Collections", icon: <Image size={20} />, href: "/admin/shared" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
         { id: "carousel", label: "Carousel", icon: <Image size={20} />, href: "/admin/carousel" },
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
@@ -44,7 +46,7 @@ const AdminMobileMenu: React.FC = () => {
 
     return (
         <div className="h-full bg-content1 rounded-[inherit] overflow-hidden overflow-y-auto">
-            <div className="p-4 bg-primary text-white">
+            <div className="p-4 bg-primary text-white sticky top-0 z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>
                         <AvatarImage src={user?.image} />

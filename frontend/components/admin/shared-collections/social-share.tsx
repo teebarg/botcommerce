@@ -12,7 +12,8 @@ interface SocialShareProps {
 }
 
 export function SocialShare({ collection, className }: SocialShareProps) {
-    const shareUrl = encodeURIComponent(window.location.href);
+    const targetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/shared/${collection.slug}`;
+    const shareUrl = encodeURIComponent(targetUrl);
     const shareText = encodeURIComponent(`Check out this amazing ${collection.title}`);
     const shareTitle = encodeURIComponent(collection.title);
 
@@ -39,7 +40,7 @@ export function SocialShare({ collection, className }: SocialShareProps) {
 
     const copyToClipboard = async () => {
         try {
-            await navigator.clipboard.writeText(window.location.href);
+            await navigator.clipboard.writeText(targetUrl);
             toast.success("Link copied to clipboard!");
         } catch (err) {
             toast.error("Failed to copy link");
@@ -56,7 +57,7 @@ export function SocialShare({ collection, className }: SocialShareProps) {
                 await navigator.share({
                     title: collection.title,
                     text: `Check out this amazing ${collection.title}`,
-                    url: window.location.href,
+                    url: targetUrl,
                 });
             } catch (err) {
                 console.log("Error sharing:", err);

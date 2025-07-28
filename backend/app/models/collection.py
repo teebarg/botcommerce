@@ -69,6 +69,3 @@ class SharedCollectionViewBase(BM):
 class SharedCollectionView(SharedCollectionViewBase):
     id: int
     timestamp: datetime
-
-class SharedCollectionViewCreate(SharedCollectionViewBase):
-    pass
