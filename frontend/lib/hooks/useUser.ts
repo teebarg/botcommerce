@@ -10,7 +10,7 @@ export const useMe = () => {
         queryFn: async () => {
             return await api.get<User>("/users/me");
         },
-        enabled: typeof window !== "undefined", 
+        enabled: typeof window !== "undefined",
     });
 };
 
@@ -122,4 +122,3 @@ export const useInvalidateMe = () => {
 
     return invalidate;
 };
-

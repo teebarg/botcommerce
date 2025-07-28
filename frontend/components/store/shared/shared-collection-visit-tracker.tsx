@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { api } from "@/apis/client";
 import { tryCatch } from "@/lib/try-catch";
 
@@ -22,6 +23,7 @@ export function SharedCollectionVisitTracker({ slug }: SharedCollectionVisitTrac
             if (hasTracked) return;
 
             const { data } = await tryCatch<VisitTrackerResponse>(api.post(`/shared/${slug}/track-visit`));
+
             if (data) {
                 setHasTracked(true);
             }

@@ -176,4 +176,3 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
 def to_product_card_view(product: Product) -> dict:
     prepared = prepare_product_data_for_indexing(product)
     return prepared
-    # return ProductCardOut(**prepared)

@@ -10,15 +10,6 @@ import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ComponentLoader from "@/components/component-loader";
 
-// interface UserInteraction {
-//     id: number;
-//     user_id: number;
-//     product_id: number;
-//     type: string;
-//     timestamp: string;
-//     metadata?: Record<string, any>;
-// }
-
 const eventTypes = ["VIEW", "CART_ADD", "PURCHASE", "WISHLIST_ADD", "WISHLIST_REMOVE"];
 
 function toCSV(rows: any[], columns: string[]): string {

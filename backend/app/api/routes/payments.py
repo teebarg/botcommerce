@@ -131,7 +131,6 @@ async def create(*, create: PaymentCreate, user: CurrentUser, notification: Noti
             where={"id": create.order_id},
             data={"status": OrderStatus.PAID}
         )
-        # Decrement inventory and handle out-of-stock notifications
         await decrement_variant_inventory_for_order(create.order_id, notification, cache)
 
         payment = await db.payment.create(
