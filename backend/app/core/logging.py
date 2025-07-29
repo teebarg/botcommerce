@@ -15,7 +15,7 @@ logging.Logger.publish = success
 
 class SlackLogHandler(logging.Handler):
     def __init__(self, channel="alerts"):
-        super().__init__(SUCCESS_LEVEL_NUM)
+        super().__init__()
         self.channel = channel
 
     def emit(self, record):
@@ -46,13 +46,13 @@ LOGGING_CONFIG = {
         },
         "slack_alerts": {
             "level": SUCCESS_LEVEL_NUM,
-            "class": SlackLogHandler,
+            "()": SlackLogHandler,
             "formatter": "standard",
             "channel": "alerts",
         },
     },
     "loggers": {
-        "": {  # root logger
+        "": {
             "handlers": ["console"],
             "level": "WARNING",
             "propagate": False,
