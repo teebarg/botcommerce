@@ -310,3 +310,18 @@ export const useReorderImages = () => {
         },
     });
 };
+
+export const useBustCache = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async () => await api.post<Message>("/cache/bust", { pattern: "products" }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            toast.success("Cache busted successfully");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to bust cache");
+        },
+    });
+};

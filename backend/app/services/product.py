@@ -1,13 +1,15 @@
 from app.prisma_client import prisma as db
 from app.core.config import settings
-from app.core.logging import logger
-from app.services.meilisearch import add_documents_to_index, update_document
+from app.core.logging import get_logger
+from app.services.meilisearch import add_documents_to_index, update_document, clear_index
 from app.models.product import Product
 from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
 from app.services.websocket import manager
 from app.services.activity import log_activity
 from app.services.redis import CacheService
+
+logger = get_logger(__name__)
 
 @with_prisma_connection
 async def reindex_product(cache: CacheService, product_id: int):
@@ -73,6 +75,7 @@ async def index_products(cache: CacheService):
             product_dict = prepare_product_data_for_indexing(product)
             documents.append(product_dict)
 
+        clear_index(settings.MEILI_PRODUCTS_INDEX)
         add_documents_to_index(
             index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 

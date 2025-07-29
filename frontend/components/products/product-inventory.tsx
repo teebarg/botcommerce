@@ -10,13 +10,14 @@ import ProductUpload from "./product-upload";
 import Overlay from "@/components/overlay";
 import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
-import { useExportProducts, useReIndexProducts } from "@/lib/hooks/useProduct";
+import { useBustCache, useExportProducts, useReIndexProducts } from "@/lib/hooks/useProduct";
 
 export function ProductInventory() {
     const addState = useOverlayTriggerState({});
 
     const exportProducts = useExportProducts();
     const reIndexProducts = useReIndexProducts();
+    const bustCache = useBustCache();
 
     const handleExport = () => {
         exportProducts.mutate();
@@ -24,6 +25,10 @@ export function ProductInventory() {
 
     const handleReIndex = () => {
         reIndexProducts.mutate();
+    };
+
+    const handleBustCache = () => {
+        bustCache.mutate();
     };
 
     return (
@@ -52,10 +57,13 @@ export function ProductInventory() {
                     className="min-w-32"
                     disabled={reIndexProducts.isPending}
                     isLoading={reIndexProducts.isPending}
-                    variant="outline"
+                    variant="emerald"
                     onClick={handleReIndex}
                 >
                     Re-index
+                </Button>
+                <Button disabled={bustCache.isPending} isLoading={bustCache.isPending} variant="warning" onClick={handleBustCache}>
+                    Bust Cache
                 </Button>
             </div>
             <ProductDetails />
