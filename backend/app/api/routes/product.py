@@ -15,7 +15,7 @@ from app.core.deps import (
     supabase,
     RedisClient
 )
-from app.core.logging import logger
+from app.core.logging import get_logger
 from app.core.utils import slugify, url_to_list, generate_sku
 from app.models.generic import Message, ImageUpload
 from app.models.product import (
@@ -39,6 +39,8 @@ from app.core.config import settings
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export
 from app.services.redis import cache_response
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 

@@ -86,7 +86,8 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
 
-    SLACK_WEBHOOK_URL: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    SLACK_ALERTS: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    SLACK_ORDERS: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
     # OAuth Settings
     GOOGLE_CLIENT_ID: str = ""

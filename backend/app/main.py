@@ -1,8 +1,6 @@
-import logging
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 from app.api.main import api_router
@@ -16,20 +14,23 @@ from app.prisma_client import prisma as db
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
-from datetime import datetime
 from app.services.websocket import manager
 import redis.asyncio as redis
 
+from app.core.logging import get_logger
+from fastapi.responses import JSONResponse
+logger = get_logger(__name__)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀connecting to dbs......:")
+    logger.debug("🚀connecting to dbs......:")
     await db.connect()
-    logger.info("✅ ~ connected to prisma......:")
+    logger.debug("✅ ~ connected to prisma......:")
     try:
         redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
         await redis_client.ping()
         app.state.redis = redis_client
-        logger.info("✅ ~ connected to redis......:")
+        logger.debug("✅ ~ connected to redis......:")
     except Exception as e:
         logger.error(f"❌ ~ failed to connect to redis......: {e}")
 
@@ -39,7 +40,6 @@ async def lifespan(app: FastAPI):
         await redis_client.close()
     except Exception as e:
         logger.error(f"❌ ~ failed to close redis connection......: {e}")
-
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
@@ -56,9 +56,13 @@ app = FastAPI(title="Botcommerce",
 #         print(f"Client host: {client_host}")  # Log the client IP
 #         return await call_next(request)
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("api")
-
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.critical(f"Unhandled error: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal Server Error"},
+    )
 
 class TimingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -139,19 +143,14 @@ async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
 
 @app.post("/api/log-error")
 @limit("5/minute")
-async def log_error(error: dict, notification: deps.Notification, request: Request):
-    slack_message = {
-        "text": f"🚨 *Error Logged* 🚨\n"
+async def log_error(error: dict, request: Request):
+    slack_message = (
         f"*Message:* {error.get('message', 'N/A')}\n"
         f"*Source:* {error.get('source', 'N/A')}\n"
-        f"*Timestamp:* {datetime.now().isoformat()}\n"
         f"*Stack:* {error.get('stack', 'N/A')}\n"
         f"*Scenario:* {error.get('scenario', 'N/A')}\n"
-    }
-    notification.send_notification(
-        channel_name="slack",
-        slack_message=slack_message
     )
+    logger.critical(slack_message)
 
 
 @app.get("/sitemap.xml", response_class=Response)
@@ -239,3 +238,9 @@ async def generate_sitemap(cache: deps.RedisClient):
 @app.on_event("startup")
 async def start_websocket_manager():
     await manager.start()
+
+@app.post("/api/notify-order")
+async def notify_order(order_id: int):
+    formatted_text = f"New order received: {order_id}\nsecond line"
+    logger.publish(formatted_text, extra={"channel": "orders"})
+    return {"message": f"Order notification sent for order {order_id}"}

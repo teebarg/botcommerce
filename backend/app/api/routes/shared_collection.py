@@ -117,8 +117,8 @@ async def get_shared_collection(request: Request, slug: str, user: UserDep) -> S
 
 @router.post("/{slug}/track-visit")
 async def track_shared_collection_visit(
-    request: Request, 
-    slug: str, 
+    request: Request,
+    slug: str,
     user: UserDep,
     cache: RedisClient
 ) -> dict:
@@ -128,17 +128,17 @@ async def track_shared_collection_visit(
     where = {"slug": slug}
     if user is None or user.role != "ADMIN":
         where["is_active"] = True
-    
+
     obj = await db.sharedcollection.find_unique(where=where)
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
-    
+
     client_ip = request.client.host
     if "x-forwarded-for" in request.headers:
         client_ip = request.headers["x-forwarded-for"].split(",")[0].strip()
-    
+
     user_agent = request.headers.get("user-agent")
-    
+
     is_new_visit = await SharedCollectionService.track_visit(
         shared_collection_id=obj.id,
         user_id=user.id if user else None,
@@ -149,7 +149,7 @@ async def track_shared_collection_visit(
     if is_new_visit:
         await cache.invalidate_list_cache("shared")
         await cache.bust_tag(f"sharedcollection:{slug}")
-    
+
     return {
         "success": True,
         "is_new_visit": is_new_visit,
@@ -169,15 +169,16 @@ async def create_shared_collection(data: SharedCollectionCreate, cache: RedisCli
 @router.patch("/{id}")
 async def update_shared_collection(id: int, data: SharedCollectionUpdate, cache: RedisClient):
     obj = await db.sharedcollection.find_unique(where={"id": id})
-    update_data = data.model_dump(exclude_unset=True)
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
+
+    update_data = data.model_dump(exclude_unset=True)
     if data.products is not None:
         product_connect = [{"id": id} for id in data.products]
         update_data["products"] = {"set": product_connect}
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
     await cache.invalidate_list_cache("shared")
-    await cache.bust_tag(f"sharedcollection:{res.slug}")
+    await cache.bust_tag(f"sharedcollection:{obj.slug}")
     return res
 
 @router.delete("/{id}")
