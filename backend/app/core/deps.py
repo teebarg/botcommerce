@@ -106,7 +106,7 @@ def get_notification_service() -> NotificationService:
     notification_service.register_channel("email", email_channel)
 
     # Configure slack channel
-    slack_channel = SlackChannel(webhook_url=settings.SLACK_WEBHOOK_URL)
+    slack_channel = SlackChannel(webhook_url=settings.SLACK_ALERTS)
     notification_service.register_channel("slack", slack_channel)
 
     return notification_service

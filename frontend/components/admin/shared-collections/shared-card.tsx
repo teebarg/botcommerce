@@ -1,11 +1,10 @@
-import { Eye, Calendar, Package, Edit } from "lucide-react";
+import { Eye, Calendar, Package } from "lucide-react";
 import Image from "next/image";
 
 import { SocialShare } from "./social-share";
 import { SharedActions } from "./shared-actions";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Shared } from "@/schemas";
 import { formatDate } from "@/lib/utils";
@@ -82,17 +81,6 @@ export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => 
                 </div>
 
                 <SharedActions item={collection} />
-
-                <div className="flex gap-2 pt-2">
-                    <Button className="flex-1" variant="outline">
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                    </Button>
-                    <Button className="flex-1" variant="default">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
-                    </Button>
-                </div>
             </div>
         </CardContent>
     </Card>
