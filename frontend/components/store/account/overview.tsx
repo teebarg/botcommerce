@@ -81,11 +81,11 @@ const OverviewTemplate: React.FC = () => {
     }
 
     return (
-        <div data-testid="overview-page-wrapper">
+        <div className="px-2 md:px-0" data-testid="overview-page-wrapper">
             <div>
                 <PromotionalBanner
                     btnClass="text-purple-600"
-                    outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 md:mx-auto max-w-8xl"
                     subtitle="Get up to 50% OFF on select products."
                     title="Big Sale on Top Brands!"
                 />

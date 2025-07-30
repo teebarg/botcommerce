@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
+import { useStore } from "@/app/store/use-store";
 
 interface OrderDetailsProps {
     order: Order;
@@ -58,6 +59,8 @@ const statusConfig: Record<Order["status"], { label: string; color: string; desc
 };
 
 const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
+    const { shopSettings } = useStore();
+
     return (
         <div className="space-y-6 px-4 md:px-8 py-8 overflow-auto">
             <div className="flex items-center gap-4">
@@ -172,22 +175,30 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <MapPin className="h-5 w-5" />
-                                Shipping Address
+                                {order.shipping_method === "PICKUP" ? "Pickup Point" : "Shipping Address"}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-sm space-y-1">
-                                <p className="font-medium text-default-900">
-                                    {order.shipping_address.first_name} {order.shipping_address.last_name}
-                                </p>
-                                <p className="text-default-700">{order.shipping_address.address_1}</p>
-                                <p className="text-default-700">
-                                    {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postal_code}
-                                </p>
-                                <p className="text-default-700">{order.shipping_address.phone}</p>
-                            </div>
+                            {order.shipping_method === "PICKUP" ? (
+                                <div className="text-sm space-y-1">
+                                    <p className="font-medium text-default-900">{shopSettings?.address}</p>
+                                    <p className="text-default-700">Open Mon-Sat: 9am - 6pm</p>
+                                </div>
+                            ) : (
+                                <div className="text-sm space-y-1">
+                                    <p className="font-medium text-default-900">
+                                        {order.shipping_address.first_name} {order.shipping_address.last_name}
+                                    </p>
+                                    <p className="text-default-700">{order.shipping_address.address_1}</p>
+                                    <p className="text-default-700">
+                                        {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postal_code}
+                                    </p>
+                                    <p className="text-default-700">{order.shipping_address.phone}</p>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
+
                     <div className="space-y-3">
                         <Button className="w-full" variant="outline">
                             Contact Support

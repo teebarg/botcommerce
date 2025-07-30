@@ -1,5 +1,6 @@
 "use client";
 
+import ClientOnly from "@/components/generic/client-only";
 import Addresses from "@/components/store/checkout/components/addresses";
 import Payment from "@/components/store/checkout/components/payment";
 import Review from "@/components/store/checkout/components/review";
@@ -12,14 +13,14 @@ type CheckoutFormProps = {
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart }) => {
     return (
-        <div>
+        <ClientOnly>
             <div className="w-full grid grid-cols-1 gap-y-4">
                 <Addresses cart={cart} />
                 <Shipping cart={cart} />
                 <Payment cart={cart} />
                 <Review cart={cart} />
             </div>
-        </div>
+        </ClientOnly>
     );
 };
 

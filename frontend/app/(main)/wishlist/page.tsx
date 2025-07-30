@@ -13,7 +13,7 @@ export default function Wishlist() {
 
     if (isLoading) {
         return (
-            <div className="max-w-7xl mx-auto mt-2 mb-4">
+            <div className="max-w-7xl mx-auto mt-2 mb-4 w-full">
                 <ComponentLoader className="h-[55vh]" />
             </div>
         );
@@ -26,7 +26,7 @@ export default function Wishlist() {
     const wishlists = data ? data.wishlists : [];
 
     return (
-        <div className="max-w-7xl mx-auto w-full mt-2 mb-4 py-8">
+        <div className="max-w-7xl mx-auto w-full mt-2 mb-4 py-8 px-2 md:px-0">
             <PromotionalBanner
                 btnClass="text-purple-600"
                 outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"

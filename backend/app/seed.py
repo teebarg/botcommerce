@@ -38,7 +38,7 @@ async def seed():
                     "hashed_password": hashed_password,
                     "role": role,
                     "status": "ACTIVE",
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.now(datetime.timezone.utc),
                 },
                 "update": {}
             }
@@ -65,7 +65,7 @@ async def seed():
                     "name": brand["name"],
                     "slug": brand["slug"],
                     "is_active": True,
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.now(datetime.timezone.utc),
                 },
                 "update": {}
             }
@@ -85,7 +85,7 @@ async def seed():
                     "name": cat["name"],
                     "slug": cat["slug"],
                     "is_active": True,
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.now(datetime.timezone.utc),
                 },
                 "update": {}
             }
@@ -105,7 +105,7 @@ async def seed():
                     "name": col["name"],
                     "slug": col["slug"],
                     "is_active": True,
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.now(datetime.timezone.utc),
                 },
                 "update": {}
             }
@@ -159,7 +159,7 @@ async def seed():
                     "categories": {"connect": [{"id": c.id} for c in categories]},
                     "collections": {"connect": [{"id": c.id} for c in collections]},
                     "variants": {"create": p["variants"]},
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.now(datetime.timezone.utc),
                 },
                 "update": {}
             }
@@ -180,7 +180,7 @@ async def seed():
                     "discount_type": dtype,
                     "discount_value": value,
                     "expiration_date": datetime.now() + timedelta(days=30),
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.now(datetime.timezone.utc),
                 },
                 "update": {}
             }
@@ -214,9 +214,9 @@ async def seed():
     # 9. Delivery Options
     logger.info("Seeding delivery options...")
     delivery_options = [
-        {"name": "Standard Shipping", "description": "Standard shipping option", "amount": 1000, "method": "STANDARD"},
-        {"name": "Express Shipping", "description": "Express shipping option", "amount": 2000, "method": "EXPRESS"},
-        {"name": "Pickup", "description": "Pickup at store", "amount": 0, "method": "PICKUP"},
+        {"name": "Standard Shipping", "description": "Your order will be delivered within 5-7 days", "amount": 3000, "method": "STANDARD"},
+        {"name": "Express Shipping", "description": "Your order will be delivered within 2-3 days", "amount": 5000, "method": "EXPRESS"},
+        {"name": "Pickup", "description": "Pickup at our store", "amount": 0, "method": "PICKUP"},
     ]
     for option in delivery_options:
         await db.deliveryoption.upsert(
@@ -258,13 +258,12 @@ async def seed():
                     "description": col["description"],
                     "is_active": col["is_active"],
                     "products": {"connect": [{"id": p.id} for p in products]},
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.now(datetime.timezone.utc),
                 },
                 "update": {}
             }
         )
 
-    
     await db.disconnect()
 
 

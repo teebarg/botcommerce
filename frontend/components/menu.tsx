@@ -3,6 +3,7 @@
 import React from "react";
 import { UserGroup, Collection, Checkout } from "nui-react-icons";
 import { Heart, Home, User as UserIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 };
 
 const Menu: React.FC = () => {
+    const pathname = usePathname();
     const { user } = useAuth();
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
@@ -66,7 +68,7 @@ const Menu: React.FC = () => {
                         </button>
                     </div>
                 ) : (
-                    <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href="/sign-in">
+                    <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href={`/sign-in?callbackUrl=${pathname}`}>
                         Log In <span aria-hidden="true">&rarr;</span>
                     </LocalizedClientLink>
                 )}

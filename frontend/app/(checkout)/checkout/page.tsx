@@ -7,7 +7,6 @@ import { BackButton } from "@/components/back";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import ServerError from "@/components/generic/server-error";
-import ClientOnly from "@/components/generic/client-only";
 import { useStore } from "@/app/store/use-store";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { CartComponent } from "@/components/store/cart/cart-component";
@@ -72,9 +71,7 @@ export default function Checkout() {
                             </ol>
                         </nav>
 
-                        <ClientOnly>
-                            <CheckoutForm cart={cart} />
-                        </ClientOnly>
+                        <CheckoutForm cart={cart} />
                     </div>
 
                     <div className="mb-24 md:mb-0 hidden md:block">

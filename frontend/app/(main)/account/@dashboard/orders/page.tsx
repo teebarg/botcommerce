@@ -13,7 +13,7 @@ export default function Orders() {
     }
 
     return (
-        <div className="w-full" data-testid="orders-page-wrapper">
+        <div className="w-full px-2" data-testid="orders-page-wrapper">
             <div className="mb-8">
                 <h1 className="text-2xl">Orders</h1>
                 <p className="text-sm text-default-700">

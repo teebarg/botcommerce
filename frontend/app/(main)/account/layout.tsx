@@ -81,7 +81,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
                     <div className="md:flex-1">{dashboard}</div>
                 </div>
                 <Separator className="my-4" />
-                <div className="flex flex-col sm:flex-row items-end justify-between py-4 gap-8">
+                <div className="flex flex-col sm:flex-row items-end justify-between py-4 px-2 md:px-0 gap-8">
                     <div>
                         <h3 className="text-lg font-medium">Got questions?</h3>
                         <span className="text-sm">You can find frequently asked questions and answers on our customer service page.</span>
@@ -92,7 +92,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
                         </LocalizedClientLink>
                     </div>
                 </div>
-                <div className="mt-8">
+                <div className="mt-8 px-2 md:px-0">
                     <p className="text:sm md:text-lg font-semibold">More to love</p>
                     <Separator className="my-2" />
                     <RecommendedProducts />

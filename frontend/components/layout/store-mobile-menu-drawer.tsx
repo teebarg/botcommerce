@@ -26,8 +26,8 @@ const StoreMenuComp: React.FC = () => {
                 </span>
             </DrawerTrigger>
             <DrawerContent>
-                <DrawerHeader>
-                    <DrawerTitle className="sr-only">Menu</DrawerTitle>
+                <DrawerHeader className="sr-only">
+                    <DrawerTitle>Menu</DrawerTitle>
                 </DrawerHeader>
                 <Menu />
             </DrawerContent>
