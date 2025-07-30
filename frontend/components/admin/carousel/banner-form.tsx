@@ -69,7 +69,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
     };
 
     return (
-        <div className="bg-card py-8 px-4">
+        <div className="bg-card py-8 px-4 h-full">
             <Form {...form}>
                 <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                     <FormField
@@ -79,7 +79,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Title</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} color="bg-content2" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -92,7 +92,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Subtitle</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} color="bg-content2" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -105,7 +105,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} />
+                                    <Textarea {...field} color="bg-content2" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -118,7 +118,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Button Text</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} color="bg-content2" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -131,7 +131,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Link</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} color="bg-content2" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -144,14 +144,14 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Order</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                                    <Input color="bg-content2" type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
                     <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={onClose}>
+                        <Button type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button disabled={formState.isSubmitting} isLoading={formState.isSubmitting} type="submit" variant="primary">

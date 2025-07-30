@@ -9,10 +9,11 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     endContent?: React.ReactNode;
     startContent?: React.ReactNode;
     wrapperClass?: string;
+    color?: "bg-background" | "bg-content1" | "bg-content2";
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, error, label, description, startContent, endContent, wrapperClass, ...props }, ref) => {
+    ({ className, type, error, label, description, startContent, endContent, wrapperClass, color = "bg-content1", ...props }, ref) => {
         const id = React.useId();
 
         return (
@@ -29,7 +30,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         className={cn(
                             "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground",
                             "flex h-10 w-full text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 px-1 bg-inherit",
-                            "rounded-md border border-divider bg-content1 px-2 py-2 shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring",
+                            "rounded-md border border-divider px-2 py-2 shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring",
+                            color,
                             startContent && "pl-12",
                             endContent && "pr-12",
                             className
