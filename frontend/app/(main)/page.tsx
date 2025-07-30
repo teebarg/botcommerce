@@ -7,12 +7,12 @@ import LocalizedClientLink from "@/components/ui/link";
 import { api } from "@/apis/client";
 import CategoriesSection from "@/components/store/landing/category-section";
 import { ProductSearch } from "@/schemas/product";
-import CarouselSection from "@/components/store/carousel";
 import { ContactSection } from "@/components/store/landing/contact-section";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
 import { tryCatch } from "@/lib/try-catch";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
 import ProductCard from "@/components/store/products/product-shared-card";
+import HeroSection from "@/components/hero-section";
 
 export const metadata: Metadata = {
     title: "Home",
@@ -26,7 +26,7 @@ export default async function Home() {
 
     return (
         <div>
-            <CarouselSection />
+            <HeroSection />
 
             <CategoriesSection />
 

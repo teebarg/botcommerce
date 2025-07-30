@@ -34,8 +34,8 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
+    --color-accent-foreground: hsl(var(--accent-foreground));
+    --color-accent: hsl(var(--accent));
     --color-muted-foreground: var(--muted-foreground);
     --color-muted: var(--muted);
     --color-secondary-foreground: var(--secondary-foreground);
@@ -67,6 +67,17 @@
     --radius-top-corners: "5px 5px 0 0";
     --radius-bottom-corners: "0 0 5px 5px";
 
+    --color-gold: hsl(var(--gold));
+    --color-gold-foreground: hsl(var(--gold-foreground));
+    --color-luxury: hsl(var(--luxury));
+    --color-luxury-foreground: hsl(var(--luxury-foreground));
+    --color-elegant: hsl(var(--elegant));
+    --color-elegant-foreground: hsl(var(--elegant-foreground));
+
+    --shadow-luxury: var(--shadow-luxury);
+    --shadow-gold: var(--shadow-gold);
+    --shadow-elegant: var(--shadow-elegant);
+
     --animate-blob: blob 15s infinite;
     --animate-blob-delayed: blob 15s infinite 2s;
     --animate-spinner-ease-spin: spinner-spin 0.8s ease infinite;
@@ -79,6 +90,9 @@
     --animate-bounce: bounce 1s infinite;
     --animate-shimmer: shimmer2 2s infinite;
     --animate-wave: wave 1.2s ease-in-out infinite;
+    --animate-float: float 6s ease-in-out infinite;
+    --animate-fade-in: fade-in 0.8s ease-out;
+    --animate-slide-up: slide-up 0.8s ease-out;
 
     @keyframes blob {
         0% {
@@ -160,6 +174,25 @@
             opacity: 1;
         }
     }
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+    @keyframes slide-up {
+        0% {
+            opacity: 0;
+            transform: translateY(40%);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0%);
+        }
+    }
 }
 
 .chatbot-message li a {
@@ -207,8 +240,11 @@
     --muted: #f1f5f9;
     --muted-foreground: #64748b;
 
-    --accent: #3b82f6;
-    --accent-foreground: #ffffff;
+    /* --accent: #3b82f6;
+    --accent-foreground: #ffffff; */
+
+    --accent: 43 74% 66%;
+    --accent-foreground: 20 14.3% 4.1%;
 
     --success: #10b981;
     --success-foreground: #ffffff;
@@ -229,6 +265,24 @@
     --border: #e2e8f0;
     --input: #ffffff;
     --radius: 0.5rem;
+
+    /* Fashion-specific design tokens */
+    --gold: 43 74% 66%;
+    --gold-foreground: 20 14.3% 4.1%;
+    --luxury: 15 25% 15%;
+    --luxury-foreground: 60 9.1% 97.8%;
+    --elegant: 210 11% 71%;
+    --elegant-foreground: 20 14.3% 4.1%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--luxury)), hsl(20 25% 25%));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--gold)), hsl(43 74% 76%));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(60 4.8% 95.9%));
+
+    /* Shadows */
+    --shadow-luxury: 0 25px 50px -12px hsl(var(--luxury) / 0.25);
+    --shadow-gold: 0 10px 30px -10px hsl(var(--gold) / 0.3);
+    --shadow-elegant: 0 4px 20px -4px hsl(20 14.3% 4.1% / 0.1);
 }
 
 .dark {
@@ -264,8 +318,11 @@
     --muted: #27272a;
     --muted-foreground: #a1a1aa;
 
-    --accent: #3b82f6;
-    --accent-foreground: #09090b;
+    /* --accent: #3b82f6;
+    --accent-foreground: #09090b; */
+
+    --accent: 43 74% 66%;
+    --accent-foreground: 20 14.3% 4.1%;
 
     --success: #10b981;
     --success-foreground: #09090b;
@@ -285,6 +342,24 @@
     --border: #27272a;
     --input: #18181b;
     --radius: 0.5rem;
+
+    /* Fashion-specific design tokens for dark mode */
+    --gold: 43 74% 66%;
+    --gold-foreground: 20 14.3% 4.1%;
+    --luxury: 60 9.1% 97.8%;
+    --luxury-foreground: 20 14.3% 4.1%;
+    --elegant: 210 11% 71%;
+    --elegant-foreground: 60 9.1% 97.8%;
+
+    /* Dark mode gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(12 6.5% 15.1%), hsl(20 14.3% 4.1%));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--gold)), hsl(43 74% 56%));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(12 6.5% 15.1%));
+
+    /* Dark mode shadows */
+    --shadow-luxury: 0 25px 50px -12px hsl(0 0% 0% / 0.5);
+    --shadow-gold: 0 10px 30px -10px hsl(var(--gold) / 0.4);
+    --shadow-elegant: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
 }
 
 @layer base {

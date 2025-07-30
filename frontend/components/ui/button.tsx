@@ -14,7 +14,7 @@ const buttonVariants = cva(
             variant: {
                 default: "bg-default text-default-foreground hover:bg-default/90",
                 destructive: "bg-danger text-danger-foreground hover:bg-danger/90",
-                outline: "border border-divider bg-background hover:bg-content1",
+                outline: "border border-input bg-background hover:bg-content1",
                 primary: "bg-primary text-primary-foreground hover:bg-primary/90",
                 secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 ghost: "hover:bg-accent hover:text-accent-foreground",
@@ -25,12 +25,18 @@ const buttonVariants = cva(
                 bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500 hover:text-white",
                 borderedSecondary: "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary-500 hover:text-white",
                 indigo: "bg-indigo-700 text-white hover:bg-indigo-800",
+                luxury: "bg-luxury text-luxury-foreground hover:bg-luxury/90 shadow-luxury transition-all duration-300 transform hover:scale-105",
+                gold: "bg-gradient-accent text-gold-foreground hover:shadow-gold transition-all duration-300 transform hover:scale-105 font-semibold",
+                hero: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant transition-all duration-500 transform hover:scale-110 hover:shadow-luxury border border-border/20",
+                elegant:
+                    "bg-transparent border-2 border-elegant text-elegant hover:bg-elegant hover:text-elegant-foreground transition-all duration-300",
             },
             size: {
                 default: "h-10 px-4 py-2 min-w-32",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
                 lg: "h-12 rounded-md px-8 text-base font-normal min-w-32",
+                xl: "h-14 rounded-lg px-12 text-base",
                 icon: "p-2",
                 iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent",
             },
