@@ -11,7 +11,6 @@ class AddressBase(BM):
     address_type: AddressType | None = Field(default=None, max_length=255)
     label: str | None = Field(default=None, max_length=255)
     city: str = Field(max_length=255)
-    postal_code: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)
     phone: str | None = Field(default=None, max_length=255)
     is_billing: bool = Field(default=False)
@@ -39,7 +38,6 @@ class AddressUpdate(AddressBase):
     address_type: AddressType | None = Field(default=None, max_length=255)
     label: str | None = Field(default=None, max_length=255)
     city: str | None = Field(default=None, max_length=255)
-    postal_code: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)
     phone: str | None = Field(default=None, max_length=255)
 
@@ -62,6 +60,5 @@ class BillingAddressCreate(BaseModel):
     address_type: AddressType | None = Field(default=None, max_length=255)
     label: str | None = Field(default=None, max_length=255)
     city: str = Field(max_length=255)
-    postal_code: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)
     phone: str | None = Field(default=None, max_length=255)

@@ -14,6 +14,7 @@ import CheckoutSkeleton from "@/components/store/checkout/checkout-skeleton";
 import CheckoutForm from "@/components/store/checkout/checkout-form";
 import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 import { useCart } from "@/providers/cart-provider";
+import CheckoutFlow from "@/components/store/checkout/components/checkout-flow";
 
 export default function Checkout() {
     const { shopSettings } = useStore();
@@ -70,6 +71,7 @@ export default function Checkout() {
                                 </li>
                             </ol>
                         </nav>
+                        <CheckoutFlow cart={cart} />
 
                         <CheckoutForm cart={cart} />
                     </div>

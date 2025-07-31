@@ -12,7 +12,6 @@ export const AddressSchema = z.object({
     address_1: z.string(),
     address_2: z.string(),
     city: z.string(),
-    postal_code: z.string(),
     state: z.string(),
     phone: z.string(),
     is_billing: z.boolean().optional(),

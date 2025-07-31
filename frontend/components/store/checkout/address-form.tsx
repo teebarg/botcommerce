@@ -19,7 +19,6 @@ const formSchema = z.object({
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
-    postal_code: z.string().min(1, "Postal code is required"),
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
     phone: z.string().min(11, "Phone is required"),
@@ -39,7 +38,6 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
             first_name: "",
             last_name: "",
             address_1: "",
-            postal_code: "",
             city: "",
             state: "",
             phone: "",
@@ -144,20 +142,6 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                     <FormLabel>Address</FormLabel>
                                     <FormControl>
                                         <Input autoComplete="address-line1" data-testid="shipping-address-input" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="postal_code"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Postal code</FormLabel>
-                                    <FormControl>
-                                        <Input autoComplete="postal-code" data-testid="shipping-postal-code-input" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
