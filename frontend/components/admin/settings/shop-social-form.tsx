@@ -14,19 +14,19 @@ interface ShopDetailsProps {
 const defaultShopDetails = [
     {
         key: "facebook",
-        label: "Facebook",
+        label: "Facebook (Ex. teebarg)",
     },
     {
         key: "instagram",
-        label: "Instagram",
+        label: "Instagram (Ex. teebarg)",
     },
     {
         key: "tiktok",
-        label: "Tiktok",
+        label: "Tiktok (Ex. teebarg)",
     },
     {
         key: "x",
-        label: "X (Twitter)",
+        label: "X (Twitter) (Ex. teebarg)",
     },
 ];
 

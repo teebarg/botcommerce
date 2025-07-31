@@ -60,7 +60,7 @@ const OrderCard = ({ order, actions }: OrderCardProps) => {
     const StatusIcon = config.icon;
 
     return (
-        <div className="bg-content1 border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-3">
+        <div className="bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden mb-3">
             <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-default-900">{order.order_number}</h3>

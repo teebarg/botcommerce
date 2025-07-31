@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal } from "lucide-react";
 
@@ -51,12 +50,12 @@ const CustomerView: React.FC = () => {
     };
 
     return (
-        <div className="px-2 md:px-10 py-8">
+        <div className="px-3 md:px-10 py-8">
             <div className="mb-4">
                 <h3 className="text-xl font-semibold">Customers view</h3>
                 <p className="text-sm text-default-500">Manage your customers.</p>
             </div>
-            <AnimatePresence>
+            <>
                 <div key="table" className="md:block hidden">
                     <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                     <Table>
@@ -113,44 +112,42 @@ const CustomerView: React.FC = () => {
                         </TableBody>
                     </Table>
                 </div>
-                <div key="mobile" className="md:hidden">
-                    <div className="pb-4">
-                        <div>
-                            <div className="relative mb-4">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Search className="text-default-500" size={18} />
-                                </div>
-                                <input
-                                    className="pl-10 pr-12 py-2 w-full border border-divider rounded-lg focus:outline-none"
-                                    placeholder="Search customers..."
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <button className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setFilterOpen(true)}>
-                                    <SlidersHorizontal className="text-default-500" size={18} />
-                                </button>
+                <div className="pb-4 md:hidden">
+                    <div>
+                        <div className="relative mb-4">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="text-default-500" size={18} />
                             </div>
-                            <div className="mt-4 bg-content1 p-2">
-                                {users?.map((user: User, idx: number) => (
-                                    <CustomerCard key={idx} actions={<CustomerActions user={user} />} user={user} />
-                                ))}
+                            <input
+                                className="pl-10 pr-12 py-2 w-full border border-divider rounded-lg focus:outline-none"
+                                placeholder="Search customers..."
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <button className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setFilterOpen(true)}>
+                                <SlidersHorizontal className="text-default-500" size={18} />
+                            </button>
+                        </div>
+                        <div className="mt-4 py-2">
+                            {users?.map((user: User, idx: number) => (
+                                <CustomerCard key={idx} actions={<CustomerActions user={user} />} user={user} />
+                            ))}
 
-                                {isLoading && <CardSkeleton showAvatar={false} />}
-                            </div>
-
-                            {users?.length === 0 && (
-                                <div className="text-center py-10">
-                                    <p className="text-default-500">No users found</p>
-                                </div>
-                            )}
+                            {isLoading && <CardSkeleton showAvatar={false} />}
                         </div>
 
-                        <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
+                        {users?.length === 0 && (
+                            <div className="text-center py-10">
+                                <p className="text-default-500">No users found</p>
+                            </div>
+                        )}
                     </div>
+
+                    <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                 </div>
                 {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
-            </AnimatePresence>
+            </>
         </div>
     );
 };

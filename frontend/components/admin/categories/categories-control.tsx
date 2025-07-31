@@ -58,7 +58,7 @@ const CategoryAction: React.FC<Props> = ({ category }) => {
                     <DialogHeader className="sr-only">
                         <DialogTitle>Delete Category</DialogTitle>
                     </DialogHeader>
-                    <Confirm onConfirm={onConfirmDelete} />
+                    <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} />
                 </DialogContent>
             </Dialog>
         </div>

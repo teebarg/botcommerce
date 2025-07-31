@@ -66,7 +66,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-background rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-content1 rounded-lg">
             <div>
                 <h3 className="font-medium text-sm">{bank.bank_name}</h3>
                 <p className="text-default-900 font-semibold">{bank.account_name}</p>
@@ -76,7 +76,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
                 aria-label="delete"
                 className="min-w-32"
                 isLoading={deleteMutation.isPending}
-                variant="destructive"
+                variant="emerald"
                 onClick={() => handleDeleteBankDetails(bank.id)}
             >
                 Delete
@@ -140,8 +140,8 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                         <BankDetailsForm onClose={addState.close} />
                     </Overlay>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 bg-content1 rounded-lg min-h-[200px] p-4">
-                    {bankDetails?.map((detail, idx: number) => {
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 rounded-lg">
+                    {bankDetails?.map((detail: BankDetails, idx: number) => {
                         return <BankDetailComponent key={idx} bank={detail} />;
                     })}
                     {bankDetails?.length === 0 && (

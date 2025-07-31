@@ -41,7 +41,7 @@ const StatComponent: React.FC = () => {
     const { summary } = data;
 
     return (
-        <div className="px-2 md:px-10 py-8">
+        <div className="px-4 md:px-10 py-8">
             <h2 className="text-lg font-medium mb-3">Store Overview</h2>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

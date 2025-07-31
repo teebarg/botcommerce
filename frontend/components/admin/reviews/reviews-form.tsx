@@ -57,7 +57,7 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
                             <FormItem>
                                 <FormLabel>Rating</FormLabel>
                                 <FormControl>
-                                    <Input max={5} min={1} type="number" {...field} />
+                                    <Input max={5} min={1} type="number" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

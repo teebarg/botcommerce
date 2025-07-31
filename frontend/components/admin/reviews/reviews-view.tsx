@@ -38,16 +38,14 @@ const ReviewView: React.FC = () => {
     const { reviews, ...pagination } = data;
 
     return (
-        <div className="px-2 md:px-12 py-8">
+        <div className="px-3 md:px-12 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold">Reviews</h1>
                     <p className="text-default-500 text-sm">Manage your product reviews</p>
                 </div>
-                <div className="flex w-full items-center gap-2 sm:w-auto">
-                    <div className="relative w-full sm:w-64">
-                        <Input className="w-full" placeholder="Search reviews..." startContent={<Search />} type="search" />
-                    </div>
+                <div className="flex w-full items-center gap-2 md:w-auto mb-4">
+                    <Input placeholder="Search reviews..." startContent={<Search />} type="search" wrapperClass="flex-1" />
                 </div>
             </div>
             <div className="md:block hidden">

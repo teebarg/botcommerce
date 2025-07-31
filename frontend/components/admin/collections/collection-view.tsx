@@ -24,7 +24,7 @@ const CollectionView: React.FC<Props> = ({ search }) => {
 
     if (isLoading) {
         return (
-            <div className="px-2 md:px-10 py-8">
+            <div className="px-3 md:px-10 py-8">
                 <ComponentLoader className="h-192" />
             </div>
         );
@@ -35,7 +35,7 @@ const CollectionView: React.FC<Props> = ({ search }) => {
     }
 
     return (
-        <div className="px-2 md:px-10 py-8">
+        <div className="px-3 md:px-10 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div>
                     <h1 className="text-2xl font-medium">Collections</h1>
@@ -99,8 +99,8 @@ const CollectionView: React.FC<Props> = ({ search }) => {
                     </div>
 
                     {collections?.length === 0 && (
-                        <div className="text-center py-8 bg-gray-50 rounded-lg">
-                            <p className="text-gray-500">No collections found</p>
+                        <div className="text-center py-8 bg-content1 rounded-lg">
+                            <p className="text-default-700">No collections found</p>
                         </div>
                     )}
                 </div>

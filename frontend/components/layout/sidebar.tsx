@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ChevronRight, CogSixTooth, DocumentText, Ecommerce, User, Users, Window } from "nui-react-icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Activity, Image, MessageSquare } from "lucide-react";
+import { Activity, MessageSquare } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
@@ -190,11 +190,11 @@ const SideBar: React.FC = () => {
                     href: "/admin/faqs",
                     icon: <DocumentText size={18} />,
                 },
-                {
-                    label: "Carousel",
-                    href: "/admin/carousel",
-                    icon: <Image size={18} />,
-                },
+                // {
+                //     label: "Carousel",
+                //     href: "/admin/carousel",
+                //     icon: <Image size={18} />,
+                // },
                 {
                     label: "Online",
                     href: "/admin/online",
