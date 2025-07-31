@@ -76,7 +76,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
                 aria-label="delete"
                 className="min-w-32"
                 isLoading={deleteMutation.isPending}
-                variant="emerald"
+                variant="destructive"
                 onClick={() => handleDeleteBankDetails(bank.id)}
             >
                 Delete

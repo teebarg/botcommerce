@@ -30,7 +30,7 @@ from app.services.redis import cache_response
 router = APIRouter()
 
 @router.get("/all")
-@cache_response(key_prefix="collections", expire=864000)
+@cache_response(key_prefix="collections")
 async def all_collections(request: Request, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
@@ -47,7 +47,7 @@ async def all_collections(request: Request, query: str = "") -> Optional[list[Co
 
 
 @router.get("/")
-@cache_response(key_prefix="collections", expire=864000)
+@cache_response(key_prefix="collections")
 async def index(
     request: Request,
     query: str = "",
@@ -100,7 +100,7 @@ async def create(*, create_data: CollectionCreate, cache: RedisClient) -> Collec
 
 
 @router.get("/{id}")
-@cache_response(key_prefix="collection", key=lambda request, id: id, expire=864000)
+@cache_response(key_prefix="collection", key=lambda request, id: id)
 async def read(request: Request, id: int) -> Collection:
     """
     Get a specific collection by id with Redis caching.
@@ -115,7 +115,7 @@ async def read(request: Request, id: int) -> Collection:
 
 
 @router.get("/slug/{slug}")
-@cache_response(key_prefix="collection", key=lambda request, slug: slug, expire=864000)
+@cache_response(key_prefix="collection", key=lambda request, slug: slug)
 async def get_by_slug(request: Request, slug: str) -> Collection:
     """
     Get a collection by its slug.
@@ -181,7 +181,7 @@ async def delete(id: int, cache: RedisClient) -> Message:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @router.get("/autocomplete/")
-@cache_response(key_prefix="collections", expire=864000)
+@cache_response(key_prefix="collections")
 async def autocomplete(search: str = "") -> Search:
     """
     Retrieve collections for autocomplete.

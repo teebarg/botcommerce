@@ -199,7 +199,6 @@ model Product {
   description        String?
   features           String[]
   image              String?            @db.VarChar(255)
-  status             ProductStatus      @default(IN_STOCK)
   variants           ProductVariant[]
   ratings            Float?             @default(0)
   categories         Category[]         @relation("ProductCategories")
@@ -567,8 +566,8 @@ model UserInteraction {
   timestamp  DateTime        @default(now())
   metadata   Json? // Additional context (time spent, etc.)
 
-  user    User    @relation(fields: [user_id], references: [id])
-  product Product @relation(fields: [product_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([user_id, timestamp])
   @@index([product_id, timestamp])
@@ -586,7 +585,7 @@ model UserPreference {
   confidence  Float    @default(0.5) // How confident we are in this preference
   lastUpdated DateTime @default(now()) @updatedAt
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([user_id, category, brand])
   @@map("user_preferences")
@@ -609,10 +608,10 @@ model SharedCollection {
 
 model SharedCollectionView {
   id                   Int              @id @default(autoincrement())
-  shared_collection    SharedCollection @relation(fields: [shared_collection_id], references: [id])
+  shared_collection    SharedCollection @relation(fields: [shared_collection_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   shared_collection_id Int
   user_id              Int?
-  user                 User?            @relation(fields: [user_id], references: [id])
+  user                 User?            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   ip_address           String?
   user_agent           String?
   timestamp            DateTime         @default(now())

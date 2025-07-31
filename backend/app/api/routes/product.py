@@ -32,7 +32,6 @@ from app.services.meilisearch import (
 )
 from app.prisma_client import prisma as db
 from math import ceil
-from prisma.enums import ProductStatus
 from pydantic import BaseModel
 from app.core.storage import upload
 from app.core.config import settings
@@ -52,7 +51,7 @@ class LandingProducts(BaseModel):
 
 
 @router.get("/landing-products")
-@cache_response("products", key="landing-products", expire=86400)
+@cache_response("products", key="landing-products")
 async def get_landing_products(request: Request) -> LandingProducts:
     """
     Retrieve multiple product categories in a single request.
@@ -104,7 +103,7 @@ async def export_products(
 
 
 @router.get("/")
-@cache_response("products", expire=86400)
+@cache_response("products")
 async def index(
     request: Request,
     query: str = "",
@@ -237,7 +236,6 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         "slug": slugified_name,
         "sku": generate_sku(product_name=product.name),
         "description": product.description,
-        "status": product.status or ProductStatus.IN_STOCK,
         "brand": {"connect": {"id": product.brand_id}},
     }
 
@@ -285,7 +283,7 @@ async def reindex_products(background_tasks: BackgroundTasks, redis: RedisClient
 
 
 @router.get("/{slug}")
-@cache_response("product", expire=86400, key=lambda request, slug, **kwargs: slug)
+@cache_response("product", key=lambda request, slug, **kwargs: slug)
 async def read(slug: str, request: Request):
     """
     Get a specific product by slug with Redis caching.
@@ -318,9 +316,6 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
 
     if product.sku is not None:
         update_data["sku"] = product.sku
-
-    if product.status is not None:
-        update_data["status"] = product.status
 
     if product.description is not None:
         update_data["description"] = product.description

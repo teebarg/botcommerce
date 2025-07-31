@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/")
-@cache_response(key_prefix="shop-settings", expire=864000)
+@cache_response(key_prefix="shop-settings", key="all")
 async def get_settings(request: Request) -> list[ShopSettings]:
     """
     Get shop settings with optional filtering
@@ -25,7 +25,7 @@ async def get_settings(request: Request) -> list[ShopSettings]:
 
 
 @router.get("/public")
-@cache_response(key_prefix="shop-settings", key="public", expire=864000)
+@cache_response(key_prefix="shop-settings", key="public")
 async def get_public_settings(request: Request) -> dict[str, str]:
     """
     Get all public settings
@@ -33,14 +33,14 @@ async def get_public_settings(request: Request) -> dict[str, str]:
     try:
         settings = await db.shopsettings.find_many()
 
-        return {setting.key: setting.value for setting in settings}
+        return { setting.key: setting.value for setting in settings }
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=e.detail)
 
 
 @router.get("/{id}")
-@cache_response(key_prefix="shop-settings", key=lambda request, id: id, expire=864000)
+@cache_response(key_prefix="shop-settings", key=lambda request, id: id)
 async def get_setting(request: Request, id: int) -> ShopSettings:
     """
     Get a specific setting by id
@@ -56,8 +56,9 @@ async def create_setting(cache: RedisClient, setting: ShopSettingsCreate) -> Sho
     Create a new shop setting
     """
     try:
+        res = await db.shopsettings.create(data=setting.model_dump())
         await cache.invalidate_list_cache("shop-settings")
-        return await db.shopsettings.create(data=setting.model_dump())
+        return res
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -100,11 +101,12 @@ async def update_setting(cache: RedisClient, id: int, setting: ShopSettingsUpdat
         raise HTTPException(status_code=404, detail="Setting not found")
 
     try:
-        await cache.invalidate_list_cache("shop-settings")
-        return await db.shopsettings.update(
+        res = await db.shopsettings.update(
             where={"id": id},
             data=setting.model_dump(exclude_unset=True)
         )
+        await cache.invalidate_list_cache("shop-settings")
+        return res
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

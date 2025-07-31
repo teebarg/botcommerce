@@ -35,7 +35,7 @@ async def create_order(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{order_id}", response_model=OrderResponse)
-@cache_response(key_prefix="order", expire=86400, key=lambda request, order_id: order_id)
+@cache_response(key_prefix="order", key=lambda request, order_id: order_id)
 async def get_order(
     request: Request,
     order_id: str,
@@ -43,7 +43,7 @@ async def get_order(
     return await retrieve_order(order_id)
 
 @router.get("/")
-@cache_response(key_prefix="orders", expire=864000)
+@cache_response(key_prefix="orders")
 async def get_orders(
     request: Request,
     user: CurrentUser,

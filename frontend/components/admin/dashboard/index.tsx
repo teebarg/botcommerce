@@ -119,6 +119,13 @@ const RecentOrdersList = () => {
                                 </TableCell>
                             </motion.tr>
                         ))}
+                        {orders?.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={6} className="h-24 text-center">
+                                    No orders found
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </div>
@@ -139,6 +146,11 @@ const RecentOrdersList = () => {
                             <div className="text-xs text-default-500 mt-1">{order.created_at}</div>
                         </div>
                     ))}
+                    {orders?.length === 0 && (
+                        <div className="p-4">
+                            <p className="text-center text-muted-foreground">No orders found</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

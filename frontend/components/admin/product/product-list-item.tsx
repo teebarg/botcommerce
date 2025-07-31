@@ -1,8 +1,9 @@
 import Image from "next/image";
 
 import { Category, Product } from "@/schemas/product";
-import { currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useProductVariant } from "@/lib/hooks/useProductVariant";
+import { PriceLabel } from "@/components/store/products/price-label";
 
 interface ProductListItemProps {
     product: Product;
@@ -10,6 +11,7 @@ interface ProductListItemProps {
 }
 
 const ProductListItem = ({ product, actions }: ProductListItemProps) => {
+    const { outOfStock, priceInfo } = useProductVariant(product);
     return (
         <div className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col">
             <div className="relative h-40 w-full bg-content1 overflow-hidden">
@@ -23,8 +25,8 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
                     src={product.images?.[0]?.image || product?.image || "/placeholder.jpg"}
                 />
 
-                <Badge className="absolute top-2 right-2 shadow-sm" variant={product.status === "IN_STOCK" ? "emerald" : "destructive"}>
-                    {product.variants?.[0]?.inventory ?? 0} in stock
+                <Badge className="absolute top-2 right-2 shadow-sm" variant={outOfStock ? "destructive" : "emerald"}>
+                    {outOfStock ? "Out of Stock" : "In Stock"}
                 </Badge>
             </div>
             <div className="p-3 flex flex-col justify-end flex-1">
@@ -32,8 +34,8 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
                     {product.categories?.map((category: Category) => category.name).join(", ")}
                 </div>
                 <h3 className="font-medium text-default-900 mb-1 truncate">{product.name}</h3>
-                <div className="flex justify-between items-center">
-                    <span className="font-bold text-lg">{currency(product.variants?.[0]?.price)}</span>
+                <div>
+                    <PriceLabel priceInfo={priceInfo} />
                     <div className="flex space-x-1">{actions}</div>
                 </div>
             </div>

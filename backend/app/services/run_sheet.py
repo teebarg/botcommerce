@@ -207,27 +207,22 @@ async def upsert_collection(collection_name: str) -> int:
 
 async def bulk_upload_products(products: list[dict]):
     try:
-        # Process each product
         for product_data in products:
-            # Handle categories
             category_names = await parse_categories(product_data.get("categories", ""))
             category_ids = []
             for cat_name in category_names:
                 cat_id = await upsert_category(cat_name)
                 category_ids.append(cat_id)
 
-            # Handle collections
             collection_names = await parse_collections(product_data.get("collections", ""))
             collection_ids = []
             for coll_name in collection_names:
                 coll_id = await upsert_collection(coll_name)
                 collection_ids.append(coll_id)
 
-            # Handle brand
             brand_name = product_data.get("brand", "")
             brand_id = await upsert_brand(brand_name)
 
-            # Handle additional images
             image_urls = await parse_images(product_data.get("images", ""))
 
             create_data = {
@@ -236,7 +231,6 @@ async def bulk_upload_products(products: list[dict]):
                 "sku": product_data["sku"],
                 "description": product_data["description"],
                 "image": product_data["image"],
-                "status": "IN_STOCK",
                 "ratings": float(product_data["ratings"]) if product_data["ratings"] else 0.0,
                 "categories": {"connect": [{"id": cid} for cid in category_ids]},
                 "collections": {"connect": [{"id": cid} for cid in collection_ids]},
@@ -246,7 +240,6 @@ async def bulk_upload_products(products: list[dict]):
                 create_data["brand"] = {"connect": {"id": brand_id}}
 
             try:
-                # Upsert product
                 product = await db.product.upsert(
                     where={"slug": product_data["slug"]},
                     data={
@@ -275,7 +268,7 @@ async def bulk_upload_products(products: list[dict]):
                         "create": {
                         "product": {"connect": {"id": product.id}},
                         "sku": product_data["sku"],
-                        "status": "IN_STOCK" if inventory > 0 else "OUT_OF_STOCK",
+                        "status": status,
                         "price": float(product_data["price"]),
                         "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
                         "inventory": inventory,
@@ -284,7 +277,7 @@ async def bulk_upload_products(products: list[dict]):
                             "price": float(product_data["price"]),
                             "old_price": float(product_data["old_price"]) if product_data["old_price"] else 0.0,
                             "inventory": inventory,
-                            "status": "IN_STOCK" if inventory > 0 else "OUT_OF_STOCK"
+                            "status": status
                         }
                     }
                 )
@@ -300,6 +293,7 @@ async def bulk_upload_products(products: list[dict]):
                     )
             except Exception as e:
                 logger.error(f"🚨 Error processing variant for product {product_data['name']}: {str(e)}")
+                raise HTTPException(status_code=400, detail=str(e))
 
             print(f"Processed product: {product_data['name']}")
         print("Bulk upload completed successfully")

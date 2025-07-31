@@ -1,4 +1,4 @@
-from typing import List, Optional, Literal
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from app.models.base import BM
@@ -18,13 +18,11 @@ class ProductCreate(BaseModel):
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
-    status: Literal["IN_STOCK", "OUT_OF_STOCK"] = "IN_STOCK"
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = None
     sku: Optional[str] = None
-    status: Optional[Literal["IN_STOCK", "OUT_OF_STOCK"]] = None
     brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
@@ -43,7 +41,6 @@ class Product(BM):
     slug: str
     description: str
     image: Optional[str] = None
-    status: str
     variants: Optional[List[ProductVariant]] = None
     ratings: float
     categories: Optional[List[Category]] = []
@@ -60,7 +57,6 @@ class SearchProduct(BaseModel):
     slug: str
     description: str
     image: Optional[str] = None
-    status: str
     ratings: float
     categories: List[str]
     collections: List[str]

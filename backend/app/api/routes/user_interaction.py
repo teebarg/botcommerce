@@ -41,7 +41,7 @@ async def batch_user_interactions(redis: RedisClient, payload: List[UserInteract
     return results
 
 @router.get("/", response_model=List[UserInteractionResponse])
-@cache_response("interactions", expire=86400)
+@cache_response("interactions")
 async def list_user_interactions(
     request: Request,
     user_id: Optional[int] = Query(None),

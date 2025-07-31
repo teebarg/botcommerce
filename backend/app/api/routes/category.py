@@ -19,7 +19,7 @@ class Search(BaseModel):
     results: list[Category]
 
 @router.get("/")
-@cache_response(key_prefix="categories", expire=864000)
+@cache_response(key_prefix="categories")
 async def index(
     request: Request,
     query: str = "",
@@ -53,7 +53,7 @@ async def create(*, data: CategoryCreate, cache: RedisClient) -> Category:
 
 
 @router.get("/{id}")
-@cache_response(key_prefix="category", key=lambda request, id: id, expire=864000)
+@cache_response(key_prefix="category", key=lambda request, id: id)
 async def read(id: int, request: Request) -> Any:
     """
     Get a specific category by id with Redis caching.
@@ -69,7 +69,7 @@ async def read(id: int, request: Request) -> Any:
 
 
 @router.get("/slug/{slug}")
-@cache_response(key_prefix="category", key=lambda request, slug: slug, expire=864000)
+@cache_response(key_prefix="category", key=lambda request, slug: slug)
 async def get_by_slug(slug: str, request: Request) -> Category:
     """
     Get a category by its slug.
@@ -137,7 +137,7 @@ async def delete(id: int, cache: RedisClient) -> Message:
 
 
 @router.get("/autocomplete/")
-@cache_response(key_prefix="categories", expire=864000)
+@cache_response(key_prefix="categories")
 async def autocomplete(request: Request, query: str = "") -> Any:
     """
     Retrieve categories for autocomplete.
