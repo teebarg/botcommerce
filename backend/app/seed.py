@@ -1,10 +1,8 @@
 import asyncio
 from prisma import Prisma
-from datetime import datetime
 
 import asyncio
-from datetime import datetime, timedelta
-import random
+from datetime import datetime, timedelta, timezone
 from faker import Faker
 import bcrypt
 from prisma import Prisma
@@ -38,18 +36,14 @@ async def seed():
                     "hashed_password": hashed_password,
                     "role": role,
                     "status": "ACTIVE",
-                    "created_at": datetime.now(datetime.timezone.utc),
+                    "created_at": datetime.now(timezone.utc),
                 },
                 "update": {}
             }
         )
 
 
-    admin = await upsert_user("teebarg01@gmail.com", "ADMIN")
-    customers = [
-        await upsert_user(f"customer{i}@email.com")
-        for i in range(1, 6)
-    ]
+    # admin = await upsert_user("teebarg01@gmail.com", "ADMIN")
 
     # 2. Brands
     logger.info("Seeding brands...")
@@ -65,7 +59,7 @@ async def seed():
                     "name": brand["name"],
                     "slug": brand["slug"],
                     "is_active": True,
-                    "created_at": datetime.now(datetime.timezone.utc),
+                    "created_at": datetime.now(timezone.utc),
                 },
                 "update": {}
             }
@@ -85,7 +79,7 @@ async def seed():
                     "name": cat["name"],
                     "slug": cat["slug"],
                     "is_active": True,
-                    "created_at": datetime.now(datetime.timezone.utc),
+                    "created_at": datetime.now(timezone.utc),
                 },
                 "update": {}
             }
@@ -105,7 +99,7 @@ async def seed():
                     "name": col["name"],
                     "slug": col["slug"],
                     "is_active": True,
-                    "created_at": datetime.now(datetime.timezone.utc),
+                    "created_at": datetime.now(timezone.utc),
                 },
                 "update": {}
             }
@@ -159,7 +153,7 @@ async def seed():
                     "categories": {"connect": [{"id": c.id} for c in categories]},
                     "collections": {"connect": [{"id": c.id} for c in collections]},
                     "variants": {"create": p["variants"]},
-                    "created_at": datetime.now(datetime.timezone.utc),
+                    "created_at": datetime.now(timezone.utc),
                 },
                 "update": {}
             }
@@ -180,7 +174,7 @@ async def seed():
                     "discount_type": dtype,
                     "discount_value": value,
                     "expiration_date": datetime.now() + timedelta(days=30),
-                    "created_at": datetime.now(datetime.timezone.utc),
+                    "created_at": datetime.now(timezone.utc),
                 },
                 "update": {}
             }
@@ -258,7 +252,7 @@ async def seed():
                     "description": col["description"],
                     "is_active": col["is_active"],
                     "products": {"connect": [{"id": p.id} for p in products]},
-                    "created_at": datetime.now(datetime.timezone.utc),
+                    "created_at": datetime.now(timezone.utc),
                 },
                 "update": {}
             }

@@ -9,6 +9,9 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.models import ShopSettings
 from app.services.redis import cache_response
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
