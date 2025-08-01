@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { MapPin } from "lucide-react";
+import { MapPin, ArrowRight } from "lucide-react";
 
 import ShippingAddressForm from "../address-form";
 
@@ -8,15 +8,17 @@ import { AddressCard } from "./address-item";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
 import { Address } from "@/schemas";
 import { useUserAddresses } from "@/lib/hooks/useCart";
 import ComponentLoader from "@/components/component-loader";
 
 interface AddressStepProps {
     address: Address | null;
+    onComplete?: () => void;
 }
 
-const AddressStep: React.FC<AddressStepProps> = ({ address }) => {
+const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     const { data, isLoading } = useUserAddresses();
     const addresses = data?.addresses ?? [];
 
@@ -24,6 +26,14 @@ const AddressStep: React.FC<AddressStepProps> = ({ address }) => {
 
     const [addressOption, setAddressOption] = useState<"existing" | "new">("existing");
     const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+
+    const handleContinue = () => {
+        if (address && onComplete) {
+            onComplete();
+        }
+    };
+
+    const canContinue = !!address;
 
     if (isLoading) {
         return <ComponentLoader className="h-24" />;
@@ -68,6 +78,15 @@ const AddressStep: React.FC<AddressStepProps> = ({ address }) => {
                     {addressOption === "new" && (
                         <div className="space-y-6 border-t pt-6">
                             <ShippingAddressForm onClose={() => setAddressOption("existing")} />
+                        </div>
+                    )}
+
+                    {canContinue && (
+                        <div className="flex justify-end pt-4">
+                            <Button className="flex items-center gap-2" size="lg" variant="luxury" onClick={handleContinue}>
+                                Continue to Payment
+                                <ArrowRight className="h-4 w-4" />
+                            </Button>
                         </div>
                     )}
                 </div>

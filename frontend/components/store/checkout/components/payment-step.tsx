@@ -1,11 +1,12 @@
 import React from "react";
-import { CreditCard } from "lucide-react";
+import { CreditCard, ArrowLeft } from "lucide-react";
 import { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { paymentInfoMap } from "@lib/constants";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
 import { Cart, PaymentMethod } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
@@ -21,9 +22,10 @@ const payMethods: { id: string; provider_id: PaymentMethod }[] = [
 
 interface PaymentStepProps {
     cart: Cart | null;
+    onBack?: () => void;
 }
 
-const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
+const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
     const { shopSettings } = useStore();
     const updateCartDetails = useUpdateCartDetails();
     const searchParams = useSearchParams();
@@ -45,17 +47,11 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
         updateCartDetails.mutate({ payment_method: providerId });
     };
 
-    const handleEdit = () => {
-        router.push(pathname + "?" + createQueryString("step", "payment"), {
-            scroll: false,
-        });
+    const handleBack = () => {
+        if (onBack) {
+            onBack();
+        }
     };
-
-    // const handleSubmit = () => {
-    //     router.push(pathname + "?" + createQueryString("step", "review"), {
-    //         scroll: false,
-    //     });
-    // };
 
     return (
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -67,7 +63,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                     </CardTitle>
                     <CardDescription>Choose your payment method and complete your order</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                     <RadioGroupWithLabel
                         className="grid grid-cols-1 md:grid-cols-3 gap-2"
                         label="Payment Method"
@@ -87,7 +83,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                             return (
                                 <RadioGroupItem key={idx} value={item.provider_id} variant="card">
                                     <div className="flex items-center gap-3">
-                                        <div className="shrink-0 mt-0.5">{paymentInfoMap[item.provider_id]?.icon}</div>
+                                        <div className="shrink-0 mt-0.5 text-accent">{paymentInfoMap[item.provider_id]?.icon}</div>
                                         <div className="text-left">
                                             <div className="font-medium text-default-900">{paymentInfoMap[item.provider_id]?.title}</div>
                                             <div className="text-sm text-default-500">{paymentInfoMap[item.provider_id]?.description}</div>
@@ -98,11 +94,17 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                         })}
                     </RadioGroupWithLabel>
 
-                    {cart?.payment_method === "PAYSTACK" && <PaystackPayment cartNumber={cart.cart_number} amount={cart.total} />}
+                    {cart?.payment_method === "PAYSTACK" && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} />}
 
                     {cart?.payment_method === "BANK_TRANSFER" && <BankTransfer amount={cart.total} />}
 
                     {cart?.payment_method === "CASH_ON_DELIVERY" && <Pickup amount={cart.total} />}
+                    <div className="pt-4">
+                        <Button className="flex items-center gap-2" variant="outline" onClick={handleBack}>
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to Address
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
         </div>

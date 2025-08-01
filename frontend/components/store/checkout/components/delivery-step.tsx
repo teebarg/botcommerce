@@ -1,8 +1,9 @@
 import React from "react";
-import { Truck, Store, Clock, MapPin } from "lucide-react";
+import { Truck, Store, Clock, MapPin, ArrowRight } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
 import { useDeliveryOptions } from "@/lib/hooks/useApi";
 import { currency } from "@/lib/utils";
 import { DeliveryOption } from "@/schemas";
@@ -12,9 +13,10 @@ import { useStore } from "@/app/store/use-store";
 
 interface DeliveryStepProps {
     cart: Cart;
+    onComplete?: () => void;
 }
 
-const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart }) => {
+const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     const { shopSettings } = useStore();
     const { data: deliveryOptions } = useDeliveryOptions();
     const updateCartDetails = useUpdateCartDetails();
@@ -27,6 +29,14 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart }) => {
         }
         updateCartDetails.mutate({ shipping_method: item.method, shipping_fee: item.amount });
     };
+
+    const handleContinue = () => {
+        if (cart.shipping_method && onComplete) {
+            onComplete();
+        }
+    };
+
+    const canContinue = !!cart.shipping_method;
 
     return (
         <Card className="w-full shadow-elegant animate-fade-in">
@@ -71,6 +81,14 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart }) => {
                         </RadioGroupItem>
                     ))}
                 </RadioGroup>
+                {canContinue && (
+                    <div className="flex justify-end pt-4">
+                        <Button className="flex items-center gap-2" size="lg" variant="luxury" onClick={handleContinue}>
+                            Continue to Address
+                            <ArrowRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

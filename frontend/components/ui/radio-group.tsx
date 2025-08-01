@@ -15,9 +15,9 @@ const radioVariants = {
     },
     card: {
         container: "grid gap-3",
-        item: "group relative flex items-center gap-3 rounded-lg border-2 border-default-200 bg-content1 p-4 transition-all duration-200 hover:border-blue-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-50 data-[state=checked]:dark:bg-blue-900/20",
+        item: "group relative flex items-center gap-3 rounded-lg border-2 border-default-200 bg-content1 p-4 transition-all duration-200 hover:border-accent hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-accent data-[state=checked]:bg-accent/10",
         indicator: "absolute right-4 top-4 flex items-center justify-center",
-        icon: "size-5 text-blue-500 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+        icon: "size-5 text-accent opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
     pill: {
         container: "flex flex-wrap gap-2",
@@ -33,7 +33,7 @@ const radioVariants = {
     },
     delivery: {
         container: "grid gap-2",
-        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:shadow-elegant border-border hover:border-accent data-[state=checked]:border-primary data-[state=checked]:bg-accent/10 data-[state=checked]:shadow-elegant group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:shadow-elegant border-border hover:border-accent/50 data-[state=checked]:border-accent data-[state=checked]:bg-accent/10 data-[state=checked]:shadow-elegant group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         indicator: "flex items-center justify-center",
         icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
