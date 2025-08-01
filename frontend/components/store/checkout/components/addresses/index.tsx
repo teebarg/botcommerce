@@ -47,7 +47,7 @@ const Addresses = ({ cart }: { cart: Omit<Cart, "refundable_amount" | "refunded_
                             <p className="font-normal text-default-500">
                                 {address.first_name} {address.last_name} <br />
                                 {address.address_1} {address.address_2} <br />
-                                {address.postal_code}, {address.city}
+                                {address.city}
                             </p>
                         </div>
 

@@ -133,7 +133,6 @@ model Address {
   address_2    String?
   city         String?
   state        String?
-  postal_code  String?
   phone        String?
   is_billing   Boolean     @default(false)
 

@@ -86,7 +86,7 @@ async def add_item_to_cart(cache: RedisClient, item: CartItemCreate, cartId: str
 
 
 @router.get("/", response_model=Optional[CartResponse])
-@cache_response(key_prefix="cart", key=lambda request, cartId, **kwargs: cartId)
+# @cache_response(key_prefix="cart", key=lambda request, cartId, **kwargs: cartId)
 async def get_cart(request: Request, cartId: str = Header()):
     """Get a specific cart by ID"""
     if not cartId:

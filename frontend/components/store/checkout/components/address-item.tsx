@@ -90,7 +90,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 <div className="space-y-0.5 text-sm">
                     <p className="text-default-800 font-medium">{address.address_1}</p>
                     <p className="text-default-500">
-                        {address.city}, {address.state} {address.postal_code}
+                        {address.city}, {address.state}
                     </p>
                     {address.phone && (
                         <p className="flex items-center gap-2 text-default-500 mt-2">

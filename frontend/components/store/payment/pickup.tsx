@@ -23,10 +23,10 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
     };
 
     return (
-        <div className="space-y-4">
-            <div className="bg-content1 p-4 rounded-lg space-y-3">
+        <div className="space-y-4 border-t pt-6">
+            <div className="space-y-3 p-4 bg-accent/10 rounded-lg">
                 <div className="flex items-start mb-3">
-                    <MapPin className="text-indigo-600 w-5 h-5 mt-0.5 shrink-0" />
+                    <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                     <div className="ml-2">
                         <p className="text-sm font-medium text-default-900">Collection Point</p>
                         <p className="text-sm text-default-500">{shopSettings?.address}</p>
@@ -39,7 +39,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                     <ul className="text-xs text-default-500 space-y-1">
                         <li>• Please bring your order confirmation email</li>
                         <li>• You can pay with cash or card at collection</li>
-                        <li>• Orders are held for 7 days before being returned to stock</li>
+                        <li>• Orders are held for 3 days before being returned to stock</li>
                     </ul>
                 </div>
             </div>
@@ -48,8 +48,9 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                 className="w-full"
                 disabled={completeCart.isPending}
                 isLoading={completeCart.isPending}
-                variant="primary"
+                variant="luxury"
                 onClick={onPaymentCompleted}
+                size="lg"
             >
                 Confirm Order for Pickup
             </Button>

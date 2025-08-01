@@ -191,7 +191,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                     </p>
                                     <p className="text-default-700">{order.shipping_address.address_1}</p>
                                     <p className="text-default-700">
-                                        {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postal_code}
+                                        {order.shipping_address.city}, {order.shipping_address.state}
                                     </p>
                                     <p className="text-default-700">{order.shipping_address.phone}</p>
                                 </div>

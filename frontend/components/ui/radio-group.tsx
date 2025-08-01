@@ -31,6 +31,12 @@ const radioVariants = {
         indicator: "flex items-center justify-center",
         icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
+    delivery: {
+        container: "grid gap-2",
+        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:shadow-elegant border-border hover:border-accent data-[state=checked]:border-primary data-[state=checked]:bg-accent/10 data-[state=checked]:shadow-elegant group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        indicator: "flex items-center justify-center",
+        icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+    },
 };
 
 function RadioGroup({

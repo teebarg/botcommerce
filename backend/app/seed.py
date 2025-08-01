@@ -210,7 +210,7 @@ async def seed():
     delivery_options = [
         {"name": "Standard Shipping", "description": "Your order will be delivered within 5-7 days", "amount": 3000, "method": "STANDARD"},
         {"name": "Express Shipping", "description": "Your order will be delivered within 2-3 days", "amount": 5000, "method": "EXPRESS"},
-        {"name": "Pickup", "description": "Pickup at our store", "amount": 0, "method": "PICKUP"},
+        {"name": "Store Pickup", "description": "Pickup at our store", "amount": 0, "method": "PICKUP"},
     ]
     for option in delivery_options:
         await db.deliveryoption.upsert(
