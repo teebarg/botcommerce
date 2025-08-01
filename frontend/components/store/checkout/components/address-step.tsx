@@ -1,20 +1,18 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { MapPin, User, Phone } from "lucide-react";
-import { AddressCard } from "./address-item";
+import { MapPin } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
+import ShippingAddressForm from "../address-form";
+
+import { AddressCard } from "./address-item";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Address } from "@/schemas";
 import { useUserAddresses } from "@/lib/hooks/useCart";
-import Overlay from "@/components/overlay";
 import ComponentLoader from "@/components/component-loader";
-import ShippingAddressForm from "../address-form";
 
 interface AddressStepProps {
     onAddressSubmitted: (address: any) => void;
@@ -57,16 +55,16 @@ const AddressStep: React.FC<AddressStepProps> = ({ onAddressSubmitted, address }
                 <CardDescription>Enter your delivery address details</CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-6">
                     <div className="space-y-4">
                         <Label className="text-base font-medium">Choose Address Option</Label>
                         <RadioGroup value={addressOption} onValueChange={(value: "existing" | "new") => setAddressOption(value)}>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="existing" id="existing" />
+                                <RadioGroupItem id="existing" value="existing" />
                                 <Label htmlFor="existing">Select from previous addresses</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="new" id="new" />
+                                <RadioGroupItem id="new" value="new" />
                                 <Label htmlFor="new">Enter new address</Label>
                             </div>
                         </RadioGroup>
@@ -86,7 +84,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ onAddressSubmitted, address }
                     {/* New Address Form */}
                     {addressOption === "new" && (
                         <div className="space-y-6 border-t pt-6">
-                            <ShippingAddressForm onClose={state.close} />
+                            <ShippingAddressForm onClose={() => setAddressOption("existing")} />
                             {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="fullName">Full Name *</Label>
@@ -119,7 +117,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ onAddressSubmitted, address }
                                     </div>
                                 </div>
                             </div> */}
-                            {/* 
+                            {/*
                             <div className="space-y-2">
                                 <Label htmlFor="street">Street Address *</Label>
                                 <Input
@@ -174,11 +172,11 @@ const AddressStep: React.FC<AddressStepProps> = ({ onAddressSubmitted, address }
                     )}
 
                     <div className="flex justify-center pt-4">
-                        <Button type="submit" variant="luxury" size="lg" className="px-12">
+                        <Button className="px-12" size="lg" type="submit" variant="luxury">
                             Continue to Payment
                         </Button>
                     </div>
-                </form>
+                </div>
             </CardContent>
         </Card>
     );

@@ -1,10 +1,12 @@
 "use client";
 
-import { useAuth } from "@/providers/auth-provider";
 import React, { useState } from "react";
+
 import DeliveryStep from "./delivery-step";
 import AddressStep from "./address-step";
 import PaymentStep from "./payment-step";
+
+import { useAuth } from "@/providers/auth-provider";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import { Cart } from "@/schemas";
 // import OrderCompleteStep from "./order-complete-step";
@@ -18,9 +20,7 @@ interface CheckoutFlowProps {
 
 const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
     const { isAuthenticated } = useAuth();
-    console.log("🚀 ~ file: checkout-flow.tsx:19 ~ isAuthenticated:", isAuthenticated)
     const [currentStep, setCurrentStep] = useState<CheckoutStep>(isAuthenticated ? "delivery" : "auth");
-    console.log("🚀 ~ file: checkout-flow.tsx:21 ~ currentStep:", currentStep)
     const [deliveryType, setDeliveryType] = useState<"shipping" | "pickup" | null>(null);
     const [shippingAddress, setShippingAddress] = useState(null);
 
@@ -34,11 +34,8 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
         if (!cart.shipping_address) {
             return "address";
         }
-        return "payment";
-    }
 
-    const handleAuthenticated = () => {
-        setCurrentStep("delivery");
+        return "payment";
     };
 
     const handleDeliverySelected = (type: "shipping" | "pickup") => {
@@ -68,11 +65,11 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
             case "auth":
                 return <CheckoutLoginPrompt />;
             case "delivery":
-                return <DeliveryStep onDeliverySelected={handleDeliverySelected} cart={cart} />;
+                return <DeliveryStep cart={cart} onDeliverySelected={handleDeliverySelected} />;
             case "address":
-                return <AddressStep onAddressSubmitted={handleAddressSubmitted} address={cart.shipping_address} />;
+                return <AddressStep address={cart.shipping_address} onAddressSubmitted={handleAddressSubmitted} />;
             case "payment":
-                return <PaymentStep deliveryType={deliveryType!} onPaymentSubmitted={handlePaymentSubmitted} />;
+                return <PaymentStep cart={cart} deliveryType={deliveryType!} onPaymentSubmitted={handlePaymentSubmitted} />;
             // case "complete":
             //     return <OrderCompleteStep deliveryType={deliveryType!} onStartShopping={handleStartShopping} />;
             default:

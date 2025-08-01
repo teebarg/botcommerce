@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { MapPin, Phone, User } from "lucide-react";
 
 import { CartUpdate } from "@/schemas";
 import { Button } from "@/components/ui/button";
@@ -62,8 +63,7 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
     };
 
     return (
-        <div className="py-6 px-4 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-default-900 mb-4">Shipping Address</h3>
+        <div className="px-2 overflow-y-auto">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -99,7 +99,12 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                 <FormItem>
                                     <FormLabel>Label (Optional)</FormLabel>
                                     <FormControl>
-                                        <Input data-testid="shipping-first_name-input" placeholder="e.g., Home, Office" {...field} />
+                                        <Input
+                                            data-testid="shipping-first_name-input"
+                                            placeholder="e.g., Home, Office"
+                                            startContent={<MapPin className="h-4 w-4 text-muted-foreground" />}
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -113,7 +118,13 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                 <FormItem>
                                     <FormLabel>First name</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="given-name" data-testid="shipping-first_name-input" {...field} />
+                                        <Input
+                                            autoComplete="given-name"
+                                            data-testid="shipping-first_name-input"
+                                            placeholder="Enter your first name"
+                                            startContent={<User className="h-4 w-4 text-muted-foreground" />}
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -127,7 +138,13 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                 <FormItem>
                                     <FormLabel>Last name</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="family-name" data-testid="shipping-last_name-input" {...field} />
+                                        <Input
+                                            autoComplete="family-name"
+                                            data-testid="shipping-last_name-input"
+                                            placeholder="Enter your last name"
+                                            startContent={<User className="h-4 w-4 text-muted-foreground" />}
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -141,7 +158,14 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                 <FormItem>
                                     <FormLabel>Address</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="address-line1" data-testid="shipping-address-input" {...field} />
+                                        <Input
+                                            required
+                                            autoComplete="address-line1"
+                                            data-testid="shipping-address-input"
+                                            placeholder="123 Main Street, Apt 4B"
+                                            startContent={<MapPin className="h-4 w-4 text-muted-foreground" />}
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -155,7 +179,14 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                 <FormItem>
                                     <FormLabel>City</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="address-level2" data-testid="shipping-city-input" {...field} />
+                                        <Input
+                                            required
+                                            autoComplete="address-level2"
+                                            data-testid="shipping-city-input"
+                                            placeholder="City"
+                                            startContent={<MapPin className="h-4 w-4 text-muted-foreground" />}
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -194,7 +225,14 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                 <FormItem>
                                     <FormLabel>Phone</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="tel" data-testid="shipping-phone-input" {...field} />
+                                        <Input
+                                            required
+                                            autoComplete="tel"
+                                            data-testid="shipping-phone-input"
+                                            startContent={<Phone className="h-4 w-4 text-muted-foreground" />}
+                                            {...field}
+                                            placeholder="0800 123 4567"
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -203,7 +241,7 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                     </div>
 
                     <div className="flex items-center justify-end gap-2 mt-8">
-                        <Button aria-label="cancel" variant="outline" onClick={onClose}>
+                        <Button aria-label="cancel" type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button

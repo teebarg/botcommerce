@@ -1,13 +1,15 @@
 import React from "react";
+import { Truck, Store, Clock, MapPin } from "lucide-react";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Truck, Store, Clock, MapPin } from "lucide-react";
 import { useDeliveryOptions } from "@/lib/hooks/useApi";
 import { currency } from "@/lib/utils";
 import { DeliveryOption } from "@/schemas";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 import { Cart } from "@/schemas";
+import { useStore } from "@/app/store/use-store";
 
 interface DeliveryStepProps {
     onDeliverySelected: (type: "shipping" | "pickup") => void;
@@ -15,6 +17,7 @@ interface DeliveryStepProps {
 }
 
 const DeliveryStep: React.FC<DeliveryStepProps> = ({ onDeliverySelected, cart }) => {
+    const { shopSettings } = useStore();
     const [selectedDelivery, setSelectedDelivery] = React.useState<"shipping" | "pickup" | null>(null);
     const { data: deliveryOptions } = useDeliveryOptions();
     const updateCartDetails = useUpdateCartDetails();
@@ -51,8 +54,8 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ onDeliverySelected, cart })
                                     ) : (
                                         <Truck className="h-6 w-6 text-accent" />
                                     )}
-                                    <div>
-                                        <h3 className="font-semibold text-lg text-left">
+                                    <div className="text-left">
+                                        <h3 className="font-semibold text-lg">
                                             {option.name} ({option.amount === 0 ? "Free" : currency(option.amount)})
                                         </h3>
                                         <p className="text-sm text-muted-foreground">{option.description}</p>
@@ -65,7 +68,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ onDeliverySelected, cart })
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <MapPin className="h-4 w-4" />
-                                        {option.amount === 0 ? <span>123 Fashion Ave, Style City, SC 12345</span> : <span>Available nationwide</span>}
+                                        {option.amount === 0 ? <span>{shopSettings.address}</span> : <span>Available nationwide</span>}
                                     </div>
                                     {option.amount === 0 && (
                                         <div className="flex items-center space-x-2">
@@ -79,7 +82,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ onDeliverySelected, cart })
                 </RadioGroup>
 
                 <div className="flex justify-center pt-4">
-                    <Button onClick={handleContinue} disabled={!selectedDelivery} variant="luxury" size="lg" className="px-12">
+                    <Button className="px-12" disabled={!selectedDelivery} size="lg" variant="luxury" onClick={handleContinue}>
                         Continue
                     </Button>
                 </div>
