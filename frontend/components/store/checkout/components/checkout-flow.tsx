@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import DeliveryStep from "./delivery-step";
 import AddressStep from "./address-step";
@@ -20,9 +20,6 @@ interface CheckoutFlowProps {
 
 const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
     const { isAuthenticated } = useAuth();
-    const [currentStep, setCurrentStep] = useState<CheckoutStep>(isAuthenticated ? "delivery" : "auth");
-    const [deliveryType, setDeliveryType] = useState<"shipping" | "pickup" | null>(null);
-    const [shippingAddress, setShippingAddress] = useState(null);
 
     const getStep = () => {
         if (!isAuthenticated) {
@@ -38,38 +35,16 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
         return "payment";
     };
 
-    const handleDeliverySelected = (type: "shipping" | "pickup") => {
-        setDeliveryType(type);
-        if (type === "pickup") {
-            setCurrentStep("payment");
-        } else {
-            setCurrentStep("address");
-        }
-    };
-
-    const handleAddressSubmitted = (address: any) => {
-        setShippingAddress(address);
-        setCurrentStep("payment");
-    };
-
-    const handlePaymentSubmitted = () => {
-        setCurrentStep("complete");
-    };
-
-    // const handleStartShopping = () => {
-    //     onClose();
-    // };
-
     const renderStep = () => {
         switch (getStep()) {
             case "auth":
                 return <CheckoutLoginPrompt />;
             case "delivery":
-                return <DeliveryStep cart={cart} onDeliverySelected={handleDeliverySelected} />;
+                return <DeliveryStep cart={cart} />;
             case "address":
-                return <AddressStep address={cart.shipping_address} onAddressSubmitted={handleAddressSubmitted} />;
+                return <AddressStep address={cart.shipping_address} />;
             case "payment":
-                return <PaymentStep cart={cart} deliveryType={deliveryType!} onPaymentSubmitted={handlePaymentSubmitted} />;
+                return <PaymentStep cart={cart} />;
             // case "complete":
             //     return <OrderCompleteStep deliveryType={deliveryType!} onStartShopping={handleStartShopping} />;
             default:
@@ -77,7 +52,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
         }
     };
 
-    return <div className="">{renderStep()}</div>;
+    return <div>{renderStep()}</div>;
 };
 
 export default CheckoutFlow;

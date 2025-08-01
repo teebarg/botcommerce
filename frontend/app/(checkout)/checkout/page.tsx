@@ -11,7 +11,6 @@ import { useStore } from "@/app/store/use-store";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import CheckoutSkeleton from "@/components/store/checkout/checkout-skeleton";
-import CheckoutForm from "@/components/store/checkout/checkout-form";
 import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 import { useCart } from "@/providers/cart-provider";
 import CheckoutFlow from "@/components/store/checkout/components/checkout-flow";
@@ -72,8 +71,6 @@ export default function Checkout() {
                             </ol>
                         </nav>
                         <CheckoutFlow cart={cart} />
-
-                        <CheckoutForm cart={cart} />
                     </div>
 
                     <div className="mb-24 md:mb-0 hidden md:block">

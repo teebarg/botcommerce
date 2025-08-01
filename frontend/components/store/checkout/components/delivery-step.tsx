@@ -2,7 +2,6 @@ import React from "react";
 import { Truck, Store, Clock, MapPin } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useDeliveryOptions } from "@/lib/hooks/useApi";
 import { currency } from "@/lib/utils";
@@ -12,21 +11,13 @@ import { Cart } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 
 interface DeliveryStepProps {
-    onDeliverySelected: (type: "shipping" | "pickup") => void;
     cart: Cart;
 }
 
-const DeliveryStep: React.FC<DeliveryStepProps> = ({ onDeliverySelected, cart }) => {
+const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart }) => {
     const { shopSettings } = useStore();
-    const [selectedDelivery, setSelectedDelivery] = React.useState<"shipping" | "pickup" | null>(null);
     const { data: deliveryOptions } = useDeliveryOptions();
     const updateCartDetails = useUpdateCartDetails();
-
-    const handleContinue = () => {
-        if (selectedDelivery) {
-            onDeliverySelected(selectedDelivery);
-        }
-    };
 
     const handleChange = (value: string) => {
         const item: DeliveryOption | undefined = deliveryOptions?.find((item: DeliveryOption) => item.method == value);
@@ -38,7 +29,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ onDeliverySelected, cart })
     };
 
     return (
-        <Card className="w-full max-w-2xl shadow-elegant animate-fade-in">
+        <Card className="w-full shadow-elegant animate-fade-in">
             <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-semibold">How would you like to receive your order?</CardTitle>
                 <CardDescription>Choose between home delivery or store pickup</CardDescription>
@@ -80,12 +71,6 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ onDeliverySelected, cart })
                         </RadioGroupItem>
                     ))}
                 </RadioGroup>
-
-                <div className="flex justify-center pt-4">
-                    <Button className="px-12" disabled={!selectedDelivery} size="lg" variant="luxury" onClick={handleContinue}>
-                        Continue
-                    </Button>
-                </div>
             </CardContent>
         </Card>
     );
