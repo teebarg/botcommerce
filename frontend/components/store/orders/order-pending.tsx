@@ -2,7 +2,6 @@
 
 import { AlertCircle, ArrowRight, Clock } from "lucide-react";
 
-import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
@@ -13,6 +12,7 @@ import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useBankDetails } from "@/lib/hooks/useApi";
+import OrderOverview from "./order-overview";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -27,14 +27,18 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
         <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-4">
             <FadeInComponent>
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-                        <Clock className="w-8 h-8 text-yellow-600" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-100 rounded-full mb-4 animate-pulse">
+                        <Clock className="w-12 h-12 text-orange-600" />
                     </div>
 
                     <h2 className="text-2xl font-bold text-default-900 mb-2">Payment Pending</h2>
 
                     <p className="text-default-700">{`We're waiting for your bank transfer. Please complete the payment with the details below:`}</p>
                 </div>
+            </FadeInComponent>
+
+            <FadeInComponent delay="50ms">
+                <OrderOverview order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
@@ -62,7 +66,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
             </FadeInComponent>
 
             {order?.payment_method === "BANK_TRANSFER" && (
-                <FadeInComponent delay="150ms">
+                <FadeInComponent delay="200ms">
                     <div className="mb-8 p-6 bg-orange-100 dark:bg-orange-900/20 border border-orange-200 rounded-2xl">
                         <div className="flex items-center justify-center gap-2 mb-4">
                             <AlertCircle className="w-5 h-5 text-orange-600" />
@@ -84,12 +88,8 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
                 </FadeInComponent>
             )}
 
-            <FadeInComponent delay="200ms">
-                <OrderNotes order={order} />
-            </FadeInComponent>
-
             <FadeInComponent delay="300ms">
-                <OrderInfo order={order} />
+                <OrderNotes order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="400ms">

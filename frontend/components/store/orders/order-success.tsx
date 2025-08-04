@@ -2,7 +2,6 @@
 
 import { Check } from "lucide-react";
 
-import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
@@ -12,6 +11,7 @@ import OrderNext from "./order-next";
 import { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Button } from "@/components/ui/button";
+import OrderOverview from "./order-overview";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -24,8 +24,8 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
         <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
-                        <Check className="w-8 h-8 text-emerald-700" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-4 animate-pulse">
+                        <Check className="w-12 h-12 text-emerald-700" />
                     </div>
 
                     <h2 className="text-2xl font-bold text-default-900 mb-2">Order Confirmed!</h2>
@@ -35,11 +35,11 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
-                <OrderNotes order={order} />
+                <OrderOverview order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="200ms">
-                <OrderInfo order={order} />
+                <OrderNotes order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="300ms">

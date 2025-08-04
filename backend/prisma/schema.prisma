@@ -20,7 +20,6 @@ enum AddressType {
 
 enum OrderStatus {
   PENDING
-  PAID
   PROCESSING
   SHIPPED
   OUT_FOR_DELIVERY

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const AddressTypeSchema = z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]);
-export const OrderStatusSchema = z.enum(["PENDING", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELED", "PAID", "REFUNDED"]);
+export const OrderStatusSchema = z.enum(["PENDING", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELED", "REFUNDED"]);
 export const DiscountTypeSchema = z.enum(["PERCENTAGE", "FIXED_AMOUNT"]);
 export const PaymentMethodSchema = z.enum(["CREDIT_CARD", "CASH_ON_DELIVERY", "BANK_TRANSFER", "PAYSTACK"]);
 export const ProductStatusSchema = z.enum(["IN_STOCK", "OUT_OF_STOCK"]);

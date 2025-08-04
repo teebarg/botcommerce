@@ -5,9 +5,10 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Button } from "@/components/ui/button";
 import { Order, OrderStatus } from "@/schemas";
-import { useChangeOrderStatus } from "@/lib/hooks/useOrder";
+import { useChangeOrderStatus, useChangePaymentStatus } from "@/lib/hooks/useOrder";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import PaymentStatusManager from "./order-payment-status";
 
 interface OrderProcessingActionProps {
     order: Order;
@@ -15,7 +16,7 @@ interface OrderProcessingActionProps {
 
 const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) => {
     const statusConfig: Record<
-        "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "PAID" | "REFUNDED",
+        "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "REFUNDED",
         {
             color: string;
             label: string;
@@ -24,13 +25,6 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             variant: "default" | "destructive" | "outline" | "secondary" | "success" | "warning";
         }
     > = {
-        PAID: {
-            color: "bg-success/20 text-success",
-            label: "Paid",
-            nextStatus: "PROCESSING" as const,
-            actionLabel: "Process Order",
-            variant: "default",
-        },
         REFUNDED: {
             color: "bg-danger/20 text-danger",
             label: "Refunded",
@@ -41,8 +35,8 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
         PENDING: {
             color: "bg-warning/20 text-warning",
             label: "Pending",
-            nextStatus: "PAID" as const,
-            actionLabel: "Mark as Paid",
+            nextStatus: "PROCESSING" as const,
+            actionLabel: "Mark as Processing",
             variant: "warning",
         },
         PROCESSING: {
@@ -83,6 +77,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
     };
 
     const stateState = useOverlayTriggerState({});
+    const paymentState = useOverlayTriggerState({});
     const config = statusConfig[order.status];
 
     const { mutateAsync: changeOrderStatus, isPending } = useChangeOrderStatus();
@@ -95,7 +90,25 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
 
     return (
         <>
-            {config.nextStatus && (
+            <Dialog open={paymentState.isOpen} onOpenChange={paymentState.setOpen}>
+                <DialogTrigger asChild>
+                    <Button className="flex-1 w-full" variant="luxury">
+                        Update Payment
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-content1">
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Update Payment Status</DialogTitle>
+                    </DialogHeader>
+                    <PaymentStatusManager
+                        id={order.id}
+                        currentStatus={order.payment_status}
+                        orderNumber={order.order_number}
+                        onClose={paymentState.close}
+                    />
+                </DialogContent>
+            </Dialog>
+            {order.payment_status === "SUCCESS" && config.nextStatus && (
                 <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
                     <DialogTrigger asChild>
                         <Button className="flex-1 w-full" disabled={isPending} isLoading={isPending} variant={config.variant}>

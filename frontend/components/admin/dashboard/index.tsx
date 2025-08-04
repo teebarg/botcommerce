@@ -12,45 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import ComponentLoader from "@/components/component-loader";
 import ClientOnly from "@/components/generic/client-only";
 import ServerError from "@/components/generic/server-error";
-
-const OrderStatusBadge = ({ status }: { status: string }) => {
-    const statusConfig: Record<string, { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "emerald" }> = {
-        PAID: {
-            icon: <CheckCircle className="mr-1" size={14} />,
-            label: "Paid",
-            variant: "emerald",
-        },
-        pending: {
-            icon: <AlertTriangle className="mr-1" size={14} />,
-            label: "Pending",
-            variant: "destructive",
-        },
-        processing: {
-            icon: <Clock className="mr-1" size={14} />,
-            label: "Processing",
-            variant: "default",
-        },
-        shipped: {
-            icon: <ShoppingCart className="mr-1" size={14} />,
-            label: "Shipped",
-            variant: "secondary",
-        },
-        delivered: {
-            icon: <CheckCircle className="mr-1" size={14} />,
-            label: "Delivered",
-            variant: "emerald",
-        },
-    };
-
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-
-    return (
-        <Badge variant={config.variant}>
-            {config.icon}
-            {config.label}
-        </Badge>
-    );
-};
+import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
 
 const RecentOrdersList = () => {
     const { data, isLoading, error } = useOrders({ take: 5 });
@@ -96,6 +58,7 @@ const RecentOrdersList = () => {
                             <TableHead>Amount</TableHead>
                             <TableHead>Date</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Payment Status</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -117,6 +80,9 @@ const RecentOrdersList = () => {
                                 <TableCell>
                                     <OrderStatusBadge status={order.status} />
                                 </TableCell>
+                                <TableCell>
+                                    <PaymentStatusBadge status={order.payment_status} />
+                                </TableCell>
                             </motion.tr>
                         ))}
                         {orders?.length === 0 && (
@@ -133,7 +99,8 @@ const RecentOrdersList = () => {
                 <div className="divide-y divide-default-200">
                     {orders?.map((order: Order, idx: number) => (
                         <div key={idx} className="p-4">
-                            <div className="flex justify-between items-center mb-2">
+                            <PaymentStatusBadge status={order.payment_status} />
+                            <div className="flex justify-between items-center mb-2 mt-2">
                                 <span className="font-medium">{order.order_number}</span>
                                 <OrderStatusBadge status={order.status} />
                             </div>

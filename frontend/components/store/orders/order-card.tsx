@@ -19,7 +19,6 @@ const statusConfig: Record<Order["status"], { label: string; color: string }> = 
     OUT_FOR_DELIVERY: { label: "Out for delivery", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
     DELIVERED: { label: "Delivered", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
     CANCELED: { label: "Cancelled", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
-    PAID: { label: "Paid", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
     REFUNDED: { label: "Refunded", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
 };
 
@@ -48,7 +47,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Badge className={statusConfig[order.status].color}>{statusConfig[order.status].label}</Badge>
+                        <Badge className={statusConfig[order.status]?.color}>{statusConfig[order.status]?.label}</Badge>
                         <Overlay
                             open={state.isOpen}
                             sheetClassName="min-w-[70vw]"

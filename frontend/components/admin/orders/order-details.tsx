@@ -38,7 +38,6 @@ const getStatusBadge = (status?: OrderStatus) => {
         ["OUT_FOR_DELIVERY"]: "blue",
         ["CANCELED"]: "destructive",
         ["DELIVERED"]: "success",
-        ["PAID"]: "emerald",
         ["REFUNDED"]: "destructive",
     };
 
@@ -99,11 +98,6 @@ const orderStatusMap = {
         label: "Cancelled",
         color: "bg-danger",
     },
-    PAID: {
-        icon: <CircleCheck className="h-5 w-5 text-white" />,
-        label: "Paid",
-        color: "bg-success",
-    },
     REFUNDED: {
         icon: <CircleSlash className="h-5 w-5 text-white" />,
         label: "Refunded",
@@ -117,7 +111,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
             <div className="sticky top-0 z-10 bg-content1 py-6">
                 <button className="flex items-center text-default-500 hover:text-default-900 cursor-pointer" onClick={onClose}>
                     <ArrowLeft className="w-4 h-4 mr-1" />
-                    <span>Back to Orders</span>
+                    <span>Back to Orders111</span>
                 </button>
             </div>
 

@@ -1,7 +1,5 @@
 import React from "react";
 import { CreditCard, ArrowLeft } from "lucide-react";
-import { useCallback } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { paymentInfoMap } from "@lib/constants";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,20 +26,6 @@ interface PaymentStepProps {
 const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
     const { shopSettings } = useStore();
     const updateCartDetails = useUpdateCartDetails();
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const pathname = usePathname();
-
-    const createQueryString = useCallback(
-        (name: string, value: string) => {
-            const params = new URLSearchParams(searchParams);
-
-            params.set(name, value);
-
-            return params.toString();
-        },
-        [searchParams]
-    );
 
     const handleChange = (providerId: PaymentMethod) => {
         updateCartDetails.mutate({ payment_method: providerId });

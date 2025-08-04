@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
+import OrderOverview from "./order-overview";
 
 interface OrderDetailsProps {
     order: Order;
@@ -46,11 +47,6 @@ const statusConfig: Record<Order["status"], { label: string; color: string; desc
         color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
         description: "This order was cancelled",
     },
-    PAID: {
-        label: "Paid",
-        color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-        description: "This order was paid",
-    },
     REFUNDED: {
         label: "Refunded",
         color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
@@ -66,7 +62,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
             <div className="flex items-center gap-4">
                 <Button className="flex items-center gap-2" size="sm" variant="outline" onClick={onBack}>
                     <ArrowLeft className="h-4 w-4" />
-                    Back to Orders
+                    Back to Orders22
                 </Button>
                 <div>
                     <h2 className="text-2xl font-bold text-default-900">Order Details</h2>
@@ -98,6 +94,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                             </div>
                         </CardContent>
                     </Card>
+                    <OrderOverview showNext order={order} />
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">

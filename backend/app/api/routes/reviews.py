@@ -115,7 +115,7 @@ async def create(review: ReviewCreate, user: CurrentUser, background_tasks: Back
         raise HTTPException(status_code=400, detail="You have already reviewed this product.")
 
     user_orders = await db.order.find_many(
-        where={"user_id": user.id, "status": {"in": ["PAID", "DELIVERED", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY"]}},
+        where={"user_id": user.id, "status": {"in": ["DELIVERED"]}},
         include={"order_items": {"include": {"variant": True}}}
     )
     has_purchased = any(

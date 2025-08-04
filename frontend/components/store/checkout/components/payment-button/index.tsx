@@ -62,7 +62,6 @@ const GiftCardPaymentButton = () => {
     const handleOrder = async () => {
         completeCart.mutate({
             payment_status: "SUCCESS",
-            status: "PAID",
         });
     };
 

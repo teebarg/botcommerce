@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
 
 import { api } from "@/apis/client";
-import { Order, OrderStatus, PaginatedOrder } from "@/schemas";
+import { Order, OrderStatus, PaginatedOrder, PaymentStatus } from "@/schemas";
 
 interface OrderSearchParams {
     query?: string;
@@ -40,6 +40,21 @@ export const useChangeOrderStatus = () => {
         },
         onError: (error) => {
             toast.error("Failed to change order status" + error);
+        },
+    });
+};
+
+export const useChangePaymentStatus = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) => await api.patch<Order>(`/payment/${id}/status?status=${status}`),
+        onSuccess: () => {
+            toast.success("Successfully changed payment status");
+            invalidate("orders");
+        },
+        onError: (error) => {
+            toast.error("Failed to change payment status" + error);
         },
     });
 };
