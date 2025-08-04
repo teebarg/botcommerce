@@ -7,6 +7,7 @@ import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 import OrderNotes from "./order-notes";
+import OrderNext from "./order-next";
 
 import { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
@@ -54,6 +55,10 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
             </FadeInComponent>
 
             <FadeInComponent delay="600ms">
+                <OrderNext />
+            </FadeInComponent>
+
+            <FadeInComponent delay="650ms">
                 <div className="mt-6 space-y-3">
                     {/* <Button className="w-full px-6 py-3 rounded-xl font-medium bg-indigo-600 text-white hover:bg-indigo-700" onClick={() => {}}>
                         Track Your Order

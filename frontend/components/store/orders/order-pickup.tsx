@@ -1,12 +1,12 @@
 "use client";
 
-import { ArrowRight } from "nui-react-icons";
-import { ShoppingBag } from "lucide-react";
+import { AlertCircle, ArrowRight, ShoppingBag } from "lucide-react";
 
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderNotes from "./order-notes";
+import OrderNext from "./order-next";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
@@ -51,6 +51,29 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
                 </div>
             </FadeInComponent>
 
+            {order?.payment_method === "BANK_TRANSFER" && (
+                <FadeInComponent delay="150ms">
+                    <div className="mb-8 p-6 bg-orange-50 border border-orange-200 rounded-2xl">
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                            <AlertCircle className="w-5 h-5 text-orange-600" />
+                            <span className="font-medium text-orange-900">Payment Pending</span>
+                        </div>
+                        <p className="text-sm text-orange-700 mb-4">
+                            Your order is currently pending payment. Please complete your bank transfer using the details provided.
+                        </p>
+                        <div className="p-4 bg-white rounded-lg border border-orange-200">
+                            <h4 className="font-medium text-gray-900 mb-2">Next Steps:</h4>
+                            <ul className="text-sm text-gray-600 space-y-1 text-left">
+                                <li>• Transfer the exact amount to our bank account</li>
+                                <li>• Include your order number ({order.order_number}) in the transfer description</li>
+                                <li>• We will process your order once payment is confirmed</li>
+                                <li>• You will receive an email confirmation within 24 hours</li>
+                            </ul>
+                        </div>
+                    </div>
+                </FadeInComponent>
+            )}
+
             <FadeInComponent delay="200ms">
                 <OrderNotes order={order} />
             </FadeInComponent>
@@ -65,6 +88,10 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
 
             <FadeInComponent delay="600ms">
                 <OrderSummary order={order} />
+            </FadeInComponent>
+
+            <FadeInComponent delay="650ms">
+                <OrderNext isPickup />
             </FadeInComponent>
 
             <FadeInComponent delay="700ms">

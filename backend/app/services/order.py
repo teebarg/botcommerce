@@ -28,8 +28,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
-    new_order = await db.order.create(
-        data={
+    data = {
             "order_number": order_number,
             "email": cart.email,
             "total": cart.total,
@@ -42,8 +41,6 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             "payment_method": cart.payment_method,
             "cart": {"connect": {"id": cart.id}},
             "user": {"connect": {"id": user_id}},
-            # "billing_address": {"connect": {"id": cart.billing_address_id}},
-            "shipping_address": {"connect": {"id": cart.shipping_address_id}},
             "order_items": {
                 "create": [
                     {
@@ -56,6 +53,12 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
                 ]
             }
         }
+
+    if cart.shipping_address_id:
+        data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
+
+    new_order = await db.order.create(
+        data=data
     )
 
     return new_order
@@ -242,7 +245,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
         raise HTTPException(status_code=404, detail="Order not found")
 
     out_of_stock_variants = []
-    
+
     async with db.tx() as tx:
         try:
             for item in order.order_items:

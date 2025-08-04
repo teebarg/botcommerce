@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowRight, Clock } from "nui-react-icons";
+import { AlertCircle, ArrowRight, Clock } from "lucide-react";
 
 import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 import OrderNotes from "./order-notes";
+import OrderNext from "./order-next";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
@@ -23,7 +24,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
     const { data: bankDetails } = useBankDetails();
 
     return (
-        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
+        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-4">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
@@ -39,26 +40,49 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
             <FadeInComponent delay="100ms">
                 <div className="bg-card rounded-xl shadow-sm p-4 mb-6 mt-4">
                     <h3 className="text-lg font-medium text-default-900 mb-4">Bank Transfer Details</h3>
-                    <div className="space-y-3">
-                        <div className="flex justify-between">
-                            <span className="text-default-500">Bank Name</span>
+                    <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                            <span className="text-default-500 text-sm">Bank Name</span>
                             <span className="font-medium">{bankDetails?.[0]?.bank_name}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-default-500">Account Name</span>
+                        <div className="flex items-center justify-between">
+                            <span className="text-default-500 text-sm">Account Name</span>
                             <span className="font-medium">{bankDetails?.[0]?.account_name}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-default-500">Account Number</span>
+                        <div className="flex items-center justify-between">
+                            <span className="text-default-500 text-sm">Account Number</span>
                             <span className="font-medium">{bankDetails?.[0]?.account_number}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-default-500">Reference</span>
+                        <div className="flex items-center justify-between">
+                            <span className="text-default-500 text-sm">Reference</span>
                             <span className="font-medium">{order.order_number}</span>
                         </div>
                     </div>
                 </div>
             </FadeInComponent>
+
+            {order?.payment_method === "BANK_TRANSFER" && (
+                <FadeInComponent delay="150ms">
+                    <div className="mb-8 p-6 bg-orange-100 dark:bg-orange-900/20 border border-orange-200 rounded-2xl">
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                            <AlertCircle className="w-5 h-5 text-orange-600" />
+                            <span className="font-medium text-orange-900">Payment Pending</span>
+                        </div>
+                        <p className="text-sm text-orange-700 mb-4">
+                            Your order is currently pending payment. Please complete your bank transfer using the details provided.
+                        </p>
+                        <div className="p-4 bg-white rounded-lg border border-orange-200">
+                            <h4 className="font-medium text-gray-900 mb-2">Next Steps:</h4>
+                            <ul className="text-sm text-gray-600 space-y-1 text-left">
+                                <li>• Transfer the exact amount to our bank account</li>
+                                <li>• Include your order number ({order.order_number}) in the transfer description</li>
+                                <li>• We will process your order once payment is confirmed</li>
+                                <li>• You will receive an email confirmation within 24 hours</li>
+                            </ul>
+                        </div>
+                    </div>
+                </FadeInComponent>
+            )}
 
             <FadeInComponent delay="200ms">
                 <OrderNotes order={order} />
@@ -78,6 +102,10 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             <FadeInComponent delay="600ms">
                 <OrderSummary order={order} />
+            </FadeInComponent>
+
+            <FadeInComponent delay="650ms">
+                <OrderNext isPickup />
             </FadeInComponent>
 
             <FadeInComponent delay="700ms">

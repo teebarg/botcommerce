@@ -64,8 +64,8 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                                 </div>
                                 <div className="space-y-2 text-sm text-muted-foreground pl-9">
                                     <div className="flex items-center space-x-2">
-                                        <Clock className="h-4 w-4" />
-                                        {option.amount === 0 ? <span>Ready in 2-4 hours</span> : <span>3-5 business days</span>}
+                                        <Clock className="h-4 w-4 mr-1" />
+                                        {option.duration}
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <MapPin className="h-4 w-4" />
@@ -84,7 +84,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                 {canContinue && (
                     <div className="flex justify-end pt-4">
                         <Button className="flex items-center gap-2" size="lg" variant="luxury" onClick={handleContinue}>
-                            Continue to Address
+                            {cart.shipping_method === "PICKUP" ? "Continue to Payment" : "Continue to Address"}
                             <ArrowRight className="h-4 w-4" />
                         </Button>
                     </div>

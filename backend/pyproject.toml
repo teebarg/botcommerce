@@ -21,8 +21,8 @@ dependencies = [
     "meilisearch==0.36.0",
     "redis==6.2.0",
     "prisma<1.0.0,>=0.11.0",
-    "supabase==2.14.0",
-    "google-genai==1.24.0",
+    "supabase==2.17.0",
+    "google-genai==1.28.0",
     "reportlab<5.0.0,>=4.0.0",
     "sentry-sdk[fastapi]<3.0.0,>=1.40.6"
 ]

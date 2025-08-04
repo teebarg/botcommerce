@@ -145,14 +145,6 @@ async def fulfill_order(cache: RedisClient, order_id: int):
     await cache.bust_tag(f"order:{order_id}")
     return updated_order
 
-# @router.get("/{order_id}/invoice")
-# async def download_invoice(order_id: int, user: CurrentUser, cache: RedisClient):
-#     """Generate and upload invoice PDF to Supabase storage, returning the download URL"""
-#     public_url = await create_invoice(order_id=order_id, user=user)
-#     await cache.invalidate_list_cache("orders")
-#     await cache.bust_tag(f"order:{order_id}")
-#     return {"invoice_url": public_url}
-
 class OrderNotesUpdate(BaseModel):
     notes: str
 

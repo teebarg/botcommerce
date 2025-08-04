@@ -2,7 +2,7 @@
 
 import { Plus } from "nui-react-icons";
 import { toast } from "sonner";
-import { LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
+import { Clock, LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import DeliveryOptionForm from "./delivery-option-form";
@@ -66,6 +66,10 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="flex items-center gap-2 text-sm">
                                     <span className="font-medium text-green-600">{currency(option.amount)}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-default-500">
+                                    <Clock className="w-4 h-4" />
+                                    <span className="font-medium">{option.duration}</span>
                                 </div>
                             </div>
                         </div>

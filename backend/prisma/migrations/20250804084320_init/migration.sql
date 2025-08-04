@@ -66,7 +66,6 @@ CREATE TABLE "addresses" (
     "address_2" TEXT,
     "city" TEXT,
     "state" TEXT,
-    "postal_code" TEXT,
     "phone" TEXT,
     "is_billing" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -122,7 +121,6 @@ CREATE TABLE "products" (
     "description" TEXT,
     "features" TEXT[],
     "image" VARCHAR(255),
-    "status" "ProductStatus" NOT NULL DEFAULT 'IN_STOCK',
     "ratings" DOUBLE PRECISION DEFAULT 0,
     "brand_id" INTEGER,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -421,6 +419,7 @@ CREATE TABLE "delivery_options" (
     "description" TEXT,
     "method" "ShippingMethod" NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
+    "duration" TEXT,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -456,6 +455,32 @@ CREATE TABLE "user_preferences" (
 );
 
 -- CreateTable
+CREATE TABLE "shared_collections" (
+    "id" SERIAL NOT NULL,
+    "title" VARCHAR(255) NOT NULL,
+    "slug" VARCHAR(255) NOT NULL,
+    "description" TEXT,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "view_count" INTEGER NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "shared_collections_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "shared_collection_views" (
+    "id" SERIAL NOT NULL,
+    "shared_collection_id" INTEGER NOT NULL,
+    "user_id" INTEGER,
+    "ip_address" TEXT,
+    "user_agent" TEXT,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "shared_collection_views_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_ProductCategories" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -469,6 +494,12 @@ CREATE TABLE "_ProductCollections" (
 
 -- CreateTable
 CREATE TABLE "_ProductTags" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_SharedCollectionProducts" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
@@ -576,6 +607,9 @@ CREATE INDEX "user_interactions_product_id_timestamp_idx" ON "user_interactions"
 CREATE UNIQUE INDEX "user_preferences_user_id_category_brand_key" ON "user_preferences"("user_id", "category", "brand");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "shared_collections_slug_key" ON "shared_collections"("slug");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_ProductCategories_AB_unique" ON "_ProductCategories"("A", "B");
 
 -- CreateIndex
@@ -592,6 +626,12 @@ CREATE UNIQUE INDEX "_ProductTags_AB_unique" ON "_ProductTags"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_ProductTags_B_index" ON "_ProductTags"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_SharedCollectionProducts_AB_unique" ON "_SharedCollectionProducts"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_SharedCollectionProducts_B_index" ON "_SharedCollectionProducts"("B");
 
 -- AddForeignKey
 ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -669,13 +709,19 @@ ALTER TABLE "conversations" ADD CONSTRAINT "conversations_user_id_fkey" FOREIGN 
 ALTER TABLE "messages" ADD CONSTRAINT "messages_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_interactions" ADD CONSTRAINT "user_interactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_interactions" ADD CONSTRAINT "user_interactions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "user_interactions" ADD CONSTRAINT "user_interactions_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_interactions" ADD CONSTRAINT "user_interactions_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "user_preferences" ADD CONSTRAINT "user_preferences_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_preferences" ADD CONSTRAINT "user_preferences_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "shared_collection_views" ADD CONSTRAINT "shared_collection_views_shared_collection_id_fkey" FOREIGN KEY ("shared_collection_id") REFERENCES "shared_collections"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "shared_collection_views" ADD CONSTRAINT "shared_collection_views_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "_ProductCategories" ADD CONSTRAINT "_ProductCategories_A_fkey" FOREIGN KEY ("A") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -694,3 +740,9 @@ ALTER TABLE "_ProductTags" ADD CONSTRAINT "_ProductTags_A_fkey" FOREIGN KEY ("A"
 
 -- AddForeignKey
 ALTER TABLE "_ProductTags" ADD CONSTRAINT "_ProductTags_B_fkey" FOREIGN KEY ("B") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SharedCollectionProducts" ADD CONSTRAINT "_SharedCollectionProducts_A_fkey" FOREIGN KEY ("A") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SharedCollectionProducts" ADD CONSTRAINT "_SharedCollectionProducts_B_fkey" FOREIGN KEY ("B") REFERENCES "shared_collections"("id") ON DELETE CASCADE ON UPDATE CASCADE;

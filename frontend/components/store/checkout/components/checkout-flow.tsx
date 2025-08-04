@@ -30,6 +30,9 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
         if (!cart.shipping_method) {
             return "delivery";
         }
+        if (cart.shipping_method === "PICKUP") {
+            return "payment";
+        }
         if (!cart.shipping_address) {
             return "address";
         }
@@ -48,7 +51,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
             completed.push("delivery");
         }
 
-        if (cart.shipping_address) {
+        if (cart.shipping_method !== "PICKUP" && cart.shipping_address) {
             completed.push("address");
         }
 
@@ -70,11 +73,33 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
             case "auth":
                 return <CheckoutLoginPrompt />;
             case "delivery":
-                return <DeliveryStep cart={cart} onComplete={() => setCurrentStep("address")} />;
+                return (
+                    <DeliveryStep
+                        cart={cart}
+                        onComplete={() => {
+                            if (cart.shipping_method === "PICKUP") {
+                                setCurrentStep("payment");
+                            } else {
+                                setCurrentStep("address");
+                            }
+                        }}
+                    />
+                );
             case "address":
                 return <AddressStep address={cart.shipping_address} onComplete={() => setCurrentStep("payment")} />;
             case "payment":
-                return <PaymentStep cart={cart} onBack={() => setCurrentStep("address")} />;
+                return (
+                    <PaymentStep
+                        cart={cart}
+                        onBack={() => {
+                            if (cart.shipping_method === "PICKUP") {
+                                setCurrentStep("delivery");
+                            } else {
+                                setCurrentStep("address");
+                            }
+                        }}
+                    />
+                );
             default:
                 return null;
         }
@@ -85,7 +110,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
 
     return (
         <div className="space-y-6">
-            {isAuthenticated && <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />}
+            <CheckoutStepIndicator cart={cart} completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />
             <div className={cn("transition-all duration-300", isAuthenticated ? "animate-fade-in" : "")}>{renderStep()}</div>
         </div>
     );

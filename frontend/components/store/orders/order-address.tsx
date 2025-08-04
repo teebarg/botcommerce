@@ -1,10 +1,12 @@
 import { MapPin, Truck } from "lucide-react";
 
-import { Order } from "@/schemas";
+import { DeliveryOption, Order } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
+import { useDeliveryOptions } from "@/lib/hooks/useApi";
 
 const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
     const { shopSettings } = useStore();
+    const { data: deliveryOptions } = useDeliveryOptions();
 
     if (order.shipping_method === "PICKUP") {
         return (
@@ -20,6 +22,8 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
             </div>
         );
     }
+
+    const option = deliveryOptions?.find((item: DeliveryOption) => item.method == order.shipping_method);
 
     return (
         <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
@@ -43,9 +47,7 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
                 <Truck className="w-5 h-5 text-default-500 mt-0.5" />
                 <div className="ml-3">
                     <h3 className="font-medium text-default-900">Delivery</h3>
-                    <p className="mt-1 text-sm text-default-600">
-                        Estimated delivery: {order.shipping_method === "EXPRESS" ? "5-7 days" : "2-3 days"}
-                    </p>
+                    <p className="mt-1 text-sm text-default-600">Estimated delivery: {option?.duration}</p>
                 </div>
             </div>
         </div>

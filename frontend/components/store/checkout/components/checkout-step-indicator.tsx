@@ -5,12 +5,14 @@ import { CheckCircle, Circle, Truck, MapPin, CreditCard, User } from "lucide-rea
 
 import { CheckoutStep } from "./checkout-flow";
 
+import { Cart } from "@/schemas";
 import { cn } from "@/lib/utils";
 
 interface CheckoutStepIndicatorProps {
     currentStep: CheckoutStep;
     completedSteps: CheckoutStep[];
     onStepClick: (step: CheckoutStep) => void;
+    cart?: Omit<Cart, "refundable_amount" | "refunded_total">;
 }
 
 const stepConfig = {
@@ -36,8 +38,10 @@ const stepConfig = {
     },
 };
 
-const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentStep, completedSteps, onStepClick }) => {
-    const steps: CheckoutStep[] = ["auth", "delivery", "address", "payment"];
+const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentStep, completedSteps, onStepClick, cart }) => {
+    const isPickup = cart?.shipping_method === "PICKUP";
+
+    const steps: CheckoutStep[] = isPickup ? ["auth", "delivery", "payment"] : ["auth", "delivery", "address", "payment"];
 
     return (
         <div className="w-full bg-background border border-border rounded-lg p-4 mb-6 sticky top-20 z-10">
@@ -54,10 +58,9 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                             <div className="flex flex-col items-center">
                                 <button
                                     className={cn(
-                                        "flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200",
-                                        isClickable && "hover:bg-accent/50 cursor-pointer",
-                                        !isClickable && "opacity-50 cursor-not-allowed",
-                                        isActive && "bg-red-500 text-white"
+                                        "flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 text-default-500",
+                                        isClickable ? "hover:bg-secondary/50 cursor-pointer" : "opacity-50 cursor-not-allowed",
+                                        isActive && "bg-secondary text-accent"
                                     )}
                                     disabled={!isClickable}
                                     onClick={() => isClickable && onStepClick(step)}
@@ -68,7 +71,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                                         ) : (
                                             <div
                                                 className={cn(
-                                                    "h-6 w-6 rounded-full border-2 flex items-center justify-center",
+                                                    "h-6 w-6 rounded-full flex items-center justify-center",
                                                     isActive ? "border-primary bg-accent/50 text-white" : "border-muted-foreground"
                                                 )}
                                             >
@@ -77,9 +80,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                                         )}
                                     </div>
                                     <div className="text-center">
-                                        <div className={cn("text-sm font-medium", isActive && "text-primary", isCompleted && "text-accent")}>
-                                            {config.title}
-                                        </div>
+                                        <div className={cn("text-sm font-medium", isActive && "", isCompleted && "text-accent")}>{config.title}</div>
                                         <div className="text-xs text-muted-foreground hidden sm:block">{config.description}</div>
                                     </div>
                                 </button>

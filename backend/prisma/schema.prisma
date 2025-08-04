@@ -550,6 +550,7 @@ model DeliveryOption {
   description String?        @db.Text
   method      ShippingMethod
   amount      Float          @db.DoublePrecision
+  duration    String?
   is_active   Boolean        @default(true)
   created_at  DateTime       @default(now())
   updated_at  DateTime       @updatedAt

@@ -102,7 +102,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
                     <div className="pt-4">
                         <Button className="flex items-center gap-2" variant="outline" onClick={handleBack}>
                             <ArrowLeft className="h-4 w-4" />
-                            Back to Address
+                            {cart?.shipping_method === "PICKUP" ? "Back to Delivery" : "Back to Address"}
                         </Button>
                     </div>
                 </CardContent>
