@@ -5,14 +5,12 @@ import { CheckCircle, Circle, Truck, MapPin, CreditCard, User } from "lucide-rea
 
 import { CheckoutStep } from "./checkout-flow";
 
-import { Cart } from "@/schemas";
 import { cn } from "@/lib/utils";
 
 interface CheckoutStepIndicatorProps {
     currentStep: CheckoutStep;
     completedSteps: CheckoutStep[];
     onStepClick: (step: CheckoutStep) => void;
-    cart?: Omit<Cart, "refundable_amount" | "refunded_total">;
 }
 
 const stepConfig = {
@@ -38,10 +36,8 @@ const stepConfig = {
     },
 };
 
-const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentStep, completedSteps, onStepClick, cart }) => {
-    const isPickup = cart?.shipping_method === "PICKUP";
-
-    const steps: CheckoutStep[] = isPickup ? ["auth", "delivery", "payment"] : ["auth", "delivery", "address", "payment"];
+const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentStep, completedSteps, onStepClick }) => {
+    const steps: CheckoutStep[] = ["delivery", "address", "payment"];
 
     return (
         <div className="w-full bg-background border border-border rounded-lg py-4 px-1 mb-6 sticky top-20 z-10">

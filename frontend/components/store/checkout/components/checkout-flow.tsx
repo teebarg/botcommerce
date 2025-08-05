@@ -110,7 +110,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
 
     return (
         <div className="space-y-6">
-            <CheckoutStepIndicator cart={cart} completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />
+            {isAuthenticated && <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />}
             <div className={cn("transition-all duration-300", isAuthenticated ? "animate-fade-in" : "")}>{renderStep()}</div>
         </div>
     );
