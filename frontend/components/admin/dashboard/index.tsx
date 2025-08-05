@@ -98,10 +98,9 @@ const RecentOrdersList = () => {
                 <div className="divide-y divide-default-200">
                     {orders?.map((order: Order, idx: number) => (
                         <div key={idx} className="p-4">
-                            <PaymentStatusBadge status={order.payment_status} />
                             <div className="flex justify-between items-center mb-2 mt-2">
                                 <span className="font-medium">{order.order_number}</span>
-                                <OrderStatusBadge status={order.status} />
+                                <PaymentStatusBadge status={order.payment_status} />
                             </div>
                             <div className="flex justify-between text-sm text-default-500">
                                 <span>
@@ -110,6 +109,10 @@ const RecentOrdersList = () => {
                                 <span className="font-medium">{currency(order.total)}</span>
                             </div>
                             <div className="text-xs text-default-500 mt-1">{order.created_at}</div>
+                            <div className="flex justify-between items-center mt-2">
+                                <span>Order Status:</span>
+                                <OrderStatusBadge status={order.status} />
+                            </div>
                         </div>
                     ))}
                     {orders?.length === 0 && (

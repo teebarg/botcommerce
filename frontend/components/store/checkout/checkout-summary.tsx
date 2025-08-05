@@ -1,3 +1,5 @@
+"use client";
+
 import DiscountCode from "./components/discount-code";
 
 import CartTotals from "@/components/store/cart/cart-totals";

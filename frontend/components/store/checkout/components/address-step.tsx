@@ -81,7 +81,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                         </div>
                     )}
 
-                    {canContinue && (
+                    {canContinue && addressOption === "existing" && (
                         <div className="flex justify-end pt-4">
                             <Button className="flex items-center gap-2" size="lg" variant="luxury" onClick={handleContinue}>
                                 Continue to Payment
