@@ -28,4 +28,13 @@ export const authApi = {
 
         return response;
     },
+    async oauthCallback(provider: "google" | "github", code: string): ApiResult<Token> {
+        const response = await tryCatch<Token>(api.post<Token>(`/auth/oauth/${provider}/callback`, { code }));
+
+        if (response.data) {
+            await setCookie("access_token", response.data.access_token);
+        }
+
+        return response;
+    },
 };

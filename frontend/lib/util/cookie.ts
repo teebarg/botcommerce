@@ -1,5 +1,6 @@
 // ✅ Set a cookie (only works on the client)
 export async function setCookie(name: string, value: string, days = 7) {
+    console.log("🚀 ~ file: cookie.ts:3 ~ name:", name)
     if (typeof window !== "undefined") {
         const expires = new Date();
 
@@ -10,6 +11,7 @@ export async function setCookie(name: string, value: string, days = 7) {
 
 // ✅ Delete a cookie (only works on the client)
 export async function deleteCookie(name: string) {
+    console.log("🚀 ~ file: cookie.ts:16 ~ name:", name)
     if (typeof window !== "undefined") {
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
     }
