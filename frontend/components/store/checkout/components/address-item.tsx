@@ -12,6 +12,7 @@ import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import ComponentLoader from "@/components/component-loader";
 
 interface AddressItemProp {
     address: Address;
@@ -55,7 +56,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
 
     return (
         <div
-            className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group ${
+            className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden ${
                 isSelected ? "ring-2 ring-accent bg-accent/10" : "border border-divider bg-content2 hover:border-accent/50 hover:shadow-md"
             }`}
             onClick={() => !isSelected && handleSelect(address.id)}
@@ -137,6 +138,11 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     </DialogContent>
                 </Dialog>
             </div>
+            {updateCartDetails.isPending && (
+                <div className="absolute top-0 left-0 w-full h-full bg-white/70 dark:bg-black/50 z-50 flex items-center justify-center">
+                    <ComponentLoader />
+                </div>
+            )}
         </div>
     );
 };

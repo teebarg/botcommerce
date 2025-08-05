@@ -26,8 +26,10 @@ interface PaymentStepProps {
 const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
     const { shopSettings } = useStore();
     const updateCartDetails = useUpdateCartDetails();
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
 
     const handleChange = (providerId: PaymentMethod) => {
+        setSelectedPaymentMethod(providerId);
         updateCartDetails.mutate({ payment_method: providerId });
     };
 
@@ -51,7 +53,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
                     className="grid grid-cols-1 md:grid-cols-3 gap-2"
                     label="Payment Method"
                     value={cart?.payment_method || ""}
-                    onValueChange={(value: string) => handleChange(value as PaymentMethod)}
+                    onValueChange={(value: string) => {
+                        handleChange(value as PaymentMethod);
+                    }}
                 >
                     {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
                         if (
@@ -64,7 +68,12 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
                         }
 
                         return (
-                            <RadioGroupItem key={idx} value={item.provider_id} variant="card">
+                            <RadioGroupItem
+                                key={idx}
+                                value={item.provider_id}
+                                variant="card"
+                                loading={updateCartDetails.isPending && selectedPaymentMethod === item.provider_id}
+                            >
                                 <div className="flex items-center gap-3">
                                     <div className="shrink-0 mt-0.5 text-accent">{paymentInfoMap[item.provider_id]?.icon}</div>
                                     <div className="text-left">

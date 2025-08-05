@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Circle, Check } from "lucide-react";
+import { Circle, Check, Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -55,34 +55,43 @@ function RadioGroupItem({
     className,
     children,
     variant = "default",
+    loading = false,
     ...props
 }: React.ComponentProps<typeof RadioGroupPrimitive.Item> & {
     variant?: keyof typeof radioVariants;
     children?: React.ReactNode;
+    loading?: boolean;
 }) {
     const variantStyles = radioVariants[variant];
 
-    if (variant === "default") {
-        return (
-            <RadioGroupPrimitive.Item className={cn(variantStyles.item, className)} {...props}>
-                <RadioGroupPrimitive.Indicator className={variantStyles.indicator}>
-                    <Circle className={variantStyles.icon} />
-                </RadioGroupPrimitive.Indicator>
-            </RadioGroupPrimitive.Item>
-        );
-    }
-
     return (
-        <RadioGroupPrimitive.Item className={cn(variantStyles.item, className)} {...props}>
-            {children}
-            <RadioGroupPrimitive.Indicator className={variantStyles.indicator}>
-                <Check className={variantStyles.icon} />
-            </RadioGroupPrimitive.Indicator>
-        </RadioGroupPrimitive.Item>
+        <div className="relative">
+            {variant === "default" ? (
+                <RadioGroupPrimitive.Item className={cn(variantStyles.item, className, "w-full")} {...props}>
+                    <RadioGroupPrimitive.Indicator className={variantStyles.indicator}>
+                        <Circle className={variantStyles.icon} />
+                    </RadioGroupPrimitive.Indicator>
+                </RadioGroupPrimitive.Item>
+            ) : (
+                <RadioGroupPrimitive.Item className={cn(variantStyles.item, className, "w-full")} {...props}>
+                    {children}
+                    <RadioGroupPrimitive.Indicator className={variantStyles.indicator}>
+                        <Check className={variantStyles.icon} />
+                    </RadioGroupPrimitive.Indicator>
+                </RadioGroupPrimitive.Item>
+            )}
+            {loading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-black/50 pointer-events-auto">
+                    <div className="flex items-center gap-2">
+                        <Loader2 className="animate-spin text-muted-foreground size-6" />
+                        <span className="text-xs text-muted-foreground">Processing...</span>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
-// Enhanced radio group with label support
 function RadioGroupWithLabel({
     className,
     variant = "default",

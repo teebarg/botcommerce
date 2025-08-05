@@ -21,6 +21,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     const { shopSettings } = useStore();
     const { data: deliveryOptions, isPending } = useDeliveryOptions();
     const updateCartDetails = useUpdateCartDetails();
+    const [selectedDeliveryMethod, setSelectedDeliveryMethod] = React.useState<DeliveryOption | null>(null);
 
     const handleChange = (value: string) => {
         const item: DeliveryOption | undefined = deliveryOptions?.find((item: DeliveryOption) => item.method == value);
@@ -28,6 +29,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
         if (!item) {
             return;
         }
+        setSelectedDeliveryMethod(item);
         updateCartDetails.mutate({ shipping_method: item.method, shipping_fee: item.amount });
     };
 
@@ -54,7 +56,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
             <CardContent className="space-y-6">
                 <RadioGroup value={cart.shipping_method} variant="delivery" onValueChange={(value: string) => handleChange(value)}>
                     {deliveryOptions?.map((option, idx: number) => (
-                        <RadioGroupItem key={idx} value={option.method} variant="delivery">
+                        <RadioGroupItem key={idx} value={option.method} variant="delivery" loading={updateCartDetails.isPending && selectedDeliveryMethod === option}>
                             <div className="">
                                 <div className="flex items-center space-x-3 mb-2">
                                     {option.method === "PICKUP" ? (
