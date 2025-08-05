@@ -1,5 +1,5 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "botmerce-cache-v5"; // Increment this value for new versions
+const CACHE_NAME = "botmerce-cache-v6";
 const ASSETS_TO_CACHE = [
     // "/", // Root URL
     "/careers",

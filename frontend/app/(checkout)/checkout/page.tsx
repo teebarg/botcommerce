@@ -24,16 +24,8 @@ export default function Checkout() {
         return <ServerError error={error.message} scenario="checkout" stack={error.stack} />;
     }
 
-    if (!cart) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <EmptyCartMessage />
-            </div>
-        );
-    }
-
     return (
-        <div className="min-h-screen bg-background">
+        <div className="bg-background">
             <div className="sticky top-0 md:hidden p-4 flex items-center justify-between gap-4 bg-background z-20 shadow-2xl pr-8">
                 <div className="flex items-center gap-2">
                     <BackButton />
@@ -57,8 +49,10 @@ export default function Checkout() {
                         <ComponentLoader className="h-192 w-full rounded-md" />
                     </div>
                 </div>
+            ) : !cart ? (
+                <EmptyCartMessage />
             ) : (
-                <main className="max-w-8xl mx-auto w-full px-2 md:px-8 md:pt-4 pb-8">
+                <main className="max-w-8xl mx-auto w-full px-2 md:px-8 md:pt-4">
                     <div className="flex flex-col md:flex-row md:gap-8">
                         <div className="w-full">
                             <nav aria-label="Breadcrumbs" data-slot="base">
