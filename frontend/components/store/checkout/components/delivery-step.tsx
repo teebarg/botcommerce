@@ -10,6 +10,7 @@ import { DeliveryOption } from "@/schemas";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 import { Cart } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
+import ComponentLoader from "@/components/component-loader";
 
 interface DeliveryStepProps {
     cart: Cart;
@@ -18,7 +19,7 @@ interface DeliveryStepProps {
 
 const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     const { shopSettings } = useStore();
-    const { data: deliveryOptions } = useDeliveryOptions();
+    const { data: deliveryOptions, isPending } = useDeliveryOptions();
     const updateCartDetails = useUpdateCartDetails();
 
     const handleChange = (value: string) => {
@@ -37,6 +38,12 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     };
 
     const canContinue = !!cart.shipping_method;
+
+    if (isPending) {
+        return (
+            <ComponentLoader className="h-48" />
+        );
+    }
 
     return (
         <Card className="w-full shadow-elegant animate-fade-in">

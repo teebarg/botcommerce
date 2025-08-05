@@ -44,7 +44,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
     const steps: CheckoutStep[] = isPickup ? ["auth", "delivery", "payment"] : ["auth", "delivery", "address", "payment"];
 
     return (
-        <div className="w-full bg-background border border-border rounded-lg p-4 mb-6 sticky top-20 z-10">
+        <div className="w-full bg-background border border-border rounded-lg py-4 px-1 mb-6 sticky top-20 z-10">
             <div className="flex items-center justify-between">
                 {steps.map((step: CheckoutStep, index: number) => {
                     const config = stepConfig[step];
@@ -58,7 +58,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                             <div className="flex flex-col items-center">
                                 <button
                                     className={cn(
-                                        "flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 text-default-500",
+                                        "flex flex-col items-center gap-1 px-2 py-3 rounded-lg transition-all duration-200 text-default-500",
                                         isClickable ? "hover:bg-secondary/50 cursor-pointer" : "opacity-50 cursor-not-allowed",
                                         isActive && "bg-secondary text-accent"
                                     )}

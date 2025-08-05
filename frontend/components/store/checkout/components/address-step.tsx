@@ -36,7 +36,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     const canContinue = !!address;
 
     if (isLoading) {
-        return <ComponentLoader className="h-24" />;
+        return <ComponentLoader className="h-48" />;
     }
 
     return (
