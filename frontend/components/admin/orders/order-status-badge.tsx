@@ -1,9 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { OrderStatus } from "@/schemas";
 import { AlertTriangle, CheckCircle, Clock, ShoppingCart } from "lucide-react";
 import { Exclamation } from "nui-react-icons";
+
+import { Badge } from "@/components/ui/badge";
+import { OrderStatus } from "@/schemas";
 
 export const PaymentStatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<

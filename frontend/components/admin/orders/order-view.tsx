@@ -8,6 +8,7 @@ import { Search } from "lucide-react";
 
 import OrderActions from "./order-actions";
 import OrderFilters from "./order-filters";
+import { OrderStatusBadge, PaymentStatusBadge } from "./order-status-badge";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/schemas";
@@ -17,7 +18,6 @@ import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import PaginationUI from "@/components/pagination";
 import { CardSkeleton } from "@/components/ui/skeletons";
-import { OrderStatusBadge, PaymentStatusBadge } from "./order-status-badge";
 
 const LIMIT = 10;
 

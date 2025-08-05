@@ -1,6 +1,7 @@
+import { OrderStatusBadge, PaymentStatusBadge } from "./order-status-badge";
+
 import { Order } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
-import { OrderStatusBadge, PaymentStatusBadge } from "./order-status-badge";
 
 interface OrderCardProps {
     order: Order;

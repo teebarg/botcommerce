@@ -325,3 +325,18 @@ export const useBustCache = () => {
         },
     });
 };
+
+export const useFlushCache = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async () => await api.post<Message>("/cache/clear", {}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            toast.success("Cache cleared successfully");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to clear cache");
+        },
+    });
+};

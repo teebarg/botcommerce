@@ -3,12 +3,13 @@
 import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
+import PaymentStatusManager from "./order-payment-status";
+
 import { Button } from "@/components/ui/button";
 import { Order, OrderStatus } from "@/schemas";
-import { useChangeOrderStatus, useChangePaymentStatus } from "@/lib/hooks/useOrder";
+import { useChangeOrderStatus } from "@/lib/hooks/useOrder";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import PaymentStatusManager from "./order-payment-status";
 
 interface OrderProcessingActionProps {
     order: Order;
@@ -101,8 +102,8 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                         <DialogTitle>Update Payment Status</DialogTitle>
                     </DialogHeader>
                     <PaymentStatusManager
-                        id={order.id}
                         currentStatus={order.payment_status}
+                        id={order.id}
                         orderNumber={order.order_number}
                         onClose={paymentState.close}
                     />

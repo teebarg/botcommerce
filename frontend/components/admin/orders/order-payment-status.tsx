@@ -1,11 +1,14 @@
+"use client";
+
 import React, { useState } from "react";
+import { CheckCircle, Clock, X, RotateCcw, CreditCard } from "lucide-react";
+import { toast } from "sonner";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, Clock, X, RotateCcw, CreditCard } from "lucide-react";
 import { PaymentStatus } from "@/schemas";
-import { toast } from "sonner";
 import { useChangePaymentStatus } from "@/lib/hooks/useOrder";
 
 interface PaymentStatusManagerProps {
@@ -118,14 +121,14 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2">
-                    <Button variant="default" onClick={onClose} disabled={isPending}>
+                    <Button disabled={isPending} variant="default" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
-                        onClick={handleStatusUpdate}
                         disabled={!hasChanges || isPending}
                         isLoading={isPending}
                         variant={hasChanges ? "luxury" : "outline"}
+                        onClick={handleStatusUpdate}
                     >
                         {hasChanges ? "Update Status" : "No Changes"}
                     </Button>

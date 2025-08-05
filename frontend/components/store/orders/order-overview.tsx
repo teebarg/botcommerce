@@ -1,7 +1,8 @@
 "use client";
 
+import { CheckCircle, Package, Calendar, Clock, RefreshCw, X, Truck } from "lucide-react";
+
 import { Order, OrderStatus } from "@/schemas";
-import { CheckCircle, Package, Calendar, Clock, Package2, RefreshCw, X, Truck } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 const OrderOverview = ({ order }: { order: Order }) => {
@@ -54,6 +55,7 @@ const OrderOverview = ({ order }: { order: Order }) => {
             .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(" ");
     };
+
     return (
         <div className="bg-accent/10 rounded-lg p-6 space-y-4 mb-4">
             <h3 className="text-xl font-semibold">Order Details</h3>

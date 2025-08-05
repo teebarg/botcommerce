@@ -58,7 +58,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
     }
 
     return (
-        <Card className="border-0 shadow-lg bg-content1">
+        <Card className="border-0 shadow-lg bg-content1 mb-4">
             <CardHeader>
                 <CardTitle className="text-xl font-semibold">Add Order Notes</CardTitle>
                 <p className="text-sm text-muted-foreground">Add special instructions, delivery preferences, or any other notes for your order.</p>

@@ -1,18 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShoppingCart, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+
+import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useOrders } from "@/lib/hooks/useOrder";
 import { Order } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import ComponentLoader from "@/components/component-loader";
 import ClientOnly from "@/components/generic/client-only";
 import ServerError from "@/components/generic/server-error";
-import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
 
 const RecentOrdersList = () => {
     const { data, isLoading, error } = useOrders({ take: 5 });
@@ -87,7 +86,7 @@ const RecentOrdersList = () => {
                         ))}
                         {orders?.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
+                                <TableCell className="h-24 text-center" colSpan={6}>
                                     No orders found
                                 </TableCell>
                             </TableRow>

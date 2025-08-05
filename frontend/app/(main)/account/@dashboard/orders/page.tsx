@@ -26,7 +26,9 @@ export default function Orders() {
                 {isLoading ? (
                     <ComponentLoader className="h-192" />
                 ) : data?.orders?.length ? (
-                    <div className="flex flex-col gap-y-8 w-full">{data.orders?.map((o: Order, idx: number) => <OrderCard key={idx} order={o} />)}</div>
+                    <div className="flex flex-col gap-y-8 w-full">
+                        {data.orders?.map((o: Order, idx: number) => <OrderCard key={idx} order={o} />)}
+                    </div>
                 ) : (
                     <div className="w-full flex flex-col items-center" data-testid="no-orders-container">
                         <h2 className="text-lg">Nothing to see here</h2>

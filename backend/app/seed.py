@@ -39,8 +39,7 @@ async def seed():
             }
         )
 
-
-    # admin = await upsert_user("teebarg01@gmail.com", "ADMIN")
+    # await upsert_user("teebarg01@gmail.com", "ADMIN")
 
     logger.info("Seeding brands...")
     brands = [

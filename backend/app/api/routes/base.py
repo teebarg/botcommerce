@@ -11,6 +11,8 @@ from app.core.deps import get_current_superuser, RedisClient
 from typing import Literal, Optional
 from datetime import timedelta, datetime
 from app.services.redis import cache_response
+from app.services.meilisearch import clear_index
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -129,6 +131,7 @@ async def bust_redis_cache(
 async def clear_redis_cache(cache: RedisClient):
     """Clear the entire Redis database (admin only)."""
     try:
+        clear_index(settings.MEILI_PRODUCTS_INDEX)
         result = await cache.clear()
         return {"success": result}
     except Exception as e:

@@ -6,12 +6,12 @@ import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderNotes from "./order-notes";
 import OrderNext from "./order-next";
+import OrderOverview from "./order-overview";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { useStore } from "@/app/store/use-store";
 import { Button } from "@/components/ui/button";
-import OrderOverview from "./order-overview";
 
 type OrderConfirmationProps = {
     order: Order;

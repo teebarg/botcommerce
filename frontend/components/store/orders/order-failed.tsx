@@ -1,5 +1,7 @@
 "use client";
 
+import { AlertCircle, CreditCard } from "lucide-react";
+
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
@@ -7,7 +9,6 @@ import OrderAddress from "./order-address";
 import { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CreditCard } from "lucide-react";
 
 type OrderConfirmationProps = {
     order: Order;

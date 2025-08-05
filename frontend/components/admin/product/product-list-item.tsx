@@ -12,6 +12,7 @@ interface ProductListItemProps {
 
 const ProductListItem = ({ product, actions }: ProductListItemProps) => {
     const { outOfStock, priceInfo } = useProductVariant(product);
+
     return (
         <div className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col">
             <div className="relative h-40 w-full bg-content1 overflow-hidden">

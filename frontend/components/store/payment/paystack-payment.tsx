@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { Globe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/apis/client";
 import { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/lib/utils";
 import { tryCatch } from "@/lib/try-catch";
-import { Globe } from "lucide-react";
 
 interface PaystackPaymentProps {
     cartNumber: string;
@@ -46,23 +46,23 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
                 </h4>
                 <div className="space-y-3">
                     <p className="text-sm text-muted-foreground">
-                        You will be redirected to Paystack's secure payment gateway to complete your transaction.
+                        {`You will be redirected to Paystack's secure payment gateway to complete your transaction.`}
                     </p>
                     <div className="flex items-center space-x-2 text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
                         <span>Secure SSL encryption</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
                         <span>Multiple payment options available</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
                         <span>Instant payment confirmation</span>
                     </div>
                 </div>
             </div>
-            <Button className="w-full" disabled={loading} isLoading={loading} variant="luxury" onClick={handlePayment} size="lg">
+            <Button className="w-full" disabled={loading} isLoading={loading} size="lg" variant="luxury" onClick={handlePayment}>
                 Pay {currency(amount)} Now
             </Button>
             <div className="mt-4 flex items-center justify-center text-xs text-gray-500">

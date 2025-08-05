@@ -2,6 +2,8 @@ import React from "react";
 import { ArrowLeft, Package, Calendar, MapPin, Truck, Download } from "lucide-react";
 import Image from "next/image";
 
+import OrderOverview from "./order-overview";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
-import OrderOverview from "./order-overview";
 
 interface OrderDetailsProps {
     order: Order;
@@ -94,7 +95,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                             </div>
                         </CardContent>
                     </Card>
-                    <OrderOverview showNext order={order} />
+                    <OrderOverview order={order} />
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">

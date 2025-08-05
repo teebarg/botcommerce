@@ -7,12 +7,12 @@ import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 import OrderNotes from "./order-notes";
 import OrderNext from "./order-next";
+import OrderOverview from "./order-overview";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useBankDetails } from "@/lib/hooks/useApi";
-import OrderOverview from "./order-overview";
 
 type OrderConfirmationProps = {
     order: Order;
