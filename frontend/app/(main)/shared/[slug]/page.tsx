@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-import { api } from "@/apis/client";
+import { api } from "@/apis/client2";
 import { Shared } from "@/schemas";
 import { tryCatchApi } from "@/lib/try-catch";
 import { SocialShare } from "@/components/store/shared/shared-listing";

@@ -75,6 +75,8 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
     const createShared = useCreateSharedCollection();
     const updateShared = useUpdateSharedCollection();
 
+    const isLoading = createShared.isPending || updateShared.isPending;
+
     const { handleSubmit, control, setValue, watch, formState } = form;
     const formProducts = watch("products");
 
@@ -172,12 +174,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
                                 Cancel
                             </Button>
                         )}
-                        <Button
-                            disabled={formState.isSubmitting || !form.watch("title")}
-                            isLoading={formState.isSubmitting}
-                            type="submit"
-                            variant="primary"
-                        >
+                        <Button disabled={isLoading || !form.watch("title")} isLoading={isLoading} type="submit" variant="primary">
                             <Save className="h-5 w-5 mr-1" />
                             {current ? "Update" : "Create"}
                         </Button>

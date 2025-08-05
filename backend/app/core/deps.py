@@ -41,7 +41,7 @@ async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
 
 TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
 
-async def get_user(token_data: TokenUser | None = None ) -> User | None:
+async def get_user(token_data: TokenUser ) -> User | None:
     if not token_data:
         return None
 
