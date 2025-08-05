@@ -2,7 +2,7 @@ import asyncio
 from prisma import Prisma
 
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from faker import Faker
 import bcrypt
 from prisma import Prisma
@@ -18,11 +18,8 @@ db = Prisma()
 
 async def seed():
     await db.connect()
-
-    # await db.productvariant.delete_many()
     await db.bankdetails.delete_many()
 
-    # 1. Users
     logger.info("Seeding users...")
     async def upsert_user(email, role="CUSTOMER"):
         hashed_password = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -42,10 +39,8 @@ async def seed():
             }
         )
 
+    # await upsert_user("teebarg01@gmail.com", "ADMIN")
 
-    # admin = await upsert_user("teebarg01@gmail.com", "ADMIN")
-
-    # 2. Brands
     logger.info("Seeding brands...")
     brands = [
         {"name": "Nike", "slug": "nike"},
@@ -65,7 +60,6 @@ async def seed():
             }
         )
 
-    # 3. Categories
     logger.info("Seeding categories...")
     categories = [
         {"name": "Shoes", "slug": "shoes"},
@@ -85,7 +79,6 @@ async def seed():
             }
         )
 
-    # 4. Collections
     logger.info("Seeding collections...")
     collections = [
         {"name": "Summer Sale", "slug": "summer-sale"},
@@ -105,82 +98,6 @@ async def seed():
             }
         )
 
-    # 5. Products
-    logger.info("Seeding products...")
-    sample_products = [
-        {
-            "name": "Air Max",
-            "sku": "RUN1233",
-            "slug": "air-max",
-            "description": "Comfy running shoes",
-            "brand_slug": "nike",
-            "category_slugs": ["shoes"],
-            "collection_slugs": ["summer-sale"],
-            "variants": [
-                {"sku": "airmax-42", "price": 12000, "old_price": 15000, "size": "42", "color": "Black", "inventory": 10},
-                {"sku": "airmax-43", "price": 12000, "old_price": 15000, "size": "43", "color": "White", "inventory": 8},
-            ]
-        },
-        {
-            "name": "Sports T-Shirt",
-            "sku": "TSH1234",
-            "slug": "sports-t-shirt",
-            "description": "Comfortable sports t-shirt",
-            "brand_slug": "adidas",
-            "category_slugs": ["clothing"],
-            "collection_slugs": ["new-arrivals"],
-            "variants": [
-                {"sku": "tshirt-m", "price": 5000, "old_price": 6000, "size": "M", "color": "Red", "inventory": 15},
-                {"sku": "tshirt-l", "price": 5000, "old_price": 6000, "size": "L", "color": "Blue", "inventory": 12},
-            ]
-        },
-    ]
-
-    for p in sample_products:
-        brand = await db.brand.find_unique(where={"slug": p["brand_slug"]})
-        categories = await db.category.find_many(where={"slug": {"in": p["category_slugs"]}})
-        collections = await db.collection.find_many(where={"slug": {"in": p["collection_slugs"]}})
-
-        await db.product.upsert(
-            where={"slug": p["slug"]},
-            data={
-                "create": {
-                    "name": p["name"],
-                    "sku": p["sku"],
-                    "slug": p["slug"],
-                    "description": p["description"],
-                    "brand": {"connect": {"id": brand.id}},
-                    "categories": {"connect": [{"id": c.id} for c in categories]},
-                    "collections": {"connect": [{"id": c.id} for c in collections]},
-                    "variants": {"create": p["variants"]},
-                    "created_at": datetime.now(timezone.utc),
-                },
-                "update": {}
-            }
-        )
-
-    # 6. Coupons
-    logger.info("Seeding coupons...")
-    for code, dtype, value in [
-            ("SAVE10", "PERCENTAGE", 10.0),
-            ("FLAT5", "FIXED_AMOUNT", 5.0),
-            ("WELCOME15", "PERCENTAGE", 15.0)
-        ]:
-        await db.coupon.upsert(
-            where={"code": code},
-            data={
-                "create": {
-                    "code": code,
-                    "discount_type": dtype,
-                    "discount_value": value,
-                    "expiration_date": datetime.now() + timedelta(days=30),
-                    "created_at": datetime.now(timezone.utc),
-                },
-                "update": {}
-            }
-        )
-
-    # 7. Settings
     logger.info("Seeding settings...")
     for setting in [
         {"key": "shop_name", "value": "The Bot Store", "type": "SHOP_DETAIL"},
@@ -191,10 +108,10 @@ async def seed():
         {"key": "tax_rate", "value": "7.5", "type": "SHOP_DETAIL"},
         {"key": "shop_email", "value": "shop@example.com", "type": "SHOP_DETAIL"},
         {"key": "whatsapp", "value": "+234123456789", "type": "SHOP_DETAIL"},
-        {"key": "facebook", "value": "https://facebook.com", "type": "SHOP_DETAIL"},
-        {"key": "instagram", "value": "https://instagram.com", "type": "SHOP_DETAIL"},
-        {"key": "tiktok", "value": "https://tiktok.com", "type": "SHOP_DETAIL"},
-        {"key": "twitter", "value": "https://twitter.com", "type": "SHOP_DETAIL"},
+        {"key": "facebook", "value": "shop-allure", "type": "SHOP_DETAIL"},
+        {"key": "instagram", "value": "shop-allure", "type": "SHOP_DETAIL"},
+        {"key": "tiktok", "value": "shop-allure", "type": "SHOP_DETAIL"},
+        {"key": "twitter", "value": "shop-allure", "type": "SHOP_DETAIL"},
     ]:
         await db.shopsettings.upsert(
             where={"key": setting["key"]},
@@ -205,12 +122,11 @@ async def seed():
         )
 
 
-    # 9. Delivery Options
     logger.info("Seeding delivery options...")
     delivery_options = [
-        {"name": "Standard Shipping", "description": "Your order will be delivered within 5-7 days", "amount": 3000, "method": "STANDARD"},
-        {"name": "Express Shipping", "description": "Your order will be delivered within 2-3 days", "amount": 5000, "method": "EXPRESS"},
-        {"name": "Pickup", "description": "Pickup at our store", "amount": 0, "method": "PICKUP"},
+        {"name": "Standard Shipping", "description": "Your order will be delivered within 5-7 days", "amount": 3000, "method": "STANDARD", "duration": "5-7 business days"},
+        {"name": "Express Shipping", "description": "Your order will be delivered within 2-3 days", "amount": 5000, "method": "EXPRESS", "duration": "2-3 business days"},
+        {"name": "Store Pickup", "description": "Pickup at our store", "amount": 0, "method": "PICKUP", "duration": "Ready in 1 hour"},
     ]
     for option in delivery_options:
         await db.deliveryoption.upsert(
@@ -221,13 +137,14 @@ async def seed():
                     "description": option["description"],
                     "method": option["method"],
                     "amount": option["amount"],
+                    "duration": option["duration"],
                     "is_active": True
                 },
                 "update": {}
             }
         )
 
-    # 10. Bank Details
+
     logger.info("Seeding bank details...")
     await db.bankdetails.create({
         "bank_name": "Citi Bank",
@@ -235,7 +152,6 @@ async def seed():
         "account_number": "0123456789",
     })
 
-    # Shared collections
     logger.info("Seeding shared collections...")
     shared_collections = [
         {"title": "Summer Sale", "slug": "summer-sale", "description": "Summer Sale", "is_active": True},

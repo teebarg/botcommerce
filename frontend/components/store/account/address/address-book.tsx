@@ -49,9 +49,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                         {address.address_1}
                         {address.address_2 && <span>, {address.address_2}</span>}
                     </span>
-                    <span data-testid="address-postal-city">
-                        {address.postal_code}, {address.city}
-                    </span>
+                    <span data-testid="address-city">{address.city}</span>
                     <span data-testid="address-state-country">{address.state && `${address.state}`}</span>
                 </p>
             </div>

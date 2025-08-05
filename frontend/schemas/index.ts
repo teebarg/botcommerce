@@ -16,6 +16,7 @@ export interface DeliveryOption {
     description?: string;
     method: "STANDARD" | "EXPRESS" | "PICKUP";
     amount: number;
+    duration: string;
     is_active: boolean;
     created_at: string;
     updated_at: string;

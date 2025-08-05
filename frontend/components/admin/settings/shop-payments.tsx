@@ -38,8 +38,8 @@ const defaultFeatures = [
     },
     {
         key: "payment_cash",
-        label: "Cash at Pickup",
-        description: "Enable cash at pickup",
+        label: "Payment at Pickup",
+        description: "Enable payment at pickup",
     },
 ];
 

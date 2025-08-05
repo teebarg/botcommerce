@@ -8,12 +8,10 @@ from app.core.deps import (
 from typing import Optional
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
-from prisma.enums import OrderStatus, PaymentStatus
+from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, send_notification, retrieve_order, list_orders
 from app.services.redis import cache_response
 from pydantic import BaseModel
-from app.services.order import create_invoice
-from app.services.order import decrement_variant_inventory_for_order
 
 router = APIRouter()
 
@@ -109,18 +107,13 @@ async def delete_order(cache: RedisClient, order_id: int):
 
 
 @router.patch("/{id}/status", response_model=OrderResponse)
-async def order_status(cache: RedisClient, id: int, status: OrderStatus, background_tasks: BackgroundTasks, notification: Notification):
+async def order_status(cache: RedisClient, id: int, status: OrderStatus):
     """Change order status"""
     order = await db.order.find_unique(where={"id": id})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
     data = {"status": status}
-
-    if status == OrderStatus.PAID:
-        data["payment_status"] = PaymentStatus.SUCCESS
-        background_tasks.add_task(create_invoice, cache=cache, order_id=id)
-        background_tasks.add_task(decrement_variant_inventory_for_order, id, notification, cache)
 
     updated_order = await db.order.update(where={"id": id}, data=data)
     await cache.invalidate_list_cache("orders")
@@ -144,14 +137,6 @@ async def fulfill_order(cache: RedisClient, order_id: int):
     await cache.invalidate_list_cache("orders")
     await cache.bust_tag(f"order:{order_id}")
     return updated_order
-
-# @router.get("/{order_id}/invoice")
-# async def download_invoice(order_id: int, user: CurrentUser, cache: RedisClient):
-#     """Generate and upload invoice PDF to Supabase storage, returning the download URL"""
-#     public_url = await create_invoice(order_id=order_id, user=user)
-#     await cache.invalidate_list_cache("orders")
-#     await cache.bust_tag(f"order:{order_id}")
-#     return {"invoice_url": public_url}
 
 class OrderNotesUpdate(BaseModel):
     notes: str

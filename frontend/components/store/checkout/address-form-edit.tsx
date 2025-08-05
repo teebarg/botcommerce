@@ -36,7 +36,6 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
         last_name: address?.last_name || "",
         address_1: address?.address_1 || "",
         address_2: address?.address_2 || "",
-        postal_code: address?.postal_code || "",
         city: address?.city || "",
         state: address?.state || "",
         phone: address?.phone || "",
@@ -136,19 +135,6 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
                                     <FormLabel>Address</FormLabel>
                                     <FormControl>
                                         <Input required autoComplete="address-line1" data-testid="shipping-address-input" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="postal_code"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Postal code</FormLabel>
-                                    <FormControl>
-                                        <Input required autoComplete="postal-code" data-testid="shipping-postal-code-input" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

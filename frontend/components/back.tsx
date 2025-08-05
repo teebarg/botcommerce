@@ -4,8 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 
-import { Button } from "./ui/button";
-
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -26,7 +25,7 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
         if (window.history.length > 1) {
             router.back();
         } else {
-            router.push("/"); // Navigate to a fallback route
+            router.push("/");
         }
     };
 

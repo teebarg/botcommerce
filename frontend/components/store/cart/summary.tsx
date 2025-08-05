@@ -1,6 +1,6 @@
 "use client";
 
-import DiscountCode from "../checkout/components/discount-code";
+import DiscountCode from "@/components/store/checkout/components/discount-code";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import CartTotals from "@/components/store/cart/cart-totals";

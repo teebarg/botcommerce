@@ -56,16 +56,14 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
     return (
         <div
             className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group ${
-                isSelected
-                    ? "ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border border-default-200 bg-content2 hover:border-default-300 hover:shadow-md"
+                isSelected ? "ring-2 ring-accent bg-accent/10" : "border border-divider bg-content2 hover:border-accent/50 hover:shadow-md"
             }`}
             onClick={() => !isSelected && handleSelect(address.id)}
         >
             <div className="absolute top-3 right-3 flex items-center gap-2">
                 <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                        isSelected ? "border-blue-400 bg-blue-500 shadow-sm" : "border-slate-300 group-hover:border-slate-400"
+                        isSelected ? "border-accent bg-accent shadow-sm" : "border-divider group-hover:border-accent/50"
                     }`}
                 >
                     {isSelected && <Check className="w-4 h-4 text-white" />}
@@ -76,7 +74,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 <div className="flex items-center gap-3 mb-3">
                     <div
                         className={`p-2.5 rounded-lg transition-colors ${
-                            isSelected ? "bg-blue-100 text-blue-800" : "bg-content1 text-default-500 group-hover:bg-content2"
+                            isSelected ? "bg-accent text-white" : "bg-content1 text-default-500 group-hover:bg-accent/50"
                         }`}
                     >
                         {getTypeIcon(address.address_type)}
@@ -90,7 +88,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 <div className="space-y-0.5 text-sm">
                     <p className="text-default-800 font-medium">{address.address_1}</p>
                     <p className="text-default-500">
-                        {address.city}, {address.state} {address.postal_code}
+                        {address.city}, {address.state}
                     </p>
                     {address.phone && (
                         <p className="flex items-center gap-2 text-default-500 mt-2">

@@ -9,6 +9,7 @@ type AuthContextType = {
     user?: User | null;
     loading: boolean;
     error: any;
+    isAuthenticated: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: user, isLoading, error } = useMe();
 
-    return <AuthContext.Provider value={{ user, loading: isLoading, error }}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={{ user, loading: isLoading, error, isAuthenticated: !!user }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

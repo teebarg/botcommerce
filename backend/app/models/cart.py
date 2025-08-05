@@ -64,7 +64,6 @@ class CartAddress(BaseModel):
     address_2: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
-    postal_code: Optional[str] = None
     phone: Optional[str] = None
     is_billing: bool
 

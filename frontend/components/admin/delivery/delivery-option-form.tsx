@@ -22,6 +22,7 @@ const formSchema = z.object({
     description: z.string().optional(),
     method: ShippingMethodSchema,
     amount: z.number().min(0, "Amount must be greater than or equal to 0"),
+    duration: z.string().min(1, "Duration is required"),
     is_active: z.boolean().default(true),
 });
 
@@ -42,6 +43,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
             description: initialData?.description || "",
             method: initialData?.method || "STANDARD",
             amount: initialData?.amount || 0,
+            duration: initialData?.duration || "",
             is_active: initialData?.is_active || true,
         },
     });
@@ -117,6 +119,20 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                                         <SelectItem value="PICKUP">Pickup</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="duration"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Duration</FormLabel>
+                                <FormControl>
+                                    <Input type="text" {...field} placeholder="Ex: 2-3 business days" />
+                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}

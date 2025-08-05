@@ -92,7 +92,7 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
 
         data = response.json()
 
-        order_in = OrderCreate(status=OrderStatus.PAID, payment_status=PaymentStatus.SUCCESS)
+        order_in = OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS)
 
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
@@ -129,7 +129,7 @@ async def create(*, create: PaymentCreate, user: CurrentUser, notification: Noti
             raise HTTPException(status_code=404, detail="Order not found")
         await db.order.update(
             where={"id": create.order_id},
-            data={"status": OrderStatus.PAID}
+            data={"status": OrderStatus.PENDING}
         )
         await decrement_variant_inventory_for_order(create.order_id, notification, cache)
 
@@ -167,3 +167,21 @@ async def list_payments(
         page=skip // limit + 1,
         limit=limit,
     )
+
+@router.patch("/{id}/status", response_model=OrderResponse)
+async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, background_tasks: BackgroundTasks, notification: Notification):
+    """Change payment status"""
+    order = await db.order.find_unique(where={"id": id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    data = {"payment_status": status}
+
+    if status == PaymentStatus.SUCCESS:
+        background_tasks.add_task(create_invoice, cache=cache, order_id=id)
+        background_tasks.add_task(decrement_variant_inventory_for_order, id, notification, cache)
+
+    updated_order = await db.order.update(where={"id": id}, data=data)
+    await cache.invalidate_list_cache("orders")
+    await cache.bust_tag(f"order:{id}")
+    return updated_order

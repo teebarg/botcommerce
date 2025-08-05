@@ -29,7 +29,7 @@ export class AddressesPage extends AccountPage {
             name: container.getByTestId("address-name"),
             company: container.getByTestId("address-company"),
             address: container.getByTestId("address-address"),
-            postalCity: container.getByTestId("address-postal-city"),
+            postalCity: container.getByTestId("address-city"),
             provinceCountry: container.getByTestId("address-province-country"),
         };
     }

@@ -1,8 +1,7 @@
 "use client";
 
-import { AlertCircle, CreditCard } from "nui-react-icons";
+import { AlertCircle, CreditCard } from "lucide-react";
 
-import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
@@ -22,8 +21,8 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
         <div className="w-full max-w-2xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4 animate-pulse">
-                        <AlertCircle className="w-8 h-8 text-red-600" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4 animate-pulse">
+                        <AlertCircle className="w-12 h-12 text-red-600" />
                     </div>
 
                     <h2 className="text-2xl font-bold text-default-900 mb-2">Payment Failed</h2>
@@ -54,10 +53,6 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
                         </li>
                     </ul>
                 </div>
-            </FadeInComponent>
-
-            <FadeInComponent delay="300ms">
-                <OrderInfo order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="400ms">

@@ -8,10 +8,10 @@ import { Search } from "lucide-react";
 
 import OrderActions from "./order-actions";
 import OrderFilters from "./order-filters";
+import { OrderStatusBadge, PaymentStatusBadge } from "./order-status-badge";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Order, OrderStatus } from "@/schemas";
+import { Order } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useOrders } from "@/lib/hooks/useOrder";
 import OrderCard from "@/components/admin/orders/order-card";
@@ -45,21 +45,6 @@ const OrderView: React.FC = () => {
 
     const { orders, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
 
-    const getStatusBadge = (status?: OrderStatus) => {
-        const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "yellow" | "success" | "emerald" | "blue"> = {
-            ["PENDING"]: "yellow",
-            ["PROCESSING"]: "default",
-            ["SHIPPED"]: "secondary",
-            ["OUT_FOR_DELIVERY"]: "blue",
-            ["CANCELED"]: "destructive",
-            ["DELIVERED"]: "success",
-            ["PAID"]: "emerald",
-            ["REFUNDED"]: "destructive",
-        };
-
-        return <Badge variant={variants[status ?? "PENDING"]}>{status}</Badge>;
-    };
-
     return (
         <div className="px-4 md:px-10 py-8">
             <div className="mb-6 flex flex-col">
@@ -77,6 +62,7 @@ const OrderView: React.FC = () => {
                                 <TableHead>Customer</TableHead>
                                 <TableHead>Total</TableHead>
                                 <TableHead>Status</TableHead>
+                                <TableHead>Payment Status</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -102,7 +88,12 @@ const OrderView: React.FC = () => {
                                             {order.user?.first_name} {order.user?.last_name}
                                         </TableCell>
                                         <TableCell>{currency(order.total)}</TableCell>
-                                        <TableCell>{getStatusBadge(order.status)}</TableCell>
+                                        <TableCell>
+                                            <OrderStatusBadge status={order.status} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <PaymentStatusBadge status={order.payment_status} />
+                                        </TableCell>
                                         <TableCell>
                                             <OrderActions order={order} />
                                         </TableCell>

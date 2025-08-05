@@ -5,21 +5,21 @@ export const paymentInfoMap: Record<string, { title: string; description: string
     PAYSTACK: {
         title: "Paystack",
         description: "Fast and secure payments with Paystack",
-        icon: <CreditCard className="text-indigo-600" size={20} />,
+        icon: <CreditCard size={20} />,
     },
     BANK_TRANSFER: {
         title: "Bank Transfer",
         description: "Make a direct bank transfer.",
-        icon: <Building className="text-indigo-600" size={20} />,
+        icon: <Building size={20} />,
     },
     CREDIT_CARD: {
         title: "Debit Card",
         description: "Checkout securely with your Debit card",
-        icon: <CreditCard className="text-indigo-600" size={20} />,
+        icon: <CreditCard size={20} />,
     },
     CASH_ON_DELIVERY: {
         title: "Pay at Pickup",
         description: "Pay when you collect your order",
-        icon: <ShoppingBag className="text-indigo-600" size={20} />,
+        icon: <ShoppingBag size={20} />,
     },
 };

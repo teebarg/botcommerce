@@ -6,8 +6,6 @@ import { currency } from "@lib/utils";
 import { Tooltip } from "@components/ui/tooltip";
 import { Trash2 } from "lucide-react";
 
-import ErrorMessage from "../error-message";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
@@ -120,15 +118,12 @@ const DiscountCode: React.FC = () => {
                             </Tooltip>
                         </span>
                         {isOpen && (
-                            <>
-                                <div className="flex w-full gap-x-2 items-center">
-                                    <Input className="flex-1" data-testid="discount-input" name="code" type="text" />
-                                    <Button aria-label="apply" className="px-4 min-w-20 text-sm gap-2" type="submit">
-                                        Apply
-                                    </Button>
-                                </div>
-                                <ErrorMessage data-testid="discount-error-message" error="" />
-                            </>
+                            <div className="flex w-full gap-x-2 items-center">
+                                <Input className="flex-1" data-testid="discount-input" name="code" type="text" />
+                                <Button aria-label="apply" className="px-4 min-w-20 text-sm gap-2" type="submit">
+                                    Apply
+                                </Button>
+                            </div>
                         )}
                     </form>
                 )}

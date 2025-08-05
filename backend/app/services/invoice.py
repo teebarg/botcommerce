@@ -174,8 +174,6 @@ class InvoiceService:
                 customer_content.append(Paragraph(addr.address_1, self.styles['InvoiceText']))
             if addr.city and addr.state:
                 city_state = f"{addr.city}, {addr.state}"
-                if addr.postal_code:
-                    city_state += f" {addr.postal_code}"
                 customer_content.append(Paragraph(city_state, self.styles['InvoiceText']))
 
         customer_content.append(Paragraph(order.user.email, self.styles['InvoiceText']))

@@ -1,62 +1,21 @@
 import React from "react";
-import { ArrowLeft, Package, Calendar, MapPin, Truck, Download } from "lucide-react";
+import { ArrowLeft, Package, MapPin, Download } from "lucide-react";
 import Image from "next/image";
+
+import OrderOverview from "./order-overview";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
-import { currency, formatDate } from "@/lib/utils";
+import { currency } from "@/lib/utils";
 import { useStore } from "@/app/store/use-store";
 
 interface OrderDetailsProps {
     order: Order;
     onBack: () => void;
 }
-
-const statusConfig: Record<Order["status"], { label: string; color: string; description: string }> = {
-    PENDING: {
-        label: "Pending",
-        color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-        description: "Your order is being prepared",
-    },
-    PROCESSING: {
-        label: "Shipped",
-        color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-        description: "Your order is on its way",
-    },
-    SHIPPED: {
-        label: "Delivered",
-        color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-        description: "Your order has been delivered",
-    },
-    OUT_FOR_DELIVERY: {
-        label: "Out for delivery",
-        color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-        description: "Your order is out for delivery",
-    },
-    DELIVERED: {
-        label: "Delivered",
-        color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-        description: "Your order has been delivered",
-    },
-    CANCELED: {
-        label: "Cancelled",
-        color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-        description: "This order was cancelled",
-    },
-    PAID: {
-        label: "Paid",
-        color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-        description: "This order was paid",
-    },
-    REFUNDED: {
-        label: "Refunded",
-        color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-        description: "This order was refunded",
-    },
-};
 
 const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
     const { shopSettings } = useStore();
@@ -76,28 +35,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
 
             <div className="grid gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2 space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Truck className="h-5 w-5" />
-                                Order Status
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <Badge className={statusConfig[order.status].color}>{statusConfig[order.status].label}</Badge>
-                                    <p className="text-sm text-default-600 mt-2">{statusConfig[order.status].description}</p>
-                                </div>
-                                <div className="text-right">
-                                    <div className="flex items-center gap-1 text-sm text-default-600">
-                                        <Calendar className="h-4 w-4" />
-                                        {formatDate(order.created_at)}
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <OrderOverview order={order} />
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
@@ -191,7 +129,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                     </p>
                                     <p className="text-default-700">{order.shipping_address.address_1}</p>
                                     <p className="text-default-700">
-                                        {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postal_code}
+                                        {order.shipping_address.city}, {order.shipping_address.state}
                                     </p>
                                     <p className="text-default-700">{order.shipping_address.phone}</p>
                                 </div>

@@ -71,7 +71,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                         </SelectTrigger>
                         <SelectContent>
                             {/* <SelectItem value="">All Status</SelectItem> */}
-                            {["PENDING", "PAID", "PROCESSING", "FULFILLED", "CANCELED", "REFUNDED"].map((status) => (
+                            {["PENDING", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELED", "REFUNDED"].map((status) => (
                                 <SelectItem key={status} value={status}>
                                     {status}
                                 </SelectItem>
@@ -103,7 +103,6 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                     { status: "PROCESSING", label: "PROCESSING", color: "bg-primary" },
                     { status: "SHIPPED", label: "SHIPPED", color: "bg-blue-500" },
                     { status: "DELIVERED", label: "DELIVERED", color: "bg-green-500" },
-                    { status: "PAID", label: "PAID", color: "bg-green-500" },
                     { status: "REFUNDED", label: "REFUNDED", color: "bg-gray-100" },
                 ].map((item: { status: string; label: string; color: string }, idx: number) => (
                     <button

@@ -17,7 +17,6 @@ const addressSchema = z.object({
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
     address_2: z.string().optional(),
-    postal_code: z.string().min(1, "Postal code is required"),
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
     phone: z.string().optional(),
@@ -39,7 +38,6 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
             last_name: "",
             address_1: "",
             address_2: "",
-            postal_code: "",
             city: "",
             state: "",
             phone: "",
@@ -114,19 +112,6 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                             )}
                         />
                         <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                            <FormField
-                                control={form.control}
-                                name="postal_code"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Postal code</FormLabel>
-                                        <FormControl>
-                                            <Input required autoComplete="postal-code" data-testid="postal-code-input" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                             <FormField
                                 control={form.control}
                                 name="city"

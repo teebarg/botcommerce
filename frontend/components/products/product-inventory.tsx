@@ -10,7 +10,7 @@ import ProductUpload from "./product-upload";
 import Overlay from "@/components/overlay";
 import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
-import { useBustCache, useExportProducts, useReIndexProducts } from "@/lib/hooks/useProduct";
+import { useBustCache, useExportProducts, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
 
 export function ProductInventory() {
     const addState = useOverlayTriggerState({});
@@ -18,6 +18,7 @@ export function ProductInventory() {
     const exportProducts = useExportProducts();
     const reIndexProducts = useReIndexProducts();
     const bustCache = useBustCache();
+    const flushCache = useFlushCache();
 
     const handleExport = () => {
         exportProducts.mutate();
@@ -29,6 +30,10 @@ export function ProductInventory() {
 
     const handleBustCache = () => {
         bustCache.mutate();
+    };
+
+    const handleFlushCache = () => {
+        flushCache.mutate();
     };
 
     return (
@@ -64,6 +69,9 @@ export function ProductInventory() {
                 </Button>
                 <Button disabled={bustCache.isPending} isLoading={bustCache.isPending} variant="warning" onClick={handleBustCache}>
                     Bust Cache
+                </Button>
+                <Button disabled={flushCache.isPending} isLoading={flushCache.isPending} variant="destructive" onClick={handleFlushCache}>
+                    Flush Cache
                 </Button>
             </div>
             <ProductDetails />

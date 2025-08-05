@@ -2,11 +2,12 @@
 
 import { Check } from "lucide-react";
 
-import OrderInfo from "./order-info";
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 import OrderNotes from "./order-notes";
+import OrderNext from "./order-next";
+import OrderOverview from "./order-overview";
 
 import { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
@@ -23,8 +24,8 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
         <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
-                        <Check className="w-8 h-8 text-emerald-700" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-4 animate-pulse">
+                        <Check className="w-12 h-12 text-emerald-700" />
                     </div>
 
                     <h2 className="text-2xl font-bold text-default-900 mb-2">Order Confirmed!</h2>
@@ -34,11 +35,11 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
-                <OrderNotes order={order} />
+                <OrderOverview order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="200ms">
-                <OrderInfo order={order} />
+                <OrderNotes order={order} />
             </FadeInComponent>
 
             <FadeInComponent delay="300ms">
@@ -54,6 +55,10 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
             </FadeInComponent>
 
             <FadeInComponent delay="600ms">
+                <OrderNext />
+            </FadeInComponent>
+
+            <FadeInComponent delay="650ms">
                 <div className="mt-6 space-y-3">
                     {/* <Button className="w-full px-6 py-3 rounded-xl font-medium bg-indigo-600 text-white hover:bg-indigo-700" onClick={() => {}}>
                         Track Your Order

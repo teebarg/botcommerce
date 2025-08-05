@@ -10,7 +10,6 @@ import {
     ArrowLeft,
     ShieldAlert,
     CircleDashed,
-    CircleCheck,
     PackageCheck,
     CircleX,
     CircleSlash,
@@ -21,52 +20,14 @@ import Image from "next/image";
 
 import OrderProcessingAction from "./order-processing-actions";
 
-import { Order, OrderItem, OrderStatus } from "@/schemas";
+import { Order, OrderItem } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { OrderStatusBadge } from "./order-status-badge";
 
 interface OrderDetailsProps {
     order: Order;
     onClose: () => void;
 }
-
-const getStatusBadge = (status?: OrderStatus) => {
-    const variants: Record<OrderStatus, "outline" | "default" | "destructive" | "secondary" | "warning" | "success" | "emerald" | "blue"> = {
-        ["PENDING"]: "warning",
-        ["PROCESSING"]: "default",
-        ["SHIPPED"]: "secondary",
-        ["OUT_FOR_DELIVERY"]: "blue",
-        ["CANCELED"]: "destructive",
-        ["DELIVERED"]: "success",
-        ["PAID"]: "emerald",
-        ["REFUNDED"]: "destructive",
-    };
-
-    return <Badge variant={variants[status ?? "PENDING"]}>{status}</Badge>;
-};
-
-const paymentStatusMap = {
-    PENDING: {
-        icon: <ShieldAlert className="h-5 w-5 text-white" />,
-        label: "Payment Pending",
-        color: "bg-warning",
-    },
-    SUCCESS: {
-        icon: <CircleCheck className="h-5 w-5 text-white" />,
-        label: "Paid",
-        color: "bg-success",
-    },
-    FAILED: {
-        icon: <CircleDashed className="h-5 w-5 text-white" />,
-        label: "Payment Failed",
-        color: "bg-danger",
-    },
-    REFUNDED: {
-        icon: <CircleDashed className="h-5 w-5 text-white" />,
-        label: "Payment Refunded",
-        color: "bg-danger",
-    },
-};
 
 const orderStatusMap = {
     PENDING: {
@@ -99,11 +60,6 @@ const orderStatusMap = {
         label: "Cancelled",
         color: "bg-danger",
     },
-    PAID: {
-        icon: <CircleCheck className="h-5 w-5 text-white" />,
-        label: "Paid",
-        color: "bg-success",
-    },
     REFUNDED: {
         icon: <CircleSlash className="h-5 w-5 text-white" />,
         label: "Refunded",
@@ -129,7 +85,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         <span className="text-default-500">{formatDate(order.created_at)}.</span>
                     </div>
                 </div>
-                <div className="mt-4 md:mt-0">{getStatusBadge(order.status)}</div>
+                <div className="mt-4 md:mt-0">
+                    <OrderStatusBadge status={order.status} />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -215,7 +173,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                         <span className="font-medium">Method:</span> {order.payment_method}
                                     </p>
                                 </div>
-                                {getStatusBadge(order.status)}
+                                <OrderStatusBadge status={order.status} />
                             </div>
                         </div>
                     </div>
@@ -286,28 +244,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                     </div>
                                                     <div className="text-right text-sm whitespace-nowrap text-default-500">
                                                         <time>{format(order.created_at, "MMMM dd")}</time>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div className="relative pb-6">
-                                            <span aria-hidden="true" className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
-                                            <div className="relative flex space-x-3">
-                                                <div>
-                                                    <span
-                                                        className={
-                                                            paymentStatusMap[order.payment_status].color +
-                                                            " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
-                                                        }
-                                                    >
-                                                        {paymentStatusMap[order.payment_status].icon}
-                                                    </span>
-                                                </div>
-                                                <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                                    <div>
-                                                        <p className="text-sm text-default-500">{paymentStatusMap[order.payment_status].label}</p>
                                                     </div>
                                                 </div>
                                             </div>

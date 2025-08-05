@@ -20,7 +20,6 @@ enum AddressType {
 
 enum OrderStatus {
   PENDING
-  PAID
   PROCESSING
   SHIPPED
   OUT_FOR_DELIVERY
@@ -133,7 +132,6 @@ model Address {
   address_2    String?
   city         String?
   state        String?
-  postal_code  String?
   phone        String?
   is_billing   Boolean     @default(false)
 
@@ -551,6 +549,7 @@ model DeliveryOption {
   description String?        @db.Text
   method      ShippingMethod
   amount      Float          @db.DoublePrecision
+  duration    String?
   is_active   Boolean        @default(true)
   created_at  DateTime       @default(now())
   updated_at  DateTime       @updatedAt
