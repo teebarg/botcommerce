@@ -10,8 +10,8 @@ import OrderOverview from "./order-overview";
 
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
-import { useStore } from "@/app/store/use-store";
 import { Button } from "@/components/ui/button";
+import { useStoreSettings } from "@/providers/store-provider";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -19,7 +19,7 @@ type OrderConfirmationProps = {
 };
 
 const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
     return (
         <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6">
@@ -45,7 +45,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
                     <div className="space-y-1">
                         <div className="flex justify-between">
                             <span className="text-default-500 text-sm">Address</span>
-                            <span className="font-medium">{shopSettings?.address}</span>
+                            <span className="font-medium">{settings?.address}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-default-500 text-sm">Opening Hours</span>

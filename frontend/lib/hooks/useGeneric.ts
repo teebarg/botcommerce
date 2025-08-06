@@ -12,6 +12,13 @@ export const useShopSettings = () => {
     });
 };
 
+export const useShopSettingsPublic = () => {
+    return useQuery({
+        queryKey: ["shop-settings", "public"],
+        queryFn: async () => api.get<Record<string, string | number>>("/shop-settings/public"),
+    });
+};
+
 export const useSubscribeNewsletter = () => {
     return useMutation({
         mutationFn: async (data: { email: string }) =>

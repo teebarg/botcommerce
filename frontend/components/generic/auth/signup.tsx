@@ -11,7 +11,7 @@ import { EyeFilled, EyeSlashFilled } from "nui-react-icons";
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 import { Separator } from "@/components/ui/separator";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { authApi } from "@/apis/auth";
@@ -30,7 +30,7 @@ type Props = {};
 
 const SignUpForm: React.FC<Props> = () => {
     const [show, setShow] = useState<boolean>(false);
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
     const form = useForm<SignUpFormValues>({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -143,7 +143,7 @@ const SignUpForm: React.FC<Props> = () => {
                         />
                     </div>
                     <span className="text-center text-default-500 text-xs mt-6">
-                        By creating an account, you agree to {shopSettings.shop_name} Store&apos;s{" "}
+                        By creating an account, you agree to {settings?.shop_name} Store&apos;s{" "}
                         <LocalizedClientLink className="underline" href="/content/privacy-policy">
                             Privacy Policy
                         </LocalizedClientLink>{" "}

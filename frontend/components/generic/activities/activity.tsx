@@ -2,7 +2,7 @@ import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { AlertCircle, CheckCircle2, Clock, Download, FileSpreadsheet, Trash2 } from "lucide-react";
 
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 import { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +30,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
 };
 
 const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
     const handleDownload = (url: string, filename: string) => {
         const link = document.createElement("a");
@@ -63,7 +63,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                         </div>
 
                         <div className="flex items-center text-xs text-default-500 mb-3">
-                            <span className="font-medium">{shopSettings?.shop_name}</span>
+                            <span className="font-medium">{settings?.shop_name}</span>
                             <span className="mx-2">•</span>
                             <span>{formatDistanceToNow(new Date(activity.created_at))}</span>
                         </div>

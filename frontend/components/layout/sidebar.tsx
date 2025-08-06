@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Activity, MessageSquare } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 
 interface MenuItem {
     label: string;
@@ -153,7 +153,7 @@ const MenuItemComponent: React.FC<{
 };
 
 const SideBar: React.FC = () => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
     const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
     const navItems: (MenuItem | SubMenuItem)[] = [
         {
@@ -274,7 +274,7 @@ const SideBar: React.FC = () => {
                         "opacity-0! w-0": isCollapsed,
                     })}
                 >
-                    {shopSettings?.shop_name}
+                    {settings?.shop_name}
                 </h1>
                 <button
                     aria-label="open"
