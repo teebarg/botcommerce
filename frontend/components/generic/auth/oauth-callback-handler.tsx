@@ -1,15 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import React from "react";
 
-import { api } from "@/apis/client";
-import { Token } from "@/schemas";
-import { setCookie } from "@/lib/util/cookie";
 import PageLoader from "@/components/loader";
-import { tryCatch } from "@/lib/try-catch";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { authApi } from "@/apis/auth";
 
@@ -50,10 +45,8 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
             }
 
             toast.success("Successfully signed in!");
-            // invalidate("me");
 
             const callbackUrl = searchParams.get("state") || "/";
-            console.log("🚀 ~ file: oauth-callback-handler.tsx:79 ~ callbackUrl:", callbackUrl)
             setTimeout(() => {
                 invalidate("me");
                 router.push(callbackUrl || "/");
