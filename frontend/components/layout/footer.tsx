@@ -72,16 +72,16 @@ export default function Footer() {
                             joy and happiness to every child's life.`}
                             </p>
                             <div className="flex space-x-6 mt-4">
-                                <Link aria-label="Twitter" href={shopSettings?.facebook || "#"}>
+                                <Link aria-label="Twitter" href={`https://web.facebook.com/profile.php?id=${shopSettings.facebook}`} target="_blank">
                                     <Facebook className="text-default-500 hover:text-primary transition-colors" size={34} />
                                 </Link>
-                                <Link aria-label="Twitter" href={shopSettings?.instagram || "#"}>
+                                <Link aria-label="Instagram" href={`https://www.instagram.com/${shopSettings.instagram}`} target="_blank">
                                     <Instagram className="text-default-500 hover:text-primary transition-colors" size={34} />
                                 </Link>
-                                <Link aria-label="Twitter" href={shopSettings?.tiktok || "#"}>
+                                <Link aria-label="Tiktok" href={`https://www.tiktok.com/@${shopSettings.tiktok}`} target="_blank">
                                     <WhatsApp className="text-default-500 hover:text-primary transition-colors" size={30} />
                                 </Link>
-                                <Link aria-label="Twitter" href={shopSettings?.x || "#"}>
+                                <Link aria-label="X" href={`https://x.com/${shopSettings.x}`} target="_blank">
                                     <Twitter className="text-default-500 hover:text-primary transition-colors" size={34} />
                                 </Link>
                             </div>
@@ -92,8 +92,8 @@ export default function Footer() {
                                     <div>
                                         <h3 className="text-base font-semibold text-default-foreground">Collections</h3>
                                         <ul className="mt-2 space-y-2 text-default-600">
-                                            {collections?.slice(0, 6).map((c: any, index: number) => (
-                                                <li key={index}>
+                                            {collections?.slice(0, 6).map((c: any, idx: number) => (
+                                                <li key={idx}>
                                                     <LocalizedClientLink
                                                         className="text-sm hover:text-primary transition-colors"
                                                         href={`/collections/${c.slug}`}
@@ -110,9 +110,9 @@ export default function Footer() {
                                 <div className="hidden md:block">
                                     <h3 className="text-base font-semibold text-default-foreground">Categories</h3>
                                     <ul className="mt-2 space-y-2 text-default-600" data-testid="footer-categories">
-                                        {categories?.map((c: Category, index: number) => {
+                                        {categories?.map((c: Category, idx: number) => {
                                             return (
-                                                <li key={index}>
+                                                <li key={idx}>
                                                     <LocalizedClientLink
                                                         className="text-sm hover:text-primary transition-colors"
                                                         data-testid="category-link"
@@ -144,8 +144,8 @@ export default function Footer() {
                             <div>
                                 <h3 className="text-base font-semibold text-default-foreground">Support</h3>
                                 <ul className="mt-2 space-y-2 text-default-600">
-                                    {support.map((item, index: number) => (
-                                        <li key={index}>
+                                    {support.map((item, idx: number) => (
+                                        <li key={idx}>
                                             <LocalizedClientLink className="text-sm hover:text-primary transition-colors" href={item.to}>
                                                 {item.label}
                                             </LocalizedClientLink>
@@ -156,8 +156,8 @@ export default function Footer() {
                             <div>
                                 <h3 className="text-base font-semibold text-default-foreground">Company</h3>
                                 <ul className="mt-2 space-y-2 text-default-600">
-                                    {company.map((item, index: number) => (
-                                        <li key={index}>
+                                    {company.map((item, idx: number) => (
+                                        <li key={idx}>
                                             <LocalizedClientLink className="text-sm hover:text-primary transition-colors" href={item.to}>
                                                 {item.label}
                                             </LocalizedClientLink>
