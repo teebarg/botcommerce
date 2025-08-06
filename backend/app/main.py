@@ -16,6 +16,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
 import redis.asyncio as redis
+from app.services.meilisearch import get_or_create_index
 
 from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
@@ -98,7 +99,11 @@ async def health():
     await db.user.find_unique(
         where={"id": 1}
     )
-    return {"message": "Server is running"}
+    # check if redis is connected
+    redis_res = await app.state.redis.ping()
+    # check meilisearch is connected
+    meilisearch_res = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+    return {"message": "Server is running", "redis": redis_res, "meilisearch": meilisearch_res}
 
 
 @app.post("/api/contact-form")

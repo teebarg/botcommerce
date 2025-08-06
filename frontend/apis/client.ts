@@ -10,7 +10,6 @@ type RequestOptions = RequestInit & {
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const { params, ...restOptions } = options;
 
-    // Add query parameters if they exist
     const url = new URL(`/api${endpoint}`, baseURL);
 
     if (params) {
@@ -39,7 +38,6 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (!response.ok) {
         if (response.status === 401) {
-            // Handle unauthorized access
             deleteCookie("access_token");
             // window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         }

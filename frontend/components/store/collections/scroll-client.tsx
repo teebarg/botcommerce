@@ -118,7 +118,7 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                         </ol>
                     </nav>
                     <div className="w-full">
-                        <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-content2 py-2">
+                        <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-background py-2">
                             <CollectionsTopBar
                                 brands={brands}
                                 categories={filteredCategories}

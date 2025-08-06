@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import React from "react";
 
-import { api } from "@/apis/client";
-import { Token } from "@/schemas";
-import { setCookie } from "@/lib/util/cookie";
 import PageLoader from "@/components/loader";
-import { tryCatch } from "@/lib/try-catch";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { authApi } from "@/apis/auth";
 
 interface OAuthCallbackHandlerProps {
     provider: "google" | "github";
@@ -39,29 +35,22 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
                 return;
             }
 
-            const { data, error: err } = await tryCatch<Token>(
-                api.post(`/auth/oauth/${provider}/callback`, {
-                    code,
-                })
-            );
+            const { error: err } = await authApi.oauthCallback(provider, code);
 
             if (err) {
-                toast.error(error);
+                toast.error(err);
                 router.push("/sign-in");
 
                 return;
             }
 
-            if (data?.access_token) {
-                invalidate("me");
-                setCookie("access_token", data.access_token);
-                const callbackUrl = searchParams.get("state") || "/";
+            toast.success("Successfully signed in!");
 
-                toast.success("Successfully signed in!");
-                setTimeout(() => {
-                    router.push(callbackUrl || "/");
-                }, 1000);
-            }
+            const callbackUrl = searchParams.get("state") || "/";
+            setTimeout(() => {
+                invalidate("me");
+                router.push(callbackUrl || "/");
+            }, 1000);
         };
 
         handleCallback();
