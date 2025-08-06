@@ -31,34 +31,3 @@ export const getSiteConfig = async () => {
 
     return siteConfig;
 };
-
-export const openingHours = [
-    {
-        day: "Monday",
-        time: "8:00am - 7:00pm",
-    },
-    {
-        day: "Tuesday",
-        time: "8:00am - 7:00pm",
-    },
-    {
-        day: "Wednesday",
-        time: "8:00am - 7:00pm",
-    },
-    {
-        day: "Thursday",
-        time: "10:00am - 7:00pm",
-    },
-    {
-        day: "Friday",
-        time: "8:00am - 7:00pm",
-    },
-    {
-        day: "Saturday",
-        time: "9:00am - 7:00pm",
-    },
-    {
-        day: "Sunday",
-        time: "Closed",
-    },
-];

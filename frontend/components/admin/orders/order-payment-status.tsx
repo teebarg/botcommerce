@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { CheckCircle, Clock, X, RotateCcw, CreditCard } from "lucide-react";
-import { toast } from "sonner";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,17 +60,7 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
     const handleStatusUpdate = async () => {
         if (selectedStatus === currentStatus) return;
 
-        try {
-            await changePaymentStatus({ id, status: selectedStatus });
-
-            toast.success("Payment Status Updated", {
-                description: `Payment status changed to ${statusConfig[selectedStatus].label}`,
-            });
-        } catch (error) {
-            toast.error("Update Failed", {
-                description: "Failed to update payment status. Please try again.",
-            });
-        }
+        changePaymentStatus({ id, status: selectedStatus })
     };
 
     const currentConfig = statusConfig[currentStatus];

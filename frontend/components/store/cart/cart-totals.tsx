@@ -3,7 +3,7 @@
 import { InformationCircleSolid } from "nui-react-icons";
 import React from "react";
 import { currency } from "@lib/utils";
-import { Tooltip } from "@components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
 
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/providers/cart-provider";
@@ -26,10 +26,13 @@ const CartTotals: React.FC = () => {
                         <dt className="text-sm text-default-500">
                             <span className="flex gap-x-1 items-center">
                                 Subtotal
-                                <Tooltip content="Cart total excluding shipping and taxes." position="right">
-                                    <span>
+                                <Tooltip>
+                                    <TooltipTrigger>
                                         <InformationCircleSolid />
-                                    </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Cart total excluding shipping and taxes.</p>
+                                    </TooltipContent>
                                 </Tooltip>
                             </span>
                         </dt>

@@ -6,11 +6,11 @@ import { Instagram } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/schemas/product";
-import { useStore } from "@/app/store/use-store";
 import { useCategories } from "@/lib/hooks/useCategories";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { Separator } from "@/components/ui/separator";
 import ClientOnly from "@/components/generic/client-only";
+import { useStoreSettings } from "@/providers/store-provider";
 
 const company = [
     {
@@ -51,8 +51,7 @@ const support = [
 ];
 
 export default function Footer() {
-    const { shopSettings } = useStore();
-
+    const { settings } = useStoreSettings();
     const { data: collections } = useCollections();
 
     const { data: cat } = useCategories();
@@ -65,23 +64,23 @@ export default function Footer() {
                     <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                         <div className="md:pr-8">
                             <div className="flex items-center justify-start">
-                                <span className="text-3xl font-semibold text-primary">{shopSettings?.shop_name}</span>
+                                <span className="text-3xl font-semibold text-primary">{settings?.shop_name}</span>
                             </div>
                             <p className="text-sm text-default-600">
                                 {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
                             </p>
                             <div className="flex space-x-6 mt-4">
-                                <Link aria-label="Twitter" href={`https://web.facebook.com/profile.php?id=${shopSettings.facebook}`} target="_blank">
+                                <Link aria-label="Twitter" href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`} target="_blank">
                                     <Facebook className="text-default-500 hover:text-primary transition-colors" size={34} />
                                 </Link>
-                                <Link aria-label="Instagram" href={`https://www.instagram.com/${shopSettings.instagram}`} target="_blank">
+                                <Link aria-label="Instagram" href={`https://www.instagram.com/${settings?.instagram}`} target="_blank">
                                     <Instagram className="text-default-500 hover:text-primary transition-colors" size={34} />
                                 </Link>
-                                <Link aria-label="Tiktok" href={`https://www.tiktok.com/@${shopSettings.tiktok}`} target="_blank">
+                                <Link aria-label="Tiktok" href={`https://www.tiktok.com/@${settings?.tiktok}`} target="_blank">
                                     <WhatsApp className="text-default-500 hover:text-primary transition-colors" size={30} />
                                 </Link>
-                                <Link aria-label="X" href={`https://x.com/${shopSettings.x}`} target="_blank">
+                                <Link aria-label="X" href={`https://x.com/${settings?.twitter}`} target="_blank">
                                     <Twitter className="text-default-500 hover:text-primary transition-colors" size={34} />
                                 </Link>
                             </div>
@@ -170,7 +169,7 @@ export default function Footer() {
                     <Separator className="my-4" />
                     <div>
                         <p className="text-sm text-default-500">
-                            &copy; {new Date().getFullYear()} {shopSettings?.shop_name}. All rights reserved.
+                            &copy; {new Date().getFullYear()} {settings?.shop_name}. All rights reserved.
                         </p>
                     </div>
                 </div>

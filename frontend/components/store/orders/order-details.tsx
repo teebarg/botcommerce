@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
 import { currency } from "@/lib/utils";
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 
 interface OrderDetailsProps {
     order: Order;
@@ -18,7 +18,7 @@ interface OrderDetailsProps {
 }
 
 const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
     return (
         <div className="space-y-6 px-4 md:px-8 py-8 overflow-auto">
@@ -119,7 +119,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <CardContent>
                             {order.shipping_method === "PICKUP" ? (
                                 <div className="text-sm space-y-1">
-                                    <p className="font-medium text-default-900">{shopSettings?.address}</p>
+                                    <p className="font-medium text-default-900">{settings?.address}</p>
                                     <p className="text-default-700">Open Mon-Sat: 9am - 6pm</p>
                                 </div>
                             ) : (

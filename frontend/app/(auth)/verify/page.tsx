@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import LocalizedClientLink from "@/components/ui/link";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
-import { useStore } from "@/app/store/use-store";
 import { useInvalidate } from "@/lib/hooks/useApi";
 import { authApi } from "@/apis/auth";
+import { useStoreSettings } from "@/providers/store-provider";
 
 export default function VerifyMagicLink() {
     const [authState, setAuthState] = useState<"loading" | "success" | "expired">("loading");
@@ -19,7 +19,7 @@ export default function VerifyMagicLink() {
     const callbackUrl = searchParams.get("callbackUrl");
     const invalidate = useInvalidate();
 
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
     useEffect(() => {
         async function verifyToken() {
@@ -54,7 +54,7 @@ export default function VerifyMagicLink() {
     return (
         <>
             <div className="bg-linear-to-r from-blue-500 to-blue-600 p-6 text-center text-white">
-                <div className="text-2xl font-bold mb-2">{shopSettings.shop_name}</div>
+                <div className="text-2xl font-bold mb-2">{settings?.shop_name}</div>
                 <h2 className="text-lg font-medium mb-1 opacity-90">Magic Link Authentication</h2>
                 <p className="text-sm opacity-80">Simple, secure, passwordless login</p>
             </div>
@@ -155,7 +155,7 @@ export default function VerifyMagicLink() {
                             Contact Support
                         </LocalizedClientLink>
                     </p>
-                    <p className="mt-1">&copy; 2025 {shopSettings.shop_name}. All rights reserved.</p>
+                    <p className="mt-1">&copy; 2025 {settings?.shop_name}. All rights reserved.</p>
                 </div>
             </div>
         </>

@@ -7,16 +7,16 @@ import { BackButton } from "@/components/back";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
 import ServerError from "@/components/generic/server-error";
-import { useStore } from "@/app/store/use-store";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 import { useCart } from "@/providers/cart-provider";
 import CheckoutFlow from "@/components/store/checkout/components/checkout-flow";
 import ComponentLoader from "@/components/component-loader";
+import { useStoreSettings } from "@/providers/store-provider";
 
 export default function Checkout() {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
     const { cart, error, isLoading } = useCart();
 
@@ -38,7 +38,7 @@ export default function Checkout() {
             </div>
             <header className="hidden md:flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
                 <LocalizedClientLink className="text-xl font-semibold" href="/">
-                    {shopSettings.shop_name}
+                    {settings?.shop_name}
                 </LocalizedClientLink>
                 <ThemeButton />
             </header>{" "}

@@ -9,7 +9,7 @@ import { currency } from "@/lib/utils";
 import { DeliveryOption } from "@/schemas";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 import { Cart } from "@/schemas";
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 import ComponentLoader from "@/components/component-loader";
 
 interface DeliveryStepProps {
@@ -18,7 +18,7 @@ interface DeliveryStepProps {
 }
 
 const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
     const { data: deliveryOptions, isPending } = useDeliveryOptions();
     const updateCartDetails = useUpdateCartDetails();
     const [selectedDeliveryMethod, setSelectedDeliveryMethod] = React.useState<DeliveryOption | null>(null);
@@ -78,7 +78,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <MapPin className="h-4 w-4" />
-                                        {option.amount === 0 ? <span>{shopSettings.address}</span> : <span>Available nationwide</span>}
+                                        {option.amount === 0 ? <span>{settings?.address}</span> : <span>Available nationwide</span>}
                                     </div>
                                     {option.amount === 0 && (
                                         <div className="flex items-center space-x-2">

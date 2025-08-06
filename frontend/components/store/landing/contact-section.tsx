@@ -4,10 +4,10 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
 import ContactForm from "../contact-form";
 
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 
 export function ContactSection() {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
     return (
         <section className="py-16 bg-content2">
@@ -31,7 +31,7 @@ export function ContactSection() {
                                     <h3 className="font-semibold text-default-foreground">Visit Us</h3>
                                 </div>
                                 <p className="text-default-600 text-sm">
-                                    {shopSettings.address}
+                                    {settings?.address}
                                     <br />
                                     Lagos, Nigeria
                                 </p>
@@ -44,7 +44,7 @@ export function ContactSection() {
                                     </div>
                                     <h3 className="font-semibold text-default-foreground">Call Us</h3>
                                 </div>
-                                <p className="text-default-600 text-sm">{shopSettings.contact_phone}</p>
+                                <p className="text-default-600 text-sm">{settings?.contact_phone}</p>
                             </div>
 
                             <div className="bg-content1 p-6 rounded-lg border border-divider">
@@ -54,7 +54,7 @@ export function ContactSection() {
                                     </div>
                                     <h3 className="font-semibold text-default-foreground">Email Us</h3>
                                 </div>
-                                <p className="text-default-600 text-sm">{shopSettings.contact_email}</p>
+                                <p className="text-default-600 text-sm">{settings?.contact_email}</p>
                             </div>
 
                             <div className="bg-content1 p-6 rounded-lg border border-divider">

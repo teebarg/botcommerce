@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
 import { cn } from "@/lib/utils";
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 
 interface NotFoundProps {
     className?: string;
@@ -15,7 +15,7 @@ interface NotFoundProps {
 
 export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     const router = useRouter();
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
     const scenarios: Record<string, any> = {
         "404": {
@@ -112,7 +112,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                             Need help?{" "}
                             <a
                                 className="font-medium transition-colors text-blue-500 hover:text-blue-600"
-                                href={`mailto:${shopSettings.contact_email}`}
+                                href={`mailto:${settings?.contact_email}`}
                             >
                                 Contact our support team
                             </a>

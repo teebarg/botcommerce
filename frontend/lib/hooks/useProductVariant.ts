@@ -5,12 +5,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useAddToCart } from "./useCart";
 
 import { currency } from "@/lib/utils";
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
     const { mutate: addToCart, isPending: loading } = useAddToCart();
 
     const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0]?.color || null);
@@ -112,7 +112,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
             typeof window !== "undefined" ? window.location.origin : ""
         }/products/${product.slug}\n\nPlease let me know the next steps for payment and delivery. Thank you!`;
 
-        const whatsappUrl = `https://wa.me/${shopSettings?.whatsapp}?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/${settings?.whatsapp}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, "_blank");
     };

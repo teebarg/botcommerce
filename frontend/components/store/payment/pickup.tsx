@@ -3,7 +3,7 @@
 import { MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 import { useCompleteCart } from "@/lib/hooks/useCart";
 
 interface PickupProps {
@@ -12,7 +12,7 @@ interface PickupProps {
 }
 
 const Pickup: React.FC<PickupProps> = ({ amount }) => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
     const completeCart = useCompleteCart();
 
     const onPaymentCompleted = async () => {
@@ -29,7 +29,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                     <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                     <div className="ml-2">
                         <p className="text-sm font-medium text-default-900">Collection Point</p>
-                        <p className="text-sm text-default-500">{shopSettings?.address}</p>
+                        <p className="text-sm text-default-500">{settings?.address}</p>
                         <p className="text-sm text-default-500">Open Mon-Sat: 9am - 6pm</p>
                     </div>
                 </div>

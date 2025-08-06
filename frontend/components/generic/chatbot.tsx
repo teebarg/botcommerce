@@ -5,14 +5,14 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import ChatBotComponent from "./chat/chatbot";
 
-import { useStore } from "@/app/store/use-store";
+import { useStoreSettings } from "@/providers/store-provider";
 
 interface Props {}
 
 const ChatBotWrapper: React.FC = () => {
-    const { shopSettings } = useStore();
+    const { settings } = useStoreSettings();
 
-    if (shopSettings?.feature_chatbot != "true") {
+    if (settings?.feature_chatbot != "true") {
         return null;
     }
 
