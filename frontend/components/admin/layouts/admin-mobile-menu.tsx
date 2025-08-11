@@ -46,7 +46,7 @@ const AdminMobileMenu: React.FC = () => {
 
     return (
         <div className="h-full bg-content1 rounded-[inherit] overflow-hidden overflow-y-auto">
-            <div className="p-4 bg-primary text-white sticky top-0 z-10">
+            <div className="p-4 bg-accent text-gray-800 sticky top-0 z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>
                         <AvatarImage src={user?.image} />
@@ -57,7 +57,7 @@ const AdminMobileMenu: React.FC = () => {
                         <div className="font-medium">
                             {user?.first_name} {user?.last_name}
                         </div>
-                        <div className="text-xs text-blue-100">{user?.email}</div>
+                        <div className="text-xs text-gray-700">{user?.email}</div>
                     </div>
                 </div>
             </div>
@@ -78,15 +78,15 @@ const AdminMobileMenu: React.FC = () => {
                     <Link
                         key={idx}
                         className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
-                            pathname === item.href ? "text-blue-600 bg-background" : ""
+                            pathname === item.href ? "bg-accent/50" : ""
                         }`}
                         href={item.href}
                     >
                         <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-blue-600" : "text-default-500"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-accent" : "text-default-500"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
-                        <ChevronRight className={pathname === item.href ? "text-blue-600" : "text-default-500"} size={16} />
+                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-default-500"} size={16} />
                     </Link>
                 ))}
             </nav>
