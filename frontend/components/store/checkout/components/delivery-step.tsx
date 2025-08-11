@@ -42,9 +42,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     const canContinue = !!cart.shipping_method;
 
     if (isPending) {
-        return (
-            <ComponentLoader className="h-48" />
-        );
+        return <ComponentLoader className="h-48" />;
     }
 
     return (
@@ -56,7 +54,12 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
             <CardContent className="space-y-6">
                 <RadioGroup value={cart.shipping_method} variant="delivery" onValueChange={(value: string) => handleChange(value)}>
                     {deliveryOptions?.map((option, idx: number) => (
-                        <RadioGroupItem key={idx} value={option.method} variant="delivery" loading={updateCartDetails.isPending && selectedDeliveryMethod === option}>
+                        <RadioGroupItem
+                            key={idx}
+                            loading={updateCartDetails.isPending && selectedDeliveryMethod === option}
+                            value={option.method}
+                            variant="delivery"
+                        >
                             <div className="">
                                 <div className="flex items-center space-x-3 mb-2">
                                     {option.method === "PICKUP" ? (

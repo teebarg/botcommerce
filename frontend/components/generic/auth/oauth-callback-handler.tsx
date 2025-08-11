@@ -47,6 +47,7 @@ const OAuthCallbackHandler = ({ provider }: OAuthCallbackHandlerProps) => {
             toast.success("Successfully signed in!");
 
             const callbackUrl = searchParams.get("state") || "/";
+
             setTimeout(() => {
                 invalidate("me");
                 router.push(callbackUrl || "/");

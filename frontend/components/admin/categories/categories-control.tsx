@@ -55,20 +55,20 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 />
             </Overlay>
             <Button
+                className={cn("", index === 0 ? "opacity-50 cursor-not-allowed" : "")}
+                disabled={index === 0}
                 size="iconOnly"
                 title="Move up"
                 onClick={() => onOrderChange?.(category?.id, "up")}
-                disabled={index === 0}
-                className={cn("", index === 0 ? "opacity-50 cursor-not-allowed" : "")}
             >
                 <ArrowUpAZ className="h-5 w-5" />
             </Button>
             <Button
+                className={cn("", index === (categoriesLength ?? 0) - 1 ? "opacity-50 cursor-not-allowed" : "")}
+                disabled={index === (categoriesLength ?? 0) - 1}
                 size="iconOnly"
                 title="Move down"
                 onClick={() => onOrderChange?.(category?.id, "down")}
-                disabled={index === (categoriesLength ?? 0) - 1}
-                className={cn("", index === (categoriesLength ?? 0) - 1 ? "opacity-50 cursor-not-allowed" : "")}
             >
                 <ArrowDownAZ className="h-5 w-5" />
             </Button>

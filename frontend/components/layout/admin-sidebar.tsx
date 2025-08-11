@@ -1,19 +1,6 @@
 "use client";
 
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuItem,
-    SidebarMenuButton,
-    useSidebar,
-} from "@/components/ui/sidebar";
-import {
     Home,
     Settings,
     Users,
@@ -34,9 +21,23 @@ import {
     Notebook,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
+    useSidebar,
+} from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useStoreSettings } from "@/providers/store-provider";
@@ -209,7 +210,7 @@ export function AdminSidebar() {
                                 <SidebarMenuButton className={cn("bg-accent py-6", state === "collapsed" && "hidden")}>
                                     <div className="flex items-center gap-2">
                                         <Avatar className="h-8 w-8 cursor-pointer">
-                                            <AvatarImage src={user?.image ?? undefined} alt={user?.first_name ?? "User"} />
+                                            <AvatarImage alt={user?.first_name ?? "User"} src={user?.image ?? undefined} />
                                             <AvatarFallback className="bg-green-600 text-white text-xs">
                                                 {user?.first_name
                                                     ?.split(" ")
@@ -225,9 +226,9 @@ export function AdminSidebar() {
                                     <ChevronUp className="ml-auto" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent side="top" className="w-(--radix-popper-anchor-width)">
+                            <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
                                 <DropdownMenuItem>
-                                    <Link href="/profile" className="justify-between">
+                                    <Link className="justify-between" href="/profile">
                                         Profile
                                         <span className="badge">New</span>
                                     </Link>

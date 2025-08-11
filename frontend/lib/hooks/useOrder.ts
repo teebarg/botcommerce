@@ -66,18 +66,18 @@ export const useChangePaymentStatus = () => {
 };
 
 export interface OrderTimelineEntry {
-  id: number;
-  order_id: number;
-  from_status?: string | null;
-  to_status?: string | null;
-  message?: string | null;
-  created_at: string;
+    id: number;
+    order_id: number;
+    from_status?: string | null;
+    to_status?: string | null;
+    message?: string | null;
+    created_at: string;
 }
 
 export const useOrderTimeline = (orderId?: number) => {
-  return useQuery({
-    queryKey: ["order-timeline", orderId],
-    enabled: !!orderId,
-    queryFn: async () => await api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
-  });
+    return useQuery({
+        queryKey: ["order-timeline", orderId],
+        enabled: !!orderId,
+        queryFn: async () => await api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
+    });
 };

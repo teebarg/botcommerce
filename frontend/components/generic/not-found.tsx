@@ -110,10 +110,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                     <div className="mt-6 pt-6 border-t transition-colors border-divider">
                         <p className="text-sm transition-colors text-default-500">
                             Need help?{" "}
-                            <a
-                                className="font-medium transition-colors text-blue-500 hover:text-blue-600"
-                                href={`mailto:${settings?.contact_email}`}
-                            >
+                            <a className="font-medium transition-colors text-blue-500 hover:text-blue-600" href={`mailto:${settings?.contact_email}`}>
                                 Contact our support team
                             </a>
                         </p>

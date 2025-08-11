@@ -111,7 +111,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                                 <FormItem>
                                     <FormLabel>Display Order</FormLabel>
                                     <FormControl>
-                                        <Input type="number" min={0} placeholder="e.g. 0, 1, 2..." {...field} />
+                                        <Input min={0} placeholder="e.g. 0, 1, 2..." type="number" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

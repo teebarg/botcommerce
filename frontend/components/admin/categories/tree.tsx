@@ -68,6 +68,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
         if (newIndex < 0 || newIndex >= categories?.length) return;
 
         const newCategories = [...categories];
+
         [newCategories[currentIndex], newCategories[newIndex]] = [newCategories[newIndex], newCategories[currentIndex]];
 
         newCategories.forEach((category: Category, index: number) => {
@@ -125,12 +126,12 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                         {hasChanges && (
                             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                                 <p className="text-sm text-yellow-800">
-                                    You have unsaved changes. Click "Save Order" to apply the new category order.
+                                    {`You have unsaved changes. Click "Save Order" to apply the new category order.`}
                                 </p>
                             </div>
                         )}
                         {hasChanges && (
-                            <Button onClick={saveOrder} disabled={reorderCategories.isPending} variant="luxury" size="lg">
+                            <Button disabled={reorderCategories.isPending} size="lg" variant="luxury" onClick={saveOrder}>
                                 <Save size={16} />
                                 <span>{reorderCategories.isPending ? "Saving..." : "Save Order"}</span>
                             </Button>
@@ -175,9 +176,9 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                                         </button>
                                                     )}
                                                     <CategoryAction
+                                                        categoriesLength={categories?.length}
                                                         category={category}
                                                         index={idx}
-                                                        categoriesLength={categories?.length}
                                                         onOrderChange={moveCategory}
                                                     />
                                                 </div>
@@ -203,9 +204,9 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                                                 <Badge variant={subcategory.is_active ? "emerald" : "destructive"} />
                                                             </div>
                                                             <CategoryAction
+                                                                categoriesLength={category?.subcategories?.length}
                                                                 category={subcategory}
                                                                 index={idx}
-                                                                categoriesLength={category?.subcategories?.length}
                                                             />
                                                         </div>
                                                     </div>

@@ -19,11 +19,11 @@ import {
 import Image from "next/image";
 
 import OrderProcessingAction from "./order-processing-actions";
-import { useOrderTimeline } from "@/lib/hooks/useOrder";
+import { OrderStatusBadge } from "./order-status-badge";
 
+import { useOrderTimeline } from "@/lib/hooks/useOrder";
 import { Order, OrderItem } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
-import { OrderStatusBadge } from "./order-status-badge";
 
 interface OrderDetailsProps {
     order: Order;
@@ -70,6 +70,7 @@ const orderStatusMap = {
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     const { data: timeline } = useOrderTimeline(order?.id);
+
     return (
         <div className="px-4 sm:px-6 pb-4 bg-content1 overflow-y-auto">
             <div className="sticky top-0 z-10 bg-content1 py-6">
