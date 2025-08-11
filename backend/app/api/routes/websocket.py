@@ -78,7 +78,7 @@ async def websocket(ws: WebSocket):
                         }):
                             logger.info(f"Promoted connection from {ip} to {user_id}")
                         else:
-                            logger.error(f"Failed to promote connection from {ip} to {user_id}")
+                            logger.debug(f"Failed to promote connection from {ip} to {user_id}")
                             continue
 
                 elif message_type == "ping":

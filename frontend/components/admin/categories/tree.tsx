@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { ChevronDown, FileImage, Plus } from "lucide-react";
+import { ChevronDown, FileImage, Plus, Save } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import CategoryAction from "./categories-control";
@@ -14,9 +14,10 @@ import { Category } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
+import { useReorderCategories } from "@/lib/hooks/useCategories";
 
 interface Props {
-    categories?: Category[];
+    data?: Category[];
 }
 
 const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }> = ({ image, categoryId }) => {
@@ -45,12 +46,47 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
     );
 };
 
-const CategoryTree: React.FC<Props> = ({ categories }) => {
+const CategoryTree: React.FC<Props> = ({ data }) => {
     const addState = useOverlayTriggerState({});
     const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
+    const reorderCategories = useReorderCategories();
+    const [hasChanges, setHasChanges] = useState<boolean>(false);
+    const [categories, setCategories] = useState<Category[]>(data || []);
+
+    useEffect(() => {
+        setCategories(data || []);
+    }, [data]);
 
     const toggleCategory = (id: number) => {
         setExpandedCategories((prev: number[]) => (prev.includes(id) ? prev.filter((item: number) => item !== id) : [...prev, id]));
+    };
+
+    const moveCategory = (categoryId: number, direction: string) => {
+        const currentIndex = categories?.findIndex((cat) => cat.id === categoryId);
+        const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+        if (newIndex < 0 || newIndex >= categories?.length) return;
+
+        const newCategories = [...categories];
+        [newCategories[currentIndex], newCategories[newIndex]] = [newCategories[newIndex], newCategories[currentIndex]];
+
+        newCategories.forEach((category: Category, index: number) => {
+            category.display_order = index + 1;
+        });
+
+        setCategories(newCategories);
+        setHasChanges(true);
+    };
+
+    const saveOrder = () => {
+        const orderData = categories.map((category: Category) => ({
+            id: category.id,
+            display_order: category.display_order,
+        }));
+
+        reorderCategories.mutateAsync(orderData).then(() => {
+            setHasChanges(false);
+        });
     };
 
     return (
@@ -85,7 +121,22 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                 </div>
 
                 <div className="space-y-4">
-                    {categories?.map((category: Category, idx: number) => (
+                    <div className="sticky top-16 z-10 bg-background space-y-2">
+                        {hasChanges && (
+                            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                                <p className="text-sm text-yellow-800">
+                                    You have unsaved changes. Click "Save Order" to apply the new category order.
+                                </p>
+                            </div>
+                        )}
+                        {hasChanges && (
+                            <Button onClick={saveOrder} disabled={reorderCategories.isPending} variant="luxury" size="lg">
+                                <Save size={16} />
+                                <span>{reorderCategories.isPending ? "Saving..." : "Save Order"}</span>
+                            </Button>
+                        )}
+                    </div>
+                    {(categories || []).map((category: Category, idx: number) => (
                         <div
                             key={idx}
                             className="bg-card rounded-2xl shadow-sm border border-divider overflow-hidden hover:shadow-md transition-shadow"
@@ -123,7 +174,12 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                             />
                                                         </button>
                                                     )}
-                                                    <CategoryAction category={category} />
+                                                    <CategoryAction
+                                                        category={category}
+                                                        index={idx}
+                                                        categoriesLength={categories?.length}
+                                                        onOrderChange={moveCategory}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -146,7 +202,11 @@ const CategoryTree: React.FC<Props> = ({ categories }) => {
                                                                 <h4 className="font-medium text-default-900 truncate mb-1">{subcategory.name}</h4>
                                                                 <Badge variant={subcategory.is_active ? "emerald" : "destructive"} />
                                                             </div>
-                                                            <CategoryAction category={subcategory} />
+                                                            <CategoryAction
+                                                                category={subcategory}
+                                                                index={idx}
+                                                                categoriesLength={category?.subcategories?.length}
+                                                            />
                                                         </div>
                                                     </div>
                                                 ))}

@@ -12,6 +12,10 @@ from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, send_notification, retrieve_order, list_orders
 from app.services.redis import cache_response
 from pydantic import BaseModel
+from app.models.order import OrderTimelineEntry
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -30,6 +34,7 @@ async def create_order(
         await cache.invalidate_list_cache("orders")
         return order
     except Exception as e:
+        logger.error(f"Failed to create order: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{order_id}", response_model=OrderResponse)
@@ -113,12 +118,26 @@ async def order_status(cache: RedisClient, id: int, status: OrderStatus):
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    data = {"status": status}
+    if order.status == status:
+        raise HTTPException(status_code=400, detail="Order status is already the same")
 
-    updated_order = await db.order.update(where={"id": id}, data=data)
-    await cache.invalidate_list_cache("orders")
-    await cache.bust_tag(f"order:{id}")
-    return updated_order
+    data = {"status": status}
+    async with db.tx() as tx:
+        try:
+            updated_order = await tx.order.update(where={"id": id}, data=data)
+            await tx.ordertimeline.create(
+                data={
+                    "order": {"connect": {"id": id}},
+                    "from_status": order.status,
+                    "to_status": status,
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to create order timeline: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        await cache.invalidate_list_cache("orders")
+        await cache.bust_tag(f"order:{id}")
+        return updated_order
 
 @router.post("/{order_id}/fulfill", response_model=OrderResponse)
 async def fulfill_order(cache: RedisClient, order_id: int):
@@ -153,3 +172,14 @@ async def update_order_notes(cache: RedisClient, order_id: int, notes_update: Or
     await cache.invalidate_list_cache("orders")
     await cache.bust_tag(f"order:{order.order_number}")
     return updated_order
+
+
+@router.get("/{order_id}/timeline", response_model=list[OrderTimelineEntry])
+async def get_order_timeline(order_id: int):
+    order = await db.order.find_unique(where={"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    entries = await db.ordertimeline.find_many(
+        where={"order_id": order_id}, order={"created_at": "asc"}
+    )
+    return entries

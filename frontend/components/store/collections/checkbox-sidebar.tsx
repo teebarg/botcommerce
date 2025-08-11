@@ -61,8 +61,8 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     <div>
                         <span className="text-sm">Collections</span>
                         <div className="block mb-6 space-y-0.5">
-                            {collections?.map((item: Collection, index: number) => (
-                                <LocalizedClientLink key={index} className="flex justify-between" href={`/collections/${item.slug}`}>
+                            {collections?.map((item: Collection, idx: number) => (
+                                <LocalizedClientLink key={idx} className="flex justify-between" href={`/collections/${item.slug}`}>
                                     {item.name} {facets?.collections && <span>({facets["collections"][item.name] ?? 0})</span>}
                                 </LocalizedClientLink>
                             ))}
@@ -81,16 +81,16 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                     <div className="flex flex-col mt-6">
                         <span className="mb-2 text-sm">Categories</span>
                         <div className="max-h-[20vh] overflow-y-scroll">
-                            {categories?.map((item: Category, index: number) => (
-                                <CheckboxGroup key={index} checkboxes={item.subcategories} facets={facets} groupName={item.name} item={item} />
+                            {(categories || []).map((item: Category, idx: number) => (
+                                <CheckboxGroup key={idx} checkboxes={item.subcategories} facets={facets} groupName={item.name} item={item as any} />
                             ))}
                         </div>
                     </div>
                     <div className="flex flex-col mt-6">
                         <span className="text-sm">Brands</span>
                         <div className="max-h-[20vh] overflow-y-scroll">
-                            {brands?.map((item: Brand, index: number) => (
-                                <div key={`brand-${index}`} className="flex justify-between mt-2">
+                            {brands?.map((item: Brand, idx: number) => (
+                                <div key={`brand-${idx}`} className="flex justify-between mt-2">
                                     <div className="flex items-center gap-1">
                                         <Checkbox
                                             checked={dataSet.has(item.slug)}

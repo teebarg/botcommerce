@@ -1,7 +1,6 @@
 "use client";
 
-import { AlertTriangle, CheckCircle, Clock, ShoppingCart } from "lucide-react";
-import { Exclamation } from "nui-react-icons";
+import { CheckCircle, Package, PackageCheck, RefreshCw, RotateCcw, ShieldAlert, Truck, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { OrderStatus } from "@/schemas";
@@ -12,12 +11,12 @@ export const PaymentStatusBadge = ({ status }: { status: string }) => {
         { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "emerald" | "warning" }
     > = {
         ["PENDING"]: {
-            icon: <AlertTriangle className="mr-1" size={14} />,
+            icon: <ShieldAlert className="mr-1" size={14} />,
             label: "Payment Pending",
             variant: "warning",
         },
         ["FAILED"]: {
-            icon: <Exclamation className="mr-1" size={14} />,
+            icon: <XCircle className="mr-1" size={14} />,
             label: "Payment Failed",
             variant: "destructive",
         },
@@ -27,7 +26,7 @@ export const PaymentStatusBadge = ({ status }: { status: string }) => {
             variant: "emerald",
         },
         ["REFUNDED"]: {
-            icon: <CheckCircle className="mr-1" size={14} />,
+            icon: <RotateCcw className="mr-1" size={14} />,
             label: "Payment Refunded",
             variant: "default",
         },
@@ -49,37 +48,37 @@ export const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {
         { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "emerald" | "yellow" | "blue" }
     > = {
         ["PENDING"]: {
-            icon: <AlertTriangle className="mr-1" size={14} />,
+            icon: <ShieldAlert className="mr-1" size={14} />,
             label: "Pending",
             variant: "yellow",
         },
         ["PROCESSING"]: {
-            icon: <Clock className="mr-1" size={14} />,
+            icon: <RefreshCw className="mr-1" size={14} />,
             label: "Processing",
             variant: "default",
         },
         ["SHIPPED"]: {
-            icon: <ShoppingCart className="mr-1" size={14} />,
+            icon: <Package className="mr-1" size={14} />,
             label: "Shipped",
             variant: "secondary",
         },
         ["OUT_FOR_DELIVERY"]: {
-            icon: <ShoppingCart className="mr-1" size={14} />,
+            icon: <Truck className="mr-1" size={14} />,
             label: "Out for delivery",
             variant: "blue",
         },
         ["DELIVERED"]: {
-            icon: <CheckCircle className="mr-1" size={14} />,
+            icon: <PackageCheck className="mr-1" size={14} />,
             label: "Delivered",
             variant: "emerald",
         },
         ["CANCELED"]: {
-            icon: <CheckCircle className="mr-1" size={14} />,
+            icon: <XCircle className="mr-1" size={14} />,
             label: "Delivered",
             variant: "destructive",
         },
         ["REFUNDED"]: {
-            icon: <CheckCircle className="mr-1" size={14} />,
+            icon: <RotateCcw className="mr-1" size={14} />,
             label: "Delivered",
             variant: "emerald",
         },

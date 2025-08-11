@@ -2,19 +2,20 @@
 
 import {
     LayoutDashboard,
-    ShoppingCart,
-    Package,
     Users,
     Settings,
     Search,
     LogOut,
     ChevronRight,
     Notebook,
-    Image,
     Activity,
     MessageSquare,
-    User,
-    MessageCircle,
+    ClipboardList,
+    Box,
+    Layers,
+    LayoutGrid,
+    UsersRound,
+    Star,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,18 +30,18 @@ const AdminMobileMenu: React.FC = () => {
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
-        { id: "orders", label: "Orders", icon: <ShoppingCart size={20} />, href: "/admin/orders" },
-        { id: "products", label: "Products", icon: <Package size={20} />, href: "/admin/products" },
+        { id: "orders", label: "Orders", icon: <ClipboardList size={20} />, href: "/admin/orders" },
+        { id: "products", label: "Products", icon: <Box size={20} />, href: "/admin/products" },
         { id: "customers", label: "Customers", icon: <Users size={20} />, href: "/admin/users" },
-        { id: "categories", label: "Categories", icon: <Image size={20} />, href: "/admin/categories" },
-        { id: "reviews", label: "Reviews", icon: <Notebook size={20} />, href: "/admin/reviews" },
-        { id: "collections", label: "Collections", icon: <Image size={20} />, href: "/admin/collections" },
-        { id: "shared", label: "Shared Collections", icon: <Image size={20} />, href: "/admin/shared" },
+        { id: "categories", label: "Categories", icon: <Layers size={20} />, href: "/admin/categories" },
+        { id: "reviews", label: "Reviews", icon: <Star size={20} />, href: "/admin/reviews" },
+        { id: "collections", label: "Collections", icon: <LayoutGrid size={20} />, href: "/admin/collections" },
+        { id: "shared", label: "Shared Collections", icon: <LayoutGrid size={20} />, href: "/admin/shared" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
         { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
-        { id: "faqs", label: "FAQs", icon: <MessageCircle size={20} />, href: "/admin/faqs" },
-        { id: "online", label: "Online", icon: <User size={20} />, href: "/admin/online" },
+        { id: "faqs", label: "FAQs", icon: <Notebook size={20} />, href: "/admin/faqs" },
+        { id: "online", label: "Online", icon: <UsersRound size={20} />, href: "/admin/online" },
     ];
 
     return (

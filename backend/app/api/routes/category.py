@@ -12,6 +12,9 @@ from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response
 from app.core.deps import get_current_superuser, RedisClient
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -35,7 +38,11 @@ async def index(
                 {"slug": {"contains": query, "mode": "insensitive"}}
             ]
         }
-    return await db.category.find_many(where=where_clause, order={"created_at": "desc"},include={"subcategories": True})
+    return await db.category.find_many(
+        where=where_clause,
+        order={"display_order": "asc"},
+        include={"subcategories": True},
+    )
 
 @router.post("/")
 async def create(*, data: CategoryCreate, cache: RedisClient) -> Category:
@@ -84,6 +91,34 @@ async def get_by_slug(slug: str, request: Request) -> Category:
     return category
 
 
+class CategoryOrderUpdate(BaseModel):
+    id: int
+    display_order: int
+
+class BulkOrderUpdate(BaseModel):
+    categories: list[CategoryOrderUpdate]
+
+@router.patch("/reorder")
+async def reorder_categories(order_data: BulkOrderUpdate, cache: RedisClient):
+    """Update display order for categories"""
+    async with db.tx() as tx:
+        try:
+            for category_update in order_data.categories:
+                category = await tx.category.find_unique(where={"id": category_update.id})
+                if category:
+                    await tx.category.update(
+                        where={"id": category_update.id},
+                        data={"display_order": category_update.display_order}
+                    )
+            
+            await cache.invalidate_list_cache("categories")
+            await cache.invalidate_list_cache("category")
+            return {"message": "Categories reordered successfully"}
+        except Exception as e:
+            logger.error(f"Failed to reorder categories: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update(
     *,
@@ -103,13 +138,14 @@ async def update(
     try:
         update = await db.category.update(
             where={"id": id},
-            data=update_data.model_dump()
+            data=update_data.model_dump(exclude_unset=True)
         )
         await cache.invalidate_list_cache("categories")
         await cache.bust_tag(f"category:{id}")
         await cache.bust_tag(f"category:{update.slug}")
         return update
     except PrismaError as e:
+        logger.error(f"Failed to update category: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
@@ -133,6 +169,7 @@ async def delete(id: int, cache: RedisClient) -> Message:
         await cache.bust_tag(f"category:{existing.slug}")
         return Message(message="Category deleted successfully")
     except PrismaError as e:
+        logger.error(f"Failed to delete category: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
@@ -152,7 +189,7 @@ async def autocomplete(request: Request, query: str = "") -> Any:
         }
     categories = await db.category.find_many(
         where=where_clause,
-        order={"created_at": "desc"},
+        order={"display_order": "asc"},
     )
     return Search(results=categories)
 
@@ -171,7 +208,6 @@ async def add_image(id: int, image_data: ImageUpload, cache: RedisClient) -> Cat
     try:
         image_url = upload(bucket="images", data=image_data)
 
-        # Update category with new image URL
         updated_category = await db.category.update(
             where={"id": id},
             data={"image": image_url}
@@ -182,6 +218,7 @@ async def add_image(id: int, image_data: ImageUpload, cache: RedisClient) -> Cat
         return updated_category
 
     except Exception as e:
+        logger.error(f"Failed to upload image: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to upload image: {str(e)}"
@@ -220,6 +257,7 @@ async def delete_image(
         return Message(message="Category image deleted successfully")
 
     except Exception as e:
+        logger.error(f"Failed to delete image: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to delete image: {str(e)}"

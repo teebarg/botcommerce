@@ -62,6 +62,18 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
         data=data
     )
 
+    try:
+        await db.ordertimeline.create(
+            data={
+                "order": {"connect": {"id": new_order.id}},
+                "message": f"Order {order_number} created",
+                # "from_status": order_in.status,
+                "to_status": order_in.status,
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to log order timeline for order {new_order.id}: {e}")
+
     return new_order
 
 async def retrieve_order(order_id: str) -> OrderResponse:

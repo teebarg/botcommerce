@@ -13,7 +13,26 @@ import {
     SidebarMenuButton,
     useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Users, Package, Menu, ChevronUp, LogOut, PanelLeftIcon, User, Box, Star, Activity, MessageSquare } from "lucide-react";
+import {
+    Home,
+    Settings,
+    Users,
+    Menu,
+    ChevronUp,
+    LogOut,
+    PanelLeftIcon,
+    User,
+    Box,
+    Star,
+    Activity,
+    MessageSquare,
+    Tag,
+    Layers,
+    LayoutGrid,
+    UserSquare,
+    ClipboardList,
+    Notebook,
+} from "lucide-react";
 import Link from "next/link";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,7 +40,6 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useStoreSettings } from "@/providers/store-provider";
-import { DocumentText } from "nui-react-icons";
 
 const AdminItems = [
     {
@@ -52,12 +70,12 @@ const AdminItems = [
     {
         title: "FAQs",
         url: "/admin/faqs",
-        icon: DocumentText,
+        icon: Notebook,
     },
     {
         title: "Online",
         url: "/admin/online",
-        icon: User,
+        icon: UserSquare,
     },
 ];
 
@@ -78,12 +96,12 @@ const storeItems = [
     {
         title: "Products",
         url: "/admin/products",
-        icon: Package,
+        icon: Box,
     },
     {
         title: "Orders",
         url: "/admin/orders",
-        icon: Box,
+        icon: ClipboardList,
     },
     {
         title: "Reviews",
@@ -93,22 +111,22 @@ const storeItems = [
     {
         title: "Brands",
         url: "/admin/brands",
-        icon: Package,
+        icon: Tag,
     },
     {
         title: "Categories",
         url: "/admin/categories",
-        icon: Package,
+        icon: Layers,
     },
     {
         title: "Collections",
         url: "/admin/collections",
-        icon: Package,
+        icon: LayoutGrid,
     },
     {
         title: "Shared Collections",
         url: "/admin/shared",
-        icon: Package,
+        icon: LayoutGrid,
     },
 ];
 

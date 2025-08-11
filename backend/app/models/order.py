@@ -78,3 +78,11 @@ class Orders(BaseModel):
     limit: int
     total_count: int
     total_pages: int
+
+class OrderTimelineEntry(BaseModel):
+    id: int
+    order_id: int
+    from_status: Optional[OrderStatus] = None
+    to_status: Optional[OrderStatus] = None
+    message: Optional[str] = None
+    created_at: datetime

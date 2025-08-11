@@ -125,13 +125,13 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                             ) : (
                                 <div className="text-sm space-y-1">
                                     <p className="font-medium text-default-900">
-                                        {order.shipping_address.first_name} {order.shipping_address.last_name}
+                                        {order.shipping_address?.first_name} {order.shipping_address?.last_name}
                                     </p>
-                                    <p className="text-default-700">{order.shipping_address.address_1}</p>
+                                    <p className="text-default-700">{order.shipping_address?.address_1}</p>
                                     <p className="text-default-700">
-                                        {order.shipping_address.city}, {order.shipping_address.state}
+                                        {order.shipping_address?.city}, {order.shipping_address?.state}
                                     </p>
-                                    <p className="text-default-700">{order.shipping_address.phone}</p>
+                                    <p className="text-default-700">{order.shipping_address?.phone}</p>
                                 </div>
                             )}
                         </CardContent>
