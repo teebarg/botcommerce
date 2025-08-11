@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { toast } from "sonner";
 
 import { api } from "@/apis/client2";
 
@@ -30,7 +29,6 @@ const flushBuffer = async () => {
             buffer.push(...batch);
             setTimeout(flushBuffer, 2000 * retryCount);
         } else {
-            toast.error("Failed to track user interactions after 3 retries");
             retryCount = 0;
         }
     }
