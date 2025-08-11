@@ -69,13 +69,13 @@ const OrderView: React.FC = () => {
                         <TableBody>
                             {isLoading ? (
                                 <TableRow key="loading">
-                                    <TableCell className="text-center" colSpan={6}>
+                                    <TableCell className="text-center" colSpan={7}>
                                         Loading...
                                     </TableCell>
                                 </TableRow>
                             ) : orders?.length === 0 ? (
                                 <TableRow key="no-orders">
-                                    <TableCell className="text-center" colSpan={6}>
+                                    <TableCell className="text-center" colSpan={7}>
                                         No orders found
                                     </TableCell>
                                 </TableRow>

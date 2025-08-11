@@ -41,8 +41,6 @@ export function ProductDetails() {
         setSelectedCollections(collectionIdsFromURL.map(Number));
     }, [searchParams]);
 
-    if (isLoading) return <ComponentLoader className="h-[300px]" />;
-
     if (!data) return <ServerError />;
 
     const { products, ...pagination } = data;
@@ -84,42 +82,58 @@ export function ProductDetails() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {products?.map((product: Product, idx: number) => (
-                            <motion.tr
-                                key={idx}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1"
-                                initial={{ opacity: 0, y: 20 }}
-                                transition={{ delay: idx * 0.1 }}
-                            >
-                                <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                    {(pagination?.page - 1) * LIMIT + idx + 1}
+                        {isLoading ? (
+                            <TableRow key="loading">
+                                <TableCell className="text-center" colSpan={8}>
+                                    Loading...
                                 </TableCell>
-                                <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
-                                    <Image
-                                        alt={product.name}
-                                        blurDataURL="/placeholder.jpg"
-                                        className="rounded"
-                                        height={40}
-                                        placeholder="blur"
-                                        src={product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"}
-                                        width={40}
-                                    />
+                            </TableRow>
+                        ) : products?.length === 0 ? (
+                            <TableRow key="no-orders">
+                                <TableCell className="text-center" colSpan={8}>
+                                    No products found
                                 </TableCell>
-                                <TableCell className="font-medium">{product.name}</TableCell>
-                                <TableCell>{product.sku}</TableCell>
-                                <TableCell>{product.description}</TableCell>
-                                <TableCell>{product.variants?.length}</TableCell>
-                                <TableCell>
-                                    <Badge variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>
-                                        {getStatus(product.variants)}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <ProductActions product={product} />
-                                </TableCell>
-                            </motion.tr>
-                        ))}
+                            </TableRow>
+                        ) : (
+                            products?.map((product: Product, idx: number) => (
+                                <motion.tr
+                                    key={idx}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                >
+                                    <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
+                                        {(pagination?.page - 1) * LIMIT + idx + 1}
+                                    </TableCell>
+                                    <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
+                                        <Image
+                                            alt={product.name}
+                                            blurDataURL="/placeholder.jpg"
+                                            className="rounded"
+                                            height={40}
+                                            placeholder="blur"
+                                            src={
+                                                product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"
+                                            }
+                                            width={40}
+                                        />
+                                    </TableCell>
+                                    <TableCell className="font-medium">{product.name}</TableCell>
+                                    <TableCell>{product.sku}</TableCell>
+                                    <TableCell>{product.description}</TableCell>
+                                    <TableCell>{product.variants?.length}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>
+                                            {getStatus(product.variants)}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <ProductActions product={product} />
+                                    </TableCell>
+                                </motion.tr>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>
@@ -189,6 +203,8 @@ export function ProductDetails() {
                             <ProductListItem key={idx} actions={<ProductActions product={product} />} product={product} />
                         ))}
                     </div>
+
+                    {isLoading && <ComponentLoader className="h-[300px]" />}
 
                     {products?.length === 0 && (
                         <div className="text-center py-8">

@@ -71,13 +71,13 @@ const ChatsView: React.FC = () => {
                         <TableBody>
                             {isLoading ? (
                                 <TableRow key="loading">
-                                    <TableCell className="text-center" colSpan={6}>
+                                    <TableCell className="text-center" colSpan={8}>
                                         Loading...
                                     </TableCell>
                                 </TableRow>
                             ) : conversations?.length === 0 ? (
                                 <TableRow key="no-orders">
-                                    <TableCell className="text-center" colSpan={6}>
+                                    <TableCell className="text-center" colSpan={8}>
                                         No conversations found
                                     </TableCell>
                                 </TableRow>

@@ -86,7 +86,7 @@ const RecentOrdersList = () => {
                         ))}
                         {orders?.length === 0 && (
                             <TableRow>
-                                <TableCell className="h-24 text-center" colSpan={6}>
+                                <TableCell className="h-24 text-center" colSpan={7}>
                                     No orders found
                                 </TableCell>
                             </TableRow>
