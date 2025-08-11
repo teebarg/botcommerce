@@ -13,6 +13,7 @@ from app.core.deps import (
 )
 from app.services.product import index_products
 from app.services.redis import CacheService
+from app.core.config import settings
 
 
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
@@ -170,13 +171,21 @@ async def send_notification(id: int, user_id: int, notification):
             logger.error(f"Failed to generate invoice email: {e}")
             return
 
+        order_link = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
+        items_overview = "\n".join(
+            [f"• {it.name} x{it.quantity} - {it.price}" for it in (order.order_items or [])]
+        ) or "No items found"
+
         slack_message = {
-            "text": f"🛍️ *New Order Created* 🛍️\n"
-                    f"*Order ID:* {order.order_number}\n"
-                    f"*Customer:* {user.first_name} {user.last_name}\n"
-                    f"*Email:* {user.email}\n"
-                    f"*Amount:* {order.total}\n"
-                    f"*Payment Status:* {order.payment_status}"
+            "text": (
+                f"🛍️ *New Order Created* 🛍️\n"
+                f"*Order:* <{order_link}|{order.order_number}>\n"
+                f"*Customer:* {user.first_name} {user.last_name}\n"
+                f"*Email:* {user.email}\n"
+                f"*Amount:* {order.total}\n"
+                f"*Payment Status:* {order.payment_status}\n"
+                f"*Items:*\n{items_overview}\n"
+            )
         }
 
         notification.send_notification(
@@ -184,6 +193,33 @@ async def send_notification(id: int, user_id: int, notification):
             slack_message=slack_message
         )
         logger.info(f"Slack notification sent to user: {user_id}")
+
+        try:
+            contact = await db.shopsettings.find_unique(
+                where={"key": "whatsapp"}
+            )
+            whatsapp_available = hasattr(notification, "channels") and "whatsapp" in getattr(notification, "channels", {})
+            if contact and whatsapp_available:
+                normalized = contact.value.replace(" ", "").replace("+", "")
+                whatsapp_text = (
+                    f"New order: {order.order_number}\n"
+                    f"Customer: {user.first_name} {user.last_name}\n"
+                    f"Email: {user.email}\n"
+                    f"Amount: {order.total}\n"
+                    f"Payment: {order.payment_status}\n"
+                    f"Items:\n{items_overview}\n\n"
+                    f"View order: {order_link}\n"
+                )
+                notification.send_notification(
+                    channel_name="whatsapp",
+                    recipient=normalized,
+                    message=whatsapp_text,
+                )
+                logger.info("WhatsApp notification sent to shop contact")
+            else:
+                logger.info("WhatsApp not configured or shop contact missing. Skipping WhatsApp notification.")
+        except Exception as e:
+            logger.error(f"Failed to send WhatsApp notification: {e}")
     except Exception as e:
         logger.error(f"Failed to send notification: {e}")
 
