@@ -6,7 +6,7 @@ import ActivityTray from "@/components/generic/activities/activity-tray";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/actions/auth";
-import MenuComp from "@/components/layout/mobile-menu-drawer";
+import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 
 const AdminNavbar = async () => {
     const siteConfig = await getSiteConfig();

@@ -14,10 +14,10 @@ import {
     Activity,
     MessageSquare,
     User,
+    MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DocumentText } from "nui-react-icons";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/auth-provider";
@@ -37,10 +37,9 @@ const AdminMobileMenu: React.FC = () => {
         { id: "collections", label: "Collections", icon: <Image size={20} />, href: "/admin/collections" },
         { id: "shared", label: "Shared Collections", icon: <Image size={20} />, href: "/admin/shared" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
-        // { id: "carousel", label: "Carousel", icon: <Image size={20} />, href: "/admin/carousel" },
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
         { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
-        { id: "faqs", label: "FAQs", icon: <DocumentText size={20} />, href: "/admin/faqs" },
+        { id: "faqs", label: "FAQs", icon: <MessageCircle size={20} />, href: "/admin/faqs" },
         { id: "online", label: "Online", icon: <User size={20} />, href: "/admin/online" },
     ];
 

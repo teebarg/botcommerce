@@ -6,7 +6,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { MenuIcon } from "lucide-react";
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import AdminMobileMenu from "@/components/admin/layouts/mobile-menu";
+import AdminMobileMenu from "@/components/admin/layouts/admin-mobile-menu";
 
 const MenuComp: React.FC = () => {
     const pathname = usePathname();
