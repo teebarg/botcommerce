@@ -9,20 +9,21 @@ import {
     Clock,
     ArrowLeft,
     ShieldAlert,
-    CircleDashed,
     PackageCheck,
-    CircleX,
-    CircleSlash,
     Download,
+    RefreshCw,
+    Package,
+    XCircle,
+    RotateCcw,
 } from "lucide-react";
-import { format } from "date-fns";
 import Image from "next/image";
 
 import OrderProcessingAction from "./order-processing-actions";
+import { OrderStatusBadge } from "./order-status-badge";
 
+import { useOrderTimeline } from "@/lib/hooks/useOrder";
 import { Order, OrderItem } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
-import { OrderStatusBadge } from "./order-status-badge";
 
 interface OrderDetailsProps {
     order: Order;
@@ -36,12 +37,12 @@ const orderStatusMap = {
         color: "bg-warning",
     },
     PROCESSING: {
-        icon: <CircleDashed className="h-5 w-5 text-white" />,
+        icon: <RefreshCw className="h-5 w-5 text-white" />,
         label: "Processing",
-        color: "bg-secondary",
+        color: "bg-accent",
     },
     SHIPPED: {
-        icon: <Truck className="h-5 w-5 text-white" />,
+        icon: <Package className="h-5 w-5 text-white" />,
         label: "Shipped",
         color: "bg-primary",
     },
@@ -56,18 +57,20 @@ const orderStatusMap = {
         color: "bg-success",
     },
     CANCELED: {
-        icon: <CircleX className="h-5 w-5 text-white" />,
+        icon: <XCircle className="h-5 w-5 text-white" />,
         label: "Cancelled",
         color: "bg-danger",
     },
     REFUNDED: {
-        icon: <CircleSlash className="h-5 w-5 text-white" />,
+        icon: <RotateCcw className="h-5 w-5 text-white" />,
         label: "Refunded",
         color: "bg-danger",
     },
 };
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
+    const { data: timeline } = useOrderTimeline(order?.id);
+
     return (
         <div className="px-4 sm:px-6 pb-4 bg-content1 overflow-y-auto">
             <div className="sticky top-0 z-10 bg-content1 py-6">
@@ -126,7 +129,19 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             ))}
                         </div>
                         <div className="border-t border-divider px-6 py-4">
-                            <div className="flex justify-between text-base font-medium text-default-900">
+                            <div className="flex justify-between text-sm font-medium text-default-900">
+                                <p>Subtotal</p>
+                                <p className="font-semibold text-default-900">{currency(order.subtotal)}</p>
+                            </div>
+                            <div className="flex justify-between text-sm font-medium text-default-900">
+                                <p>Shipping</p>
+                                <p className="font-semibold text-default-900">{currency(order.shipping_fee)}</p>
+                            </div>
+                            <div className="flex justify-between text-sm font-medium text-default-900">
+                                <p>Tax</p>
+                                <p className="font-semibold text-default-900">{currency(order.tax)}</p>
+                            </div>
+                            <div className="flex justify-between text-sm font-medium text-default-900 mt-4">
                                 <p>Total</p>
                                 <p className="font-semibold text-default-900 text-lg">{currency(order.total)}</p>
                             </div>
@@ -144,17 +159,23 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             <div>
                                 <h3 className="text-sm font-medium text-default-500">Contact Details</h3>
                                 <p className="text-default-900 font-medium">
-                                    {order.user.first_name} {order.user.last_name}
+                                    {order.user?.first_name} {order.user?.last_name}
                                 </p>
-                                <p className="text-default-900">{order.user.email}</p>
-                                <p className="text-default-900">{order.shipping_address.phone}</p>
+                                <p className="text-default-900">{order.user?.email}</p>
+                                <p className="text-default-900">{order.shipping_address?.phone}</p>
                             </div>
                             <div>
                                 <h3 className="text-sm font-medium text-default-500">Shipping Address</h3>
-                                <p className="text-default-900">{order.shipping_address.address_1},</p>
-                                <p className="text-default-900">
-                                    {order.shipping_address.city}, {order.shipping_address.state}.
-                                </p>
+                                {!order.shipping_address ? (
+                                    <p>Not applicable ({order.shipping_method})</p>
+                                ) : (
+                                    <>
+                                        <p className="text-default-900">{order.shipping_address?.address_1},</p>
+                                        <p className="text-default-900">
+                                            {order.shipping_address?.city}, {order.shipping_address?.state}.
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -209,7 +230,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
                         <div className="p-6 space-y-4">
                             <OrderProcessingAction order={order} />
-                            {order.invoice_url && (
+                            {order.payment_status === "SUCCESS" && order.invoice_url && (
                                 <a
                                     download
                                     className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2 px-4 rounded-lg w-full"
@@ -243,35 +264,51 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                         <p className="text-sm text-default-500">Order placed</p>
                                                     </div>
                                                     <div className="text-right text-sm whitespace-nowrap text-default-500">
-                                                        <time>{format(order.created_at, "MMMM dd")}</time>
+                                                        <time>{formatDate(order.created_at)}</time>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </li>
-                                    <li>
-                                        <div className="relative">
-                                            <div className="relative flex space-x-3">
-                                                <div>
-                                                    <span
-                                                        className={
-                                                            orderStatusMap[order.status].color +
-                                                            " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
-                                                        }
-                                                    >
-                                                        {orderStatusMap[order.status].icon}
-                                                    </span>
-                                                </div>
-                                                <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    {(timeline || []).map((evt, idx) => (
+                                        <li key={idx}>
+                                            <div className="relative pb-6">
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={
+                                                        idx === (timeline?.length || 0) - 1
+                                                            ? "hidden"
+                                                            : "absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                                                    }
+                                                />
+                                                <div className="relative flex space-x-3">
                                                     <div>
-                                                        <p className="text-sm text-default-500">{orderStatusMap[order.status].label}</p>
+                                                        <span
+                                                            className={
+                                                                orderStatusMap[evt.to_status as keyof typeof orderStatusMap].color +
+                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
+                                                            }
+                                                        >
+                                                            {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].icon}
+                                                        </span>
+                                                    </div>
+                                                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                                        <div>
+                                                            <p className="text-sm text-default-500">
+                                                                {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].label}
+                                                            </p>
+                                                        </div>
+                                                        <div className="text-right text-sm whitespace-nowrap text-default-500">
+                                                            <time>{formatDate(evt.created_at)}</time>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </li>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
+                            {timeline?.length === 0 && <p className="text-sm text-default-500">No timeline events found</p>}
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,15 @@ class ContactFormCreate(BaseModel):
     message: str = "bearer"
 
 
+class BulkPurchaseCreate(BaseModel):
+    name: str
+    email: str
+    phone: str
+    bulkType: str
+    quantity: str | None = None
+    message: str | None = None
+
+
 class NewsletterCreate(BaseModel):
     email: str
 

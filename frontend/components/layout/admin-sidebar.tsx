@@ -1,6 +1,29 @@
 "use client";
 
 import {
+    Home,
+    Settings,
+    Users,
+    Menu,
+    ChevronUp,
+    LogOut,
+    PanelLeftIcon,
+    User,
+    Box,
+    Star,
+    Activity,
+    MessageSquare,
+    Tag,
+    Layers,
+    LayoutGrid,
+    UserSquare,
+    ClipboardList,
+    Notebook,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
@@ -13,15 +36,11 @@ import {
     SidebarMenuButton,
     useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Users, Package, Menu, ChevronUp, LogOut, PanelLeftIcon, User, Box, Star, Activity, MessageSquare } from "lucide-react";
-import Link from "next/link";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useStoreSettings } from "@/providers/store-provider";
-import { DocumentText } from "nui-react-icons";
 
 const AdminItems = [
     {
@@ -52,12 +71,12 @@ const AdminItems = [
     {
         title: "FAQs",
         url: "/admin/faqs",
-        icon: DocumentText,
+        icon: Notebook,
     },
     {
         title: "Online",
         url: "/admin/online",
-        icon: User,
+        icon: UserSquare,
     },
 ];
 
@@ -78,12 +97,12 @@ const storeItems = [
     {
         title: "Products",
         url: "/admin/products",
-        icon: Package,
+        icon: Box,
     },
     {
         title: "Orders",
         url: "/admin/orders",
-        icon: Box,
+        icon: ClipboardList,
     },
     {
         title: "Reviews",
@@ -93,22 +112,22 @@ const storeItems = [
     {
         title: "Brands",
         url: "/admin/brands",
-        icon: Package,
+        icon: Tag,
     },
     {
         title: "Categories",
         url: "/admin/categories",
-        icon: Package,
+        icon: Layers,
     },
     {
         title: "Collections",
         url: "/admin/collections",
-        icon: Package,
+        icon: LayoutGrid,
     },
     {
         title: "Shared Collections",
         url: "/admin/shared",
-        icon: Package,
+        icon: LayoutGrid,
     },
 ];
 
@@ -191,7 +210,7 @@ export function AdminSidebar() {
                                 <SidebarMenuButton className={cn("bg-accent py-6", state === "collapsed" && "hidden")}>
                                     <div className="flex items-center gap-2">
                                         <Avatar className="h-8 w-8 cursor-pointer">
-                                            <AvatarImage src={user?.image ?? undefined} alt={user?.first_name ?? "User"} />
+                                            <AvatarImage alt={user?.first_name ?? "User"} src={user?.image ?? undefined} />
                                             <AvatarFallback className="bg-green-600 text-white text-xs">
                                                 {user?.first_name
                                                     ?.split(" ")
@@ -207,9 +226,9 @@ export function AdminSidebar() {
                                     <ChevronUp className="ml-auto" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent side="top" className="w-(--radix-popper-anchor-width)">
+                            <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
                                 <DropdownMenuItem>
-                                    <Link href="/profile" className="justify-between">
+                                    <Link className="justify-between" href="/profile">
                                         Profile
                                         <span className="badge">New</span>
                                     </Link>

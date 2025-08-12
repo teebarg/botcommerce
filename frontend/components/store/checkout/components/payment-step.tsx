@@ -70,9 +70,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
                         return (
                             <RadioGroupItem
                                 key={idx}
+                                loading={updateCartDetails.isPending && selectedPaymentMethod === item.provider_id}
                                 value={item.provider_id}
                                 variant="card"
-                                loading={updateCartDetails.isPending && selectedPaymentMethod === item.provider_id}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="shrink-0 mt-0.5 text-accent">{paymentInfoMap[item.provider_id]?.icon}</div>

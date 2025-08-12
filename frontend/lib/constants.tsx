@@ -4,7 +4,7 @@ import React from "react";
 export const paymentInfoMap: Record<string, { title: string; description: string; icon: React.JSX.Element | any }> = {
     PAYSTACK: {
         title: "Paystack",
-        description: "Fast and secure payments with Paystack",
+        description: "Fast and secure payments",
         icon: <CreditCard size={20} />,
     },
     BANK_TRANSFER: {
@@ -19,7 +19,7 @@ export const paymentInfoMap: Record<string, { title: string; description: string
     },
     CASH_ON_DELIVERY: {
         title: "Pay at Pickup",
-        description: "Pay when you collect your order",
+        description: "Pay when you pick up your order",
         icon: <ShoppingBag size={20} />,
     },
 };

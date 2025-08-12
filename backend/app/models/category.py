@@ -8,6 +8,7 @@ class CategoryBase(BM):
     is_active: bool = True
     parent_id: Optional[int] = None
     image: Optional[str] = None
+    display_order: int = 0
 
 
 class Category(CategoryBase):
@@ -23,12 +24,14 @@ class CategoryCreate(BaseModel):
     is_active: bool = True
     parent_id: Optional[int] = None
     image: Optional[str] = None
+    display_order: int = 0
 
 
 class CategoryUpdate(BaseModel):
     name: Optional[str] = None
     is_active: Optional[bool] = None
     parent_id: Optional[int] = None
+    display_order: Optional[int] = None
 
 
 class Categories(BaseModel):

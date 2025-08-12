@@ -89,6 +89,10 @@ class Settings(BaseSettings):
     SLACK_ALERTS: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
     SLACK_ORDERS: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
+    # WhatsApp Business (Cloud API)
+    WHATSAPP_TOKEN: str | None = None
+    WHATSAPP_PHONE_NUMBER_ID: str | None = None
+
     # OAuth Settings
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""

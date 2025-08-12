@@ -165,6 +165,7 @@ model Category {
   slug          String     @unique
   image         String?
   is_active     Boolean    @default(true)
+  display_order Int        @default(0)
   parent_id     Int? // Nullable for top-level categories
   parent        Category?  @relation("CategoryToSubcategory", fields: [parent_id], references: [id], onDelete: Cascade)
   subcategories Category[] @relation("CategoryToSubcategory")
@@ -323,8 +324,22 @@ model Order {
   invoice_url     String?         @db.Text
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt
+  OrderTimeline   OrderTimeline[]
 
   @@map("orders")
+}
+
+model OrderTimeline {
+  id          Int          @id @default(autoincrement())
+  order       Order        @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order_id    Int
+  from_status OrderStatus?
+  to_status   OrderStatus?
+  message     String?      @db.Text
+  created_at  DateTime     @default(now())
+
+  @@index([order_id, created_at])
+  @@map("order_timeline")
 }
 
 // OrderItem Model

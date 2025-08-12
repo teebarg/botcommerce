@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import heroImage from "@/public/banner3.avif";
+import heroImage from "@/public/banner3.jpg";
 
 const HeroSection: React.FC = () => {
     const router = useRouter();
@@ -18,27 +18,27 @@ const HeroSection: React.FC = () => {
             </div>
 
             <div className="absolute top-20 left-10 animate-float">
-                <Sparkles className="w-6 h-6 text-gold opacity-60" />
+                <Sparkles className="w-6 h-6 text-accent opacity-60" />
             </div>
             <div className="absolute top-40 right-20 animate-float delay-200">
                 <Star className="w-8 h-8 text-accent opacity-50" />
             </div>
             <div className="absolute bottom-32 left-20 animate-float delay-400">
-                <Sparkles className="w-5 h-5 text-gold opacity-70" />
+                <Sparkles className="w-5 h-5 text-accent opacity-70" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="text-left space-y-8 animate-fade-in">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold-foreground backdrop-blur-sm">
-                            <Star className="w-4 h-4 text-gold" />
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent-foreground backdrop-blur-sm">
+                            <Star className="w-4 h-4 text-accent" />
                             <span className="text-sm font-medium">New Collection</span>
                         </div>
 
                         <div className="space-y-4">
                             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight text-foreground">
                                 Elevate Your
-                                <span className="block text-gold">Style</span>
+                                <span className="block text-accent">Style</span>
                             </h1>
                             <p className="text-xl sm:text-2xl text-muted-foreground max-w-lg">
                                 Discover our curated collection of premium fashion pieces that define elegance and sophistication.
@@ -47,15 +47,15 @@ const HeroSection: React.FC = () => {
 
                         <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-gold" />
+                                <div className="w-2 h-2 rounded-full bg-accent" />
                                 <span>Premium Quality</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-gold" />
+                                <div className="w-2 h-2 rounded-full bg-accent" />
                                 <span>Sustainable Fashion</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-gold" />
+                                <div className="w-2 h-2 rounded-full bg-accent" />
                                 <span>Global Shipping</span>
                             </div>
                         </div>
@@ -65,8 +65,8 @@ const HeroSection: React.FC = () => {
                                 Shop Collection
                                 <ArrowRight className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" />
                             </Button>
-                            <Button className="group" size="xl" variant="elegant" onClick={() => router.push("/collections/featured")}>
-                                Featured Products
+                            <Button className="group" size="xl" variant="elegant" onClick={() => router.push("/bulk")}>
+                                Bulk Purchase
                                 <Sparkles className="w-5 h-5 ml-1 transition-transform group-hover:rotate-12" />
                             </Button>
                         </div>
@@ -99,8 +99,8 @@ const HeroSection: React.FC = () => {
                                         <h3 className="font-semibold text-card-foreground">Spring Collection</h3>
                                         <p className="text-sm text-muted-foreground">Limited Edition</p>
                                     </div>
-                                    <div className="bg-gold/10 px-3 py-1 rounded-full">
-                                        <span className="text-xs font-medium text-gold">30% OFF</span>
+                                    <div className="bg-accent/10 px-3 py-1 rounded-full">
+                                        <span className="text-xs font-medium text-accent">30% OFF</span>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-3">
@@ -114,7 +114,7 @@ const HeroSection: React.FC = () => {
                                 <h3 className="font-semibold text-card-foreground mb-3">Trending Now</h3>
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-3 h-3 rounded-full bg-gold animate-pulse" />
+                                        <div className="w-3 h-3 rounded-full bg-accent animate-pulse" />
                                         <span className="text-sm text-muted-foreground">Oversized Blazers</span>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -122,7 +122,7 @@ const HeroSection: React.FC = () => {
                                         <span className="text-sm text-muted-foreground">Vintage Denim</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-3 h-3 rounded-full bg-gold animate-pulse delay-1000" />
+                                        <div className="w-3 h-3 rounded-full bg-accent animate-pulse delay-1000" />
                                         <span className="text-sm text-muted-foreground">Statement Accessories</span>
                                     </div>
                                 </div>

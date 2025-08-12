@@ -58,6 +58,32 @@ class SlackChannel(NotificationChannel):
             logger.error(f"Slack notification failed: {str(e)}")
             return False
 
+class WhatsAppChannel(NotificationChannel):
+    def __init__(self, token: str, phone_number_id: str):
+        self.token = token
+        self.phone_number_id = phone_number_id
+
+    def send(self, recipient: str, message: str, **kwargs) -> bool:
+        try:
+            if not recipient:
+                return False
+            url = f"https://graph.facebook.com/v17.0/{self.phone_number_id}/messages"
+            headers = {
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json",
+            }
+            payload = {
+                "messaging_product": "whatsapp",
+                "to": recipient,
+                "type": "text",
+                "text": {"preview_url": True, "body": message},
+            }
+            response = requests.post(url, json=payload, headers=headers, timeout=10)
+            return 200 <= response.status_code < 300
+        except Exception as e:
+            logger.error(f"WhatsApp notification failed: {str(e)}")
+            return False
+
 class SMSChannel(NotificationChannel):
     def __init__(self, api_key: str, api_secret: str, from_number: str):
         self.api_key = api_key

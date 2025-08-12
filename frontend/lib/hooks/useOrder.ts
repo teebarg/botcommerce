@@ -37,6 +37,7 @@ export const useChangeOrderStatus = () => {
         onSuccess: () => {
             toast.success("Successfully changed order status");
             invalidate("orders");
+            invalidate("order-timeline");
         },
         onError: (error) => {
             toast.error("Failed to change order status" + error);
@@ -54,11 +55,29 @@ export const useChangePaymentStatus = () => {
                 description: "Payment status changed successfully",
             });
             invalidate("orders");
+            invalidate("order-timeline");
         },
         onError: (error) => {
             toast.error("An error occurred!", {
                 description: "Payment status change failed" + error,
             });
         },
+    });
+};
+
+export interface OrderTimelineEntry {
+    id: number;
+    order_id: number;
+    from_status?: string | null;
+    to_status?: string | null;
+    message?: string | null;
+    created_at: string;
+}
+
+export const useOrderTimeline = (orderId?: number) => {
+    return useQuery({
+        queryKey: ["order-timeline", orderId],
+        enabled: !!orderId,
+        queryFn: async () => await api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
     });
 };

@@ -14,11 +14,10 @@ interface PaymentStatusManagerProps {
     id: number;
     currentStatus: PaymentStatus;
     orderNumber: string;
-    onStatusChange?: (newStatus: PaymentStatus) => void;
     onClose?: () => void;
 }
 
-const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, currentStatus, orderNumber, onStatusChange, onClose }) => {
+const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, currentStatus, orderNumber, onClose }) => {
     const { mutateAsync: changePaymentStatus, isPending } = useChangePaymentStatus();
     const [selectedStatus, setSelectedStatus] = useState<PaymentStatus>(currentStatus);
 
@@ -60,7 +59,9 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
     const handleStatusUpdate = async () => {
         if (selectedStatus === currentStatus) return;
 
-        changePaymentStatus({ id, status: selectedStatus })
+        changePaymentStatus({ id, status: selectedStatus }).then(() => {
+            onClose?.();
+        });
     };
 
     const currentConfig = statusConfig[currentStatus];

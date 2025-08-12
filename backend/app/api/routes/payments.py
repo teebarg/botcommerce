@@ -15,6 +15,9 @@ from prisma.errors import PrismaError
 from pydantic import BaseModel
 from prisma.models import Cart
 from app.services.order import create_order_from_cart, send_notification, create_invoice, decrement_variant_inventory_for_order
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -177,11 +180,24 @@ async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, bac
 
     data = {"payment_status": status}
 
-    if status == PaymentStatus.SUCCESS:
-        background_tasks.add_task(create_invoice, cache=cache, order_id=id)
-        background_tasks.add_task(decrement_variant_inventory_for_order, id, notification, cache)
+    async with db.tx() as tx:
+        updated_order = await tx.order.update(where={"id": id}, data=data)
+        await cache.invalidate_list_cache("orders")
+        await cache.bust_tag(f"order:{id}")
 
-    updated_order = await db.order.update(where={"id": id}, data=data)
-    await cache.invalidate_list_cache("orders")
-    await cache.bust_tag(f"order:{id}")
-    return updated_order
+        if status == PaymentStatus.SUCCESS:
+            background_tasks.add_task(create_invoice, cache=cache, order_id=id)
+            background_tasks.add_task(decrement_variant_inventory_for_order, id, notification, cache)
+            try:
+                if order.status != OrderStatus.PENDING:
+                    await tx.ordertimeline.create(
+                        data={
+                            "order": {"connect": {"id": id}},
+                            "from_status": order.status,
+                            "to_status": OrderStatus.PENDING,
+                        }
+                    )
+            except Exception as e:
+                logger.error(f"Failed to create order timeline: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        return updated_order

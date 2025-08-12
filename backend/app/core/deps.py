@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from app.core import security
 from app.core.config import settings
 from app.models.generic import TokenPayload
-from app.services.notification import EmailChannel, NotificationService, SlackChannel
+from app.services.notification import EmailChannel, NotificationService, SlackChannel, WhatsAppChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from prisma.models import User
@@ -108,6 +108,14 @@ def get_notification_service() -> NotificationService:
     # Configure slack channel
     slack_channel = SlackChannel(webhook_url=settings.SLACK_ALERTS)
     notification_service.register_channel("slack", slack_channel)
+
+    # Configure WhatsApp channel
+    if getattr(settings, "WHATSAPP_TOKEN", None) and getattr(settings, "WHATSAPP_PHONE_NUMBER_ID", None):
+        whatsapp_channel = WhatsAppChannel(
+            token=settings.WHATSAPP_TOKEN,
+            phone_number_id=settings.WHATSAPP_PHONE_NUMBER_ID,
+        )
+        notification_service.register_channel("whatsapp", whatsapp_channel)
 
     return notification_service
 

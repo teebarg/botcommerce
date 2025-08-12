@@ -8,8 +8,8 @@ from app.core import deps
 from app.core.config import settings
 from app.core.decorators import limit
 from app.core.utils import (generate_contact_form_email,
-                            generate_newsletter_email, send_email)
-from app.models.generic import ContactFormCreate, NewsletterCreate
+                            generate_newsletter_email, send_email, generate_bulk_purchase_email)
+from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
 from app.prisma_client import prisma as db
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -144,6 +144,33 @@ async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
             logger.error(f"Failed to send newsletter email: {e}")
     background_tasks.add_task(send_email_task)
     return {"message": "Email sent successfully"}
+
+
+@app.post("/api/bulk-purchase")
+async def bulk_purchase(background_tasks: BackgroundTasks, data: BulkPurchaseCreate):
+    async def send_email_task():
+        try:
+            email_data = await generate_bulk_purchase_email(
+                name=data.name,
+                email=data.email,
+                phone=data.phone,
+                bulkType=data.bulkType,
+                quantity=data.quantity,
+                message=data.message,
+            )
+            shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
+            if not shop_email:
+                logger.error("Shop email not found")
+                return
+            send_email(
+                email_to=shop_email.value,
+                subject=email_data.subject,
+                html_content=email_data.html_content,
+            )
+        except Exception as e:
+            logger.error(f"Failed to send bulk purchase email: {e}")
+    background_tasks.add_task(send_email_task)
+    return {"message": "Bulk purchase inquiry submitted successfully"}
 
 
 @app.post("/api/log-error")

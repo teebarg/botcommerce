@@ -2,19 +2,20 @@
 
 import {
     LayoutDashboard,
-    ShoppingCart,
-    Package,
     Users,
     Settings,
     Search,
     LogOut,
     ChevronRight,
     Notebook,
-    Image,
     Activity,
     MessageSquare,
-    User,
-    MessageCircle,
+    ClipboardList,
+    Box,
+    Layers,
+    LayoutGrid,
+    UsersRound,
+    Star,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,23 +30,23 @@ const AdminMobileMenu: React.FC = () => {
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
-        { id: "orders", label: "Orders", icon: <ShoppingCart size={20} />, href: "/admin/orders" },
-        { id: "products", label: "Products", icon: <Package size={20} />, href: "/admin/products" },
+        { id: "orders", label: "Orders", icon: <ClipboardList size={20} />, href: "/admin/orders" },
+        { id: "products", label: "Products", icon: <Box size={20} />, href: "/admin/products" },
         { id: "customers", label: "Customers", icon: <Users size={20} />, href: "/admin/users" },
-        { id: "categories", label: "Categories", icon: <Image size={20} />, href: "/admin/categories" },
-        { id: "reviews", label: "Reviews", icon: <Notebook size={20} />, href: "/admin/reviews" },
-        { id: "collections", label: "Collections", icon: <Image size={20} />, href: "/admin/collections" },
-        { id: "shared", label: "Shared Collections", icon: <Image size={20} />, href: "/admin/shared" },
+        { id: "categories", label: "Categories", icon: <Layers size={20} />, href: "/admin/categories" },
+        { id: "reviews", label: "Reviews", icon: <Star size={20} />, href: "/admin/reviews" },
+        { id: "collections", label: "Collections", icon: <LayoutGrid size={20} />, href: "/admin/collections" },
+        { id: "shared", label: "Shared Collections", icon: <LayoutGrid size={20} />, href: "/admin/shared" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
         { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
-        { id: "faqs", label: "FAQs", icon: <MessageCircle size={20} />, href: "/admin/faqs" },
-        { id: "online", label: "Online", icon: <User size={20} />, href: "/admin/online" },
+        { id: "faqs", label: "FAQs", icon: <Notebook size={20} />, href: "/admin/faqs" },
+        { id: "online", label: "Online", icon: <UsersRound size={20} />, href: "/admin/online" },
     ];
 
     return (
         <div className="h-full bg-content1 rounded-[inherit] overflow-hidden overflow-y-auto">
-            <div className="p-4 bg-primary text-white sticky top-0 z-10">
+            <div className="p-4 bg-accent text-gray-800 sticky top-0 z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>
                         <AvatarImage src={user?.image} />
@@ -56,7 +57,7 @@ const AdminMobileMenu: React.FC = () => {
                         <div className="font-medium">
                             {user?.first_name} {user?.last_name}
                         </div>
-                        <div className="text-xs text-blue-100">{user?.email}</div>
+                        <div className="text-xs text-gray-700">{user?.email}</div>
                     </div>
                 </div>
             </div>
@@ -77,15 +78,15 @@ const AdminMobileMenu: React.FC = () => {
                     <Link
                         key={idx}
                         className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
-                            pathname === item.href ? "text-blue-600 bg-background" : ""
+                            pathname === item.href ? "bg-accent/50" : ""
                         }`}
                         href={item.href}
                     >
                         <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-blue-600" : "text-default-500"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-accent" : "text-default-500"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
-                        <ChevronRight className={pathname === item.href ? "text-blue-600" : "text-default-500"} size={16} />
+                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-default-500"} size={16} />
                     </Link>
                 ))}
             </nav>

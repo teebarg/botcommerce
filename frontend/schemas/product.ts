@@ -26,6 +26,7 @@ export const CategorySchema = z
         slug: z.string(),
         image: z.string().optional(),
         is_active: z.boolean(),
+        display_order: z.number().default(0),
         parent_id: z.number().nullable(),
         parent: z.null(),
         subcategories: z.array(z.any()).optional(),

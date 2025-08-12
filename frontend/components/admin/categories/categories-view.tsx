@@ -19,7 +19,7 @@ const CategoryView: React.FC = () => {
 
     return (
         <div className="max-w-7xl w-full mx-auto px-2 md:px-4">
-            {isLoading ? <ComponentLoader className="h-[80vh]" /> : <CategoryTree categories={categories} />}
+            {isLoading ? <ComponentLoader className="h-[80vh]" /> : <CategoryTree data={categories} />}
         </div>
     );
 };

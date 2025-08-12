@@ -67,3 +67,18 @@ export const useDeleteCategory = () => {
         },
     });
 };
+
+export const useReorderCategories = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async (data: { id: number; display_order: number }[]) => await api.patch<Category>(`/category/reorder`, { categories: data }),
+        onSuccess: () => {
+            invalidate("categories");
+            toast.success("Category reordered successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to reorder category" + error);
+        },
+    });
+};
