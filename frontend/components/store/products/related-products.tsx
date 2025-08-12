@@ -1,10 +1,9 @@
 "use client";
 
 import { Product, ProductSearch } from "@/schemas/product";
-import ServerError from "@/components/generic/server-error";
 import { useSimilarProducts } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
-import ProductCard from "@/components/store/products/product-shared-card";
+import ProductCard from "@/components/store/products/product-card";
 
 type RelatedProductsProps = {
     product: Product;
@@ -18,7 +17,7 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
     }
 
     if (error) {
-        return <ServerError error={error.message} scenario="related-products" stack={error.stack} />;
+        return null;
     }
 
     const productPreviews = data?.similar_products?.filter((item: ProductSearch) => item.id !== product.id);

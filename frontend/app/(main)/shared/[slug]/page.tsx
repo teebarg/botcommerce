@@ -5,7 +5,7 @@ import { api } from "@/apis/client2";
 import { Shared } from "@/schemas";
 import { tryCatchApi } from "@/lib/try-catch";
 import { SocialShare } from "@/components/store/shared/shared-listing";
-import ProductCardBase from "@/components/store/products/product-shared-card";
+import ProductCardBase from "@/components/store/products/product-card";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 
 type Params = Promise<{ slug: string }>;

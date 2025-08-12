@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "nui-react-icons";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Clock, LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";

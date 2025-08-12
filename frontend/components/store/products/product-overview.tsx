@@ -188,7 +188,7 @@ const ProductOverview: React.FC<{
                     <p className="text-default-600 leading-relaxed">{product.description}</p>
                 </div>
 
-                <div className={cn("hidden", colors?.length > 1 && "block")}>
+                <div className={cn("hidden", colors?.length > 0 && "block")}>
                     <h3 className="font-semibold text-default-900 mb-3">Color: {selectedColor}</h3>
                     <div className="flex space-x-3">
                         {colors?.map((color: string, idx: number) => {
@@ -222,35 +222,33 @@ const ProductOverview: React.FC<{
                     </div>
                 </div>
 
-                {sizes?.length > 1 && (
-                    <div>
-                        <h3 className="font-semibold text-default-900 mb-3">Size: {selectedSize}</h3>
-                        <div className="flex flex-wrap gap-2">
-                            {sizes?.map((size: string, idx: number) => {
-                                const available = isOptionAvailable("size", size!);
-                                const isSelected = selectedSize === size;
+                <div className={cn("hidden", sizes?.length > 0 && "block")}>
+                    <h3 className="font-semibold text-default-900 mb-3">Size: {selectedSize}</h3>
+                    <div className="flex gap-2">
+                        {sizes?.map((size: string, idx: number) => {
+                            const available = isOptionAvailable("size", size!);
+                            const isSelected = selectedSize === size;
 
-                                return (
-                                    <button
-                                        key={idx}
-                                        className={cn(
-                                            "relative flex-1 px-4 py-2 rounded-lg border border-default-200 transition-all data-[state=checked]:ring-1 ring-offset-1",
-                                            "data-[state=checked]:ring-blue-500 data-[state=checked]:text-blue-600 data-[state=checked]:bg-blue-50",
-                                            {
-                                                "cursor-not-allowed opacity-60 bg-default-300": !available,
-                                            }
-                                        )}
-                                        data-state={isSelected ? "checked" : "unchecked"}
-                                        disabled={!available}
-                                        onClick={() => available && toggleSizeSelect(size)}
-                                    >
-                                        {size}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                            return (
+                                <button
+                                    key={idx}
+                                    className={cn(
+                                        "px-4 py-2 rounded-lg border border-default-200 transition-all data-[state=checked]:ring-1 ring-offset-1",
+                                        "data-[state=checked]:ring-blue-500 data-[state=checked]:text-blue-600 data-[state=checked]:bg-blue-50",
+                                        {
+                                            "cursor-not-allowed opacity-60 bg-default-300": !available,
+                                        }
+                                    )}
+                                    data-state={isSelected ? "checked" : "unchecked"}
+                                    disabled={!available}
+                                    onClick={() => available && toggleSizeSelect(size)}
+                                >
+                                    {size}
+                                </button>
+                            );
+                        })}
                     </div>
-                )}
+                </div>
 
                 <div>
                     <h3 className="text-lg font-semibold text-default-900 mb-3">Quantity</h3>

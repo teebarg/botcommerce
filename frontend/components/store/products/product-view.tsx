@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowUpRightMini, ChevronRight, Delivery } from "nui-react-icons";
 import Image from "next/image";
-import { RefreshCw, Truck } from "lucide-react";
+import { ArrowUpRight, Backpack, ChevronRight, RefreshCw, Truck } from "lucide-react";
 
 import { cn, currency } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
@@ -136,7 +135,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     </div>
                     <div className="mt-6 flex flex-col gap-1">
                         <div className="mb-4 flex items-center gap-2 text-default-900">
-                            <Delivery />
+                            <Truck />
                             <p className="text-sm font-medium">Free shipping and 30 days return</p>
                         </div>
                         <LocalizedClientLink
@@ -144,38 +143,34 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             href={"/"}
                         >
                             See guide
-                            <ArrowUpRightMini />
+                            <ArrowUpRight />
                         </LocalizedClientLink>
                     </div>
-                    <div className="text-sm py-8 bg-yellow-50 text-yellow-950 dark:bg-zinc-800 dark:text-yellow-50 -mx-4 px-2 rounded-none md:rounded-lg">
-                        <div className="grid grid-cols-1 gap-y-8">
-                            <div className="flex items-start gap-x-2">
-                                <Truck className="h-6 w-6" />
-                                <div>
-                                    <span className="font-semibold">Fast delivery</span>
-                                    <p className="max-w-sm">
-                                        Your package will arrive in 3-5 business days at your pick up location or in the comfort of your home.
-                                    </p>
-                                </div>
+                    <div className="text-sm py-8 bg-yellow-50 text-yellow-950 dark:bg-zinc-800 dark:text-yellow-50 -mx-4 px-4 md:px-2 rounded-none md:rounded-lg space-y-4">
+                        <div className="flex items-start gap-x-2">
+                            <Truck className="h-6 w-6" />
+                            <div>
+                                <span className="font-semibold">Fast delivery</span>
+                                <p className="max-w-sm">
+                                    Your package will arrive in 3-5 business days at your pick up location or in the comfort of your home.
+                                </p>
                             </div>
-                            <div className="flex items-start gap-x-2">
-                                <RefreshCw className="h-6 w-6" />
-                                <div>
-                                    <span className="font-semibold">Simple exchanges</span>
-                                    <p className="max-w-sm">
-                                        Is the fit not quite right? No worries - we&apos;ll exchange your product for a new one.
-                                    </p>
-                                </div>
+                        </div>
+                        <div className="flex items-start gap-x-2">
+                            <RefreshCw className="h-6 w-6" />
+                            <div>
+                                <span className="font-semibold">Simple exchanges</span>
+                                <p className="max-w-sm">Is the fit not quite right? No worries - we&apos;ll exchange your product for a new one.</p>
                             </div>
-                            <div className="flex items-start gap-x-2">
-                                {/* <Back /> */}
-                                <div>
-                                    <span className="font-semibold">Easy returns</span>
-                                    <p className="max-w-sm">
-                                        Just return your product and we&apos;ll refund your money. No questions asked – we&apos;ll do our best to make
-                                        sure your return is hassle-free.
-                                    </p>
-                                </div>
+                        </div>
+                        <div className="flex items-start gap-x-2">
+                            <Backpack className="h-6 w-6" />
+                            <div>
+                                <span className="font-semibold">Easy returns</span>
+                                <p className="max-w-sm">
+                                    Just return your product and we&apos;ll refund your money. No questions asked – we&apos;ll do our best to make
+                                    sure your return is hassle-free.
+                                </p>
                             </div>
                         </div>
                     </div>

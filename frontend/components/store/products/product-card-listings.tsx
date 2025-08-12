@@ -5,7 +5,7 @@ import { useInView } from "react-intersection-observer";
 
 import { ProductSearch } from "@/schemas/product";
 import { cn } from "@/lib/utils";
-import ProductCard from "@/components/store/products/product-shared-card";
+import ProductCard from "@/components/store/products/product-card";
 
 interface ProductCardProps {
     products: ProductSearch[];
@@ -23,7 +23,7 @@ const ProductCardListings: React.FC<ProductCardProps> = ({ products, sm, md, lg,
             {inView && (
                 <div className={cn("grid grid-cols-1 gap-4", className, sm && `sm:${sm}`, md && `md:${md}`, lg && `lg:${lg}`)}>
                     {products.map((product, idx) => (
-                        <ProductCard key={idx} product={product} variant="bg-content1" />
+                        <ProductCard key={idx} product={product} />
                     ))}
                 </div>
             )}

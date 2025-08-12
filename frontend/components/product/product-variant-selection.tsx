@@ -123,7 +123,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         </div>
                         <div className="text-right">
                             <p className="text-lg font-bold text-default-900">{currency(selectedVariant.price)}</p>
-                            {selectedVariant.old_price && (
+                            {selectedVariant.old_price > 0 && (
                                 <p className="text-sm text-default-500 line-through">{currency(selectedVariant.old_price)}</p>
                             )}
                         </div>

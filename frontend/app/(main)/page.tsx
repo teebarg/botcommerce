@@ -11,7 +11,7 @@ import { ContactSection } from "@/components/store/landing/contact-section";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
 import { tryCatch } from "@/lib/try-catch";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
-import ProductCard from "@/components/store/products/product-shared-card";
+import ProductCard from "@/components/store/products/product-card";
 import HeroSection from "@/components/hero-section";
 
 export const metadata: Metadata = {
@@ -48,9 +48,7 @@ export default async function Home() {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {data?.featured?.map((product: ProductSearch, idx: number) => (
-                                <ProductCard key={idx} product={product} variant="bg-content1" />
-                            ))}
+                            {data?.featured?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                         </div>
 
                         <div className="text-center mt-12">
@@ -73,9 +71,7 @@ export default async function Home() {
                         </div>
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {data?.trending?.map((product: ProductSearch, idx: number) => (
-                                <ProductCard key={idx} product={product} size="lg" variant="bg-content1" />
-                            ))}
+                            {data?.trending?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                         </div>
                     </div>
                 </section>
@@ -88,10 +84,10 @@ export default async function Home() {
             />
             <LazyFadeIn delay={100}>
                 <section className="bg-content1">
-                    <div className="max-w-8xl mx-auto px-1 md:px-0 py-8">
+                    <div className="max-w-8xl mx-auto px-4 md:px-0 py-8">
                         <p className="text-3xl font-bold">New Arrivals</p>
                         <p className="text-default-600">Find the best thrifts for your kids</p>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mt-6">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                             {data?.latest?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                         </div>
                     </div>
