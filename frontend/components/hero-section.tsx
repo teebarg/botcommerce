@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import heroImage from "@/public/banner3.avif";
+import heroImage from "@/public/banner3.jpg";
 
 const HeroSection: React.FC = () => {
     const router = useRouter();
@@ -65,8 +65,8 @@ const HeroSection: React.FC = () => {
                                 Shop Collection
                                 <ArrowRight className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" />
                             </Button>
-                            <Button className="group" size="xl" variant="elegant" onClick={() => router.push("/collections/featured")}>
-                                Featured Products
+                            <Button className="group" size="xl" variant="elegant" onClick={() => router.push("/bulk")}>
+                                Bulk Purchase
                                 <Sparkles className="w-5 h-5 ml-1 transition-transform group-hover:rotate-12" />
                             </Button>
                         </div>

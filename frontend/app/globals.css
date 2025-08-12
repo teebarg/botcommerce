@@ -250,11 +250,11 @@
     --muted: #f1f5f9;
     --muted-foreground: #64748b;
 
-    /* --accent: #3b82f6;
-    --accent-foreground: #ffffff; */
+    /* --accent: hsl(43 74% 66%);
+    --accent-foreground: hsl(20 14.3% 4.1%); */
 
-    --accent: hsl(43 74% 66%);
-    --accent-foreground: hsl(20 14.3% 4.1%);
+    --accent: hsl(45 85% 60%);
+    --accent-foreground: hsl(25 25% 15%);
 
     --success: #10b981;
     --success-foreground: #ffffff;
@@ -336,9 +336,6 @@
 
     --muted: #27272a;
     --muted-foreground: #a1a1aa;
-
-    /* --accent: #3b82f6;
-    --accent-foreground: #09090b; */
 
     /* --accent: hsl(43 74% 66%);
     --accent-foreground: hsl(20 14.3% 4.1%); */

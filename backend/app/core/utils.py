@@ -210,6 +210,23 @@ async def generate_contact_form_email(
     return EmailData(html_content=html_content, subject="New Contact Email")
 
 
+async def generate_bulk_purchase_email(name: str, email: str, phone: str, bulkType: str, quantity: str | None = None, message: str | None = None) -> EmailData:
+    html_content = render_email_template(
+        template_name="bulk_purchase.html",
+        context={
+            "name": name,
+            "email": email,
+            "phone": phone,
+            "bulkType": bulkType,
+            "quantity": quantity or "Not specified",
+            "message": message or "No additional details provided",
+            "current_year": datetime.now().year,
+            **(await merge_metadata({"description": "New Bulk Purchase Inquiry"}))
+        },
+    )
+    return EmailData(html_content=html_content, subject="New Bulk Purchase Inquiry")
+
+
 async def generate_newsletter_email(email: str) -> EmailData:
     html_content = render_email_template(
         template_name="newsletter.html",

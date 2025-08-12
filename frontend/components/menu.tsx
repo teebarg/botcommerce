@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { UserGroup, Collection, Checkout } from "nui-react-icons";
-import { Heart, Home, User as UserIcon } from "lucide-react";
+import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { Separator } from "@/components/ui/separator";
@@ -42,12 +41,12 @@ const Menu: React.FC = () => {
     return (
         <div className="flex flex-col py-4 px-4 flex-1">
             <div className="space-y-3">
-                <NavLink href="/" icon={<Home className="h-8 w-8" />} title="Home" />
-                <NavLink href="/account/profile" icon={<UserIcon className="h-8 w-8" viewBox="0 0 20 20" />} title="Profile" />
-                <NavLink href="/collections" icon={<Collection className="h-8 w-8" />} title="Collections" />
-                <NavLink href="/checkout" icon={<Checkout className="h-8 w-8" />} title="Checkout" />
-                {user && <NavLink href="/wishlist" icon={<Heart className="h-8 w-8" />} title="Favorites" />}
-                {user?.role === "ADMIN" && <NavLink href="/admin" icon={<UserGroup className="h-8 w-8" viewBox="0 0 24 24" />} title="Admin" />}
+                <NavLink href="/" icon={<Home className="h-6 w-6" />} title="Home" />
+                <NavLink href="/account/profile" icon={<UserIcon className="h-6 w-6" />} title="Profile" />
+                <NavLink href="/collections" icon={<LayoutGrid className="h-6 w-6" />} title="Collections" />
+                <NavLink href="/checkout" icon={<CreditCard className="h-6 w-6" />} title="Checkout" />
+                {user && <NavLink href="/wishlist" icon={<Heart className="h-6 w-6" />} title="Favorites" />}
+                {user?.role === "ADMIN" && <NavLink href="/admin" icon={<User2 className="h-6 w-6" />} title="Admin" />}
             </div>
 
             <Separator className="my-8" />
