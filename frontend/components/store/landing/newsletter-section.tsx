@@ -49,8 +49,8 @@ const NewsletterSection: React.FC = () => {
             icon: Zap,
             title: "New Arrivals",
             description: "Be the first to know about our latest products and collections",
-            color: "text-secondary",
-            bgColor: "bg-secondary/10",
+            color: "text-emerald-600",
+            bgColor: "bg-emerald-600/10",
         },
         {
             icon: Bell,

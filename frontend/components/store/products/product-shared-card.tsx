@@ -47,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "bg-conten
                 {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
                 {/* Always visible gradient overlay for mobile */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 dark:from-black via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 dark:from-black/40 via-transparent to-transparent" />
 
                 <div className="absolute top-4 left-2 right-4 flex items-start justify-between">
                     <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />

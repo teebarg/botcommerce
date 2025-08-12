@@ -25,8 +25,8 @@ export function ContactSection() {
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="bg-content1 p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                        <MapPin className="h-5 w-5 text-primary" />
+                                    <div className="p-2 bg-accent/10 rounded-lg">
+                                        <MapPin className="h-5 w-5 text-accent" />
                                     </div>
                                     <h3 className="font-semibold text-default-foreground">Visit Us</h3>
                                 </div>
@@ -39,8 +39,8 @@ export function ContactSection() {
 
                             <div className="bg-content1 p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-secondary/10 rounded-lg">
-                                        <Phone className="h-5 w-5 text-secondary" />
+                                    <div className="p-2 bg-accent/10 rounded-lg">
+                                        <Phone className="h-5 w-5 text-accent" />
                                     </div>
                                     <h3 className="font-semibold text-default-foreground">Call Us</h3>
                                 </div>

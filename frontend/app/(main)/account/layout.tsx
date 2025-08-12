@@ -41,7 +41,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
 
     return (
         <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">
-            <div className="bg-blue-600 text-white p-6 md:hidden">
+            <div className="bg-primary text-white p-6 md:hidden">
                 <div className="flex items-center gap-4">
                     <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
                         <User className="h-10 w-10" />

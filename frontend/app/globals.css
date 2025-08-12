@@ -235,14 +235,18 @@
     --default-foreground: #0f172a;
     --default: #64748b;
 
-    --primary: #2563eb;
-    --primary-foreground: #ffffff;
+    /* --primary: #2563eb;
+    --primary-foreground: #ffffff; */
 
-    --secondary: hsl(20 14.3% 4.1%);
-    --secondary-foreground: hsl(60 9.1% 97.8%);
+    --primary: hsl(20 14.3% 4.1%);
+    --primary-foreground: hsl(60 9.1% 97.8%);
 
-    /* --secondary: #10b981;
-    --secondary-foreground: #ffffff; */
+    /* --secondary: hsl(20 14.3% 4.1%);
+    --secondary-foreground: hsl(60 9.1% 97.8%); */
+
+    --secondary: hsl(35 25% 88%);
+    --secondary-foreground: hsl(25 25% 15%);
+
 
     --card: #ffffff;
     --card-foreground: #0f172a;
@@ -322,14 +326,17 @@
     --default-foreground: #fafafa;
     --default: #71717a;
 
-    --primary: #2563eb;
-    --primary-foreground: #ffffff;
+    /* --primary: #2563eb;
+    --primary-foreground: #ffffff; */
 
-    --secondary: hsl(60 9.1% 97.8%);
-    --secondary-foreground: hsl(20 14.3% 4.1%);
+    --primary: hsl(60 9.1% 97.8%);
+    --primary-foreground: hsl(20 14.3% 4.1%);
+    
+    /* --secondary: hsl(60 9.1% 97.8%);
+    --secondary-foreground: hsl(20 14.3% 4.1%); */
 
-    /* --secondary: #10b981;
-    --secondary-foreground: #09090b; */
+    --secondary: hsl(25 15% 18%);
+    --secondary-foreground: hsl(35 20% 85%);
 
     --card: #18181b;
     --card-foreground: #fafafa;

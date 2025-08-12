@@ -39,7 +39,7 @@ const BulkPurchase: React.FC = () => {
             name: "",
             email: "",
             phone: "",
-            bulkType: "",
+            bulkType: "quarter-bale",
             quantity: "",
             message: "",
         },
@@ -50,7 +50,7 @@ const BulkPurchase: React.FC = () => {
             id: "slots",
             name: "Slots",
             description: "Perfect for small retailers and boutiques",
-            minQuantity: "50+ pieces",
+            minQuantity: "20+ pieces",
             discount: "15-25% off",
             icon: Package,
             popular: false,
@@ -59,7 +59,7 @@ const BulkPurchase: React.FC = () => {
             id: "quarter-bale",
             name: "Quarter Bale",
             description: "Ideal for growing businesses",
-            minQuantity: "200+ pieces",
+            minQuantity: "100+ pieces",
             discount: "25-35% off",
             icon: Package,
             popular: true,
@@ -68,7 +68,7 @@ const BulkPurchase: React.FC = () => {
             id: "half-bale",
             name: "Half Bale",
             description: "Great for established retailers",
-            minQuantity: "500+ pieces",
+            minQuantity: "200+ pieces",
             discount: "35-45% off",
             icon: Truck,
             popular: false,
@@ -77,7 +77,7 @@ const BulkPurchase: React.FC = () => {
             id: "full-bale",
             name: "Full Bale",
             description: "Maximum savings for large operations",
-            minQuantity: "1000+ pieces",
+            minQuantity: "400+ pieces",
             discount: "45-60% off",
             icon: Users,
             popular: false,
@@ -134,11 +134,11 @@ const BulkPurchase: React.FC = () => {
                     <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-primary" />
-                            <span>Minimum 50 pieces</span>
+                            <span>Minimum 20 pieces</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-primary" />
-                            <span>Up to 60% discount</span>
+                            <span>Up to 40% discount</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-primary" />
