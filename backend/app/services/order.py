@@ -67,7 +67,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             data={
                 "order": {"connect": {"id": new_order.id}},
                 "message": f"Order {order_number} created",
-                # "from_status": order_in.status,
+                "from_status": order_in.status,
                 "to_status": order_in.status,
             }
         )
