@@ -358,3 +358,69 @@ async def google(payload: GooglePayload) -> Token:
 async def logout():
     return Message(message="Logout successful")
 
+
+class EmailData(BaseModel):
+    email: str
+    url: str
+
+@router.post("/send-magic-link")
+async def send_magic_link(
+    background_tasks: BackgroundTasks,
+    payload: EmailData,
+) -> Message:
+    """
+    Request a magic link for passwordless authentication.
+    The link will be sent to the user's email if they have an account.
+    """
+    email = payload.email
+    url = payload.url
+
+    user = await prisma.user.find_first(
+        where={
+            "email": email,
+        }
+    )
+
+    if not user:
+        return {"message": "If an account exists with this email, you will receive a magic link"}
+
+    async def send_magic_link_email(user: User, email: str, url: Optional[str] = None):
+        # token = security.create_magic_link_token(email)
+        # magic_link = f"{settings.FRONTEND_HOST}/verify?token={token}"
+        # if url is not None:
+        #     magic_link += f"&url={url}"
+        email_data = await generate_magic_link_email(email_to=email, magic_link=url, first_name=user.first_name)
+        send_email(
+            email_to=email,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
+
+    background_tasks.add_task(send_magic_link_email, user, email, url)
+
+    return {"message": "If an account exists with this email, you will receive a magic link"}
+
+class SyncUserPayload(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+
+@router.post("/sync-user")
+async def sync_user(payload: SyncUserPayload) -> Message:
+    user = await prisma.user.find_first(
+        where={
+            "email": payload.email,
+        }
+    )
+    if not user:
+        user = await prisma.user.create(
+            data={
+                "email": payload.email,
+                "first_name": payload.first_name,
+                "last_name": payload.last_name,
+                "status": "ACTIVE",
+                "role": "CUSTOMER",
+                "hashed_password": "password"
+            }
+        )
+    return {"message": "User synced successfully"}

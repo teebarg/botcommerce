@@ -16,11 +16,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { signOut } from "next-auth/react"
 
 export default function UserDropDown({ user }: { user: Session }) {
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
         await authApi.logOut();
+        await signOut();
         invalidate();
         window.location.href = "/";
     };
@@ -46,7 +48,7 @@ export default function UserDropDown({ user }: { user: Session }) {
             dataKey: "account",
             child: (
                 <button aria-label="log out" className="text-red-500 cursor-pointer" data-testid="logout-button" type="button" onClick={handleLogout}>
-                    Log out
+                    Log out222
                 </button>
             ),
         },
