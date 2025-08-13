@@ -21,7 +21,7 @@ export default function SocialLoginButtons({ callbackUrl }: Props) {
 
     return (
         <div className="space-y-3">
-            <Button className="w-full" disabled={isLoading} isLoading={isLoading} size="lg" variant="primary" onClick={handleSocialLogin}>
+            <Button className="w-full" disabled={isLoading} isLoading={isLoading} size="md" variant="primary" onClick={handleSocialLogin}>
                 <img alt="Google" className="w-5 h-5 mr-2" src="/google.svg" />
                 Continue with Google
             </Button>

@@ -29,7 +29,7 @@ export default function VerifyRequestPage() {
                     </div>
 
                     <div className="space-y-4">
-                        <Button variant="emerald" size="lg" onClick={() => window.history.back()} className="w-full py-3 px-4 rounded-full">
+                        <Button variant="emerald" size="lg" onClick={() => window.history.back()} className="w-full">
                             <ArrowLeft size={16} />
                             Back to sign in
                         </Button>

@@ -8,8 +8,8 @@ import { MagicLinkForm } from "./magic-link";
 
 export default function SignInPage() {
     return (
-        <div className="">
-            <div className="p-4 md:p-8">
+        <div>
+            <div className="p-2 md:p-4">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-accent/10 rounded-full mb-4">
                         <Mail className="text-accent" size={24} />

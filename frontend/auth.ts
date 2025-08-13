@@ -40,7 +40,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             maxAge: 60 * 60,
             async sendVerificationRequest({ identifier: email, url }) {
                 const { error } = await tryCatch<Message>(serverApi.post<Message>("/auth/send-magic-link", { email, url }));
-                console.log("🚀 ~ file: auth.ts:43 ~ error:", error)
 
                 if (error) {
                     throw new Error(error);
@@ -48,15 +47,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             },
         },
         GoogleProvider({
-            clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!,
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
             allowDangerousEmailAccountLinking: true,
             authorization: { params: { scope: "openid email profile" } },
         }),
     ],
     session: {
         strategy: "jwt",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        maxAge: 60 * 60 * 24 * 7,
     },
     pages: {
         signIn: "/auth/signin",
@@ -72,11 +71,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             return true;
         },
         async jwt({ token, user, account, profile }) {
-            // console.log("🚀 ~ jwt ~ profile:", profile);
-            // console.log("🚀 ~ jwt ~ account:", account);
-            // console.log("🚀 ~ jwt ~ user:", user);
-            // console.log("🚀 ~ jwt ~ token:", token);
-
             if (!account) {
                 return token;
             }

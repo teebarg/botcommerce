@@ -37,7 +37,7 @@ const Menu: React.FC = () => {
         await authApi.logOut();
         await signOut();
         invalidate();
-        // window.location.href = "/";
+        window.location.href = "/";
     };
 
     return (

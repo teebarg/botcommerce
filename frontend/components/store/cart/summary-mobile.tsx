@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown, XMark } from "nui-react-icons";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { currency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Cart, CartItem } from "@/schemas";
+import { ChevronDown, X } from "lucide-react";
 
 type SummaryProps = {
     cart: Cart;
@@ -34,7 +34,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                 <div className="flex items-center justify-between py-2">
                     <p className="text-xl font-medium">Summary</p>
                     <Button aria-label="close" className="bg-inherit min-w-0 w-auto px-0" onClick={toggleSummary}>
-                        <XMark />
+                        <X />
                     </Button>
                 </div>
                 <div className="flex items-center justify-between text-sm font-medium">

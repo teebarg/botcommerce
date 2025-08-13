@@ -32,7 +32,6 @@ export const SessionSchema = z.object({
     last_name: z.string().optional(),
     email: z.string(),
     image: z.string().nullable().optional(),
-    // phone: z.string().optional(),
     isActive: z.boolean(),
     isAdmin: z.boolean(),
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),

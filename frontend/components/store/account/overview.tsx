@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation";
 import { currency } from "@lib/utils";
-import { ChevronDown } from "nui-react-icons";
+import { ChevronDown } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import PromotionalBanner from "@/components/promotion";

@@ -1,7 +1,6 @@
 "use client";
 
-import { Package, User } from "nui-react-icons";
-import { MapPin } from "lucide-react";
+import { MapPin, Package, User } from "lucide-react";
 
 import RecommendedProducts from "@/components/store/products/recommended";
 import LocalizedClientLink from "@/components/ui/link";
@@ -57,8 +56,8 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
             <div className="bg-content2 md:hidden" data-testid="mobile-account-nav">
                 <div className="text-base">
                     <ul className="flex justify-between px-6">
-                        {navLinks.map((link, index: number) => (
-                            <li key={index}>
+                        {navLinks.map((link, idx: number) => (
+                            <li key={idx}>
                                 <LocalizedClientLink
                                     active="text-rose-500"
                                     className="px-8 text-xs font-semibold"
