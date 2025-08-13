@@ -6,7 +6,9 @@ import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import LocalizedClientLink from "@/components/ui/link";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import { PaginatedProductSearch } from "@/schemas";
-import { api } from "@/apis/client";
+import { serverApi } from "@/apis/server-client";
+import { tryCatch } from "@/lib/try-catch";
+import ServerError from "@/components/generic/server-error";
 
 export const metadata: Metadata = {
     title: "Search",
@@ -35,7 +37,11 @@ export default async function SearchResults({ params, searchParams }: { params: 
         brand_id: brand_id,
     };
 
-    const initialData = await api.get<PaginatedProductSearch>("/product/search", { params: { page: 1, ...queryParams } });
+    const { data: initialData, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { page: 1, ...queryParams } }));
+
+    if (error) {
+        return <ServerError error={error} scenario="server" stack="SearchResults" />;
+    }
 
     return (
         <div className="container mx-auto mt-4 py-4 px-1">
@@ -49,7 +55,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
                 </LocalizedClientLink>
             </div>
             <Suspense fallback={<CollectionTemplateSkeleton />}>
-                <InfiniteScrollClient initialData={initialData.products} initialSearchParams={queryParams} />
+                <InfiniteScrollClient initialData={initialData?.products} initialSearchParams={queryParams} />
             </Suspense>
         </div>
     );

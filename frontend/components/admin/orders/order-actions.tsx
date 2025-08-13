@@ -24,7 +24,7 @@ const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
                 sheetClassName="min-w-[70vw]"
                 title="Order Details"
                 trigger={
-                    <Button className="flex-1" variant="primary" onClick={state.open}>
+                    <Button className="flex-1" variant="indigo" onClick={state.open}>
                         View Details
                     </Button>
                 }

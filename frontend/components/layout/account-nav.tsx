@@ -1,13 +1,13 @@
 "use client";
 
-import { User as UserIcon } from "nui-react-icons";
 import { usePathname } from "next/navigation";
-import { MapPin, Package } from "lucide-react";
+import { MapPin, Package, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { signOut } from "next-auth/react";
 
 const AccountNav = () => {
     const route = usePathname();
@@ -15,6 +15,7 @@ const AccountNav = () => {
 
     const handleLogout = async () => {
         await authApi.logOut();
+        await signOut();
         invalidate();
         window.location.href = "/";
     };
@@ -22,13 +23,13 @@ const AccountNav = () => {
     const navLinks = [
         {
             href: "/account",
-            icon: <UserIcon className="h-8 w-8" viewBox="0 0 20 20" />,
+            icon: <User className="h-8 w-8" />,
             label: "Overview",
             dataTestid: "overview-link",
         },
         {
             href: "/account/profile",
-            icon: <UserIcon className="h-8 w-8" viewBox="0 0 20 20" />,
+            icon: <User className="h-8 w-8" />,
             label: "Profile",
             dataTestid: "addresses-link",
         },

@@ -34,13 +34,6 @@ class OAuthCallback(BaseModel):
     code: str
     state: Optional[str] = None
 
-class OAuthUserInfo(BaseModel):
-    email: str
-    first_name: str
-    last_name: str
-    image: Optional[str] = None
-    oauth_id: str
-
 class GooglePayload(BaseModel):
     email: str
     first_name: str
@@ -56,77 +49,6 @@ def tokenData(user: User):
         "status": user.status,
         "role": user.role
     }
-
-@router.post("/magic-link")
-async def request_magic_link(
-    background_tasks: BackgroundTasks,
-    payload: MagicLinkPayload,
-) -> Message:
-    """
-    Request a magic link for passwordless authentication.
-    The link will be sent to the user's email if they have an account.
-    """
-    email = payload.email
-    callback_url = payload.callback_url
-
-    user = await prisma.user.find_first(
-        where={
-            "email": email,
-        }
-    )
-
-    if not user:
-        return {"message": "If an account exists with this email, you will receive a magic link"}
-
-    async def send_magic_link_email(user: User, email: str, callback_url: Optional[str] = None):
-        token = security.create_magic_link_token(email)
-        magic_link = f"{settings.FRONTEND_HOST}/verify?token={token}"
-        if callback_url is not None:
-            magic_link += f"&callbackUrl={callback_url}"
-        email_data = await generate_magic_link_email(email_to=email, magic_link=magic_link, first_name=user.first_name)
-        send_email(
-            email_to=email,
-            subject=email_data.subject,
-            html_content=email_data.html_content,
-        )
-
-    background_tasks.add_task(send_magic_link_email, user, email, callback_url)
-
-    return {"message": "If an account exists with this email, you will receive a magic link"}
-
-@router.post("/verify-magic-link")
-async def verify_magic_link(token: TokenPayload) -> Token:
-    """
-    Verify a magic link token and return an access token if valid.
-    """
-    email = security.verify_magic_link_token(token.token)
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired magic link",
-        )
-
-    # Get user
-    user = await prisma.user.find_first(
-        where={
-            "email": email,
-            # "is_active": True,
-        }
-    )
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User not found",
-        )
-
-    # Generate access token
-    access_token = security.create_access_token(
-        data=tokenData(user=user),
-        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
-
-    return Token(access_token=access_token)
 
 @router.post("/signup")
 async def signup(payload: SignUpPayload, background_tasks: BackgroundTasks) -> Token:
@@ -358,3 +280,77 @@ async def google(payload: GooglePayload) -> Token:
 async def logout():
     return Message(message="Logout successful")
 
+
+class EmailData(BaseModel):
+    email: str
+    url: str
+
+@router.post("/send-magic-link")
+async def send_magic_link(
+    background_tasks: BackgroundTasks,
+    payload: EmailData,
+) -> Message:
+    """
+    Request a magic link for passwordless authentication.
+    The link will be sent to the user's email if they have an account.
+    """
+    email = payload.email
+    url = payload.url
+
+    user = await prisma.user.find_first(
+        where={
+            "email": email,
+        }
+    )
+
+    if not user:
+        user = await prisma.user.create(
+            data={
+                "email": email,
+                "first_name": "",
+                "last_name": "",
+                "image": "",
+                "status": "ACTIVE",
+                "role": "CUSTOMER",
+                "hashed_password": "password"
+            }
+        )
+
+    async def send_magic_link_email(name: str, email: str, url: Optional[str] = None):
+        email_data = await generate_magic_link_email(email_to=email, magic_link=url, first_name=name)
+        send_email(
+            email_to=email,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
+
+    background_tasks.add_task(send_magic_link_email, user.first_name, email, url)
+
+    return {"message": "If an account exists with this email, you will receive a magic link"}
+
+class SyncUserPayload(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+    image: Optional[str] = None
+
+@router.post("/sync-user")
+async def sync_user(payload: SyncUserPayload) -> Message:
+    user = await prisma.user.find_first(
+        where={
+            "email": payload.email,
+        }
+    )
+    if not user:
+        user = await prisma.user.create(
+            data={
+                "email": payload.email,
+                "first_name": payload.first_name,
+                "last_name": payload.last_name,
+                "image": payload.image,
+                "status": "ACTIVE",
+                "role": "CUSTOMER",
+                "hashed_password": "password"
+            }
+        )
+    return {"message": "User synced successfully"}

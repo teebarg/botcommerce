@@ -4,13 +4,13 @@ import ThemeToggle from "@lib/theme/theme-button";
 import ActivityTray from "@/components/generic/activities/activity-tray";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
-import { auth } from "@/actions/auth";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import UserDropDown from "@/components/layout/user-dropdown";
+import { auth } from "@/auth";
 
 const AdminNavbar = async () => {
     const siteConfig = await getSiteConfig();
-    const user = await auth();
+    const session = await auth();
 
     return (
         <NavigationBar>
@@ -33,10 +33,10 @@ const AdminNavbar = async () => {
                     <ActivityTray />
                 </NavbarItem>
                 <NavbarItem className="flex">
-                    {user ? (
-                        <UserDropDown user={user} />
+                    {session?.user ? (
+                        <UserDropDown user={session.user} />
                     ) : (
-                        <LocalizedClientLink href="/sign-in">
+                        <LocalizedClientLink href="/auth/signin">
                             Log In <span aria-hidden="true">&rarr;</span>
                         </LocalizedClientLink>
                     )}

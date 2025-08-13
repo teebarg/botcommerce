@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowUpDown, Search } from "nui-react-icons";
+import { ArrowUpDown, Search } from "lucide-react";
 
 import { CreateCollection } from "./create-collection";
 import { CollectionActions } from "./collection-actions";

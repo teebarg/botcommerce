@@ -1,18 +1,18 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-import { api } from "@/apis/client2";
 import { Shared } from "@/schemas";
-import { tryCatchApi } from "@/lib/try-catch";
+import { tryCatch } from "@/lib/try-catch";
 import { SocialShare } from "@/components/store/shared/shared-listing";
 import ProductCardBase from "@/components/store/products/product-card";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
+import { serverApi } from "@/apis/server-client";
 
 type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: shared } = await tryCatchApi<Shared>(api.get(`/shared/${slug}`));
+    const { data: shared } = await tryCatch<Shared>(serverApi.get(`/shared/${slug}`));
 
     if (!shared) {
         return {
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function SharedPage({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: shared, error } = await tryCatchApi<Shared>(api.get(`/shared/${slug}`));
+    const { data: shared, error } = await tryCatch<Shared>(serverApi.get(`/shared/${slug}`));
 
     if (!shared || error) return notFound();
 

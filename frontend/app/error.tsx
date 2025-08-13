@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { BtnLink } from "@/components/ui/btnLink";
-import { api } from "@/apis/client2";
+import { api } from "@/apis/client";
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
     useEffect(() => {

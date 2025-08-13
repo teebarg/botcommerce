@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowUpDown, Search } from "nui-react-icons";
+import { ArrowUpDown, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { ReviewActions } from "./reviews-actions";

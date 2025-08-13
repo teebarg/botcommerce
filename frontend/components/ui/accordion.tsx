@@ -1,9 +1,9 @@
 "use client";
 
-import { ChevronDown } from "nui-react-icons";
 import React, { createContext, useContext, useState } from "react";
 
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 
 type AccordionContextType = {
     expanded: string | null;

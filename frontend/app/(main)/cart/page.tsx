@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 
-import ClientOnly from "@/components/generic/client-only";
 import CartView from "@/components/store/cart/cart-view";
 
 export const metadata: Metadata = {
@@ -8,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default async function Cart() {
-    return (
-        <ClientOnly>
-            <CartView />
-        </ClientOnly>
-    );
+    return <CartView />;
 }

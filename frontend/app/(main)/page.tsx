@@ -4,7 +4,6 @@ import { TrendingUp } from "lucide-react";
 
 import PromotionalBanner from "@/components/promotion";
 import LocalizedClientLink from "@/components/ui/link";
-import { api } from "@/apis/client";
 import CategoriesSection from "@/components/store/landing/category-section";
 import { ProductSearch } from "@/schemas/product";
 import { ContactSection } from "@/components/store/landing/contact-section";
@@ -13,6 +12,7 @@ import { tryCatch } from "@/lib/try-catch";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
 import ProductCard from "@/components/store/products/product-card";
 import HeroSection from "@/components/hero-section";
+import { serverApi } from "@/apis/server-client";
 
 export const metadata: Metadata = {
     title: "Home",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
     const { data } = await tryCatch<{ trending: ProductSearch[]; latest: ProductSearch[]; featured: ProductSearch[] }>(
-        api.get("/product/landing-products")
+        serverApi.get("/product/landing-products")
     );
 
     return (

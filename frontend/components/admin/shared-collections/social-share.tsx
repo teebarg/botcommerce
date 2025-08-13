@@ -60,7 +60,7 @@ export function SocialShare({ collection, className }: SocialShareProps) {
                     url: targetUrl,
                 });
             } catch (err) {
-                console.log("Error sharing:", err);
+                toast.error("Error sharing", { description: "Please try again" });
             }
         }
     };

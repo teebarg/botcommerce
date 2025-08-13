@@ -1,10 +1,9 @@
 "use client";
 
-import { InformationCircleSolid } from "nui-react-icons";
 import React, { useMemo, useState } from "react";
 import { currency } from "@lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
-import { Trash2 } from "lucide-react";
+import { Info, Trash2 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -113,7 +112,7 @@ const DiscountCode: React.FC = () => {
                             </button>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <InformationCircleSolid />
+                                    <Info className="size-4 text-gray-500" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>You can add multiple gift cards, but only one discount code.</p>

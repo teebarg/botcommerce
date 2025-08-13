@@ -5,15 +5,16 @@ import ThemeButton from "@lib/theme/theme-button";
 
 import GetApp from "../get-app";
 
+import UserDropDown from "./user-dropdown";
+
 import { CartComponent } from "@/components/store/cart/cart-component";
 import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
-import { auth } from "@/actions/auth";
 import { getSiteConfig } from "@/lib/config";
-import UserDropDown from "./user-dropdown";
+import { auth } from "@/auth";
 
 const StoreNavbar = async () => {
-    const user = await auth();
+    const session = await auth();
     const siteConfig = await getSiteConfig();
 
     return (
@@ -34,7 +35,7 @@ const StoreNavbar = async () => {
                     <CartComponent />
                     <ThemeButton />
                     <div className="hidden md:flex">
-                        {user ? (
+                        {session ? (
                             <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
                                 <HeartFilled className="h-8 w-8 text-accent" />
                             </LocalizedClientLink>
@@ -44,10 +45,10 @@ const StoreNavbar = async () => {
                     </div>
                     <GetApp />
                     <div className="hidden sm:flex">
-                        {user ? (
-                            <UserDropDown user={user} />
+                        {session ? (
+                            <UserDropDown user={session.user} />
                         ) : (
-                            <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
+                            <LocalizedClientLink className="text-sm font-semibold leading-6" href="/auth/signin">
                                 Log In <span aria-hidden="true">&rarr;</span>
                             </LocalizedClientLink>
                         )}

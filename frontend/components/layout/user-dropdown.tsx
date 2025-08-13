@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 
 import ProfileAvatar from "@/public/profile.svg";
 import LocalizedClientLink from "@/components/ui/link";
@@ -21,6 +22,7 @@ export default function UserDropDown({ user }: { user: Session }) {
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
         await authApi.logOut();
+        await signOut();
         invalidate();
         window.location.href = "/";
     };

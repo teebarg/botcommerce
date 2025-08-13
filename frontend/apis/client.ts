@@ -1,4 +1,3 @@
-import { deleteCookie } from "@/lib/util/cookie";
 import { getCookie } from "@/lib/util/server-utils";
 
 const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
@@ -8,6 +7,7 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    const { token } = await fetch("/api/session").then(res => res.json());
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -19,10 +19,8 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    const token = await getCookie("access_token");
     const cartId = await getCookie("_cart_id");
 
-    // Get auth token
     const headers = {
         "Content-Type": "application/json",
         "X-Auth": token ?? "token",
@@ -38,7 +36,6 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (!response.ok) {
         if (response.status === 401) {
-            deleteCookie("access_token");
             // window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         }
         const error = await response.json();

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import React from "react";
 
 import RelatedProducts from "@/components/store/products/related-products";
-import { api } from "@/apis/client";
+import { serverApi } from "@/apis/server-client";
 import ServerError from "@/components/generic/server-error";
 import ProductView from "@/components/store/products/product-view";
 import ReviewsSection from "@/components/product/product-reviews";
@@ -14,7 +14,7 @@ type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: product, error } = await tryCatch<Product>(api.get(`/product/${slug}`));
+    const { data: product, error } = await tryCatch<Product>(serverApi.get(`/product/${slug}`));
 
     if (error) {
         return {};
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
 
-    const { data: product, error } = await tryCatch<Product>(api.get(`/product/${slug}`));
+    const { data: product, error } = await tryCatch<Product>(serverApi.get(`/product/${slug}`));
 
     if (error) {
         return <ServerError />;
