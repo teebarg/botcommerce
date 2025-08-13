@@ -33,6 +33,7 @@ class ProductVariant(BaseModel):
     size: Optional[str]
     color: Optional[str]
 
+
 class SearchProduct(BaseModel):
     id: int
     name: str
@@ -40,7 +41,6 @@ class SearchProduct(BaseModel):
     slug: str
     description: str
     image: Optional[str] = None
-    status: str
     ratings: float
     categories: List[str]
     collections: List[str]
@@ -49,8 +49,6 @@ class SearchProduct(BaseModel):
     images: Optional[List[str]] = []
     favorites: Optional[List[str]] = []
     variants: Optional[List[ProductVariant]] = []
-    average_rating: Optional[float] = None
-    review_count: Optional[int] = None
     average_rating: Optional[float] = None
     review_count: Optional[int] = None
     user_interactions: Any

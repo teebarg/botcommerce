@@ -51,7 +51,6 @@ class RecommendationEngine:
                         FROM product_variants
                         GROUP BY product_id
                     ) pv ON p.id = pv.product_id
-                    WHERE p.status = 'IN_STOCK'
                     GROUP BY p.id, p.name, p.ratings, p.features, b.name, pv.min_price
                 """
 
