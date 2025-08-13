@@ -49,6 +49,7 @@ interface ProductSearchProps {
     searchDelay?: number;
     className?: string;
     placeholder?: string;
+    closeOnSelect?: boolean;
 }
 
 const ProductSearchClient: React.FC<ProductSearchProps> = ({
@@ -57,6 +58,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
     searchDelay = 500,
     className,
     placeholder = "Search for products...",
+    closeOnSelect = true,
 }) => {
     const { user } = useAuth();
     const [query, setQuery] = useState(initialQuery);
@@ -98,8 +100,10 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
     }, []);
 
     const handleProductSelect = (product: ProductSearch) => {
-        setQuery(product.name);
-        setIsOpen(false);
+        if (closeOnSelect) {
+            setQuery(product.name);
+            setIsOpen(false);
+        }
         onProductSelect?.(product);
     };
 
