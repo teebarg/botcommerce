@@ -1,4 +1,4 @@
-name: Docker Build & Push
+name: Docker Build & Push Recommendation
 
 on:
   workflow_dispatch:
