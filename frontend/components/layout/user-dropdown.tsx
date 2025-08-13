@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 
 import ProfileAvatar from "@/public/profile.svg";
 import LocalizedClientLink from "@/components/ui/link";
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
-import { signOut } from "next-auth/react"
 
 export default function UserDropDown({ user }: { user: Session }) {
     const invalidate = useInvalidateMe();

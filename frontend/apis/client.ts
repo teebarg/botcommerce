@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { deleteCookie } from "@/lib/util/cookie";
 import { getCookie } from "@/lib/util/server-utils";
 
@@ -8,6 +9,9 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    // const session = await auth();
+
+    // console.log("🚀 ~ request ~ session:", session);
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -19,13 +23,16 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    const token = await getCookie("access_token");
+    // const session = await auth();
+    // console.log("🚀 ~ request ~ session:", session)
+    // const token = session?.accessToken;
     const cartId = await getCookie("_cart_id");
 
     // Get auth token
     const headers = {
         "Content-Type": "application/json",
-        "X-Auth": token ?? "token",
+        // "X-Auth": session?.accessToken ?? "token",
+        "X-Auth": "token",
         cartId: cartId ?? "",
         ...options.headers,
     };

@@ -404,6 +404,7 @@ class SyncUserPayload(BaseModel):
     email: str
     first_name: str
     last_name: str
+    image: Optional[str] = None
 
 @router.post("/sync-user")
 async def sync_user(payload: SyncUserPayload) -> Message:
@@ -418,6 +419,7 @@ async def sync_user(payload: SyncUserPayload) -> Message:
                 "email": payload.email,
                 "first_name": payload.first_name,
                 "last_name": payload.last_name,
+                "image": payload.image,
                 "status": "ACTIVE",
                 "role": "CUSTOMER",
                 "hashed_password": "password"

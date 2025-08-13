@@ -5,17 +5,17 @@ import ThemeButton from "@lib/theme/theme-button";
 
 import GetApp from "../get-app";
 
+import UserDropDown from "./user-dropdown";
+
 import { CartComponent } from "@/components/store/cart/cart-component";
 import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
 // import { auth } from "@/actions/auth";
 import { getSiteConfig } from "@/lib/config";
-import UserDropDown from "./user-dropdown";
 import { auth } from "@/auth";
 
 const StoreNavbar = async () => {
     const session = await auth();
-    console.log("🚀 ~ file: store-nav.tsx:18 ~ session:", session)
     const siteConfig = await getSiteConfig();
 
     return (
@@ -49,7 +49,7 @@ const StoreNavbar = async () => {
                         {session ? (
                             <UserDropDown user={session.user} />
                         ) : (
-                            <LocalizedClientLink className="text-sm font-semibold leading-6" href="/sign-in">
+                            <LocalizedClientLink className="text-sm font-semibold leading-6" href="/auth/signin">
                                 Log In <span aria-hidden="true">&rarr;</span>
                             </LocalizedClientLink>
                         )}

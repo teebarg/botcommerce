@@ -3,8 +3,9 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Mail, Recycle, Sparkles } from "lucide-react";
+import { Mail } from "lucide-react";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -19,7 +20,11 @@ export default function SignInPage() {
         e.preventDefault();
         setLoading(true);
 
-        await signIn("email", {
+        // await signIn("email", {
+        //     email,
+        //     callbackUrl,
+        // });
+        await signIn("http-email", {
             email,
             callbackUrl,
         });
@@ -39,27 +44,27 @@ export default function SignInPage() {
 
                     <div className="space-y-6">
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
                                 Email address
                             </label>
                             <input
-                                type="email"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                                 id="email"
+                                placeholder="your@email.com"
+                                type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                                placeholder="your@email.com"
                             />
                         </div>
 
                         <button
-                            onClick={handleEmailSignIn}
-                            disabled={loading}
                             className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3 px-4 rounded-lg font-medium hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02]"
+                            disabled={loading}
+                            onClick={handleEmailSignIn}
                         >
                             {loading ? (
                                 <div className="flex items-center justify-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                     Sending magic link...
                                 </div>
                             ) : (
@@ -69,7 +74,7 @@ export default function SignInPage() {
 
                         <Separator />
 
-                        <Button type="button" onClick={() => signIn("google", { callbackUrl })} variant="outline" className="w-full" size="lg">
+                        <Button className="w-full" size="lg" type="button" variant="outline" onClick={() => signIn("google", { callbackUrl })}>
                             <img alt="Google" className="w-5 h-5 mr-2" src="/google.svg" />
                             Sign in with Google
                         </Button>
@@ -78,11 +83,11 @@ export default function SignInPage() {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-500">
                             By signing in, you agree to our{" "}
-                            <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                            <a className="text-emerald-600 hover:text-emerald-700 font-medium" href="#">
                                 Terms of Service
                             </a>{" "}
                             and{" "}
-                            <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                            <a className="text-emerald-600 hover:text-emerald-700 font-medium" href="#">
                                 Privacy Policy
                             </a>
                         </p>
@@ -93,7 +98,7 @@ export default function SignInPage() {
             <div className="mt-8 text-center">
                 <p className="text-sm text-gray-500">
                     Need help?{" "}
-                    <Link href="/contact" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    <Link className="text-emerald-600 hover:text-emerald-700 font-medium" href="/contact">
                         Contact support
                     </Link>
                 </p>

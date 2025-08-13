@@ -6,12 +6,12 @@ import { jwtVerify } from "jose";
 import { deleteCookie } from "@/lib/util/cookie";
 import { Session } from "@/schemas";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+const secret = new TextEncoder().encode(process.env.AUTH_SECRET!);
 
 export async function verifyToken(token: string) {
     try {
         if (!secret) {
-            throw new Error("JWT_SECRET environment variable is not defined");
+            throw new Error("AUTH_SECRET environment variable is not defined");
         }
 
         const result = await jwtVerify(token, secret, {
