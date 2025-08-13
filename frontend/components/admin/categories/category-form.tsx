@@ -17,7 +17,6 @@ const CategoryFormSchema = z.object({
     name: z.string().min(1, "Name is required"),
     is_active: z.boolean().default(true),
     parent_id: z.number().nullable().optional(),
-    display_order: z.number().min(0).default(0),
 });
 
 export type CategoryFormValues = z.infer<typeof CategoryFormSchema>;
@@ -38,7 +37,6 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
         name: current?.name || "",
         is_active: current?.is_active ?? true,
         parent_id: hasParent && parent_id ? parent_id : (current?.parent_id ?? null),
-        display_order: (current as any)?.display_order ?? 0,
     };
 
     const form = useForm<CategoryFormValues>({
@@ -101,19 +99,6 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                                     <FormControl>
                                         <Switch checked={field.value} disabled={isPending} onCheckedChange={field.onChange} />
                                     </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={control}
-                            name="display_order"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Display Order</FormLabel>
-                                    <FormControl>
-                                        <Input min={0} placeholder="e.g. 0, 1, 2..." type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
