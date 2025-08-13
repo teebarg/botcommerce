@@ -1,12 +1,12 @@
 import NextAuth, { DefaultSession } from "next-auth";
-// import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
 import { Redis } from "@upstash/redis";
 
 import { Message, Role, Status, User } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import { api } from "@/apis/client";
+import { SignJWT } from "jose";
+import { serverApi } from "@/apis/server-client";
 
 const redis = new Redis({
     url: process.env.UPSTASH_REDIS_URL!,
@@ -33,25 +33,14 @@ declare module "next-auth" {
 export const { auth, handlers, signIn, signOut } = NextAuth({
     adapter: UpstashRedisAdapter(redis),
     providers: [
-        // EmailProvider({
-        //     // server: {},
-        //     server: "smtp://username:password@smtp.example.com:587", // not used
-        //     from: "",
-        //     async sendVerificationRequest({ identifier: email, url }) {
-        //         const { error } = await tryCatch<Message>(api.post<Message>("/auth/send-magic-link", { email, url }));
-
-        //         if (error) {
-        //             throw new Error(error);
-        //         }
-        //     },
-        // }),
         {
             id: "http-email",
             name: "Email",
             type: "email",
-            maxAge: 60 * 60 * 24, // Email link will expire in 24 hours
+            maxAge: 60 * 60,
             async sendVerificationRequest({ identifier: email, url }) {
-                const { error } = await tryCatch<Message>(api.post<Message>("/auth/send-magic-link", { email, url }));
+                const { error } = await tryCatch<Message>(serverApi.post<Message>("/auth/send-magic-link", { email, url }));
+                console.log("🚀 ~ file: auth.ts:43 ~ error:", error)
 
                 if (error) {
                     throw new Error(error);
@@ -76,8 +65,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
     callbacks: {
         async signIn({ user, account }) {
-            // console.log("🚀 ~ file: route.ts:42 ~ account:", account);
-            // console.log("🚀 ~ file: route.ts:42 ~ user:", user);
             // if (["email", "google"].includes(account?.provider!)) {
             //     await tryCatch<Message>(api.post<Message>("/auth/sync-user", { email: user.email!, first_name: user.name!, last_name: user.name! }));
             // }
@@ -85,14 +72,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             return true;
         },
         async jwt({ token, user, account, profile }) {
-            console.log("🚀 ~ jwt ~ profile:", profile);
-            console.log("🚀 ~ jwt ~ account:", account);
-            console.log("🚀 ~ file: route.ts:49 ~ user:", user);
-            console.log("🚀 ~ file: route.ts:49 ~ token:", token);
+            // console.log("🚀 ~ jwt ~ profile:", profile);
+            // console.log("🚀 ~ jwt ~ account:", account);
+            // console.log("🚀 ~ jwt ~ user:", user);
+            // console.log("🚀 ~ jwt ~ token:", token);
+
+            if (!account) {
+                return token;
+            }
 
             if (account?.provider === "google" && profile) {
                 await tryCatch<Message>(
-                    api.post<Message>("/auth/sync-user", {
+                    serverApi.post<Message>("/auth/sync-user", {
                         email: user.email!,
                         first_name: profile?.given_name!,
                         last_name: profile?.family_name!,
@@ -101,31 +92,21 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 );
             }
 
-            const { data, error } = await tryCatch<User>(api.get<User>(`/users/get-user?email=${token.email}`));
+            const { data, error } = await tryCatch<User>(serverApi.get<User>(`/users/get-user?email=${token.email}`));
 
             if (error) {
                 throw new Error(error);
             }
-            if (user) {
+            if (data) {
                 token.user = data;
-            }
-
-            if (account && user) {
-                return {
-                    ...token,
-                    accessToken: account.access_token,
-                    refreshToken: account.id_token,
-                };
+                token.accessToken = await generateJoseToken(data?.email!);
             }
 
             return token;
         },
         async session({ session, token }) {
-            // console.log("🚀 ~ file: route.ts:65 ~ token:", token);
-            // console.log("🚀 ~ file: route.ts:65 ~ session:", session);
             if (token?.accessToken) {
                 session.accessToken = token.accessToken as string;
-                session.refreshToken = token.refreshToken as string;
             }
             if (token?.sub) {
                 session.user.id = token.sub;
@@ -143,7 +124,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     debug: true,
 });
 
-// export { handler as GET, handler as POST };
+async function generateJoseToken(email: string) {
+    try {
+        const jwt = await new SignJWT({
+            email,
+            sub: email,
+        })
+            .setProtectedHeader({ alg: "HS256" })
+            .setIssuedAt()
+            .setExpirationTime("24h")
+            .sign(new TextEncoder().encode(process.env.AUTH_SECRET!));
 
-// import { handlers } from "@/auth"
-// export const { GET, POST } = handlers
+        return jwt;
+    } catch (error) {
+        console.error("Error generating JWT:", error);
+        throw error;
+    }
+}

@@ -16,10 +16,10 @@ import { Brand, Collection, Product, ProductVariant } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/lib/hooks/useProduct";
-import ServerError from "@/components/generic/server-error";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useBrands } from "@/lib/hooks/useBrand";
 import ComponentLoader from "@/components/component-loader";
+import ServerError from "@/components/generic/server-error";
 
 const LIMIT = 10;
 
@@ -41,7 +41,13 @@ export function ProductDetails() {
         setSelectedCollections(collectionIdsFromURL.map(Number));
     }, [searchParams]);
 
-    if (!data) return <ServerError />;
+    if (isLoading) {
+        return <ComponentLoader className="h-96" />;
+    }
+
+    if (!data) {
+        return <ServerError />;
+    }
 
     const { products, ...pagination } = data;
 

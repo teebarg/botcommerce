@@ -24,7 +24,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, description, tr
                         <Badge variant={trend === "up" ? "emerald" : trend === "down" ? "destructive" : "default"}>{trendValue}</Badge>
                     )}
                 </div>
-                {icon && <div className="p-2 rounded-full bg-secondary/10 text-secondary">{icon}</div>}
+                {icon && <div className="p-2 rounded-full bg-accent/10 text-accent">{icon}</div>}
             </div>
         </div>
     );

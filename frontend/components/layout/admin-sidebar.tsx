@@ -88,7 +88,7 @@ const AccountItems = [
     },
     {
         title: "Profile",
-        url: "/profile",
+        url: "/account/profile",
         icon: User,
     },
 ];
@@ -207,7 +207,7 @@ export function AdminSidebar() {
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton className={cn("bg-accent py-6", state === "collapsed" && "hidden")}>
+                                <SidebarMenuButton className={cn("bg-secondary py-6", state === "collapsed" && "hidden")}>
                                     <div className="flex items-center gap-2">
                                         <Avatar className="h-8 w-8 cursor-pointer">
                                             <AvatarImage alt={user?.first_name ?? "User"} src={user?.image ?? undefined} />
@@ -220,7 +220,7 @@ export function AdminSidebar() {
                                         </Avatar>
                                         <div className="flex flex-col">
                                             <p className="font-semibold">{user?.first_name ?? "User"}</p>
-                                            <p className="text-xs text-gray-500">{user?.email ?? "User"}</p>
+                                            <p className="text-xs text-gray-600">{user?.email ?? "User"}</p>
                                         </div>
                                     </div>
                                     <ChevronUp className="ml-auto" />

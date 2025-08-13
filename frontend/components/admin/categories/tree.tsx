@@ -93,7 +93,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
     return (
         <React.Fragment>
             <div className="w-full max-w-6xl mx-auto p-2 md:p-4 space-y-6">
-                <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 text-white">
+                <div className="bg-gradient-to-r from-primary to-accent rounded-2xl p-8 text-default-200">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
                             <h1 className="text-3xl font-bold mb-2">Product Categories</h1>
@@ -109,7 +109,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                             open={addState.isOpen}
                             title="Create Category"
                             trigger={
-                                <Button className="bg-white text-primary px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 shadow-lg" size="lg">
+                                <Button className="bg-white text-gray-900 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 shadow-lg" size="lg">
                                     <Plus className="w-5 h-5" />
                                     Add New Category
                                 </Button>

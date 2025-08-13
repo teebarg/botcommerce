@@ -4,6 +4,7 @@ import React from "react";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export default function ErrorPage() {
     const searchParams = useSearchParams();
@@ -59,23 +60,19 @@ export default function ErrorPage() {
     const errorContent = getErrorContent();
 
     return (
-        <div className="w-full max-w-lg">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-100">
+        <div>
+            <div className="p-8">
                 <div className="text-center">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-100 rounded-full mb-6">
                         <AlertTriangle className="text-orange-600" size={32} />
                     </div>
 
-                    <h2 className="text-3xl font-bold text-gray-800 mb-4">{errorContent.title}</h2>
-                    <p className="text-gray-600 text-lg mb-4">{errorContent.message}</p>
-                    <p className="text-sm text-gray-500 mb-8">{errorContent.details}</p>
+                    <h2 className="text-2xl font-bold text-default-900 mb-3">{errorContent.title}</h2>
+                    <p className="text-default-500 text-lg mb-4">{errorContent.message}</p>
+                    <p className="text-sm text-default-500 mb-8">{errorContent.details}</p>
 
                     <div className="space-y-4">
-                        <Button
-                            variant="emerald"
-                            onClick={() => window.history.back()}
-                            className="w-full py-3 px-4 border border-emerald-200 rounded-lg"
-                        >
+                        <Button variant="emerald" onClick={() => window.history.back()} className="w-full">
                             <ArrowLeft size={16} />
                             Back to sign in
                         </Button>
@@ -83,8 +80,10 @@ export default function ErrorPage() {
                 </div>
             </div>
 
+            <Separator />
+
             <div className="mt-6 text-center">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-default-500">
                     Still having trouble?{" "}
                     <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`} className="text-emerald-600 hover:text-emerald-700 font-medium">
                         Contact support

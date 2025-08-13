@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 import NotFoundUI from "./not-found";
 
-import { api } from "@/apis/client2";
+import { api } from "@/apis/client";
 import { cn } from "@/lib/utils";
 
 const ServerError: React.FC<{ className?: string; error?: string; scenario?: string; stack?: string }> = ({ className, error, scenario, stack }) => {

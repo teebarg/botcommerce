@@ -3,19 +3,20 @@
 import React from "react";
 import { Mail, ArrowLeft, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export default function VerifyRequestPage() {
     return (
-        <div className="w-full max-w-2xl">
-            <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 border border-emerald-100">
+        <div>
+            <div className="p-4 md:p-8">
                 <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-6">
-                        <Mail className="text-emerald-600" size={32} />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-full mb-6">
+                        <Mail className="text-accent" size={24} />
                     </div>
 
-                    <h2 className="text-3xl font-bold text-gray-800 mb-4">Check your email</h2>
+                    <h2 className="text-2xl font-bold text-default-800 mb-3">Check your email</h2>
 
-                    <p className="text-gray-600 mb-2">We&apos;ve sent a magic link to your email</p>
+                    <p className="text-default-500 mb-2">We&apos;ve sent a magic link to your email</p>
 
                     <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-8">
                         <div className="flex items-start gap-3">
@@ -36,9 +37,11 @@ export default function VerifyRequestPage() {
                 </div>
             </div>
 
-            <div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-                <h3 className="font-medium text-gray-800 mb-2">Having trouble?</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
+            <Separator />
+
+            <div className="mt-6 bg-secondary rounded-lg p-4">
+                <h3 className="font-medium text-default-800 mb-2">Having trouble?</h3>
+                <ul className="text-sm text-default-500 space-y-1">
                     <li>• Check your spam or junk folder</li>
                     <li>• Make sure the email address is correct</li>
                     <li>• Try resending the link if it&apos;s been a few minutes</li>

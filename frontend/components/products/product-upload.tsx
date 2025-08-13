@@ -5,10 +5,9 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 
 import { useWebSocket } from "@/providers/websocket";
-import { getCookie } from "@/lib/util/server-utils";
 import { Button } from "@/components/ui/button";
-import { tryCatchApi } from "@/lib/try-catch";
-import { api } from "@/apis/client2";
+import { tryCatch } from "@/lib/try-catch";
+import { api } from "@/apis/client";
 import { Message } from "@/schemas";
 
 interface ProductUploadProps {}
@@ -31,7 +30,7 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
 
     const handleSyncProducts = async () => {
         setIsSyncing(true);
-        const { error } = await tryCatchApi<Message>(api.post("/product/upload-products/"));
+        const { error } = await tryCatch<Message>(api.post("/product/upload-products/"));
 
         if (error) {
             toast.error(error);
@@ -59,13 +58,11 @@ const ProductUpload: React.FC<ProductUploadProps> = () => {
 
             void (async () => {
                 const toastId = toast.loading("Uploading products...");
-                const accessToken = await getCookie("access_token");
 
                 try {
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/product/upload-products/`, {
+                    const response = await fetch("/api/product-upload", {
                         method: "POST",
                         body: formData,
-                        headers: { "X-Auth": accessToken ?? "" },
                     });
 
                     if (!response.ok) {

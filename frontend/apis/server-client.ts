@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { getCookie } from "@/lib/util/server-utils";
 
 const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
@@ -6,7 +7,8 @@ type RequestOptions = RequestInit & {
     params?: Record<string, string | number>;
 };
 
-async function request<T>(endpoint: string, options: RequestOptions = {}) {
+async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    const session = await auth();
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -18,24 +20,34 @@ async function request<T>(endpoint: string, options: RequestOptions = {}) {
         });
     }
 
-    const token = await getCookie("access_token");
     const cartId = await getCookie("_cart_id");
 
     const headers = {
         "Content-Type": "application/json",
-        "X-Auth": token ?? "token222",
+        "X-Auth": session?.accessToken ?? "token",
         cartId: cartId ?? "",
         ...options.headers,
     };
 
-    return fetch(url, {
+    const response = await fetch(url, {
         ...restOptions,
         headers,
         credentials: "include",
     });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            // window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        }
+        const error = await response.json();
+
+        throw new Error(error.detail || error.message || `API Error: ${response.statusText}`);
+    }
+
+    return response.json();
 }
 
-export const api = {
+export const serverApi = {
     get: <T>(endpoint: string, options?: RequestOptions) => request<T>(endpoint, { ...options, method: "GET" }),
 
     post: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>

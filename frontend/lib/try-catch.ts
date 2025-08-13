@@ -27,32 +27,3 @@ export async function tryCatch<T, E = string>(promise: Promise<T>): Promise<Resu
         return { data: null, error: (err as Error).message || "An error occurred" };
     }
 }
-
-export async function tryCatchApi<T>(promise: Promise<Response>, callbackUrl?: string): Promise<Result<T>> {
-    try {
-        const response = await promise;
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                deleteCookie("access_token");
-                redirect(`/sign-in${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`);
-            }
-
-            const error = await response.json();
-
-            return {
-                data: null,
-                error: error.message || error.detail || response.statusText,
-            };
-        }
-
-        const data = await response.json();
-
-        return { data, error: null };
-    } catch (err) {
-        return {
-            data: null,
-            error: "An unknown error occurred",
-        };
-    }
-}

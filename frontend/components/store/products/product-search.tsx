@@ -118,13 +118,12 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
     const showSuggestions = isOpen;
 
     return (
-        <div ref={dropdownRef} className={cn("relative w-full max-w-2xl", className)}>
+        <div ref={dropdownRef} className={cn("relative w-full max-w-xl", className)}>
             <div className="relative">
                 <div
                     className={cn(
                         "relative flex items-center rounded-xl border transition-all duration-200",
-                        "bg-search-background border-search-border",
-                        "hover:border-primary/30 hover:shadow-[var(--shadow-search)]",
+                        "bg-search-background border-search-border hover:border-primary/30 hover:shadow-[var(--shadow-search)]",
                         isOpen && "border-primary shadow-[var(--shadow-search)] bg-search-focus"
                     )}
                 >
@@ -132,7 +131,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                     <input
                         ref={inputRef}
                         className={cn(
-                            "w-full pl-12 pr-12 py-4 bg-transparent border-0 outline-0",
+                            "w-full pl-12 pr-12 py-2.5 bg-transparent border-0 outline-0",
                             "text-foreground placeholder:text-muted-foreground",
                             "transition-all duration-200"
                         )}
@@ -164,7 +163,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                     ref={dropdownRef}
                     className={cn(
                         "absolute top-full left-0 right-0 mt-2 z-50",
-                        "bg-search-background border border-search-border rounded-xl",
+                        "bg-background border border-search-border rounded-xl",
                         "shadow-lg backdrop-blur-sm max-h-[60vh] overflow-y-auto"
                     )}
                 >
@@ -220,7 +219,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                                 )}
 
                                 {showSuggestions && (
-                                    <div className={`p-2 border-default-700 ${data?.products?.length ? "border-t" : ""}`}>
+                                    <div className={`p-2 border-divider ${data?.products?.length ? "border-t" : ""}`}>
                                         <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide flex items-center gap-2 text-default-500">
                                             <Clock className="w-3 h-3" />
                                             Suggestions
@@ -228,7 +227,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                                         {data?.suggestions.map((suggestion: string, idx: number) => (
                                             <button
                                                 key={idx}
-                                                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-150 text-left"
+                                                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-150 text-left text-sm"
                                                 onClick={() => handleSuggestionClick(suggestion)}
                                             >
                                                 <Search className="w-4 h-4 flex-shrink-0 opacity-50" />

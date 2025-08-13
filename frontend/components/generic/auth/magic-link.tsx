@@ -5,11 +5,11 @@ import { Input } from "@components/ui/input";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { Mail } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { Separator } from "@/components/ui/separator";
-import { authApi } from "@/apis/auth";
 
 type Props = {
     callbackUrl?: string;
@@ -20,24 +20,19 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const searchParams = useSearchParams();
 
-    const sendLink = async () => {
+    const handleEmailSignIn = async (e: React.FormEvent) => {
+        e.preventDefault();
         if (!email) {
             toast.error("Please enter a valid email");
 
             return;
         }
         setLoading(true);
-        const { data, error } = await authApi.requestMagicLink(email, (callbackUrl || searchParams.get("callbackUrl")) ?? "/");
 
-        if (error) {
-            toast.error(error);
-            setLoading(false);
-
-            return;
-        }
-
-        toast.success(data?.message);
-        setLoading(false);
+        await signIn("http-email", {
+            email,
+            callbackUrl: callbackUrl || searchParams.get("callbackUrl") || "/",
+        });
     };
 
     return (
@@ -62,7 +57,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     isLoading={loading}
                     type="button"
                     variant="primary"
-                    onClick={sendLink}
+                    onClick={handleEmailSignIn}
                 >
                     Send Magic Link
                 </Button>

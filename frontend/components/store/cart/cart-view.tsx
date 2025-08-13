@@ -13,6 +13,7 @@ import { CartItem } from "@/schemas";
 import CartPageDetails from "@/components/store/cart/cart-page-details";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";
+import ClientOnly from "@/components/generic/client-only";
 
 interface Props {}
 
@@ -38,7 +39,7 @@ const CartView: React.FC<Props> = () => {
     const product_ids = cart?.items?.map((x: CartItem) => x.variant_id);
 
     return (
-        <div>
+        <ClientOnly>
             <SummaryMobile cart={cart} />
             <div className="py-0 md:py-12">
                 <PromotionalBanner
@@ -65,7 +66,7 @@ const CartView: React.FC<Props> = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </ClientOnly>
     );
 };
 

@@ -5,9 +5,9 @@ import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
 import { PaginatedProductSearch } from "@/schemas";
-import { api } from "@/apis/client2";
-import { tryCatchApi } from "@/lib/try-catch";
+import { tryCatch } from "@/lib/try-catch";
 import ServerError from "@/components/generic/server-error";
+import { serverApi } from "@/apis/server-client";
 
 type SearchParams = Promise<{
     sortBy?: SortOptions;
@@ -39,7 +39,7 @@ export default async function Collections({ searchParams }: Props) {
         brand_id: brand_id,
     };
 
-    const { data, error } = await tryCatchApi<PaginatedProductSearch>(api.get("/product/search", { params: { page: 1, ...queryParams } }));
+    const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { page: 1, ...queryParams } }));
 
     if (error) {
         return <ServerError error={error} scenario="server" stack="Collections" />;

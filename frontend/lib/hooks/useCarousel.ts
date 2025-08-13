@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { api as api2 } from "@/apis/client2";
 import { CarouselBanner, ImageUpload, Message } from "@/schemas";
 
 export const useCarouselBanners = () => {
@@ -75,7 +74,7 @@ export const useUploadCarouselImage = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: ImageUpload }) => await api2.patch<CarouselBanner>(`/carousel/${id}/image`, data),
+        mutationFn: async ({ id, data }: { id: number; data: ImageUpload }) => await api.patch<CarouselBanner>(`/carousel/${id}/image`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["carousel-banners"] });
             toast.success("Image uploaded");

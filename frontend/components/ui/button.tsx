@@ -24,7 +24,7 @@ const buttonVariants = cva(
                 emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
                 bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500 hover:text-white",
                 borderedSecondary: "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary-500 hover:text-white",
-                indigo: "bg-indigo-700 text-white hover:bg-indigo-800",
+                indigo: "bg-indigo-500 text-white hover:bg-indigo-600",
                 luxury: "bg-luxury text-luxury-foreground hover:bg-luxury/90 shadow-luxury transition-all duration-300 transform hover:scale-105",
                 accent: "bg-gradient-accent text-accent-foreground transition-all duration-300 transform hover:scale-105 font-semibold",
                 hero: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant transition-all duration-500 transform hover:scale-110 hover:shadow-luxury border border-border/20",

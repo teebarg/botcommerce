@@ -10,7 +10,6 @@ import UserDropDown from "./user-dropdown";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
-// import { auth } from "@/actions/auth";
 import { getSiteConfig } from "@/lib/config";
 import { auth } from "@/auth";
 

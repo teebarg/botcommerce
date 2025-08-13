@@ -5,10 +5,10 @@ import React, { Suspense } from "react";
 import { SortOptions } from "@/types/models";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { CollectionTemplateSkeleton } from "@/components/store/collections/skeleton";
-import { api } from "@/apis/client2";
 import { Collection, PaginatedProductSearch } from "@/schemas";
-import { tryCatchApi } from "@/lib/try-catch";
+import { tryCatch } from "@/lib/try-catch";
 import ServerError from "@/components/generic/server-error";
+import { serverApi } from "@/apis/server-client";
 
 type Params = Promise<{ slug: string }>;
 
@@ -22,7 +22,7 @@ type SearchParams = Promise<{
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: collection } = await tryCatchApi<Collection>(api.get(`/collection/slug/${slug}`));
+    const { data: collection } = await tryCatch<Collection>(serverApi.get(`/collection/slug/${slug}`));
 
     if (!collection) {
         notFound();
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
     const { minPrice, maxPrice, brand_id, cat_ids, sortBy } = (await searchParams) || {};
     const { slug } = await params;
-    const { data: collection } = await tryCatchApi<Collection>(api.get(`/collection/slug/${slug}`));
+    const { data: collection } = await tryCatch<Collection>(serverApi.get(`/collection/slug/${slug}`));
 
     if (!collection) {
         notFound();
@@ -50,7 +50,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
         brand_id: brand_id,
     };
 
-    const { data, error } = await tryCatchApi<PaginatedProductSearch>(api.get("/product/search", { params: { page: 1, ...queryParams } }));
+    const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { page: 1, ...queryParams } }));
 
     if (error) {
         return <ServerError error={error} scenario="server" stack={`/collections/${slug}`} />;

@@ -11,6 +11,7 @@ import ThemeButton from "@/lib/theme/theme-button";
 import { useAuth } from "@/providers/auth-provider";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { signOut } from "next-auth/react";
 
 interface NavLinkProp {
     href: string;
@@ -34,8 +35,9 @@ const Menu: React.FC = () => {
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
         await authApi.logOut();
+        await signOut();
         invalidate();
-        window.location.href = "/";
+        // window.location.href = "/";
     };
 
     return (

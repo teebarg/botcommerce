@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { api } from "@/apis/client2";
-import { tryCatchApi } from "@/lib/try-catch";
+import { api } from "@/apis/client";
+import { tryCatch } from "@/lib/try-catch";
 import { UserInteraction } from "@/schemas";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ const AnalyticsDashboard: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const { data, error } = await tryCatchApi<UserInteraction[]>(api.get("/user-interactions"));
+            const { data, error } = await tryCatch<UserInteraction[]>(api.get("/user-interactions"));
 
             setLoading(false);
             if (error) {

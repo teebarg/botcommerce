@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { signOut } from "next-auth/react";
 
 const AccountNav = () => {
     const route = usePathname();
@@ -15,6 +16,7 @@ const AccountNav = () => {
 
     const handleLogout = async () => {
         await authApi.logOut();
+        await signOut();
         invalidate();
         window.location.href = "/";
     };

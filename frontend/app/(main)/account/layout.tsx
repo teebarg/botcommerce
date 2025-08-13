@@ -4,10 +4,10 @@ import { Package, User } from "nui-react-icons";
 import { MapPin } from "lucide-react";
 
 import RecommendedProducts from "@/components/store/products/recommended";
-import AccountNav from "@/modules/account/components/account-nav";
 import LocalizedClientLink from "@/components/ui/link";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/providers/auth-provider";
+import AccountNav from "@/components/layout/account-nav";
 
 const navLinks = [
     {
@@ -41,7 +41,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
 
     return (
         <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">
-            <div className="bg-primary text-white p-6 md:hidden">
+            <div className="bg-secondary text-secondary-foreground p-6 md:hidden">
                 <div className="flex items-center gap-4">
                     <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
                         <User className="h-10 w-10" />
@@ -50,7 +50,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
                         <h1 className="text-xl font-bold">
                             {user?.first_name} {user?.last_name}
                         </h1>
-                        <p className="text-blue-100">{user?.email}</p>
+                        <p className="">{user?.email}</p>
                     </div>
                 </div>
             </div>

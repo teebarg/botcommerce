@@ -48,7 +48,7 @@ export default function UserDropDown({ user }: { user: Session }) {
             dataKey: "account",
             child: (
                 <button aria-label="log out" className="text-red-500 cursor-pointer" data-testid="logout-button" type="button" onClick={handleLogout}>
-                    Log out222
+                    Log out
                 </button>
             ),
         },
