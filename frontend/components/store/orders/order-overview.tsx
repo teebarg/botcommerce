@@ -3,7 +3,7 @@
 import { CheckCircle, Package, Calendar, Clock, RefreshCw, X, Truck } from "lucide-react";
 
 import { Order, OrderStatus } from "@/schemas";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 const OrderOverview = ({ order }: { order: Order }) => {
     const isPending = order.payment_status === "PENDING";
@@ -57,7 +57,7 @@ const OrderOverview = ({ order }: { order: Order }) => {
     };
 
     return (
-        <div className="bg-accent/10 rounded-lg p-6 space-y-4 mb-4">
+        <div className={cn("bg-secondary/70 rounded-lg p-6 space-y-4 mb-4")}>
             <h3 className="text-xl font-semibold">Order Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                 <div className="space-y-2">

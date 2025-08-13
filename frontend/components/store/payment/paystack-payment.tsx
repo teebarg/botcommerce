@@ -22,6 +22,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
     const handlePayment = async () => {
         setLoading(true);
         const { data, error } = await tryCatch<PaymentInitialize>(api.post(`/payment/initialize/${cartNumber}`));
+        setLoading(false);
 
         if (error) {
             toast.error(error);
@@ -34,7 +35,6 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
             return;
         }
         window.location.href = data?.authorization_url ?? "/";
-        setLoading(false);
     };
 
     return (

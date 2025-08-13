@@ -33,35 +33,39 @@ class PaymentCreate(BaseModel):
 async def initialize_payment(cart: Cart, user: User) -> PaymentInitialize:
     """Initialize a Paystack payment"""
     async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{PAYSTACK_BASE_URL}/transaction/initialize",
-            json={
-                "email": user.email,
-                # "amount": int(cart.total * 100),  # Convert to kobo
-                "amount": 500,  # Convert to kobo
-                "reference": f"CART-{cart.id}-{datetime.now().timestamp()}",
-                "callback_url": f"{settings.FRONTEND_HOST}/payment/verify",
-                "metadata": {
-                    "cart_number": cart.cart_number,
-                    "user_id": user.id,
-                    "cart_id": cart.id,
+        try:
+            response = await client.post(
+                f"{PAYSTACK_BASE_URL}/transaction/initialize",
+                json={
+                    "email": user.email,
+                    # "amount": int(cart.total * 100),  # Convert to kobo
+                    "amount": 500,  # Convert to kobo
+                    "reference": f"CART-{cart.id}-{datetime.now().timestamp()}",
+                    "callback_url": f"{settings.FRONTEND_HOST}/payment/verify",
+                    "metadata": {
+                        "cart_number": cart.cart_number,
+                        "user_id": user.id,
+                        "cart_id": cart.id,
+                    }
+                },
+                headers={
+                    "Authorization": f"Bearer {PAYSTACK_SECRET_KEY}",
+                    "Content-Type": "application/json",
                 }
-            },
-            headers={
-                "Authorization": f"Bearer {PAYSTACK_SECRET_KEY}",
-                "Content-Type": "application/json",
-            }
-        )
+            )
 
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to initialize payment")
+            if response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Failed to initialize payment")
 
-        data = response.json()
-        return PaymentInitialize(
-            authorization_url=data["data"]["authorization_url"],
-            reference=data["data"]["reference"],
-            access_code=data["data"]["access_code"],
-        )
+            data = response.json()
+            return PaymentInitialize(
+                authorization_url=data["data"]["authorization_url"],
+                reference=data["data"]["reference"],
+                access_code=data["data"]["access_code"],
+            )
+        except Exception as e:
+            logger.error(f"Failed to initialize payment: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Failed to initialize payment: {str(e)}")
 
 @router.post("/initialize/{cart_number}", response_model=PaymentInitialize)
 async def create_payment(
