@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
-import { signIn } from "next-auth/react";
 
 type Props = {
     callbackUrl?: string;

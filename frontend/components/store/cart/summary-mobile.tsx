@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { currency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Cart, CartItem } from "@/schemas";
-import { ChevronDown, X } from "lucide-react";
 
 type SummaryProps = {
     cart: Cart;

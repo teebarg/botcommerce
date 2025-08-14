@@ -12,6 +12,7 @@ import { ProductVariantSelection } from "@/components/product/product-variant-se
 import { Product } from "@/schemas/product";
 import { useAuth } from "@/providers/auth-provider";
 import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
+import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 
 interface Props {
     product: Product;
@@ -109,7 +110,10 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 <div className="flex flex-col px-2 md:px-0 mt-6 md:mt-0">
                     <div className="flex items-center justify-between">
                         <h1 className="text-xl font-bold tracking-tight">{product.name}</h1>
-                        <ProductShare name={product.name} />
+                        <div className="flex items-center gap-2">
+                            <ProductCollectionIndicator product={product} />
+                            <ProductShare name={product.name} />
+                        </div>
                     </div>
                     <div className={cn("text-4xl font-bold", selectedVariant ? "hidden md:block" : "hidden")}>{currency(selectedVariant?.price)}</div>
                     <div className={cn("bg-orange-800 py-4 px-4 md:hidden -mx-2 mb-4 mt-2", selectedVariant ? "" : "hidden")}>

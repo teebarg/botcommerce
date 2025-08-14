@@ -1,7 +1,3 @@
-import { redirect } from "next/navigation";
-
-import { deleteCookie } from "@/lib/util/cookie";
-
 // Types for the result object with discriminated union
 type Success<T> = {
     data: T;

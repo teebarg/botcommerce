@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ArrowUpDown, Search } from "lucide-react";
 
 import BrandItem from "./brand-item";
 
@@ -13,7 +14,6 @@ import { BrandActions } from "@/components/admin/brands/brand-actions";
 import { CreateBrand } from "@/components/admin/brands/create-brand";
 import { useBrands } from "@/lib/hooks/useBrand";
 import { TableSkeleton } from "@/components/ui/skeletons";
-import { ArrowUpDown, Search } from "lucide-react";
 
 const BrandView: React.FC = () => {
     const { data: brands, isLoading, error } = useBrands();

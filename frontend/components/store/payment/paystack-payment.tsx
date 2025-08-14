@@ -22,6 +22,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
     const handlePayment = async () => {
         setLoading(true);
         const { data, error } = await tryCatch<PaymentInitialize>(api.post(`/payment/initialize/${cartNumber}`));
+
         setLoading(false);
 
         if (error) {

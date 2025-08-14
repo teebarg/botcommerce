@@ -161,7 +161,9 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter first name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{field.value || "Not set"}</div>
+                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">
+                                                            {field.value || "Not set"}
+                                                        </div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />
@@ -179,7 +181,9 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter last name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{field.value || "Not set"}</div>
+                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">
+                                                            {field.value || "Not set"}
+                                                        </div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />

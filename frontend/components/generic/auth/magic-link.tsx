@@ -42,7 +42,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     required
                     className="bg-content2"
                     data-testid="email-input"
-                    label="Email"
+                    label="Email address"
                     name="email"
                     placeholder="Enter your email address"
                     startContent={<Mail className="text-default-500" />}
@@ -55,10 +55,10 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     className="w-full mt-6"
                     data-testid="magic-link-button"
                     isLoading={loading}
+                    size="md"
                     type="button"
                     variant="primary"
                     onClick={handleEmailSignIn}
-                    size="md"
                 >
                     Send Magic Link
                 </Button>

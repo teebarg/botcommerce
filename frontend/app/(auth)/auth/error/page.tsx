@@ -3,6 +3,7 @@
 import React from "react";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -72,7 +73,7 @@ export default function ErrorPage() {
                     <p className="text-sm text-default-500 mb-8">{errorContent.details}</p>
 
                     <div className="space-y-4">
-                        <Button variant="emerald" onClick={() => window.history.back()} className="w-full">
+                        <Button className="w-full" variant="emerald" onClick={() => window.history.back()}>
                             <ArrowLeft size={16} />
                             Back to sign in
                         </Button>
@@ -85,7 +86,7 @@ export default function ErrorPage() {
             <div className="mt-6 text-center">
                 <p className="text-sm text-default-500">
                     Still having trouble?{" "}
-                    <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`} className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    <a className="text-emerald-600 hover:text-emerald-700 font-medium" href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}>
                         Contact support
                     </a>
                 </p>

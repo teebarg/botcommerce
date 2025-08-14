@@ -2,10 +2,10 @@ import NextAuth, { DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
 import { Redis } from "@upstash/redis";
+import { SignJWT } from "jose";
 
 import { Message, Role, Status, User } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import { SignJWT } from "jose";
 import { serverApi } from "@/apis/server-client";
 
 const redis = new Redis({

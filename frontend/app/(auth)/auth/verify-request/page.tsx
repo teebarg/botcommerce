@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Mail, ArrowLeft, Clock } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -29,7 +30,7 @@ export default function VerifyRequestPage() {
                     </div>
 
                     <div className="space-y-4">
-                        <Button variant="emerald" size="lg" onClick={() => window.history.back()} className="w-full">
+                        <Button className="w-full" size="lg" variant="emerald" onClick={() => window.history.back()}>
                             <ArrowLeft size={16} />
                             Back to sign in
                         </Button>

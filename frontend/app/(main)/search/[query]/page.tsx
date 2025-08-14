@@ -37,7 +37,9 @@ export default async function SearchResults({ params, searchParams }: { params: 
         brand_id: brand_id,
     };
 
-    const { data: initialData, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { page: 1, ...queryParams } }));
+    const { data: initialData, error } = await tryCatch<PaginatedProductSearch>(
+        serverApi.get("/product/search", { params: { page: 1, ...queryParams } })
+    );
 
     if (error) {
         return <ServerError error={error} scenario="server" stack="SearchResults" />;

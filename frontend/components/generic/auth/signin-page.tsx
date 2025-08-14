@@ -3,12 +3,14 @@
 import { Mail } from "lucide-react";
 import Link from "next/link";
 
-import { Separator } from "@/components/ui/separator";
 import { MagicLinkForm } from "./magic-link";
+
+import { Separator } from "@/components/ui/separator";
+import ClientOnly from "@/components/generic/client-only";
 
 export default function SignInPage() {
     return (
-        <div>
+        <ClientOnly>
             <div className="p-2 md:p-4">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-accent/10 rounded-full mb-4">
@@ -44,6 +46,6 @@ export default function SignInPage() {
                     </Link>
                 </p>
             </div>
-        </div>
+        </ClientOnly>
     );
 }
