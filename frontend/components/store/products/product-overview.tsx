@@ -12,6 +12,7 @@ import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
 import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { useAuth } from "@/providers/auth-provider";
+import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -173,15 +174,18 @@ const ProductOverview: React.FC<{
                             </p>
                         )}
                     </div>
-                    <button
-                        className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            isLiked ? removeWishlist() : addWishlist();
-                        }}
-                    >
-                        <Heart className={`w-6 h-6 ${isLiked ? "text-red-500 fill-current" : "text-default-600"}`} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <ManageSlate product={product} />
+                        <button
+                            className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                isLiked ? removeWishlist() : addWishlist();
+                            }}
+                        >
+                            <Heart className={`w-6 h-6 ${isLiked ? "text-red-500 fill-current" : "text-default-600"}`} />
+                        </button>
+                    </div>
                 </div>
 
                 <div>

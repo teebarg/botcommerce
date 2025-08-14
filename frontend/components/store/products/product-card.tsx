@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import { ProductSearch } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
+import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -49,6 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }
 
                 <div className="absolute top-4 left-2 right-4 flex items-start justify-between">
                     <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
+                    <ProductCollectionIndicator product={product} />
                 </div>
 
                 <div className="absolute top-4 right-4 flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
@@ -73,6 +76,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }
                 )}
 
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white md1:transform md1:translate-y-full md1:group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="flex justify-end mb-4">
+                        <ManageSlate product={product} />
+                    </div>
                     <div className="space-y-3">
                         <div className="flex gap-2 items-center justify-between">
                             <div>

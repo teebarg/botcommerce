@@ -1,5 +1,6 @@
-import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+
+import { auth } from "@/auth";
 
 export async function POST(req: Request) {
     const session = await auth();
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
 
     if (!backendRes.ok) {
         const errorText = await backendRes.text();
+
         return NextResponse.json({ error: errorText || "Failed to upload products" }, { status: backendRes.status });
     }
 

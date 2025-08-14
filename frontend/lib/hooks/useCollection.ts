@@ -130,3 +130,35 @@ export const useDeleteSharedCollection = () => {
         },
     });
 };
+
+export const useAddProductToSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
+            await api.post<{ message: string }>(`/shared/${collectionId}/add-product/${productId}`),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Product added to collection successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to add product to collection: " + error);
+        },
+    });
+};
+
+export const useRemoveProductFromSharedCollection = () => {
+    const invalidate = useInvalidate();
+
+    return useMutation({
+        mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
+            await api.delete<{ message: string }>(`/shared/${collectionId}/remove-product/${productId}`),
+        onSuccess: () => {
+            invalidate("shared-collections");
+            toast.success("Product removed from collection successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to remove product from collection: " + error);
+        },
+    });
+};

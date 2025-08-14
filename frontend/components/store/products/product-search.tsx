@@ -9,9 +9,11 @@ import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useAuth } from "@/providers/auth-provider";
 import { cn, currency } from "@/lib/utils";
 import { useProductRecommendations, useProductSearch } from "@/lib/hooks/useProduct";
+import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 
 const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: ProductSearch) => void }> = ({ product, onProductSelect }) => {
     const { priceInfo } = useProductVariant(product);
+    const { user } = useAuth();
 
     return (
         <div
@@ -39,6 +41,12 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
                     )}
                 </div>
             </div>
+
+            {user?.role === "ADMIN" && (
+                <div onClick={(e) => e.stopPropagation()}>
+                    <ManageSlate product={product} />
+                </div>
+            )}
         </div>
     );
 };

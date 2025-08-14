@@ -163,6 +163,7 @@ async def create_shared_collection(data: SharedCollectionCreate, cache: RedisCli
         create_data["products"] = {"connect": product_connect}
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
+
     await cache.invalidate_list_cache("shared")
     return res
 
@@ -177,6 +178,7 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate, cache:
         product_connect = [{"id": id} for id in data.products]
         update_data["products"] = {"set": product_connect}
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
+
     await cache.invalidate_list_cache("shared")
     await cache.bust_tag(f"sharedcollection:{obj.slug}")
     return res
@@ -187,6 +189,65 @@ async def delete_shared_collection(id: int, cache: RedisClient) -> Message:
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
     await db.sharedcollection.delete(where={"id": id})
+
     await cache.invalidate_list_cache("shared")
     await cache.bust_tag(f"sharedcollection:{obj.slug}")
     return {"message": "SharedCollection deleted successfully"}
+
+@router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])
+async def add_product_to_shared_collection(id: int, product_id: int, cache: RedisClient) -> Message:
+    """Add a product to a shared collection"""
+    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
+    if not shared_collection:
+        raise HTTPException(status_code=404, detail="SharedCollection not found")
+
+    product = await db.product.find_unique(where={"id": product_id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    existing_product = await db.sharedcollection.find_first(
+        where={
+            "id": id,
+            "products": {
+                "some": {"id": product_id}
+            }
+        }
+    )
+
+    if existing_product:
+        raise HTTPException(status_code=400, detail="Product is already in this collection")
+
+    await db.sharedcollection.update(
+        where={"id": id},
+        data={
+            "products": {
+                "connect": {"id": product_id}
+            }
+        }
+    )
+
+    await cache.invalidate_list_cache("shared")
+    await cache.bust_tag(f"sharedcollection:{shared_collection.slug}")
+
+    return {"message": "Product added to collection successfully"}
+
+@router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(get_current_superuser)])
+async def remove_product_from_shared_collection(id: int, product_id: int, cache: RedisClient) -> Message:
+    """Remove a product from a shared collection"""
+    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
+    if not shared_collection:
+        raise HTTPException(status_code=404, detail="SharedCollection not found")
+
+    await db.sharedcollection.update(
+        where={"id": id},
+        data={
+            "products": {
+                "disconnect": {"id": product_id}
+            }
+        }
+    )
+
+    await cache.invalidate_list_cache("shared")
+    await cache.bust_tag(f"sharedcollection:{shared_collection.slug}")
+
+    return {"message": "Product removed from collection successfully"}

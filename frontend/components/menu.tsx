@@ -3,6 +3,7 @@
 import React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,6 @@ import ThemeButton from "@/lib/theme/theme-button";
 import { useAuth } from "@/providers/auth-provider";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
-import { signOut } from "next-auth/react";
 
 interface NavLinkProp {
     href: string;

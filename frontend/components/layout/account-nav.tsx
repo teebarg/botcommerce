@@ -2,12 +2,12 @@
 
 import { usePathname } from "next/navigation";
 import { MapPin, Package, User } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
-import { signOut } from "next-auth/react";
 
 const AccountNav = () => {
     const route = usePathname();
