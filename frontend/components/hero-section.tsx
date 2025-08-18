@@ -13,7 +13,7 @@ const HeroSection: React.FC = () => {
     return (
         <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
-                <Image alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" sizes="100vw" src={heroImage} priority />
+                <Image priority alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" sizes="100vw" src={heroImage} />
                 <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent dark:from-background/85 dark:via-background/40" />
             </div>
 
