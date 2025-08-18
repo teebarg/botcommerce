@@ -116,7 +116,7 @@ self.addEventListener("push", function (event) {
                 subscriberId: data.subscriberId,
                 eventType: "DELIVERED",
                 platform: navigator.platform,
-                deviceType: "WEB",
+                deviceType: getDeviceType(),
                 userAgent: navigator.userAgent,
                 notificationId: data.notificationId,
                 deliveredAt: new Date(),
@@ -154,15 +154,15 @@ self.addEventListener("notificationclick", function (event) {
 
 self.addEventListener("notificationclick", (event) => {
     const data = event.notification.data;
-
+    
     fetch("/api/push-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             subscriberId: data.subscriberId,
-            eventType: "CLICKED",
+            eventType: event.action === "view" ? "OPENED" : "DISMISSED",
             platform: navigator.platform,
-            deviceType: "WEB",
+            deviceType: getDeviceType(),
             userAgent: navigator.userAgent,
             notificationId: data.notificationId,
             readAt: new Date(),
@@ -176,3 +176,21 @@ self.addEventListener("message", (event) => {
         self.skipWaiting();
     }
 });
+
+function getDeviceType() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+
+    if (/iPad|iPhone|iPod/.test(ua) && !("MSStream" in window)) {
+        return "IOS";
+    }
+
+    if (/android/i.test(ua)) {
+        return "ANDROID";
+    }
+
+    if (/Macintosh|Windows|Linux/.test(ua)) {
+        return "DESKTOP";
+    }
+
+    return "WEB";
+}

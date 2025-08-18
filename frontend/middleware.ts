@@ -1,23 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { authMiddleware } from "./middlewares/authMiddleware";
+import { auth } from "@/auth";
 
-/**
- * Main middleware handler
- */
-export async function middleware(request: NextRequest) {
-    // Run authMiddleware only for protected routes
-    const protectedRoutes = ["/sign-in", "/sign-up", "/account", "/admin", "/wishlist"];
+const AUTH_PATHS = new Set<string>(["/auth/signin", "/auth/error", "/auth/verify-request"]);
 
-    if (protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))) {
-        const authResponse = await authMiddleware(request);
+export default async function middleware(req: NextRequest) {
+    const { pathname } = req.nextUrl;
+    const session = await auth();
 
-        if (authResponse) return authResponse;
+    if (AUTH_PATHS.has(pathname)) {
+        if (session) {
+            const origin = new URL("/", req.nextUrl.origin);
+            return NextResponse.redirect(origin);
+        }
+        return NextResponse.next();
     }
 
+    if (!session) {
+        const signInUrl = new URL("/auth/signin", req.nextUrl.origin);
+        signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
+        return NextResponse.redirect(signInUrl);
+    }
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/:path*"], // Apply middleware to all routes
+    matcher: ["/account", "/account/:path*", "/auth/:path*", "/admin", "/admin/:path*", "/wishlist"],
 };
