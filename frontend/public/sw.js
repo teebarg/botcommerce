@@ -1,5 +1,5 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "botmerce-cache-v6";
+const CACHE_NAME = "botcommerce-cache-v1";
 const ASSETS_TO_CACHE = [
     // "/", // Root URL
     "/careers",
@@ -154,6 +154,7 @@ self.addEventListener("notificationclick", function (event) {
 
 self.addEventListener("notificationclick", (event) => {
     const data = event.notification.data;
+
     fetch("/api/push-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

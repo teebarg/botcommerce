@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, X, Clock, TrendingUp, Star } from "lucide-react";
 import { useDebounce } from "use-debounce";
+import Image from "next/image";
 
 import { ProductSearch } from "@/schemas";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
@@ -21,9 +22,11 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
             onClick={() => onProductSelect?.(product)}
         >
             <div className="relative w-12 h-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                <img
+                <Image
+                    fill
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    className="object-cover group-hover:scale-105 transition-transform duration-200"
+                    sizes="48px"
                     src={product.images[0] || product.image || "/placeholder.jpg"}
                 />
             </div>
