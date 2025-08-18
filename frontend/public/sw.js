@@ -100,7 +100,7 @@ self.addEventListener("push", function (event) {
             ],
             vibrate: [200, 100, 200],
             data: {
-                url: data.path || "/",
+                url: data.data.actionUrl || data.path || "/",
                 dateOfArrival: Date.now(),
                 primaryKey: "2",
                 subscriberId: data.subscriberId,

@@ -115,7 +115,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             return session;
         },
     },
-    debug: true,
 });
 
 async function generateJoseToken(email: string) {
