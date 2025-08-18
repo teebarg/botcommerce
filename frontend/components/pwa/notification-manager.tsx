@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
-import { saveSubscription } from "./actions";
+import { saveSubscription, syncSubscription } from "./actions";
 
 import { Button } from "@/components/ui/button";
 
@@ -77,9 +77,10 @@ const PushNotificationManager: React.FC = () => {
 
     async function requestNotificationPermission() {
         if ("Notification" in window) {
-            const permission = await Notification.requestPermission();
+            // const permission = await Notification.requestPermission();
 
-            return permission === "granted";
+            // return permission === "granted";
+            return true;
         }
 
         return false;
@@ -100,6 +101,12 @@ const PushNotificationManager: React.FC = () => {
             return;
         }
 
+        await syncSubscription({
+            endpoint: sub.endpoint,
+            p256dh: sub.toJSON().keys?.p256dh || "",
+            auth: sub.toJSON().keys?.auth || "",
+        });
+
         setSubscription(sub);
     }
 
@@ -119,7 +126,7 @@ const PushNotificationManager: React.FC = () => {
         const permissionGranted = await requestNotificationPermission();
 
         if (!permissionGranted) {
-            // toast.error("Please grant notification permission");
+            toast.error("Please grant notification permission");
 
             return;
         }

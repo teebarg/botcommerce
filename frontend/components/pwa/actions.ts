@@ -6,14 +6,14 @@ interface PushSubscriptionData {
     auth: string;
 }
 
-export async function getSubscription(endpoint: string) {
+export async function saveSubscription(subscriptionData: PushSubscriptionData) {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}?q=${endpoint}`, {
-            method: "GET",
+        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}/api/subscription`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ endpoint }),
+            body: JSON.stringify({ ...subscriptionData, group: "bot" }),
         });
 
         if (!response.ok) {
@@ -28,9 +28,9 @@ export async function getSubscription(endpoint: string) {
     }
 }
 
-export async function saveSubscription(subscriptionData: PushSubscriptionData) {
+export async function syncSubscription(subscriptionData: PushSubscriptionData) {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}/api/subscription`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_NOTIFICATION_URL}/api/subscription/sync`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
