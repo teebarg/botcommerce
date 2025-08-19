@@ -33,11 +33,11 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
                     <h3 className="font-medium text-default-900">Shipping Address</h3>
                     <div className="mt-1 text-sm text-default-600">
                         <p>
-                            {order.shipping_address.first_name} {order.shipping_address.last_name}
+                            {order.shipping_address?.first_name} {order.shipping_address?.last_name}
                         </p>
-                        <p>{order.shipping_address.address_1}</p>
+                        <p>{order.shipping_address?.address_1}</p>
                         <p>
-                            {order.shipping_address.city}, {order.shipping_address.state}
+                            {order.shipping_address?.city}, {order.shipping_address?.state}
                         </p>
                     </div>
                 </div>

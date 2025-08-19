@@ -46,7 +46,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">
-                        <DialogTitle>Delete {user.first_name}</DialogTitle>
+                        <DialogTitle>Delete {user?.first_name}</DialogTitle>
                     </DialogHeader>
                     <Confirm onClose={deleteState.close} onConfirm={onDelete} />
                 </DialogContent>

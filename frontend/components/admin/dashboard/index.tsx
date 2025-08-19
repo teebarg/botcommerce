@@ -72,7 +72,7 @@ const RecentOrdersList = () => {
                                 <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{idx + 1}</TableCell>
                                 <TableCell className="whitespace-nowrap px-3 py-4 text-sm">{order.order_number}</TableCell>
                                 <TableCell className="font-medium">
-                                    {order.user.first_name} {order.user.last_name}
+                                    {order.user?.first_name} {order.user?.last_name}
                                 </TableCell>
                                 <TableCell>{currency(order.total)}</TableCell>
                                 <TableCell>{formatDate(order.created_at)}</TableCell>
@@ -104,7 +104,7 @@ const RecentOrdersList = () => {
                             </div>
                             <div className="flex justify-between text-sm text-default-500">
                                 <span>
-                                    {order.user.first_name} {order.user.last_name}
+                                    {order.user?.first_name} {order.user?.last_name}
                                 </span>
                                 <span className="font-medium">{currency(order.total)}</span>
                             </div>

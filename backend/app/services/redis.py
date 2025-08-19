@@ -128,6 +128,29 @@ class CacheService:
     def expire(self, key: str, seconds: int) -> bool:
         return self.redis.expire(key, seconds)
 
+    @handle_redis_errors(default=0)
+    async def publish(self, channel: str, message: Any) -> int:
+        """
+        Publish a message to a Redis Pub/Sub channel. Message will be JSON-encoded if not a string.
+        Returns the number of clients that received the message.
+        """
+        try:
+            payload = message if isinstance(message, str) else json.dumps(message, cls=EnhancedJSONEncoder)
+        except Exception:
+            payload = str(message)
+        return await self.redis.publish(channel, payload)
+
+    @handle_redis_errors(default=False)
+    async def publish_event(self, event_name: str, payload: dict[str, Any]) -> bool:
+        """
+        Append an event to a Redis Stream for durable consumption by consumers.
+        Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
+        """
+        stream_key = f"events:{event_name}"
+        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
+        await self.redis.xadd(stream_key, data)
+        return True
+
 async def get_redis_dependency(request: Request):
     return CacheService(request.app.state.redis)
 

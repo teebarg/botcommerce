@@ -39,10 +39,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-class MagicLinkPayload(BaseModel):
-    email: EmailStr
-    callback_url: str | None = None
-
 
 class ImageUpload(BaseModel):
     file: str  # Base64 encoded file

@@ -28,6 +28,7 @@ export const PaginatedUserSchema = PagSchema.extend({
 
 export const SessionSchema = z.object({
     id: z.string(),
+    name: z.string(),
     first_name: z.string(),
     last_name: z.string().optional(),
     email: z.string(),
