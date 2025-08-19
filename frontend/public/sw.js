@@ -91,9 +91,9 @@ self.addEventListener("push", function (event) {
         const data = event.data.json();
         const options = {
             body: data.body,
-            icon: "/icon.png",
-            image: "/promo-banner.webp",
-            badge: "/icon.png",
+            icon: "/icon.png", // small icon
+            image: data.imageUrl ?? "/promo-banner.webp", // large image
+            badge: "/icon.png", // monochrome badge (Android only)
             actions: [
                 { action: "view", title: "View" },
                 { action: "dismiss", title: "Dismiss" },
@@ -130,7 +130,7 @@ self.addEventListener("push", function (event) {
 self.addEventListener("notificationclick", function (event) {
     if (event.action == "view") {
         event.waitUntil(clients.openWindow(event.notification.data.url));
-
+        event.notification.close();
         return;
     }
 
@@ -154,7 +154,7 @@ self.addEventListener("notificationclick", function (event) {
 
 self.addEventListener("notificationclick", (event) => {
     const data = event.notification.data;
-    
+
     fetch("/api/push-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
