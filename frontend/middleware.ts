@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+
+import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 
@@ -12,16 +13,21 @@ export default async function middleware(req: NextRequest) {
     if (AUTH_PATHS.has(pathname)) {
         if (session) {
             const origin = new URL("/", req.nextUrl.origin);
+
             return NextResponse.redirect(origin);
         }
+
         return NextResponse.next();
     }
 
     if (!session) {
         const signInUrl = new URL("/auth/signin", req.nextUrl.origin);
+
         signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
+
         return NextResponse.redirect(signInUrl);
     }
+
     return NextResponse.next();
 }
 

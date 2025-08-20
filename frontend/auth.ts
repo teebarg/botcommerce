@@ -90,6 +90,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
             if (error) {
                 console.error("JWT user fetch error:", error);
+
                 return token;
             }
             if (data) {
@@ -105,6 +106,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             }
             if (token?.sub && token.user) {
                 const user = token.user as User;
+
                 session.user.id = token.sub;
                 session.user.first_name = user.first_name;
                 session.user.last_name = user.last_name;

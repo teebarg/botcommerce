@@ -69,7 +69,7 @@ export default function UserDropDown({ user }: { user: Session }) {
         <DropdownMenu>
             <DropdownMenuTrigger>
                 <Avatar>
-                    <AvatarImage src={user.image ?? ProfileAvatar} alt="@user" />
+                    <AvatarImage alt="@user" src={user.image ?? ProfileAvatar} />
                     <AvatarFallback>{user?.first_name?.[0] + user?.last_name?.[0]}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>

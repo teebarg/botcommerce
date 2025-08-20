@@ -11,14 +11,18 @@ from app.prisma_client import prisma
 from app.services.redis import CacheService
 from datetime import datetime, timedelta
 from pydantic import BaseModel
+from app.models.generic import Token
+from app.core import deps
 
 import httpx
 from typing import Optional
 
 router = APIRouter()
 
+
 class TokenPayload(BaseModel):
     token: str
+
 
 class SignUpPayload(BaseModel):
     email: EmailStr
@@ -26,19 +30,24 @@ class SignUpPayload(BaseModel):
     first_name: str = Field(max_length=255)
     last_name: str = Field(max_length=255)
 
+
 class VerifyEmailPayload(BaseModel):
     token: str
 
 # OAuth Models
+
+
 class OAuthCallback(BaseModel):
     code: str
     state: Optional[str] = None
+
 
 class GooglePayload(BaseModel):
     email: str
     first_name: str
     last_name: str
     image: Optional[str] = None
+
 
 def tokenData(user: User):
     return {
@@ -49,6 +58,7 @@ def tokenData(user: User):
         "status": user.status,
         "role": user.role
     }
+
 
 @router.post("/signup")
 async def signup(request: Request, payload: SignUpPayload, background_tasks: BackgroundTasks) -> Token:
@@ -74,7 +84,8 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
     hashed_password = security.get_password_hash(payload.password)
 
     # Generate email verification token
-    verification_token = security.create_email_verification_token(payload.email)
+    verification_token = security.create_email_verification_token(
+        payload.email)
 
     # Create user with pending status
     user = await prisma.user.create(
@@ -130,6 +141,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
     )
 
     return Token(access_token=access_token)
+
 
 @router.post("/verify-email")
 async def verify_email(payload: VerifyEmailPayload) -> Token:
@@ -249,7 +261,7 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
             where={"email": user_info["email"]},
             data={
                 "create": {
-                   "email": user_info["email"],
+                    "email": user_info["email"],
                     "first_name": user_info.get("given_name", ""),
                     "last_name": user_info.get("family_name", ""),
                     "image": user_info.get("picture"),
@@ -283,7 +295,8 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
         # Generate access token
         access_token = security.create_access_token(
             data=tokenData(user=user),
-            expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+            expires_delta=timedelta(
+                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         )
 
         return Token(access_token=access_token)
@@ -337,6 +350,7 @@ async def google(request: Request, payload: GooglePayload) -> Token:
 
     return Token(access_token=access_token)
 
+
 @router.post("/logout")
 async def logout():
     return Message(message="Logout successful")
@@ -345,6 +359,7 @@ async def logout():
 class EmailData(BaseModel):
     email: str
     url: str
+
 
 @router.post("/send-magic-link")
 async def send_magic_link(
@@ -404,9 +419,11 @@ async def send_magic_link(
             html_content=email_data.html_content,
         )
 
-    background_tasks.add_task(send_magic_link_email, user.first_name, email, url)
+    background_tasks.add_task(send_magic_link_email,
+                              user.first_name, email, url)
 
     return {"message": "If an account exists with this email, you will receive a magic link"}
+
 
 class SyncUserPayload(BaseModel):
     email: str
@@ -414,8 +431,9 @@ class SyncUserPayload(BaseModel):
     last_name: str
     image: Optional[str] = None
 
+
 @router.post("/sync-user")
-async def sync_user(request: Request, payload: SyncUserPayload) -> Message:
+async def sync_user(request: Request, payload: SyncUserPayload, redis: deps.RedisClient) -> Message:
     user = await prisma.user.find_first(
         where={
             "email": payload.email,
@@ -435,9 +453,8 @@ async def sync_user(request: Request, payload: SyncUserPayload) -> Message:
         )
         # Publish event for new user registration via sync-user
         try:
-            cache: CacheService = CacheService(request.app.state.redis)
-            await cache.publish_event(
-                "user.created",
+            await redis.publish_event(
+                "USER_REGISTERED",
                 {
                     "id": user.id,
                     "email": user.email,
@@ -449,6 +466,7 @@ async def sync_user(request: Request, payload: SyncUserPayload) -> Message:
                     "created_at": user.created_at,
                 },
             )
-        except Exception:
+        except Exception as e:
+            logger.error(f"Failed to publish user.created event: {e}")
             pass
     return {"message": "User synced successfully"}
