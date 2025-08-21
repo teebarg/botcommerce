@@ -151,6 +151,55 @@ async def index(
     }
 
 
+@router.get("/search/public")
+@cache_response("products", expire=3600)
+async def search(
+    request: Request,
+    search: str = "",
+    sort: str = "created_at:desc",
+    categories: str = Query(default=""),
+    collections: str = Query(default=""),
+    max_price: int = Query(default=1000000, gt=0),
+    min_price: int = Query(default=1, gt=0),
+    limit: int = Query(default=20, le=100),
+) -> list[SearchProduct]:
+    """
+    Retrieve products using Meilisearch, sorted by latest.
+    """
+    filters = []
+    if categories:
+        filters.append(f"categories IN {url_to_list(categories)}")
+    if collections:
+        filters.append(f"collections IN [{collections}]")
+    if min_price and max_price:
+        filters.append(
+            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+
+    search_params = {
+        "limit": limit,
+        "sort": [sort],
+    }
+
+    if filters:
+        search_params["filter"] = " AND ".join(filters)
+
+    try:
+        search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
+            search,
+            {
+                **search_params
+            }
+        )
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=400,
+            detail=e.message
+        )
+
+    return search_results["hits"]
+
+
 @router.get("/search")
 @cache_response("products", expire=3600)
 async def search(
