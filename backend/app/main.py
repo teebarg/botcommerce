@@ -274,22 +274,18 @@ async def generate_sitemap(cache: deps.RedisClient):
 
 @app.post("/api/test-event")
 async def test_event(request: Request, redis: deps.RedisClient):
-    # cache: CacheService = CacheService(request.app.state.redis)
-    # res = await redis.publish_event("email", {"event": "TEST_EVENT"})
     await redis.publish_event(
         "USER_REGISTERED",
         {
             "id": "1",
-            "email": "test@example.com",
-            "first_name": "Test",
-            "last_name": "User",
+            "email": "neyostica2000@yahoo.com",
+            "first_name": "Niyi",
+            "last_name": "Oyinlola",
             "status": "ACTIVE",
             "role": "CUSTOMER",
             "source": "sync_user",
-            # "created_at": datetime.now(),
         },
     )
-    # print("🚀 ~ res:", res)
     return {"message": "Test event sent"}
 
 

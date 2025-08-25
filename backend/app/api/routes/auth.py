@@ -101,11 +101,10 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
         }
     )
 
-    # Publish event for new user registration
     try:
         cache: CacheService = CacheService(request.app.state.redis)
         await cache.publish_event(
-            "user.created",
+            "USER_REGISTERED",
             {
                 "id": user.id,
                 "email": user.email,
@@ -277,7 +276,7 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
             try:
                 cache: CacheService = CacheService(request.app.state.redis)
                 await cache.publish_event(
-                    "user.created",
+                    "USER_REGISTERED",
                     {
                         "id": user.id,
                         "email": user.email,
@@ -322,12 +321,11 @@ async def google(request: Request, payload: GooglePayload) -> Token:
         }
     )
 
-    # Publish event only if this is a new user
     if not user_before:
         try:
             cache: CacheService = CacheService(request.app.state.redis)
             await cache.publish_event(
-                "user.created",
+                "USER_REGISTERED",
                 {
                     "id": user.id,
                     "email": user.email,
@@ -392,11 +390,11 @@ async def send_magic_link(
                 "hashed_password": "password"
             }
         )
-        # Publish event for new user registration via magic link request
+
         try:
             cache: CacheService = CacheService(request.app.state.redis)
             await cache.publish_event(
-                "user.created",
+                "USER_REGISTERED",
                 {
                     "id": user.id,
                     "email": user.email,
@@ -467,6 +465,6 @@ async def sync_user(request: Request, payload: SyncUserPayload, redis: deps.Redi
                 },
             )
         except Exception as e:
-            logger.error(f"Failed to publish user.created event: {e}")
+            logger.error(f"Failed to publish USER_REGISTERED event: {e}")
             pass
     return {"message": "User synced successfully"}
