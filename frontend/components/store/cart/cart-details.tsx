@@ -23,7 +23,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
     return (
         <ClientOnly>
             <div className="rounded-t-2xl max-h-screen overflow-hidden flex flex-col">
-                <div className="p-4 border-b border-default-100 flex justify-between items-center sticky top-0 z-10">
+                <div className="p-4 border-b border-default-100 flex justify-between items-center sticky top-safe z-10">
                     <div className="flex items-center space-x-2">
                         <ShoppingCart className="h-5 w-5 text-default-700" />
                         <h2 className="font-semibold text-lg">Your Cart</h2>

@@ -26,7 +26,7 @@ export default function Checkout() {
 
     return (
         <div className="bg-background">
-            <div className="sticky top-0 md:hidden p-4 flex items-center justify-between gap-4 bg-background z-20 shadow-2xl pr-8">
+            <div className="sticky top-safe md:hidden p-4 flex items-center justify-between gap-4 bg-background z-20 shadow-2xl pr-8">
                 <div className="flex items-center gap-2">
                     <BackButton />
                     <div>
@@ -36,7 +36,7 @@ export default function Checkout() {
                 </div>
                 <CartComponent />
             </div>
-            <header className="hidden md:flex justify-between items-center px-8 sticky top-0 h-16 bg-background z-10">
+            <header className="hidden md:flex justify-between items-center px-8 sticky top-safe h-16 bg-background z-10">
                 <LocalizedClientLink className="text-xl font-semibold" href="/">
                     {settings?.shop_name}
                 </LocalizedClientLink>

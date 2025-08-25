@@ -11,6 +11,29 @@ function isInStandaloneMode() {
     return "standalone" in window.navigator && (window.navigator as any).standalone;
 }
 
+const ShareIcon = () => (
+    <svg
+        className="inline-block align-text-bottom"
+        fill="none"
+        height="16"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        viewBox="0 0 24 24"
+        width="16"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+        <polyline points="16 6 12 2 8 6" />
+        <line x1="12" x2="12" y1="2" y2="15" />
+    </svg>
+);
+
+const STORAGE_KEY = "ios-install-banner-count";
+const DISMISSED_KEY = "ios-install-banner-dismissed";
+const MAX_VIEWS = 3; // show at most 3 times
+
 const GetApp: React.FC = () => {
     const [isStandalone, setIsStandalone] = useState<boolean>(false);
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -32,7 +55,13 @@ const GetApp: React.FC = () => {
         window.addEventListener("appinstalled", () => setIsStandalone(true));
 
         if (isIos() && !isInStandaloneMode()) {
-            setShowIosBanner(true);
+            const dismissed = localStorage.getItem(DISMISSED_KEY) === "true";
+            const count = Number(localStorage.getItem(STORAGE_KEY) || "0");
+
+            if (!dismissed && count < MAX_VIEWS) {
+                setShowIosBanner(true);
+                localStorage.setItem(STORAGE_KEY, String(count + 1));
+            }
         }
 
         return () => {
@@ -50,24 +79,46 @@ const GetApp: React.FC = () => {
         }
     };
 
+    const handleClose = () => {
+        setShowIosBanner(false);
+        localStorage.setItem(DISMISSED_KEY, "true");
+    };
+
+    const handleRemindLater = () => {
+        setShowIosBanner(false);
+    };
+
     if (isStandalone) return null;
 
     if (showIosBanner) {
         return (
-            <div className="fixed inset-x-4 bottom-40 z-[70] rounded-2xl bg-white/95 shadow-xl border border-gray-200 p-4 backdrop-blur-sm">
+            <div className="fixed inset-x-4 bottom-6 z-[60] rounded-2xl bg-white/95 shadow-xl border border-gray-200 p-4 backdrop-blur-sm">
                 <div className="flex items-start gap-3">
                     <RectangleVertical className="text-primary shrink-0 mt-0.5" />
                     <div className="text-gray-800 text-sm leading-relaxed">
                         <p>
-                            Install this app: Tap <span className="font-semibold">Share</span> →{" "}
-                            <span className="font-semibold">Add to Home Screen</span>.
+                            Install this app: Tap{" "}
+                            <span className="font-semibold flex items-center gap-1">
+                                Share <ShareIcon />
+                            </span>{" "}
+                            → <span className="font-semibold">Add to Home Screen</span>.
                         </p>
+                        <div className="flex gap-3 mt-3">
+                            <button
+                                className="text-xs text-primary font-medium px-3 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 transition"
+                                onClick={handleRemindLater}
+                            >
+                                Remind me later
+                            </button>
+                            <button
+                                className="text-xs text-gray-600 font-medium px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                                onClick={handleClose}
+                            >
+                                {`Don't show again`}
+                            </button>
+                        </div>
                     </div>
-                    <button
-                        aria-label="Close"
-                        className="ml-auto text-gray-400 hover:text-gray-600 transition"
-                        onClick={() => setShowIosBanner(false)}
-                    >
+                    <button aria-label="Close" className="ml-auto text-gray-400 hover:text-gray-600 transition" onClick={handleClose}>
                         <X size={16} />
                     </button>
                 </div>

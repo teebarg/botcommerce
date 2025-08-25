@@ -3,7 +3,7 @@ name: Docker Build & Push Recommendation
 on:
   workflow_dispatch:
 
-# Build the image, pust it to Docker Hub
+# Build the image, push it to Docker Hub
 jobs:
     build:
         runs-on: ubuntu-latest

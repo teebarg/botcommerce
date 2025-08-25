@@ -111,7 +111,7 @@ const ProductOverview: React.FC<{
 
     return (
         <div className="bg-content1 z-50 overflow-y-auto duration-300 w-full rounded-[inherit]">
-            <div className="sticky top-0 z-20 bg-content1">
+            <div className="sticky top-safe z-20 bg-content1">
                 <button
                     className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg"
                     onClick={onClose}
