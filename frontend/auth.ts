@@ -131,7 +131,7 @@ async function generateJoseToken(email: string) {
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
             .setExpirationTime("24h")
-            .sign(new TextEncoder().encode(process.env.NEXTAUTH_SECRET!));
+            .sign(new TextEncoder().encode(process.env.AUTH_SECRET!));
 
         return jwt;
     } catch (error) {

@@ -70,9 +70,9 @@ class SearchProduct(BaseModel):
     review_count: Optional[int] = None
 
 class Facets(BaseModel):
-    brand: dict[str, int]
-    categories: dict[str, int]
-    collections: dict[str, int]
+    brand: Optional[dict[str, int]] = None
+    categories: Optional[dict[str, int]] = None
+    collections: Optional[dict[str, int]] = None
 
 class SearchProducts(BaseModel):
     products: List[SearchProduct]
