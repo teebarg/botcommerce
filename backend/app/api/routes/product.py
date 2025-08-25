@@ -155,7 +155,7 @@ async def index(
 @cache_response("products", expire=3600)
 async def search(
     request: Request,
-    search: str = "",
+    q: str = "",
     sort: str = "created_at:desc",
     categories: str = Query(default=""),
     collections: str = Query(default=""),
@@ -185,7 +185,7 @@ async def search(
 
     try:
         search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
-            search,
+            q,
             {
                 **search_params
             }
