@@ -69,7 +69,7 @@ const Menu: React.FC = () => {
                         </button>
                     </div>
                 ) : (
-                    <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href={`/sign-in?callbackUrl=${pathname}`}>
+                    <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href={`/auth/signin?callbackUrl=${pathname}`}>
                         Log In <span aria-hidden="true">&rarr;</span>
                     </LocalizedClientLink>
                 )}

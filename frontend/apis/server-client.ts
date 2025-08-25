@@ -37,7 +37,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (!response.ok) {
         if (response.status === 401) {
-            // window.location.href = `/sign-in?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+            // window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         }
         const error = await response.json();
 

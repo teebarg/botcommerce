@@ -92,7 +92,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        <BtnLink className="w-full md:w-auto px-8" href={`/sign-in?callbackUrl=${pathname}`} size="lg">
+                        <BtnLink className="w-full md:w-auto px-8" href={`/auth/signin?callbackUrl=${pathname}`} size="lg">
                             Login to Write a Review
                         </BtnLink>
                     </div>

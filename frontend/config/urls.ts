@@ -15,8 +15,8 @@ export const siteUrls = {
     features: "/features",
     support: "/support",
     auth: {
-        login: "/sign-in",
-        signup: "/sign-up",
+        login: "/auth/signin",
+        signup: "/auth/signup",
     },
     admin: {
         dashboard: "/admin/dashboard",
