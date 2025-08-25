@@ -90,7 +90,7 @@ const CustomerView: React.FC = () => {
                                         <TableCell>
                                             <div>
                                                 <p>
-                                                    {user.first_name} {user.last_name}
+                                                    {user?.first_name} {user?.last_name}
                                                 </p>
                                                 <p className="text-default-500">{user.email}</p>
                                             </div>

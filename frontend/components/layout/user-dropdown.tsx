@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { signOut } from "next-auth/react";
 
 import ProfileAvatar from "@/public/profile.svg";
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function UserDropDown({ user }: { user: Session }) {
     const invalidate = useInvalidateMe();
@@ -67,10 +67,11 @@ export default function UserDropDown({ user }: { user: Session }) {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <span className="relative outline-none w-10 h-10 rounded-full ring-2 ring-offset-1 ring-green-200 cursor-pointer">
-                    <Image fill alt="avatar" sizes="40px" src={user?.image || ProfileAvatar} />
-                </span>
+            <DropdownMenuTrigger>
+                <Avatar>
+                    <AvatarImage alt="@user" src={user.image ?? ProfileAvatar} />
+                    <AvatarFallback>{user?.first_name?.[0] + user?.last_name?.[0]}</AvatarFallback>
+                </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>

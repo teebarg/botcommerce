@@ -89,7 +89,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             const { data, error } = await tryCatch<User>(serverApi.get<User>(`/users/get-user?email=${token.email}`));
 
             if (error) {
-                throw new Error(error);
+                console.error("JWT user fetch error:", error);
+
+                return token;
             }
             if (data) {
                 token.user = data;
@@ -102,14 +104,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             if (token?.accessToken) {
                 session.accessToken = token.accessToken as string;
             }
-            if (token?.sub) {
+            if (token?.sub && token.user) {
+                const user = token.user as User;
+
                 session.user.id = token.sub;
-                session.user.first_name = (token.user as User).first_name;
-                session.user.last_name = (token.user as User).last_name;
-                session.user.status = (token.user as User).status;
-                session.user.role = (token.user as User).role as Role;
-                session.user.isAdmin = (token.user as User).role === "ADMIN";
-                session.user.isActive = (token.user as User).status === "ACTIVE";
+                session.user.first_name = user.first_name;
+                session.user.last_name = user.last_name;
+                session.user.image = user.image;
+                session.user.status = user.status;
+                session.user.role = user.role as Role;
+                session.user.isAdmin = user.role === "ADMIN";
+                session.user.isActive = user.status === "ACTIVE";
             }
 
             return session;

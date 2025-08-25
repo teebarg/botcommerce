@@ -22,13 +22,15 @@ from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
 logger = get_logger(__name__)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug("🚀connecting to dbs......:")
     await db.connect()
     logger.debug("✅ ~ connected to prisma......:")
     try:
-        redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+        redis_client = redis.from_url(
+            settings.REDIS_URL, decode_responses=True)
         await redis_client.ping()
         app.state.redis = redis_client
         logger.debug("✅ ~ connected to redis......:")
@@ -57,6 +59,7 @@ app = FastAPI(title="Botcommerce",
 #         print(f"Client host: {client_host}")  # Log the client IP
 #         return await call_next(request)
 
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.critical(f"Unhandled error: {exc}", exc_info=True)
@@ -64,6 +67,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"detail": "Internal Server Error"},
     )
+
 
 class TimingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -74,6 +78,7 @@ class TimingMiddleware(BaseHTTPMiddleware):
         logger.info(f"{request.method} {request.url.path} - {duration_ms}ms")
 
         return response
+
 
 app.add_middleware(TimingMiddleware)
 
@@ -267,9 +272,27 @@ async def generate_sitemap(cache: deps.RedisClient):
 #             )
 
 
+@app.post("/api/test-event")
+async def test_event(request: Request, redis: deps.RedisClient):
+    await redis.publish_event(
+        "USER_REGISTERED",
+        {
+            "id": "1",
+            "email": "neyostica2000@yahoo.com",
+            "first_name": "Niyi",
+            "last_name": "Oyinlola",
+            "status": "ACTIVE",
+            "role": "CUSTOMER",
+            "source": "sync_user",
+        },
+    )
+    return {"message": "Test event sent"}
+
+
 @app.on_event("startup")
 async def start_websocket_manager():
     await manager.start()
+
 
 @app.post("/api/notify-order")
 async def notify_order(order_id: int):

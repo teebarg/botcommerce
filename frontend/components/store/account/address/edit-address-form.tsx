@@ -38,8 +38,8 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(addressSchema),
         defaultValues: {
-            first_name: address.first_name || "",
-            last_name: address.last_name || "",
+            first_name: address?.first_name || "",
+            last_name: address?.last_name || "",
             address_1: address.address_1 || "",
             address_2: address.address_2 || "",
             city: address.city || "",

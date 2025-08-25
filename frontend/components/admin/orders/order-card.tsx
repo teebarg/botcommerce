@@ -20,7 +20,7 @@ const OrderCard = ({ order, actions }: OrderCardProps) => {
                 <div className="flex justify-between text-sm mb-2">
                     <span className="text-default-500">Customer</span>
                     <span className="font-medium text-default-900">
-                        {order.user.first_name} {order.user.last_name}
+                        {order.user?.first_name} {order.user?.last_name}
                     </span>
                 </div>
 

@@ -42,7 +42,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
         >
             <div className="flex flex-col">
                 <h3 className="text-left text-sm font-semibold" data-testid="address-name">
-                    {address.first_name} {address.last_name}
+                    {address?.first_name} {address?.last_name}
                 </h3>
                 <p className="flex flex-col text-left mt-2 font-semibold">
                     <span data-testid="address-address">

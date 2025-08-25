@@ -82,7 +82,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     </div>
                     <div>
                         <h3 className="font-semibold text-default-800 text-lg">{address.label}</h3>
-                        <p className="text-default-500 text-sm">{address.first_name + " " + address.last_name}</p>
+                        <p className="text-default-500 text-sm">{address?.first_name + " " + address?.last_name}</p>
                     </div>
                 </div>
 

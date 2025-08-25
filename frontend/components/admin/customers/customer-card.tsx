@@ -10,7 +10,7 @@ interface CustomerCardProps {
 }
 
 const CustomerCard = ({ user, actions }: CustomerCardProps) => {
-    const fullName = `${user.first_name} ${user.last_name}`;
+    const fullName = `${user?.first_name} ${user?.last_name}`;
 
     const totalSpent = user.orders?.reduce((total: number, order: Order) => total + order.total, 0) || 0;
 
