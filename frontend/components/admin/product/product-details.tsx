@@ -80,7 +80,6 @@ export function ProductDetails() {
                             <TableHead>S/N</TableHead>
                             <TableHead>Image</TableHead>
                             <TableHead>Product</TableHead>
-                            <TableHead>Sku</TableHead>
                             <TableHead>Description</TableHead>
                             <TableHead>Variant</TableHead>
                             <TableHead>Status</TableHead>
@@ -126,7 +125,6 @@ export function ProductDetails() {
                                         />
                                     </TableCell>
                                     <TableCell className="font-medium">{product.name}</TableCell>
-                                    <TableCell>{product.sku}</TableCell>
                                     <TableCell>{product.description}</TableCell>
                                     <TableCell>{product.variants?.length}</TableCell>
                                     <TableCell>

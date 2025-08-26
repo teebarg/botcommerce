@@ -59,23 +59,20 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
 
         setIsPending(true);
         try {
+            const productData = {
+                ...data,
+                category_ids: categoryIds,
+                collection_ids: collectionIds,
+                brand_id: brand,
+            };
+
             if (product?.id) {
                 await updateProduct.mutateAsync({
                     id: product.id,
-                    input: {
-                        ...data,
-                        category_ids: categoryIds,
-                        collection_ids: collectionIds,
-                        brand_id: brand,
-                    },
+                    input: productData,
                 });
             } else {
-                await createProduct.mutateAsync({
-                    ...data,
-                    category_ids: categoryIds,
-                    collection_ids: collectionIds,
-                    brand_id: brand,
-                });
+                await createProduct.mutateAsync(productData);
             }
             if (!product?.id) {
                 onClose?.();
@@ -178,6 +175,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                     </FormItem>
                                 )}
                             />
+
                             <div className="flex gap-2 justify-end md:col-span-2">
                                 <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose()}>
                                     Close

@@ -1,5 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
+from app.models.generic import ImageUpload
 
 from app.models.base import BM
 from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review, ProductVariant
@@ -89,3 +90,7 @@ class Products(BaseModel):
     limit: int
     total_count: int
     total_pages: int
+
+class ProductCreateBundle(ProductCreate):
+    images: Optional[List[ImageUpload]] = None
+    variants: Optional[List[VariantWithStatus]] = None
