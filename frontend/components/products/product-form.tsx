@@ -5,8 +5,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
 
-import ProductImageUpload from "./product-image-upload";
-
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
 import { Brand, Category, Collection, Product } from "@/schemas/product";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
-import { ProductImageFile } from "@/types/product-image";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -40,7 +37,6 @@ interface ProductFormProps {
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections, categories, brands }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
-    const [uploadedImages, setUploadedImages] = useState<ProductImageFile[]>([]);
     const createProduct = useCreateProduct();
     const updateProduct = useUpdateProduct();
 
@@ -68,8 +64,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                 category_ids: categoryIds,
                 collection_ids: collectionIds,
                 brand_id: brand,
-                // Include uploaded images if any
-                ...(uploadedImages.length > 0 && { images: uploadedImages }),
             };
 
             if (product?.id) {
@@ -181,36 +175,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                     </FormItem>
                                 )}
                             />
-
-                            {/* Product Images Section */}
-                            <div className="md:col-span-2">
-                                <ProductImageUpload
-                                    categories={categories}
-                                    collections={collections}
-                                    initialImages={
-                                        product?.images?.map((img) => ({
-                                            id: img.id.toString(),
-                                            file: new File([], img.image), // Placeholder file
-                                            preview: img.image,
-                                            metadata: {
-                                                id: img.id.toString(),
-                                                name: img.image.split("/").pop() || "",
-                                                description: "",
-                                                categories: [],
-                                                collections: [],
-                                                variants: [],
-                                                tags: [],
-                                                altText: "",
-                                                isPrimary: img.order === 1,
-                                            },
-                                            uploadProgress: 100,
-                                            uploadStatus: "success" as const,
-                                        })) || []
-                                    }
-                                    variants={[]} // TODO: Get variants from product if editing
-                                    onImagesUploaded={setUploadedImages}
-                                />
-                            </div>
 
                             <div className="flex gap-2 justify-end md:col-span-2">
                                 <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose()}>

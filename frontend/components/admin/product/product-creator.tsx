@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
 
 import { ImageUpload } from "./product-image-upload";
@@ -10,6 +12,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { Product, ProductVariant } from "@/schemas";
+import { api } from "@/apis/client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export interface ProductImage {
     id: string;
@@ -20,25 +26,19 @@ export interface ProductImage {
 export interface ProductDetails {
     name: string;
     description: string;
-    price: number;
-    category: string;
+    categories: { value: number; label: string }[];
+    collections: { value: number; label: string }[];
+    brand: number;
     sku: string;
 }
 
-export interface ProductVariant {
-    id: string;
-    name: string;
-    type: "size" | "color" | "style";
-    value: string;
-    priceModifier: number;
-    stock: number;
-}
-
-export interface Product {
+export type FormProduct = Omit<Partial<Product>, "brand" | "images" | "variants" | "categories" | "collections"> & {
+    brand?: number;
+    categories: { value: number; label: string }[];
+    collections: { value: number; label: string }[];
     images: ProductImage[];
-    details: ProductDetails;
     variants: ProductVariant[];
-}
+};
 
 const STEPS = [
     { id: 1, title: "Images", description: "Upload product photos" },
@@ -48,19 +48,87 @@ const STEPS = [
 ];
 
 export function ProductCreator() {
-    const [currentStep, setCurrentStep] = useState(1);
-    const [product, setProduct] = useState<Product>({
+    const router = useRouter();
+    const [currentStep, setCurrentStep] = useState<number>(1);
+    const [product, setProduct] = useState<FormProduct>({
+        name: "",
+        description: "",
+        categories: [],
+        collections: [],
+        brand: 0,
+        sku: "",
         images: [],
-        details: {
-            name: "",
-            description: "",
-            price: 0,
-            category: "",
-            sku: "",
-        },
         variants: [],
     });
-    const [isCompleted, setIsCompleted] = useState(false);
+    const [isCompleted, setIsCompleted] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [lastPayload, setLastPayload] = useState<any | null>(null);
+
+    const DRAFT_KEY = "product_creator_draft";
+
+    const loadDraft = useCallback(() => {
+        try {
+            const raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return;
+            const draft = JSON.parse(raw);
+            if (draft?.product) {
+                setProduct((prev) => ({
+                    ...prev,
+                    ...draft.product,
+                    images: (draft.product.images || []).map((img: any) => ({ id: img.id, url: img.url, file: undefined as any })),
+                }));
+            }
+            if (draft?.currentStep) {
+                setCurrentStep(draft.currentStep);
+            }
+        } catch {}
+    }, []);
+
+    const clearDraft = useCallback(() => {
+        try {
+            localStorage.removeItem(DRAFT_KEY);
+        } catch {}
+    }, []);
+
+    const latestStateRef = useRef<{ product: FormProduct; currentStep: number; isCompleted: boolean }>({ product, currentStep, isCompleted });
+
+    useEffect(() => {
+        latestStateRef.current = { product, currentStep, isCompleted };
+    }, [product, currentStep, isCompleted]);
+
+    useEffect(() => {
+        loadDraft();
+        const handleBeforeUnload = () => {
+            if (!latestStateRef.current.isCompleted) {
+                try {
+                    const draft = {
+                        currentStep: latestStateRef.current.currentStep,
+                        product: {
+                            ...latestStateRef.current.product,
+                            images: (latestStateRef.current.product.images || []).map((img) => ({ id: img.id, url: img.url })),
+                        },
+                    };
+                    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+                } catch {}
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [loadDraft]);
+
+    useEffect(() => {
+        try {
+            const draft = {
+                currentStep,
+                product: {
+                    ...product,
+                    images: (product.images || []).map((img) => ({ id: img.id, url: img.url })),
+                },
+            };
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        } catch {}
+    }, [product, currentStep]);
 
     const progress = ((currentStep - 1) / (STEPS.length - 1)) * 100;
 
@@ -80,18 +148,82 @@ export function ProductCreator() {
         setProduct((prev) => ({ ...prev, images }));
     };
 
-    const handleDetailsChange = (details: ProductDetails) => {
-        setProduct((prev) => ({ ...prev, details }));
+    const handleDetailsChange = (details: FormProduct) => {
+        setProduct((prev) => ({ ...prev, ...details }));
     };
 
     const handleVariantsChange = (variants: ProductVariant[]) => {
         setProduct((prev) => ({ ...prev, variants }));
     };
 
-    const handleCreateProduct = () => {
-        // Here you would typically send the product to your backend
-        console.log("Creating product:", product);
-        setIsCompleted(true);
+    const handleCreateProduct = async () => {
+        setIsLoading(true);
+        try {
+            setErrorMessage(null);
+            const fileToBase64 = (file: File) =>
+                new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve((reader.result as string).split(",")[1] || "");
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsDataURL(file);
+                });
+
+            const imagesPayload = await Promise.all(
+                (product.images || []).map(async (img) => ({
+                    file: img.file ? await fileToBase64(img.file) : "",
+                    file_name: img.file?.name || "image.jpg",
+                    content_type: img.file?.type || "image/jpeg",
+                }))
+            );
+
+            const variantsPayload = (product.variants || []).map((variant) => ({
+                price: variant.price,
+                old_price: variant.old_price,
+                inventory: variant.inventory,
+                size: (variant as any).size,
+                color: (variant as any).color,
+            }));
+
+            const payload: any = {
+                name: product.name,
+                description: product.description,
+                brand_id: product.brand || undefined,
+                category_ids: product.categories?.map((c) => c.value) || [],
+                collection_ids: product.collections?.map((c) => c.value) || [],
+                images: imagesPayload.length ? imagesPayload : undefined,
+                variants: variantsPayload.length ? variantsPayload : undefined,
+            };
+
+            setLastPayload(payload);
+            await api.post("/product/create-bundle", payload);
+
+            toast.success("Product created successfully");
+            setIsCompleted(true);
+            clearDraft();
+        } catch (error: any) {
+            toast.error(error?.message || "Failed to create product");
+            console.error(error);
+            setErrorMessage(error?.message || "Failed to create product");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const retryCreate = async () => {
+        if (!lastPayload) return handleCreateProduct();
+        setIsLoading(true);
+        try {
+            setErrorMessage(null);
+            await api.post("/product/create-bundle", lastPayload);
+            toast.success("Product created successfully");
+            setIsCompleted(true);
+            clearDraft();
+        } catch (error: any) {
+            toast.error(error?.message || "Failed to create product");
+            setErrorMessage(error?.message || "Failed to create product");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const canProceed = () => {
@@ -99,9 +231,9 @@ export function ProductCreator() {
             case 1:
                 return product.images.length > 0;
             case 2:
-                return product.details.name && product.details.description && product.details.price > 0;
+                return product.name;
             case 3:
-                return true; // Variants are optional
+                return true;
             case 4:
                 return true;
             default:
@@ -111,7 +243,7 @@ export function ProductCreator() {
 
     if (isCompleted) {
         return (
-            <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
+            <div className="flex justify-center px-4 py-8">
                 <Card className="w-full max-w-md p-8 text-center bg-gradient-card shadow-medium">
                     <div className="flex justify-center mb-6">
                         <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
@@ -119,29 +251,29 @@ export function ProductCreator() {
                         </div>
                     </div>
                     <h2 className="text-2xl font-bold mb-4 text-card-foreground">Product Created!</h2>
-                    <p className="text-muted-foreground mb-6">Your product "{product.details.name}" has been successfully created.</p>
-                    <Button
-                        className="w-full bg-gradient-primary hover:shadow-medium transition-all duration-smooth"
-                        onClick={() => window.location.reload()}
-                    >
-                        Create Another Product
-                    </Button>
+                    <p className="text-muted-foreground mb-6">Your product "{product.name}" has been successfully created.</p>
+                    <div className="flex gap-2">
+                        <Button className="w-full" onClick={() => window.location.reload()} variant="success">
+                            Create Another Product
+                        </Button>
+                        <Button className="w-full" onClick={() => router.push("/admin/products")} variant="indigo">
+                            Go To Products
+                        </Button>
+                    </div>
                 </Card>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-subtle">
-            {/* Header with Progress */}
+        <div className="mb-4 bg-gradient-subtle">
             <div className="bg-card shadow-soft">
                 <div className="max-w-4xl mx-auto px-4 py-6">
                     <div className="mb-6">
-                        <h1 className="text-2xl font-bold mb-2 text-card-foreground">Create New Product</h1>
+                        <h1 className="text-2xl font-bold mb-2 text-card-foreground">Create Product</h1>
                         <Progress className="h-2" value={progress} />
                     </div>
 
-                    {/* Steps Indicator */}
                     <div className="flex justify-between">
                         {STEPS.map((step) => (
                             <div key={step.id} className="flex flex-col items-center flex-1">
@@ -170,14 +302,26 @@ export function ProductCreator() {
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto px-2 md:px-4 py-4">
                 <Card className="bg-gradient-card shadow-medium border-0">
-                    <div className="p-6 sm:p-8">
+                    <div className="p-6">
                         {currentStep === 1 && <ImageUpload images={product.images} onImagesChange={handleImagesChange} />}
-                        {currentStep === 2 && <ProductDetailsForm details={product.details} onDetailsChange={handleDetailsChange} />}
+                        {currentStep === 2 && <ProductDetailsForm product={product} onDetailsChange={handleDetailsChange} />}
                         {currentStep === 3 && <VariantCreation variants={product.variants} onVariantsChange={handleVariantsChange} />}
-                        {currentStep === 4 && <ProductReview product={product} onCreateProduct={handleCreateProduct} />}
+                        {currentStep === 4 && <ProductReview product={product} />}
+                        {currentStep === 4 && errorMessage && (
+                            <div className="mt-4 p-4 border border-destructive/30 rounded-md bg-destructive/10">
+                                <p className="text-destructive mb-3">{errorMessage}</p>
+                                <div className="flex gap-2">
+                                    <Button onClick={retryCreate} isLoading={isLoading} disabled={isLoading} variant="destructive">
+                                        Retry
+                                    </Button>
+                                    <Button onClick={() => setErrorMessage(null)} variant="outline">
+                                        Edit Details
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Navigation */}
@@ -192,21 +336,13 @@ export function ProductCreator() {
                         </div>
 
                         {currentStep < STEPS.length ? (
-                            <Button
-                                className="flex items-center gap-2 bg-gradient-primary hover:shadow-medium transition-all duration-smooth"
-                                disabled={!canProceed()}
-                                onClick={handleNext}
-                            >
+                            <Button className="flex items-center gap-2" disabled={!canProceed()} onClick={handleNext} variant="outline">
                                 Next
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         ) : (
-                            <Button
-                                className="bg-gradient-primary hover:shadow-medium transition-all duration-smooth"
-                                disabled={!canProceed()}
-                                onClick={handleCreateProduct}
-                            >
-                                Create Product
+                            <Button disabled={!canProceed() || isLoading} onClick={handleCreateProduct} variant="outline" isLoading={isLoading}>
+                                {errorMessage ? "Retry" : "Create Product"}
                             </Button>
                         )}
                     </div>

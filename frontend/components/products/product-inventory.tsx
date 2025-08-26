@@ -1,24 +1,21 @@
 "use client";
 
-import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Download } from "lucide-react";
 
 import { ProductDetails } from "../admin/product/product-details";
 
 import ProductUpload from "./product-upload";
 
-import Overlay from "@/components/overlay";
-import { ProductView } from "@/components/products/product-view";
 import { Button } from "@/components/ui/button";
 import { useBustCache, useExportProducts, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
+import { useRouter } from "next/navigation";
 
 export function ProductInventory() {
-    const addState = useOverlayTriggerState({});
-
     const exportProducts = useExportProducts();
     const reIndexProducts = useReIndexProducts();
     const bustCache = useBustCache();
     const flushCache = useFlushCache();
+    const router = useRouter();
 
     const handleExport = () => {
         exportProducts.mutate();
@@ -46,15 +43,9 @@ export function ProductInventory() {
                 <ProductUpload />
             </div>
             <div className="flex flex-wrap gap-2 mb-2">
-                <Overlay
-                    open={addState.isOpen}
-                    sheetClassName="min-w-[500px]"
-                    title="Add Product"
-                    trigger={<Button variant="primary">Add Product</Button>}
-                    onOpenChange={addState.setOpen}
-                >
-                    <ProductView onClose={addState.close} />
-                </Overlay>
+                <Button variant="primary" onClick={() => router.push("/admin/products/create")}>
+                    Create Product
+                </Button>
                 <Button disabled={exportProducts.isPending} isLoading={exportProducts.isPending} variant="outline" onClick={handleExport}>
                     <Download className="mr-2 h-4 w-4" /> Export Products
                 </Button>

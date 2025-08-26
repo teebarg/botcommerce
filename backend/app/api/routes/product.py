@@ -26,7 +26,8 @@ from app.models.product import (
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
-    Product, Products, SearchProducts, SearchProduct
+    Product, Products, SearchProducts, SearchProduct,
+    ProductCreateBundle,
 )
 from app.services.meilisearch import (
     clear_index,
@@ -317,6 +318,98 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         reindex_product, cache=redis, product_id=created_product.id)
 
     return created_product
+
+
+@router.post("/create-bundle")
+async def create_product_bundle(
+    payload: ProductCreateBundle,
+    background_tasks: BackgroundTasks,
+    redis: RedisClient,
+):
+    """
+    Create a product, images and variants.
+    - Creates the product with provided relations
+    - Uploads additional images to Supabase (if provided)
+    - Creates variants (if provided)
+    """
+    async with db.tx() as tx:
+        try:
+            slugified_name = slugify(payload.name)
+
+            data: dict[str, Any] = {
+                "name": payload.name,
+                "slug": slugified_name,
+                "sku": generate_sku(product_name=payload.name),
+                "description": payload.description,
+            }
+
+            if payload.brand_id is not None:
+                data["brand"] = {"connect": {"id": payload.brand_id}}
+
+            if payload.category_ids:
+                data["categories"] = {"connect": [{"id": id} for id in payload.category_ids]}
+
+            if payload.collection_ids:
+                data["collections"] = {"connect": [{"id": id} for id in payload.collection_ids]}
+
+            if payload.tags_ids:
+                data["tags"] = {"connect": [{"id": id} for id in payload.tags_ids]}
+
+            product = await tx.product.create(data=data)
+
+            # Additional images
+            if payload.images:
+                created_images = []
+                for index, img in enumerate(payload.images):
+                    try:
+                        image_url = upload(bucket="product-images", data=img)
+                        created_images.append({
+                            "image": image_url,
+                            "product_id": product.id,
+                            "order": index,
+                        })
+                    except Exception as e:
+                        logger.error(e)
+                        raise HTTPException(status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
+
+                if created_images:
+                    await tx.productimage.create_many(data=created_images)
+
+            # Variants
+            if payload.variants:
+                for variant in payload.variants:
+                    try:
+                        await tx.productvariant.create(
+                            data={
+                                "sku": generate_sku(product_name=product.name),
+                                "price": variant.price,
+                                "old_price": variant.old_price,
+                                "inventory": variant.inventory,
+                                "product_id": product.id,
+                                "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                "size": variant.size,
+                                "color": variant.color,
+                            }
+                        )
+                    except Exception as e:
+                        logger.error(e)
+                        raise HTTPException(status_code=400, detail=f"Failed to create variant: {str(e)}")
+
+            background_tasks.add_task(reindex_product, cache=redis, product_id=product.id)
+
+            full = await tx.product.find_unique(
+                where={"id": product.id},
+                include={"variants": True, "images": True}
+            )
+
+            return full
+        except UniqueViolationError:
+            raise HTTPException(status_code=400, detail="Product with this name already exists")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/reindex", response_model=Message)

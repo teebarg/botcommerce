@@ -37,10 +37,10 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { useStoreSettings } from "@/providers/store-provider";
+import { UserAvatar } from "@/components/generic/user-avatar";
 
 const AdminItems = [
     {
@@ -209,15 +209,7 @@ export function AdminSidebar() {
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton className={cn("bg-secondary py-6", state === "collapsed" && "hidden")}>
                                     <div className="flex items-center gap-2">
-                                        <Avatar className="h-8 w-8 cursor-pointer">
-                                            <AvatarImage alt={user?.first_name ?? "User"} src={user?.image ?? undefined} />
-                                            <AvatarFallback className="bg-green-600 text-white text-xs">
-                                                {user?.first_name
-                                                    ?.split(" ")
-                                                    .map((n) => n[0])
-                                                    .join("") ?? "ME"}
-                                            </AvatarFallback>
-                                        </Avatar>
+                                        <UserAvatar />
                                         <div className="flex flex-col">
                                             <p className="font-semibold">{user?.first_name ?? "User"}</p>
                                             <p className="text-xs text-gray-600">{user?.email ?? "User"}</p>

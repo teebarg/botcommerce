@@ -32,7 +32,7 @@ const ShareIcon = () => (
 
 const STORAGE_KEY = "ios-install-banner-count";
 const DISMISSED_KEY = "ios-install-banner-dismissed";
-const MAX_VIEWS = 3; // show at most 3 times
+const MAX_VIEWS = 5;
 
 const GetApp: React.FC = () => {
     const [isStandalone, setIsStandalone] = useState<boolean>(false);
