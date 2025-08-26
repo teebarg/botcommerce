@@ -127,8 +127,8 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                             <Input
                                 id="old_price"
                                 placeholder="0"
-                                type="number"
                                 step="1"
+                                type="number"
                                 value={newVariant.old_price || ""}
                                 onChange={(e) => setNewVariant((prev) => ({ ...prev, old_price: parseFloat(e.target.value) || 0 }))}
                             />
@@ -149,7 +149,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                         </div>
                     </div>
 
-                    <Button className="w-full" disabled={newVariant.price < 2} onClick={addVariant} variant="indigo">
+                    <Button className="w-full" disabled={newVariant.price < 2} variant="indigo" onClick={addVariant}>
                         <Plus className="w-4 h-4 mr-2" />
                         Add Variant
                     </Button>
@@ -185,7 +185,12 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                                     <span>{currency(variant.price)}</span>
                                                     {variant.old_price !== 0 && (
-                                                        <span className={cn(variant.old_price > variant.price ? "text-success" : "text-warning", "text-xs")}>
+                                                        <span
+                                                            className={cn(
+                                                                variant.old_price > variant.price ? "text-success" : "text-warning",
+                                                                "text-xs"
+                                                            )}
+                                                        >
                                                             {variant.old_price > variant.price ? "-" : ""}
                                                             {currency(variant.old_price)}
                                                         </span>

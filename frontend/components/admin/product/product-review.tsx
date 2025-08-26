@@ -1,9 +1,10 @@
+import type { FormProduct } from "./product-creator";
+
 import { Package, Image as ImageIcon, Palette } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/lib/utils";
-import type { FormProduct } from "./product-creator";
 import { Label } from "@/components/ui/label";
 
 interface ProductReviewProps {
@@ -77,7 +78,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                             <Label className="text-xs font-medium text-muted-foreground">Categories</Label>
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {product.categories.map((category, idx: number) => (
-                                    <Badge className="text-xs" variant="primary" key={idx}>
+                                    <Badge key={idx} className="text-xs" variant="primary">
                                         {category.label}
                                     </Badge>
                                 ))}
@@ -85,7 +86,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                             <Label className="text-xs font-medium text-muted-foreground">Collections</Label>
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {product.collections.map((collection, idx: number) => (
-                                    <Badge className="text-xs" variant="warning" key={idx}>
+                                    <Badge key={idx} className="text-xs" variant="warning">
                                         {collection.label}
                                     </Badge>
                                 ))}

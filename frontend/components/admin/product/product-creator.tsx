@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { ImageUpload } from "./product-image-upload";
 import { ProductDetailsForm } from "./product-details-form";
@@ -14,8 +16,6 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Product, ProductVariant } from "@/schemas";
 import { api } from "@/apis/client";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export interface ProductImage {
     id: string;
@@ -70,8 +70,10 @@ export function ProductCreator() {
     const loadDraft = useCallback(() => {
         try {
             const raw = localStorage.getItem(DRAFT_KEY);
+
             if (!raw) return;
             const draft = JSON.parse(raw);
+
             if (draft?.product) {
                 setProduct((prev) => ({
                     ...prev,
@@ -109,11 +111,14 @@ export function ProductCreator() {
                             images: (latestStateRef.current.product.images || []).map((img) => ({ id: img.id, url: img.url })),
                         },
                     };
+
                     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
                 } catch {}
             }
         };
+
         window.addEventListener("beforeunload", handleBeforeUnload);
+
         return () => window.removeEventListener("beforeunload", handleBeforeUnload);
     }, [loadDraft]);
 
@@ -126,6 +131,7 @@ export function ProductCreator() {
                     images: (product.images || []).map((img) => ({ id: img.id, url: img.url })),
                 },
             };
+
             localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
         } catch {}
     }, [product, currentStep]);
@@ -163,6 +169,7 @@ export function ProductCreator() {
             const fileToBase64 = (file: File) =>
                 new Promise<string>((resolve, reject) => {
                     const reader = new FileReader();
+
                     reader.onload = () => resolve((reader.result as string).split(",")[1] || "");
                     reader.onerror = (e) => reject(e);
                     reader.readAsDataURL(file);
@@ -251,12 +258,12 @@ export function ProductCreator() {
                         </div>
                     </div>
                     <h2 className="text-2xl font-bold mb-4 text-card-foreground">Product Created!</h2>
-                    <p className="text-muted-foreground mb-6">Your product "{product.name}" has been successfully created.</p>
+                    <p className="text-muted-foreground mb-6">{`Your product "${product.name}" has been successfully created.`}</p>
                     <div className="flex gap-2">
-                        <Button className="w-full" onClick={() => window.location.reload()} variant="success">
+                        <Button className="w-full" variant="success" onClick={() => window.location.reload()}>
                             Create Another Product
                         </Button>
-                        <Button className="w-full" onClick={() => router.push("/admin/products")} variant="indigo">
+                        <Button className="w-full" variant="indigo" onClick={() => router.push("/admin/products")}>
                             Go To Products
                         </Button>
                     </div>
@@ -313,10 +320,10 @@ export function ProductCreator() {
                             <div className="mt-4 p-4 border border-destructive/30 rounded-md bg-destructive/10">
                                 <p className="text-destructive mb-3">{errorMessage}</p>
                                 <div className="flex gap-2">
-                                    <Button onClick={retryCreate} isLoading={isLoading} disabled={isLoading} variant="destructive">
+                                    <Button disabled={isLoading} isLoading={isLoading} variant="destructive" onClick={retryCreate}>
                                         Retry
                                     </Button>
-                                    <Button onClick={() => setErrorMessage(null)} variant="outline">
+                                    <Button variant="outline" onClick={() => setErrorMessage(null)}>
                                         Edit Details
                                     </Button>
                                 </div>
@@ -336,12 +343,12 @@ export function ProductCreator() {
                         </div>
 
                         {currentStep < STEPS.length ? (
-                            <Button className="flex items-center gap-2" disabled={!canProceed()} onClick={handleNext} variant="outline">
+                            <Button className="flex items-center gap-2" disabled={!canProceed()} variant="outline" onClick={handleNext}>
                                 Next
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         ) : (
-                            <Button disabled={!canProceed() || isLoading} onClick={handleCreateProduct} variant="outline" isLoading={isLoading}>
+                            <Button disabled={!canProceed() || isLoading} isLoading={isLoading} variant="outline" onClick={handleCreateProduct}>
                                 {errorMessage ? "Retry" : "Create Product"}
                             </Button>
                         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Download } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { ProductDetails } from "../admin/product/product-details";
 
@@ -8,7 +9,6 @@ import ProductUpload from "./product-upload";
 
 import { Button } from "@/components/ui/button";
 import { useBustCache, useExportProducts, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
-import { useRouter } from "next/navigation";
 
 export function ProductInventory() {
     const exportProducts = useExportProducts();
