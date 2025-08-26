@@ -1,4 +1,5 @@
 from typing import Any
+import base64
 
 from fastapi import (
     APIRouter,
@@ -6,7 +7,10 @@ from fastapi import (
     HTTPException,
     Query,
     BackgroundTasks,
-    Request
+    Request,
+    UploadFile,
+    File,
+    Form
 )
 from app.core.deps import (
     CurrentUser,
@@ -723,3 +727,67 @@ async def reorder_images(id: int, image_ids: list[int], redis: RedisClient):
     await reindex_product(cache=redis, product_id=id)
 
     return {"success": True}
+
+
+@router.post("/images/upload")
+async def upload_product_images(
+    files: list[UploadFile] = File(...),
+    metas: list[str] | None = Form(default=None),
+):
+    """
+    Upload one or more product images via multipart/form-data and return their public URLs.
+
+    Form fields:
+    - files: list of image files (image/*)
+    - metas: optional parallel list of JSON strings for each file's metadata
+    """
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided")
+
+    uploaded: list[dict] = []
+
+    # Ensure metas list aligns with files length
+    metas = metas or []
+    if len(metas) < len(files):
+        # pad with empty objects as strings
+        metas = metas + ["{}"] * (len(files) - len(metas))
+
+    try:
+        for index, file in enumerate(files):
+            # Read file bytes
+            file_bytes = await file.read()
+
+            # Derive extension and unique name
+            original_name = file.filename or "upload.jpg"
+            extension = original_name.split(".")[-1]
+
+            # Build ImageUpload payload for existing storage util
+            image_payload = ImageUpload(
+                file=base64.b64encode(file_bytes).decode("utf-8"),
+                file_name=original_name,
+                content_type=file.content_type or f"image/{extension}",
+            )
+
+            image_url = upload(bucket="product-images", data=image_payload)
+
+            # Parse metadata JSON if provided
+            meta_raw = metas[index] if index < len(metas) else "{}"
+            try:
+                import json
+
+                meta_obj = json.loads(meta_raw) if isinstance(meta_raw, str) else meta_raw
+            except Exception:
+                meta_obj = {}
+
+            uploaded.append({
+                "url": image_url,
+                "metadata": meta_obj,
+            })
+
+        return {"success": True, "images": uploaded}
+    except HTTPException:
+        # Re-raise known HTTP errors
+        raise
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
