@@ -6,6 +6,7 @@ from app.models.base import BM
 from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review, ProductVariant
 
 class VariantWithStatus(BaseModel):
+    id: Optional[int] = None
     price: float = Field(..., gt=0)
     old_price: Optional[float] = 0.0
     inventory: int = Field(..., ge=0)

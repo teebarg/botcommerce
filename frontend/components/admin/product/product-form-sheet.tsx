@@ -11,7 +11,7 @@ import { useBrands } from "@/lib/hooks/useBrand";
 import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Product, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useCreateImageMetadata } from "@/lib/hooks/useProduct";
+import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useProduct";
 
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
 const COLOR_OPTIONS = ["Red", "Blue", "Green", "Black", "White"];
@@ -26,20 +26,24 @@ type FormProduct = Omit<Partial<Product>, "brand" | "images" | "variants" | "cat
 interface ProductSheetFormProps {
     imageId: number;
     onClose: () => void;
+    currentProduct?: Product
 }
 
-export function ProductSheetForm({ onClose, imageId }: ProductSheetFormProps) {
-    const { mutateAsync: createImageMetadata, isPending } = useCreateImageMetadata();
+export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSheetFormProps) {
+    const { mutateAsync: createImageMetadata, isPending: createPending } = useCreateImageMetadata();
+    const { mutateAsync: updateImageMetadata, isPending: updatePending } = useUpdateImageMetadata();
+
+    const isPending = createPending || updatePending;
     const [errors, setErrors] = useState<Partial<FormProduct>>({});
     const { data: collections } = useCollections();
     const { data: categories } = useCategories();
     const { data: brands } = useBrands();
     const [product, setProduct] = useState<FormProduct>({
-        name: "",
-        categories: [],
-        collections: [],
+        name: currentProduct?.name ?? "",
+        categories: currentProduct?.categories?.map((c) => ({ value: c.id, label: c.name })) ?? [],
+        collections: currentProduct?.collections?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         brand: 1,
-        variants: [],
+        variants: currentProduct?.variants ?? [],
     });
 
     const updateField = (field: keyof FormProduct, value: string | number | SelectOption[]) => {
@@ -54,11 +58,12 @@ export function ProductSheetForm({ onClose, imageId }: ProductSheetFormProps) {
     };
 
     const [newVariant, setNewVariant] = useState<Partial<ProductVariant>>({
-        size: "",
-        color: "",
-        price: 0,
-        old_price: 0,
-        inventory: 1,
+        id: currentProduct?.variants?.[0].id ?? undefined,
+        size: currentProduct?.variants?.[0].size ?? "",
+        color: currentProduct?.variants?.[0].color ?? "",
+        price: currentProduct?.variants?.[0].price ?? 0,
+        old_price: currentProduct?.variants?.[0].old_price ?? 0,
+        inventory: currentProduct?.variants?.[0].inventory ?? 1,
     });
 
     const isDisabled = newVariant.price < 2;
@@ -69,10 +74,14 @@ export function ProductSheetForm({ onClose, imageId }: ProductSheetFormProps) {
             brand_id: product.brand || undefined,
             category_ids: product.categories?.map((c) => c.value) || [],
             collection_ids: product.collections?.map((c) => c.value) || [],
-            variants: [...product.variants, newVariant],
+            variants: [newVariant],
         };
 
-        createImageMetadata({ imageId, input }).then(() => onClose());
+        if (currentProduct) {
+            updateImageMetadata({ imageId, input }).then(() => onClose());
+        } else {
+            createImageMetadata({ imageId, input }).then(() => onClose());
+        }
     };
 
     return (

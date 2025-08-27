@@ -91,10 +91,20 @@ export const useSimilarProducts = (productId: number, num: number = 16) => {
     });
 };
 
-export const useImageGallery = () => {
-    return useQuery({
-        queryKey: ["gallery"],
-        queryFn: async () => await api.get<ProductImage[]>("/product/gallery"),
+export const useImageGalleryInfinite = (pageSize: number = 24) => {
+    return useInfiniteQuery({
+        queryKey: ["gallery", "infinite", pageSize],
+        queryFn: async ({ pageParam = 0 }) =>
+            await api.get<{ images: ProductImage[]; skip: number; limit: number; total_count: number; total_pages: number }>(
+                "/product/gallery",
+                { params: { skip: pageParam, limit: pageSize } }
+            ),
+        getNextPageParam: (lastPage) => {
+            const nextSkip = lastPage.skip + lastPage.limit;
+            const hasMore = nextSkip < lastPage.total_count;
+            return hasMore ? nextSkip : undefined;
+        },
+        initialPageParam: 0,
     });
 };
 
@@ -110,6 +120,22 @@ export const useCreateImageMetadata = () => {
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to create image metadata");
+        },
+    });
+};
+
+export const useUpdateImageMetadata = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ imageId, input }: { imageId: number; input: any }) => await api.patch<Message>(`/product/${imageId}/metadata`, input),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
+            toast.success("Image metadata updated");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to update image metadata");
         },
     });
 };
@@ -280,6 +306,7 @@ export const useUploadImages = () => {
         mutationFn: async ({ id, data }: { id: number; data: any }) => await api.post<Message>(`/product/${id}/images`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Images uploaded successfully");
         },
         onError: (error: any) => {
@@ -310,6 +337,7 @@ export const useDeleteImages = () => {
         mutationFn: async ({ id, imageId }: { id: number; imageId: number }) => await api.delete<Message>(`/product/${id}/images/${imageId}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image deleted successfully");
         },
         onError: (error: any) => {

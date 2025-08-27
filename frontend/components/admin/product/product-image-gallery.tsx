@@ -4,12 +4,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { ImageUpload } from "./product-image-upload";
-import { GalleryCard } from "./product-gallery-card";
 
 import { api } from "@/apis/client";
-import { useImageGallery } from "@/lib/hooks/useProduct";
+import { useEffect, useRef } from "react";
+import { useImageGalleryInfinite } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { GalleryCard } from "./product-gallery-card";
 
 interface ProductImage {
     id: string;
@@ -18,9 +19,26 @@ interface ProductImage {
 }
 
 export function ProductImageGallery() {
-    const { data: images, isLoading: isImagesLoading } = useImageGallery();
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(12);
+    const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const invalidate = useInvalidate();
+
+    useEffect(() => {
+        if (!sentinelRef.current) return;
+        const el = sentinelRef.current;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const first = entries[0];
+                if (first.isIntersecting && hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage();
+                }
+            },
+            { root: null, rootMargin: "200px", threshold: 0.1 }
+        );
+        observer.observe(el);
+        return () => observer.unobserve(el);
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     const handleImagesChange = async (images: ProductImage[]) => {
         setIsLoading(true);
@@ -58,21 +76,25 @@ export function ProductImageGallery() {
     };
 
     return (
-        <div className="px-4 py-8 overflow-y-auto">
+        <div className="px-6 py-8 overflow-y-auto">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold">Image Gallery</h3>
                 <p className="text-sm text-default-500">Manage your product images.</p>
             </div>
-            <div className="mb-8 w-full">
+            <div className="mb-8 max-w-xl">
                 <ImageUpload images={[]} isLoading={isLoading} onImagesChange={handleImagesChange} showUploadArea={false} />
             </div>
 
             {isImagesLoading ? (
                 <ComponentLoader />
             ) : (
-                <div className="mb-8 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {images?.map((img: any, idx: number) => <GalleryCard key={idx} image={img} />)}
-                </div>
+                <>
+                    <div className="mb-8 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {data?.pages?.flatMap((p) => p.images).map((img: any, idx: number) => <GalleryCard key={`${img.id}-${idx}`} image={img} />)}
+                    </div>
+                    <div ref={sentinelRef} />
+                    {isFetchingNextPage && <ComponentLoader />}
+                </>
             )}
         </div>
     );

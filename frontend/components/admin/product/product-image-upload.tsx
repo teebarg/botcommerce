@@ -6,7 +6,6 @@ import { Upload, X, Image as ImageIcon, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import ComponentLoader from "@/components/component-loader";
 
 interface ImageUploadProps {
     images: ProductImage[];
@@ -69,7 +68,6 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
 
     return (
         <div className="space-y-6">
-            {/* Upload Area */}
             <Card
                 className={cn(
                     "border-2 border-dashed transition-all duration-smooth cursor-pointer hover:border-primary/50",
@@ -94,13 +92,19 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                         Choose Images
                     </Button>
                     <p className="text-xs text-muted-foreground mt-2">Supports JPG, PNG, WebP up to 5MB each</p>
-                    {isLoading && <ComponentLoader />}
+                    {isLoading && (
+                        <div className="mb-4">
+                            <div className="w-full bg-default-200 rounded-full h-2.5">
+                                <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />
+                            </div>
+                            <p className="text-sm text-blue-500 mt-1">Uploading...</p>
+                        </div>
+                    )}
                 </div>
             </Card>
 
             <input ref={fileInputRef} multiple accept="image/*" className="hidden" type="file" onChange={handleFileSelect} />
             <div className={cn(!showUploadArea && "hidden")}>
-                {/* Image Gallery */}
                 {images.length > 0 && (
                     <div>
                         <h3 className="text-lg font-medium mb-4 text-card-foreground">Uploaded Images ({images.length})</h3>

@@ -90,17 +90,38 @@ async def get_landing_products(request: Request) -> LandingProducts:
 
 
 @router.get("/gallery")
-async def image_gallery():
+async def image_gallery(skip: int = Query(default=0), limit: int = Query(default=10)):
     """
     Upload one or more product images.
     """
     try:
+        where_clause = {
+            "order": 0,
+        }
         images = await db.productimage.find_many(
-            where={
-                "product_id": {"equals": None}
-            }
+            where=where_clause,
+            skip=skip,
+            take=limit,
+            order={"created_at": "desc"},
+            include={
+                "product": {
+                    "include": {
+                        "categories": True,
+                        "collections": True,
+                        "variants": True,
+                        "images": True,
+                    }
+                }
+            },
         )
-        return images
+        total = await db.productimage.count(where=where_clause)
+        return {
+            "images": images,
+            "skip": skip,
+            "limit": limit,
+            "total_pages": ceil(total/limit),
+            "total_count": total,
+        }
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -765,7 +786,8 @@ async def delete_gallery_image(image_id: int, redis: RedisClient) -> Message:
         supabase.storage.from_("product-images").remove([file_path])
 
         await db.productimage.delete(where={"id": image_id})
-        reindex_product(cache=redis, product_id=image.product_id)
+        if image.product_id:
+            reindex_product(cache=redis, product_id=image.product_id)
 
         return {"message": "Image deleted successfully"}
     except Exception as e:
@@ -965,6 +987,98 @@ async def create_image_metadata(
 
             background_tasks.add_task(
                 reindex_product, cache=redis, product_id=product.id)
+
+            return {"success": True}
+        except UniqueViolationError:
+            raise HTTPException(
+                status_code=400, detail="Product with this name already exists")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.patch("/{image_id}/metadata")
+async def update_image_metadata(
+    image_id: int,
+    payload: ProductImageMetadata,
+    background_tasks: BackgroundTasks,
+    redis: RedisClient,
+):
+    """
+    Create a product, images and variants.
+    - Creates the product with provided relations
+    - Uploads additional images to Supabase (if provided)
+    - Creates variants (if provided)
+    """
+    async with db.tx() as tx:
+        try:
+            existing_image = await db.productimage.find_unique(where={"id": image_id})
+            if not existing_image:
+                raise HTTPException(status_code=404, detail="Image not found")
+
+            update_data = {}
+
+            if payload.name is not None:
+                update_data["name"] = payload.name
+                update_data["slug"] = slugify(payload.name)
+
+            if payload.description is not None:
+                update_data["description"] = payload.description
+
+            if payload.category_ids is not None:
+                category_ids = [{"id": id} for id in payload.category_ids]
+                update_data["categories"] = {"set": category_ids}
+
+            if payload.collection_ids is not None:
+                collection_ids = [{"id": id} for id in payload.collection_ids]
+                update_data["collections"] = {"set": collection_ids}
+            if payload.brand_id is not None:
+                update_data["brand"] = {"connect": {"id": payload.brand_id}}
+
+            await db.product.update(
+                where={"id": existing_image.product_id},
+                data=update_data,
+            )
+
+            # Variants
+            if payload.variants:
+                for variant in payload.variants:
+                    print("🚀 ~ variant:", variant)
+                    try:
+                        await tx.productvariant.upsert(
+                            where={
+                                'id': variant.id
+                            },
+                            data={
+                                "create": {
+                                    "product_id": existing_image.product_id,
+                                    'sku': generate_sku(),
+                                    'price': variant.price,
+                                    'old_price': variant.old_price,
+                                    'inventory': variant.inventory,
+                                    'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                    'size': variant.size,
+                                    'color': variant.color,
+                                },
+                                "update": {
+                                    'price': variant.price,
+                                    'old_price': variant.old_price,
+                                    'inventory': variant.inventory,
+                                    'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                    'size': variant.size,
+                                    'color': variant.color,
+                                }
+                            },
+                        )
+                    except Exception as e:
+                        logger.error(e)
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to create variant: {str(e)}")
+
+            background_tasks.add_task(
+                reindex_product, cache=redis, product_id=existing_image.product_id)
 
             return {"success": True}
         except UniqueViolationError:

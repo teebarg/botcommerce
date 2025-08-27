@@ -1,49 +1,39 @@
 import { useState } from "react";
-import { Edit2, Package, Trash2 } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
-
-import { ProductSheetForm } from "./product-form-sheet";
+import { Star, Package } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ProductImage } from "@/schemas";
+import { Badge } from "@/components/ui/badge";
+import { cn, currency } from "@/lib/utils";
+import { Category, Collection, Product, ProductImage } from "@/schemas";
+import { GalleryCardActions } from "./gallery-card-actions";
 import Overlay from "@/components/overlay";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Confirm } from "@/components/generic/confirm";
-import { useDeleteGalleryImage } from "@/lib/hooks/useProduct";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+import ProductImagesManager from "@/components/admin/product/product-images";
+
+type GalleryImage = ProductImage & {
+    product: Product;
+};
 
 interface GalleryCardProps {
-    image: ProductImage;
-    isSelected?: boolean;
+    image: GalleryImage;
     onClick?: () => void;
 }
 
-export function GalleryCard({ image, isSelected, onClick }: GalleryCardProps) {
-    const { mutateAsync: deleteImage } = useDeleteGalleryImage();
-    const editState = useOverlayTriggerState({});
-    const deleteState = useOverlayTriggerState({});
-
+export function GalleryCard({ image, onClick }: GalleryCardProps) {
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
-    const primaryImage = image;
-
-    const handleDelete = async () => {
-        deleteImage({ id: image.id }).then(() => {
-            deleteState.close();
-        });
-    };
+    const { product } = image;
+    const imgState = useOverlayTriggerState({});
 
     return (
         <Card
             className={cn(
-                "group relative overflow-hidden border-0 bg-gradient-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
-                isSelected && "ring-2 ring-primary shadow-lg scale-[1.02]"
+                "group relative overflow-hidden border-0 bg-gradient-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer"
             )}
             onClick={onClick}
         >
             <CardContent className="p-0">
                 <div className="relative aspect-square overflow-hidden">
-                    {primaryImage ? (
+                    {image.image ? (
                         <>
                             <img
                                 alt="product image"
@@ -67,35 +57,86 @@ export function GalleryCard({ image, isSelected, onClick }: GalleryCardProps) {
                     )}
 
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <GalleryCardActions image={image} />
+                    </div>
+
+                    <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                        {image.product?.collections?.slice(0, 2).map((item: Collection, idx: number) => (
+                            <Badge key={idx} variant="warning">
+                                {item.name}
+                            </Badge>
+                        ))}
+                    </div>
+
+                    {image.product?.images?.length > 0 && (
+                        <Overlay
+                            open={imgState.isOpen}
+                            sheetClassName="min-w-[40vw]"
+                            title="Create Metadata"
+                            trigger={
+                                <div
+                                    className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium"
+                                    onClick={imgState.open}
+                                >
+                                    {image.product?.images?.length} photos
+                                </div>
+                            }
+                            onOpenChange={imgState.setOpen}
+                        >
+                            <div className="p-6 overflow-y-auto">
+                                <ProductImagesManager initialImages={product?.images?.sort((a, b) => a.order - b.order) || []} productId={product.id} />
+                            </div>
+                        </Overlay>
+                    )}
+                </div>
+
+                <div className="p-4 space-y-3">
+                    <div className="space-y-2">
+                        <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{product?.name}</h3>
+
                         <div className="flex items-center gap-2">
-                            <Overlay
-                                open={editState.isOpen}
-                                sheetClassName="min-w-[40vw]"
-                                title="Create Metadata"
-                                trigger={
-                                    <Button className="bg-white/90 text-black hover:bg-white" size="sm" onClick={editState.open}>
-                                        <Edit2 className="h-4 w-4 mr-1" />
-                                        Edit
-                                    </Button>
-                                }
-                                onOpenChange={editState.setOpen}
-                            >
-                                <ProductSheetForm imageId={image.id} onClose={editState.close} />
-                            </Overlay>
-                            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                                <DialogTrigger asChild>
-                                    <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader className="sr-only">
-                                        <DialogTitle>Delete</DialogTitle>
-                                    </DialogHeader>
-                                    <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
-                                </DialogContent>
-                            </Dialog>
+                            <span className="text-xs text-muted-foreground font-mono">{product?.sku}</span>
+                            {product?.ratings && product?.ratings > 0 && (
+                                <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                    <span className="text-xs text-muted-foreground">{product?.ratings}</span>
+                                </div>
+                            )}
                         </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            {product?.brand && (
+                                <Badge className="text-xs" variant="outline">
+                                    {product?.brand?.name}
+                                </Badge>
+                            )}
+                            {product?.variants?.length && (
+                                <span className="text-xs text-muted-foreground">
+                                    {product?.variants?.length} variant{product?.variants?.length !== 1 ? "s" : ""}
+                                </span>
+                            )}
+                        </div>
+
+                        {product?.variants?.length && (
+                            <div className="flex items-center gap-2">
+                                <span className="font-semibold text-primary">{currency(product?.variants?.[0].price)}</span>
+                                {product?.variants?.[0].old_price > 0 && (
+                                    <span className="text-sm font-semibold line-through text-primary">
+                                        {currency(product?.variants?.[0].old_price)}
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-1">
+                        {product?.categories?.slice(0, 3).map((category: Category, idx: number) => (
+                            <Badge key={idx} className="text-xs" variant="secondary">
+                                {category?.name}
+                            </Badge>
+                        ))}
                     </div>
                 </div>
             </CardContent>
