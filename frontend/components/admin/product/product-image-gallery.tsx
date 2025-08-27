@@ -64,7 +64,7 @@ export function ProductImageGallery() {
                 <p className="text-sm text-default-500">Manage your product images.</p>
             </div>
             <div className="mb-8 w-full">
-                <ImageUpload images={[]} isLoading={isLoading} onImagesChange={handleImagesChange} />
+                <ImageUpload images={[]} isLoading={isLoading} onImagesChange={handleImagesChange} showUploadArea={false} />
             </div>
 
             {isImagesLoading ? (

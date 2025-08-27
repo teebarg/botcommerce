@@ -685,7 +685,7 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
 
 
 @router.delete("/{id}/image")
-async def delete_image(id: int, background_tasks: BackgroundTasks, redis: RedisClient):
+async def delete_image(id: int, redis: RedisClient):
     """
     Delete an image from a product.
     """
@@ -704,8 +704,7 @@ async def delete_image(id: int, background_tasks: BackgroundTasks, redis: RedisC
 
     try:
         await db.product.update(where={"id": id}, data={"image": None})
-
-        background_tasks.add_task(reindex_product, cache=redis, product_id=id)
+        reindex_product(cache=redis, product_id=id)
 
         return {"success": True}
     except Exception as e:
@@ -718,11 +717,43 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
     """
     Delete an image from a product images.
     """
-    # Check if product exists
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    image = await db.productimage.find_unique(where={"id": image_id})
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    async with db.tx() as tx:
+        try:
+            file_path = image.image.split(
+                "/storage/v1/object/public/product-images/")[1]
+
+            supabase.storage.from_("product-images").remove([file_path])
+            await tx.productimage.delete(where={"id": image_id})
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=400, detail=str(e))
+
+        # Reorder images
+        images = await tx.productimage.find_many(where={"product_id": id}, order={"order": "asc"})
+        for index, image in enumerate(images):
+            await tx.productimage.update(
+                where={"id": image.id},
+                data={"order": index}
+            )
+
+        background_tasks.add_task(reindex_product, cache=redis, product_id=id)
+
+        return {"success": True}
+
+
+@router.delete("/gallery/{image_id}")
+async def delete_gallery_image(image_id: int, redis: RedisClient) -> Message:
+    """
+    Delete an image from gallery.
+    """
     image = await db.productimage.find_unique(where={"id": image_id})
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
@@ -732,27 +763,14 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
             "/storage/v1/object/public/product-images/")[1]
 
         supabase.storage.from_("product-images").remove([file_path])
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
 
-    try:
         await db.productimage.delete(where={"id": image_id})
+        reindex_product(cache=redis, product_id=image.product_id)
+
+        return {"message": "Image deleted successfully"}
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
-
-    # Reorder images
-    images = await db.productimage.find_many(where={"product_id": id}, order={"order": "asc"})
-    for index, image in enumerate(images):
-        await db.productimage.update(
-            where={"id": image.id},
-            data={"order": index}
-        )
-
-    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
-
-    return {"success": True}
 
 
 @router.post("/upload-products/")
@@ -852,34 +870,32 @@ async def upload_product_images(payload: ProductBulkImages):
     """
     Upload one or more product images.
     """
-    async with db.tx() as tx:
-        try:
-            if payload.images:
-                created_images = []
-                for index, img in enumerate(payload.images):
-                    try:
-                        image_url = upload(bucket="product-images", data=img)
-                        created_images.append({
-                            "image": image_url,
-                            "order": 0,
-                        })
-                    except Exception as e:
-                        logger.error(e)
-                        raise HTTPException(
-                            status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
+    try:
+        created_images = []
+        for index, img in enumerate(payload.images):
+            try:
+                image_url = upload(bucket="product-images", data=img)
+                created_images.append({
+                    "image": image_url,
+                    "order": 0,
+                })
+            except Exception as e:
+                logger.error(e)
+                raise HTTPException(
+                    status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
 
-                if created_images:
-                    await tx.productimage.create_many(data=created_images)
+        if created_images:
+            await db.productimage.create_many(data=created_images)
 
-            return {"success": True}
-        except UniqueViolationError:
-            raise HTTPException(
-                status_code=400, detail="Product with this name already exists")
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(e)
-            raise HTTPException(status_code=500, detail=str(e))
+        return {"success": True}
+    except UniqueViolationError:
+        raise HTTPException(
+            status_code=400, detail="Product with this name already exists")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/{image_id}/metadata")

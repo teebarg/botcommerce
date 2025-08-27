@@ -29,7 +29,7 @@ interface ProductSheetFormProps {
 }
 
 export function ProductSheetForm({ onClose, imageId }: ProductSheetFormProps) {
-    const { mutateAsync: createImageMetadata } = useCreateImageMetadata();
+    const { mutateAsync: createImageMetadata, isPending } = useCreateImageMetadata();
     const [errors, setErrors] = useState<Partial<FormProduct>>({});
     const { data: collections } = useCollections();
     const { data: categories } = useCategories();
@@ -38,7 +38,7 @@ export function ProductSheetForm({ onClose, imageId }: ProductSheetFormProps) {
         name: "",
         categories: [],
         collections: [],
-        brand: 0,
+        brand: 1,
         variants: [],
     });
 
@@ -61,14 +61,22 @@ export function ProductSheetForm({ onClose, imageId }: ProductSheetFormProps) {
         inventory: 1,
     });
 
+    const isDisabled = newVariant.price < 2;
+
     const handleSubmit = () => {
-        const input = { ...product, variants: [...product.variants, newVariant] };
+        const input: any = {
+            name: product.name,
+            brand_id: product.brand || undefined,
+            category_ids: product.categories?.map((c) => c.value) || [],
+            collection_ids: product.collections?.map((c) => c.value) || [],
+            variants: [...product.variants, newVariant],
+        };
 
         createImageMetadata({ imageId, input }).then(() => onClose());
     };
 
     return (
-        <div className="space-y-6 px-4 py-8">
+        <div className="space-y-6 px-4 pt-8 overflow-y-auto">
             <div>
                 <h2 className="text-xl font-semibold mb-2 text-card-foreground">Product Details</h2>
                 <p className="text-muted-foreground">Provide essential information about your product that customers will see.</p>
@@ -223,11 +231,11 @@ export function ProductSheetForm({ onClose, imageId }: ProductSheetFormProps) {
                 </div>
             </Card>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 sticky bottom-0 bg-background -mx-4 py-4 px-4">
                 <Button variant="destructive" onClick={onClose}>
                     Close
                 </Button>
-                <Button variant="indigo" onClick={handleSubmit}>
+                <Button variant="indigo" onClick={handleSubmit} disabled={isDisabled} isLoading={isPending}>
                     Save
                 </Button>
             </div>

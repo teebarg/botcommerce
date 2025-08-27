@@ -318,6 +318,22 @@ export const useDeleteImages = () => {
     });
 };
 
+
+export const useDeleteGalleryImage = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/product/gallery/${id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
+            toast.success("Image deleted successfully");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to delete image");
+        },
+    });
+};
+
 export const useReorderImages = () => {
     const queryClient = useQueryClient();
 

@@ -19,6 +19,7 @@ import {
     UserSquare,
     ClipboardList,
     Notebook,
+    Image,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -98,6 +99,11 @@ const storeItems = [
         title: "Products",
         url: "/admin/products",
         icon: Box,
+    },
+    {
+        title: "Gallery",
+        url: "/admin/gallery",
+        icon: Image,
     },
     {
         title: "Orders",

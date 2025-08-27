@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Edit2, Package } from "lucide-react";
+import { Edit2, Package, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { ProductSheetForm } from "./product-form-sheet";
@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ProductImage } from "@/schemas";
 import Overlay from "@/components/overlay";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Confirm } from "@/components/generic/confirm";
+import { useDeleteGalleryImage } from "@/lib/hooks/useProduct";
 
 interface GalleryCardProps {
     image: ProductImage;
@@ -17,9 +20,18 @@ interface GalleryCardProps {
 }
 
 export function GalleryCard({ image, isSelected, onClick }: GalleryCardProps) {
+    const { mutateAsync: deleteImage } = useDeleteGalleryImage();
     const editState = useOverlayTriggerState({});
+    const deleteState = useOverlayTriggerState({});
+
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const primaryImage = image;
+
+    const handleDelete = async () => {
+        deleteImage({ id: image.id }).then(() => {
+            deleteState.close();
+        });
+    };
 
     return (
         <Card
@@ -30,7 +42,6 @@ export function GalleryCard({ image, isSelected, onClick }: GalleryCardProps) {
             onClick={onClick}
         >
             <CardContent className="p-0">
-                {/* Image Container */}
                 <div className="relative aspect-square overflow-hidden">
                     {primaryImage ? (
                         <>
@@ -56,20 +67,35 @@ export function GalleryCard({ image, isSelected, onClick }: GalleryCardProps) {
                     )}
 
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <Overlay
-                            open={editState.isOpen}
-                            sheetClassName="min-w-[40vw]"
-                            title="Create Metadata"
-                            trigger={
-                                <Button className="bg-white/90 text-black hover:bg-white" size="sm" onClick={editState.open}>
-                                    <Edit2 className="h-4 w-4 mr-1" />
-                                    Edit
-                                </Button>
-                            }
-                            onOpenChange={editState.setOpen}
-                        >
-                            <ProductSheetForm imageId={image.id} onClose={editState.close} />
-                        </Overlay>
+                        <div className="flex items-center gap-2">
+                            <Overlay
+                                open={editState.isOpen}
+                                sheetClassName="min-w-[40vw]"
+                                title="Create Metadata"
+                                trigger={
+                                    <Button className="bg-white/90 text-black hover:bg-white" size="sm" onClick={editState.open}>
+                                        <Edit2 className="h-4 w-4 mr-1" />
+                                        Edit
+                                    </Button>
+                                }
+                                onOpenChange={editState.setOpen}
+                            >
+                                <ProductSheetForm imageId={image.id} onClose={editState.close} />
+                            </Overlay>
+                            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                                <DialogTrigger asChild>
+                                    <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader className="sr-only">
+                                        <DialogTitle>Delete</DialogTitle>
+                                    </DialogHeader>
+                                    <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
+                                </DialogContent>
+                            </Dialog>
+                        </div>
                     </div>
                 </div>
             </CardContent>

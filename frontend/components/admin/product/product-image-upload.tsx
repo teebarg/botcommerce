@@ -12,9 +12,10 @@ interface ImageUploadProps {
     images: ProductImage[];
     onImagesChange: (images: ProductImage[]) => void;
     isLoading?: boolean;
+    showUploadArea?: boolean;
 }
 
-export function ImageUpload({ images, onImagesChange, isLoading = false }: ImageUploadProps) {
+export function ImageUpload({ images, onImagesChange, isLoading = false, showUploadArea = true }: ImageUploadProps) {
     const [isDragOver, setIsDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,11 +69,6 @@ export function ImageUpload({ images, onImagesChange, isLoading = false }: Image
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-xl font-semibold mb-2 text-card-foreground">Product Images</h2>
-                <p className="text-muted-foreground">Upload high-quality images of your product. The first image will be the main product image.</p>
-            </div>
-
             {/* Upload Area */}
             <Card
                 className={cn(
@@ -85,79 +81,80 @@ export function ImageUpload({ images, onImagesChange, isLoading = false }: Image
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
             >
-                <div className="p-8 text-center">
+                <div className="px-8 py-4 text-center">
                     <div className="flex justify-center mb-4">
-                        <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
                             <Upload className="w-6 h-6 text-white" />
                         </div>
                     </div>
-                    <h3 className="text-lg font-medium mb-2 text-card-foreground">Drop your images here</h3>
+                    <h3 className="text-lg font-medium text-card-foreground">Drop your images here</h3>
                     <p className="text-muted-foreground mb-4">or click to browse your files</p>
                     <Button className="pointer-events-none" size="sm" variant="outline">
                         <ImageIcon className="w-4 h-4 mr-2" />
                         Choose Images
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-2">Supports JPG, PNG, WebP up to 10MB each</p>
+                    <p className="text-xs text-muted-foreground mt-2">Supports JPG, PNG, WebP up to 5MB each</p>
                     {isLoading && <ComponentLoader />}
                 </div>
             </Card>
 
             <input ref={fileInputRef} multiple accept="image/*" className="hidden" type="file" onChange={handleFileSelect} />
-
-            {/* Image Gallery */}
-            {images.length > 0 && (
-                <div>
-                    <h3 className="text-lg font-medium mb-4 text-card-foreground">Uploaded Images ({images.length})</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {images.map((image: ProductImage, idx: number) => (
-                            <Card key={idx} className="relative group overflow-hidden bg-gradient-card shadow-soft">
-                                <div className="aspect-square">
-                                    <img
-                                        alt={`Product image ${idx + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-smooth group-hover:scale-105"
-                                        src={image.url}
-                                    />
-                                </div>
-                                {idx === 0 && (
-                                    <div className="absolute top-2 left-2 bg-gradient-primary text-white px-2 py-1 rounded-md text-xs font-medium">
-                                        Main
+            <div className={cn(!showUploadArea && "hidden")}>
+                {/* Image Gallery */}
+                {images.length > 0 && (
+                    <div>
+                        <h3 className="text-lg font-medium mb-4 text-card-foreground">Uploaded Images ({images.length})</h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {images.map((image: ProductImage, idx: number) => (
+                                <Card key={idx} className="relative group overflow-hidden bg-gradient-card shadow-soft">
+                                    <div className="aspect-square">
+                                        <img
+                                            alt={`Product image ${idx + 1}`}
+                                            className="w-full h-full object-cover transition-transform duration-smooth group-hover:scale-105"
+                                            src={image.url}
+                                        />
                                     </div>
-                                )}
-                                <button
-                                    className="absolute top-2 right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-smooth hover:bg-destructive/90"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        removeImage(image.id);
-                                    }}
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
+                                    {idx === 0 && (
+                                        <div className="absolute top-2 left-2 bg-gradient-primary text-white px-2 py-1 rounded-md text-xs font-medium">
+                                            Main
+                                        </div>
+                                    )}
+                                    <button
+                                        className="absolute top-2 right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-smooth hover:bg-destructive/90"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            removeImage(image.id);
+                                        }}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </Card>
+                            ))}
+
+                            {/* Add More Button */}
+                            <Card
+                                className="relative group overflow-hidden bg-gradient-card shadow-soft border-2 border-dashed border-border hover:border-primary/50 transition-colors duration-smooth cursor-pointer"
+                                onClick={openFileDialog}
+                            >
+                                <div className="aspect-square flex items-center justify-center">
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-primary group-hover:text-white transition-colors duration-smooth">
+                                            <Plus className="w-4 h-4" />
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">Add More</p>
+                                    </div>
+                                </div>
                             </Card>
-                        ))}
-
-                        {/* Add More Button */}
-                        <Card
-                            className="relative group overflow-hidden bg-gradient-card shadow-soft border-2 border-dashed border-border hover:border-primary/50 transition-colors duration-smooth cursor-pointer"
-                            onClick={openFileDialog}
-                        >
-                            <div className="aspect-square flex items-center justify-center">
-                                <div className="text-center">
-                                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center mx-auto mb-2 group-hover:bg-primary group-hover:text-white transition-colors duration-smooth">
-                                        <Plus className="w-4 h-4" />
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">Add More</p>
-                                </div>
-                            </div>
-                        </Card>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {images.length === 0 && (
-                <div className="text-center py-8">
-                    <p className="text-muted-foreground">No images uploaded yet</p>
-                </div>
-            )}
+                {images.length === 0 && (
+                    <div className="text-center py-8">
+                        <p className="text-muted-foreground">No images uploaded yet</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
