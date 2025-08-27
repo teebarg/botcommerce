@@ -37,10 +37,10 @@ class ReviewCreate(BaseModel):
 
 class Product(BM):
     id: int
-    name: str
+    name: Optional[str] = None
     sku: Optional[str] = None
     slug: str
-    description: str
+    description: Optional[str] = None
     image: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
     ratings: float
@@ -53,10 +53,10 @@ class Product(BM):
 
 class SearchProduct(BaseModel):
     id: int
-    name: str
+    name: Optional[str] = None
     sku: Optional[str] = None
     slug: str
-    description: str
+    description: Optional[str] = None
     image: Optional[str] = None
     ratings: float
     categories: List[str]
@@ -93,4 +93,10 @@ class Products(BaseModel):
 
 class ProductCreateBundle(ProductCreate):
     images: Optional[List[ImageUpload]] = None
+    variants: Optional[List[VariantWithStatus]] = None
+
+class ProductBulkImages(BaseModel):
+    images: Optional[List[ImageUpload]] = None
+
+class ProductImageMetadata(ProductCreate):
     variants: Optional[List[VariantWithStatus]] = None

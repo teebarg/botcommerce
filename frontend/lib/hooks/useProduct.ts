@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tansta
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, ProductVariant, PaginatedProduct } from "@/schemas";
+import { Product, PaginatedProductSearch, Message, ProductVariant, PaginatedProduct, ProductImage } from "@/schemas";
 
 type SearchParams = {
     search?: string;
@@ -88,6 +88,29 @@ export const useSimilarProducts = (productId: number, num: number = 16) => {
             return response.json();
         },
         enabled: !!productId,
+    });
+};
+
+export const useImageGallery = () => {
+    return useQuery({
+        queryKey: ["gallery"],
+        queryFn: async () => await api.get<ProductImage[]>("/product/gallery"),
+    });
+};
+
+export const useCreateImageMetadata = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ imageId, input }: { imageId: number; input: any }) => await api.post<Message>(`/product/${imageId}/metadata`, input),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
+            toast.success("Image metadata created");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to create image metadata");
+        },
     });
 };
 

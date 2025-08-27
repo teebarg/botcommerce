@@ -6,13 +6,15 @@ import { Upload, X, Image as ImageIcon, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import ComponentLoader from "@/components/component-loader";
 
 interface ImageUploadProps {
     images: ProductImage[];
     onImagesChange: (images: ProductImage[]) => void;
+    isLoading?: boolean;
 }
 
-export function ImageUpload({ images, onImagesChange }: ImageUploadProps) {
+export function ImageUpload({ images, onImagesChange, isLoading = false }: ImageUploadProps) {
     const [isDragOver, setIsDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +98,7 @@ export function ImageUpload({ images, onImagesChange }: ImageUploadProps) {
                         Choose Images
                     </Button>
                     <p className="text-xs text-muted-foreground mt-2">Supports JPG, PNG, WebP up to 10MB each</p>
+                    {isLoading && <ComponentLoader />}
                 </div>
             </Card>
 
@@ -106,16 +109,16 @@ export function ImageUpload({ images, onImagesChange }: ImageUploadProps) {
                 <div>
                     <h3 className="text-lg font-medium mb-4 text-card-foreground">Uploaded Images ({images.length})</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {images.map((image, index) => (
-                            <Card key={image.id} className="relative group overflow-hidden bg-gradient-card shadow-soft">
+                        {images.map((image: ProductImage, idx: number) => (
+                            <Card key={idx} className="relative group overflow-hidden bg-gradient-card shadow-soft">
                                 <div className="aspect-square">
                                     <img
-                                        alt={`Product image ${index + 1}`}
+                                        alt={`Product image ${idx + 1}`}
                                         className="w-full h-full object-cover transition-transform duration-smooth group-hover:scale-105"
                                         src={image.url}
                                     />
                                 </div>
-                                {index === 0 && (
+                                {idx === 0 && (
                                     <div className="absolute top-2 left-2 bg-gradient-primary text-white px-2 py-1 rounded-md text-xs font-medium">
                                         Main
                                     </div>

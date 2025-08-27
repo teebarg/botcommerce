@@ -1,5 +1,4 @@
 from typing import Any
-import base64
 
 from fastapi import (
     APIRouter,
@@ -7,10 +6,7 @@ from fastapi import (
     HTTPException,
     Query,
     BackgroundTasks,
-    Request,
-    UploadFile,
-    File,
-    Form
+    Request
 )
 from app.core.deps import (
     CurrentUser,
@@ -28,6 +24,8 @@ from app.models.product import (
     VariantWithStatus,
     Product, Products, SearchProducts, SearchProduct,
     ProductCreateBundle,
+    ProductBulkImages,
+    ProductImageMetadata
 )
 from app.services.meilisearch import (
     clear_index,
@@ -64,7 +62,8 @@ async def get_landing_products(request: Request) -> LandingProducts:
     result = {}
 
     for product_type in ["trending", "latest", "featured"]:
-        filters = [f"collections IN [{product_type}]", "min_variant_price >= 1"]
+        filters = [
+            f"collections IN [{product_type}]", "min_variant_price >= 1"]
         search_params = {
             "limit": 6 if product_type == "featured" else 4,
             "offset": 0,
@@ -88,6 +87,23 @@ async def get_landing_products(request: Request) -> LandingProducts:
         result[product_type] = search_results["hits"]
 
     return result
+
+
+@router.get("/gallery")
+async def image_gallery():
+    """
+    Upload one or more product images.
+    """
+    try:
+        images = await db.productimage.find_many(
+            where={
+                "product_id": {"equals": None}
+            }
+        )
+        return images
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/export")
@@ -259,7 +275,8 @@ async def search(
                 "matchingStrategy": "all"
             }
         )
-        suggestions = list({hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+        suggestions = list(
+            {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -288,7 +305,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
     data = {
         "name": product.name,
         "slug": slugified_name,
-        "sku": generate_sku(product_name=product.name),
+        "sku": generate_sku(),
         "description": product.description,
         "brand": {"connect": {"id": product.brand_id}},
     }
@@ -339,7 +356,7 @@ async def create_product_bundle(
             data: dict[str, Any] = {
                 "name": payload.name,
                 "slug": slugified_name,
-                "sku": generate_sku(product_name=payload.name),
+                "sku": generate_sku(),
                 "description": payload.description,
             }
 
@@ -347,13 +364,16 @@ async def create_product_bundle(
                 data["brand"] = {"connect": {"id": payload.brand_id}}
 
             if payload.category_ids:
-                data["categories"] = {"connect": [{"id": id} for id in payload.category_ids]}
+                data["categories"] = {"connect": [{"id": id}
+                                                  for id in payload.category_ids]}
 
             if payload.collection_ids:
-                data["collections"] = {"connect": [{"id": id} for id in payload.collection_ids]}
+                data["collections"] = {"connect": [{"id": id}
+                                                   for id in payload.collection_ids]}
 
             if payload.tags_ids:
-                data["tags"] = {"connect": [{"id": id} for id in payload.tags_ids]}
+                data["tags"] = {"connect": [{"id": id}
+                                            for id in payload.tags_ids]}
 
             product = await tx.product.create(data=data)
 
@@ -370,7 +390,8 @@ async def create_product_bundle(
                         })
                     except Exception as e:
                         logger.error(e)
-                        raise HTTPException(status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
 
                 if created_images:
                     await tx.productimage.create_many(data=created_images)
@@ -381,7 +402,7 @@ async def create_product_bundle(
                     try:
                         await tx.productvariant.create(
                             data={
-                                "sku": generate_sku(product_name=product.name),
+                                "sku": generate_sku(),
                                 "price": variant.price,
                                 "old_price": variant.old_price,
                                 "inventory": variant.inventory,
@@ -393,9 +414,11 @@ async def create_product_bundle(
                         )
                     except Exception as e:
                         logger.error(e)
-                        raise HTTPException(status_code=400, detail=f"Failed to create variant: {str(e)}")
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            background_tasks.add_task(reindex_product, cache=redis, product_id=product.id)
+            background_tasks.add_task(
+                reindex_product, cache=redis, product_id=product.id)
 
             full = await tx.product.find_unique(
                 where={"id": product.id},
@@ -404,7 +427,8 @@ async def create_product_bundle(
 
             return full
         except UniqueViolationError:
-            raise HTTPException(status_code=400, detail="Product with this name already exists")
+            raise HTTPException(
+                status_code=400, detail="Product with this name already exists")
         except HTTPException:
             raise
         except Exception as e:
@@ -529,7 +553,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
     try:
         created_variant = await db.productvariant.create(
             data={
-                "sku": generate_sku(product_name=product.name),
+                "sku": generate_sku(),
                 "price": variant.price,
                 "old_price": variant.old_price,
                 "inventory": variant.inventory,
@@ -730,6 +754,7 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
 
     return {"success": True}
 
+
 @router.post("/upload-products/")
 async def upload_products(
     user: CurrentUser,
@@ -823,64 +848,114 @@ async def reorder_images(id: int, image_ids: list[int], redis: RedisClient):
 
 
 @router.post("/images/upload")
-async def upload_product_images(
-    files: list[UploadFile] = File(...),
-    metas: list[str] | None = Form(default=None),
+async def upload_product_images(payload: ProductBulkImages):
+    """
+    Upload one or more product images.
+    """
+    async with db.tx() as tx:
+        try:
+            if payload.images:
+                created_images = []
+                for index, img in enumerate(payload.images):
+                    try:
+                        image_url = upload(bucket="product-images", data=img)
+                        created_images.append({
+                            "image": image_url,
+                            "order": 0,
+                        })
+                    except Exception as e:
+                        logger.error(e)
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
+
+                if created_images:
+                    await tx.productimage.create_many(data=created_images)
+
+            return {"success": True}
+        except UniqueViolationError:
+            raise HTTPException(
+                status_code=400, detail="Product with this name already exists")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{image_id}/metadata")
+async def create_image_metadata(
+    image_id: int,
+    payload: ProductImageMetadata,
+    background_tasks: BackgroundTasks,
+    redis: RedisClient,
 ):
     """
-    Upload one or more product images via multipart/form-data and return their public URLs.
-
-    Form fields:
-    - files: list of image files (image/*)
-    - metas: optional parallel list of JSON strings for each file's metadata
+    Create a product, images and variants.
+    - Creates the product with provided relations
+    - Uploads additional images to Supabase (if provided)
+    - Creates variants (if provided)
     """
-    if not files:
-        raise HTTPException(status_code=400, detail="No files provided")
+    async with db.tx() as tx:
+        try:
+            slugified_name = slugify(payload.name)
 
-    uploaded: list[dict] = []
+            data: dict[str, Any] = {
+                "name": payload.name,
+                "slug": slugified_name,
+                "sku": generate_sku(),
+                # "description": payload.description,
+            }
 
-    # Ensure metas list aligns with files length
-    metas = metas or []
-    if len(metas) < len(files):
-        # pad with empty objects as strings
-        metas = metas + ["{}"] * (len(files) - len(metas))
+            if payload.brand_id is not None:
+                data["brand"] = {"connect": {"id": payload.brand_id}}
 
-    try:
-        for index, file in enumerate(files):
-            # Read file bytes
-            file_bytes = await file.read()
+            if payload.category_ids:
+                data["categories"] = {"connect": [{"id": id}
+                                                  for id in payload.category_ids]}
 
-            # Derive extension and unique name
-            original_name = file.filename or "upload.jpg"
-            extension = original_name.split(".")[-1]
+            if payload.collection_ids:
+                data["collections"] = {"connect": [{"id": id}
+                                                   for id in payload.collection_ids]}
 
-            # Build ImageUpload payload for existing storage util
-            image_payload = ImageUpload(
-                file=base64.b64encode(file_bytes).decode("utf-8"),
-                file_name=original_name,
-                content_type=file.content_type or f"image/{extension}",
+            product = await tx.product.create(data=data)
+
+            await tx.productimage.update(
+                where={"id": image_id},
+                data={
+                    "product": {"connect": {"id": product.id}}
+                }
             )
 
-            image_url = upload(bucket="product-images", data=image_payload)
+            # Variants
+            if payload.variants:
+                for variant in payload.variants:
+                    try:
+                        await tx.productvariant.create(
+                            data={
+                                "sku": generate_sku(),
+                                "price": variant.price,
+                                "old_price": variant.old_price,
+                                "inventory": variant.inventory,
+                                "product_id": product.id,
+                                "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                "size": variant.size,
+                                "color": variant.color,
+                            }
+                        )
+                    except Exception as e:
+                        logger.error(e)
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            # Parse metadata JSON if provided
-            meta_raw = metas[index] if index < len(metas) else "{}"
-            try:
-                import json
+            background_tasks.add_task(
+                reindex_product, cache=redis, product_id=product.id)
 
-                meta_obj = json.loads(meta_raw) if isinstance(meta_raw, str) else meta_raw
-            except Exception:
-                meta_obj = {}
-
-            uploaded.append({
-                "url": image_url,
-                "metadata": meta_obj,
-            })
-
-        return {"success": True, "images": uploaded}
-    except HTTPException:
-        # Re-raise known HTTP errors
-        raise
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+            return {"success": True}
+        except UniqueViolationError:
+            raise HTTPException(
+                status_code=400, detail="Product with this name already exists")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=500, detail=str(e))

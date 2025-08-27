@@ -372,7 +372,7 @@ async def process_products(user_id: int) -> list[dict]:
                     "id": row_data.get("id", ""),
                     "name": name,
                     "slug": row_data.get("slug", name.lower().replace(" ", "-")),
-                    "sku": row_data.get("sku", generate_sku(product_name=name)),
+                    "sku": row_data.get("sku", generate_sku()),
                     "description": row_data.get("description", ""),
                     "price": float(row_data.get("price", 0.0)),
                     "old_price": float(row_data.get("old_price", 0.0)),
