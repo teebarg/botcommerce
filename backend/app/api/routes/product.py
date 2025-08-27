@@ -547,22 +547,27 @@ async def delete_product(id: int, redis: RedisClient) -> Message:
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    async with db.tx() as tx:
+        try:
+            images = await tx.productimage.find_many(where={"product_id": id})
+            paths = [image.image.split("/storage/v1/object/public/product-images/")[1] for image in images]
+            if paths:
+                supabase.storage.from_("product-images").remove(paths)
 
-    try:
-        await db.productimage.delete_many(where={"product_id": id})
-        await db.review.delete_many(where={"product_id": id})
-        await db.productvariant.delete_many(where={"product_id": id})
+            await tx.productimage.delete_many(where={"product_id": id})
+            await tx.review.delete_many(where={"product_id": id})
+            await tx.productvariant.delete_many(where={"product_id": id})
 
-        await db.product.delete(where={"id": id})
+            await tx.product.delete(where={"id": id})
 
-        delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
-                        document_id=str(id))
-    except Exception as e:
-        logger.error(e)
+            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
+                            document_id=str(id))
+        except Exception as e:
+            logger.error(e)
 
-    await redis.invalidate_list_cache("products")
-    await redis.bust_tag(f"product:{product.slug}")
-    return Message(message="Product deleted successfully")
+        await redis.invalidate_list_cache("products")
+        await redis.bust_tag(f"product:{product.slug}")
+        return Message(message="Product deleted successfully")
 
 
 @router.post("/{id}/variants")
@@ -725,7 +730,7 @@ async def delete_image(id: int, redis: RedisClient):
 
     try:
         await db.product.update(where={"id": id}, data={"image": None})
-        reindex_product(cache=redis, product_id=id)
+        await reindex_product(cache=redis, product_id=id)
 
         return {"success": True}
     except Exception as e:
@@ -779,20 +784,37 @@ async def delete_gallery_image(image_id: int, redis: RedisClient) -> Message:
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
 
-    try:
-        file_path = image.image.split(
-            "/storage/v1/object/public/product-images/")[1]
+    async with db.tx() as tx:
+        try:
+            file_path = image.image.split(
+                "/storage/v1/object/public/product-images/")[1]
 
-        supabase.storage.from_("product-images").remove([file_path])
+            supabase.storage.from_("product-images").remove([file_path])
 
-        await db.productimage.delete(where={"id": image_id})
-        if image.product_id:
-            reindex_product(cache=redis, product_id=image.product_id)
+            await tx.productimage.delete(where={"id": image_id})
+            if image.product_id:
+                images = await tx.productimage.find_many(where={"product_id": image.product_id})
+                paths = [image.image.split("/storage/v1/object/public/product-images/")[1] for image in images]
+                if paths:
+                    supabase.storage.from_("product-images").remove(paths)
 
-        return {"message": "Image deleted successfully"}
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
+                await tx.productimage.delete_many(where={"product_id": image.product_id})
+                await tx.review.delete_many(where={"product_id": image.product_id})
+                await tx.productvariant.delete_many(where={"product_id": image.product_id})
+
+                await tx.product.delete(where={"id": image.product_id})
+
+                delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
+                                document_id=str(image.product_id))
+                await reindex_product(cache=redis, product_id=image.product_id)
+                await redis.invalidate_list_cache("products")
+                await redis.invalidate_list_cache("shared")
+                await redis.invalidate_list_cache("sharedcollection")
+
+            return {"message": "Image deleted successfully"}
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/upload-products/")
