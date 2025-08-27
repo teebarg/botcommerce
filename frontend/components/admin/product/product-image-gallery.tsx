@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useEffect, useRef } from "react";
 
 import { ImageUpload } from "./product-image-upload";
+import { GalleryCard } from "./product-gallery-card";
 
 import { api } from "@/apis/client";
-import { useEffect, useRef } from "react";
 import { useImageGalleryInfinite } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { GalleryCard } from "./product-gallery-card";
 
 interface ProductImage {
     id: string;
@@ -30,13 +30,16 @@ export function ProductImageGallery() {
         const observer = new IntersectionObserver(
             (entries) => {
                 const first = entries[0];
+
                 if (first.isIntersecting && hasNextPage && !isFetchingNextPage) {
                     fetchNextPage();
                 }
             },
             { root: null, rootMargin: "200px", threshold: 0.1 }
         );
+
         observer.observe(el);
+
         return () => observer.unobserve(el);
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
@@ -82,7 +85,7 @@ export function ProductImageGallery() {
                 <p className="text-sm text-default-500">Manage your product images.</p>
             </div>
             <div className="mb-8 max-w-xl">
-                <ImageUpload images={[]} isLoading={isLoading} onImagesChange={handleImagesChange} showUploadArea={false} />
+                <ImageUpload images={[]} isLoading={isLoading} showUploadArea={false} onImagesChange={handleImagesChange} />
             </div>
 
             {isImagesLoading ? (

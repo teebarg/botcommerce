@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Star, Package } from "lucide-react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+import Image from "next/image";
+
+import { GalleryCardActions } from "./gallery-card-actions";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn, currency } from "@/lib/utils";
 import { Category, Collection, Product, ProductImage } from "@/schemas";
-import { GalleryCardActions } from "./gallery-card-actions";
 import Overlay from "@/components/overlay";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 import ProductImagesManager from "@/components/admin/product/product-images";
 
 type GalleryImage = ProductImage & {
@@ -31,16 +33,18 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
             )}
             onClick={onClick}
         >
-            <CardContent className="p-0">
-                <div className="relative aspect-square overflow-hidden">
+            <CardContent className="p-0 md:p-0">
+                <div className="relative aspect-product overflow-hidden">
                     {image.image ? (
                         <>
-                            <img
+                            <Image
+                                fill
                                 alt="product image"
                                 className={cn(
                                     "w-full h-full object-cover transition-all duration-500 group-hover:scale-110",
                                     imageLoaded ? "opacity-100" : "opacity-0"
                                 )}
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 src={image.image}
                                 onLoad={() => setImageLoaded(true)}
                             />
@@ -84,61 +88,66 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                             onOpenChange={imgState.setOpen}
                         >
                             <div className="p-6 overflow-y-auto">
-                                <ProductImagesManager initialImages={product?.images?.sort((a, b) => a.order - b.order) || []} productId={product.id} />
+                                <ProductImagesManager
+                                    initialImages={product?.images?.sort((a, b) => a.order - b.order) || []}
+                                    productId={product.id}
+                                />
                             </div>
                         </Overlay>
                     )}
                 </div>
 
-                <div className="p-4 space-y-3">
-                    <div className="space-y-2">
-                        <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{product?.name}</h3>
+                {product && (
+                    <div className="p-4 space-y-3">
+                        <div className="space-y-2">
+                            <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{product?.name}</h3>
 
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground font-mono">{product?.sku}</span>
-                            {product?.ratings && product?.ratings > 0 && (
-                                <div className="flex items-center gap-1">
-                                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                    <span className="text-xs text-muted-foreground">{product?.ratings}</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            {product?.brand && (
-                                <Badge className="text-xs" variant="outline">
-                                    {product?.brand?.name}
-                                </Badge>
-                            )}
-                            {product?.variants?.length && (
-                                <span className="text-xs text-muted-foreground">
-                                    {product?.variants?.length} variant{product?.variants?.length !== 1 ? "s" : ""}
-                                </span>
-                            )}
-                        </div>
-
-                        {product?.variants?.length && (
                             <div className="flex items-center gap-2">
-                                <span className="font-semibold text-primary">{currency(product?.variants?.[0].price)}</span>
-                                {product?.variants?.[0].old_price > 0 && (
-                                    <span className="text-sm font-semibold line-through text-primary">
-                                        {currency(product?.variants?.[0].old_price)}
+                                <span className="text-xs text-muted-foreground font-mono">{product?.sku}</span>
+                                {product?.ratings && product?.ratings > 0 && (
+                                    <div className="flex items-center gap-1">
+                                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                        <span className="text-xs text-muted-foreground">{product?.ratings}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                {product?.brand && (
+                                    <Badge className="text-xs" variant="outline">
+                                        {product?.brand?.name}
+                                    </Badge>
+                                )}
+                                {product?.variants?.length && (
+                                    <span className="text-xs text-muted-foreground">
+                                        {product?.variants?.length} variant{product?.variants?.length !== 1 ? "s" : ""}
                                     </span>
                                 )}
                             </div>
-                        )}
-                    </div>
 
-                    <div className="flex flex-wrap gap-1">
-                        {product?.categories?.slice(0, 3).map((category: Category, idx: number) => (
-                            <Badge key={idx} className="text-xs" variant="secondary">
-                                {category?.name}
-                            </Badge>
-                        ))}
+                            {product?.variants?.length && (
+                                <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-primary">{currency(product?.variants?.[0].price)}</span>
+                                    {product?.variants?.[0].old_price > 0 && (
+                                        <span className="text-sm font-semibold line-through text-primary">
+                                            {currency(product?.variants?.[0].old_price)}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-1">
+                            {product?.categories?.slice(0, 3).map((category: Category, idx: number) => (
+                                <Badge key={idx} className="text-xs" variant="secondary">
+                                    {category?.name}
+                                </Badge>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
             </CardContent>
         </Card>
     );

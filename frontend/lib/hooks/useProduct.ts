@@ -95,13 +95,13 @@ export const useImageGalleryInfinite = (pageSize: number = 24) => {
     return useInfiniteQuery({
         queryKey: ["gallery", "infinite", pageSize],
         queryFn: async ({ pageParam = 0 }) =>
-            await api.get<{ images: ProductImage[]; skip: number; limit: number; total_count: number; total_pages: number }>(
-                "/product/gallery",
-                { params: { skip: pageParam, limit: pageSize } }
-            ),
+            await api.get<{ images: ProductImage[]; skip: number; limit: number; total_count: number; total_pages: number }>("/product/gallery", {
+                params: { skip: pageParam, limit: pageSize },
+            }),
         getNextPageParam: (lastPage) => {
             const nextSkip = lastPage.skip + lastPage.limit;
             const hasMore = nextSkip < lastPage.total_count;
+
             return hasMore ? nextSkip : undefined;
         },
         initialPageParam: 0,
@@ -345,7 +345,6 @@ export const useDeleteImages = () => {
         },
     });
 };
-
 
 export const useDeleteGalleryImage = () => {
     const queryClient = useQueryClient();

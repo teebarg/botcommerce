@@ -26,7 +26,7 @@ type FormProduct = Omit<Partial<Product>, "brand" | "images" | "variants" | "cat
 interface ProductSheetFormProps {
     imageId: number;
     onClose: () => void;
-    currentProduct?: Product
+    currentProduct?: Product;
 }
 
 export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSheetFormProps) {
@@ -244,7 +244,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                 <Button variant="destructive" onClick={onClose}>
                     Close
                 </Button>
-                <Button variant="indigo" onClick={handleSubmit} disabled={isDisabled} isLoading={isPending}>
+                <Button disabled={isDisabled} isLoading={isPending} variant="indigo" onClick={handleSubmit}>
                     Save
                 </Button>
             </div>

@@ -45,7 +45,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
                 }
                 onOpenChange={editState.setOpen}
             >
-                <ProductSheetForm imageId={image.id} onClose={editState.close} currentProduct={image.product} />
+                <ProductSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
             </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
