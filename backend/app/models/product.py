@@ -6,6 +6,7 @@ from app.models.base import BM
 from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review, ProductVariant
 
 class VariantWithStatus(BaseModel):
+    id: Optional[int] = None
     price: float = Field(..., gt=0)
     old_price: Optional[float] = 0.0
     inventory: int = Field(..., ge=0)
@@ -13,7 +14,7 @@ class VariantWithStatus(BaseModel):
     color: Optional[str] = None
 
 class ProductCreate(BaseModel):
-    name: str = Field(..., min_length=1)
+    name: Optional[str] = Field(None)
     description: Optional[str] = None
     brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None
@@ -37,10 +38,10 @@ class ReviewCreate(BaseModel):
 
 class Product(BM):
     id: int
-    name: str
+    name: Optional[str] = None
     sku: Optional[str] = None
     slug: str
-    description: str
+    description: Optional[str] = None
     image: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
     ratings: float
@@ -53,10 +54,10 @@ class Product(BM):
 
 class SearchProduct(BaseModel):
     id: int
-    name: str
+    name: Optional[str] = None
     sku: Optional[str] = None
     slug: str
-    description: str
+    description: Optional[str] = None
     image: Optional[str] = None
     ratings: float
     categories: List[str]
@@ -93,4 +94,10 @@ class Products(BaseModel):
 
 class ProductCreateBundle(ProductCreate):
     images: Optional[List[ImageUpload]] = None
+    variants: Optional[List[VariantWithStatus]] = None
+
+class ProductBulkImages(BaseModel):
+    images: Optional[List[ImageUpload]] = None
+
+class ProductImageMetadata(ProductCreate):
     variants: Optional[List[VariantWithStatus]] = None

@@ -1,6 +1,7 @@
 import type { FormProduct } from "./product-creator";
 
 import { Package, Image as ImageIcon, Palette } from "lucide-react";
+import Image from "next/image";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,15 +35,21 @@ export function ProductReview({ product }: ProductReviewProps) {
                         </div>
 
                         {images.length > 0 && (
-                            <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                                <img alt="Main product image" className="w-full h-full object-cover" src={images[0].url} />
+                            <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
+                                <Image
+                                    fill
+                                    alt="Main product image"
+                                    className="w-full h-full object-cover"
+                                    sizes="(max-width: 1024px) 50vw, 33vw"
+                                    src={images[0].url}
+                                />
                             </div>
                         )}
                     </div>
                 </Card>
 
                 <div className="space-y-4">
-                    <Card className="p-4 bg-gradient-card shadow-soft">
+                    <Card className="p-4 bg-card shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
                             <ImageIcon className="w-4 h-4 text-primary" />
                             <h4 className="font-medium text-card-foreground">Images</h4>
@@ -52,7 +59,13 @@ export function ProductReview({ product }: ProductReviewProps) {
                             <div className="grid grid-cols-4 gap-2">
                                 {images.slice(0, 4).map((image, index) => (
                                     <div key={image.id} className="aspect-square rounded overflow-hidden bg-muted relative">
-                                        <img alt={`Product image ${index + 1}`} className="w-full h-full object-cover" src={image.url} />
+                                        <Image
+                                            fill
+                                            alt={`Product image ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                            sizes="25vw"
+                                            src={image.url}
+                                        />
                                         {index === 0 && <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded">Main</div>}
                                     </div>
                                 ))}
@@ -96,7 +109,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                         </div>
                     </Card>
 
-                    <Card className="p-4 bg-gradient-card shadow-soft">
+                    <Card className="p-4 bg-card shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
                             <Package className="w-4 h-4 text-primary" />
                             <h4 className="font-medium text-card-foreground">Variants</h4>

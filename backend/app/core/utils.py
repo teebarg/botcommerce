@@ -60,6 +60,8 @@ def slugify(text) -> str:
     Returns:
         str: The slugified string
     """
+    if not text:
+        return ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
     text = text.lower().replace(' ', '-')
     slug = ''.join(char for char in text if char.isalnum() or char == '-')
     while '--' in slug:
@@ -240,32 +242,15 @@ async def generate_newsletter_email(email: str) -> EmailData:
     return EmailData(html_content=html_content, subject="Welcome to our newsletter")
 
 
-def generate_slug(name: str) -> str:
-    # Remove accents
-    name = unicodedata.normalize("NFKD", name.lower()).encode("ASCII", "ignore").decode("ASCII")
-
-    # Replace spaces with hyphens
-    name = re.sub(r"\s+", "-", name)
-
-    # Remove all other special characters
-    name = re.sub(r"[^a-z0-9\-]", "", name)
-
-    # Remove multiple hyphens
-    name = re.sub(r"-+", "-", name)
-    name = name.strip("-")
-
-    return name
-
-def generate_sku(product_name: str, rand_digits: int = 3) -> str:
-    def sanitize(text, length=3):
-        text = re.sub(r'\W+', '', text)
-        return text[:length].upper()
-
-    name_part = sanitize(product_name)
-    random_part = ''.join(random.choices(string.digits, k=rand_digits))
-
-    sku = f"{name_part}-{random_part}"
-    return sku.strip('-')
+def generate_sku(prefix: str = "PRD") -> str:
+    """
+    Generate a unique product SKU.
+    Format: {prefix}-{YYYYMMDD}-{RANDOM}
+    Example: PRD-20250825-7G9X2
+    """
+    date_part = datetime.now().strftime("%Y%m%d")
+    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    return f"{prefix}-{date_part}-{random_part}"
 
 
 

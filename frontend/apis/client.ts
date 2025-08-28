@@ -1,4 +1,4 @@
-// import { signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 import { getCookie } from "@/lib/util/server-utils";
 
@@ -38,7 +38,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (!response.ok) {
         if (response.status === 401) {
-            // await signOut({ callbackUrl: "/auth/signin" });
+            await signOut({ redirect: false });
             // window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         }
         const error = await response.json();

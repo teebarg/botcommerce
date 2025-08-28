@@ -25,7 +25,7 @@ async def seed():
         hashed_password = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         return await db.user.upsert(
             where={"email": email},
-             data={
+            data={
                 "create": {
                     "first_name": fake.first_name(),
                     "last_name": fake.last_name(),

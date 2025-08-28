@@ -9,14 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { cn, currency } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductVariant } from "@/schemas";
+import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 
 interface VariantCreationProps {
     variants: ProductVariant[];
     onVariantsChange: (variants: ProductVariant[]) => void;
 }
-
-const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
-const COLOR_OPTIONS = ["Red", "Blue", "Green", "Black", "White"];
 
 export function VariantCreation({ variants, onVariantsChange }: VariantCreationProps) {
     const [newVariant, setNewVariant] = useState<Partial<ProductVariant>>({
@@ -63,7 +61,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
             </div>
 
             {/* Add New Variant */}
-            <Card className="p-4 bg-gradient-card shadow-soft">
+            <Card className="p-4 bg-card shadow-sm">
                 <div className="space-y-4">
                     <Label className="text-sm font-medium flex items-center gap-2">
                         <Plus className="w-4 h-4 text-primary" />
@@ -78,7 +76,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                     <SelectValue placeholder="Select Size" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {SIZE_OPTIONS.map((size) => (
+                                    {SIZE_OPTIONS.map((size: string) => (
                                         <SelectItem key={size} value={size}>
                                             {size}
                                         </SelectItem>
@@ -97,7 +95,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                     <SelectValue placeholder="Select Color" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {COLOR_OPTIONS.map((color) => (
+                                    {COLOR_OPTIONS.map((color: string) => (
                                         <SelectItem key={color} value={color}>
                                             {color}
                                         </SelectItem>
@@ -163,7 +161,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                     <div className="space-y-3">
                         {variants.map((variant) => {
                             return (
-                                <Card key={variant.id} className="p-4 bg-gradient-card shadow-soft">
+                                <Card key={variant.id} className="p-4 bg-card shadow-sm">
                                     <div className="flex md:items-center md:flex-row flex-col justify-between gap-4">
                                         <div className="flex items-center gap-3 flex-1">
                                             <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">

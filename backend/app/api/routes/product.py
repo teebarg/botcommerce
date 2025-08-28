@@ -1,5 +1,4 @@
 from typing import Any
-import base64
 
 from fastapi import (
     APIRouter,
@@ -7,10 +6,7 @@ from fastapi import (
     HTTPException,
     Query,
     BackgroundTasks,
-    Request,
-    UploadFile,
-    File,
-    Form
+    Request
 )
 from app.core.deps import (
     CurrentUser,
@@ -28,6 +24,8 @@ from app.models.product import (
     VariantWithStatus,
     Product, Products, SearchProducts, SearchProduct,
     ProductCreateBundle,
+    ProductBulkImages,
+    ProductImageMetadata
 )
 from app.services.meilisearch import (
     clear_index,
@@ -64,7 +62,8 @@ async def get_landing_products(request: Request) -> LandingProducts:
     result = {}
 
     for product_type in ["trending", "latest", "featured"]:
-        filters = [f"collections IN [{product_type}]", "min_variant_price >= 1"]
+        filters = [
+            f"collections IN [{product_type}]", "min_variant_price >= 1"]
         search_params = {
             "limit": 6 if product_type == "featured" else 4,
             "offset": 0,
@@ -88,6 +87,44 @@ async def get_landing_products(request: Request) -> LandingProducts:
         result[product_type] = search_results["hits"]
 
     return result
+
+
+@router.get("/gallery")
+async def image_gallery(skip: int = Query(default=0), limit: int = Query(default=10)):
+    """
+    Upload one or more product images.
+    """
+    try:
+        where_clause = {
+            "order": 0,
+        }
+        images = await db.productimage.find_many(
+            where=where_clause,
+            skip=skip,
+            take=limit,
+            order={"created_at": "desc"},
+            include={
+                "product": {
+                    "include": {
+                        "categories": True,
+                        "collections": True,
+                        "variants": True,
+                        "images": True,
+                    }
+                }
+            },
+        )
+        total = await db.productimage.count(where=where_clause)
+        return {
+            "images": images,
+            "skip": skip,
+            "limit": limit,
+            "total_pages": ceil(total/limit),
+            "total_count": total,
+        }
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/export")
@@ -259,7 +296,8 @@ async def search(
                 "matchingStrategy": "all"
             }
         )
-        suggestions = list({hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+        suggestions = list(
+            {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -288,7 +326,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
     data = {
         "name": product.name,
         "slug": slugified_name,
-        "sku": generate_sku(product_name=product.name),
+        "sku": generate_sku(),
         "description": product.description,
         "brand": {"connect": {"id": product.brand_id}},
     }
@@ -339,7 +377,7 @@ async def create_product_bundle(
             data: dict[str, Any] = {
                 "name": payload.name,
                 "slug": slugified_name,
-                "sku": generate_sku(product_name=payload.name),
+                "sku": generate_sku(),
                 "description": payload.description,
             }
 
@@ -347,13 +385,16 @@ async def create_product_bundle(
                 data["brand"] = {"connect": {"id": payload.brand_id}}
 
             if payload.category_ids:
-                data["categories"] = {"connect": [{"id": id} for id in payload.category_ids]}
+                data["categories"] = {"connect": [{"id": id}
+                                                  for id in payload.category_ids]}
 
             if payload.collection_ids:
-                data["collections"] = {"connect": [{"id": id} for id in payload.collection_ids]}
+                data["collections"] = {"connect": [{"id": id}
+                                                   for id in payload.collection_ids]}
 
             if payload.tags_ids:
-                data["tags"] = {"connect": [{"id": id} for id in payload.tags_ids]}
+                data["tags"] = {"connect": [{"id": id}
+                                            for id in payload.tags_ids]}
 
             product = await tx.product.create(data=data)
 
@@ -370,7 +411,8 @@ async def create_product_bundle(
                         })
                     except Exception as e:
                         logger.error(e)
-                        raise HTTPException(status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
 
                 if created_images:
                     await tx.productimage.create_many(data=created_images)
@@ -381,7 +423,7 @@ async def create_product_bundle(
                     try:
                         await tx.productvariant.create(
                             data={
-                                "sku": generate_sku(product_name=product.name),
+                                "sku": generate_sku(),
                                 "price": variant.price,
                                 "old_price": variant.old_price,
                                 "inventory": variant.inventory,
@@ -393,9 +435,11 @@ async def create_product_bundle(
                         )
                     except Exception as e:
                         logger.error(e)
-                        raise HTTPException(status_code=400, detail=f"Failed to create variant: {str(e)}")
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            background_tasks.add_task(reindex_product, cache=redis, product_id=product.id)
+            background_tasks.add_task(
+                reindex_product, cache=redis, product_id=product.id)
 
             full = await tx.product.find_unique(
                 where={"id": product.id},
@@ -404,7 +448,8 @@ async def create_product_bundle(
 
             return full
         except UniqueViolationError:
-            raise HTTPException(status_code=400, detail="Product with this name already exists")
+            raise HTTPException(
+                status_code=400, detail="Product with this name already exists")
         except HTTPException:
             raise
         except Exception as e:
@@ -502,22 +547,27 @@ async def delete_product(id: int, redis: RedisClient) -> Message:
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    async with db.tx() as tx:
+        try:
+            images = await tx.productimage.find_many(where={"product_id": id})
+            paths = [image.image.split("/storage/v1/object/public/product-images/")[1] for image in images]
+            if paths:
+                supabase.storage.from_("product-images").remove(paths)
 
-    try:
-        await db.productimage.delete_many(where={"product_id": id})
-        await db.review.delete_many(where={"product_id": id})
-        await db.productvariant.delete_many(where={"product_id": id})
+            await tx.productimage.delete_many(where={"product_id": id})
+            await tx.review.delete_many(where={"product_id": id})
+            await tx.productvariant.delete_many(where={"product_id": id})
 
-        await db.product.delete(where={"id": id})
+            await tx.product.delete(where={"id": id})
 
-        delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
-                        document_id=str(id))
-    except Exception as e:
-        logger.error(e)
+            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
+                            document_id=str(id))
+        except Exception as e:
+            logger.error(e)
 
-    await redis.invalidate_list_cache("products")
-    await redis.bust_tag(f"product:{product.slug}")
-    return Message(message="Product deleted successfully")
+        await redis.invalidate_list_cache("products")
+        await redis.bust_tag(f"product:{product.slug}")
+        return Message(message="Product deleted successfully")
 
 
 @router.post("/{id}/variants")
@@ -529,7 +579,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
     try:
         created_variant = await db.productvariant.create(
             data={
-                "sku": generate_sku(product_name=product.name),
+                "sku": generate_sku(),
                 "price": variant.price,
                 "old_price": variant.old_price,
                 "inventory": variant.inventory,
@@ -661,7 +711,7 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
 
 
 @router.delete("/{id}/image")
-async def delete_image(id: int, background_tasks: BackgroundTasks, redis: RedisClient):
+async def delete_image(id: int, redis: RedisClient):
     """
     Delete an image from a product.
     """
@@ -674,14 +724,9 @@ async def delete_image(id: int, background_tasks: BackgroundTasks, redis: RedisC
             "/storage/v1/object/public/product-images/")[1]
 
         supabase.storage.from_("product-images").remove([file_path])
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
 
-    try:
         await db.product.update(where={"id": id}, data={"image": None})
-
-        background_tasks.add_task(reindex_product, cache=redis, product_id=id)
+        await reindex_product(cache=redis, product_id=id)
 
         return {"success": True}
     except Exception as e:
@@ -694,7 +739,6 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
     """
     Delete an image from a product images.
     """
-    # Check if product exists
     product = await db.product.find_unique(where={"id": id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -703,32 +747,74 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
 
-    try:
-        file_path = image.image.split(
-            "/storage/v1/object/public/product-images/")[1]
+    async with db.tx() as tx:
+        try:
+            file_path = image.image.split(
+                "/storage/v1/object/public/product-images/")[1]
 
+            supabase.storage.from_("product-images").remove([file_path])
+            await tx.productimage.delete(where={"id": image_id})
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=400, detail=str(e))
+
+        # Reorder images
+        images = await tx.productimage.find_many(where={"product_id": id}, order={"order": "asc"})
+        for index, image in enumerate(images):
+            await tx.productimage.update(
+                where={"id": image.id},
+                data={"order": index}
+            )
+
+        background_tasks.add_task(reindex_product, cache=redis, product_id=id)
+
+        return {"success": True}
+
+
+
+@router.delete("/gallery/{image_id}")
+async def delete_gallery_image(image_id: int, redis: RedisClient) -> Message:
+    """
+    Delete a gallery image.
+    If the image is linked to a product, delete the entire product,
+    its variants, reviews, and all images (both from DB and Supabase).
+    """
+    image = await db.productimage.find_unique(where={"id": image_id})
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    if not image.product_id:
+        file_path = image.image.split("/storage/v1/object/public/product-images/")[1]
         supabase.storage.from_("product-images").remove([file_path])
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-    try:
         await db.productimage.delete(where={"id": image_id})
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
+        return Message(message="Image deleted successfully")
 
-    # Reorder images
-    images = await db.productimage.find_many(where={"product_id": id}, order={"order": "asc"})
-    for index, image in enumerate(images):
-        await db.productimage.update(
-            where={"id": image.id},
-            data={"order": index}
-        )
+    async with db.tx() as tx:
+        product_id = image.product_id
 
-    background_tasks.add_task(reindex_product, cache=redis, product_id=id)
+        images = await tx.productimage.find_many(where={"product_id": product_id})
+        file_paths = [
+            img.image.split("/storage/v1/object/public/product-images/")[1]
+            for img in images
+            if "/storage/v1/object/public/product-images/" in img.image
+        ]
 
-    return {"success": True}
+        if file_paths:
+            supabase.storage.from_("product-images").remove(file_paths)
+
+        await tx.productimage.delete_many(where={"product_id": product_id})
+        await tx.review.delete_many(where={"product_id": product_id})
+        await tx.productvariant.delete_many(where={"product_id": product_id})
+        await tx.product.delete(where={"id": product_id})
+
+    delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(image.product_id))
+    await reindex_product(cache=redis, product_id=image.product_id)
+    await redis.invalidate_list_cache("products")
+    await redis.invalidate_list_cache("shared")
+    await redis.invalidate_list_cache("sharedcollection")
+
+    return Message(message="Product and all related data deleted successfully")
+
 
 @router.post("/upload-products/")
 async def upload_products(
@@ -823,64 +909,202 @@ async def reorder_images(id: int, image_ids: list[int], redis: RedisClient):
 
 
 @router.post("/images/upload")
-async def upload_product_images(
-    files: list[UploadFile] = File(...),
-    metas: list[str] | None = Form(default=None),
-):
+async def upload_product_images(payload: ProductBulkImages):
     """
-    Upload one or more product images via multipart/form-data and return their public URLs.
-
-    Form fields:
-    - files: list of image files (image/*)
-    - metas: optional parallel list of JSON strings for each file's metadata
+    Upload one or more product images.
     """
-    if not files:
-        raise HTTPException(status_code=400, detail="No files provided")
-
-    uploaded: list[dict] = []
-
-    # Ensure metas list aligns with files length
-    metas = metas or []
-    if len(metas) < len(files):
-        # pad with empty objects as strings
-        metas = metas + ["{}"] * (len(files) - len(metas))
-
     try:
-        for index, file in enumerate(files):
-            # Read file bytes
-            file_bytes = await file.read()
-
-            # Derive extension and unique name
-            original_name = file.filename or "upload.jpg"
-            extension = original_name.split(".")[-1]
-
-            # Build ImageUpload payload for existing storage util
-            image_payload = ImageUpload(
-                file=base64.b64encode(file_bytes).decode("utf-8"),
-                file_name=original_name,
-                content_type=file.content_type or f"image/{extension}",
-            )
-
-            image_url = upload(bucket="product-images", data=image_payload)
-
-            # Parse metadata JSON if provided
-            meta_raw = metas[index] if index < len(metas) else "{}"
+        created_images = []
+        for index, img in enumerate(payload.images):
             try:
-                import json
+                image_url = upload(bucket="product-images", data=img)
+                created_images.append({
+                    "image": image_url,
+                    "order": 0,
+                })
+            except Exception as e:
+                logger.error(e)
+                raise HTTPException(
+                    status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
 
-                meta_obj = json.loads(meta_raw) if isinstance(meta_raw, str) else meta_raw
-            except Exception:
-                meta_obj = {}
+        if created_images:
+            await db.productimage.create_many(data=created_images)
 
-            uploaded.append({
-                "url": image_url,
-                "metadata": meta_obj,
-            })
-
-        return {"success": True, "images": uploaded}
+        return {"success": True}
+    except UniqueViolationError:
+        raise HTTPException(
+            status_code=400, detail="Product with this name already exists")
     except HTTPException:
-        # Re-raise known HTTP errors
         raise
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{image_id}/metadata")
+async def create_image_metadata(
+    image_id: int,
+    payload: ProductImageMetadata,
+    background_tasks: BackgroundTasks,
+    redis: RedisClient,
+):
+    """
+    Create a product, images and variants.
+    - Creates the product with provided relations
+    - Uploads additional images to Supabase (if provided)
+    - Creates variants (if provided)
+    """
+    async with db.tx() as tx:
+        try:
+            slugified_name = slugify(payload.name)
+
+            data: dict[str, Any] = {
+                "name": payload.name,
+                "slug": slugified_name,
+                "sku": generate_sku(),
+                # "description": payload.description,
+            }
+
+            if payload.brand_id is not None:
+                data["brand"] = {"connect": {"id": payload.brand_id}}
+
+            if payload.category_ids:
+                data["categories"] = {"connect": [{"id": id}
+                                                  for id in payload.category_ids]}
+
+            if payload.collection_ids:
+                data["collections"] = {"connect": [{"id": id}
+                                                   for id in payload.collection_ids]}
+
+            product = await tx.product.create(data=data)
+
+            await tx.productimage.update(
+                where={"id": image_id},
+                data={
+                    "product": {"connect": {"id": product.id}}
+                }
+            )
+
+            # Variants
+            if payload.variants:
+                for variant in payload.variants:
+                    try:
+                        await tx.productvariant.create(
+                            data={
+                                "sku": generate_sku(),
+                                "price": variant.price,
+                                "old_price": variant.old_price,
+                                "inventory": variant.inventory,
+                                "product_id": product.id,
+                                "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                "size": variant.size,
+                                "color": variant.color,
+                            }
+                        )
+                    except Exception as e:
+                        logger.error(e)
+                        raise HTTPException(
+                            status_code=400, detail=f"Failed to create variant: {str(e)}")
+
+            background_tasks.add_task(
+                reindex_product, cache=redis, product_id=product.id)
+
+            return {"success": True}
+        except UniqueViolationError:
+            raise HTTPException(
+                status_code=400, detail="Product with this name already exists")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.patch("/{image_id}/metadata")
+async def update_image_metadata(
+    image_id: int,
+    payload: ProductImageMetadata,
+    background_tasks: BackgroundTasks,
+    redis: RedisClient,
+):
+    """
+    Create a product, images and variants.
+    - Creates the product with provided relations
+    - Uploads additional images to Supabase (if provided)
+    - Creates variants (if provided)
+    """
+    async with db.tx() as tx:
+        try:
+            existing_image = await db.productimage.find_unique(where={"id": image_id})
+            if not existing_image:
+                raise HTTPException(status_code=404, detail="Image not found")
+
+            update_data = {}
+
+            if payload.name is not None:
+                update_data["name"] = payload.name
+                update_data["slug"] = slugify(payload.name)
+
+            if payload.description is not None:
+                update_data["description"] = payload.description
+
+            if payload.category_ids is not None:
+                category_ids = [{"id": id} for id in payload.category_ids]
+                update_data["categories"] = {"set": category_ids}
+
+            if payload.collection_ids is not None:
+                collection_ids = [{"id": id} for id in payload.collection_ids]
+                update_data["collections"] = {"set": collection_ids}
+            if payload.brand_id is not None:
+                update_data["brand"] = {"connect": {"id": payload.brand_id}}
+
+            await db.product.update(
+                where={"id": existing_image.product_id},
+                data=update_data,
+            )
+
+            # Variants
+            for variant in payload.variants:
+                try:
+                    await tx.productvariant.upsert(
+                        where={
+                            'id': variant.id
+                        },
+                        data={
+                            "create": {
+                                "product_id": existing_image.product_id,
+                                'sku': generate_sku(),
+                                'price': variant.price,
+                                'old_price': variant.old_price,
+                                'inventory': variant.inventory,
+                                'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                'size': variant.size,
+                                'color': variant.color,
+                            },
+                            "update": {
+                                'price': variant.price,
+                                'old_price': variant.old_price,
+                                'inventory': variant.inventory,
+                                'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                'size': variant.size,
+                                'color': variant.color,
+                            }
+                        },
+                    )
+                except Exception as e:
+                    logger.error(e)
+                    raise HTTPException(
+                        status_code=400, detail=f"Failed to create variant: {str(e)}")
+
+            background_tasks.add_task(
+                reindex_product, cache=redis, product_id=existing_image.product_id)
+
+            return {"success": True}
+        except UniqueViolationError:
+            raise HTTPException(
+                status_code=400, detail="Product with this name already exists")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e)
+            raise HTTPException(status_code=500, detail=str(e))

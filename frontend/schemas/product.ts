@@ -55,7 +55,7 @@ export const PaginatedCollectionSchema = PagSchema.extend({
 export const ProductImageSchema = z
     .object({
         id: z.number(),
-        product_id: z.number(),
+        product_id: z.number().optional(),
         image: z.string(),
         order: z.number(),
     })
