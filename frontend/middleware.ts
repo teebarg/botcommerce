@@ -28,6 +28,9 @@ export default async function middleware(req: NextRequest) {
         return NextResponse.redirect(signInUrl);
     }
 
+    if (pathname.startsWith("/admin") && !session?.user?.isAdmin) {
+        return NextResponse.redirect(new URL("/", req.nextUrl));
+    }
     return NextResponse.next();
 }
 

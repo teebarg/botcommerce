@@ -15,6 +15,9 @@ import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/auth-provider";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
+import ImpersonationBanner from "@/components/impersonation-banner";
+import { auth } from "@/auth";
+import { SessionProvider } from "next-auth/react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -65,6 +68,7 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    const session = await auth();
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className, nunitoSans.variable)} lang="en">
             <head>
@@ -84,11 +88,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <Toaster closeButton richColors duration={4000} expand={false} position="top-right" />
                         <TanstackProviders>
                             <StoreProvider>
-                                <AuthProvider>
-                                    <CartProvider>
-                                        <WebSocketProvider>{children}</WebSocketProvider>
-                                    </CartProvider>
-                                </AuthProvider>
+                                <SessionProvider>
+                                    <AuthProvider session={session}>
+                                        <CartProvider>
+                                            <WebSocketProvider>
+                                                {children}
+                                                <ImpersonationBanner />
+                                            </WebSocketProvider>
+                                        </CartProvider>
+                                    </AuthProvider>
+                                </SessionProvider>
                             </StoreProvider>
                             <ReactQueryDevtools initialIsOpen={false} />
                         </TanstackProviders>

@@ -12,24 +12,24 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSharedCollections, useAddProductToSharedCollection, useRemoveProductFromSharedCollection } from "@/lib/hooks/useCollection";
-import { useAuth } from "@/providers/auth-provider";
 import ComponentLoader from "@/components/component-loader";
 import { ProductSearch } from "@/schemas";
 import Overlay from "@/components/overlay";
+import { useSession } from "next-auth/react";
 
 interface ManageSlateProps {
     product: ProductSearch;
 }
 
 export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
-    const { user } = useAuth();
+    const { data: session } = useSession();
     const state = useOverlayTriggerState({});
     const { data: sharedCollections, isLoading } = useSharedCollections();
 
     const addProductMutation = useAddProductToSharedCollection();
     const removeProductMutation = useRemoveProductFromSharedCollection();
 
-    if (user?.role !== "ADMIN") {
+    if (!session?.user?.isAdmin) {
         return null;
     }
 

@@ -17,6 +17,8 @@ declare module "next-auth" {
     interface Session extends DefaultSession {
         accessToken: string;
         refreshToken: string;
+        impersonated?: boolean;
+        impersonatedBy?: string | null;
         user: {
             id: string;
             first_name: string;
@@ -64,13 +66,26 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
     callbacks: {
         async signIn({ user, account }) {
-            // if (["email", "google"].includes(account?.provider!)) {
-            //     await tryCatch<Message>(api.post<Message>("/auth/sync-user", { email: user.email!, first_name: user.name!, last_name: user.name! }));
-            // }
-
             return true;
         },
-        async jwt({ token, user, account, profile }) {
+        async jwt({ token, user, account, profile, trigger, session }) {
+            if (trigger === "update" && session?.mode === "impersonate") {
+                const { data, error } = await tryCatch<User>(serverApi.get<User>(`/users/get-user?email=${session?.email}`));
+                if (error) {
+                    console.error("Error fetching impersonated user:", error);
+
+                    return token;
+                }
+                token.user = data;
+                token.impersonated = session?.impersonated;
+                token.impersonatedBy = session?.impersonatedBy;
+                token.email = session?.email;
+                token.sub = token.sub;
+                token.accessToken = await generateJoseToken(session?.email!);
+
+                return token;
+            }
+
             if (!account) {
                 return token;
             }
@@ -115,6 +130,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 session.user.role = user.role as Role;
                 session.user.isAdmin = user.role === "ADMIN";
                 session.user.isActive = user.status === "ACTIVE";
+                session.impersonated = token.impersonated as boolean;
+                session.impersonatedBy = token.impersonatedBy as string;
             }
 
             return session;
