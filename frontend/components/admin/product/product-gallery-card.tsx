@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, Package } from "lucide-react";
+import { Package } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Image from "next/image";
 
@@ -102,7 +102,7 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                         <div className="space-y-2">
                             <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{product?.name}</h3>
 
-                            <div className="flex items-center gap-2">
+                            {/* <div className="flex items-center gap-2">
                                 <span className="text-xs text-muted-foreground font-mono">{product?.sku}</span>
                                 {product?.ratings && product?.ratings > 0 && (
                                     <div className="flex items-center gap-1">
@@ -110,7 +110,7 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                                         <span className="text-xs text-muted-foreground">{product?.ratings}</span>
                                     </div>
                                 )}
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="flex items-center justify-between">

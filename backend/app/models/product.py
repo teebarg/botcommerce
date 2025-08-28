@@ -14,7 +14,7 @@ class VariantWithStatus(BaseModel):
     color: Optional[str] = None
 
 class ProductCreate(BaseModel):
-    name: str = Field(..., min_length=1)
+    name: Optional[str] = Field(None)
     description: Optional[str] = None
     brand_id: Optional[int] = None
     category_ids: Optional[List[int]] = None

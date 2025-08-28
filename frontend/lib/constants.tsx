@@ -23,3 +23,6 @@ export const paymentInfoMap: Record<string, { title: string; description: string
         icon: <ShoppingBag size={20} />,
     },
 };
+
+export const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
+export const COLOR_OPTIONS = ["Red", "Blue", "Green", "Black", "White"];

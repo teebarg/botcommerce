@@ -138,7 +138,6 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                                 </Card>
                             ))}
 
-                            {/* Add More Button */}
                             <Card
                                 className="relative group overflow-hidden bg-gradient-card shadow-soft border-2 border-dashed border-border hover:border-primary/50 transition-colors duration-smooth cursor-pointer"
                                 onClick={openFileDialog}

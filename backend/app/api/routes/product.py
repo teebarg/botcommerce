@@ -724,11 +724,7 @@ async def delete_image(id: int, redis: RedisClient):
             "/storage/v1/object/public/product-images/")[1]
 
         supabase.storage.from_("product-images").remove([file_path])
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
 
-    try:
         await db.product.update(where={"id": id}, data={"image": None})
         await reindex_product(cache=redis, product_id=id)
 
@@ -807,11 +803,11 @@ async def delete_gallery_image(image_id: int, redis: RedisClient) -> Message:
                 delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
                                 document_id=str(image.product_id))
                 await reindex_product(cache=redis, product_id=image.product_id)
+
                 await redis.invalidate_list_cache("products")
                 await redis.invalidate_list_cache("shared")
                 await redis.invalidate_list_cache("sharedcollection")
-
-            return {"message": "Image deleted successfully"}
+            return Message(message="Product deleted successfully")
         except Exception as e:
             logger.error(e)
             raise HTTPException(status_code=400, detail=str(e))
@@ -1065,39 +1061,37 @@ async def update_image_metadata(
             )
 
             # Variants
-            if payload.variants:
-                for variant in payload.variants:
-                    print("🚀 ~ variant:", variant)
-                    try:
-                        await tx.productvariant.upsert(
-                            where={
-                                'id': variant.id
+            for variant in payload.variants:
+                try:
+                    await tx.productvariant.upsert(
+                        where={
+                            'id': variant.id
+                        },
+                        data={
+                            "create": {
+                                "product_id": existing_image.product_id,
+                                'sku': generate_sku(),
+                                'price': variant.price,
+                                'old_price': variant.old_price,
+                                'inventory': variant.inventory,
+                                'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                'size': variant.size,
+                                'color': variant.color,
                             },
-                            data={
-                                "create": {
-                                    "product_id": existing_image.product_id,
-                                    'sku': generate_sku(),
-                                    'price': variant.price,
-                                    'old_price': variant.old_price,
-                                    'inventory': variant.inventory,
-                                    'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
-                                    'size': variant.size,
-                                    'color': variant.color,
-                                },
-                                "update": {
-                                    'price': variant.price,
-                                    'old_price': variant.old_price,
-                                    'inventory': variant.inventory,
-                                    'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
-                                    'size': variant.size,
-                                    'color': variant.color,
-                                }
-                            },
-                        )
-                    except Exception as e:
-                        logger.error(e)
-                        raise HTTPException(
-                            status_code=400, detail=f"Failed to create variant: {str(e)}")
+                            "update": {
+                                'price': variant.price,
+                                'old_price': variant.old_price,
+                                'inventory': variant.inventory,
+                                'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                'size': variant.size,
+                                'color': variant.color,
+                            }
+                        },
+                    )
+                except Exception as e:
+                    logger.error(e)
+                    raise HTTPException(
+                        status_code=400, detail=f"Failed to create variant: {str(e)}")
 
             background_tasks.add_task(
                 reindex_product, cache=redis, product_id=existing_image.product_id)

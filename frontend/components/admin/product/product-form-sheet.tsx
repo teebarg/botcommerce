@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Package, Tag } from "lucide-react";
+import { FileText, Package, Tag } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,8 @@ import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Product, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useProduct";
-
-const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
-const COLOR_OPTIONS = ["Red", "Blue", "Green", "Black", "White"];
+import { Textarea } from "@/components/ui/textarea";
+import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 
 type FormProduct = Omit<Partial<Product>, "brand" | "images" | "variants" | "categories" | "collections"> & {
     brand?: number;
@@ -40,6 +39,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
     const { data: brands } = useBrands();
     const [product, setProduct] = useState<FormProduct>({
         name: currentProduct?.name ?? "",
+        description: currentProduct?.description ?? "",
         categories: currentProduct?.categories?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         collections: currentProduct?.collections?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         brand: 1,
@@ -71,6 +71,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
     const handleSubmit = () => {
         const input: any = {
             name: product.name,
+            description: product.description,
             brand_id: product.brand || undefined,
             category_ids: product.categories?.map((c) => c.value) || [],
             collection_ids: product.collections?.map((c) => c.value) || [],
@@ -85,14 +86,14 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
     };
 
     return (
-        <div className="space-y-6 px-4 pt-8 overflow-y-auto">
+        <div className="space-y-4 px-4 pt-8 overflow-y-auto">
             <div>
-                <h2 className="text-xl font-semibold mb-2 text-card-foreground">Product Details</h2>
+                <h2 className="text-xl font-semibold text-card-foreground">Product Details</h2>
                 <p className="text-muted-foreground">Provide essential information about your product that customers will see.</p>
             </div>
 
             <div className="grid gap-6">
-                <Card className="p-4 bg-gradient-card shadow-soft">
+                <Card className="p-4 bg-card shadow-sm">
                     <div className="space-y-2">
                         <Label className="text-sm font-medium flex items-center gap-2" htmlFor="name">
                             <Package className="w-4 h-4 text-primary" />
@@ -106,6 +107,25 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                             onChange={(e) => updateField("name", e.target.value)}
                         />
                         {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                    </div>
+                </Card>
+                <Card className="p-4 bg-card shadow-sm">
+                    <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2" htmlFor="description">
+                            <FileText className="w-4 h-4 text-primary" />
+                            Description
+                        </Label>
+                        <Textarea
+                            className="min-h-[100px] resize-none"
+                            id="description"
+                            placeholder="Describe your product features, benefits, and specifications..."
+                            value={product.description}
+                            onChange={(e) => updateField("description", e.target.value)}
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Help customers understand what makes your product special</span>
+                            <span>{product.description?.length || 0}/500</span>
+                        </div>
                     </div>
                 </Card>
 
@@ -171,7 +191,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 <SelectValue placeholder="Select Size" />
                             </SelectTrigger>
                             <SelectContent>
-                                {SIZE_OPTIONS.map((size) => (
+                                {SIZE_OPTIONS.map((size: string) => (
                                     <SelectItem key={size} value={size}>
                                         {size}
                                     </SelectItem>
@@ -187,7 +207,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 <SelectValue placeholder="Select Color" />
                             </SelectTrigger>
                             <SelectContent>
-                                {COLOR_OPTIONS.map((color) => (
+                                {COLOR_OPTIONS.map((color: string) => (
                                     <SelectItem key={color} value={color}>
                                         {color}
                                     </SelectItem>

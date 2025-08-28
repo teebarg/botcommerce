@@ -26,7 +26,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
     const deleteState = useOverlayTriggerState({});
 
     const handleDelete = async () => {
-        deleteImage({ id: image.id }).then(() => {
+        deleteImage({ id: image.id }).finally(() => {
             deleteState.close();
         });
     };
