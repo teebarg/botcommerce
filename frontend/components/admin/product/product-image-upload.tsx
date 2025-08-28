@@ -111,7 +111,7 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                         <h3 className="text-lg font-medium mb-4 text-card-foreground">Uploaded Images ({images.length})</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                             {images.map((image: ProductImage, idx: number) => (
-                                <Card key={idx} className="relative group overflow-hidden bg-gradient-card shadow-soft">
+                                <Card key={idx} className="relative group overflow-hidden bg-card shadow-sm">
                                     <div className="aspect-square">
                                         <Image
                                             fill
@@ -139,7 +139,7 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                             ))}
 
                             <Card
-                                className="relative group overflow-hidden bg-gradient-card shadow-soft border-2 border-dashed border-border hover:border-primary/50 transition-colors duration-smooth cursor-pointer"
+                                className="relative group overflow-hidden bg-gradient-card shadow-sm border-2 border-dashed border-border hover:border-primary/50 transition-colors duration-smooth cursor-pointer"
                                 onClick={openFileDialog}
                             >
                                 <div className="aspect-square flex items-center justify-center">

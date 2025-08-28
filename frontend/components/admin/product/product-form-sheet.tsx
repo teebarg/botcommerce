@@ -51,7 +51,6 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
 
         setProduct((prev) => ({ ...prev, ...updatedDetails }));
 
-        // Clear error for this field
         if (errors[field]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }));
         }
@@ -130,7 +129,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                 </Card>
 
                 <div className="grid sm:grid-cols-2 gap-4">
-                    <Card className="p-4 bg-gradient-card shadow-soft">
+                    <Card className="p-4 bg-card shadow-sm">
                         <div className="space-y-2">
                             <Label className="text-sm font-medium flex items-center gap-2">
                                 <Tag className="w-4 h-4 text-primary" />
@@ -145,7 +144,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                         </div>
                     </Card>
 
-                    <Card className="p-4 bg-gradient-card shadow-soft">
+                    <Card className="p-4 bg-card shadow-sm">
                         <div className="space-y-2">
                             <Label className="text-sm font-medium flex items-center gap-2">
                                 <Tag className="w-4 h-4 text-primary" />
@@ -160,7 +159,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                         </div>
                     </Card>
 
-                    <Card className="p-4 bg-gradient-card shadow-soft">
+                    <Card className="p-4 bg-card shadow-sm">
                         <div className="space-y-2">
                             <Label className="text-sm font-medium flex items-center gap-2">
                                 <Tag className="w-4 h-4 text-primary" />

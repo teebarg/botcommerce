@@ -273,8 +273,8 @@ export function ProductCreator() {
     }
 
     return (
-        <div className="mb-4 bg-gradient-subtle">
-            <div className="bg-card shadow-soft">
+        <div className="mb-4">
+            <div className="bg-card shadow-sm">
                 <div className="max-w-4xl mx-auto px-4 py-6">
                     <div className="mb-6">
                         <h1 className="text-2xl font-bold mb-2 text-card-foreground">Create Product</h1>
@@ -287,7 +287,7 @@ export function ProductCreator() {
                                 <div
                                     className={cn(
                                         "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-smooth",
-                                        step.id <= currentStep ? "bg-gradient-primary text-white shadow-soft" : "bg-muted text-muted-foreground"
+                                        step.id <= currentStep ? "bg-gradient-primary text-white shadow-sm" : "bg-muted text-muted-foreground"
                                     )}
                                 >
                                     {step.id}
@@ -331,7 +331,6 @@ export function ProductCreator() {
                         )}
                     </div>
 
-                    {/* Navigation */}
                     <div className="flex justify-between items-center px-6 sm:px-8 py-6 border-t border-border bg-accent/30">
                         <Button className="flex items-center gap-2" disabled={currentStep === 1} variant="outline" onClick={handlePrevious}>
                             <ArrowLeft className="w-4 h-4" />

@@ -49,7 +49,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                 </Card>
 
                 <div className="space-y-4">
-                    <Card className="p-4 bg-gradient-card shadow-soft">
+                    <Card className="p-4 bg-card shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
                             <ImageIcon className="w-4 h-4 text-primary" />
                             <h4 className="font-medium text-card-foreground">Images</h4>
@@ -109,7 +109,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                         </div>
                     </Card>
 
-                    <Card className="p-4 bg-gradient-card shadow-soft">
+                    <Card className="p-4 bg-card shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
                             <Package className="w-4 h-4 text-primary" />
                             <h4 className="font-medium text-card-foreground">Variants</h4>

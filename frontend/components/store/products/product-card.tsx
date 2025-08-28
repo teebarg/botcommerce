@@ -33,8 +33,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
 
     return (
-        <div className="group relative overflow-hidden rounded-3xl bg-card shadow-soft animate-fade-in">
-            <div className="relative aspect-[4/5] overflow-hidden">
+        <div className="group relative overflow-hidden rounded-3xl bg-card shadow-sm animate-fade-in">
+            <div className="relative aspect-product overflow-hidden">
                 <Image
                     fill
                     alt={product.name}
@@ -46,7 +46,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }
 
                 {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
-                {/* Always visible gradient overlay for mobile */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 dark:from-black/40 via-transparent to-transparent" />
 
                 <div className="absolute top-4 left-2 right-4 flex items-start justify-between">
