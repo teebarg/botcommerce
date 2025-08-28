@@ -70,7 +70,7 @@ export default async function Home() {
                             <p className="text-default-600">Discover our handpicked selection of premium products</p>
                         </div>
 
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6">
                             {data?.trending?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                         </div>
                     </div>
