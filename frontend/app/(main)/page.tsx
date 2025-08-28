@@ -38,7 +38,7 @@ export default async function Home() {
             />
             <LazyFadeIn delay={100}>
                 <section className="py-16 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-content1 dark:to-content2 transition-colors duration-300">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-8xl mx-auto px-6">
                         <div className="text-center mb-12">
                             <div className="flex items-center justify-center mb-4">
                                 <TrendingUp className="text-orange-500 mr-2" size={32} />
@@ -64,13 +64,13 @@ export default async function Home() {
             </LazyFadeIn>
             <LazyFadeIn delay={100}>
                 <section className="py-16 bg-content2">
-                    <div className="max-w-8xl mx-auto px-4">
+                    <div className="max-w-8xl mx-auto px-6">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-bold text-default-foreground mb-1">Trending Products</h2>
                             <p className="text-default-600">Discover our handpicked selection of premium products</p>
                         </div>
 
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {data?.trending?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                         </div>
                     </div>
@@ -84,7 +84,7 @@ export default async function Home() {
             />
             <LazyFadeIn delay={100}>
                 <section className="bg-content1">
-                    <div className="max-w-8xl mx-auto px-4 md:px-0 py-8">
+                    <div className="max-w-8xl mx-auto px-6">
                         <p className="text-3xl font-bold">New Arrivals</p>
                         <p className="text-default-600">Find the best thrifts for your kids</p>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
