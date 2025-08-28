@@ -182,7 +182,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                 </div>
             </div>
             <Card className="p-4">
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label className="text-sm">Size</Label>
                         <Select value={newVariant.size.toString()} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, size: value }))}>

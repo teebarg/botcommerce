@@ -7,8 +7,8 @@ import { GalleryCardActions } from "./gallery-card-actions";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn, currency } from "@/lib/utils";
-import { Category, Collection, Product, ProductImage } from "@/schemas";
+import { cn } from "@/lib/utils";
+import { Collection, Product, ProductImage } from "@/schemas";
 import Overlay from "@/components/overlay";
 import ProductImagesManager from "@/components/admin/product/product-images";
 
@@ -60,7 +60,7 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                         </div>
                     )}
 
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/20 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                         <GalleryCardActions image={image} />
                     </div>
 
@@ -97,20 +97,10 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                     )}
                 </div>
 
-                {product && (
+                {/* {product && (
                     <div className="p-4 space-y-3">
-                        <div className="space-y-2">
+                        <div>
                             <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{product?.name}</h3>
-
-                            {/* <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground font-mono">{product?.sku}</span>
-                                {product?.ratings && product?.ratings > 0 && (
-                                    <div className="flex items-center gap-1">
-                                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                        <span className="text-xs text-muted-foreground">{product?.ratings}</span>
-                                    </div>
-                                )}
-                            </div> */}
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -147,7 +137,7 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                             ))}
                         </div>
                     </div>
-                )}
+                )} */}
             </CardContent>
         </Card>
     );
