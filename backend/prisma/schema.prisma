@@ -414,6 +414,7 @@ model Cart {
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt // Used to detect abandoned carts
 
+  @@index([cart_number])
   @@map("carts")
 }
 

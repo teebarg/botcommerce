@@ -11,6 +11,7 @@ import Overlay from "@/components/overlay";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useDeleteGalleryImage } from "@/lib/hooks/useProduct";
+import { ManageSlate } from "../shared-collections/manage-slate";
 
 type GalleryImage = ProductImage & {
     product: Product;
@@ -33,6 +34,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
 
     return (
         <div className="flex items-center gap-2">
+            <ManageSlate product={image.product} />
             <Overlay
                 open={editState.isOpen}
                 sheetClassName="min-w-[40vw]"

@@ -25,8 +25,8 @@ router = APIRouter()
 @router.get("/")
 async def index(
     current_user: CurrentUser,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
 ) -> Addresses:
     """
     Retrieve addresses.

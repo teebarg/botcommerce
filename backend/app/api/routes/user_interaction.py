@@ -46,8 +46,8 @@ async def list_user_interactions(
     request: Request,
     user_id: Optional[int] = Query(None),
     product_id: Optional[int] = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
 ):
     where = {}
     if user_id is not None:

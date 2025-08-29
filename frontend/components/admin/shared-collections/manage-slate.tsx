@@ -14,11 +14,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSharedCollections, useAddProductToSharedCollection, useRemoveProductFromSharedCollection } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
-import { ProductSearch } from "@/schemas";
+import { ProductSearch, Product } from "@/schemas";
 import Overlay from "@/components/overlay";
 
 interface ManageSlateProps {
-    product: ProductSearch;
+    product: ProductSearch | Product;
 }
 
 export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
@@ -72,12 +72,20 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                                     fill
                                     alt={product.name}
                                     className="object-contain"
-                                    src={product.images?.[0] || product.image || "/placeholder.jpg"}
+                                    src={
+                                        typeof product.images?.[0] === "string"
+                                            ? product.images[0]
+                                            : product.images?.[0]?.image || product.image || "/placeholder.jpg"
+                                    }
                                 />
                             </div>
                             <div>
                                 <p className="font-medium text-sm">{product.name}</p>
-                                <p className="text-xs text-muted-foreground">{product.categories?.[0] || "No category"}</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {typeof product.categories?.[0] === "string"
+                                        ? product.categories[0]
+                                        : product.categories?.[0]?.name || "No category"}
+                                </p>
                             </div>
                         </div>
                     </div>

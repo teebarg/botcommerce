@@ -89,9 +89,12 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
     };
 
     const addProduct = (product: ProductSearch) => {
-        setProducts([...products, product]);
-        setValue("products", [...formProducts, product.id]);
-    };
+        const updated = [product, ...products];
+        const unique = Array.from(new Map(updated.map(p => [p.id, p])).values());
+      
+        setProducts(unique);
+        setValue("products", [product.id, ...formProducts]);
+      };
 
     const removeProduct = (productId: number) => {
         setProducts(products.filter((p: ProductSearch) => p.id !== productId));
@@ -105,7 +108,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
         <div className="px-4 pt-4 overflow-y-auto">
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                    <ProductSearchClient closeOnSelect={false} onProductSelect={addProduct} />
+                    <ProductSearchClient onProductSelect={addProduct} />
                     <Card className="border-0 bg-card/50 backdrop-blur-sm">
                         <CardContent className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-6">

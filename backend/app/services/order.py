@@ -11,7 +11,7 @@ from datetime import datetime
 from app.core.deps import (
     supabase
 )
-from app.services.product import index_products
+from app.services.product import reindex_product
 from app.services.redis import CacheService
 from app.core.config import settings
 
@@ -58,21 +58,20 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
     if cart.shipping_address_id:
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
 
-    new_order = await db.order.create(
-        data=data
-    )
-
-    try:
-        await db.ordertimeline.create(
-            data={
-                "order": {"connect": {"id": new_order.id}},
-                "message": f"Order {order_number} created",
-                "from_status": order_in.status,
-                "to_status": order_in.status,
-            }
-        )
-    except Exception as e:
-        logger.error(f"Failed to log order timeline for order {new_order.id}: {e}")
+    async with db.tx() as tx:
+        try:
+           new_order = await tx.order.create(data=data) 
+           await tx.ordertimeline.create(
+                data={
+                    "order": {"connect": {"id": new_order.id}},
+                    "message": f"Order {order_number} created",
+                    "from_status": order_in.status,
+                    "to_status": order_in.status,
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to create order: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     return new_order
 
@@ -294,32 +293,28 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
 
     out_of_stock_variants = []
 
-    async with db.tx() as tx:
-        try:
-            for item in order.order_items:
-                variant_id = item.variant_id
-                quantity = item.quantity
-                variant = await tx.productvariant.find_unique(where={"id": variant_id})
-                if not variant:
-                    logger.info(f"Variant {variant_id} not found for order {order_id}")
-                    continue
-                new_inventory = max(0, variant.inventory - quantity)
-                update_data = {"inventory": new_inventory}
-                out_of_stock = False
-                if new_inventory == 0 and variant.status != "OUT_OF_STOCK":
-                    update_data["status"] = "OUT_OF_STOCK"
-                    out_of_stock = True
-                await tx.productvariant.update(where={"id": variant_id}, data=update_data)
-                # if cache:
-                #     await reindex_product(cache=cache, product_id=variant.product_id)
-                if out_of_stock:
-                    out_of_stock_variants.append(variant)
-        except Exception as e:
-            logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
-            raise HTTPException(status_code=500, detail="Failed to decrement variant inventory for order")
-
-    if cache:
-        await index_products(cache=cache)
+    try:
+        for item in order.order_items:
+            variant_id = item.variant_id
+            quantity = item.quantity
+            variant = await db.productvariant.find_unique(where={"id": variant_id})
+            if not variant:
+                logger.info(f"Variant {variant_id} not found for order {order_id}")
+                continue
+            new_inventory = max(0, variant.inventory - quantity)
+            update_data = {"inventory": new_inventory}
+            out_of_stock = False
+            if new_inventory == 0 and variant.status != "OUT_OF_STOCK":
+                update_data["status"] = "OUT_OF_STOCK"
+                out_of_stock = True
+            await db.productvariant.update(where={"id": variant_id}, data=update_data)
+            if cache:
+                await reindex_product(cache=cache, product_id=variant.product_id)
+            if out_of_stock:
+                out_of_stock_variants.append(variant)
+    except Exception as e:
+        logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to decrement variant inventory for order")
 
     if out_of_stock_variants and notification:
         subject = f"Product Variants OUT OF STOCK in Order {order_id}"

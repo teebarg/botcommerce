@@ -7,6 +7,7 @@ import { api } from "@/apis/client";
 import { Collection, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
+import { useSession } from "next-auth/react";
 
 export const useCollections = (query?: string) => {
     return useQuery({
@@ -64,9 +65,11 @@ export const useDeleteCollection = () => {
 };
 
 export const useSharedCollections = (query?: string) => {
+    const { data: session } = useSession();
     return useQuery({
         queryKey: ["shared-collections", query],
         queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { query: query || "" } }),
+        enabled: session?.user?.isAdmin,
     });
 };
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -102,13 +101,7 @@ export function ProductDetails() {
                             </TableRow>
                         ) : (
                             products?.map((product: Product, idx: number) => (
-                                <motion.tr
-                                    key={idx}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    transition={{ delay: idx * 0.1 }}
-                                >
+                                <TableRow key={idx} className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1">
                                     <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
                                         {(pagination?.skip - 1) * LIMIT + idx + 1}
                                     </TableCell>
@@ -136,7 +129,7 @@ export function ProductDetails() {
                                     <TableCell className="text-right">
                                         <ProductActions product={product} />
                                     </TableCell>
-                                </motion.tr>
+                                </TableRow>
                             ))
                         )}
                     </TableBody>

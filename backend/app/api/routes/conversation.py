@@ -242,8 +242,8 @@ async def create_message(user: UserDep, message: MessageCreate, uid: str):
 @router.get("/conversations/{uid}/messages")
 async def list_messages(
     uid: str,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=100)
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=100)
 ):
     """List messages for a conversation"""
     conversation = await db.conversation.find_unique(where={"conversation_uuid": uid})

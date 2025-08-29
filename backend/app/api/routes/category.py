@@ -243,7 +243,6 @@ async def delete_image(
         raise HTTPException(status_code=404, detail="Category has no image")
 
     try:
-        # Extract file path from URL
         file_path = category.image.split("/storage/v1/object/public/images/")[1]
         delete_image(bucket="images", file_path=file_path)
 

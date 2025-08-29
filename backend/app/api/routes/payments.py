@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from app.core.config import settings
 from app.schemas.payment import (
     PaymentInitialize,
 )
 from app.models.order import OrderCreate, OrderResponse
-from app.core.deps import CurrentUser, Notification, RedisClient
+from app.core.deps import CurrentUser, Notification, RedisClient, get_current_user
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -124,22 +124,20 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
             raise HTTPException(status_code=500, detail="Payment verification failed")
 
 
-@router.post("/")
-async def create(*, create: PaymentCreate, user: CurrentUser, notification: Notification, cache: RedisClient):
+@router.post("/", dependencies=[Depends(get_current_user)])
+async def create(*, create: PaymentCreate, notification: Notification, cache: RedisClient, background_tasks: BackgroundTasks):
     """
     Create new payment.
     """
-    try:
-        order = await db.order.find_unique(where={"id": create.order_id})
-        if not order:
-            raise HTTPException(status_code=404, detail="Order not found")
-        await db.order.update(
+    order = await db.order.find_unique(where={"id": create.order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    async with db.tx() as tx:
+        await tx.order.update(
             where={"id": create.order_id},
             data={"status": OrderStatus.PENDING}
         )
-        await decrement_variant_inventory_for_order(create.order_id, notification, cache)
-
-        payment = await db.payment.create(
+        payment = await tx.payment.create(
             data={
                 "order": {"connect": {"id": create.order_id}},
                 "amount": create.amount,
@@ -149,9 +147,9 @@ async def create(*, create: PaymentCreate, user: CurrentUser, notification: Noti
                 "payment_method": PaymentMethod.PAYSTACK,
             }
         )
-        return payment
-    except PrismaError as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    background_tasks.add_task(decrement_variant_inventory_for_order, create.order_id, notification, cache)
+    return payment
+
 
 @router.patch("/{id}/status", response_model=OrderResponse)
 async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, background_tasks: BackgroundTasks, notification: Notification):
@@ -181,5 +179,5 @@ async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, bac
                     )
             except Exception as e:
                 logger.error(f"Failed to create order timeline: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+                raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
         return updated_order

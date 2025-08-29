@@ -2,41 +2,46 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 
-import { useAddToCart } from "./useCart";
+import { useAddToCart, useChangeCartQuantity } from "./useCart";
 
 import { currency } from "@/lib/utils";
 import { useStoreSettings } from "@/providers/store-provider";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
+import { useCart } from "@/providers/cart-provider";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
+    const { cart } = useCart();
     const { settings } = useStoreSettings();
-    const { mutate: addToCart, isPending: loading } = useAddToCart();
+    const { mutate: addToCart, isPending: creating } = useAddToCart();
+    const { mutateAsync: updateQuantity, isPending: updating } = useChangeCartQuantity();
 
-    const [selectedColor, setSelectedColor] = useState<string | null>(product.variants?.[0]?.color || null);
-    const [selectedSize, setSelectedSize] = useState<string | null>(product.variants?.[0]?.size || null);
+    const loading = creating || updating;
+
+    const [selectedColor, setSelectedColor] = useState<string | null>(product?.variants?.[0]?.color || null);
+    const [selectedSize, setSelectedSize] = useState<string | null>(product?.variants?.[0]?.size || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
 
     const sizes = useMemo(() => {
-        return [...new Set(product.variants?.filter((v) => v.size).map((v) => v.size))];
-    }, [product.variants]);
+        return [...new Set(product?.variants?.filter((v) => v.size).map((v) => v.size))];
+    }, [product?.variants]);
 
     const colors = useMemo(() => {
-        return [...new Set(product.variants?.filter((v) => v.color).map((v) => v.color))];
-    }, [product.variants]);
+        return [...new Set(product?.variants?.filter((v) => v.color).map((v) => v.color))];
+    }, [product?.variants]);
 
     const priceInfo = useMemo(() => {
-        const prices = product.variants?.map((v: ProductVariant) => v.price) || [];
-        const comparePrices = product.variants?.map((v: ProductVariant) => v.old_price || v.price) || [];
+        const prices = product?.variants?.map((v: ProductVariant) => v.price) || [];
+        const comparePrices = product?.variants?.map((v: ProductVariant) => v.old_price || v.price) || [];
 
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
         const minCompareAtPrice = Math.min(...comparePrices);
         const maxCompareAtPrice = Math.max(...comparePrices);
 
-        const hasDiscount = product.variants?.some((v) => v.old_price && v.old_price > v.price);
-        const allDiscounted = product.variants?.every((v) => v.old_price && v.old_price > v.price);
+        const hasDiscount = product?.variants?.some((v) => v.old_price && v.old_price > v.price);
+        const allDiscounted = product?.variants?.every((v) => v.old_price && v.old_price > v.price);
 
         const maxDiscountPercent = Math.round(((maxCompareAtPrice - minPrice) / maxCompareAtPrice) * 100);
 
@@ -49,24 +54,28 @@ export const useProductVariant = (product: Product | ProductSearch) => {
             allDiscounted,
             maxDiscountPercent,
         };
-    }, [product.variants]);
+    }, [product?.variants]);
+
+    const variantInCart = useMemo(() => {
+        return cart?.items?.find((item) => item.variant_id == selectedVariant?.id);
+    }, [cart, selectedVariant]);
 
     const findMatchingVariant = (size: string | null, color: string | null) => {
-        if (product.variants?.length == 0) {
+        if (product?.variants?.length == 0) {
             return undefined;
         }
-        if (product.variants?.length == 1) {
-            return product.variants[0];
+        if (product?.variants?.length == 1) {
+            return product?.variants[0];
         }
         if (!size && !color) {
-            return product.variants?.find((variant) => variant.inventory > 0);
+            return product?.variants?.find((variant) => variant.inventory > 0);
         }
 
-        return product.variants?.find((variant) => variant.size === size && variant.color === color);
+        return product?.variants?.find((variant) => variant.size === size && variant.color === color);
     };
 
     useEffect(() => {
-        setSelectedVariant(product.variants?.find((v) => v.inventory > 0) || product.variants?.[0]);
+        setSelectedVariant(product?.variants?.find((v) => v.inventory > 0) || product?.variants?.[0]);
     }, []);
 
     useEffect(() => {
@@ -77,9 +86,9 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const isOptionAvailable = (type: "size" | "color", value: string) => {
         if (type === "size") {
-            return product.variants?.some((v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.inventory > 0);
+            return product?.variants?.some((v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.inventory > 0);
         } else {
-            return product.variants?.some((v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.inventory > 0);
+            return product?.variants?.some((v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.inventory > 0);
         }
     };
 
@@ -93,6 +102,10 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
+        if (variantInCart) {
+            await updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity });
+            return;
+        }
         addToCart({
             variant_id: selectedVariant.id,
             quantity,
@@ -134,6 +147,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         handleWhatsAppPurchase,
         priceInfo,
         loading,
-        outOfStock: product.variants?.length == 0 || product.variants?.every((v) => v.inventory <= 0),
+        outOfStock: product?.variants?.length == 0 || product?.variants?.every((v) => v.inventory <= 0),
     };
 };
