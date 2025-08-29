@@ -16,7 +16,7 @@ export default function ImpersonationBanner() {
     if (!session?.impersonated) return null;
 
     return (
-        <div className="fixed bottom-12 left-6 z-50 flex items-center gap-3 px-3 py-2 rounded-md bg-amber-100 text-amber-900 shadow-md border border-amber-300">
+        <div className="fixed bottom-24 md:bottom-12 left-4 z-50 flex items-center gap-3 px-3 py-2 rounded-md bg-amber-100 text-amber-900 shadow-md border border-amber-300">
             <span className="text-sm">Impersonation mode</span>
             <button className="text-xs font-semibold underline" onClick={stopImpersonation}>
                 Exit
