@@ -143,7 +143,7 @@ async def list_orders(
     total = await db.order.count(where=where)
     return {
         "orders": orders,
-        "page": skip,
+        "skip": skip,
         "limit": take,
         "total_pages": (total + take - 1) // take,
         "total_count": total,

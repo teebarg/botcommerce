@@ -110,10 +110,10 @@ async def reorder_categories(order_data: BulkOrderUpdate, cache: RedisClient):
                         where={"id": category_update.id},
                         data={"display_order": category_update.display_order}
                     )
-            
+
             await cache.invalidate_list_cache("categories")
             await cache.invalidate_list_cache("category")
-            return {"message": "Categories reordered successfully"}
+            return {"message": "categories reordered successfully"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e))

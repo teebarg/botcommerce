@@ -50,8 +50,8 @@ async def get_order(
 async def get_orders(
     request: Request,
     user: CurrentUser,
-    skip: int = Query(0, ge=0),
-    take: int = Query(20, ge=1, le=100),
+    skip: int = Query(default=0, ge=0),
+    take: int = Query(default=20, ge=1, le=100),
     status: Optional[OrderStatus] = None,
     sort: Optional[str] = "desc",
     search: Optional[str] = None,

@@ -10,7 +10,7 @@ const RatingSchema = z.object({
 });
 
 const PagSchema = z.object({
-    skip: z.number().optional(),
+    skip: z.number(),
     limit: z.number(),
     total_count: z.number(),
     total_pages: z.number(),

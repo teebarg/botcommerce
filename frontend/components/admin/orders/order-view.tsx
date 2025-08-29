@@ -43,7 +43,7 @@ const OrderView: React.FC = () => {
         ...filters,
     });
 
-    const { orders, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
+    const { orders, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     return (
         <div className="px-4 md:px-10 py-8">

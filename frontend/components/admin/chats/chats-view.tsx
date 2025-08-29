@@ -14,7 +14,7 @@ import { Conversation, ConversationStatus } from "@/schemas";
 import { useConversations } from "@/lib/hooks/useApi";
 import { formatDate } from "@/lib/utils";
 import ComponentLoader from "@/components/component-loader";
-import PaginationUI from "@/components/pagination-skip";
+import PaginationUI from "@/components/pagination";
 
 const LIMIT = 10;
 

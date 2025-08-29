@@ -14,7 +14,7 @@ import { Order, Status, User } from "@/schemas";
 import { useUsers } from "@/lib/hooks/useUser";
 import { currency } from "@/lib/utils";
 import { CardSkeleton } from "@/components/ui/skeletons";
-import PaginationUI from "@/components/pagination-skip";
+import PaginationUI from "@/components/pagination";
 
 const LIMIT = 10;
 

@@ -8,15 +8,7 @@ export const TokenSchema = z.object({
 });
 
 export const PagSchema = z.object({
-    page: z.number(),
     skip: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
-});
-
-export const PagSkipSchema = z.object({
-    skip: z.number().optional(),
     limit: z.number(),
     total_count: z.number(),
     total_pages: z.number(),
@@ -25,13 +17,6 @@ export const PagSkipSchema = z.object({
 export const MessageSchema = z.object({
     message: z.string(),
     error: z.boolean().default(false),
-});
-
-export const PaginationSchema = z.object({
-    page: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
 });
 
 export const SiteConfigSchema = z.object({
@@ -99,13 +84,11 @@ export const ImageUploadSchema = z.object({
     content_type: z.string(),
 });
 
-export type Pagination = z.infer<typeof PaginationSchema>;
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
 export type ImageUpload = z.infer<typeof ImageUploadSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;
 export type Pag = z.infer<typeof PagSchema>;
-export type PagSkip = z.infer<typeof PagSkipSchema>;
 export type Message = z.infer<typeof MessageSchema>;
 export type SiteConfig = z.infer<typeof SiteConfigSchema>;
 export type PaginatedSiteConfig = z.infer<typeof PaginatedSiteConfigSchema>;

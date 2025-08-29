@@ -34,13 +34,5 @@ class CategoryUpdate(BaseModel):
     display_order: Optional[int] = None
 
 
-class Categories(BaseModel):
-    categories: list[Category]
-    page: int
-    limit: int
-    total_count: int
-    total_pages: int
-
-
 class Search(BaseModel):
     results: list[Category]

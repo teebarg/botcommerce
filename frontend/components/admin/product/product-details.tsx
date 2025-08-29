@@ -10,7 +10,6 @@ import { ProductQuery } from "./product-query";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import PaginationUI from "@/components/pagination";
 import { ProductActions } from "@/components/admin/product/product-actions";
 import { Brand, Collection, Product, ProductVariant } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
@@ -20,6 +19,7 @@ import { useCollections } from "@/lib/hooks/useCollection";
 import { useBrands } from "@/lib/hooks/useBrand";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
+import PaginationUI from "@/components/pagination";
 
 const LIMIT = 10;
 
@@ -28,7 +28,8 @@ export function ProductDetails() {
     const { data: collections } = useCollections();
     const { data: brands } = useBrands();
     const searchParams = useSearchParams();
-    const { data, isLoading } = useProducts({ query: searchParams.get("search") || "", page: Number(searchParams.get("page")) });
+    const page = Number(searchParams.get("page")) || 1;
+    const { data, isLoading } = useProducts({ query: searchParams.get("search") || "", skip: (page - 1) * LIMIT });
 
     const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
@@ -109,7 +110,7 @@ export function ProductDetails() {
                                     transition={{ delay: idx * 0.1 }}
                                 >
                                     <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        {(pagination?.page - 1) * LIMIT + idx + 1}
+                                        {(pagination?.skip - 1) * LIMIT + idx + 1}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
                                         <Image
