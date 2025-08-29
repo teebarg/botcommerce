@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Collection, Product, ProductImage } from "@/schemas";
 import Overlay from "@/components/overlay";
 import ProductImagesManager from "@/components/admin/product/product-images";
+import { useProductVariant } from "@/lib/hooks/useProductVariant";
 
 type GalleryImage = ProductImage & {
     product: Product;
@@ -25,6 +26,7 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const { product } = image;
     const imgState = useOverlayTriggerState({});
+    const { outOfStock } = useProductVariant(product);
 
     return (
         <Card
@@ -70,6 +72,10 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                                 {item.name}
                             </Badge>
                         ))}
+                    </div>
+
+                    <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
+                        {outOfStock && <Badge variant="destructive">Out of stock</Badge>}
                     </div>
 
                     {image.product?.images?.length > 0 && (

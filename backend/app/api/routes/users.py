@@ -83,7 +83,7 @@ async def index(
     role: Optional[Role] = None,
     status: Optional[Status] = None,
     sort: Optional[str] = "desc",
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ):
     """
@@ -106,7 +106,7 @@ async def index(
 
     users = await db.user.find_many(
         where=where_clause,
-        skip=(page - 1) * limit,
+        skip=skip,
         take=limit,
         order={"created_at": sort},
         include={"orders": True}
@@ -114,7 +114,7 @@ async def index(
     total = await db.user.count(where=where_clause)
     return {
         "users":users,
-        "page":page,
+        "skip":skip,
         "limit":limit,
         "total_pages":ceil(total/limit),
         "total_count":total,

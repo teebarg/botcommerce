@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 
 import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
@@ -62,13 +61,7 @@ const RecentOrdersList = () => {
                     </TableHeader>
                     <TableBody>
                         {orders?.map((order: Order, idx: number) => (
-                            <motion.tr
-                                key={idx}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1"
-                                initial={{ opacity: 0, y: 20 }}
-                                transition={{ delay: idx * 0.1 }}
-                            >
+                            <TableRow key={idx} className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1">
                                 <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{idx + 1}</TableCell>
                                 <TableCell className="whitespace-nowrap px-3 py-4 text-sm">{order.order_number}</TableCell>
                                 <TableCell className="font-medium">
@@ -82,7 +75,7 @@ const RecentOrdersList = () => {
                                 <TableCell>
                                     <PaymentStatusBadge status={order.payment_status} />
                                 </TableCell>
-                            </motion.tr>
+                            </TableRow>
                         ))}
                         {orders?.length === 0 && (
                             <TableRow>

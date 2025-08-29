@@ -4,26 +4,13 @@ import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
 
 import { api } from "@/apis/client";
-import { Brand, PaginatedBrand } from "@/schemas";
+import { Brand } from "@/schemas";
 import { BrandFormValues } from "@/components/admin/brands/brand-form";
-
-interface SearchParams {
-    search?: string;
-    page?: number;
-    limit?: number;
-}
 
 export const useBrands = (query?: string) => {
     return useQuery({
         queryKey: ["brands", query],
         queryFn: async () => await api.get<Brand[]>(`/brand/all`, { params: { query: query ?? "" } }),
-    });
-};
-
-export const useBrandsSearch = (searchParams: SearchParams) => {
-    return useQuery({
-        queryKey: ["brands", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedBrand>("/brand/", { params: { ...searchParams } }),
     });
 };
 

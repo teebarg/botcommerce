@@ -19,13 +19,5 @@ class TagUpdate(TagBase):
     pass
 
 
-class Tags(BaseModel):
-    tags: list[Tag]
-    page: int
-    limit: int
-    total_count: int
-    total_pages: int
-
-
 class Search(BaseModel):
     results: list[Tag]

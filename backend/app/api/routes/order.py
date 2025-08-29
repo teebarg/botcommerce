@@ -35,7 +35,7 @@ async def create_order(
         return order
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) 
 
 @router.get("/{order_id}", response_model=OrderResponse)
 @cache_response(key_prefix="order", key=lambda request, order_id: order_id)
@@ -50,8 +50,8 @@ async def get_order(
 async def get_orders(
     request: Request,
     user: CurrentUser,
-    skip: int = Query(0, ge=0),
-    take: int = Query(20, ge=1, le=100),
+    skip: int = Query(default=0, ge=0),
+    take: int = Query(default=20, ge=1, le=100),
     status: Optional[OrderStatus] = None,
     sort: Optional[str] = "desc",
     search: Optional[str] = None,

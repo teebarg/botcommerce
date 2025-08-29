@@ -150,7 +150,7 @@ async def index(
     request: Request,
     query: str = "",
     brand: str = Query(default=""),
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> Products:
     """
@@ -171,7 +171,7 @@ async def index(
         }
     products = await db.product.find_many(
         where=where_clause,
-        skip=(page - 1) * limit,
+        skip=skip,
         take=limit,
         order={"created_at": "desc"},
         include={
@@ -186,7 +186,7 @@ async def index(
     total = await db.product.count(where=where_clause)
     return {
         "products": products,
-        "page": page,
+        "skip": skip,
         "limit": limit,
         "total_pages": ceil(total/limit),
         "total_count": total,
@@ -194,7 +194,7 @@ async def index(
 
 
 @router.get("/search/public")
-@cache_response("products", expire=3600)
+@cache_response("products")
 async def search(
     request: Request,
     q: str = "",
@@ -243,7 +243,7 @@ async def search(
 
 
 @router.get("/search")
-@cache_response("products", expire=3600)
+@cache_response("products")
 async def search(
     request: Request,
     search: str = "",
@@ -253,7 +253,7 @@ async def search(
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> SearchProducts:
     """
@@ -273,7 +273,7 @@ async def search(
 
     search_params = {
         "limit": limit,
-        "offset": (page - 1) * limit,
+        "offset": skip,
         "sort": [sort],
         "facets": ["brand", "categories", "collections"],
     }
@@ -311,7 +311,7 @@ async def search(
     return {
         "products": search_results["hits"],
         "facets": search_results.get("facetDistribution", {}),
-        "page": page,
+        "skip": skip,
         "limit": limit,
         "total_count": total_count,
         "total_pages": total_pages,
@@ -950,8 +950,6 @@ async def create_image_metadata(
 ):
     """
     Create a product, images and variants.
-    - Creates the product with provided relations
-    - Uploads additional images to Supabase (if provided)
     - Creates variants (if provided)
     """
     async with db.tx() as tx:
@@ -962,7 +960,7 @@ async def create_image_metadata(
                 "name": payload.name,
                 "slug": slugified_name,
                 "sku": generate_sku(),
-                # "description": payload.description,
+                "description": payload.description,
             }
 
             if payload.brand_id is not None:
@@ -985,7 +983,6 @@ async def create_image_metadata(
                 }
             )
 
-            # Variants
             if payload.variants:
                 for variant in payload.variants:
                     try:
@@ -1028,10 +1025,8 @@ async def update_image_metadata(
     redis: RedisClient,
 ):
     """
-    Create a product, images and variants.
-    - Creates the product with provided relations
-    - Uploads additional images to Supabase (if provided)
-    - Creates variants (if provided)
+    - Updates product metadata
+    - Creates or updates variants (if provided)
     """
     async with db.tx() as tx:
         try:
@@ -1058,20 +1053,30 @@ async def update_image_metadata(
             if payload.brand_id is not None:
                 update_data["brand"] = {"connect": {"id": payload.brand_id}}
 
-            await db.product.update(
+            await tx.product.update(
                 where={"id": existing_image.product_id},
                 data=update_data,
             )
 
-            # Variants
             for variant in payload.variants:
                 try:
-                    await tx.productvariant.upsert(
-                        where={
-                            'id': variant.id
-                        },
-                        data={
-                            "create": {
+                    if variant.id:
+                        await tx.productvariant.update(
+                            where={
+                                'id': variant.id
+                            },
+                            data={
+                                'price': variant.price,
+                                'old_price': variant.old_price,
+                                'inventory': variant.inventory,
+                                'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
+                                'size': variant.size,
+                                'color': variant.color,
+                            }
+                        )
+                    else:
+                        await tx.productvariant.create(
+                            data={
                                 "product_id": existing_image.product_id,
                                 'sku': generate_sku(),
                                 'price': variant.price,
@@ -1080,17 +1085,8 @@ async def update_image_metadata(
                                 'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 'size': variant.size,
                                 'color': variant.color,
-                            },
-                            "update": {
-                                'price': variant.price,
-                                'old_price': variant.old_price,
-                                'inventory': variant.inventory,
-                                'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
-                                'size': variant.size,
-                                'color': variant.color,
                             }
-                        },
-                    )
+                        )
                 except Exception as e:
                     logger.error(e)
                     raise HTTPException(

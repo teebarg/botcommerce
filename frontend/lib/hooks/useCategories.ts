@@ -7,12 +7,6 @@ import { api } from "@/apis/client";
 import { Category } from "@/schemas";
 import { CategoryFormValues } from "@/components/admin/categories/category-form";
 
-interface SearchParams {
-    search?: string;
-    page?: number;
-    limit?: number;
-}
-
 export const useCategories = (query?: string) => {
     return useQuery({
         queryKey: ["categories", query],

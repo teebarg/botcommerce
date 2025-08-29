@@ -13,7 +13,7 @@ export const useActivities = () => {
         queryKey: ["activities", "all"],
         queryFn: async ({ pageParam = 0 }) => await api.get<PaginatedActivity>("/activities/", { params: { skip: pageParam, limit: LIMIT } }),
         getNextPageParam: (lastPage: PaginatedActivity) => {
-            const nextSkip = lastPage.skip!;
+            const nextSkip = lastPage.skip + lastPage.limit;
             const hasMore = nextSkip < lastPage.total_count;
 
             return hasMore ? nextSkip : undefined;

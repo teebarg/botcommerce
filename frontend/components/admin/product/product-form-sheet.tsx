@@ -57,12 +57,12 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
     };
 
     const [newVariant, setNewVariant] = useState<Partial<ProductVariant>>({
-        id: currentProduct?.variants?.[0].id ?? undefined,
-        size: currentProduct?.variants?.[0].size ?? "",
-        color: currentProduct?.variants?.[0].color ?? "",
-        price: currentProduct?.variants?.[0].price ?? 0,
-        old_price: currentProduct?.variants?.[0].old_price ?? 0,
-        inventory: currentProduct?.variants?.[0].inventory ?? 1,
+        id: currentProduct?.variants?.[0]?.id ?? undefined,
+        size: currentProduct?.variants?.[0]?.size ?? "",
+        color: currentProduct?.variants?.[0]?.color ?? "",
+        price: currentProduct?.variants?.[0]?.price ?? 0,
+        old_price: currentProduct?.variants?.[0]?.old_price ?? 0,
+        inventory: currentProduct?.variants?.[0]?.inventory ?? 0,
     });
 
     const isDisabled = newVariant.price < 2;
@@ -245,14 +245,14 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
 
                     <div className="space-y-2">
                         <Label className="text-sm" htmlFor="inventory">
-                            Stock
+                            Inventory
                         </Label>
                         <Input
                             id="inventory"
                             min="0"
                             placeholder="0"
                             type="number"
-                            value={newVariant.inventory || "1"}
+                            value={newVariant.inventory}
                             onChange={(e) => setNewVariant((prev) => ({ ...prev, inventory: parseInt(e.target.value) || 0 }))}
                         />
                     </div>

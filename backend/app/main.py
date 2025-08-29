@@ -272,23 +272,6 @@ async def generate_sitemap(cache: deps.RedisClient):
 #             )
 
 
-@app.post("/api/test-event")
-async def test_event(request: Request, redis: deps.RedisClient):
-    await redis.publish_event(
-        "USER_REGISTERED",
-        {
-            "id": "1",
-            "email": "neyostica2000@yahoo.com",
-            "first_name": "Niyi",
-            "last_name": "Oyinlola",
-            "status": "ACTIVE",
-            "role": "CUSTOMER",
-            "source": "sync_user",
-        },
-    )
-    return {"message": "Test event sent"}
-
-
 @app.on_event("startup")
 async def start_websocket_manager():
     await manager.start()

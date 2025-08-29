@@ -9,6 +9,7 @@ from app.core.utils import generate_magic_link_email, send_email, generate_welco
 from app.models.user import User
 from app.prisma_client import prisma
 from app.services.redis import CacheService
+from app.services.events import publish_user_registered
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from app.models.generic import Token
@@ -33,9 +34,6 @@ class SignUpPayload(BaseModel):
 
 class VerifyEmailPayload(BaseModel):
     token: str
-
-# OAuth Models
-
 
 class OAuthCallback(BaseModel):
     code: str
@@ -66,8 +64,6 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
     Register a new user with email and password.
     Requires CAPTCHA verification and email verification.
     """
-
-    # Check if user already exists
     existing_user = await prisma.user.find_first(
         where={
             "email": payload.email,
@@ -80,14 +76,11 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
             detail="Email already registered",
         )
 
-    # Hash password
     hashed_password = security.get_password_hash(payload.password)
 
-    # Generate email verification token
     verification_token = security.create_email_verification_token(
         payload.email)
 
-    # Create user with pending status
     user = await prisma.user.create(
         data={
             "email": payload.email,
@@ -103,18 +96,11 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
 
     try:
         cache: CacheService = CacheService(request.app.state.redis)
-        await cache.publish_event(
-            "USER_REGISTERED",
-            {
-                "id": user.id,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "status": user.status,
-                "role": user.role,
-                "source": "email_password",
-                "created_at": user.created_at,
-            },
+        await publish_user_registered(
+            cache,
+            user=user,
+            source="email_password",
+            created_at=user.created_at,
         )
     except Exception:
         pass
@@ -133,7 +119,6 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
 
     background_tasks.add_task(send_verification_email)
 
-    # Generate access token
     access_token = security.create_access_token(
         data=tokenData(user=user),
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -154,7 +139,6 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
             detail="Invalid or expired verification token",
         )
 
-    # Get user
     user = await prisma.user.find_first(
         where={
             "email": email,
@@ -171,7 +155,6 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
             detail="Invalid or expired verification token",
         )
 
-    # Update user status and clear verification token
     await prisma.user.update(
         where={"id": user.id},
         data={
@@ -181,7 +164,6 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
         }
     )
 
-    # Send welcome email
     welcome_email = await generate_welcome_email(
         email_to=user.email,
         first_name=user.first_name
@@ -192,7 +174,6 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
         html_content=welcome_email.html_content,
     )
 
-    # Generate access token
     access_token = security.create_access_token(
         data=tokenData(user=user),
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -240,7 +221,6 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
 
         token_data = token_response.json()
 
-        # Get user info
         user_response = await client.get(
             "https://www.googleapis.com/oauth2/v2/userinfo",
             headers={"Authorization": f"Bearer {token_data['access_token']}"}
@@ -254,7 +234,6 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
 
         user_info = user_response.json()
 
-        # Create or update user
         user_before = await prisma.user.find_first(where={"email": user_info["email"]})
         user = await prisma.user.upsert(
             where={"email": user_info["email"]},
@@ -271,27 +250,18 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
             }
         )
 
-        # Publish event only if this is a new user
         if not user_before:
             try:
                 cache: CacheService = CacheService(request.app.state.redis)
-                await cache.publish_event(
-                    "USER_REGISTERED",
-                    {
-                        "id": user.id,
-                        "email": user.email,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "status": user.status,
-                        "role": user.role,
-                        "source": "google_oauth",
-                        "created_at": user.created_at,
-                    },
+                await publish_user_registered(
+                    cache,
+                    user=user,
+                    source="google_oauth",
+                    created_at=user.created_at,
                 )
             except Exception:
                 pass
 
-        # Generate access token
         access_token = security.create_access_token(
             data=tokenData(user=user),
             expires_delta=timedelta(
@@ -304,7 +274,6 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
 @router.post("/google")
 async def google(request: Request, payload: GooglePayload) -> Token:
     """Handle Google OAuth callback"""
-    # Create or update user
     user_before = await prisma.user.find_first(where={"email": payload.email})
     user = await prisma.user.upsert(
         where={"email": payload.email},
@@ -324,23 +293,15 @@ async def google(request: Request, payload: GooglePayload) -> Token:
     if not user_before:
         try:
             cache: CacheService = CacheService(request.app.state.redis)
-            await cache.publish_event(
-                "USER_REGISTERED",
-                {
-                    "id": user.id,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "status": user.status,
-                    "role": user.role,
-                    "source": "google_direct",
-                    "created_at": user.created_at,
-                },
+            await publish_user_registered(
+                cache,
+                user=user,
+                source="google_direct",
+                created_at=user.created_at,
             )
         except Exception:
             pass
 
-    # Generate access token
     access_token = security.create_access_token(
         data=tokenData(user=user),
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -393,18 +354,11 @@ async def send_magic_link(
 
         try:
             cache: CacheService = CacheService(request.app.state.redis)
-            await cache.publish_event(
-                "USER_REGISTERED",
-                {
-                    "id": user.id,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "status": user.status,
-                    "role": user.role,
-                    "source": "magic_link_auto_create",
-                    "created_at": user.created_at,
-                },
+            await publish_user_registered(
+                cache,
+                user=user,
+                source="magic_link_auto_create",
+                created_at=user.created_at,
             )
         except Exception:
             pass
@@ -449,20 +403,12 @@ async def sync_user(request: Request, payload: SyncUserPayload, redis: deps.Redi
                 "hashed_password": "password"
             }
         )
-        # Publish event for new user registration via sync-user
         try:
-            await redis.publish_event(
-                "USER_REGISTERED",
-                {
-                    "id": user.id,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "status": user.status,
-                    "role": user.role,
-                    "source": "sync_user",
-                    "created_at": user.created_at,
-                },
+            await publish_user_registered(
+                redis,
+                user=user,
+                source="sync_user",
+                created_at=user.created_at,
             )
         except Exception as e:
             logger.error(f"Failed to publish USER_REGISTERED event: {e}")

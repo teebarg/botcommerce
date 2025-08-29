@@ -36,7 +36,7 @@ async def list_shared_collections(
     request: Request,
     query: str = "",
     product_id: int | None = None,
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100)
 ):
     where_clause = {}
@@ -51,7 +51,7 @@ async def list_shared_collections(
             ]
     shared = await db.sharedcollection.find_many(
         where=where_clause,
-        skip=(page - 1) * limit,
+        skip=skip,
         take=limit,
         order={"created_at": "desc"},
         include={
@@ -82,7 +82,7 @@ async def list_shared_collections(
     total = await db.sharedcollection.count(where=where_clause)
     return {
         "shared":shared_transformed,
-        "page":page,
+        "skip":skip,
         "limit":limit,
         "total_pages":ceil(total/limit),
         "total_count":total,

@@ -10,11 +10,9 @@ import { ProductSearch } from "@/schemas";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { cn, currency } from "@/lib/utils";
 import { useProductRecommendations, useProductSearch } from "@/lib/hooks/useProduct";
-import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 
 const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: ProductSearch) => void }> = ({ product, onProductSelect }) => {
     const { priceInfo } = useProductVariant(product);
-    const { data: session } = useSession();
 
     return (
         <div
@@ -44,12 +42,6 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
                     )}
                 </div>
             </div>
-
-            {session?.user?.isAdmin && (
-                <div onClick={(e) => e.stopPropagation()}>
-                    <ManageSlate product={product} />
-                </div>
-            )}
         </div>
     );
 };
@@ -82,8 +74,8 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
 
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, page: 1 });
-    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 5, page: 1 });
+    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, skip: 0 });
+    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 5, skip: 0 });
     const { data: recommendedData } = useProductRecommendations(session?.user?.id, 5);
 
     useEffect(() => {

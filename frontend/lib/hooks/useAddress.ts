@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { api } from "@/apis/client";
 import { PaginatedAddress, Address, Message } from "@/schemas";
 
-export const useAddresses = (params?: { search?: string; page?: number; limit?: number }) => {
+export const useAddresses = (params?: { search?: string; skip?: number; limit?: number }) => {
     return useQuery({
         queryKey: ["address", JSON.stringify(params)],
         queryFn: async () => await api.get<PaginatedAddress>("/address/", { params }),

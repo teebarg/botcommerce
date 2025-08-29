@@ -51,12 +51,6 @@ class OrderResponse(OrderBase):
     class Config:
         from_attributes = True
 
-class OrderListResponse(BaseModel):
-    total: int
-    page: int
-    limit: int
-    orders: List[OrderResponse]
-
 class OrderFilterParams(BaseModel):
     status: Optional[OrderStatus] = None
     search: Optional[str] = None

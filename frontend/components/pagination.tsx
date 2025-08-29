@@ -3,7 +3,6 @@
 import React from "react";
 
 import { type Pag as PaginationType } from "@/schemas/common";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import {
     Pagination,
     PaginationContent,
@@ -13,32 +12,33 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 
 interface Props {
     pagination: PaginationType;
-    range?: number; // how many pages before/after the current page
+    range?: number;
 }
 
 const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
     const { updateQuery } = useUpdateQuery(200);
-    const page = pagination?.page ?? 1;
+    const page = (pagination?.skip ?? 0) / (pagination?.limit ?? 1) + 1;
     const totalPages = pagination?.total_pages ?? 1;
 
     const onNextPage = () => {
-        updateQuery([{ key: "page", value: `${page + 1}` }]);
+        updateQuery([{ key: "skip", value: `${page * pagination?.limit}` }]);
     };
 
     const onPreviousPage = () => {
-        updateQuery([{ key: "page", value: `${page - 1}` }]);
+        updateQuery([{ key: "skip", value: `${(page - 1) * pagination?.limit}` }]);
     };
 
     const onPageChange = (pageNum: number) => {
-        updateQuery([{ key: "page", value: pageNum.toString() }]);
+        updateQuery([{ key: "skip", value: `${(pageNum - 1) * pagination?.limit}` }]);
     };
 
     const renderPage = (p: number) => (
         <PaginationItem key={p}>
-            <PaginationLink className="cursor-pointer px-4" isActive={page === p} onClick={() => onPageChange(p)}>
+            <PaginationLink className="cursor-pointer" isActive={page === p} onClick={() => onPageChange(p)}>
                 {p}
             </PaginationLink>
         </PaginationItem>
@@ -85,9 +85,7 @@ const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
             </PaginationItem>
 
             <PaginationItem>
-                <PaginationLink isActive className="px-4">
-                    {page}
-                </PaginationLink>
+                <PaginationLink isActive>{page}</PaginationLink>
             </PaginationItem>
 
             <PaginationItem>

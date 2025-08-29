@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { timeAgo } from "@/lib/utils";
-import PaginationUI from "@/components/pagination-skip";
+import PaginationUI from "@/components/pagination";
 import { useReviews } from "@/lib/hooks/useReview";
 import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";
