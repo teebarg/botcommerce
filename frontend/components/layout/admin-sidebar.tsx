@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import {
     Sidebar,
@@ -39,7 +40,6 @@ import {
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/providers/auth-provider";
 import { useStoreSettings } from "@/providers/store-provider";
 import { UserAvatar } from "@/components/generic/user-avatar";
 
@@ -138,7 +138,7 @@ const storeItems = [
 ];
 
 export function AdminSidebar() {
-    const { user } = useAuth();
+    const { data: session } = useSession();
     const { settings } = useStoreSettings();
     const { toggleSidebar, state } = useSidebar();
     const path = usePathname();
@@ -217,8 +217,8 @@ export function AdminSidebar() {
                                     <div className="flex items-center gap-2">
                                         <UserAvatar />
                                         <div className="flex flex-col">
-                                            <p className="font-semibold">{user?.first_name ?? "User"}</p>
-                                            <p className="text-xs text-gray-600">{user?.email ?? "User"}</p>
+                                            <p className="font-semibold">{session?.user?.first_name ?? "User"}</p>
+                                            <p className="text-xs text-gray-600">{session?.user?.email ?? "User"}</p>
                                         </div>
                                     </div>
                                     <ChevronUp className="ml-auto" />

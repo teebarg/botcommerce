@@ -27,7 +27,7 @@ export const PaginatedUserSchema = PagSchema.extend({
 });
 
 export const SessionSchema = z.object({
-    id: z.string(),
+    id: z.number(),
     first_name: z.string(),
     last_name: z.string().optional(),
     email: z.string(),
@@ -36,6 +36,9 @@ export const SessionSchema = z.object({
     isAdmin: z.boolean(),
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
     role: z.enum(["ADMIN", "CUSTOMER"]),
+    addresses: z.array(AddressSchema).optional(),
+    impersonated: z.boolean().optional(),
+    impersonatedBy: z.string().optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;

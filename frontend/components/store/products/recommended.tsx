@@ -1,19 +1,20 @@
 "use client";
 
+import { useSession } from "next-auth/react";
+
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas/product";
 import { useProductRecommendations } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
-import { useAuth } from "@/providers/auth-provider";
 
 type RecommendedProductsProps = {
     exclude?: number[];
 };
 
 export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
-    const { user } = useAuth();
-    const { data, isLoading, error } = useProductRecommendations(user?.id, 40);
+    const { data: session } = useSession();
+    const { data, isLoading, error } = useProductRecommendations(session?.user?.id, 40);
 
     if (error) {
         return <ServerError error={error.message} scenario="recommended-products" stack={error.stack} />;

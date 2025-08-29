@@ -1,13 +1,13 @@
 import { MessageSquare, Star, Users, Package } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import { ReviewForm } from "./review-form";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Overlay from "@/components/overlay";
-import { useAuth } from "@/providers/auth-provider";
 import { BtnLink } from "@/components/ui/btnLink";
 
 interface ProductReviewsZeroStateProps {
@@ -17,8 +17,8 @@ interface ProductReviewsZeroStateProps {
 }
 
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
+    const { data: session } = useSession();
     const state = useOverlayTriggerState({});
-    const { user } = useAuth();
     const pathname = usePathname();
 
     return (
@@ -72,7 +72,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                     </div>
                 </div>
 
-                {user ? (
+                {session?.user ? (
                     <div className="space-y-3">
                         <Overlay
                             open={state.isOpen}

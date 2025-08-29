@@ -15,6 +15,9 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from math import ceil
 from prisma.errors import PrismaError
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -60,13 +63,14 @@ async def create(
         address = await db.address.create(
             data={
                 **create_data.model_dump(),
-                "user_id": user.id
+                "user": {"connect": {"id": user.id}},
             }
         )
         return address
     except PrismaError as e:
+        logger.error(e)
         raise HTTPException(
-            status_code=500, detail=f"Database error: {str(e)}")
+            status_code=400, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{id}")

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Backpack, ChevronRight, RefreshCw, Truck } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 import { cn, currency } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
@@ -10,7 +11,6 @@ import ProductShare from "@/components/product/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/product/product-variant-selection";
 import { Product } from "@/schemas/product";
-import { useAuth } from "@/providers/auth-provider";
 import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 
@@ -25,13 +25,13 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
 
-    const { user } = useAuth();
+    const { data: session } = useSession();
     const trackInteraction = useTrackUserInteraction();
 
     useEffect(() => {
-        if (user && product?.id) {
+        if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: user.id,
+                user_id: session.user.id,
                 product_id: product.id,
                 type: "VIEW",
                 metadata: { source: "product-view" },
@@ -43,9 +43,9 @@ const ProductView: React.FC<Props> = ({ product }) => {
         return () => {
             const timeSpent = Date.now() - startTime;
 
-            if (user && product?.id) {
+            if (session?.user && product?.id) {
                 trackInteraction.mutate({
-                    user_id: user.id,
+                    user_id: session.user.id,
                     product_id: product.id,
                     type: "VIEW",
                     metadata: { timeSpent, source: "product-view" },
@@ -53,7 +53,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?.id, product?.id]);
+    }, [session?.user?.id, product?.id]);
 
     return (
         <div className="max-w-7xl mx-auto h-full w-full md:my-8">

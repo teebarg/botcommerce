@@ -2,8 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-
-import { useAuth } from "./auth-provider";
+import { useSession } from "next-auth/react";
 
 import { useInvalidate } from "@/lib/hooks/useApi";
 
@@ -23,12 +22,12 @@ const MAX_RECONNECT_ATTEMPTS = 5;
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
 export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
+    const { data: session } = useSession();
     const [messages, setMessages] = useState<any[]>([]);
     const [currentMessage, setCurrentMessage] = useState<any>(null);
     const [error, setError] = useState<Event | null>(null);
-    const [reconnecting, setReconnecting] = useState(false);
-    const [reconnectAttempts, setReconnectAttempts] = useState(0);
-    const { user } = useAuth();
+    const [reconnecting, setReconnecting] = useState<boolean>(false);
+    const [reconnectAttempts, setReconnectAttempts] = useState<number>(0);
 
     const pathname = usePathname();
 
@@ -37,7 +36,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const shouldReconnectRef = useRef<boolean>(true);
     const userInitSentRef = useRef<boolean>(false);
-    const userRef = useRef(user);
+    const userRef = useRef(session?.user);
     const invalidate = useInvalidate();
 
     const connect = async () => {
@@ -125,8 +124,8 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     }, []);
 
     useEffect(() => {
-        userRef.current = user;
-    }, [user]);
+        userRef.current = session?.user;
+    }, [session?.user]);
 
     useEffect(() => {
         if (socketRef.current?.readyState === WebSocket.OPEN) {

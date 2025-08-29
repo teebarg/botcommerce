@@ -3,6 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import CartItems from "./cart-items";
 
@@ -12,10 +13,9 @@ import SignInPrompt from "@/components/generic/auth/sign-in-prompt";
 import ClientOnly from "@/components/generic/client-only";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";
-import { useAuth } from "@/providers/auth-provider";
 
 const CartPageDetails: React.FC = () => {
-    const { isAuthenticated } = useAuth();
+    const { data: session } = useSession();
     const pathname = usePathname();
     const { cart, isLoading } = useCart();
 
@@ -37,7 +37,7 @@ const CartPageDetails: React.FC = () => {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8 pt-4">
                             <div className="flex flex-col bg-content1 p-4 gap-y-6 rounded-md">
-                                {!isAuthenticated && <SignInPrompt callbackUrl={pathname} />}
+                                {!session && <SignInPrompt callbackUrl={pathname} />}
                                 <CartItems />
                             </div>
                             <div className="relative hidden md:block">

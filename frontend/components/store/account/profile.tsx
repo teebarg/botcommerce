@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,9 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useInvalidate } from "@/lib/hooks/useApi";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
-import { useAuth } from "@/providers/auth-provider";
 import { Separator } from "@/components/ui/separator";
-import ComponentLoader from "@/components/component-loader";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -43,13 +42,13 @@ const ProfilePage: React.FC = () => {
     const [editingSection, setEditingSection] = useState<string | null>(null);
     const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
-    const { user, loading, error } = useAuth();
+    const { data: session } = useSession();
 
     const profileForm = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            first_name: user?.first_name ?? "",
-            last_name: user?.last_name ?? "",
+            first_name: session?.user?.first_name ?? "",
+            last_name: session?.user?.last_name ?? "",
         },
     });
 
@@ -110,12 +109,8 @@ const ProfilePage: React.FC = () => {
         passwordForm.reset();
     };
 
-    if (error) {
-        return <ServerError error={error.message} scenario="profile" stack={error.stack} />;
-    }
-
-    if (loading) {
-        return <ComponentLoader className="h-[600px]" />;
+    if (!session) {
+        return <ServerError error="Failed to get session" scenario="profile" stack="Invalid session" />;
     }
 
     return (
@@ -194,7 +189,7 @@ const ProfilePage: React.FC = () => {
 
                                 <div>
                                     <label className="block text-sm font-medium text-default-500 mb-2">Email Address</label>
-                                    <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{user?.email}</div>
+                                    <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{session?.user?.email}</div>
                                 </div>
 
                                 {editingSection === "profile" && (

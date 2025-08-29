@@ -16,7 +16,6 @@ import { useUpdateAddress } from "@/lib/hooks/useAddress";
 
 const addressSchema = z.object({
     address_type: AddressTypeSchema,
-    label: z.string().optional(),
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
@@ -46,7 +45,6 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
             state: address.state || "",
             phone: address.phone || "",
             address_type: address.address_type || "HOME",
-            label: address.label || "",
         },
     });
 
@@ -61,43 +59,28 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
             <h2 className="text-lg font-semibold mb-4">Edit address</h2>
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="address_type"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Address Type</FormLabel>
-                                    <Select value={field.value} onValueChange={field.onChange}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="HOME">Home</SelectItem>
-                                            <SelectItem value="WORK">Work</SelectItem>
-                                            <SelectItem value="BILLING">Billing</SelectItem>
-                                            <SelectItem value="SHIPPING">Shipping</SelectItem>
-                                            <SelectItem value="OTHER">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="label"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Label (Optional)</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="e.g., Home, Office" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
+                    <FormField
+                        control={form.control}
+                        name="address_type"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Address Type</FormLabel>
+                                <Select value={field.value} onValueChange={field.onChange}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="HOME">Home</SelectItem>
+                                        <SelectItem value="WORK">Work</SelectItem>
+                                        <SelectItem value="BILLING">Billing</SelectItem>
+                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
+                                        <SelectItem value="OTHER">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <div className="grid grid-cols-1 gap-y-2">
                         <div className="grid grid-cols-2 gap-x-2">
                             <FormField

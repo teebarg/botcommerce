@@ -134,7 +134,9 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                         </main>
                     </div>
                 </div>
-                <div className="w-full absolute bottom-52">{hasNextPage && <div ref={lastElementRef} className="h-2" />}</div>
+                <ClientOnly>
+                    <div className="w-full absolute bottom-52">{hasNextPage && <div ref={lastElementRef} className="h-2" />}</div>
+                </ClientOnly>
                 {isFetchingNextPage && (
                     <div className="flex flex-col items-center justify-center text-blue-600">
                         <Loader className="h-8 w-8 animate-spin mb-2" />

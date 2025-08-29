@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import CustomerForm from "./customer-form";
 
@@ -21,13 +23,25 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     const { mutate } = useDeleteUser();
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
+    const { data: session, update } = useSession();
 
     const onDelete = () => {
         mutate(user.id);
     };
 
+    const handleUpdateName = async () => {
+        await update({ impersonatedBy: session?.user?.email!, email: user.email, impersonated: true, mode: "impersonate" });
+        toast.success("Exited impersonation");
+        window.location.reload();
+    };
+
     return (
         <div className="flex gap-2">
+            {user.role !== "ADMIN" && (
+                <Button size="iconOnly" title="Impersonate" onClick={handleUpdateName}>
+                    <Eye className="h-5 w-5" />
+                </Button>
+            )}
             <Overlay
                 open={editState.isOpen}
                 title="Edit Customer"
