@@ -77,7 +77,7 @@ const PushNotificationManager: React.FC = () => {
 
     async function requestNotificationPermission() {
         if ("Notification" in window) {
-            await Notification.requestPermission();
+            // await Notification.requestPermission();
 
             // return permission === "granted";
             return true;

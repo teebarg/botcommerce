@@ -3,9 +3,9 @@
 import { RectangleVertical, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-function isIos() {
-    return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-}
+// function isIos() {
+//     return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+// }
 
 function isInStandaloneMode() {
     return "standalone" in window.navigator && (window.navigator as any).standalone;
@@ -35,15 +35,22 @@ const DISMISSED_KEY = "ios-install-banner-dismissed";
 const MAX_VIEWS = 5;
 
 const GetApp: React.FC = () => {
+    const [isIOS, setIsIOS] = useState<boolean>(false);
     const [isStandalone, setIsStandalone] = useState<boolean>(false);
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [showIosBanner, setShowIosBanner] = useState<boolean>(false);
 
     useEffect(() => {
-        if (window.matchMedia("(display-mode: standalone)").matches || isInStandaloneMode()) {
-            setIsStandalone(true);
-        }
+        setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
+
+        setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
     }, []);
+
+    // useEffect(() => {
+    //     if (window.matchMedia("(display-mode: standalone)").matches || isInStandaloneMode()) {
+    //         setIsStandalone(true);
+    //     }
+    // }, []);
 
     useEffect(() => {
         const handler = (e: Event) => {
@@ -54,7 +61,7 @@ const GetApp: React.FC = () => {
         window.addEventListener("beforeinstallprompt", handler as EventListener);
         window.addEventListener("appinstalled", () => setIsStandalone(true));
 
-        if (isIos() && !isInStandaloneMode()) {
+        if (isIOS && !isInStandaloneMode()) {
             const dismissed = localStorage.getItem(DISMISSED_KEY) === "true";
             const count = Number(localStorage.getItem(STORAGE_KEY) || "0");
 
