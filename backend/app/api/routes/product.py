@@ -150,7 +150,7 @@ async def index(
     request: Request,
     query: str = "",
     brand: str = Query(default=""),
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> Products:
     """
@@ -171,7 +171,7 @@ async def index(
         }
     products = await db.product.find_many(
         where=where_clause,
-        skip=(page - 1) * limit,
+        skip=skip,
         take=limit,
         order={"created_at": "desc"},
         include={
@@ -186,7 +186,7 @@ async def index(
     total = await db.product.count(where=where_clause)
     return {
         "products": products,
-        "page": page,
+        "skip": skip,
         "limit": limit,
         "total_pages": ceil(total/limit),
         "total_count": total,
@@ -253,7 +253,7 @@ async def search(
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> SearchProducts:
     """
@@ -273,7 +273,7 @@ async def search(
 
     search_params = {
         "limit": limit,
-        "offset": (page - 1) * limit,
+        "offset": skip,
         "sort": [sort],
         "facets": ["brand", "categories", "collections"],
     }
@@ -311,7 +311,7 @@ async def search(
     return {
         "products": search_results["hits"],
         "facets": search_results.get("facetDistribution", {}),
-        "page": page,
+        "skip": skip,
         "limit": limit,
         "total_count": total_count,
         "total_pages": total_pages,

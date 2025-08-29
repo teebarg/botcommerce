@@ -44,7 +44,7 @@ class AddressUpdate(AddressBase):
 
 class Addresses(BaseModel):
     addresses: list[Address]
-    page: int
+    skip: int
     limit: int
     total_count: int
     total_pages: int

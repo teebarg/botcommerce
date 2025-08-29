@@ -10,7 +10,7 @@ type SearchParams = {
     collections?: string;
     min_price?: number | string;
     max_price?: number | string;
-    page?: number;
+    skip?: number;
     limit?: number;
     sort?: string;
 };
@@ -18,7 +18,7 @@ type SearchParams = {
 interface ProductParams {
     query?: string;
     status?: string;
-    page?: number;
+    skip?: number;
     limit?: number;
     sort?: string;
 }
@@ -40,15 +40,15 @@ export const useProductSearch = (params: SearchParams) => {
 export const useProductInfiniteSearch = (params: SearchParams) => {
     return useInfiniteQuery({
         queryKey: ["products", "infinite-search", JSON.stringify(params)],
-        queryFn: async ({ pageParam = 1 }) =>
-            await api.get<PaginatedProductSearch>("/product/search", { params: { page: pageParam, limit: 12, ...params } }),
+        queryFn: async ({ pageParam = 0 }) =>
+            await api.get<PaginatedProductSearch>("/product/search", { params: { skip: pageParam, limit: 12, ...params } }),
         getNextPageParam: (lastPage: PaginatedProductSearch) => {
-            const nextSkip = lastPage.page + 1;
+            const nextSkip = lastPage.skip + lastPage.limit;
             const hasMore = nextSkip < lastPage.total_count;
 
             return hasMore ? nextSkip : undefined;
         },
-        initialPageParam: 1,
+        initialPageParam: 0,
     });
 };
 

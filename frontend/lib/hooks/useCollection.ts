@@ -4,22 +4,9 @@ import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
 
 import { api } from "@/apis/client";
-import { Collection, PaginatedCollection, PaginatedShared, Shared } from "@/schemas";
+import { Collection, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
-
-interface SearchParams {
-    search?: string;
-    page?: number;
-    limit?: number;
-}
-
-export const useCollectionsSearch = (searchParams: SearchParams) => {
-    return useQuery({
-        queryKey: ["collections", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedCollection>("/collection/", { params: { ...searchParams } }),
-    });
-};
 
 export const useCollections = (query?: string) => {
     return useQuery({

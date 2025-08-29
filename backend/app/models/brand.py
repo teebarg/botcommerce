@@ -21,7 +21,7 @@ class BrandUpdate(BrandBase):
 
 class Brands(BaseModel):
     brands: list[Brand]
-    page: int
+    skip: int
     limit: int
     total_count: int
     total_pages: int

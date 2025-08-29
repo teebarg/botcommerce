@@ -82,8 +82,8 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
 
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, page: 1 });
-    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 5, page: 1 });
+    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, skip: 0 });
+    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 5, skip: 0 });
     const { data: recommendedData } = useProductRecommendations(session?.user?.id, 5);
 
     useEffect(() => {

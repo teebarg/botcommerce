@@ -51,7 +51,7 @@ async def all_collections(request: Request, query: str = "") -> Optional[list[Co
 async def index(
     request: Request,
     query: str = "",
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> Collections:
     """
@@ -67,14 +67,14 @@ async def index(
         }
     collections = await db.collection.find_many(
         where=where_clause,
-        skip=(page - 1) * limit,
+        skip=skip,
         take=limit,
         order={"created_at": "desc"},
     )
     total = await db.collection.count(where=where_clause)
     return {
         "collections":collections,
-        "page":page,
+        "skip":skip,
         "limit":limit,
         "total_pages":ceil(total/limit),
         "total_count":total,

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 from datetime import datetime
 from prisma.enums import PaymentStatus
 
@@ -33,9 +33,3 @@ class PaymentVerify(BaseModel):
     status: str
     message: str
     payment_id: Optional[int] = None
-
-class PaymentListResponse(BaseModel):
-    payments: List[PaymentResponse]
-    total: int
-    page: int
-    limit: int

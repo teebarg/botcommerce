@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from app.core.config import settings
 from app.schemas.payment import (
     PaymentInitialize,
-    PaymentListResponse,
 )
 from app.models.order import OrderCreate, OrderResponse
 from app.core.deps import CurrentUser, Notification, RedisClient
@@ -153,27 +152,6 @@ async def create(*, create: PaymentCreate, user: CurrentUser, notification: Noti
         return payment
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-@router.get("/list", response_model=PaymentListResponse)
-async def list_payments(
-    current_user: CurrentUser,
-    skip: int = 0,
-    limit: int = 10,
-):
-    """List payments for the current user"""
-    payments = await db.payment.find_many(
-        where={"user_id": current_user.id},
-        skip=skip,
-        take=limit,
-    )
-    total = await db.payment.count(where={"user_id": current_user.id})
-
-    return PaymentListResponse(
-        payments=payments,
-        total=total,
-        page=skip // limit + 1,
-        limit=limit,
-    )
 
 @router.patch("/{id}/status", response_model=OrderResponse)
 async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, background_tasks: BackgroundTasks, notification: Notification):

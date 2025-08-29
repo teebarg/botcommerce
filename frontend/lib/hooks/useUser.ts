@@ -18,7 +18,7 @@ interface UsersParams {
     query?: string;
     role?: "ADMIN" | "CUSTOMER";
     status?: "ACTIVE" | "INACTIVE" | "PENDING";
-    page?: number;
+    skip?: number;
     limit?: number;
     sort?: string;
 }
@@ -26,7 +26,7 @@ interface UsersParams {
 export const useUsers = (searchParams: UsersParams) => {
     return useQuery({
         queryKey: ["users", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedUser>(`/users/`, { params: { ...searchParams } }),
+        queryFn: async () => await api.get<PaginatedUser>("/users/", { params: { ...searchParams } }),
     });
 };
 

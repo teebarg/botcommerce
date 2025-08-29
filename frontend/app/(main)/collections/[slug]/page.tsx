@@ -50,7 +50,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
         brand_id: brand_id,
     };
 
-    const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { page: 1, ...queryParams } }));
+    const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { skip: 0, ...queryParams } }));
 
     if (error) {
         return <ServerError error={error} scenario="server" stack={`/collections/${slug}`} />;

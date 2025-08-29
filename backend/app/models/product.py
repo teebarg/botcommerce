@@ -80,14 +80,14 @@ class SearchProducts(BaseModel):
     products: List[SearchProduct]
     facets: Facets
     suggestions: List[str]
-    page: int
+    skip: int
     limit: int
     total_count: int
     total_pages: int
 
 class Products(BaseModel):
     products: list[Product]
-    page: int
+    skip: int
     limit: int
     total_count: int
     total_pages: int

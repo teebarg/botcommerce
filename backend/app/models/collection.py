@@ -23,7 +23,7 @@ class CollectionUpdate(CollectionBase):
 
 class Collections(BaseModel):
     collections: list[Collection]
-    page: int
+    skip: int
     limit: int
     total_count: int
     total_pages: int
@@ -46,7 +46,7 @@ class SharedCollection(SharedCollectionBase):
 
 class SharedCollections(BaseModel):
     shared: list[SharedCollection]
-    page: int
+    skip: int
     limit: int
     total_count: int
     total_pages: int

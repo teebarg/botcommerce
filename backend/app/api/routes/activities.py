@@ -14,8 +14,8 @@ router = APIRouter()
 
 @router.get("/", dependencies=[Depends(get_current_superuser)])
 async def index(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, le=100),
 ):
     """
     Retrieve activities.
@@ -28,7 +28,7 @@ async def index(
     total = await db.activitylog.count()
     return {
         "activities": activities,
-        "skip": skip + limit,
+        "skip": skip,
         "limit":limit,
         "total_pages":ceil(total/limit),
         "total_count":total,

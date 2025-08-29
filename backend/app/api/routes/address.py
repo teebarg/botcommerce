@@ -25,8 +25,8 @@ router = APIRouter()
 @router.get("/")
 async def index(
     current_user: CurrentUser,
-    page: int = Query(default=1, gt=0),
-    limit: int = Query(default=20, le=100),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
 ) -> Addresses:
     """
     Retrieve addresses.
@@ -38,14 +38,14 @@ async def index(
         }
     addresses = await db.address.find_many(
         where=where_clause,
-        skip=(page - 1) * limit,
+        skip=skip,
         take=limit,
         order={"created_at": "desc"},
     )
     total = await db.address.count(where=where_clause)
     return {
         "addresses": addresses,
-        "page": page,
+        "skip": skip,
         "limit": limit,
         "total_pages": ceil(total/limit),
         "total_count": total,

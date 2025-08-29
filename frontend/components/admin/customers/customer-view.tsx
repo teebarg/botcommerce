@@ -12,9 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Order, Status, User } from "@/schemas";
 import { useUsers } from "@/lib/hooks/useUser";
-import PaginationUI from "@/components/pagination";
 import { currency } from "@/lib/utils";
 import { CardSkeleton } from "@/components/ui/skeletons";
+import PaginationUI from "@/components/pagination-skip";
 
 const LIMIT = 10;
 
@@ -32,12 +32,12 @@ const CustomerView: React.FC = () => {
     };
 
     const { data, isLoading } = useUsers({
-        page: (page - 1) * LIMIT,
+        skip: (page - 1) * LIMIT,
         limit: LIMIT,
         ...filters,
     });
 
-    const { users, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
+    const { users, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     const getStatusBadge = (status?: Status) => {
         const variants: Record<Status, "destructive" | "emerald" | "warning"> = {

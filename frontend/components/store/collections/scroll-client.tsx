@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { ChevronRight, Loader, Tag } from "nui-react-icons";
 import { useSearchParams } from "next/navigation";
 
 import { BtnLink } from "@/components/ui/btnLink";
@@ -19,6 +18,7 @@ import { Category, Collection, ProductSearch } from "@/schemas/product";
 import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
 import ClientOnly from "@/components/generic/client-only";
 import ProductCardListings from "@/components/store/products/product-card-listings";
+import { ChevronRight, Loader, Tag } from "lucide-react";
 
 interface SearchParams {
     sortBy?: string;

@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.models.config import (
     SiteConfig,
@@ -26,7 +26,8 @@ async def site_config() -> Any:
 
 @router.get("/")
 async def index(
-    skip: int = 0, limit: int = 20
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, le=100),
 ) -> SiteConfigs:
     """
     Retrieve configs with Redis caching.
@@ -39,7 +40,7 @@ async def index(
     total = await db.siteconfig.count()
     return {
         "configs": configs,
-        "page": skip,
+        "skip": skip,
         "limit": limit,
         "total_pages": ceil(total/limit),
         "total_count": total,

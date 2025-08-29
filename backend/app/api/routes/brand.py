@@ -42,13 +42,12 @@ async def all_brands(query: str = "") -> Optional[list[Brand]]:
 @router.get("/")
 async def index(
     query: str = "",
-    page: int = Query(default=1, gt=0),
+    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> Brands:
     """
     Retrieve brands with Redis caching.
     """
-    # Define the where clause based on query parameter
     where_clause = None
     if query:
         where_clause = {
@@ -59,14 +58,14 @@ async def index(
         }
     brands = await db.brand.find_many(
         where=where_clause,
-        skip=(page - 1) * limit,
+        skip=skip,
         take=limit,
         order={"created_at": "desc"},
     )
     total = await db.brand.count(where=where_clause)
     return {
         "brands":brands,
-        "page":page,
+        "skip":skip,
         "limit":limit,
         "total_pages":ceil(total/limit),
         "total_count":total,

@@ -24,10 +24,3 @@ export interface PaymentVerify {
     message: string;
     payment_id?: number;
 }
-
-export interface PaymentListResponse {
-    payments: Payment[];
-    total: number;
-    page: number;
-    limit: number;
-}

@@ -12,9 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Conversation, ConversationStatus } from "@/schemas";
 import { useConversations } from "@/lib/hooks/useApi";
-import PaginationUI from "@/components/pagination";
 import { formatDate } from "@/lib/utils";
 import ComponentLoader from "@/components/component-loader";
+import PaginationUI from "@/components/pagination-skip";
 
 const LIMIT = 10;
 
@@ -36,7 +36,7 @@ const ChatsView: React.FC = () => {
         ...filters,
     });
 
-    const { conversations, ...pagination } = data ?? { page: 0, limit: 0, total_pages: 0, total_count: 0 };
+    const { conversations, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     const getStatusBadge = (status?: ConversationStatus) => {
         const variants: Record<ConversationStatus, "destructive" | "emerald" | "warning"> = {

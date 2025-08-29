@@ -4,9 +4,7 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
-    Query,
 )
-from math import ceil
 from prisma.errors import PrismaError
 
 from app.core.deps import get_current_user
@@ -21,39 +19,6 @@ from app.prisma_client import prisma as db
 from app.core.utils import slugify
 
 router = APIRouter()
-
-
-@router.get("/", dependencies=[Depends(get_current_user)])
-async def index(
-    query: str = "",
-    page: int = Query(default=1, gt=0),
-    limit: int = Query(default=20, le=100),
-):
-    """
-    Retrieve tags.
-    """
-    where_clause = None
-    if query:
-        where_clause = {
-            "OR": [
-                {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
-            ]
-        }
-    tags = await db.tag.find_many(
-        where=where_clause,
-        skip=(page - 1) * limit,
-        take=limit,
-        order={"created_at": "desc"},
-    )
-    total = await db.tag.count(where=where_clause)
-    return {
-        "tags":tags,
-        "page":page,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
-    }
 
 
 @router.post("/")

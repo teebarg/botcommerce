@@ -38,7 +38,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
     };
 
     const { data: initialData, error } = await tryCatch<PaginatedProductSearch>(
-        serverApi.get("/product/search", { params: { page: 1, ...queryParams } })
+        serverApi.get("/product/search", { params: { skip: 0, ...queryParams } })
     );
 
     if (error) {
