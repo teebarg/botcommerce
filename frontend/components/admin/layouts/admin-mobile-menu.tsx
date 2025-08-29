@@ -19,14 +19,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/providers/auth-provider";
 
 const AdminMobileMenu: React.FC = () => {
     const pathname = usePathname();
-
-    const { user } = useAuth();
+    const { data: session } = useSession();
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
@@ -50,15 +49,15 @@ const AdminMobileMenu: React.FC = () => {
             <div className="p-4 bg-accent text-gray-800 sticky top-safe z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>
-                        <AvatarImage src={user?.image} />
-                        <AvatarFallback className="bg-secondary">{user?.first_name[0] || ""}</AvatarFallback>
+                        <AvatarImage src={session?.user?.image!} />
+                        <AvatarFallback className="bg-secondary">{session?.user?.first_name[0] || ""}</AvatarFallback>
                     </Avatar>
 
                     <div>
                         <div className="font-medium">
-                            {user?.first_name} {user?.last_name}
+                            {session?.user?.first_name} {session?.user?.last_name}
                         </div>
-                        <div className="text-xs text-gray-700">{user?.email}</div>
+                        <div className="text-xs text-gray-700">{session?.user?.email}</div>
                     </div>
                 </div>
             </div>

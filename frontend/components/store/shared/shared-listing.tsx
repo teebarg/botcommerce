@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
-import { useAuth } from "@/providers/auth-provider";
+import { useSession } from "next-auth/react";
 
 export const SocialShare = ({ title, view_count }: { title: string; view_count: number }) => {
+    const { data: session } = useSession();
     const [copied, setCopied] = useState<boolean>(false);
     const [url, setUrl] = useState<string>("");
-    const { user } = useAuth();
 
     useEffect(() => {
         setUrl(window.location.href);
@@ -24,7 +23,7 @@ export const SocialShare = ({ title, view_count }: { title: string; view_count: 
         }
     };
 
-    if (!user || user.role !== "ADMIN") return null;
+    if (!session?.user.isAdmin) return null;
 
     return (
         <div>

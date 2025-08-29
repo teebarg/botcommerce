@@ -31,6 +31,7 @@ export default async function middleware(req: NextRequest) {
     if (pathname.startsWith("/admin") && !session?.user?.isAdmin) {
         return NextResponse.redirect(new URL("/", req.nextUrl));
     }
+
     return NextResponse.next();
 }
 

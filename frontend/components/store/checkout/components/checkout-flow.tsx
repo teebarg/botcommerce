@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 
 import DeliveryStep from "./delivery-step";
 import AddressStep from "./address-step";
 import PaymentStep from "./payment-step";
 import CheckoutStepIndicator from "./checkout-step-indicator";
 
-import { useAuth } from "@/providers/auth-provider";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import { Cart } from "@/schemas";
 import { cn } from "@/lib/utils";
@@ -20,11 +20,11 @@ interface CheckoutFlowProps {
 }
 
 const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
-    const { isAuthenticated } = useAuth();
+    const { data: session } = useSession();
     const [currentStep, setCurrentStep] = useState<CheckoutStep>("auth");
 
     const getStep = () => {
-        if (!isAuthenticated) {
+        if (!session) {
             return "auth";
         }
         if (!cart.shipping_method) {
@@ -43,7 +43,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
     const getCompletedSteps = (): CheckoutStep[] => {
         const completed: CheckoutStep[] = [];
 
-        if (isAuthenticated) {
+        if (session) {
             completed.push("auth");
         }
 
@@ -110,8 +110,8 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
 
     return (
         <div className="space-y-6">
-            {isAuthenticated && <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />}
-            <div className={cn("transition-all duration-300", isAuthenticated ? "animate-fade-in" : "")}>{renderStep()}</div>
+            {session && <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />}
+            <div className={cn("transition-all duration-300", session ? "animate-fade-in" : "")}>{renderStep()}</div>
         </div>
     );
 };

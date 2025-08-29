@@ -16,12 +16,12 @@ export default function ImpersonationBanner() {
     if (!session?.impersonated) return null;
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-3 py-2 rounded-md bg-amber-100 text-amber-900 shadow-md border border-amber-300">
+        <div className="fixed bottom-12 left-6 z-50 flex items-center gap-3 px-3 py-2 rounded-md bg-amber-100 text-amber-900 shadow-md border border-amber-300">
             <span className="text-sm">Impersonation mode</span>
-            <button onClick={stopImpersonation} className="text-xs font-semibold underline">
+            <button className="text-xs font-semibold underline" onClick={stopImpersonation}>
                 Exit
             </button>
-            <button aria-label="dismiss" onClick={stopImpersonation} className="ml-1">
+            <button aria-label="dismiss" className="ml-1" onClick={stopImpersonation}>
                 <X className="h-4 w-4" />
             </button>
         </div>

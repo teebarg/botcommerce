@@ -13,6 +13,7 @@ import { useCreateAddress } from "@/lib/hooks/useAddress";
 import { states } from "@/components/store/collections/data";
 
 const addressSchema = z.object({
+    address_type: z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]),
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
@@ -34,12 +35,13 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(addressSchema),
         defaultValues: {
+            address_type: "HOME",
             first_name: "",
             last_name: "",
             address_1: "",
             address_2: "",
             city: "",
-            state: "",
+            state: "Lagos",
             phone: "",
         },
     });
@@ -57,6 +59,30 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="grid grid-cols-1 gap-y-2">
+                        <FormField
+                            control={form.control}
+                            name="address_type"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Address Type</FormLabel>
+                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select type" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="HOME">Home</SelectItem>
+                                            <SelectItem value="WORK">Work</SelectItem>
+                                            <SelectItem value="BILLING">Billing</SelectItem>
+                                            <SelectItem value="SHIPPING">Shipping</SelectItem>
+                                            <SelectItem value="OTHER">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <div className="grid grid-cols-2 gap-x-2">
                             <FormField
                                 control={form.control}
@@ -65,7 +91,13 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                     <FormItem>
                                         <FormLabel>First name</FormLabel>
                                         <FormControl>
-                                            <Input required autoComplete="given-name" data-testid="first-name-input" {...field} />
+                                            <Input
+                                                required
+                                                autoComplete="given-name"
+                                                data-testid="first-name-input"
+                                                {...field}
+                                                placeholder="First name"
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -78,7 +110,13 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                     <FormItem>
                                         <FormLabel>Last name</FormLabel>
                                         <FormControl>
-                                            <Input required autoComplete="family-name" data-testid="last-name-input" {...field} />
+                                            <Input
+                                                required
+                                                autoComplete="family-name"
+                                                data-testid="last-name-input"
+                                                {...field}
+                                                placeholder="Last name"
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -92,7 +130,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                 <FormItem>
                                     <FormLabel>Address</FormLabel>
                                     <FormControl>
-                                        <Input required autoComplete="address-line1" data-testid="address-1-input" {...field} />
+                                        <Input required autoComplete="address-line1" data-testid="address-1-input" {...field} placeholder="Address" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -105,7 +143,12 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                 <FormItem>
                                     <FormLabel>Apartment, suite, etc.</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="address-line2" data-testid="address-2-input" {...field} />
+                                        <Input
+                                            autoComplete="address-line2"
+                                            data-testid="address-2-input"
+                                            {...field}
+                                            placeholder="Apartment, suite, etc."
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -119,7 +162,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                     <FormItem>
                                         <FormLabel>City</FormLabel>
                                         <FormControl>
-                                            <Input required autoComplete="locality" data-testid="city-input" {...field} />
+                                            <Input required autoComplete="locality" data-testid="city-input" {...field} placeholder="City" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -157,7 +200,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                 <FormItem>
                                     <FormLabel>Phone</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="phone" data-testid="phone-input" {...field} />
+                                        <Input autoComplete="phone" data-testid="phone-input" {...field} placeholder="Phone" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

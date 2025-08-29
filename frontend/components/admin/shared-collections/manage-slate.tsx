@@ -4,6 +4,7 @@ import React from "react";
 import { Plus, Check, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 import { SocialShare } from "./social-share";
 
@@ -15,7 +16,6 @@ import { useSharedCollections, useAddProductToSharedCollection, useRemoveProduct
 import ComponentLoader from "@/components/component-loader";
 import { ProductSearch } from "@/schemas";
 import Overlay from "@/components/overlay";
-import { useSession } from "next-auth/react";
 
 interface ManageSlateProps {
     product: ProductSearch;

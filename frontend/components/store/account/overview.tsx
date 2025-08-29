@@ -4,16 +4,16 @@ import { notFound } from "next/navigation";
 import { currency } from "@lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useSession } from "next-auth/react";
 
 import PromotionalBanner from "@/components/promotion";
-import { Order, User } from "@/schemas";
-import { useAuth } from "@/providers/auth-provider";
+import { Order, Session } from "@/schemas";
 import { useOrders } from "@/lib/hooks/useOrder";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
 import ComponentLoader from "@/components/component-loader";
 
-const getProfileCompletion = (customer: Omit<User, "password_hash"> | null) => {
+const getProfileCompletion = (customer: Omit<Session, "password_hash"> | null) => {
     let count = 0;
 
     if (!customer) {
@@ -69,14 +69,14 @@ const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
 };
 
 const OverviewTemplate: React.FC = () => {
-    const { user, loading } = useAuth();
+    const { data: session } = useSession();
     const { data, isPending } = useOrders({});
 
-    if (loading || isPending) {
+    if (isPending) {
         return <ComponentLoader className="h-192" />;
     }
 
-    if (!user || !data?.orders) {
+    if (!data?.orders) {
         notFound();
     }
 
@@ -90,13 +90,13 @@ const OverviewTemplate: React.FC = () => {
                     title="Big Sale on Top Brands!"
                 />
                 <div className="text-xl hidden md:flex justify-between items-center mt-4">
-                    <span data-testid="welcome-message" data-value={user?.first_name}>
-                        Hello {user?.first_name}
+                    <span data-testid="welcome-message" data-value={session?.user?.first_name}>
+                        Hello {session?.user?.first_name}
                     </span>
                     <span className="text-sm text-default-900">
                         Signed in as:{" "}
-                        <span className="font-semibold" data-testid="customer-email" data-value={user?.email}>
-                            {user?.email}
+                        <span className="font-semibold" data-testid="customer-email" data-value={session?.user?.email}>
+                            {session?.user?.email}
                         </span>
                     </span>
                 </div>
@@ -106,8 +106,8 @@ const OverviewTemplate: React.FC = () => {
                             <div className="flex flex-col bg-pink-100 dark:bg-pink-900 rounded-lg py-2 px-4 text-default-900 ">
                                 <h3 className="font-semibold">Profile</h3>
                                 <div className="flex items-center gap-x-2">
-                                    <span data-testid="customer-profile-completion" data-value={getProfileCompletion(user)}>
-                                        {getProfileCompletion(user).toFixed(2)}%
+                                    <span data-testid="customer-profile-completion" data-value={getProfileCompletion(session?.user!)}>
+                                        {getProfileCompletion(session?.user!).toFixed(2)}%
                                     </span>
                                     <span className="uppercase">Completed</span>
                                 </div>
@@ -116,8 +116,8 @@ const OverviewTemplate: React.FC = () => {
                             <div className="flex flex-col bg-yellow-100 dark:bg-yellow-900 rounded-lg py-2 px-4 text-default-900">
                                 <h3 className="font-semibold">Addresses</h3>
                                 <div className="flex items-center gap-x-2">
-                                    <span data-testid="addresses-count" data-value={user?.addresses?.length || 0}>
-                                        {user?.addresses?.length || 0}
+                                    <span data-testid="addresses-count" data-value={session?.user?.addresses?.length || 0}>
+                                        {session?.user?.addresses?.length || 0}
                                     </span>
                                     <span className="uppercase">Saved</span>
                                 </div>

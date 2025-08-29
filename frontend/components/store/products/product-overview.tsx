@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 import { DiscountBadge } from "./discount-badge";
 
@@ -11,7 +12,6 @@ import LocalizedClientLink from "@/components/ui/link";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
 import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
-import { useAuth } from "@/providers/auth-provider";
 import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 
 const ProductOverview: React.FC<{
@@ -40,13 +40,13 @@ const ProductOverview: React.FC<{
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
-    const { user } = useAuth();
+    const { data: session } = useSession();
     const trackInteraction = useTrackUserInteraction();
 
     useEffect(() => {
-        if (user && product?.id) {
+        if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: user.id,
+                user_id: session.user.id,
                 product_id: product.id,
                 type: "VIEW",
                 metadata: { source: "product-overview" },
@@ -58,9 +58,9 @@ const ProductOverview: React.FC<{
         return () => {
             const timeSpent = Date.now() - startTime;
 
-            if (user && product?.id) {
+            if (session?.user && product?.id) {
                 trackInteraction.mutate({
-                    user_id: user.id,
+                    user_id: session.user.id,
                     product_id: product.id,
                     type: "VIEW",
                     metadata: { timeSpent, source: "product-overview" },
@@ -68,12 +68,12 @@ const ProductOverview: React.FC<{
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?.id, product?.id]);
+    }, [session?.user?.id, product?.id]);
 
     const handleAddToCartAndTrack = () => {
-        if (user && product?.id) {
+        if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: user.id,
+                user_id: session.user.id,
                 product_id: product.id,
                 type: "CART_ADD",
                 metadata: { source: "product-overview" },
@@ -87,9 +87,9 @@ const ProductOverview: React.FC<{
 
     const addWishlist = async () => {
         createWishlist(product.id);
-        if (user && product?.id) {
+        if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: user.id,
+                user_id: session?.user.id,
                 product_id: product.id,
                 type: "WISHLIST_ADD",
                 metadata: { source: "product-overview" },
@@ -99,9 +99,9 @@ const ProductOverview: React.FC<{
 
     const removeWishlist = async () => {
         deleteWishlist(product.id);
-        if (user && product?.id) {
+        if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: user.id,
+                user_id: session?.user.id,
                 product_id: product.id,
                 type: "WISHLIST_REMOVE",
                 metadata: { source: "product-overview" },

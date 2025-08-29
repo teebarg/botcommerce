@@ -1,11 +1,11 @@
 "use client";
 
 import { MapPin, Package, User } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 import RecommendedProducts from "@/components/store/products/recommended";
 import LocalizedClientLink from "@/components/ui/link";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/providers/auth-provider";
 import AccountNav from "@/components/layout/account-nav";
 
 const navLinks = [
@@ -36,7 +36,7 @@ const navLinks = [
 ];
 
 export default function AccountPageLayout({ dashboard }: { dashboard?: React.ReactNode }) {
-    const { user } = useAuth();
+    const { data: session } = useSession();
 
     return (
         <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">
@@ -47,9 +47,9 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
                     </div>
                     <div>
                         <h1 className="text-xl font-bold">
-                            {user?.first_name} {user?.last_name}
+                            {session?.user?.first_name} {session?.user?.last_name}
                         </h1>
-                        <p className="">{user?.email}</p>
+                        <p>{session?.user?.email}</p>
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
             </div>
             <div className="flex-1 h-full max-w-7xl mx-auto bg-content1 flex flex-col rounded-md md:px-8">
                 <div className="md:flex md:gap-4 py-4 md:py-12">
-                    <div className="md:min-w-60">{user && <AccountNav />}</div>
+                    <div className="md:min-w-60">{session?.user && <AccountNav />}</div>
                     <div className="md:flex-1">{dashboard}</div>
                 </div>
                 <Separator className="my-4" />

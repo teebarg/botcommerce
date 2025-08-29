@@ -2,20 +2,20 @@
 
 import React from "react";
 import { Check } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
 import { useSharedCollections } from "@/lib/hooks/useCollection";
-import { useAuth } from "@/providers/auth-provider";
 
 interface ProductCollectionIndicatorProps {
     product: { id: number; name: string; [key: string]: any };
 }
 
 export const ProductCollectionIndicator: React.FC<ProductCollectionIndicatorProps> = ({ product }) => {
-    const { user } = useAuth();
+    const { data: session } = useSession();
     const { data: sharedCollections } = useSharedCollections();
 
-    if (user?.role !== "ADMIN") {
+    if (!session?.user?.isAdmin) {
         return null;
     }
 

@@ -3,13 +3,12 @@
 import React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import ThemeButton from "@/lib/theme/theme-button";
-import { useAuth } from "@/providers/auth-provider";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
 
@@ -31,7 +30,7 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 
 const Menu: React.FC = () => {
     const pathname = usePathname();
-    const { user } = useAuth();
+    const { data: session } = useSession();
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
         await authApi.logOut();
@@ -47,8 +46,8 @@ const Menu: React.FC = () => {
                 <NavLink href="/account/profile" icon={<UserIcon className="h-6 w-6" />} title="Profile" />
                 <NavLink href="/collections" icon={<LayoutGrid className="h-6 w-6" />} title="Collections" />
                 <NavLink href="/checkout" icon={<CreditCard className="h-6 w-6" />} title="Checkout" />
-                {user && <NavLink href="/wishlist" icon={<Heart className="h-6 w-6" />} title="Favorites" />}
-                {user?.role === "ADMIN" && <NavLink href="/admin" icon={<User2 className="h-6 w-6" />} title="Admin" />}
+                {session && <NavLink href="/wishlist" icon={<Heart className="h-6 w-6" />} title="Favorites" />}
+                {session?.user?.isAdmin && <NavLink href="/admin" icon={<User2 className="h-6 w-6" />} title="Admin" />}
             </div>
 
             <Separator className="my-8" />
@@ -61,9 +60,9 @@ const Menu: React.FC = () => {
                 <ThemeButton />
             </div>
             <div className="mt-4 mb-2 block md:hidden">
-                {user ? (
+                {session ? (
                     <div>
-                        <p className="font-semibold leading-6 text-primary-900">Logged in as {user?.first_name}</p>
+                        <p className="font-semibold leading-6 text-primary-900">Logged in as {session.user?.first_name}</p>
                         <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
                             Log out
                         </button>

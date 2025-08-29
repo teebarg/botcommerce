@@ -3,6 +3,7 @@ import { Lexend, Outfit, Nunito_Sans } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { SessionProvider } from "next-auth/react";
 
 import TanstackProviders from "./query-provider";
 
@@ -12,12 +13,9 @@ import { getSiteConfig } from "@/lib/config";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { WebSocketProvider } from "@/providers/websocket";
 import { cn } from "@/lib/utils";
-import { AuthProvider } from "@/providers/auth-provider";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
-import { auth } from "@/auth";
-import { SessionProvider } from "next-auth/react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -68,7 +66,6 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    const session = await auth();
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className, nunitoSans.variable)} lang="en">
             <head>
@@ -89,14 +86,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         <TanstackProviders>
                             <StoreProvider>
                                 <SessionProvider>
-                                    <AuthProvider session={session}>
-                                        <CartProvider>
-                                            <WebSocketProvider>
-                                                {children}
-                                                <ImpersonationBanner />
-                                            </WebSocketProvider>
-                                        </CartProvider>
-                                    </AuthProvider>
+                                    <CartProvider>
+                                        <WebSocketProvider>
+                                            {children}
+                                            <ImpersonationBanner />
+                                        </WebSocketProvider>
+                                    </CartProvider>
                                 </SessionProvider>
                             </StoreProvider>
                             <ReactQueryDevtools initialIsOpen={false} />

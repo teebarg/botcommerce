@@ -3,6 +3,8 @@
 import React from "react";
 import { Edit, Trash2, Eye } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import CustomerForm from "./customer-form";
 
@@ -12,8 +14,6 @@ import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 interface CustomerActionsProps {
     user: User;
@@ -38,7 +38,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     return (
         <div className="flex gap-2">
             {user.role !== "ADMIN" && (
-                <Button size="iconOnly" onClick={handleUpdateName} title="Impersonate">
+                <Button size="iconOnly" title="Impersonate" onClick={handleUpdateName}>
                     <Eye className="h-5 w-5" />
                 </Button>
             )}

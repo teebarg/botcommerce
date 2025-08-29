@@ -2,12 +2,12 @@
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 import { ReviewsList } from "../store/reviews/reviews-list";
 
 import ComponentLoader from "@/components/component-loader";
-import { useAuth } from "@/providers/auth-provider";
 import { useOrders } from "@/lib/hooks/useOrder";
 import { useReviews } from "@/lib/hooks/useReview";
 
@@ -17,20 +17,20 @@ interface Prop {
 }
 
 const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
+    const { data: session } = useSession();
     const searchParams = useSearchParams();
     const skip = parseInt(searchParams.get("skip") || "0", 10);
     const sort = searchParams.get("sort") || "newest";
 
     const { data, isLoading } = useReviews({ product_id, skip, limit: 5, sort });
-    const { user, loading: userLoading } = useAuth();
     const { data: orders, isLoading: ordersLoading } = useOrders({});
 
-    if (isLoading || userLoading || ordersLoading) {
+    if (isLoading || ordersLoading) {
         return <ComponentLoader className="min-h-[400px]" />;
     }
 
-    const isLoggedIn = !!user;
-    const hasReviewed = isLoggedIn && data?.reviews?.some((r) => r.user?.id === user?.id);
+    const isLoggedIn = !!session?.user;
+    const hasReviewed = isLoggedIn && data?.reviews?.some((r) => r.user?.id === session?.user?.id);
     let hasPurchased = false;
 
     if (isLoggedIn && orders?.orders) {

@@ -4,17 +4,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { Search, X, Clock, TrendingUp, Star } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 import { ProductSearch } from "@/schemas";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
-import { useAuth } from "@/providers/auth-provider";
 import { cn, currency } from "@/lib/utils";
 import { useProductRecommendations, useProductSearch } from "@/lib/hooks/useProduct";
 import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 
 const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: ProductSearch) => void }> = ({ product, onProductSelect }) => {
     const { priceInfo } = useProductVariant(product);
-    const { user } = useAuth();
+    const { data: session } = useSession();
 
     return (
         <div
@@ -45,7 +45,7 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
                 </div>
             </div>
 
-            {user?.role === "ADMIN" && (
+            {session?.user?.isAdmin && (
                 <div onClick={(e) => e.stopPropagation()}>
                     <ManageSlate product={product} />
                 </div>
@@ -71,7 +71,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
     placeholder = "Search for products...",
     closeOnSelect = true,
 }) => {
-    const { user } = useAuth();
+    const { data: session } = useSession();
     const [query, setQuery] = useState(initialQuery);
     const [debouncedQuery] = useDebounce(query, searchDelay);
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -84,7 +84,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
 
     const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, page: 1 });
     const { data: trendingData } = useProductSearch({ collections: "trending", limit: 5, page: 1 });
-    const { data: recommendedData } = useProductRecommendations(user?.id, 5);
+    const { data: recommendedData } = useProductRecommendations(session?.user?.id, 5);
 
     useEffect(() => {
         const savedHistory = localStorage.getItem("searchHistory");
