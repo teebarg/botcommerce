@@ -12,12 +12,13 @@ import GetApp from "@/components/get-app";
 export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
         <div className="flex flex-col flex-1">
-            {/* <Banner /> */}
             <StoreNavbar />
-            <div className="px-2 py-2 md:hidden sticky top-safe z-40 bg-background flex items-center gap-2">
-                <BackButton />
-                <Search className="justify-between w-full" />
-                <GetApp />
+            <div className="md:hidden sticky top-0 z-40 bg-background -mt-[env(safe-area-inset-top)]">
+                <div className="flex items-center gap-2 px-2 pt-[env(safe-area-inset-top)] pb-3">
+                    <BackButton />
+                    <Search className="justify-between w-full" />
+                    <GetApp />
+                </div>
             </div>
             <main className="flex-1 flex flex-col">{props.children}</main>
             <Cookie />
