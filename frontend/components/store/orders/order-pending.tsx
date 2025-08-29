@@ -33,7 +33,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
                     <h2 className="text-2xl font-bold text-default-900 mb-2">Payment Pending</h2>
 
-                    <p className="text-default-700">{`We're waiting for your bank transfer. Please complete the payment with the details below:`}</p>
+                    <p className="text-default-700">{`We're waiting for your payment. Please complete the payment with the details below:`}</p>
                 </div>
             </FadeInComponent>
 

@@ -101,7 +101,7 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                     <FormControl>
                                         <Input
                                             data-testid="shipping-first_name-input"
-                                            placeholder="e.g., Home, Office"
+                                            placeholder="e.g., Home, Office, Mum's place"
                                             startContent={<MapPin className="h-4 w-4 text-muted-foreground" />}
                                             {...field}
                                         />

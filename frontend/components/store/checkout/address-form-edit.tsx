@@ -95,7 +95,7 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
                                 <FormItem>
                                     <FormLabel>Label (Optional)</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g., Home, Office" {...field} />
+                                        <Input placeholder="e.g., Home, Office, Mum's place" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
