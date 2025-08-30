@@ -35,7 +35,6 @@ from app.services.meilisearch import (
 )
 from app.prisma_client import prisma as db
 from math import ceil
-from pydantic import BaseModel
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
@@ -47,46 +46,31 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-class LandingProducts(BaseModel):
-    trending: list[SearchProduct]
-    latest: list[SearchProduct]
-    featured: list[SearchProduct]
-
-
-@router.get("/landing-products")
-@cache_response("products", key="landing-products")
-async def get_landing_products(request: Request) -> LandingProducts:
+@router.get("/trending/{type}")
+@cache_response("products", key="trending-products")
+async def get_trending_products(request: Request, type: str = "trending", skip: int = Query(default=0), limit: int = Query(default=20)) -> list[SearchProduct]:
     """
-    Retrieve multiple product categories in a single request.
+    Retrieve trending products.
     """
-    result = {}
+    filters = [f"collections IN [{type}]", "min_variant_price >= 1"]
+    search_params = {
+        "limit": limit,
+        "offset": skip,
+        "sort": ["created_at:desc"],
+        "filter": " AND ".join(filters) if filters else None,
+    }
 
-    for product_type in ["trending", "latest", "featured"]:
-        filters = [
-            f"collections IN [{product_type}]", "min_variant_price >= 1"]
-        search_params = {
-            "limit": 6 if product_type == "featured" else 4,
-            "offset": 0,
-            "sort": ["created_at:desc"],
-            "filter": " AND ".join(filters) if filters else None,
-        }
-
-        try:
-            search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
-                "",
-                {
-                    **search_params
-                }
-            )
-        except Exception as e:
-            logger.error(e)
-            raise HTTPException(
-                status_code=400,
-                detail=str(e)
-            )
-        result[product_type] = search_results["hits"]
-
-    return result
+    try:
+        search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
+            "",
+            {
+                **search_params
+            }
+        )
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
+    return search_results["hits"]
 
 
 @router.get("/gallery")
