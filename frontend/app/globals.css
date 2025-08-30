@@ -432,7 +432,7 @@
         /* modern + iOS fallback */
         height: env(safe-area-inset-top);
         height: constant(safe-area-inset-top);
-        background: var(--header-bg, #0f172a); /* match header bg */
+        background: var(--background, #0f172a);
       }
 }
 

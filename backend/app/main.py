@@ -101,14 +101,12 @@ async def root():
 
 @app.get("/api/health")
 async def health():
-    await db.user.find_unique(
+    user = await db.user.find_unique(
         where={"id": 1}
     )
-    # check if redis is connected
     redis_res = await app.state.redis.ping()
-    # check meilisearch is connected
     meilisearch_res = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    return {"message": "Server is running", "redis": redis_res, "meilisearch": meilisearch_res}
+    return {"message": "Server is running", "redis": redis_res, "meilisearch": meilisearch_res, "user": {"id": user.id, "email": user.email}}
 
 
 @app.post("/api/contact-form")
