@@ -421,6 +421,19 @@
     .bottom-safe {
         bottom: var(--safe-bottom);
     }
+
+    .safe-top-mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 60;
+        pointer-events: none;
+        /* modern + iOS fallback */
+        height: env(safe-area-inset-top);
+        height: constant(safe-area-inset-top);
+        background: var(--header-bg, #0f172a); /* match header bg */
+      }
 }
 
 /* Thin scrollbar for WebKit */

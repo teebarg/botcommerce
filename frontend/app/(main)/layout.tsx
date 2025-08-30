@@ -13,6 +13,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
     return (
         <div className="flex flex-col flex-1">
             <StoreNavbar />
+            <div className="safe-top-mask md:hidden" />
             <div className="md:hidden sticky top-[env(safe-area-inset-top)] z-40 bg-background">
                 <div className="flex items-center gap-2 px-2 py-3">
                     <BackButton />
