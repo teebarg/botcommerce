@@ -29,7 +29,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     const addProductMutation = useAddProductToSharedCollection();
     const removeProductMutation = useRemoveProductFromSharedCollection();
 
-    if (!session?.user?.isAdmin) {
+    if (!session?.user?.isAdmin || !Boolean(product)) {
         return null;
     }
 
