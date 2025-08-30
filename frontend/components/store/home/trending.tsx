@@ -11,7 +11,7 @@ export default function Trending() {
     const { data, isLoading } = useQuery({
         queryKey: ["products", "trending"],
         queryFn: async () => {
-            return await api.get<ProductSearch[]>("/product/trending/trending?limit=4");
+            return await api.get<ProductSearch[]>("/product/collection/trending?limit=4");
         },
     });
 

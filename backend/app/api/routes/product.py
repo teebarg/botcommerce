@@ -46,11 +46,11 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/trending/{type}")
-@cache_response("products", key="trending-products")
+@router.get("/collection/{type}")
+@cache_response("products", key=lambda request, type, skip, limit, **kwargs: type)
 async def get_trending_products(request: Request, type: str = "trending", skip: int = Query(default=0), limit: int = Query(default=20)) -> list[SearchProduct]:
     """
-    Retrieve trending products.
+    Retrieve collection products.
     """
     filters = [f"collections IN [{type}]", "min_variant_price >= 1"]
     search_params = {

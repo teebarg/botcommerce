@@ -11,7 +11,7 @@ export default function NewArrivals() {
     const { data, isLoading } = useQuery({
         queryKey: ["products", "new-arrivals"],
         queryFn: async () => {
-            return await api.get<ProductSearch[]>("/product/trending/new-arrivals?limit=4");
+            return await api.get<ProductSearch[]>("/product/collection/new-arrivals?limit=4");
         },
     });
 

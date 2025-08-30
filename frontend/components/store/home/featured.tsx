@@ -13,7 +13,7 @@ export default function Featured() {
     const { data, isLoading } = useQuery({
         queryKey: ["products", "featured"],
         queryFn: async () => {
-            return await api.get<ProductSearch[]>("/product/trending/featured?limit=6");
+            return await api.get<ProductSearch[]>("/product/collection/featured?limit=6");
         },
     });
 
