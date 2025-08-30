@@ -22,9 +22,6 @@ const formSchema = z.object({
     categories: z.array(z.any()),
     collections: z.array(z.any()),
     brand: z.number(),
-    status: z.string().min(3, {
-        message: "Status must be at least 3 characters.",
-    }),
 });
 
 interface ProductFormProps {
@@ -45,7 +42,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
         defaultValues: {
             name: product?.name || "",
             description: product?.description || "",
-            status: product?.status || "IN_STOCK",
             brand: product?.brand?.id || 1,
             categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
             collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],

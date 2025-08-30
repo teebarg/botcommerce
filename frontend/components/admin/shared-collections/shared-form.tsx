@@ -90,11 +90,11 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
 
     const addProduct = (product: ProductSearch) => {
         const updated = [product, ...products];
-        const unique = Array.from(new Map(updated.map(p => [p.id, p])).values());
-      
+        const unique = Array.from(new Map(updated.map((p) => [p.id, p])).values());
+
         setProducts(unique);
         setValue("products", [product.id, ...formProducts]);
-      };
+    };
 
     const removeProduct = (productId: number) => {
         setProducts(products.filter((p: ProductSearch) => p.id !== productId));

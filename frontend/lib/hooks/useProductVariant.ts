@@ -104,6 +104,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         if (!selectedVariant) return;
         if (variantInCart) {
             await updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity });
+
             return;
         }
         addToCart({

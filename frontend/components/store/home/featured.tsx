@@ -2,11 +2,11 @@
 
 import React from "react";
 import { TrendingUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/apis/client";
 
 export default function Featured() {

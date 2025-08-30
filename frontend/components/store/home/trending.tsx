@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/apis/client";
 
 export default function Trending() {

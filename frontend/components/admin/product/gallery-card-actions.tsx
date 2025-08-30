@@ -3,6 +3,8 @@
 import { Edit2, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
+import { ManageSlate } from "../shared-collections/manage-slate";
+
 import { ProductSheetForm } from "./product-form-sheet";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +13,6 @@ import Overlay from "@/components/overlay";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useDeleteGalleryImage } from "@/lib/hooks/useProduct";
-import { ManageSlate } from "../shared-collections/manage-slate";
 
 type GalleryImage = ProductImage & {
     product: Product;

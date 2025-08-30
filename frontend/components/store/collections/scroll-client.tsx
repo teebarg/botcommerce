@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
+import { ChevronRight, Loader, Tag } from "lucide-react";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import LocalizedClientLink from "@/components/ui/link";
@@ -18,7 +19,6 @@ import { Category, Collection, ProductSearch } from "@/schemas/product";
 import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
 import ClientOnly from "@/components/generic/client-only";
 import ProductCardListings from "@/components/store/products/product-card-listings";
-import { ChevronRight, Loader, Tag } from "lucide-react";
 
 interface SearchParams {
     sortBy?: string;
