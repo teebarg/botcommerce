@@ -52,7 +52,7 @@ async def get_trending_products(request: Request, type: str = "trending", skip: 
     """
     Retrieve collection products.
     """
-    filters = [f"collections IN [{type}]", "min_variant_price >= 1"]
+    filters = [f"collection_slugs IN [{type}]", "min_variant_price >= 1"]
     search_params = {
         "limit": limit,
         "offset": skip,
@@ -194,9 +194,9 @@ async def search(
     """
     filters = []
     if categories:
-        filters.append(f"categories IN {url_to_list(categories)}")
+        filters.append(f"category_slugs IN {url_to_list(categories)}")
     if collections:
-        filters.append(f"collections IN [{collections}]")
+        filters.append(f"collection_slugs IN [{collections}]")
     if min_price and max_price:
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
@@ -248,9 +248,9 @@ async def search(
         brands = brand_id.split(",")
         filters.append(" OR ".join([f'brand = "{brand}"' for brand in brands]))
     if categories:
-        filters.append(f"categories IN {url_to_list(categories)}")
+        filters.append(f"category_slugs IN {url_to_list(categories)}")
     if collections:
-        filters.append(f"collections IN [{collections}]")
+        filters.append(f"collection_slugs IN [{collections}]")
     if min_price and max_price:
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
@@ -259,7 +259,7 @@ async def search(
         "limit": limit,
         "offset": skip,
         "sort": [sort],
-        "facets": ["brand", "categories", "collections"],
+        "facets": ["brand", "category_slugs", "collection_slugs"],
     }
 
     if filters:
@@ -382,7 +382,6 @@ async def create_product_bundle(
 
             product = await tx.product.create(data=data)
 
-            # Additional images
             if payload.images:
                 created_images = []
                 for index, img in enumerate(payload.images):
@@ -401,7 +400,6 @@ async def create_product_bundle(
                 if created_images:
                     await tx.productimage.create_many(data=created_images)
 
-            # Variants
             if payload.variants:
                 for variant in payload.variants:
                     try:
@@ -820,7 +818,7 @@ async def configure_filterable_attributes(
     try:
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         index.update_filterable_attributes(
-            ["id", "brand", "categories", "collections", "name", "variants", "average_rating",
+            ["id", "brand", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
                 "review_count", "max_variant_price", "min_variant_price"]
         )
         index.update_sortable_attributes(

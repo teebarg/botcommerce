@@ -81,11 +81,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                             </div>
                             <div>
                                 <p className="font-medium text-sm">{product.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    {typeof product.categories?.[0] === "string"
-                                        ? product.categories[0]
-                                        : product.categories?.[0]?.name || "No category"}
-                                </p>
+                                <p className="text-xs text-muted-foreground">{product.categories?.[0]?.name || "No category"}</p>
                             </div>
                         </div>
                     </div>

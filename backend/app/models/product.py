@@ -60,8 +60,10 @@ class SearchProduct(BaseModel):
     description: Optional[str] = None
     image: Optional[str] = None
     ratings: float
-    categories: List[str]
-    collections: List[str]
+    categories: Optional[List[Category]] = []
+    category_slugs: List[str]
+    collections: Optional[List[Collection]] = []
+    collection_slugs: List[str]
     brand: Optional[str] = None
     tags: Optional[List[str]] = []
     images: Optional[List[str]] = []
@@ -73,8 +75,8 @@ class SearchProduct(BaseModel):
 
 class Facets(BaseModel):
     brand: Optional[dict[str, int]] = None
-    categories: Optional[dict[str, int]] = None
-    collections: Optional[dict[str, int]] = None
+    category_slugs: Optional[dict[str, int]] = None
+    collection_slugs: Optional[dict[str, int]] = None
 
 class SearchProducts(BaseModel):
     products: List[SearchProduct]

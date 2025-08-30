@@ -391,7 +391,6 @@ async def process_products(user_id: int) -> list[dict]:
             await bulk_upload_products(products)
             print(f"Bulk upload for batch {i + 1} completed successfully")
 
-            # Send WebSocket update
             await broadcast_channel(
                 data={
                     "total_rows": num_batches * batch_size,

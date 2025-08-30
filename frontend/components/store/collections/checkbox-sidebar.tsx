@@ -63,7 +63,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                         <div className="block mb-6 space-y-0.5">
                             {collections?.map((item: Collection, idx: number) => (
                                 <LocalizedClientLink key={idx} className="flex justify-between" href={`/collections/${item.slug}`}>
-                                    {item.name} {facets?.collections && <span>({facets["collections"][item.name] ?? 0})</span>}
+                                    {item.name} {facets?.collection_slugs && <span>({facets["collection_slugs"][item.slug] ?? 0})</span>}
                                 </LocalizedClientLink>
                             ))}
                         </div>
@@ -82,7 +82,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                         <span className="mb-2 text-sm">Categories</span>
                         <div className="max-h-[20vh] overflow-y-scroll">
                             {(categories || []).map((item: Category, idx: number) => (
-                                <CheckboxGroup key={idx} checkboxes={item.subcategories} facets={facets} groupName={item.name} item={item as any} />
+                                <CheckboxGroup key={idx} checkboxes={item.subcategories} facets={facets} groupName={item.slug} item={item as any} />
                             ))}
                         </div>
                     </div>

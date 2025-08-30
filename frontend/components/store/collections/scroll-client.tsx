@@ -52,7 +52,7 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
     });
 
     const products = data?.pages?.flatMap((page) => page.products) ?? initialData;
-    const facets = data?.pages?.flatMap((page) => page.facets) || {};
+    const facets = data?.pages?.[0]?.facets || {};
     const filteredCategories = categories?.filter((cat: Category) => !cat.parent_id);
 
     return (

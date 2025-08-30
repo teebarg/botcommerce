@@ -42,6 +42,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from "@/lib/utils";
 import { useStoreSettings } from "@/providers/store-provider";
 import { UserAvatar } from "@/components/generic/user-avatar";
+import ClientOnly from "@/components/generic/client-only";
 
 const AdminItems = [
     {
@@ -144,105 +145,107 @@ export function AdminSidebar() {
     const path = usePathname();
 
     return (
-        <Sidebar collapsible="icon">
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton>
-                            <PanelLeftIcon onClick={toggleSidebar} />
-                            <p className="ml-2 text-2xl font-semibold">{settings?.shop_name}</p>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {AdminItems.map((item, idx: number) => (
-                                <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url}>
-                                        <Link href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Store</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {storeItems.map((item, idx: number) => (
-                                <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url}>
-                                        <Link href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Account</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {AccountItems.map((item, idx: number) => (
-                                <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url}>
-                                        <Link href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton className={cn("bg-secondary py-6", state === "collapsed" && "hidden")}>
-                                    <div className="flex items-center gap-2">
-                                        <UserAvatar />
-                                        <div className="flex flex-col">
-                                            <p className="font-semibold">{session?.user?.first_name ?? "User"}</p>
-                                            <p className="text-xs text-gray-600">{session?.user?.email ?? "User"}</p>
+        <ClientOnly>
+            <Sidebar collapsible="icon">
+                <SidebarHeader>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton>
+                                <PanelLeftIcon onClick={toggleSidebar} />
+                                <p className="ml-2 text-2xl font-semibold">{settings?.shop_name}</p>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarHeader>
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Application</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {AdminItems.map((item, idx: number) => (
+                                    <SidebarMenuItem key={idx}>
+                                        <SidebarMenuButton asChild isActive={path === item.url}>
+                                            <Link href={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Store</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {storeItems.map((item, idx: number) => (
+                                    <SidebarMenuItem key={idx}>
+                                        <SidebarMenuButton asChild isActive={path === item.url}>
+                                            <Link href={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Account</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {AccountItems.map((item, idx: number) => (
+                                    <SidebarMenuItem key={idx}>
+                                        <SidebarMenuButton asChild isActive={path === item.url}>
+                                            <Link href={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+                <SidebarFooter>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <SidebarMenuButton className={cn("bg-secondary py-6", state === "collapsed" && "hidden")}>
+                                        <div className="flex items-center gap-2">
+                                            <UserAvatar />
+                                            <div className="flex flex-col">
+                                                <p className="font-semibold">{session?.user?.first_name ?? "User"}</p>
+                                                <p className="text-xs text-gray-600">{session?.user?.email ?? "User"}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <ChevronUp className="ml-auto" />
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
-                                <DropdownMenuItem>
-                                    <Link className="justify-between" href="/profile">
-                                        Profile
-                                        <span className="badge">New</span>
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Link href="/settings">Settings</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-600 cursor-pointer">
-                                    <LogOut className="h-4 w-4 mr-2" />
-                                    <Link href="/api/auth/signout">Sign out</Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
-        </Sidebar>
+                                        <ChevronUp className="ml-auto" />
+                                    </SidebarMenuButton>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
+                                    <DropdownMenuItem>
+                                        <Link className="justify-between" href="/profile">
+                                            Profile
+                                            <span className="badge">New</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <Link href="/settings">Settings</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600 cursor-pointer">
+                                        <LogOut className="h-4 w-4 mr-2" />
+                                        <Link href="/api/auth/signout">Sign out</Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarFooter>
+            </Sidebar>
+        </ClientOnly>
     );
 }

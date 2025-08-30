@@ -87,7 +87,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
             "hashed_password": hashed_password,
             "first_name": payload.first_name,
             "last_name": payload.last_name,
-            "status": "PENDING",  # User starts with pending status
+            "status": "PENDING",
             "role": "CUSTOMER",
             "email_verification_token": verification_token,
             "email_verification_expires": datetime.utcnow() + timedelta(hours=24),

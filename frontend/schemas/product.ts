@@ -90,7 +90,6 @@ export const ProductSchema = z
         sku: z.string(),
         description: z.string(),
         image: z.string(),
-        status: ProductStatusSchema,
         variants: z.array(ProductVariantSchema).optional(),
         ratings: z.number(),
         categories: z.array(CategorySchema),
@@ -119,8 +118,10 @@ export const ProductSearchSchema = z.object({
     status: ProductStatusSchema,
     variants: z.array(ProductVariantSchema).nullable(),
     ratings: z.number(),
-    categories: z.array(z.string()),
-    collections: z.array(z.string()),
+    categories: z.array(CategorySchema),
+    category_slugs: z.array(z.string()),
+    collections: z.array(CollectionSchema),
+    collection_slugs: z.array(z.string()),
     brand: z.string(),
     tags: z.null(),
     images: z.array(z.string()),
@@ -150,8 +151,8 @@ export const PaginatedSharedSchema = PagSchema.extend({
 
 export const FacetSchema = z.object({
     brand: z.record(z.string()).optional(),
-    categories: z.record(z.string()).optional(),
-    collections: z.record(z.string()).optional(),
+    category_slugs: z.record(z.string()).optional(),
+    collection_slugs: z.record(z.string()).optional(),
 });
 
 export const PaginatedProductSearchSchema = PagSchema.extend({

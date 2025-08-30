@@ -143,10 +143,12 @@ async def product_export(email: str, user_id: str):
 def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
 
-    product_dict["collections"] = [c.name for c in product.collections]
+    product_dict["collection_slugs"] = [c.slug for c in product.collections]
+    product_dict["collections"] = [dict(c) for c in product.collections]
     if product.brand:
         product_dict["brand"] = product.brand.name
-    product_dict["categories"] = [c.name for c in product.categories]
+    product_dict["category_slugs"] = [c.slug for c in product.categories]
+    product_dict["categories"] = [dict(c) for c in product.categories]
     product_dict["images"] = [img.image for img in sorted(
         product.images, key=lambda img: img.order)]
 

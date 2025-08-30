@@ -31,7 +31,7 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
 
             <div className="flex-1 min-w-0">
                 <h4 className="font-medium text-sm text-foreground truncate">{product.name}</h4>
-                <p className="text-xs text-muted-foreground truncate">{product.categories[0]}</p>
+                <p className="text-xs text-muted-foreground truncate">{product.category_slugs[0]}</p>
                 <div className="flex items-center gap-2 mt-1">
                     <span className="font-semibold text-sm text-primary">{currency(priceInfo.minPrice)}</span>
                     {product.average_rating > 0 && (

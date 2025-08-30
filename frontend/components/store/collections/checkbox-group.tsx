@@ -74,7 +74,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
                     />
                     <label className="capitalize ml-1">{groupName}</label>
                 </div>
-                {facets?.categories && <span>({facets["categories"][groupName] ?? 0})</span>}
+                {facets?.category_slugs && <span>({facets["category_slugs"][groupName] ?? 0})</span>}
             </div>
             <div className="space-y-2 mt-2" style={{ marginLeft: "22px" }}>
                 {checkboxes?.map((checkbox) => (
@@ -86,7 +86,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
                             />
                             <label className="capitalize ml-1">{checkbox.name}</label>
                         </div>
-                        {facets?.categories && <span>({facets["categories"][checkbox.name] ?? 0})</span>}
+                        {facets?.category_slugs && <span>({facets["category_slugs"][checkbox.name] ?? 0})</span>}
                     </div>
                 ))}
             </div>
