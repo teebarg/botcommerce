@@ -16,14 +16,11 @@ export default function NewArrivals() {
     });
 
     return (
-        <section className="py-16 bg-content2">
+        <section className="bg-content1">
             <div className="max-w-8xl mx-auto px-6">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-default-foreground mb-1">Trending Products</h2>
-                    <p className="text-default-600">Discover our handpicked selection of premium products</p>
-                </div>
-
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <p className="text-3xl font-bold">New Arrivals</p>
+                <p className="text-default-600">Find the best thrifts for your kids</p>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                     {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                 </div>
             </div>
