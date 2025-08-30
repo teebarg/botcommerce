@@ -1,4 +1,6 @@
 import "./globals.css";
+import type { Viewport } from "next";
+
 import { Lexend, Outfit, Nunito_Sans } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
@@ -65,6 +67,14 @@ export async function generateMetadata() {
     };
 }
 
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover",
+};
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className, nunitoSans.variable)} lang="en">
@@ -75,7 +85,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <link href="/favicon.ico" rel="shortcut icon" />
                 <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
                 <meta content="Shop" name="apple-mobile-web-app-title" />
-                <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport" />
+                {/* <meta content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" name="viewport" /> */}
+                <meta content="yes" name="apple-mobile-web-app-capable" />
+                <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style" />
             </head>
             <body>
                 <ProgressBar className="h-1 bg-primary">
