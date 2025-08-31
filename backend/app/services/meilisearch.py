@@ -7,6 +7,7 @@ from meilisearch import Client
 
 from app.core.config import settings
 from app.core.logging import logger
+from meilisearch.errors import MeilisearchApiError
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
@@ -18,13 +19,40 @@ class CustomEncoder(JSONEncoder):
         return super().default(o)
 
 
+def ensure_index_ready(index):
+    """
+    Ensures that the given Meilisearch index has the required
+    filterable and sortable attributes.
+    """
+    REQUIRED_FILTERABLES = ["id", "brand", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
+                "review_count", "max_variant_price", "min_variant_price"]
+    REQUIRED_SORTABLES = ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"]
+    
+    filter_task = index.update_filterable_attributes(REQUIRED_FILTERABLES)
+    index.wait_for_task(filter_task.task_uid)
+
+    sort_task = index.update_sortable_attributes(REQUIRED_SORTABLES)
+    index.wait_for_task(sort_task.task_uid)
+
+
 def get_or_create_index(index_name: str) -> Any:
     """
     Get or create a Meilisearch index.
     """
     try:
         return client.get_index(index_name)
+    except MeilisearchApiError as e:
+        error_code = getattr(e, "code", None)
+        if error_code == "index_not_found":
+            index = client.index(index_name)
+            logger.error(f"Index {index_name} not found")
+            create_task = client.create_index(uid=index_name)
+            index.wait_for_task(create_task.task_uid)
+
+            ensure_index_ready(index)
+            return index
     except Exception:
+        logger.error(f"Error creating index {index_name}")
         client.create_index(index_name)
         return client.index(index_name)
 
