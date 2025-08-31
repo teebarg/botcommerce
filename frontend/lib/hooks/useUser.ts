@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { PaginatedUser, User, Wishlist } from "@/schemas";
@@ -76,10 +77,12 @@ export const useDeleteUser = () => {
 };
 
 export const useUserWishlist = () => {
+    const { data: session } = useSession();
+
     return useQuery({
         queryKey: ["wishlist"],
-        queryFn: async () => await api.get<Wishlist>(`/users/wishlist`),
-        enabled: typeof window !== "undefined",
+        queryFn: async () => await api.get<Wishlist>("/users/wishlist"),
+        enabled: Boolean(session?.user),
     });
 };
 

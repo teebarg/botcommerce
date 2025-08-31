@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import { api } from "@/apis/client";
+import ComponentLoader from "@/components/component-loader";
 
 export default function Trending() {
     const { data, isLoading } = useQuery({
@@ -22,6 +23,7 @@ export default function Trending() {
                     <h2 className="text-3xl font-bold text-default-foreground mb-1">Trending Products</h2>
                     <p className="text-default-600">Discover our handpicked selection of premium products</p>
                 </div>
+                {isLoading && <ComponentLoader className="h-[400px]" />}
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}

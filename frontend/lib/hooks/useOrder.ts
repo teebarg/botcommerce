@@ -51,11 +51,13 @@ export const useChangePaymentStatus = () => {
     return useMutation({
         mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) => await api.patch<Order>(`/payment/${id}/status?status=${status}`),
         onSuccess: () => {
-            toast.success("Successfull!", {
+            toast.success("Successful!", {
                 description: "Payment status changed successfully",
             });
             invalidate("orders");
             invalidate("order-timeline");
+            invalidate("gallery");
+            invalidate("products");
         },
         onError: (error) => {
             toast.error("An error occurred!", {

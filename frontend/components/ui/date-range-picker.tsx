@@ -23,7 +23,7 @@ export function DateRangePicker({ className, value, onChange, placeholder = "Pic
             <Popover>
                 <PopoverTrigger asChild>
                     <Button
-                        className={cn("w-full justify-start text-left font-normal", !value && "text-muted-foreground")}
+                        className={cn("w-full justify-start text-left font-normal h-11", !value && "text-muted-foreground")}
                         id="date"
                         variant={"outline"}
                     >

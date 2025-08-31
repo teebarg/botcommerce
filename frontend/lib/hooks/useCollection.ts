@@ -70,7 +70,7 @@ export const useSharedCollections = (query?: string) => {
     return useQuery({
         queryKey: ["shared-collections", query],
         queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { query: query || "" } }),
-        enabled: session?.user?.isAdmin,
+        enabled: Boolean(session?.user?.isAdmin),
     });
 };
 

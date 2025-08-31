@@ -8,6 +8,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import { api } from "@/apis/client";
+import ComponentLoader from "@/components/component-loader";
 
 export default function Featured() {
     const { data, isLoading } = useQuery({
@@ -27,6 +28,8 @@ export default function Featured() {
                     </div>
                     <p className="text-xl text-default-600">Handpicked selections from our premium collection</p>
                 </div>
+
+                {isLoading && <ComponentLoader className="h-[400px]" />}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}

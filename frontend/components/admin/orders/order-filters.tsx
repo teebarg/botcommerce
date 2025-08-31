@@ -79,11 +79,11 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                         </SelectContent>
                     </Select>
                     <DateRangePicker className="w-[300px]" placeholder="Filter by date" value={dateRange} onChange={setDateRange} />
-                    <Button variant="primary" onClick={applyFilters}>
+                    <Button size="md" variant="indigo" onClick={applyFilters}>
                         <Filter className="h-4 w-4 mr-2" />
                         Apply Filters
                     </Button>
-                    <Button variant="outline" onClick={clearFilters}>
+                    <Button size="md" variant="warning" onClick={clearFilters}>
                         <X className="h-4 w-4 mr-2" />
                         Clear Filters
                     </Button>
