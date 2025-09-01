@@ -312,6 +312,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
                 await reindex_product(cache=cache, product_id=variant.product_id)
             if out_of_stock:
                 out_of_stock_variants.append(variant)
+            logger.info(f"Decrementing inventory for variant {variant_id} in order {order_id}")
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
         raise HTTPException(status_code=500, detail="Failed to decrement variant inventory for order")

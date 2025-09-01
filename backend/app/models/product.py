@@ -12,6 +12,7 @@ class VariantWithStatus(BaseModel):
     inventory: int = Field(..., ge=0)
     size: Optional[str] = None
     color: Optional[str] = None
+    measurement: Optional[int] = None
 
 class ProductCreate(BaseModel):
     name: Optional[str] = Field(None)

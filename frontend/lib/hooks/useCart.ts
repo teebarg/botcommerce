@@ -133,12 +133,10 @@ export const useCompleteCart = () => {
     return useMutation({
         mutationFn: async (complete: CartComplete) => {
             const res = await api.post<Order>("/order/", complete);
-
-            await deleteCookie("_cart_id");
-
             return res;
         },
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
+            await deleteCookie("_cart_id");
             router.push(`/order/confirmed/${data?.order_number}`);
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Order placed successfully");

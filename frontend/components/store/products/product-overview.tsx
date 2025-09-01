@@ -23,14 +23,19 @@ const ProductOverview: React.FC<{
         priceInfo,
         selectedColor,
         selectedSize,
+        selectedMeasurement,
         quantity,
         selectedVariant,
         setQuantity,
+        setQuantitySafely,
+        maxQuantity,
         sizes,
         colors,
+        measurements,
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
+        toggleMeasurementSelect,
         handleAddToCart,
         handleWhatsAppPurchase,
         loading,
@@ -46,7 +51,7 @@ const ProductOverview: React.FC<{
     useEffect(() => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "VIEW",
                 metadata: { source: "product-overview" },
@@ -60,7 +65,7 @@ const ProductOverview: React.FC<{
 
             if (session?.user && product?.id) {
                 trackInteraction.mutate({
-                    user_id: session.user.id,
+                    user_id: session.id,
                     product_id: product.id,
                     type: "VIEW",
                     metadata: { timeSpent, source: "product-overview" },
@@ -68,12 +73,12 @@ const ProductOverview: React.FC<{
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [session?.user?.id, product?.id]);
+    }, [session?.id, product?.id]);
 
     const handleAddToCartAndTrack = () => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "CART_ADD",
                 metadata: { source: "product-overview" },
@@ -89,7 +94,7 @@ const ProductOverview: React.FC<{
         createWishlist(product.id);
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session?.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "WISHLIST_ADD",
                 metadata: { source: "product-overview" },
@@ -101,7 +106,7 @@ const ProductOverview: React.FC<{
         deleteWishlist(product.id);
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session?.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "WISHLIST_REMOVE",
                 metadata: { source: "product-overview" },
@@ -226,6 +231,34 @@ const ProductOverview: React.FC<{
                     </div>
                 </div>
 
+                <div className={cn("hidden", measurements?.length > 0 && "block")}>
+                    <h3 className="font-semibold text-default-900 mb-3">Measurement: {selectedMeasurement}</h3>
+                    <div className="flex gap-2">
+                        {measurements?.map((measurement: number, idx: number) => {
+                            const available = isOptionAvailable("measurement", measurement.toString());
+                            const isSelected = selectedMeasurement === measurement;
+
+                            return (
+                                <button
+                                    key={idx}
+                                    className={cn(
+                                        "px-4 py-2 rounded-lg border border-default-200 transition-all data-[state=checked]:ring-1 ring-offset-1",
+                                        "data-[state=checked]:ring-blue-500 data-[state=checked]:text-blue-600 data-[state=checked]:bg-blue-50",
+                                        {
+                                            "cursor-not-allowed opacity-60 bg-default-300": !available,
+                                        }
+                                    )}
+                                    data-state={isSelected ? "checked" : "unchecked"}
+                                    disabled={!available}
+                                    onClick={() => available && toggleMeasurementSelect(measurement)}
+                                >
+                                    {measurement}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
                 <div className={cn("hidden", sizes?.length > 0 && "block")}>
                     <h3 className="font-semibold text-default-900 mb-3">Size: {selectedSize}</h3>
                     <div className="flex gap-2">
@@ -258,19 +291,26 @@ const ProductOverview: React.FC<{
                     <h3 className="text-lg font-semibold text-default-900 mb-3">Quantity</h3>
                     <div className="flex items-center space-x-4">
                         <button
-                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors"
-                            onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity <= 1}
+                            onClick={() => setQuantitySafely(quantity - 1)}
                         >
                             <Minus className="w-4 h-4" />
                         </button>
                         <span className="text-xl font-medium w-8 text-center">{quantity}</span>
                         <button
-                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors"
-                            onClick={() => setQuantity(quantity + 1)}
+                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity >= maxQuantity}
+                            onClick={() => setQuantitySafely(quantity + 1)}
                         >
                             <Plus className="w-4 h-4" />
                         </button>
                     </div>
+                    {maxQuantity < selectedVariant?.inventory && (
+                        <p className="text-sm text-amber-600 mt-2">
+                            Only {maxQuantity} more available (you have {quantity} in cart)
+                        </p>
+                    )}
                 </div>
             </div>
             <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-default-200">

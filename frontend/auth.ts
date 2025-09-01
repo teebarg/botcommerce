@@ -15,6 +15,7 @@ const redis = new Redis({
 
 declare module "next-auth" {
     interface Session extends DefaultSession {
+        id: number;
         accessToken: string;
         refreshToken: string;
         impersonated?: boolean;
@@ -124,7 +125,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             if (token?.sub && token.user) {
                 const user = token.user as User;
 
-                // session.user.id = user.id;
+                session.id = user.id;
                 session.user.first_name = user.first_name;
                 session.user.last_name = user.last_name;
                 session.user.image = user.image;

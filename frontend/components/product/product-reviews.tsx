@@ -30,7 +30,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     }
 
     const isLoggedIn = !!session?.user;
-    const hasReviewed = isLoggedIn && data?.reviews?.some((r) => r.user?.id === session?.user?.id);
+    const hasReviewed = isLoggedIn && data?.reviews?.some((r) => r.user?.id === session?.id);
     let hasPurchased = false;
 
     if (isLoggedIn && orders?.orders) {

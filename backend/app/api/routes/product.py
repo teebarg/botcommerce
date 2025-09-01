@@ -32,6 +32,7 @@ from app.services.meilisearch import (
     delete_document,
     delete_index,
     get_or_create_index,
+    ensure_index_ready
 )
 from app.prisma_client import prisma as db
 from math import ceil
@@ -40,6 +41,7 @@ from app.core.config import settings
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export
 from app.services.redis import cache_response
+from meilisearch.errors import MeilisearchApiError
 
 logger = get_logger(__name__)
 
@@ -60,17 +62,28 @@ async def get_trending_products(request: Request, type: str = "trending", skip: 
         "filter": " AND ".join(filters) if filters else None,
     }
 
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+
     try:
-        search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
-            "",
-            {
-                **search_params
-            }
-        )
+        search_results = index.search("", search_params)
+        return search_results["hits"]
+
+    except MeilisearchApiError as e:
+        error_code = getattr(e, "code", None)
+        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
+            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+
+            ensure_index_ready(index)
+
+            retry_results = index.search("", search_params)
+            return retry_results["hits"]
+
+        logger.error(f"Meilisearch error: {e}")
+        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
+
     except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-    return search_results["hits"]
+        logger.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/gallery")
@@ -179,7 +192,7 @@ async def index(
 
 @router.get("/search/public")
 @cache_response("products")
-async def search(
+async def public_search(
     request: Request,
     q: str = "",
     sort: str = "created_at:desc",
@@ -209,13 +222,32 @@ async def search(
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+
     try:
-        search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
+        search_results = index.search(
             q,
             {
                 **search_params
             }
         )
+    except MeilisearchApiError as e:
+        error_code = getattr(e, "code", None)
+        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
+            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+
+            ensure_index_ready(index)
+
+            retry_results = index.search(
+                q,
+                {
+                    **search_params
+                }
+            )
+            return retry_results["hits"]
+
+        logger.error(f"Meilisearch error: {e}")
+        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -265,14 +297,15 @@ async def search(
     if filters:
         search_params["filter"] = " AND ".join(filters)
 
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
     try:
-        search_results = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
+        search_results = index.search(
             search,
             {
                 **search_params
             }
         )
-        suggestions_raw = meilisearch_client.index(settings.MEILI_PRODUCTS_INDEX).search(
+        suggestions_raw = index.search(
             search,
             {
                 "limit": 4,
@@ -413,6 +446,7 @@ async def create_product_bundle(
                                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 "size": variant.size,
                                 "color": variant.color,
+                                "measurement": variant.measurement,
                             }
                         )
                     except Exception as e:
@@ -568,7 +602,8 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
                 "product_id": id,
                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                 "size": variant.size,
-                "color": variant.color
+                "color": variant.color,
+                "measurement": variant.measurement
             }
         )
     except UniqueViolationError as e:
@@ -607,6 +642,9 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     if variant.color is not None:
         update_data["color"] = variant.color
+
+    if variant.measurement is not None:
+        update_data["measurement"] = variant.measurement
 
     try:
         updated_variant = await db.productvariant.update(
@@ -817,12 +855,8 @@ async def configure_filterable_attributes(
     """
     try:
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-        index.update_filterable_attributes(
-            ["id", "brand", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
-                "review_count", "max_variant_price", "min_variant_price"]
-        )
-        index.update_sortable_attributes(
-            ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"])
+        index.update_filterable_attributes(REQUIRED_FILTERABLES)
+        index.update_sortable_attributes(REQUIRED_SORTABLES)
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(
@@ -978,6 +1012,7 @@ async def create_image_metadata(
                                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 "size": variant.size,
                                 "color": variant.color,
+                                "measurement": variant.measurement,
                             }
                         )
                     except Exception as e:
@@ -1054,6 +1089,7 @@ async def update_image_metadata(
                                 'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 'size': variant.size,
                                 'color': variant.color,
+                                'measurement': variant.measurement,
                             }
                         )
                     else:
@@ -1067,6 +1103,7 @@ async def update_image_metadata(
                                 'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 'size': variant.size,
                                 'color': variant.color,
+                                'measurement': variant.measurement,
                             }
                         )
                 except Exception as e:

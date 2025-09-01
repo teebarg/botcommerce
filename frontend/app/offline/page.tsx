@@ -43,20 +43,17 @@ const OfflinePage = () => {
                     </div>
                 </div>
 
-                {/* Content */}
                 <h1 className="text-3xl font-bold text-default-800 mb-4">{`You're Offline`}</h1>
 
                 <p className="text-default-500 mb-8">
                     {`It seems you've lost your internet connection. Don't worry - your data is safe and you can still access previously loaded content.`}
                 </p>
 
-                {/* Retry Button */}
                 <Button aria-label="retry" className="px-8  text-white" color="warning" disabled={isRetrying} onClick={handleRetry}>
                     <RefreshCcw className={cn("w-5 h-5", isRetrying && "animate-spin")} />
                     {isRetrying ? "Retrying..." : "Try Again"}
                 </Button>
 
-                {/* Tips Section */}
                 <div className="mt-8 pt-8 border-t border-default-200">
                     <h2 className="text-sm font-semibold text-default-500 mb-4">{`While you're offline, you can:`}</h2>
                     <ul className="text-sm text-default-500 space-y-2">

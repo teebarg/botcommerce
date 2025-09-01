@@ -230,6 +230,7 @@ model ProductVariant {
   inventory   Int
   size        String?
   color       String?
+  measurement Int?
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem
   created_at  DateTime      @default(now())
