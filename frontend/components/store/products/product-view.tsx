@@ -31,7 +31,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     useEffect(() => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "VIEW",
                 metadata: { source: "product-view" },
@@ -45,7 +45,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
             if (session?.user && product?.id) {
                 trackInteraction.mutate({
-                    user_id: session.user.id,
+                    user_id: session.id,
                     product_id: product.id,
                     type: "VIEW",
                     metadata: { timeSpent, source: "product-view" },
@@ -53,7 +53,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [session?.user?.id, product?.id]);
+    }, [session?.id, product?.id]);
 
     return (
         <div className="max-w-7xl mx-auto h-full w-full md:my-8">

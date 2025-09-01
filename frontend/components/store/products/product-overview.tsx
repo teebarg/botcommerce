@@ -49,7 +49,7 @@ const ProductOverview: React.FC<{
     useEffect(() => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "VIEW",
                 metadata: { source: "product-overview" },
@@ -63,7 +63,7 @@ const ProductOverview: React.FC<{
 
             if (session?.user && product?.id) {
                 trackInteraction.mutate({
-                    user_id: session.user.id,
+                    user_id: session.id,
                     product_id: product.id,
                     type: "VIEW",
                     metadata: { timeSpent, source: "product-overview" },
@@ -71,12 +71,12 @@ const ProductOverview: React.FC<{
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [session?.user?.id, product?.id]);
+    }, [session?.id, product?.id]);
 
     const handleAddToCartAndTrack = () => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "CART_ADD",
                 metadata: { source: "product-overview" },
@@ -92,7 +92,7 @@ const ProductOverview: React.FC<{
         createWishlist(product.id);
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session?.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "WISHLIST_ADD",
                 metadata: { source: "product-overview" },
@@ -104,7 +104,7 @@ const ProductOverview: React.FC<{
         deleteWishlist(product.id);
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session?.user.id,
+                user_id: session.id,
                 product_id: product.id,
                 type: "WISHLIST_REMOVE",
                 metadata: { source: "product-overview" },

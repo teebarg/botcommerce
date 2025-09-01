@@ -76,7 +76,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
 
     const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, skip: 0 });
     const { data: trendingData } = useProductSearch({ collections: "trending", limit: 5, skip: 0 });
-    const { data: recommendedData } = useProductRecommendations(session?.user?.id, 5);
+    const { data: recommendedData } = useProductRecommendations(session?.id, 5);
 
     useEffect(() => {
         const savedHistory = localStorage.getItem("searchHistory");

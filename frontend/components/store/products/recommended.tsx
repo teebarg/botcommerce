@@ -14,7 +14,7 @@ type RecommendedProductsProps = {
 
 export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
     const { data: session } = useSession();
-    const { data, isLoading, error } = useProductRecommendations(session?.user?.id, 40);
+    const { data, isLoading, error } = useProductRecommendations(session?.id, 40);
 
     if (error) {
         return <ServerError error={error.message} scenario="recommended-products" stack={error.stack} />;
