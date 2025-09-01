@@ -1,19 +1,21 @@
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from typing import List
 from math import ceil
 
-from app.core.deps import CurrentUser, get_current_superuser
+from app.core.deps import CurrentUser, get_current_superuser, RedisClient
 from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
-
 from prisma.models import ActivityLog
+from app.services.redis import cache_response
 
 router = APIRouter()
 
 @router.get("/", dependencies=[Depends(get_current_superuser)])
+@cache_response("activities")
 async def index(
+    request: Request,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ):
@@ -35,7 +37,8 @@ async def index(
     }
 
 @router.get("/me", response_model=List[ActivityLog])
-async def get_recent_activities(user: CurrentUser):
+@cache_response("activities", key=lambda request, user: user.id)
+async def get_recent_activities(request: Request, user: CurrentUser):
     """
     Get current user's activities
     """
@@ -48,7 +51,7 @@ async def get_recent_activities(user: CurrentUser):
 
 
 @router.delete("/{id}", response_model=Message)
-async def delete_activity(id: int, user: CurrentUser):
+async def delete_activity(id: int, user: CurrentUser, redis: RedisClient):
     existing = await db.activitylog.find_unique(where={"id": id})
     if not existing:
         raise HTTPException(status_code=404, detail="Activity not found")
@@ -58,6 +61,8 @@ async def delete_activity(id: int, user: CurrentUser):
         if not user.role == "ADMIN":
             whereQuery.update({"user_id" : user.id})
         await db.activitylog.delete(where=whereQuery)
+        await redis.invalidate_list_cache("activities")
+        await redis.bust_tag(f"activities:{user.id}")
         return Message(message="Activity deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
