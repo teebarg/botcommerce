@@ -47,8 +47,11 @@ function SheetContent({
         <SheetPortal>
             <SheetOverlay />
             <SheetPrimitive.Content
+                aria-describedby={undefined} // prevents Radix warning if no description
                 className={cn(
-                    "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+                    "pointer-events-auto bg-background fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out",
+                    "[-webkit-transform:translateZ(0)]", // iOS PWA touch fix
+                    "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
                     side === "right" &&
                         "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l border-l-default-200 sm:max-w-sm",
                     side === "left" &&

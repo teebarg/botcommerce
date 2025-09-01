@@ -31,7 +31,7 @@ const Overlay: React.FC<OverlayProps> = ({
         return (
             <Sheet open={open} onOpenChange={onOpenChange}>
                 <SheetTrigger asChild>{trigger}</SheetTrigger>
-                <SheetContent className={sheetClassName}>
+                <SheetContent className={sheetClassName} aria-describedby={undefined}>
                     <SheetHeader className={showHeader ? "" : "sr-only"}>
                         <SheetTitle>{title}</SheetTitle>
                     </SheetHeader>
@@ -44,7 +44,7 @@ const Overlay: React.FC<OverlayProps> = ({
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
             <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-            <DrawerContent>
+            <DrawerContent aria-describedby={undefined}>
                 <DrawerHeader className={showHeader ? "" : "sr-only"}>
                     <DrawerTitle>{title}</DrawerTitle>
                 </DrawerHeader>
