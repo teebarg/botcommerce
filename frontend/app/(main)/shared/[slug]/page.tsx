@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-import { Shared } from "@/schemas";
+import { ProductSearch, Shared } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { SocialShare } from "@/components/store/shared/shared-listing";
 import ProductCardBase from "@/components/store/products/product-card";
@@ -49,17 +49,15 @@ export default async function SharedPage({ params }: { params: Params }) {
     if (!shared || error) return notFound();
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="max-w-7xl mx-auto w-full p-4">
             <SharedCollectionVisitTracker slug={slug} />
             <h1 className="text-3xl font-bold mb-2">{shared.title}</h1>
             {shared.description && <p className="mb-4 text-lg text-default-600">{shared.description}</p>}
             <SocialShare title={shared.title} view_count={shared.view_count} />
             {shared.products && shared.products.length > 0 ? (
-                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
-                    {shared.products.map((product, index) => (
-                        <div key={product.id} className="break-inside-avoid" style={{ animationDelay: `${index * 0.1}s` }}>
-                            <ProductCardBase product={product} />
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {shared.products.map((product: ProductSearch, idx: number) => (
+                        <ProductCardBase key={idx} product={product} />
                     ))}
                 </div>
             ) : (

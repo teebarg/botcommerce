@@ -1,7 +1,7 @@
 import SharedCollectionList from "@/components/admin/shared-collections/shared-collection-list";
 
 export const metadata = {
-    title: "Shared Collections",
+    title: "Catalogs",
 };
 
 export default function SharedAdminPage() {

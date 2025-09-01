@@ -158,9 +158,10 @@ async def track_shared_collection_visit(
 @router.post("/")
 async def create_shared_collection(data: SharedCollectionCreate, cache: RedisClient):
     create_data = data.model_dump(exclude_unset=True)
-    if data.products:
-        product_connect = [{"id": id} for id in data.products]
-        create_data["products"] = {"connect": product_connect}
+
+    if data.products is not None:
+        create_data["products"] = {"connect": [{"id": id} for id in data.products]}
+
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
 

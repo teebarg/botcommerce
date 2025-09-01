@@ -315,6 +315,33 @@ async def search(
         )
         suggestions = list(
             {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+
+    except MeilisearchApiError as e:
+        error_code = getattr(e, "code", None)
+        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
+            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+
+            ensure_index_ready(index)
+
+            search_results = index.search(
+                search,
+                {
+                    **search_params
+                }
+            )
+            suggestions_raw = index.search(
+                search,
+                {
+                    "limit": 4,
+                    "attributesToRetrieve": ["name"],
+                    "matchingStrategy": "all"
+                }
+            )
+            suggestions = list(
+                {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+
+        logger.error(f"Meilisearch error: {e}")
+        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
     except Exception as e:
         logger.error(e)
         raise HTTPException(

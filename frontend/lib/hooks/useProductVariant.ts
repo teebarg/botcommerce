@@ -66,13 +66,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         return cart?.items?.find((item) => item.variant_id == selectedVariant?.id);
     }, [cart, selectedVariant]);
 
-    const maxQuantity = useMemo(() => {
-        if (!selectedVariant) return 1;
-        const inCartQuantity = variantInCart?.quantity || 0;
-
-        return Math.max(1, selectedVariant.inventory - inCartQuantity);
-    }, [selectedVariant, variantInCart]);
-
     const findMatchingVariant = (size: string | null, color: string | null, measurement: number | null) => {
         if (product?.variants?.length == 0) {
             return undefined;
@@ -137,12 +130,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedMeasurement((prev) => (prev === measurement ? null : measurement));
     };
 
-    const setQuantitySafely = (newQuantity: number) => {
-        if (newQuantity >= 1 && newQuantity <= maxQuantity) {
-            setQuantity(newQuantity);
-        }
-    };
-
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
 
@@ -193,8 +180,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedMeasurement,
         quantity,
         setQuantity,
-        setQuantitySafely,
-        maxQuantity,
         selectedVariant,
         sizes,
         colors,

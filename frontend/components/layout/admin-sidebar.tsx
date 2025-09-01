@@ -132,7 +132,7 @@ const storeItems = [
         icon: LayoutGrid,
     },
     {
-        title: "Shared Collections",
+        title: "Catalog",
         url: "/admin/shared",
         icon: LayoutGrid,
     },
