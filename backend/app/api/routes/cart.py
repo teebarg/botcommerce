@@ -54,21 +54,58 @@ async def add_item_to_cart(cache: RedisClient, item_in: CartItemCreate, backgrou
     if variant.status != "IN_STOCK":
         raise HTTPException(status_code=400, detail="Variant is out of stock")
 
-    async with db.tx() as tx:
-        item = await tx.cartitem.create(
-            data={
-                "cart_id": cart.id,
-                "cart_number": cart.cart_number,
-                "name": variant.product.name,
-                "slug": variant.product.slug,
-                "variant_id": item_in.variant_id,
-                "quantity": item_in.quantity,
-                "price": variant.price,
-                "image": variant.product.images[0].image if variant.product.images else variant.product.image
-            }
-        )
+    # Check if this variant already exists in the cart
+    existing_cart_item = await db.cartitem.find_first(
+        where={
+            "cart_id": cart.id,
+            "variant_id": item_in.variant_id
+        }
+    )
 
-        increment = item.price * item.quantity
+    # Calculate total quantity (existing + new)
+    total_quantity = item_in.quantity
+    if existing_cart_item:
+        total_quantity += existing_cart_item.quantity
+
+    # Validate against inventory
+    if total_quantity > variant.inventory:
+        available_quantity = variant.inventory - (existing_cart_item.quantity if existing_cart_item else 0)
+        if available_quantity <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not enough inventory. Only {variant.inventory} items available in stock."
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not enough inventory. You can add {available_quantity} more items (only {variant.inventory} available in stock)."
+            )
+
+    async with db.tx() as tx:
+        if existing_cart_item:
+            # Update existing cart item
+            item = await tx.cartitem.update(
+                where={"id": existing_cart_item.id},
+                data={"quantity": total_quantity}
+            )
+            # Calculate the price difference for the additional quantity
+            increment = variant.price * item_in.quantity
+        else:
+            # Create new cart item
+            item = await tx.cartitem.create(
+                data={
+                    "cart_id": cart.id,
+                    "cart_number": cart.cart_number,
+                    "name": variant.product.name,
+                    "slug": variant.product.slug,
+                    "variant_id": item_in.variant_id,
+                    "quantity": item_in.quantity,
+                    "price": variant.price,
+                    "image": variant.product.images[0].image if variant.product.images else variant.product.image
+                }
+            )
+            increment = item.price * item.quantity
+
         subtotal = cart.subtotal + increment
         tax = subtotal * 0.075
         total = subtotal + tax + cart.shipping_fee
@@ -211,9 +248,19 @@ async def delete_cart_item(cache: RedisClient, item_id: int, cartId: str = Heade
 
 @router.put("/items/{item_id}")
 async def update_cart_item(cache: RedisClient, item_id: int, quantity: int, cartId: str = Header(default=None)):
-    cart_item = await db.cartitem.find_unique(where={"id": item_id}, include={"cart": True})
+    cart_item = await db.cartitem.find_unique(
+        where={"id": item_id},
+        include={"cart": True, "variant": True}
+    )
     if not cart_item or cart_item.cart_number != cartId:
         raise HTTPException(status_code=404, detail="cart item not found")
+
+    # Validate against inventory
+    if quantity > cart_item.variant.inventory:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available in stock."
+        )
 
     old_qty = cart_item.quantity
     diff = (quantity - old_qty) * cart_item.price

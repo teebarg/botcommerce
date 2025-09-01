@@ -65,6 +65,13 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         return cart?.items?.find((item) => item.variant_id == selectedVariant?.id);
     }, [cart, selectedVariant]);
 
+    const maxQuantity = useMemo(() => {
+        if (!selectedVariant) return 1;
+        const inCartQuantity = variantInCart?.quantity || 0;
+
+        return Math.max(1, selectedVariant.inventory - inCartQuantity);
+    }, [selectedVariant, variantInCart]);
+
     const findMatchingVariant = (size: string | null, color: string | null, measurement: number | null) => {
         if (product?.variants?.length == 0) {
             return undefined;
@@ -129,8 +136,23 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedMeasurement((prev) => (prev === measurement ? null : measurement));
     };
 
+    const setQuantitySafely = (newQuantity: number) => {
+        if (newQuantity >= 1 && newQuantity <= maxQuantity) {
+            setQuantity(newQuantity);
+        }
+    };
+
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
+
+        // Check inventory before adding to cart
+        const totalQuantity = variantInCart ? variantInCart.quantity + quantity : quantity;
+
+        if (totalQuantity > selectedVariant.inventory) {
+            // This will be handled by the backend validation, but we can provide immediate feedback
+            return;
+        }
+
         if (variantInCart) {
             await updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity });
 
@@ -169,6 +191,8 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedMeasurement,
         quantity,
         setQuantity,
+        setQuantitySafely,
+        maxQuantity,
         selectedVariant,
         sizes,
         colors,

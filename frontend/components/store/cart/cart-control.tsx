@@ -47,7 +47,7 @@ const CartControl: React.FC<Props> = ({ item }) => {
 
                     <button
                         className="p-2 hover:bg-default-100 transition-colors disabled:opacity-50"
-                        disabled={updateQuantity.isPending}
+                        disabled={updateQuantity.isPending || (item.variant?.inventory && item.quantity >= item.variant.inventory)}
                         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                     >
                         <Plus className="h-4 w-4 text-default-600" />

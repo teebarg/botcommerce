@@ -27,6 +27,8 @@ const ProductOverview: React.FC<{
         quantity,
         selectedVariant,
         setQuantity,
+        setQuantitySafely,
+        maxQuantity,
         sizes,
         colors,
         measurements,
@@ -289,19 +291,26 @@ const ProductOverview: React.FC<{
                     <h3 className="text-lg font-semibold text-default-900 mb-3">Quantity</h3>
                     <div className="flex items-center space-x-4">
                         <button
-                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors"
-                            onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity <= 1}
+                            onClick={() => setQuantitySafely(quantity - 1)}
                         >
                             <Minus className="w-4 h-4" />
                         </button>
                         <span className="text-xl font-medium w-8 text-center">{quantity}</span>
                         <button
-                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors"
-                            onClick={() => setQuantity(quantity + 1)}
+                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity >= maxQuantity}
+                            onClick={() => setQuantitySafely(quantity + 1)}
                         >
                             <Plus className="w-4 h-4" />
                         </button>
                     </div>
+                    {maxQuantity < selectedVariant?.inventory && (
+                        <p className="text-sm text-amber-600 mt-2">
+                            Only {maxQuantity} more available (you have {quantity} in cart)
+                        </p>
+                    )}
                 </div>
             </div>
             <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-default-200">
