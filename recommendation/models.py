@@ -32,6 +32,7 @@ class ProductVariant(BaseModel):
     inventory: int
     size: Optional[str]
     color: Optional[str]
+    measurement: Optional[int]
 
 
 class SearchProduct(BaseModel):

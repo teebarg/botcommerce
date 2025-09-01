@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import { useInvalidate } from "./useApi";
 
@@ -16,9 +17,12 @@ interface OrderSearchParams {
 }
 
 export const useOrders = (searchParams: OrderSearchParams) => {
+    const { data: session } = useSession();
+
     return useQuery({
         queryKey: ["orders", JSON.stringify(searchParams)],
         queryFn: async () => await api.get<PaginatedOrder>("/order/", { params: { ...searchParams } }),
+        enabled: Boolean(session?.user),
     });
 };
 

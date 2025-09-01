@@ -60,6 +60,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         id: currentProduct?.variants?.[0]?.id ?? undefined,
         size: currentProduct?.variants?.[0]?.size ?? "",
         color: currentProduct?.variants?.[0]?.color ?? "",
+        measurement: currentProduct?.variants?.[0]?.measurement ?? undefined,
         price: currentProduct?.variants?.[0]?.price ?? 0,
         old_price: currentProduct?.variants?.[0]?.old_price ?? 0,
         inventory: currentProduct?.variants?.[0]?.inventory ?? 0,
@@ -213,6 +214,15 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 ))}
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-sm">Measurement</Label>
+                        <Input
+                            type="number"
+                            value={newVariant.measurement || ""}
+                            onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
+                        />
                     </div>
 
                     <div className="space-y-2">

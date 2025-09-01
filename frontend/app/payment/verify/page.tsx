@@ -9,11 +9,13 @@ import { Order } from "@/schemas";
 import PaymentLoading from "@/components/store/payment/payment-loading";
 import { deleteCookie } from "@/lib/util/cookie";
 import { tryCatch } from "@/lib/try-catch";
+import { useInvalidate } from "@/lib/hooks/useApi";
 
 export default function PaymentVerifyPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const reference = searchParams.get("reference");
+    const invalidate = useInvalidate()
 
     useEffect(() => {
         const verifyPayment = async () => {
@@ -33,7 +35,7 @@ export default function PaymentVerifyPage() {
                 return;
             }
             await deleteCookie("_cart_id");
-
+            invalidate("cart")
             router.push(`/order/confirmed/${data?.order_number}`);
         };
 

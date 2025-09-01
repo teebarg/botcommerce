@@ -189,6 +189,7 @@ export function ProductCreator() {
                 inventory: variant.inventory,
                 size: (variant as any).size,
                 color: (variant as any).color,
+                measurement: (variant as any).measurement,
             }));
 
             const payload: any = {

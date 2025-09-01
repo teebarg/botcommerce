@@ -224,6 +224,7 @@ export const useUpdateVariant = () => {
             status?: "IN_STOCK" | "OUT_OF_STOCK";
             size?: string;
             color?: string;
+            measurement?: number;
         }) => {
             const { id, ...variantData } = input;
 

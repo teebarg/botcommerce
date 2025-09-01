@@ -446,6 +446,7 @@ async def create_product_bundle(
                                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 "size": variant.size,
                                 "color": variant.color,
+                                "measurement": variant.measurement,
                             }
                         )
                     except Exception as e:
@@ -601,7 +602,8 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
                 "product_id": id,
                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                 "size": variant.size,
-                "color": variant.color
+                "color": variant.color,
+                "measurement": variant.measurement
             }
         )
     except UniqueViolationError as e:
@@ -640,6 +642,9 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     if variant.color is not None:
         update_data["color"] = variant.color
+
+    if variant.measurement is not None:
+        update_data["measurement"] = variant.measurement
 
     try:
         updated_variant = await db.productvariant.update(
@@ -1007,6 +1012,7 @@ async def create_image_metadata(
                                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 "size": variant.size,
                                 "color": variant.color,
+                                "measurement": variant.measurement,
                             }
                         )
                     except Exception as e:
@@ -1083,6 +1089,7 @@ async def update_image_metadata(
                                 'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 'size': variant.size,
                                 'color': variant.color,
+                                'measurement': variant.measurement,
                             }
                         )
                     else:
@@ -1096,6 +1103,7 @@ async def update_image_metadata(
                                 'status': variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                                 'size': variant.size,
                                 'color': variant.color,
+                                'measurement': variant.measurement,
                             }
                         )
                 except Exception as e:

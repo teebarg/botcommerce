@@ -36,11 +36,13 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead>
                             <tr>
-                                {["SKU", "Price", "Inventory", "Size", "Color", "Status", "Actions"]?.map((variant: string, idx: number) => (
-                                    <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-default-500 uppercase tracking-wider">
-                                        {variant}
-                                    </th>
-                                ))}
+                                {["SKU", "Price", "Inventory", "Size", "Color", "Measurement", "Status", "Actions"]?.map(
+                                    (variant: string, idx: number) => (
+                                        <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-default-500 uppercase tracking-wider">
+                                            {variant}
+                                        </th>
+                                    )
+                                )}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -53,6 +55,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.inventory}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.size || "-"}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.color || "-"}</td>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.measurement || "-"}</td>
                                     <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">
                                         <Badge variant={variant.status === "IN_STOCK" ? "emerald" : "destructive"}>{variant.status}</Badge>
                                     </td>
