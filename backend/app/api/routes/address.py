@@ -9,7 +9,6 @@ from app.core.deps import CurrentUser, RedisClient
 from app.models.address import (
     AddressCreate,
     AddressUpdate,
-    BillingAddressCreate
 )
 from app.models.address import Address, Addresses
 from app.models.generic import Message
