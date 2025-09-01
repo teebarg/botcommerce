@@ -26,4 +26,3 @@ export const paymentInfoMap: Record<string, { title: string; description: string
 
 export const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
 export const COLOR_OPTIONS = ["Red", "Blue", "Green", "Black", "White"];
-export const MEASUREMENT_OPTIONS = [41, 42, 43, 44, 45, 46, 47, 48, 49, 50];

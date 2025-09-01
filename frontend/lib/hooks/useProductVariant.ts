@@ -9,6 +9,7 @@ import { useStoreSettings } from "@/providers/store-provider";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
+import { toast } from "sonner";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();
@@ -145,11 +146,12 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
 
-        // Check inventory before adding to cart
         const totalQuantity = variantInCart ? variantInCart.quantity + quantity : quantity;
 
         if (totalQuantity > selectedVariant.inventory) {
-            // This will be handled by the backend validation, but we can provide immediate feedback
+            toast.error(
+                `Not enough inventory. You can add ${selectedVariant.inventory - (variantInCart?.quantity || 0)} more items (only ${selectedVariant.inventory} available in stock).`
+            );
             return;
         }
 
