@@ -20,6 +20,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
     const [newVariant, setNewVariant] = useState<Partial<ProductVariant>>({
         size: "",
         color: "",
+        measurement: undefined,
         price: 0,
         old_price: 0,
         inventory: 0,
@@ -33,6 +34,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
             inventory: newVariant.inventory || 0,
             size: newVariant.size || "",
             color: newVariant.color || "",
+            measurement: newVariant.measurement || undefined,
         };
 
         onVariantsChange([...variants, variant]);
@@ -42,6 +44,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
             inventory: 0,
             size: "",
             color: "",
+            measurement: undefined,
         });
     };
 
@@ -102,6 +105,16 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                     ))}
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm">Measurement</Label>
+                            <Input
+                                placeholder="Enter measurement (e.g., 41, 42)"
+                                type="number"
+                                value={newVariant.measurement || ""}
+                                onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
+                            />
                         </div>
 
                         <div className="space-y-2">
@@ -177,6 +190,11 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                                     {variant.color && (
                                                         <Badge className="text-xs" variant="secondary">
                                                             {variant.color}
+                                                        </Badge>
+                                                    )}
+                                                    {variant.measurement && (
+                                                        <Badge className="text-xs" variant="success">
+                                                            {variant.measurement}
                                                         </Badge>
                                                     )}
                                                 </div>

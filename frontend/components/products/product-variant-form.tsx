@@ -27,6 +27,7 @@ const variantFormSchema = z.object({
     }),
     size: z.string().optional(),
     color: z.string().optional(),
+    measurement: z.number().optional(),
 });
 
 const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, variant, onCancel }) => {
@@ -41,6 +42,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
             inventory: variant?.inventory || 0,
             size: variant?.size || "",
             color: variant?.color || "",
+            measurement: variant?.measurement || undefined,
         },
     });
 
@@ -53,6 +55,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
             inventory: variant?.inventory || 0,
             size: variant?.size || "",
             color: variant?.color || "",
+            measurement: variant?.measurement || undefined,
         });
     };
 
@@ -134,6 +137,24 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
                                         <FormLabel>Color</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Enter color" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="measurement"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Measurement</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Enter measurement (e.g., 41, 42)"
+                                                type="number"
+                                                {...field}
+                                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

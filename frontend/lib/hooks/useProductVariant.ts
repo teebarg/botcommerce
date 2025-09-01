@@ -20,6 +20,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const [selectedColor, setSelectedColor] = useState<string | null>(product?.variants?.[0]?.color || null);
     const [selectedSize, setSelectedSize] = useState<string | null>(product?.variants?.[0]?.size || null);
+    const [selectedMeasurement, setSelectedMeasurement] = useState<number | null>(product?.variants?.[0]?.measurement || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
 
@@ -29,6 +30,10 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const colors = useMemo(() => {
         return [...new Set(product?.variants?.filter((v) => v.color).map((v) => v.color))];
+    }, [product?.variants]);
+
+    const measurements = useMemo(() => {
+        return [...new Set(product?.variants?.filter((v) => v.measurement).map((v) => v.measurement))];
     }, [product?.variants]);
 
     const priceInfo = useMemo(() => {
@@ -60,18 +65,18 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         return cart?.items?.find((item) => item.variant_id == selectedVariant?.id);
     }, [cart, selectedVariant]);
 
-    const findMatchingVariant = (size: string | null, color: string | null) => {
+    const findMatchingVariant = (size: string | null, color: string | null, measurement: number | null) => {
         if (product?.variants?.length == 0) {
             return undefined;
         }
         if (product?.variants?.length == 1) {
             return product?.variants[0];
         }
-        if (!size && !color) {
+        if (!size && !color && !measurement) {
             return product?.variants?.find((variant) => variant.inventory > 0);
         }
 
-        return product?.variants?.find((variant) => variant.size === size && variant.color === color);
+        return product?.variants?.find((variant) => variant.size === size && variant.color === color && variant.measurement === measurement);
     };
 
     useEffect(() => {
@@ -79,16 +84,36 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     }, []);
 
     useEffect(() => {
-        const matchingVariant = findMatchingVariant(selectedSize, selectedColor);
+        const matchingVariant = findMatchingVariant(selectedSize, selectedColor, selectedMeasurement);
 
         setSelectedVariant(matchingVariant ?? undefined);
-    }, [selectedSize, selectedColor]);
+    }, [selectedSize, selectedColor, selectedMeasurement]);
 
-    const isOptionAvailable = (type: "size" | "color", value: string) => {
+    const isOptionAvailable = (type: "size" | "color" | "measurement", value: string) => {
         if (type === "size") {
-            return product?.variants?.some((v) => v.size === value && (!selectedColor || v.color === selectedColor) && v.inventory > 0);
+            return product?.variants?.some(
+                (v) =>
+                    v.size === value &&
+                    (!selectedColor || v.color === selectedColor) &&
+                    (!selectedMeasurement || v.measurement === selectedMeasurement) &&
+                    v.inventory > 0
+            );
+        } else if (type === "color") {
+            return product?.variants?.some(
+                (v) =>
+                    v.color === value &&
+                    (!selectedSize || v.size === selectedSize) &&
+                    (!selectedMeasurement || v.measurement === selectedMeasurement) &&
+                    v.inventory > 0
+            );
         } else {
-            return product?.variants?.some((v) => v.color === value && (!selectedSize || v.size === selectedSize) && v.inventory > 0);
+            return product?.variants?.some(
+                (v) =>
+                    v.measurement === parseInt(value) &&
+                    (!selectedSize || v.size === selectedSize) &&
+                    (!selectedColor || v.color === selectedColor) &&
+                    v.inventory > 0
+            );
         }
     };
 
@@ -98,6 +123,10 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const toggleColorSelect = (color: string) => {
         setSelectedColor((prev) => (prev === color ? null : color));
+    };
+
+    const toggleMeasurementSelect = (measurement: number) => {
+        setSelectedMeasurement((prev) => (prev === measurement ? null : measurement));
     };
 
     const handleAddToCart = async () => {
@@ -117,7 +146,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         e.stopPropagation();
 
         const variantInfo = selectedVariant
-            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nPrice: ${currency(
+            ? `\nSelected Variant:\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nMeasurement: ${selectedVariant.measurement || "N/A"}\nPrice: ${currency(
                   selectedVariant.price
               )}`
             : "";
@@ -136,14 +165,18 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedColor,
         selectedSize,
         setSelectedSize,
+        selectedMeasurement,
+        setSelectedMeasurement,
         quantity,
         setQuantity,
         selectedVariant,
         sizes,
         colors,
+        measurements,
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
+        toggleMeasurementSelect,
         handleAddToCart,
         handleWhatsAppPurchase,
         priceInfo,

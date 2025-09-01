@@ -20,14 +20,17 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
     const {
         selectedColor,
         selectedSize,
+        selectedMeasurement,
         quantity,
         selectedVariant,
         setQuantity,
         sizes,
         colors,
+        measurements,
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
+        toggleMeasurementSelect,
         handleAddToCart,
         handleWhatsAppPurchase,
         loading,
@@ -107,6 +110,39 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                             <div className="w-6 h-0.5 bg-default-400 rotate-45" />
                                         </div>
                                     )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {measurements?.length > 0 && (
+                <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-default-800">Measurement</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {measurements?.map((measurement) => {
+                            if (!measurement) {
+                                return null;
+                            }
+                            const available = isOptionAvailable("measurement", measurement!);
+                            const isSelected = selectedMeasurement === measurement;
+
+                            return (
+                                <button
+                                    key={measurement}
+                                    className={cn(
+                                        "px-6 py-2 text-sm font-medium border border-default-300 rounded-md transition-all duration-200",
+                                        isSelected
+                                            ? "bg-teal-800 text-white"
+                                            : available
+                                              ? "bg-card text-default-800"
+                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                                    )}
+                                    disabled={!available}
+                                    onClick={() => available && toggleMeasurementSelect(measurement)}
+                                >
+                                    {measurement}
                                 </button>
                             );
                         })}

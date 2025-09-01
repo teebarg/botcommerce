@@ -56,7 +56,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                             <div className="flex-1">
                                                 <h4 className="font-medium text-default-900">{item.name}</h4>
                                                 <p className="text-sm text-default-700">Quantity: {item.quantity}</p>
-                                                {item.variant && (item.variant.size || item.variant.color) && (
+                                                {item.variant && (item.variant.size || item.variant.color || item.variant.measurement) && (
                                                     <div className="flex flex-wrap gap-1.5 mb-2 mt-4">
                                                         {item.variant.color && (
                                                             <div className="flex items-center gap-1">
@@ -71,6 +71,14 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                                 <span className="text-xs text-default-600">Size:</span>
                                                                 <Badge className="text-sm px-2 py-0.5" variant="outline">
                                                                     {item.variant.size}
+                                                                </Badge>
+                                                            </div>
+                                                        )}
+                                                        {item.variant.measurement && (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="text-xs text-default-600">Measurement:</span>
+                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
+                                                                    {item.variant.measurement}
                                                                 </Badge>
                                                             </div>
                                                         )}

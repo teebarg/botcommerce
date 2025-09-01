@@ -73,6 +73,7 @@ export const ProductVariantSchema: z.ZodType<any> = z.lazy(() =>
             inventory: z.number(),
             size: z.string().nullable().optional(),
             color: z.string().nullable().optional(),
+            measurement: z.number().nullable().optional(),
             order_items: z.null(),
             cart_items: z.null(),
 
