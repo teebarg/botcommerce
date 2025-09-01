@@ -66,7 +66,7 @@ class CacheService:
         return self.redis.hgetall(key)
 
     @handle_redis_errors(default=False)
-    async def set(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION, tag: str = None) -> bool:
+    async def fset(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION, tag: str = None) -> bool:
         if isinstance(expire, timedelta):
             expire = int(expire.total_seconds())
         await self.redis.setex(key, expire, value)
@@ -76,6 +76,10 @@ class CacheService:
     @handle_redis_errors()
     async def get(self, key: str) -> str | None:
         return await self.redis.get(key)
+
+    @handle_redis_errors()
+    async def set(self, key: str, value: Any, ex: int | timedelta | None = DEFAULT_EXPIRATION) -> str | None:
+        return await self.redis.set(key, value, ex)
 
     @handle_redis_errors(default=False)
     async def bust_tag(self, tag: str):
@@ -184,7 +188,7 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
                 return json.loads(cached)
 
             result = await func(*args, **kwargs)
-            await cache.set(redis_key, json.dumps(result, cls=EnhancedJSONEncoder), expire, tag=raw_key)
+            await cache.fset(redis_key, json.dumps(result, cls=EnhancedJSONEncoder), expire, tag=raw_key)
             return result
         return wrapper
     return decorator

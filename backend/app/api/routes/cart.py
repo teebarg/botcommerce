@@ -8,6 +8,9 @@ from app.prisma_client import prisma as db
 from app.core.deps import TokenUser, RedisClient
 from prisma.models import Cart
 from app.services.redis import cache_response
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
