@@ -22,7 +22,7 @@ export default function SharedCollectionList() {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Shared Collections</h1>
+                <h1 className="text-2xl font-bold">Catalogs</h1>
                 <Overlay
                     open={state.isOpen}
                     sheetClassName="min-w-[450px]"
