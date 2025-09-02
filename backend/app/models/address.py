@@ -51,14 +51,3 @@ class Addresses(BaseModel):
 
 class Search(BaseModel):
     results: list[Address]
-
-class BillingAddressCreate(BaseModel):
-    first_name: str = Field(..., max_length=255)
-    last_name: str | None = Field(default=None, max_length=255)
-    address_1: str = Field(..., max_length=1255)
-    address_2: str | None = Field(default=None, max_length=1255)
-    address_type: AddressType | None = Field(default=None, max_length=255)
-    label: str | None = Field(default=None, max_length=255)
-    city: str = Field(max_length=255)
-    state: str | None = Field(default=None, max_length=255)
-    phone: str | None = Field(default=None, max_length=255)

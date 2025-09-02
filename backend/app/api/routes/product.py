@@ -11,7 +11,6 @@ from fastapi import (
 from app.core.deps import (
     CurrentUser,
     get_current_user,
-    meilisearch_client,
     supabase,
     RedisClient
 )

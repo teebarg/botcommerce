@@ -2,13 +2,13 @@ from fastapi import (
     APIRouter,
     HTTPException,
     Query,
+    Request
 )
 
-from app.core.deps import CurrentUser
+from app.core.deps import CurrentUser, RedisClient
 from app.models.address import (
     AddressCreate,
     AddressUpdate,
-    BillingAddressCreate
 )
 from app.models.address import Address, Addresses
 from app.models.generic import Message
@@ -16,6 +16,7 @@ from app.prisma_client import prisma as db
 from math import ceil
 from prisma.errors import PrismaError
 from app.core.logging import get_logger
+from app.services.redis import cache_response
 
 logger = get_logger(__name__)
 
@@ -23,7 +24,9 @@ router = APIRouter()
 
 
 @router.get("/")
+@cache_response("addresses")
 async def index(
+    request: Request,
     current_user: CurrentUser,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
@@ -54,7 +57,7 @@ async def index(
 
 @router.post("/")
 async def create(
-    *, user: CurrentUser, create_data: AddressCreate
+    *, user: CurrentUser, create_data: AddressCreate, redis: RedisClient
 ) -> Address:
     """
     Create new address.
@@ -66,6 +69,7 @@ async def create(
                 "user": {"connect": {"id": user.id}},
             }
         )
+        await redis.invalidate_list_cache("addresses")
         return address
     except PrismaError as e:
         logger.error(e)
@@ -74,7 +78,8 @@ async def create(
 
 
 @router.get("/{id}")
-async def read(id: int, user: CurrentUser) -> Address:
+@cache_response("address", key=lambda request, id, user: f"{user.id}:{id}")
+async def read(request: Request, id: int, user: CurrentUser) -> Address:
     """
     Get a specific address by id.
     """
@@ -87,48 +92,12 @@ async def read(id: int, user: CurrentUser) -> Address:
     return address
 
 
-@router.post("/billing")
-async def set_billing_address(user: CurrentUser, address: BillingAddressCreate) -> Address:
-    # address = await db.address.upsert(
-    #     where={"id": existing_address.id if existing_address else -1},  # Use ID if found
-    #     update={**address.model_dump(exclude={"id", "user"})},  # Update only valid fields
-    #     create={**address.model_dump(), "user_id": user.id, "is_billing": True}  # Create new if not found
-    # )
-    update_data = address.dict(exclude_unset=True)
-
-    try:
-        address = await db.address.find_first(
-            where={"user_id": user.id, "is_billing": True}
-        )
-        if address:
-            update = await db.address.update(
-                where={"id": address.id},
-                data={
-                    **update_data,
-                    "is_billing": True,
-                    "user": {"connect": {"id": user.id}},
-                }
-            )
-            return update
-
-        address = await db.address.create(
-            data={
-                **update_data,
-                "user_id": user.id,
-                "is_billing": True
-            }
-        )
-        return address
-    except PrismaError as e:
-        raise HTTPException(
-            status_code=500, detail=f"Database error: {str(e)}")
-
-
 @router.patch("/{id}")
 async def update(
     id: int,
     user: CurrentUser,
     update: AddressUpdate,
+    redis: RedisClient,
 ) -> Address:
     """
     Update a address.
@@ -153,6 +122,8 @@ async def update(
                 **update_data
             }
         )
+        await redis.invalidate_list_cache("addresses")
+        await redis.bust_tag(f"address:{user.id}:{id}")
         return update
     except PrismaError as e:
         raise HTTPException(
@@ -160,7 +131,7 @@ async def update(
 
 
 @router.delete("/{id}")
-async def delete(id: int) -> Message:
+async def delete(id: int, user: CurrentUser, redis: RedisClient) -> Message:
     """
     Delete a address.
     """
@@ -170,10 +141,17 @@ async def delete(id: int) -> Message:
     if not existing:
         raise HTTPException(status_code=404, detail="Address not found")
 
+    if not user.role == "ADMIN" and user.id != existing.user_id:
+        raise HTTPException(
+            status_code=401, detail="Unauthorized to delete this address."
+        )
+
     try:
         await db.address.delete(
             where={"id": id}
         )
+        await redis.invalidate_list_cache("addresses")
+        await redis.bust_tag(f"address:{user.id}:{id}")
         return Message(message="Address deleted successfully")
     except PrismaError as e:
         raise HTTPException(

@@ -94,7 +94,7 @@ async def add_item_to_cart(cache: RedisClient, item_in: CartItemCreate, backgrou
     background_tasks.add_task(calculate_cart_totals, cart)
     await cache.bust_tag(f"cart:{cart.cart_number}")
 
-    return item
+    return {"message": "Cart updated"}
 
 
 @router.get("/", response_model=Optional[CartResponse])
@@ -128,6 +128,8 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cache: Red
 
     user = await db.user.find_unique(where={"email": token_data.sub}) if token_data else None
 
+    update_data = {}
+
     if cart_update.shipping_address:
         if cart_update.shipping_address.id:
             address = await db.address.upsert(
@@ -150,17 +152,15 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cache: Red
                 }
             )
 
-    update_data = {}
+        update_data["shipping_address"] = {"connect": {"id": address.id}}
+        update_data["billing_address"] = {"connect": {"id": address.id}}
+
 
     if cart_update.status:
         update_data["status"] = cart_update.status
 
     if cart_update.email:
         update_data["email"] = cart_update.email
-
-    if cart_update.shipping_address:
-        update_data["shipping_address"] = {"connect": {"id": address.id}}
-        update_data["billing_address"] = {"connect": {"id": address.id}}
 
     if cart_update.payment_method:
         update_data["payment_method"] = cart_update.payment_method
@@ -172,7 +172,10 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cache: Red
         update_data["shipping_fee"] = cart_update.shipping_fee
         update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"]
 
-    update_data["user"] = {"connect": {"id": user.id}} if user else {"disconnect": True}
+    if user:
+        update_data["user"] = {"connect": {"id": user.id}}
+
+    # update_data["user"] = {"connect": {"id": user.id}} if user else {"disconnect": True}
 
     updated_cart = await db.cart.update(
         where={"cart_number": cartId},
