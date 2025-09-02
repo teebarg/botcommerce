@@ -53,17 +53,14 @@ const isEqual = (value: any, other: any): boolean => {
         return true;
     }
 
-    // Check if either value is null or undefined
     if (value == null || other == null) {
         return value === other;
     }
 
-    // Check if the types are different
     if (typeof value !== typeof other) {
         return false;
     }
 
-    // Handle arrays
     if (Array.isArray(value) && Array.isArray(other)) {
         if (value.length !== other.length) {
             return false;
@@ -77,7 +74,6 @@ const isEqual = (value: any, other: any): boolean => {
         return true;
     }
 
-    // Handle objects
     if (typeof value === "object" && typeof other === "object") {
         const valueKeys = Object.keys(value);
         const otherKeys = Object.keys(other);
@@ -95,7 +91,6 @@ const isEqual = (value: any, other: any): boolean => {
         return true;
     }
 
-    // For all other types, use strict equality
     return value === other;
 };
 
