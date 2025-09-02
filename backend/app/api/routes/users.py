@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from app.core.deps import (
     CurrentUser,
-    get_current_superuser
+    get_current_superuser, RedisClient
 )
 from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists, WishlistCreate
@@ -17,6 +17,7 @@ from prisma.enums import Role, Status
 from prisma.models import User
 from math import ceil
 from app.core.security import verify_password, get_password_hash
+from app.services.recently_viewed import RecentlyViewedService
 
 router = APIRouter()
 
@@ -272,3 +273,45 @@ async def change_password(
         return Message(message="Password updated successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/recently-viewed")
+async def get_recently_viewed(
+    current_user: CurrentUser,
+    cache: RedisClient,
+    limit: int = Query(default=10, le=20)
+) -> list:
+    """Get current user's recently viewed products."""
+    service = RecentlyViewedService(cache)
+    products = await service.get_recently_viewed(current_user.id, limit)
+    return products
+
+
+@router.post("/recently-viewed/{product_id}")
+async def add_recently_viewed(
+    product_id: int,
+    current_user: CurrentUser,
+    cache: RedisClient
+):
+    """Add a product to user's recently viewed list."""
+    # Get product details from database
+    product = await db.product.find_unique(
+        where={"id": product_id},
+        include={"variants": True, "images": True}
+    )
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Prepare product data for caching
+    product_data = {
+        "id": product.id,
+        "name": product.name,
+        "slug": product.slug,
+        "image": product.image or (product.images[0].image if product.images else None),
+        "price": min(variant.price for variant in product.variants) if product.variants else 0
+    }
+
+    service = RecentlyViewedService(cache)
+    await service.add_product(current_user.id, product_data)
+    
+    return {"message": "Product added to recently viewed"}

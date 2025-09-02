@@ -6,6 +6,9 @@ from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod
 from app.core.config import settings
 from app.services.redis import CacheService
 import redis.asyncio as redis
+from app.services.recently_viewed import RecentlyViewedService
+from prisma import Json
+from datetime import datetime
 
 logger = get_logger(__name__)
 
@@ -20,6 +23,8 @@ async def handle_event(event):
         await handle_payment_success(event)
     elif event["type"] == "PAYMENT_FAILED":
         await handle_payment_failed(event)
+    elif event["type"] == "RECENTLY_VIEWED":
+        await handle_recently_viewed(event)
 
 
 def get_notification():
@@ -74,3 +79,50 @@ async def handle_payment_success(event):
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")
         raise Exception(f"Database error: {str(e)}")
+
+async def handle_recently_viewed(event):
+    try:
+        metadata = {
+            "source": event.get("source", ""),
+        }
+        if int(event.get("time_spent", 0)) > 0:
+            metadata["time_spent"] = int(event.get("time_spent", 0))
+        await db.userinteraction.create(
+            data={
+                "user": {"connect": {"id": int(event["user_id"])}},
+                "product": {"connect": {"id": int(event["product_id"])}},
+                "type": event["view_type"],
+                "metadata": Json(metadata),
+                "timestamp": datetime.now(),
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to create order: {str(e)}")
+        raise Exception(f"Database error: {str(e)}")
+
+
+    try:
+        product = await db.product.find_unique(
+            where={"id": int(event["product_id"])},
+            include={"variants": True, "images": True}
+        )
+        if not product:
+            raise Exception("Product not found")
+
+        product_data = {
+            "id": product.id,
+            "name": product.name or "",
+            "slug": product.slug or "",
+            "image": (product.images[0].image if product.images else ""),
+            "price": min(variant.price for variant in product.variants) if product.variants else 0,
+            "old_price": min(variant.old_price for variant in product.variants) if product.variants else 0,
+            "rating": product.ratings or 4.5
+        }
+        if len(product.variants) > 0:
+            product_data["variant_id"] = product.variants[0].id
+        service = RecentlyViewedService(cache=get_cache())
+        await service.add_product(user_id=int(event["user_id"]), product_data=product_data)
+    except Exception as e:
+        logger.error(f"Failed to add product to recently viewed in redis: {str(e)}")
+        raise Exception(f"Redis error: {str(e)}")
+

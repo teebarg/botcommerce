@@ -11,7 +11,7 @@ import ProductShare from "@/components/product/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/product/product-variant-selection";
 import { Product } from "@/schemas/product";
-import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
+import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 
 interface Props {
@@ -29,31 +29,38 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const trackInteraction = useTrackUserInteraction();
 
     useEffect(() => {
-        if (session?.user && product?.id) {
-            trackInteraction.mutate({
-                user_id: session.id,
-                product_id: product.id,
-                type: "VIEW",
-                metadata: { source: "product-view" },
-            });
-        }
+        handlePurchase("VIEW");
 
         const startTime = Date.now();
 
         return () => {
             const timeSpent = Date.now() - startTime;
 
-            if (session?.user && product?.id) {
-                trackInteraction.mutate({
-                    user_id: session.id,
-                    product_id: product.id,
-                    type: "VIEW",
-                    metadata: { timeSpent, source: "product-view" },
-                });
-            }
+            handlePurchase("VIEW", { timeSpent });
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session?.id, product?.id]);
+
+    const handlePurchase = async (type: UserInteractionType, metadata?: Record<string, any>) => {
+        if (session?.user && product?.id) {
+            trackInteraction.mutate({
+                user_id: session.id,
+                product_id: product.id,
+                type,
+                metadata: { source: "product-view", ...metadata },
+                details: {
+                    name: product.name,
+                    slug: product.slug,
+                    image: product.image,
+                    price: selectedVariant?.price,
+                    old_price: selectedVariant?.old_price,
+                    variant_id: selectedVariant?.id,
+                    rating: product?.ratings,
+                    review_count: product?.reviews?.length,
+                },
+            });
+        }
+    };
 
     return (
         <div className="max-w-7xl mx-auto h-full w-full md:my-8">

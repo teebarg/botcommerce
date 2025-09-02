@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
-import { useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
+import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 
 const ProductOverview: React.FC<{
@@ -47,41 +47,20 @@ const ProductOverview: React.FC<{
     const trackInteraction = useTrackUserInteraction();
 
     useEffect(() => {
-        if (session?.user && product?.id) {
-            trackInteraction.mutate({
-                user_id: session.id,
-                product_id: product.id,
-                type: "VIEW",
-                metadata: { source: "product-overview" },
-            });
-        }
+        handlePurchase("VIEW");
 
         const startTime = Date.now();
 
         return () => {
             const timeSpent = Date.now() - startTime;
 
-            if (session?.user && product?.id) {
-                trackInteraction.mutate({
-                    user_id: session.id,
-                    product_id: product.id,
-                    type: "VIEW",
-                    metadata: { timeSpent, source: "product-overview" },
-                });
-            }
+            handlePurchase("VIEW", { timeSpent });
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session?.id, product?.id]);
 
     const handleAddToCartAndTrack = () => {
-        if (session?.user && product?.id) {
-            trackInteraction.mutate({
-                user_id: session.id,
-                product_id: product.id,
-                type: "CART_ADD",
-                metadata: { source: "product-overview" },
-            });
-        }
+        handlePurchase("CART_ADD");
         handleAddToCart();
     };
 
@@ -90,24 +69,31 @@ const ProductOverview: React.FC<{
 
     const addWishlist = async () => {
         createWishlist(product.id);
-        if (session?.user && product?.id) {
-            trackInteraction.mutate({
-                user_id: session.id,
-                product_id: product.id,
-                type: "WISHLIST_ADD",
-                metadata: { source: "product-overview" },
-            });
-        }
+        handlePurchase("WISHLIST_ADD");
     };
 
     const removeWishlist = async () => {
         deleteWishlist(product.id);
+        handlePurchase("WISHLIST_REMOVE");
+    };
+
+    const handlePurchase = async (type: UserInteractionType, metadata?: Record<string, any>) => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
                 user_id: session.id,
                 product_id: product.id,
-                type: "WISHLIST_REMOVE",
-                metadata: { source: "product-overview" },
+                type,
+                metadata: { source: "product-overview", ...metadata },
+                details: {
+                    name: product.name,
+                    slug: product.slug,
+                    image: product.image,
+                    price: product.price,
+                    old_price: product.old_price,
+                    variant_id: product?.variants?.[0]?.id,
+                    rating: product?.ratings,
+                    review_count: product?.review_count,
+                },
             });
         }
     };

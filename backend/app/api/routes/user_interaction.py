@@ -11,34 +11,34 @@ from app.core.deps import (
 
 router = APIRouter()
 
-@router.post("/", response_model=UserInteractionResponse)
-async def create_user_interaction(payload: UserInteractionCreate, redis: RedisClient):
+@router.post("/")
+async def create_user_interaction(payload: UserInteractionCreate, cache: RedisClient):
     try:
-        interaction = await log_user_interaction(
+        await log_user_interaction(
+            redis=cache.redis,
             user_id=payload.user_id,
             product_id=payload.product_id,
             type=payload.type,
             metadata=payload.metadata,
         )
-        await redis.invalidate_list_cache("interactions")
-        return interaction
+        await cache.invalidate_list_cache("interactions")
+        return {"message": "success"}
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post("/batch", response_model=List[UserInteractionResponse])
-async def batch_user_interactions(redis: RedisClient, payload: List[UserInteractionCreate] = Body(...)):
-    results = []
+@router.post("/batch")
+async def batch_user_interactions(cache: RedisClient, payload: List[UserInteractionCreate] = Body(...)):
     for item in payload:
-        interaction = await log_user_interaction(
+        await log_user_interaction(
+            redis=cache.redis,
             user_id=item.user_id,
             product_id=item.product_id,
             type=item.type,
             metadata=item.metadata,
         )
-        results.append(interaction)
-    await redis.invalidate_list_cache("interactions")
-    return results
+    await cache.invalidate_list_cache("interactions")
+    return {"message": "success"}
 
 @router.get("/", response_model=List[UserInteractionResponse])
 @cache_response("interactions")
