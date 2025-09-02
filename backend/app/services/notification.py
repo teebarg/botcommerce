@@ -91,10 +91,8 @@ class SMSChannel(NotificationChannel):
         self.from_number = from_number
 
     def send(self, recipient: str, message: str, **kwargs) -> bool:
-        # Implementation would depend on your SMS provider (e.g., Twilio, MessageBird)
-        # This is a placeholder implementation
+        #TODO: Implementation would depend on your SMS provider (e.g., Twilio, MessageBird)
         try:
-            # Make API call to SMS provider
             return True
         except Exception as e:
             logger.error(f"SMS sending failed: {str(e)}")

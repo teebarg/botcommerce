@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, BackgroundTasks, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from app.core.deps import (
     CurrentUser,
-    Notification,
     get_current_superuser,
     RedisClient,
 )
@@ -9,7 +8,7 @@ from typing import Optional
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus
-from app.services.order import create_order_from_cart, send_notification, retrieve_order, list_orders
+from app.services.order import create_order_from_cart, retrieve_order, list_orders
 from app.services.redis import cache_response
 from pydantic import BaseModel
 from app.models.order import OrderTimelineEntry
@@ -22,15 +21,12 @@ router = APIRouter()
 @router.post("/", response_model=OrderResponse)
 async def create_order(
     cache: RedisClient,
-    background_tasks: BackgroundTasks,
     order_in: OrderCreate,
     user: CurrentUser,
-    notification: Notification,
     cartId: str = Header(default=None),
 ):
     try:
-        order = await create_order_from_cart(order_in, user.id, cartId)
-        background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
+        order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId, redis=cache.redis)
         await cache.invalidate_list_cache("orders")
         return order
     except Exception as e:

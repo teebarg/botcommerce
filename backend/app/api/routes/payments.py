@@ -1,8 +1,6 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from app.core.config import settings
-from app.schemas.payment import (
-    PaymentInitialize,
-)
+from app.schemas.payment import PaymentInitialize
 from app.models.order import OrderCreate, OrderResponse
 from app.core.deps import CurrentUser, Notification, RedisClient, get_current_user
 from app.models.user import User
@@ -10,11 +8,11 @@ import httpx
 from datetime import datetime
 from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
-from prisma.errors import PrismaError
 from pydantic import BaseModel
 from prisma.models import Cart
-from app.services.order import create_order_from_cart, send_notification, create_invoice, decrement_variant_inventory_for_order
+from app.services.order import create_order_from_cart, decrement_variant_inventory_for_order
 from app.core.logging import get_logger
+from app.services.events import publish_event, publish_order_event
 
 logger = get_logger(__name__)
 
@@ -83,7 +81,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}", response_model=OrderResponse)
-async def verify_payment(background_tasks: BackgroundTasks, reference: str, user: CurrentUser, notification: Notification, cache: RedisClient):
+async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient):
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -103,24 +101,32 @@ async def verify_payment(background_tasks: BackgroundTasks, reference: str, user
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
-            background_tasks.add_task(send_notification, id=order.id, user_id=user.id, notification=notification)
-            background_tasks.add_task(create_invoice, cache=cache, order_id=order.id)
-            background_tasks.add_task(decrement_variant_inventory_for_order, order.id, notification, cache)
+            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number, redis=cache.redis)
+            await publish_order_event(cache=cache.redis, order=order, type="ORDER_PAID")
 
-            await db.payment.create(
-                data={
-                    "order": {"connect": {"id": order.id}},
-                    "amount": data["data"]["amount"] / 100,  # Convert from kobo
-                    "reference": data["data"]["reference"],
-                    "transaction_id": data["data"]["reference"],
-                    "status": PaymentStatus.SUCCESS,
-                    "payment_method": PaymentMethod.PAYSTACK,
-                }
-            )
+            event = {
+                "type": "PAYMENT_SUCCESS",
+                "order_id": order.id,
+                "amount": data["data"]["amount"] / 100,
+                "reference": data["data"]["reference"],
+                "transaction_id": data["data"]["reference"],
+                "status": PaymentStatus.SUCCESS,
+                "payment_method": PaymentMethod.PAYSTACK,
+            }
+            await publish_event(cache=cache.redis, event=event)
 
             return order
         else:
+            event = {
+                "type": "PAYMENT_FAILED",
+                "order_id": order.id,
+                "amount": data["data"]["amount"] / 100,
+                "reference": data["data"]["reference"],
+                "transaction_id": data["data"]["reference"],
+                "status": PaymentStatus.FAILED,
+                "payment_method": PaymentMethod.PAYSTACK,
+            }
+            await publish_event(cache=cache.redis, event=event)
             raise HTTPException(status_code=500, detail="Payment verification failed")
 
 
@@ -166,8 +172,9 @@ async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, bac
         await cache.bust_tag(f"order:{id}")
 
         if status == PaymentStatus.SUCCESS:
-            background_tasks.add_task(create_invoice, cache=cache, order_id=id)
-            background_tasks.add_task(decrement_variant_inventory_for_order, id, notification, cache)
+            await publish_order_event(cache=cache.redis, order=updated_order, type="ORDER_PAID")
+            # background_tasks.add_task(create_invoice, cache=cache, order_id=id)
+            # background_tasks.add_task(decrement_variant_inventory_for_order, id, notification, cache)
             try:
                 if order.status != OrderStatus.PENDING:
                     await tx.ordertimeline.create(

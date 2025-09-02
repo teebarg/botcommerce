@@ -92,9 +92,9 @@ async def add_item_to_cart(cache: RedisClient, item_in: CartItemCreate, backgrou
         )
 
     background_tasks.add_task(calculate_cart_totals, cart)
-    await cache.bust_tag(f"cart:{cart.cart_number}")
+    await cache.bust_tag(f"cart:{cartId}")
 
-    return {"message": "Cart updated"}
+    return item
 
 
 @router.get("/", response_model=Optional[CartResponse])

@@ -8,15 +8,14 @@ from app.core.logging import logger
 from app.services.invoice import invoice_service
 
 from datetime import datetime
-from app.core.deps import (
-    supabase
-)
+from app.core.deps import supabase, RedisClient
 from app.services.product import reindex_product
 from app.services.redis import CacheService
 from app.core.config import settings
+from app.services.events import publish_order_event
 
 
-async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
+async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str, redis: RedisClient) -> OrderResponse:
     """
     Create a new order from a cart
     """
@@ -58,20 +57,13 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
     if cart.shipping_address_id:
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
 
-    async with db.tx() as tx:
-        try:
-           new_order = await tx.order.create(data=data) 
-           await tx.ordertimeline.create(
-                data={
-                    "order": {"connect": {"id": new_order.id}},
-                    "message": f"Order {order_number} created",
-                    "from_status": order_in.status,
-                    "to_status": order_in.status,
-                }
-            )
-        except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    try:
+        new_order = await db.order.create(data=data) 
+    except Exception as e:
+        logger.error(f"Failed to create order: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    await publish_order_event(cache=redis, order=new_order, type="ORDER_CREATED")
 
     return new_order
 
@@ -241,7 +233,7 @@ async def create_invoice(cache, order_id: int) -> str:
         order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
         if not order:
             logger.error(f"Order not found for ID: {order_id}")
-            raise HTTPException(status_code=404, detail="Order not found")
+            raise Exception("Order not found")
         settings = await db.shopsettings.find_many()
         settings_dict = {setting.key: setting.value for setting in settings}
 
@@ -256,10 +248,10 @@ async def create_invoice(cache, order_id: int) -> str:
             })
 
             if not result:
-                raise HTTPException(status_code=500, detail="Failed to upload invoice to storage")
+                raise Exception("Failed to upload invoice to storage")
         except Exception as e:
             logger.error(e)
-            raise HTTPException(status_code=500, detail="Failed to upload invoice to storage.")
+            raise Exception("Failed to upload invoice to storage.")
 
         public_url = supabase.storage.from_("invoices").get_public_url(filename, {"download": filename})
 
@@ -272,11 +264,9 @@ async def create_invoice(cache, order_id: int) -> str:
         await cache.bust_tag(f"order:{order_id}")
 
         return public_url
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Unexpected error in download_invoice: {str(e)}")
-        raise HTTPException(status_code=500, detail="An unexpected error occurred while generating the invoice")
+        raise Exception("An unexpected error occurred while generating the invoice")
 
 
 async def decrement_variant_inventory_for_order(order_id: int, notification=None, cache: CacheService = None):
@@ -289,7 +279,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
     )
     if not order:
         logger.error(f"Order not found for ID: {order_id}")
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise Exception("Order not found")
 
     out_of_stock_variants = []
 
@@ -315,7 +305,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
             logger.info(f"Decrementing inventory for variant {variant_id} in order {order_id}")
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to decrement variant inventory for order")
+        raise Exception("Failed to decrement variant inventory for order")
 
     if out_of_stock_variants and notification:
         subject = f"Product Variants OUT OF STOCK in Order {order_id}"

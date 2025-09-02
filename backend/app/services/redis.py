@@ -41,6 +41,10 @@ class CacheService:
     def __init__(self, redis: Redis):
         self.redis = redis
 
+    @handle_redis_errors(default=False)
+    def redis(self) -> Redis:
+        return self.redis
+
     @handle_redis_errors(default=[])
     def keys(self, pattern: str) -> list[str]:
         return self.redis.keys(pattern)
@@ -151,7 +155,7 @@ class CacheService:
         Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
         """
         stream_key = f"events:{event_name}"
-        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
+        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)} 
         await self.redis.xadd(stream_key, data)
         return True
 
