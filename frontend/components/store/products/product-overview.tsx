@@ -84,16 +84,6 @@ const ProductOverview: React.FC<{
                 product_id: product.id,
                 type,
                 metadata: { source: "product-overview", ...metadata },
-                details: {
-                    name: product.name,
-                    slug: product.slug,
-                    image: product.image,
-                    price: product.price,
-                    old_price: product.old_price,
-                    variant_id: product?.variants?.[0]?.id,
-                    rating: product?.ratings,
-                    review_count: product?.review_count,
-                },
             });
         }
     };

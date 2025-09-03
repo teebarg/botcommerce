@@ -48,16 +48,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 product_id: product.id,
                 type,
                 metadata: { source: "product-view", ...metadata },
-                details: {
-                    name: product.name,
-                    slug: product.slug,
-                    image: product.image,
-                    price: selectedVariant?.price,
-                    old_price: selectedVariant?.old_price,
-                    variant_id: selectedVariant?.id,
-                    rating: product?.ratings,
-                    review_count: product?.reviews?.length,
-                },
             });
         }
     };

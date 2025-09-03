@@ -173,8 +173,6 @@ async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, bac
 
         if status == PaymentStatus.SUCCESS:
             await publish_order_event(cache=cache.redis, order=updated_order, type="ORDER_PAID")
-            # background_tasks.add_task(create_invoice, cache=cache, order_id=id)
-            # background_tasks.add_task(decrement_variant_inventory_for_order, id, notification, cache)
             try:
                 if order.status != OrderStatus.PENDING:
                     await tx.ordertimeline.create(

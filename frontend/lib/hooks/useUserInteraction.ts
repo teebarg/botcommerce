@@ -4,23 +4,11 @@ import { api } from "@/apis/client";
 
 export type UserInteractionType = "VIEW" | "PURCHASE" | "CART_ADD" | "WISHLIST_ADD" | "WISHLIST_REMOVE";
 
-type RecentlyViewed = {
-    name: string
-    slug: string
-    image: string
-    price: number
-    old_price?: number
-    variant_id?: number
-    rating?: number
-    review_count?: number
-}
-
 export interface UserInteractionPayload {
     user_id: number;
     product_id: number;
     type: UserInteractionType;
     metadata?: Record<string, any>;
-    details?: RecentlyViewed
 }
 
 let buffer: UserInteractionPayload[] = [];
