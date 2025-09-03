@@ -171,6 +171,14 @@ class CacheService:
     async def zremrangebyrank(self, key: str, start: int, end: int) -> int:
         return await self.redis.zremrangebyrank(key, start, end)
 
+    @handle_redis_errors(default=0)
+    async def zincrby(self, key: str, amount: float, member: str) -> float:
+        return await self.redis.zincrby(key, amount, member)
+
+    @handle_redis_errors(default=[])
+    async def zrange(self, key: str, start: int, end: int, withscores: bool = False) -> list:
+        return await self.redis.zrange(key, start, end, withscores=withscores)
+
 async def get_redis_dependency(request: Request):
     return CacheService(request.app.state.redis)
 

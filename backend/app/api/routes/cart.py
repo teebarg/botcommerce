@@ -8,6 +8,7 @@ from app.prisma_client import prisma as db
 from app.core.deps import TokenUser, RedisClient
 from prisma.models import Cart
 from app.services.redis import cache_response
+from app.services.popular_products import PopularProductsService
 
 router = APIRouter()
 
@@ -41,7 +42,12 @@ async def get_or_create_cart(cartId: Optional[str]):
 
 
 @router.post("/items")
-async def add_item_to_cart(cache: RedisClient, item_in: CartItemCreate, background_tasks: BackgroundTasks, cartId: str = Header(default=None)):
+async def add_item_to_cart(
+    cache: RedisClient,
+    item_in: CartItemCreate,
+    background_tasks: BackgroundTasks,
+    cartId: str = Header(default=None)
+):
     cart = await get_or_create_cart(cartId)
 
     variant = await db.productvariant.find_unique(
@@ -90,6 +96,14 @@ async def add_item_to_cart(cache: RedisClient, item_in: CartItemCreate, backgrou
             where={"cart_number": cartId},
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
+
+    # Track add to cart in background
+    popular_service = PopularProductsService(cache)
+    background_tasks.add_task(
+        popular_service.track_product_interaction,
+        variant.product.id,
+        "add_to_cart"
+    )
 
     background_tasks.add_task(calculate_cart_totals, cart)
     await cache.bust_tag(f"cart:{cartId}")

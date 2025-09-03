@@ -23,10 +23,6 @@ class RecentlyViewedService:
             'id': int(product_data['id']),
             'name': product_data['name'],
             'slug': product_data['slug'],
-            'image': product_data.get('image', ''),
-            'price': product_data.get('price', 0),
-            'old_price': product_data.get('old_price', 0),
-            'variant_id': product_data.get('variant_id', None)
         })
         
         # Add to sorted set with timestamp as score

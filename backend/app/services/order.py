@@ -1,6 +1,6 @@
 from typing import Optional
 import uuid
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderCreate
 from app.core.utils import generate_invoice_email
@@ -13,9 +13,9 @@ from app.services.product import reindex_product
 from app.services.redis import CacheService
 from app.core.config import settings
 from app.services.events import publish_order_event
+from app.services.popular_products import PopularProductsService
 
-
-async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str, redis: RedisClient) -> OrderResponse:
+async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str, redis: RedisClient, background_tasks: BackgroundTasks) -> OrderResponse:
     """
     Create a new order from a cart
     """
@@ -64,6 +64,15 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     await publish_order_event(cache=redis, order=new_order, type="ORDER_CREATED")
+
+    popular_service = PopularProductsService(cache)
+    for item in cart.items:
+        background_tasks.add_task(
+            popular_service.track_product_interaction,
+            item.product.id,
+            "purchase"
+        )
+
 
     return new_order
 

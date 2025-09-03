@@ -102,10 +102,7 @@ async def handle_recently_viewed(event):
 
 
     try:
-        product = await db.product.find_unique(
-            where={"id": int(event["product_id"])},
-            include={"variants": True, "images": True}
-        )
+        product = await db.product.find_unique(where={"id": int(event["product_id"])})
         if not product:
             raise Exception("Product not found")
 
@@ -113,11 +110,6 @@ async def handle_recently_viewed(event):
             "id": product.id,
             "name": product.name or "",
             "slug": product.slug or "",
-            "image": (product.images[0].image if product.images else ""),
-            "price": min(variant.price for variant in product.variants) if product.variants else 0,
-            "old_price": min(variant.old_price for variant in product.variants) if product.variants else 0,
-            "rating": product.ratings or 4.5,
-            "variant_id": product.variants[0].id if len(product.variants) > 0 else None,
         }
         service = RecentlyViewedService(cache=get_cache())
         await service.add_product(user_id=int(event["user_id"]), product_data=product_data)
