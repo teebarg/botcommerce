@@ -36,7 +36,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const shouldReconnectRef = useRef<boolean>(true);
     const userInitSentRef = useRef<boolean>(false);
-    const userRef = useRef(session?.user);
+    const userRef = useRef(session);
     const invalidate = useInvalidate();
 
     const connect = async () => {
@@ -54,7 +54,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                         socket.send(JSON.stringify({ type: "ping" }));
 
                         if (!userInitSentRef.current && userRef.current) {
-                            socket.send(JSON.stringify({ type: "init", id: userRef.current.id, email: userRef.current.email }));
+                            socket.send(JSON.stringify({ type: "init", id: userRef.current.id, email: userRef.current.user.email }));
                             userInitSentRef.current = true;
                         }
                     }
@@ -66,6 +66,10 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
                 if (data?.type === "product-index" && data?.status === "completed") {
                     invalidate("products");
+                }
+
+                if (data?.type === "recently_viewed") {
+                    invalidate("recently-viewed");
                 }
 
                 setMessages((prev) => [...prev, data]);
@@ -124,7 +128,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     }, []);
 
     useEffect(() => {
-        userRef.current = session?.user;
+        userRef.current = session;
     }, [session?.user]);
 
     useEffect(() => {

@@ -50,7 +50,7 @@ export const useAddToCart = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Added to cart");
+            toast.success("Added to cart", { duration: 500 });
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to add to cart");

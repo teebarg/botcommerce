@@ -67,6 +67,7 @@ async def lifespan(app: FastAPI):
 
                 for stream, messages in events:
                     for msg_id, data in messages:
+                        logger.debug(f"Processing event: {data}")
                         try:
                             await handle_event(data)
                             await redis_client.xack(STREAM_NAME, GROUP_NAME, msg_id)

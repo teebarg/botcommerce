@@ -10,6 +10,7 @@ import HeroSection from "@/components/hero-section";
 import NewArrivals from "@/components/store/home/arrival";
 import Trending from "@/components/store/home/trending";
 import Featured from "@/components/store/home/featured";
+import RecentlyViewedSection from "@/components/store/home/recently-viewed";
 
 export const metadata: Metadata = {
     title: "Home",
@@ -32,7 +33,7 @@ export default async function Home() {
             <LazyFadeIn delay={100}>
                 <Featured />
             </LazyFadeIn>
-            <LazyFadeIn delay={100}>
+            <LazyFadeIn delay={200}>
                 <Trending />
             </LazyFadeIn>
             <PromotionalBanner
@@ -41,13 +42,16 @@ export default async function Home() {
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
-            <LazyFadeIn delay={100}>
+            <LazyFadeIn delay={200}>
+                <RecentlyViewedSection />
+            </LazyFadeIn>
+            <LazyFadeIn delay={300}>
                 <NewArrivals />
             </LazyFadeIn>
-            <LazyFadeIn delay={100}>
+            <LazyFadeIn delay={400}>
                 <ContactSection />
             </LazyFadeIn>
-            <LazyFadeIn delay={100}>
+            <LazyFadeIn delay={500}>
                 <NewsletterSection />
             </LazyFadeIn>
         </div>

@@ -80,19 +80,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             return;
         }
 
-        try {
-            const res = await api.post<Cart>("/cart/items", item);
-            const id = await getCookie("_cart_id");
+        // try {
+        //     const res = await api.post<Cart>("/cart/items", item);
+        //     const id = await getCookie("_cart_id");
 
-            if (!id && res.cart_number) {
-                await setCookie("_cart_id", res.cart_number);
-            }
+        //     if (!id && res.cart_number) {
+        //         await setCookie("_cart_id", res.cart_number);
+        //     }
 
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Added to cart");
-        } catch (e: any) {
-            toast.error(e.message || "Failed to add to cart");
-        }
+        //     queryClient.invalidateQueries({ queryKey: ["cart"] });
+        //     toast.success("Added to cart");
+        // } catch (e: any) {
+        //     toast.error(e.message || "Failed to add to cart");
+        // }
     };
 
     const syncOfflineCart = async () => {
