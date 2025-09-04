@@ -6,6 +6,7 @@ import { Eye } from "lucide-react";
 import { useUserRecentlyViewed } from "@/lib/hooks/useUser";
 import { ProductSearch } from "@/schemas";
 import ProductCard from "@/components/store/products/product-card";
+import PromotionalBanner from "@/components/promotion";
 
 export default function RecentlyViewedSection() {
     const { data } = useUserRecentlyViewed(4);
@@ -30,6 +31,12 @@ export default function RecentlyViewedSection() {
                     {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                 </div>
             </div>
+            <PromotionalBanner
+                btnClass="text-purple-600"
+                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
+                subtitle="Get up to 50% OFF on select products."
+                title="Big Sale on Top Brands!"
+            />
         </section>
     );
 }

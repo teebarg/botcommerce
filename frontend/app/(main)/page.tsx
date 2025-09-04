@@ -45,12 +45,6 @@ export default async function Home() {
             <LazyFadeIn delay={200}>
                 <RecentlyViewedSection />
             </LazyFadeIn>
-            <PromotionalBanner
-                btnClass="text-purple-600"
-                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
-                subtitle="Get up to 50% OFF on select products."
-                title="Big Sale on Top Brands!"
-            />
             <LazyFadeIn delay={300}>
                 <NewArrivals />
             </LazyFadeIn>
