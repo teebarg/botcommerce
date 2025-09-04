@@ -15,7 +15,7 @@ export default function PaymentVerifyPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const reference = searchParams.get("reference");
-    const invalidate = useInvalidate()
+    const invalidate = useInvalidate();
 
     useEffect(() => {
         const verifyPayment = async () => {
@@ -35,7 +35,7 @@ export default function PaymentVerifyPage() {
                 return;
             }
             await deleteCookie("_cart_id");
-            invalidate("cart")
+            invalidate("cart");
             router.push(`/order/confirmed/${data?.order_number}`);
         };
 

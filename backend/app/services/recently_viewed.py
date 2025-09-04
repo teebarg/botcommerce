@@ -13,21 +13,14 @@ class RecentlyViewedService:
     async def get_key(self, user_id: int) -> str:
         return f"recently_viewed:{user_id}"
 
-    async def add_product(self, user_id: int, product_data: dict):
+    async def add_product(self, user_id: int, product_id: int):
         """Add a product to user's recently viewed list"""
         key = await self.get_key(user_id)
         timestamp = datetime.now().timestamp()
-        
-        product_key = f"product:{product_data['id']}"
-        await self.cache.hset(product_key, mapping={
-            'id': int(product_data['id']),
-            'name': product_data['name'],
-            'slug': product_data['slug'],
-        })
-        
+
         # Add to sorted set with timestamp as score
-        await self.cache.zadd(key, {str(product_data['id']): timestamp})
-        
+        await self.cache.zadd(key, {str(product_id): timestamp})
+
         #keep only latest
         await self.cache.zremrangebyrank(key, 0, -(self.max_items + 1))
 
@@ -40,10 +33,10 @@ class RecentlyViewedService:
     async def get_recently_viewed(self, user_id: int, limit: int = 10) -> List[dict]:
         """Get user's recently viewed products"""
         key = await self.get_key(user_id)
-        
+
         product_ids = await self.cache.zrevrange(key, 0, limit - 1)
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-        
+
         products = []
         for pid in product_ids:
             # product_key = f"product:{pid}"
@@ -53,5 +46,5 @@ class RecentlyViewedService:
             # product_data = await self.cache.hgetall(product_key)
             # if product_data:
             #     products.append(product_data)
-                
+
         return products

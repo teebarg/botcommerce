@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { useAddToCart, useChangeCartQuantity } from "./useCart";
 
@@ -9,7 +10,6 @@ import { useStoreSettings } from "@/providers/store-provider";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
-import { toast } from "sonner";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();
@@ -139,6 +139,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
             toast.error(
                 `Not enough inventory. You can add ${selectedVariant.inventory - (variantInCart?.quantity || 0)} more items (only ${selectedVariant.inventory} available in stock).`
             );
+
             return;
         }
 

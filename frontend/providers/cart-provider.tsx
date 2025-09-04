@@ -6,8 +6,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/apis/client";
 import { addToOfflineCart, clearOfflineCart, getOfflineCart } from "@/lib/indexeddb/offline-cart";
-import { getCookie } from "@/lib/util/server-utils";
-import { setCookie } from "@/lib/util/cookie";
 import { Cart } from "@/schemas";
 
 type AddItem = {

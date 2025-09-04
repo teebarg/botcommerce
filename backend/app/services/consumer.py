@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.services.redis import CacheService
 import redis.asyncio as redis
 from app.services.recently_viewed import RecentlyViewedService
+from app.services.popular_products import PopularProductsService
 from prisma import Json
 from datetime import datetime
 
@@ -102,18 +103,19 @@ async def handle_recently_viewed(event):
 
 
     try:
-        product = await db.product.find_unique(where={"id": int(event["product_id"])})
-        if not product:
-            raise Exception("Product not found")
+        if event["view_type"] == "VIEW":
+            recent_service = RecentlyViewedService(cache=get_cache())
+            await recent_service.add_product(user_id=int(event["user_id"]), product_id=int(event["product_id"]))
 
-        product_data = {
-            "id": product.id,
-            "name": product.name or "",
-            "slug": product.slug or "",
-        }
-        service = RecentlyViewedService(cache=get_cache())
-        await service.add_product(user_id=int(event["user_id"]), product_data=product_data)
+            await handle_track_popular(product_id=int(event["product_id"]), interaction_type="view")
+        elif event["view_type"] == "CART_ADD":
+            await handle_track_popular(product_id=int(event["product_id"]), interaction_type="add_to_cart")
+
     except Exception as e:
         logger.error(f"Failed to add product to recently viewed in redis: {str(e)}")
         raise Exception(f"Redis error: {str(e)}")
 
+
+async def handle_track_popular(product_id: int, interaction_type: str):
+    recent_service = PopularProductsService(cache=get_cache())
+    await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)

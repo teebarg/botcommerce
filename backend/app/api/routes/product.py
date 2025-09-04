@@ -47,7 +47,7 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-@router.get("/")
+@router.get("/popular")
 async def get_popular_products(
     cache: RedisClient,
     limit: int = Query(default=10, le=20)
@@ -528,12 +528,7 @@ async def reindex_products(background_tasks: BackgroundTasks, redis: RedisClient
 
 @router.get("/{slug}")
 @cache_response("product", key=lambda request, slug, **kwargs: slug)
-async def read(
-    slug: str, 
-    request: Request,
-    cache: RedisClient,
-    background_tasks: BackgroundTasks
-):
+async def read(request: Request, slug: str):
     """Get a specific product by slug with Redis caching."""
     product = await db.product.find_unique(
         where={"slug": slug},
@@ -544,13 +539,6 @@ async def read(
     )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-
-    service = PopularProductsService(cache)
-    background_tasks.add_task(
-        service.track_product_interaction,
-        product.id,
-        "view"
-    )
 
     return product
 
