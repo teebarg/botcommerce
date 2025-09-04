@@ -10,9 +10,7 @@ class PopularProductsService:
         self.max_items = 50
 
     POPULARITY_KEY = "popular_products"
-    # PRODUCT_DETAILS_KEY = "product_details:{}"
 
-    # Weights for different actions
     WEIGHTS = {
         "view": 1,
         "add_to_cart": 2,
@@ -22,17 +20,10 @@ class PopularProductsService:
     async def track_product_interaction(self, product_id: int, interaction_type: str):
         """Track a product interaction and update its popularity score"""
         try:
-            # Store product details in a hash
-            # product_key = self.PRODUCT_DETAILS_KEY.format(product_id)
-            # await self.cache.hset(product_key, mapping={
-            #     'id': str(product_id),
-            # })
-
             # Increment score in sorted set
             weight = self.WEIGHTS.get(interaction_type, 0)
             await self.cache.zincrby(self.POPULARITY_KEY, weight, str(product_id))
 
-            # Trim to keep only top max_items
             await self.cache.zremrangebyrank(self.POPULARITY_KEY, 0, -(self.max_items + 1))
 
         except Exception as e:
@@ -41,7 +32,6 @@ class PopularProductsService:
     async def get_popular_products(self, limit: int = 10) -> List[dict]:
         """Get the most popular products"""
         try:
-            # Get product IDs from sorted set, highest score first
             product_ids = await self.cache.zrevrange(self.POPULARITY_KEY, 0, limit - 1)
             index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
 
@@ -62,7 +52,6 @@ class PopularProductsService:
         try:
             products = await self.cache.zrange(self.POPULARITY_KEY, 0, -1, withscores=True)
 
-            # Apply decay factor
             for product_id, score in products:
                 new_score = score * decay_factor
                 await self.cache.zadd(self.POPULARITY_KEY, {product_id: new_score})
