@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from app.core.deps import (
     CurrentUser,
-    get_current_superuser
+    get_current_superuser, RedisClient
 )
 from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists, WishlistCreate
@@ -17,6 +17,8 @@ from prisma.enums import Role, Status
 from prisma.models import User
 from math import ceil
 from app.core.security import verify_password, get_password_hash
+from app.services.recently_viewed import RecentlyViewedService
+from app.models.product import SearchProduct
 
 router = APIRouter()
 
@@ -272,3 +274,15 @@ async def change_password(
         return Message(message="Password updated successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/recently-viewed")
+async def get_recently_viewed(
+    current_user: CurrentUser,
+    cache: RedisClient,
+    limit: int = Query(default=10, le=20)
+) -> list[SearchProduct]:
+    """Get current user's recently viewed products."""
+    service = RecentlyViewedService(cache)
+    products = await service.get_recently_viewed(current_user.id, limit)
+    return products

@@ -2,6 +2,10 @@ from typing import Any, Dict, Optional
 
 from app.services.redis import CacheService
 from app.models.user import User
+from app.core.deps import RedisClient
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 async def publish_user_registered(
@@ -25,4 +29,25 @@ async def publish_user_registered(
 
     await cache.publish_event("USER_REGISTERED", payload)
 
+
+async def publish_event(cache: RedisClient, event: dict):
+    try:
+        await cache.xadd("EVENT_STREAMS", event)
+    except Exception as e:
+        logger.error(f"Failed to publish event to EVENT_STREAMS: {str(e)}")
+
+
+async def publish_order_event(cache: RedisClient, order: dict, type: str):
+    event = {
+        "type": type,
+        "order_id": order.id,
+        "order_number": order.order_number,
+        "user_id": order.user_id,
+        "email": order.email if order.email else "",
+        "status": order.status,
+    }
+    try:
+        await cache.xadd("EVENT_STREAMS", event)
+    except Exception as e:
+        logger.error(f"Failed to publish event to EVENT_STREAMS: {str(e)}")
 

@@ -6,8 +6,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/apis/client";
 import { addToOfflineCart, clearOfflineCart, getOfflineCart } from "@/lib/indexeddb/offline-cart";
-import { getCookie } from "@/lib/util/server-utils";
-import { setCookie } from "@/lib/util/cookie";
 import { Cart } from "@/schemas";
 
 type AddItem = {
@@ -78,20 +76,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             toast.success("Added to cart (offline)");
 
             return;
-        }
-
-        try {
-            const res = await api.post<Cart>("/cart/items", item);
-            const id = await getCookie("_cart_id");
-
-            if (!id && res.cart_number) {
-                await setCookie("_cart_id", res.cart_number);
-            }
-
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Added to cart");
-        } catch (e: any) {
-            toast.error(e.message || "Failed to add to cart");
         }
     };
 

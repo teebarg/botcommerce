@@ -41,10 +41,21 @@ from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export
 from app.services.redis import cache_response
 from meilisearch.errors import MeilisearchApiError
+from app.services.popular_products import PopularProductsService
 
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+@router.get("/popular")
+async def get_popular_products(
+    cache: RedisClient,
+    limit: int = Query(default=10, le=20)
+) -> list[SearchProduct]:
+    """Get popular products."""
+    service = PopularProductsService(cache)
+    products = await service.get_popular_products(limit)
+    return products
 
 
 @router.get("/collection/{type}")
@@ -517,10 +528,8 @@ async def reindex_products(background_tasks: BackgroundTasks, redis: RedisClient
 
 @router.get("/{slug}")
 @cache_response("product", key=lambda request, slug, **kwargs: slug)
-async def read(slug: str, request: Request):
-    """
-    Get a specific product by slug with Redis caching.
-    """
+async def read(request: Request, slug: str):
+    """Get a specific product by slug with Redis caching."""
     product = await db.product.find_unique(
         where={"slug": slug},
         include={

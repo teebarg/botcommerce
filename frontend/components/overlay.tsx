@@ -31,7 +31,7 @@ const Overlay: React.FC<OverlayProps> = ({
         return (
             <Sheet open={open} onOpenChange={onOpenChange}>
                 <SheetTrigger asChild>{trigger}</SheetTrigger>
-                <SheetContent className={sheetClassName} aria-describedby={undefined}>
+                <SheetContent aria-describedby={undefined} className={sheetClassName}>
                     <SheetHeader className={showHeader ? "" : "sr-only"}>
                         <SheetTitle>{title}</SheetTitle>
                     </SheetHeader>

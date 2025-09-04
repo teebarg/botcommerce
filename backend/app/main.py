@@ -1,3 +1,4 @@
+import asyncio
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager
@@ -20,8 +21,14 @@ from app.services.meilisearch import get_or_create_index
 
 from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
-logger = get_logger(__name__)
 
+from app.services.consumer import handle_event
+
+STREAM_NAME = "EVENT_STREAMS"
+GROUP_NAME = "notifications"
+CONSUMER_NAME = "notif-api-worker"
+
+logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,7 +44,51 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"❌ ~ failed to connect to redis......: {e}")
 
+    try:
+        await redis_client.xgroup_create(STREAM_NAME, GROUP_NAME, id="0", mkstream=True)
+    except Exception:
+        pass
+
+    shutdown_event = asyncio.Event()
+
+    async def consume():
+        logger.debug("Consumer started......")
+        try:
+            while not shutdown_event.is_set():
+                events = await redis_client.xreadgroup(
+                    GROUP_NAME,
+                    CONSUMER_NAME,
+                    streams={STREAM_NAME: ">"},
+                    count=10,
+                    block=5000,
+                    )
+                if not events:
+                    continue
+
+                for stream, messages in events:
+                    for msg_id, data in messages:
+                        logger.debug(f"Processing event: {data}")
+                        try:
+                            await handle_event(data)
+                            await redis_client.xack(STREAM_NAME, GROUP_NAME, msg_id)
+                        except Exception as e:
+                            logger.error(f"Failed to handle order event: {str(e)}")
+        except Exception as e:
+            logger.exception(f"Unexpected error in consumer: {e}")
+            await asyncio.sleep(1)
+    consumer_task = asyncio.create_task(consume())
+
     yield
+    shutdown_event.set()
+    consumer_task.cancel()
+
+    try:
+        await asyncio.wait_for(consumer_task, timeout=5.0)
+    except asyncio.TimeoutError:
+        logger.warning("❌ ~ Consumer task didn't stop gracefully")
+    except asyncio.CancelledError:
+        pass
+
     await db.disconnect()
     try:
         await redis_client.close()

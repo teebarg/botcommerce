@@ -41,6 +41,10 @@ class CacheService:
     def __init__(self, redis: Redis):
         self.redis = redis
 
+    @handle_redis_errors(default=False)
+    def redis(self) -> Redis:
+        return self.redis
+
     @handle_redis_errors(default=[])
     def keys(self, pattern: str) -> list[str]:
         return self.redis.keys(pattern)
@@ -151,9 +155,29 @@ class CacheService:
         Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
         """
         stream_key = f"events:{event_name}"
-        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
+        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)} 
         await self.redis.xadd(stream_key, data)
         return True
+
+    @handle_redis_errors(default=False)
+    async def zadd(self, key: str, mapping: dict) -> bool:
+        return await self.redis.zadd(key, mapping)
+
+    @handle_redis_errors(default=[])
+    async def zrevrange(self, key: str, start: int, end: int) -> list:
+        return await self.redis.zrevrange(key, start, end)
+
+    @handle_redis_errors(default=0)
+    async def zremrangebyrank(self, key: str, start: int, end: int) -> int:
+        return await self.redis.zremrangebyrank(key, start, end)
+
+    @handle_redis_errors(default=0)
+    async def zincrby(self, key: str, amount: float, member: str) -> float:
+        return await self.redis.zincrby(key, amount, member)
+
+    @handle_redis_errors(default=[])
+    async def zrange(self, key: str, start: int, end: int, withscores: bool = False) -> list:
+        return await self.redis.zrange(key, start, end, withscores=withscores)
 
 async def get_redis_dependency(request: Request):
     return CacheService(request.app.state.redis)

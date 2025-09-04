@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
-import { PaginatedUser, User, Wishlist } from "@/schemas";
+import { PaginatedUser, ProductSearch, User, Wishlist } from "@/schemas";
 
 export const useMe = () => {
     return useQuery({
@@ -82,6 +82,16 @@ export const useUserWishlist = () => {
     return useQuery({
         queryKey: ["wishlist"],
         queryFn: async () => await api.get<Wishlist>("/users/wishlist"),
+        enabled: Boolean(session?.user),
+    });
+};
+
+export const useUserRecentlyViewed = (limit: number = 12) => {
+    const { data: session } = useSession();
+
+    return useQuery({
+        queryKey: ["recently-viewed"],
+        queryFn: async () => await api.get<ProductSearch[]>("/users/recently-viewed", { params: { limit } }),
         enabled: Boolean(session?.user),
     });
 };
