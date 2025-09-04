@@ -21,7 +21,6 @@ class RecentlyViewedService:
         # Add to sorted set with timestamp as score
         await self.cache.zadd(key, {str(product_id): timestamp})
 
-        #keep only latest
         await self.cache.zremrangebyrank(key, 0, -(self.max_items + 1))
 
         await manager.send_to_user(
@@ -39,12 +38,8 @@ class RecentlyViewedService:
 
         products = []
         for pid in product_ids:
-            # product_key = f"product:{pid}"
             product = index.get_document(int(pid))
             if product:
                 products.append(product)
-            # product_data = await self.cache.hgetall(product_key)
-            # if product_data:
-            #     products.append(product_data)
 
         return products

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, BackgroundTasks
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from app.core.deps import (
     CurrentUser,
     get_current_superuser,
@@ -23,11 +23,10 @@ async def create_order(
     cache: RedisClient,
     order_in: OrderCreate,
     user: CurrentUser,
-    background_tasks: BackgroundTasks,
     cartId: str = Header(default=None),
 ):
     try:
-        order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId, redis=cache.redis, background_tasks=background_tasks)
+        order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId, redis=cache.redis)
         await cache.invalidate_list_cache("orders")
         return order
     except Exception as e:

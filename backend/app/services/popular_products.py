@@ -60,10 +60,9 @@ class PopularProductsService:
     async def decay_scores(self, decay_factor: float = 0.95):
         """Decay popularity scores over time"""
         try:
-            # Get all product scores
             products = await self.cache.zrange(self.POPULARITY_KEY, 0, -1, withscores=True)
 
-            # Apply decay factor to each score
+            # Apply decay factor
             for product_id, score in products:
                 new_score = score * decay_factor
                 await self.cache.zadd(self.POPULARITY_KEY, {product_id: new_score})

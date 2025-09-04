@@ -81,7 +81,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}", response_model=OrderResponse)
-async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient, background_tasks: BackgroundTasks):
+async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient):
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -101,7 +101,7 @@ async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient, 
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number, redis=cache.redis, background_tasks=background_tasks)
+            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number, redis=cache.redis)
             await publish_order_event(cache=cache.redis, order=order, type="ORDER_PAID")
 
             event = {

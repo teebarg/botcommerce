@@ -58,6 +58,17 @@ async def handle_order_created(event):
                 "to_status": OrderStatus.PENDING,
             }
         )
+        order_items = await db.orderitem.find_many(
+            where={
+                "order_id": int(event["order_id"]),
+            },
+            include={
+                "variant": True,
+            }
+        )
+        service = PopularProductsService(cache=get_cache())
+        for item in order_items:
+            await service.track_product_interaction(product_id=item.variant.product_id, interaction_type="purchase")
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")
         raise Exception(f"Database error: {str(e)}")
