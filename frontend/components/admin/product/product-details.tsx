@@ -103,7 +103,7 @@ export function ProductDetails() {
                             products?.map((product: Product, idx: number) => (
                                 <TableRow key={idx} className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1">
                                     <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        {(pagination?.skip - 1) * LIMIT + idx + 1}
+                                        {(pagination?.skip) * LIMIT + idx + 1}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
                                         <Image
