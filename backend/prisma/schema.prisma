@@ -198,6 +198,7 @@ model Product {
   description        String?
   features           String[]
   image              String?            @db.VarChar(255)
+  active             Boolean            @default(true)
   variants           ProductVariant[]
   ratings            Float?             @default(0)
   categories         Category[]         @relation("ProductCategories")
@@ -345,17 +346,18 @@ model OrderTimeline {
 
 // OrderItem Model
 model OrderItem {
-  id         Int            @id @default(autoincrement())
+  id         Int             @id @default(autoincrement())
   name       String?
-  order      Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order      Order           @relation(fields: [order_id], references: [id], onDelete: Cascade)
   order_id   Int
-  variant    ProductVariant @relation(fields: [variant_id], references: [id], onDelete: NoAction)
-  variant_id Int
+  variant    ProductVariant? @relation(fields: [variant_id], references: [id], onDelete: SetNull)
+  variant_id Int?
+  active     Boolean         @default(true)
   image      String?
   quantity   Int
-  price      Float          @db.DoublePrecision
-  created_at DateTime       @default(now())
-  updated_at DateTime       @updatedAt
+  price      Float           @db.DoublePrecision
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
 
   @@map("order_items")
 }

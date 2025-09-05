@@ -41,7 +41,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             id: "http-email",
             name: "Email",
             type: "email",
-            maxAge: 60 * 60,
+            maxAge: 60 * 60 * 24 * 7,
             async sendVerificationRequest({ identifier: email, url }) {
                 const { error } = await tryCatch<Message>(serverApi.post<Message>("/auth/send-magic-link", { email, url }));
 
@@ -151,7 +151,7 @@ async function generateJoseToken(email: string) {
         })
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
-            .setExpirationTime("24h")
+            .setExpirationTime("7d")
             .sign(new TextEncoder().encode(process.env.AUTH_SECRET!));
 
         return jwt;
