@@ -1,25 +1,19 @@
 "use client";
 
-import { Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { ProductDetails } from "../admin/product/product-details";
+import { ProductDetails } from "@/components/admin/product/product-details";
 
 import ProductUpload from "./product-upload";
 
 import { Button } from "@/components/ui/button";
-import { useBustCache, useExportProducts, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
+import { useBustCache, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
 
 export function ProductInventory() {
-    const exportProducts = useExportProducts();
     const reIndexProducts = useReIndexProducts();
     const bustCache = useBustCache();
     const flushCache = useFlushCache();
     const router = useRouter();
-
-    const handleExport = () => {
-        exportProducts.mutate();
-    };
 
     const handleReIndex = () => {
         reIndexProducts.mutate();
@@ -45,9 +39,6 @@ export function ProductInventory() {
             <div className="flex flex-wrap gap-2 mb-2">
                 <Button variant="primary" onClick={() => router.push("/admin/products/create")}>
                     Create Product
-                </Button>
-                <Button disabled={exportProducts.isPending} isLoading={exportProducts.isPending} variant="outline" onClick={handleExport}>
-                    <Download className="mr-2 h-4 w-4" /> Export Products
                 </Button>
                 <Button
                     className="min-w-32"

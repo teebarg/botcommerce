@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useProduct";
 import { Textarea } from "@/components/ui/textarea";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type FormProduct = Omit<Partial<Product>, "brand" | "images" | "variants" | "categories" | "collections"> & {
     brand?: number;
@@ -43,10 +44,11 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         categories: currentProduct?.categories?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         collections: currentProduct?.collections?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         brand: 1,
+        active: currentProduct?.active ?? true,
         variants: currentProduct?.variants ?? [],
     });
 
-    const updateField = (field: keyof FormProduct, value: string | number | SelectOption[]) => {
+    const updateField = (field: keyof FormProduct, value: string | number | SelectOption[] | boolean) => {
         const updatedDetails = { ...product, [field]: value };
 
         setProduct((prev) => ({ ...prev, ...updatedDetails }));
@@ -75,6 +77,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
             brand_id: product.brand || undefined,
             category_ids: product.categories?.map((c) => c.value) || [],
             collection_ids: product.collections?.map((c) => c.value) || [],
+            active: product.active,
             variants: [newVariant],
         };
 
@@ -128,6 +131,13 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                         </div>
                     </div>
                 </Card>
+
+                <div className="flex items-center gap-2">
+                    <Checkbox id="active" checked={product.active} onCheckedChange={(checked) => updateField("active", checked)} />
+                    <Label className="text-sm font-medium" htmlFor="active">
+                        Active
+                    </Label>
+                </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                     <Card className="p-4 bg-card shadow-sm">

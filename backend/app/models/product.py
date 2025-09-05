@@ -21,6 +21,7 @@ class ProductCreate(BaseModel):
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
+    active: Optional[bool] = True
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1)
@@ -30,6 +31,7 @@ class ProductUpdate(BaseModel):
     category_ids: Optional[List[int]] = None
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
+    active: Optional[bool] = True
 
 class ReviewCreate(BaseModel):
     product_id: int = Field(..., gt=0)
@@ -52,6 +54,7 @@ class Product(BM):
     tags: Optional[List[Tag]] = []
     images: Optional[List[ProductImage]] = []
     reviews: Optional[List[Review]] = []
+    active: Optional[bool] = True
 
 class SearchProduct(BaseModel):
     id: int
@@ -73,6 +76,9 @@ class SearchProduct(BaseModel):
     variants: Optional[List[ProductVariant]] = []
     average_rating: Optional[float] = None
     review_count: Optional[int] = None
+    max_variant_price: Optional[float] = None
+    min_variant_price: Optional[float] = None
+    active: Optional[bool] = True
 
 class Facets(BaseModel):
     brand: Optional[dict[str, int]] = None

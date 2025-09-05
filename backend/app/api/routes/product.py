@@ -31,7 +31,9 @@ from app.services.meilisearch import (
     delete_document,
     delete_index,
     get_or_create_index,
-    ensure_index_ready
+    ensure_index_ready,
+    REQUIRED_FILTERABLES,
+    REQUIRED_SORTABLES
 )
 from app.prisma_client import prisma as db
 from math import ceil
@@ -60,11 +62,13 @@ async def get_popular_products(
 
 @router.get("/collection/{type}")
 @cache_response("products", key=lambda request, type, skip, limit, **kwargs: type)
-async def get_trending_products(request: Request, type: str = "trending", skip: int = Query(default=0), limit: int = Query(default=20)) -> list[SearchProduct]:
+async def get_trending_products(request: Request, type: str = "trending", active: bool = Query(default=True), skip: int = Query(default=0), limit: int = Query(default=20)) -> list[SearchProduct]:
     """
     Retrieve collection products.
     """
     filters = [f"collection_slugs IN [{type}]", "min_variant_price >= 1"]
+    if active is not None:
+        filters.append(f"active = {active}")
     search_params = {
         "limit": limit,
         "offset": skip,
@@ -157,25 +161,24 @@ async def index(
     request: Request,
     query: str = "",
     brand: str = Query(default=""),
+    active: bool = Query(default=True),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> Products:
     """
     Retrieve products.
     """
-    where_clause = None
+    where_clause = {
+        "active": active
+    }
     if brand:
-        where_clause = {
-            "brand": {"name": {"contains": brand, "mode": "insensitive"}}
-        }
+        where_clause["brand"] = {"name": {"contains": brand, "mode": "insensitive"}}
     if query:
-        where_clause = {
-            "OR": [
-                {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}},
-                {"description": {"contains": query, "mode": "insensitive"}}
-            ]
-        }
+        where_clause["OR"] = [
+            {"name": {"contains": query, "mode": "insensitive"}},
+            {"slug": {"contains": query, "mode": "insensitive"}},
+            {"description": {"contains": query, "mode": "insensitive"}}
+        ]
     products = await db.product.find_many(
         where=where_clause,
         skip=skip,
@@ -211,6 +214,7 @@ async def public_search(
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
     limit: int = Query(default=20, le=100),
+    active: bool = Query(default=True),
 ) -> list[SearchProduct]:
     """
     Retrieve products using Meilisearch, sorted by latest.
@@ -223,6 +227,7 @@ async def public_search(
     if min_price and max_price:
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+    filters.append(f"active = {active}")
 
     search_params = {
         "limit": limit,
@@ -281,6 +286,7 @@ async def search(
     min_price: int = Query(default=1, gt=0),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
+    active: bool = Query(default=True),
 ) -> SearchProducts:
     """
     Retrieve products using Meilisearch, sorted by latest.
@@ -296,6 +302,7 @@ async def search(
     if min_price and max_price:
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+    filters.append(f"active = {active}")
 
     search_params = {
         "limit": limit,
@@ -383,6 +390,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         "sku": generate_sku(),
         "description": product.description,
         "brand": {"connect": {"id": product.brand_id}},
+        "active": product.active,
     }
 
     if product.category_ids:
@@ -433,6 +441,7 @@ async def create_product_bundle(
                 "slug": slugified_name,
                 "sku": generate_sku(),
                 "description": payload.description,
+                "active": True,
             }
 
             if payload.brand_id is not None:
@@ -571,6 +580,8 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
         update_data["collections"] = {"set": collection_ids}
     if product.brand_id is not None:
         update_data["brand"] = {"connect": {"id": product.brand_id}}
+    if product.active is not None:
+        update_data["active"] = product.active
 
     try:
         updated_product = await db.product.update(
@@ -1012,6 +1023,7 @@ async def create_image_metadata(
                 "slug": slugified_name,
                 "sku": generate_sku(),
                 "description": payload.description,
+                "active": True,
             }
 
             if payload.brand_id is not None:
@@ -1104,6 +1116,8 @@ async def update_image_metadata(
                 update_data["collections"] = {"set": collection_ids}
             if payload.brand_id is not None:
                 update_data["brand"] = {"connect": {"id": payload.brand_id}}
+            if payload.active is not None:
+                update_data["active"] = payload.active
 
             await tx.product.update(
                 where={"id": existing_image.product_id},

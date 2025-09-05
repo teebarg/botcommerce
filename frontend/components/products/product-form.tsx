@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
 import { Brand, Category, Collection, Product } from "@/schemas/product";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -22,6 +23,7 @@ const formSchema = z.object({
     categories: z.array(z.any()),
     collections: z.array(z.any()),
     brand: z.number(),
+    active: z.boolean(),
 });
 
 interface ProductFormProps {
@@ -45,6 +47,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
             brand: product?.brand?.id || 1,
             categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
             collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],
+            active: product?.active,
         },
     });
 
@@ -168,6 +171,21 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                             </Select>
                                         </FormControl>
                                         <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="active"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                        <FormControl>
+                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel className="text-sm text-default-500">Active {field.value}</FormLabel>
+                                            <FormMessage />
+                                        </div>
                                     </FormItem>
                                 )}
                             />

@@ -11,6 +11,10 @@ from meilisearch.errors import MeilisearchApiError
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
+REQUIRED_FILTERABLES = ["id", "brand", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
+                "review_count", "max_variant_price", "min_variant_price", "active"]
+REQUIRED_SORTABLES = ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count", "active"]
+
 
 class CustomEncoder(JSONEncoder):
     def default(self, o):
@@ -24,10 +28,6 @@ def ensure_index_ready(index):
     Ensures that the given Meilisearch index has the required
     filterable and sortable attributes.
     """
-    REQUIRED_FILTERABLES = ["id", "brand", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
-                "review_count", "max_variant_price", "min_variant_price"]
-    REQUIRED_SORTABLES = ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count"]
-    
     filter_task = index.update_filterable_attributes(REQUIRED_FILTERABLES)
     index.wait_for_task(filter_task.task_uid)
 

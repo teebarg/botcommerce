@@ -19,6 +19,7 @@ import { useBrands } from "@/lib/hooks/useBrand";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
 import PaginationUI from "@/components/pagination";
+import { cn } from "@/lib/utils";
 
 const LIMIT = 10;
 
@@ -103,20 +104,24 @@ export function ProductDetails() {
                             products?.map((product: Product, idx: number) => (
                                 <TableRow key={idx} className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1">
                                     <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        {(pagination?.skip) * LIMIT + idx + 1}
+                                        {pagination?.skip * LIMIT + idx + 1}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <Image
-                                            alt={product.name}
-                                            blurDataURL="/placeholder.jpg"
-                                            className="rounded"
-                                            height={40}
-                                            placeholder="blur"
-                                            src={
-                                                product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"
-                                            }
-                                            width={40}
-                                        />
+                                        <div className={cn("rounded-md overflow-hidden", product.active ? "" : "ring-2 ring-red-300")}>
+                                            <Image
+                                                alt={product.name}
+                                                blurDataURL="/placeholder.jpg"
+                                                className="w-full"
+                                                height={40}
+                                                placeholder="blur"
+                                                src={
+                                                    product.images?.sort((a, b) => a.order - b.order)?.[0]?.image ||
+                                                    product?.image ||
+                                                    "/placeholder.jpg"
+                                                }
+                                                width={40}
+                                            />
+                                        </div>
                                     </TableCell>
                                     <TableCell className="font-medium">{product.name}</TableCell>
                                     <TableCell>{product.description}</TableCell>

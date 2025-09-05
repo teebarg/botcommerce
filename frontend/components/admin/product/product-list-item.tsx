@@ -29,6 +29,9 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
                 <Badge className="absolute top-2 right-2 shadow-sm" variant={outOfStock ? "destructive" : "emerald"}>
                     {outOfStock ? "Out of Stock" : "In Stock"}
                 </Badge>
+                <Badge className="absolute top-2 left-2 shadow-sm" variant={product.active ? "emerald" : "destructive"}>
+                    {product.active ? "Active" : "Inactive"}
+                </Badge>
             </div>
             <div className="p-3 flex flex-col justify-end flex-1">
                 <div className="text-sm text-primary font-medium mb-1">

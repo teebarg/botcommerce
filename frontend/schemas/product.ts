@@ -100,6 +100,7 @@ export const ProductSchema = z
         images: z.array(ProductImageSchema),
         reviews: z.array(ReviewSchema),
         favorites: z.null(),
+        active: z.boolean(),
     })
     .merge(AuditSchema);
 
@@ -132,6 +133,7 @@ export const ProductSearchSchema = z.object({
     review_count: z.number(),
     max_variant_price: z.number(),
     min_variant_price: z.number(),
+    active: z.boolean(),
 });
 
 export const SharedSchema = z
