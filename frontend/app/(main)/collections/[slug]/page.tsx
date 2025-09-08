@@ -19,6 +19,8 @@ type SearchParams = Promise<{
     cat_ids?: string;
     maxPrice?: string;
     minPrice?: string;
+    sizes?: string;
+    colors?: string;
 }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
@@ -33,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 }
 
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
-    const { minPrice, maxPrice, cat_ids, sortBy } = (await searchParams) || {};
+    const { minPrice, maxPrice, cat_ids, sortBy, sizes, colors } = (await searchParams) || {};
     const { slug } = await params;
     const { data: collection } = await tryCatch<Collection>(serverApi.get(`/collection/slug/${slug}`));
 
@@ -48,6 +50,8 @@ export default async function CollectionPage({ params, searchParams }: { params:
         min_price: minPrice ?? 0,
         collections: collection?.slug,
         categories: cat_ids,
+        sizes: sizes,
+        colors: colors,
     };
 
     const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { skip: 0, ...queryParams } }));

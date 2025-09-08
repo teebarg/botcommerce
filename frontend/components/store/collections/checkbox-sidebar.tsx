@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
 
@@ -10,6 +10,8 @@ import LocalizedClientLink from "@/components/ui/link";
 import { Category, Collection, Facet } from "@/schemas/product";
 import { Separator } from "@/components/ui/separator";
 import ClientOnly from "@/components/generic/client-only";
+import { SIZE_OPTIONS } from "@/lib/constants";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ComponentProps {
     collections?: Collection[];
@@ -18,7 +20,7 @@ interface ComponentProps {
 }
 
 const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories, facets }) => {
-    // const [dataSet, setDataSet] = useState(new Set());
+    const [dataSet, setDataSet] = useState(new Set());
     const searchParams = useSearchParams();
     const { updateQuery } = useUpdateQuery();
 
@@ -31,29 +33,29 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories,
         ]);
     };
 
-    // const onBrandChange = (checked: boolean, slug: string) => {
-    //     const newSet = new Set(dataSet);
+    const onSizeChange = (checked: boolean, slug: string) => {
+        const newSet = new Set(dataSet);
 
-    //     if (checked) {
-    //         newSet.add(slug);
-    //     } else {
-    //         newSet.delete(slug);
-    //     }
+        if (checked) {
+            newSet.add(slug);
+        } else {
+            newSet.delete(slug);
+        }
 
-    //     setDataSet(newSet);
-    //     updateQuery([{ key: "brand_id", value: Array.from(newSet).join(",") }]);
-    // };
+        setDataSet(newSet);
+        updateQuery([{ key: "sizes", value: Array.from(newSet).join(",") }]);
+    };
 
-    // useEffect(() => {
-    //     const brandIdsFromURL = searchParams.get("brand_id")?.split(",") || [];
+    useEffect(() => {
+        const sizesFromURL = searchParams.get("sizes")?.split(",") || [];
 
-    //     const newSet = new Set(brandIdsFromURL);
+        const newSet = new Set(sizesFromURL);
 
-    //     setDataSet(newSet);
-    // }, [searchParams]);
+        setDataSet(newSet);
+    }, [searchParams]);
 
     return (
-        <div className="h-full min-w-[20rem] md:max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-content1 rounded-xl">
+        <div className="h-full min-w-[20rem] md:max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-content1 rounded-xl pb-12">
             <ClientOnly>
                 <div className="w-full max-w-sm p-6">
                     <div>
@@ -78,29 +80,29 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories,
                     />
                     <div className="flex flex-col mt-6">
                         <span className="mb-2 text-sm">Categories</span>
-                        <div className="max-h-[35vh] overflow-y-scroll">
+                        <div className="max-h-[25vh] overflow-y-scroll">
                             {(categories || []).map((item: Category, idx: number) => (
                                 <CheckboxGroup key={idx} checkboxes={item.subcategories} facets={facets} groupName={item.slug} item={item as any} />
                             ))}
                         </div>
                     </div>
-                    {/* <div className="flex flex-col mt-6">
-                        <span className="text-sm">Brands</span>
-                        <div className="max-h-[20vh] overflow-y-scroll">
-                            {brands?.map((item: Brand, idx: number) => (
-                                <div key={`brand-${idx}`} className="flex justify-between mt-2">
+                    <div className="flex flex-col mt-6">
+                        <span className="text-sm">Sizes</span>
+                        <div className="max-h-[25vh] overflow-y-scroll">
+                            {SIZE_OPTIONS?.map((item: string, idx: number) => (
+                                <div key={`size-${idx}`} className="flex justify-between mt-2">
                                     <div className="flex items-center gap-1">
                                         <Checkbox
-                                            checked={dataSet.has(item.slug)}
-                                            onCheckedChange={(checked) => onBrandChange(checked == "indeterminate" ? false : checked, item.slug)}
+                                            checked={dataSet.has(item)}
+                                            onCheckedChange={(checked) => onSizeChange(checked == "indeterminate" ? false : checked, item)}
                                         />
-                                        <label>{item.name}</label>
+                                        <label>Uk {item}</label>
                                     </div>
-                                    {facets?.brand && <span>({facets["brand"][item.name] ?? 0})</span>}
+                                    {facets?.sizes && <span>({facets["sizes"][item] ?? 0})</span>}
                                 </div>
                             ))}
                         </div>
-                    </div> */}
+                    </div>
                 </div>
             </ClientOnly>
         </div>

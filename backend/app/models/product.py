@@ -79,11 +79,15 @@ class SearchProduct(BaseModel):
     max_variant_price: Optional[float] = None
     min_variant_price: Optional[float] = None
     active: Optional[bool] = True
+    sizes: Optional[List[str]] = None
+    colors: Optional[List[str]] = None
 
 class Facets(BaseModel):
     # brand: Optional[dict[str, int]] = None
     category_slugs: Optional[dict[str, int]] = None
     collection_slugs: Optional[dict[str, int]] = None
+    sizes: Optional[dict[str, int]] = None
+    colors: Optional[dict[str, int]] = None
 
 class SearchProducts(BaseModel):
     products: List[SearchProduct]

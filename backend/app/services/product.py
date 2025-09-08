@@ -170,6 +170,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         product_dict["status"] = "IN STOCK"
     else:
         product_dict["status"] = "OUT OF STOCK"
+    product_dict["sizes"] = [v["size"] for v in variants if v.get("size") is not None]
+    product_dict["colors"] = [v["color"] for v in variants if v.get("color") is not None]
 
     return product_dict
 

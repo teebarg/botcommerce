@@ -212,6 +212,8 @@ async def public_search(
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
+    sizes: str = Query(default=""),
+    colors: str = Query(default=""),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
 ) -> list[SearchProduct]:
@@ -226,6 +228,10 @@ async def public_search(
     if min_price and max_price:
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+    if sizes:
+        filters.append(f"sizes IN [{sizes}]")
+    if colors:
+        filters.append(f"colors IN [{colors}]")
     filters.append(f"active = {active}")
 
     search_params = {
@@ -282,6 +288,8 @@ async def search(
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
+    sizes: str = Query(default=""),
+    colors: str = Query(default=""),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
@@ -301,12 +309,16 @@ async def search(
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
     filters.append(f"active = {active}")
+    if sizes:
+        filters.append(f"sizes IN [{sizes}]")
+    if colors:
+        filters.append(f"colors IN [{colors}]")
 
     search_params = {
         "limit": limit,
         "offset": skip,
         "sort": [sort],
-        "facets": ["category_slugs", "collection_slugs"],
+        "facets": ["category_slugs", "collection_slugs", "sizes", "colors"],
     }
 
     if filters:

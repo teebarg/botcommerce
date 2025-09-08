@@ -103,6 +103,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                                             products={collection.products}
                                             onAdd={handleAddToCollection}
                                             onRemove={handleRemoveFromCollection}
+                                            isPending={addProductMutation.isPending || removeProductMutation.isPending}
                                         />
                                     ))}
                                 </div>
@@ -121,9 +122,10 @@ interface CollectionItemProps {
     products: ProductSearch[];
     onAdd: (collectionId: number) => void;
     onRemove: (collectionId: number) => void;
+    isPending: boolean;
 }
 
-const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, onAdd, onRemove, products }) => {
+const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, onAdd, onRemove, products, isPending = false }) => {
     const hasProduct = products?.some((product) => product.id === productId) || false;
 
     return (
@@ -160,7 +162,14 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, 
                             </Button>
                         </div>
                     ) : (
-                        <Button className="text-xs" disabled={!collection.is_active} size="sm" variant="outline" onClick={() => onAdd(collection.id)}>
+                        <Button
+                            className="text-xs"
+                            disabled={!collection.is_active || isPending}
+                            size="sm"
+                            variant="outline"
+                            onClick={() => onAdd(collection.id)}
+                            isLoading={isPending}
+                        >
                             <Plus className="h-3 w-3 mr-1" />
                             Add
                         </Button>

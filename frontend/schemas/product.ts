@@ -132,6 +132,8 @@ export const ProductSearchSchema = z.object({
     max_variant_price: z.number(),
     min_variant_price: z.number(),
     active: z.boolean(),
+    sizes: z.array(z.string()),
+    colors: z.array(z.string()),
 });
 
 export const SharedSchema = z
@@ -153,6 +155,8 @@ export const PaginatedSharedSchema = PagSchema.extend({
 export const FacetSchema = z.object({
     category_slugs: z.record(z.string()).optional(),
     collection_slugs: z.record(z.string()).optional(),
+    sizes: z.record(z.string()).optional(),
+    colors: z.record(z.string()).optional(),
 });
 
 export const PaginatedProductSearchSchema = PagSchema.extend({

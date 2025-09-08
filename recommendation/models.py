@@ -76,6 +76,8 @@ class SearchProduct(BaseModel):
     max_variant_price: Optional[float] = None
     min_variant_price: Optional[float] = None
     active: Optional[bool] = True
+    sizes: Optional[List[str]] = None
+    colors: Optional[List[str]] = None
 
 
 class RecommendationResponse(BaseModel):
