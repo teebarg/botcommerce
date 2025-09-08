@@ -8,10 +8,9 @@ import { useState } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
-import { Brand, Category, Collection, Product } from "@/schemas/product";
+import { Category, Collection, Product } from "@/schemas/product";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -22,7 +21,6 @@ const formSchema = z.object({
     description: z.string(),
     categories: z.array(z.any()),
     collections: z.array(z.any()),
-    brand: z.number(),
     active: z.boolean(),
 });
 
@@ -31,10 +29,9 @@ interface ProductFormProps {
     onClose: () => void;
     collections: Collection[];
     categories: Category[];
-    brands: Brand[];
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections, categories, brands }) => {
+const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections, categories }) => {
     const [isPending, setIsPending] = useState<boolean>(false);
     const createProduct = useCreateProduct();
     const updateProduct = useUpdateProduct();
@@ -44,7 +41,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
         defaultValues: {
             name: product?.name || "",
             description: product?.description || "",
-            brand: product?.brand?.id || 1,
             categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
             collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],
             active: product?.active,
@@ -52,7 +48,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        const { brand, categories, collections, ...data } = values;
+        const { categories, collections, ...data } = values;
         const categoryIds = categories.map((category) => category.value);
         const collectionIds = collections.map((collection) => collection.value);
 
@@ -62,7 +58,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                 ...data,
                 category_ids: categoryIds,
                 collection_ids: collectionIds,
-                brand_id: brand,
             };
 
             if (product?.id) {
@@ -82,7 +77,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
     }
 
     return (
-        <div className="overflow-y-auto flex flex-col pb-4 mt-4">
+        <div className="overflow-y-auto flex flex-col pb-4 mt-4 min-h-[70vh]">
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="w-full h-full">
@@ -152,30 +147,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                             />
                             <FormField
                                 control={form.control}
-                                name="brand"
-                                render={({ field }) => (
-                                    <FormItem className="md:col-span-2">
-                                        <FormLabel>Brand</FormLabel>
-                                        <FormControl>
-                                            <Select defaultValue={field.value.toString()} onValueChange={(e) => field.onChange(Number(e))}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select brand" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {brands?.map((brand) => (
-                                                        <SelectItem key={brand.id} value={brand.id.toString()}>
-                                                            {brand.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
                                 name="active"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-row items-start space-x-3 space-y-0">
@@ -183,7 +154,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                         </FormControl>
                                         <div className="space-y-1 leading-none">
-                                            <FormLabel className="text-sm text-default-500">Active {field.value}</FormLabel>
+                                            <FormLabel className="text-sm text-default-500">Show in Store</FormLabel>
                                             <FormMessage />
                                         </div>
                                     </FormItem>

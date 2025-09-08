@@ -5,7 +5,7 @@ import { Eye } from "lucide-react";
 
 import { useUserRecentlyViewed } from "@/lib/hooks/useUser";
 import { ProductSearch } from "@/schemas";
-import ProductCard from "@/components/store/products/product-card";
+import ProductCard from "@/components/store/products/product-card2";
 import PromotionalBanner from "@/components/promotion";
 
 export default function RecentlyViewedSection() {

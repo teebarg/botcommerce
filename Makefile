@@ -113,3 +113,21 @@ pre-commit-docker:
     "docker exec shop-frontend-1 npm run build" \
 	"docker exec shop-backend-1 ./scripts/lint.sh" \
 	"docker exec shop-backend-1 ./scripts/test.sh"
+
+
+# build docker image and push to docker hub
+stage: docker-build docker-push
+	@echo "$(YELLOW)Building docker image and pushing to docker hub...$(RESET)"
+	@$(MAKE) -s docker-build docker-push
+	@echo "$(YELLOW)Docker image built and pushed to docker hub...$(RESET)"
+
+
+docker-build: ## Build docker image
+	@echo "$(YELLOW)Building docker image...$(RESET)"
+	@docker build -t $(DOCKER_HUB)/$(APP_NAME):latest -t $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD) -f backend/Dockerfile backend
+
+
+docker-push: ## Push docker image (latest and sha)
+	@echo "$(YELLOW)Pushing docker image...$(RESET)"
+	@docker push $(DOCKER_HUB)/$(APP_NAME):latest
+	@docker push $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD)

@@ -100,7 +100,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
                 {isOpen && !disabled && (
-                    <div className="absolute z-40 mt-1 w-full rounded-md border max-h-60 overflow-auto border-default-200 bg-background py-1 shadow-lg">
+                    <div className="absolute z-40 mt-1 w-full rounded-md border min-h-40 max-h-60 overflow-auto border-default-200 bg-background py-1 shadow-lg">
                         {options.length > 0 ? (
                             options.map((option) => {
                                 const isSelected = selectedItems.some((item) => item.value === option.value);

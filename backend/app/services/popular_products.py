@@ -1,8 +1,10 @@
 from typing import List
 from app.services.redis import CacheService
-from app.core.logging import logger
+from app.core.logging import get_logger
 from app.core.config import settings
 from app.services.meilisearch import get_or_create_index
+
+logger = get_logger(__name__)
 
 class PopularProductsService:
     def __init__(self, cache: CacheService):
@@ -37,15 +39,31 @@ class PopularProductsService:
 
             products = []
             for pid in product_ids:
-                product = index.get_document(int(pid))
-                if product:
-                    products.append(product)
+                try:
+                    product = index.get_document(int(pid))
+                    if product:
+                        products.append(product)
+                except Exception as e:
+                    logger.error(f"Error getting popular product: {str(e)}")
 
             return products
 
         except Exception as e:
             logger.error(f"Error getting popular products: {str(e)}")
             return []
+
+    async def remove_product(self, product_id: int):
+        """Remove a product from the popular products list"""
+        try:
+            await self.cache.zrem(self.POPULARITY_KEY, str(product_id))
+        except Exception as e:
+            logger.error(f"Error removing product from popular products: {str(e)}")
+
+    async def remove_product_from_all(self, product_id: int):
+        """Remove a product from all users' popular products list"""
+        keys = await self.cache.keys("popular_products*")
+        for key in keys:
+            await self.cache.zrem(key, str(product_id))
 
     async def decay_scores(self, decay_factor: float = 0.95):
         """Decay popularity scores over time"""

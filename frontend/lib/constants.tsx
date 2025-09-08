@@ -24,5 +24,22 @@ export const paymentInfoMap: Record<string, { title: string; description: string
     },
 };
 
-export const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
-export const COLOR_OPTIONS = ["Red", "Blue", "Green", "Black", "White"];
+export const SIZE_OPTIONS = ["6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
+export const COLOR_OPTIONS = [
+    "Red",
+    "Blue",
+    "Green",
+    "Black",
+    "White",
+    "Gray",
+    "Yellow",
+    "Purple",
+    "Orange",
+    "Pink",
+    "Brown",
+    "Cyan",
+    "Magenta",
+    "Teal",
+    "Indigo",
+    "Wine",
+];

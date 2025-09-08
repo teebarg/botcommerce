@@ -2,10 +2,9 @@
 
 import { useRouter } from "next/navigation";
 
-import { ProductDetails } from "@/components/admin/product/product-details";
-
 import ProductUpload from "./product-upload";
 
+import { ProductDetails } from "@/components/admin/product/product-details";
 import { Button } from "@/components/ui/button";
 import { useBustCache, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
 

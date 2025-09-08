@@ -19,8 +19,6 @@ async def reindex_product(cache: CacheService, product_id: int):
             include={
                 "variants": True,
                 "categories": True,
-                "brand": True,
-                "tags": True,
                 "images": True,
                 "collections": True,
                 "reviews": True,
@@ -64,7 +62,6 @@ async def index_products(cache: CacheService):
                 "variants": True,
                 "categories": True,
                 "collections": True,
-                "brand": True,
                 "images": True,
                 "reviews": True,
             }
@@ -145,8 +142,6 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
 
     product_dict["collection_slugs"] = [c.slug for c in product.collections]
     product_dict["collections"] = [dict(c) for c in product.collections]
-    if product.brand:
-        product_dict["brand"] = product.brand.name
     product_dict["category_slugs"] = [c.slug for c in product.categories]
     product_dict["categories"] = [dict(c) for c in product.categories]
     product_dict["images"] = [img.image for img in sorted(
@@ -175,6 +170,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         product_dict["status"] = "IN STOCK"
     else:
         product_dict["status"] = "OUT OF STOCK"
+    product_dict["sizes"] = [v["size"] for v in variants if v.get("size") is not None]
+    product_dict["colors"] = [v["color"] for v in variants if v.get("color") is not None]
 
     return product_dict
 

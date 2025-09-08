@@ -10,12 +10,11 @@ import { ProductQuery } from "./product-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ProductActions } from "@/components/admin/product/product-actions";
-import { Brand, Collection, Product, ProductVariant } from "@/schemas/product";
+import { Collection, Product, ProductVariant } from "@/schemas/product";
 import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/lib/hooks/useProduct";
 import { useCollections } from "@/lib/hooks/useCollection";
-import { useBrands } from "@/lib/hooks/useBrand";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
 import PaginationUI from "@/components/pagination";
@@ -26,19 +25,15 @@ const LIMIT = 10;
 export function ProductDetails() {
     const router = useRouter();
     const { data: collections } = useCollections();
-    const { data: brands } = useBrands();
     const searchParams = useSearchParams();
     const page = Number(searchParams.get("page")) || 1;
     const { data, isLoading } = useProducts({ query: searchParams.get("search") || "", skip: (page - 1) * LIMIT });
 
     const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
-    const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
 
-    const brandIdsFromURL = searchParams.get("brands")?.split(",") || [];
     const collectionIdsFromURL = searchParams.get("collections")?.split(",") || [];
 
     useEffect(() => {
-        setSelectedBrands(brandIdsFromURL.map(Number));
         setSelectedCollections(collectionIdsFromURL.map(Number));
     }, [searchParams]);
 
@@ -56,8 +51,8 @@ export function ProductDetails() {
         router.push("/admin/collections");
     };
 
-    const handleManageBrands = () => {
-        router.push("/admin/brands");
+    const handleManageCategories = () => {
+        router.push("/admin/categories");
     };
 
     const getStatus = (variants: ProductVariant[] | undefined) => {
@@ -74,7 +69,7 @@ export function ProductDetails() {
     return (
         <div>
             <div className="hidden md:block">
-                <ProductQuery brands={brands} collections={collections} selectedBrands={selectedBrands} selectedCollections={selectedCollections} />
+                <ProductQuery collections={collections} selectedCollections={selectedCollections} />
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -142,14 +137,9 @@ export function ProductDetails() {
             </div>
             <div className="md:hidden">
                 <div className="py-4">
-                    <ProductQuery
-                        brands={brands}
-                        collections={collections}
-                        selectedBrands={selectedBrands}
-                        selectedCollections={selectedCollections}
-                    />
+                    <ProductQuery collections={collections} selectedCollections={selectedCollections} />
 
-                    {(selectedCollections.length > 0 || selectedBrands.length > 0) && (
+                    {selectedCollections.length > 0 && (
                         <div className="mb-4 flex gap-2 flex-wrap">
                             {selectedCollections.map((id: number, idx: number) => {
                                 const collection = collections?.find((c: Collection) => c.id === id);
@@ -170,25 +160,6 @@ export function ProductDetails() {
                                     </div>
                                 );
                             })}
-                            {selectedBrands.map((id: number, idx: number) => {
-                                const brand = brands?.find((b: Brand) => b.id === id);
-
-                                if (!brand) return null;
-
-                                return (
-                                    <div key={idx} className="bg-emerald-100 text-emerald-700 text-sm rounded-full px-3 py-1 flex items-center">
-                                        <p>{brand.name}</p>
-                                        <button
-                                            className="ml-1"
-                                            onClick={() => {
-                                                setSelectedBrands(selectedBrands.filter((bId) => bId !== id));
-                                            }}
-                                        >
-                                            <X size={14} />
-                                        </button>
-                                    </div>
-                                );
-                            })}
                         </div>
                     )}
 
@@ -196,8 +167,8 @@ export function ProductDetails() {
                         <Button className="text-xs" size="sm" variant="outline" onClick={handleManageCollections}>
                             Collections
                         </Button>
-                        <Button className="text-xs" size="sm" variant="outline" onClick={handleManageBrands}>
-                            Brands
+                        <Button className="text-xs" size="sm" variant="outline" onClick={handleManageCategories}>
+                            Categories
                         </Button>
                     </div>
 

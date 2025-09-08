@@ -93,7 +93,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <div className="relative flex flex-col min-h-screen">
                         <PushNotificationManager />
                         <InstallPrompt />
-                        <Toaster closeButton richColors duration={4000} expand={false} position="top-right" />
+                        <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
                         <TanstackProviders>
                             <StoreProvider>
                                 <SessionProvider>

@@ -11,7 +11,6 @@ import { CollectionsSideBar } from "@/components/store/collections/checkbox-side
 import { CollectionsTopBar } from "@/components/store/collections/checkout-topbar";
 import NoProductsFound from "@/components/store/products/no-products";
 import { cn } from "@/lib/utils";
-import { useBrands } from "@/lib/hooks/useBrand";
 import { useCategories } from "@/lib/hooks/useCategories";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
@@ -37,7 +36,6 @@ interface Props {
 
 export default function InfiniteScrollClient({ initialSearchParams, collection, initialData }: Props) {
     const searchParams = useSearchParams();
-    const { data: brands } = useBrands();
     const { data: categories } = useCategories();
     const { data: collections } = useCollections();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductInfiniteSearch(initialSearchParams);
@@ -58,7 +56,7 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
     return (
         <div className="flex gap-6">
             <div className="hidden md:block">
-                <CollectionsSideBar brands={brands} categories={filteredCategories} collections={collections} facets={facets} />
+                <CollectionsSideBar categories={filteredCategories} collections={collections} facets={facets} />
             </div>
             <div className="w-full flex-1 flex-col relative">
                 <PromotionalBanner
@@ -120,7 +118,6 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                     <div className="w-full">
                         <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-background py-2">
                             <CollectionsTopBar
-                                brands={brands}
                                 categories={filteredCategories}
                                 collections={collections}
                                 count={products?.length}

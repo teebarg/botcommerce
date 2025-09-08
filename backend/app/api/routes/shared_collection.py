@@ -60,7 +60,6 @@ async def list_shared_collections(
                     "images": True,
                     "variants": True,
                     "collections": True,
-                    "brand": True,
                     "categories": True,
                     "reviews": True
                 }
@@ -101,7 +100,6 @@ async def get_shared_collection(request: Request, slug: str, user: UserDep) -> S
                     "images": True,
                     "variants": True,
                     "collections": True,
-                    "brand": True,
                     "categories": True,
                     "reviews": True
                 }

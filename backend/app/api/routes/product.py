@@ -44,6 +44,7 @@ from app.services.product import index_products, reindex_product, product_upload
 from app.services.redis import cache_response
 from meilisearch.errors import MeilisearchApiError
 from app.services.popular_products import PopularProductsService
+from app.services.recently_viewed import RecentlyViewedService
 
 logger = get_logger(__name__)
 
@@ -101,7 +102,8 @@ async def get_trending_products(request: Request, type: str = "trending", active
 
 
 @router.get("/gallery")
-async def image_gallery(skip: int = Query(default=0), limit: int = Query(default=10)):
+@cache_response("products", key=lambda request, skip, limit, **kwargs: f"gallery:{skip}:{limit}")
+async def image_gallery(request: Request, skip: int = Query(default=0), limit: int = Query(default=10)):
     """
     Upload one or more product images.
     """
@@ -160,7 +162,6 @@ async def export_products(
 async def index(
     request: Request,
     query: str = "",
-    brand: str = Query(default=""),
     active: bool = Query(default=True),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
@@ -171,8 +172,8 @@ async def index(
     where_clause = {
         "active": active
     }
-    if brand:
-        where_clause["brand"] = {"name": {"contains": brand, "mode": "insensitive"}}
+    # if brand:
+    #     where_clause["brand"] = {"name": {"contains": brand, "mode": "insensitive"}}
     if query:
         where_clause["OR"] = [
             {"name": {"contains": query, "mode": "insensitive"}},
@@ -187,8 +188,6 @@ async def index(
         include={
             "categories": True,
             "collections": True,
-            "brand": True,
-            "tags": True,
             "variants": True,
             "images": True,
         }
@@ -213,6 +212,8 @@ async def public_search(
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
+    sizes: str = Query(default=""),
+    colors: str = Query(default=""),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
 ) -> list[SearchProduct]:
@@ -227,6 +228,10 @@ async def public_search(
     if min_price and max_price:
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+    if sizes:
+        filters.append(f"sizes IN [{sizes}]")
+    if colors:
+        filters.append(f"colors IN [{colors}]")
     filters.append(f"active = {active}")
 
     search_params = {
@@ -279,11 +284,12 @@ async def search(
     request: Request,
     search: str = "",
     sort: str = "created_at:desc",
-    brand_id: str = Query(default=""),
     categories: str = Query(default=""),
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
+    sizes: str = Query(default=""),
+    colors: str = Query(default=""),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
@@ -292,9 +298,9 @@ async def search(
     Retrieve products using Meilisearch, sorted by latest.
     """
     filters = []
-    if brand_id:
-        brands = brand_id.split(",")
-        filters.append(" OR ".join([f'brand = "{brand}"' for brand in brands]))
+    # if brand_id:
+    #     brands = brand_id.split(",")
+    #     filters.append(" OR ".join([f'brand = "{brand}"' for brand in brands]))
     if categories:
         filters.append(f"category_slugs IN {url_to_list(categories)}")
     if collections:
@@ -303,12 +309,16 @@ async def search(
         filters.append(
             f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
     filters.append(f"active = {active}")
+    if sizes:
+        filters.append(f"sizes IN [{sizes}]")
+    if colors:
+        filters.append(f"colors IN [{colors}]")
 
     search_params = {
         "limit": limit,
         "offset": skip,
         "sort": [sort],
-        "facets": ["brand", "category_slugs", "collection_slugs"],
+        "facets": ["category_slugs", "collection_slugs", "sizes", "colors"],
     }
 
     if filters:
@@ -389,7 +399,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         "slug": slugified_name,
         "sku": generate_sku(),
         "description": product.description,
-        "brand": {"connect": {"id": product.brand_id}},
+        # "brand": {"connect": {"id": product.brand_id}},
         "active": product.active,
     }
 
@@ -444,8 +454,8 @@ async def create_product_bundle(
                 "active": True,
             }
 
-            if payload.brand_id is not None:
-                data["brand"] = {"connect": {"id": payload.brand_id}}
+            # if payload.brand_id is not None:
+            #     data["brand"] = {"connect": {"id": payload.brand_id}}
 
             if payload.category_ids:
                 data["categories"] = {"connect": [{"id": id}
@@ -578,8 +588,8 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     if product.collection_ids is not None:
         collection_ids = [{"id": id} for id in product.collection_ids]
         update_data["collections"] = {"set": collection_ids}
-    if product.brand_id is not None:
-        update_data["brand"] = {"connect": {"id": product.brand_id}}
+    # if product.brand_id is not None:
+    #     update_data["brand"] = {"connect": {"id": product.brand_id}}
     if product.active is not None:
         update_data["active"] = product.active
 
@@ -629,6 +639,8 @@ async def delete_product(id: int, redis: RedisClient) -> Message:
 
         await redis.invalidate_list_cache("products")
         await redis.bust_tag(f"product:{product.slug}")
+        service = RecentlyViewedService(cache=redis)
+        await service.remove_product_from_all(product_id=id)
         return Message(message="Product deleted successfully")
 
 
@@ -873,6 +885,9 @@ async def delete_gallery_image(image_id: int, redis: RedisClient) -> Message:
         await tx.productvariant.delete_many(where={"product_id": product_id})
         await tx.product.delete(where={"id": product_id})
 
+    service = RecentlyViewedService(cache=redis)
+    await service.remove_product_from_all(product_id=product_id)
+
     delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(image.product_id))
     await reindex_product(cache=redis, product_id=image.product_id)
     await redis.invalidate_list_cache("products")
@@ -971,7 +986,7 @@ async def reorder_images(id: int, image_ids: list[int], redis: RedisClient):
 
 
 @router.post("/images/upload")
-async def upload_product_images(payload: ProductBulkImages):
+async def upload_product_images(payload: ProductBulkImages, redis: RedisClient):
     """
     Upload one or more product images.
     """
@@ -991,6 +1006,8 @@ async def upload_product_images(payload: ProductBulkImages):
 
         if created_images:
             await db.productimage.create_many(data=created_images)
+
+        await redis.invalidate_list_cache("products:gallery")
 
         return {"success": True}
     except UniqueViolationError:
@@ -1026,8 +1043,8 @@ async def create_image_metadata(
                 "active": True,
             }
 
-            if payload.brand_id is not None:
-                data["brand"] = {"connect": {"id": payload.brand_id}}
+            # if payload.brand_id is not None:
+            #     data["brand"] = {"connect": {"id": payload.brand_id}}
 
             if payload.category_ids:
                 data["categories"] = {"connect": [{"id": id}
@@ -1067,6 +1084,7 @@ async def create_image_metadata(
                         raise HTTPException(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
+            await redis.invalidate_list_cache("products:gallery")
             background_tasks.add_task(
                 reindex_product, cache=redis, product_id=product.id)
 
@@ -1114,8 +1132,8 @@ async def update_image_metadata(
             if payload.collection_ids is not None:
                 collection_ids = [{"id": id} for id in payload.collection_ids]
                 update_data["collections"] = {"set": collection_ids}
-            if payload.brand_id is not None:
-                update_data["brand"] = {"connect": {"id": payload.brand_id}}
+            # if payload.brand_id is not None:
+            #     update_data["brand"] = {"connect": {"id": payload.brand_id}}
             if payload.active is not None:
                 update_data["active"] = payload.active
 
@@ -1160,6 +1178,7 @@ async def update_image_metadata(
                     raise HTTPException(
                         status_code=400, detail=f"Failed to create variant: {str(e)}")
 
+            await redis.invalidate_list_cache("products:gallery")
             background_tasks.add_task(
                 reindex_product, cache=redis, product_id=existing_image.product_id)
 

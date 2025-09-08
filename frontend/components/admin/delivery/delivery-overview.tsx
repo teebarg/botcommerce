@@ -78,7 +78,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                     <div className="flex items-center gap-2 ml-4">
                         <Overlay
                             open={editState.isOpen}
-                            title="Edit Brand"
+                            title="Edit Delivery Option"
                             trigger={
                                 <Button size="iconOnly" onClick={editState.open}>
                                     <Pencil className="h-5 w-5" />

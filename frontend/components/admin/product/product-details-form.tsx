@@ -7,10 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useCategories } from "@/lib/hooks/useCategories";
-import { useBrands } from "@/lib/hooks/useBrand";
 import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 
 interface ProductDetailsFormProps {
@@ -22,7 +20,6 @@ export function ProductDetailsForm({ product, onDetailsChange }: ProductDetailsF
     const [errors, setErrors] = useState<Partial<FormProduct>>({});
     const { data: collections } = useCollections();
     const { data: categories } = useCategories();
-    const { data: brands } = useBrands();
 
     const updateField = (field: keyof FormProduct, value: string | number | SelectOption[]) => {
         const updatedDetails = { ...product, [field]: value };
@@ -106,27 +103,6 @@ export function ProductDetailsForm({ product, onDetailsChange }: ProductDetailsF
                                 value={product.collections}
                                 onChange={(value) => updateField("collections", value)}
                             />
-                        </div>
-                    </Card>
-
-                    <Card className="p-4 bg-card shadow-sm">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-primary" />
-                                Brand
-                            </Label>
-                            <Select value={product.brand?.toString()} onValueChange={(value) => updateField("brand", Number(value))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select brand" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {brands?.map((brand) => (
-                                        <SelectItem key={brand.id} value={brand.id.toString()}>
-                                            {brand.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
                         </div>
                     </Card>
                 </div>

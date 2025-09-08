@@ -10,6 +10,8 @@ import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
 
+export const revalidate = 60;
+
 type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {

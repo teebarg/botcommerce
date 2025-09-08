@@ -8,29 +8,24 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import ProductFilter from "./product-filter";
 
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
-import { Collection, Brand } from "@/schemas/product";
+import { Collection } from "@/schemas/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface ProductQueryProps {
     collections?: Collection[];
-    brands?: Brand[];
     selectedCollections: number[];
-    selectedBrands: number[];
 }
 
-export function ProductQuery({ collections, brands, selectedCollections, selectedBrands }: ProductQueryProps) {
+export function ProductQuery({ collections, selectedCollections }: ProductQueryProps) {
     const searchParams = useSearchParams();
     const { updateQuery } = useUpdateQuery(500);
 
     const [searchQuery, setSearchQuery] = useState<string>(searchParams.get("search") || "");
     const filterState = useOverlayTriggerState({});
 
-    const handleApplyFilters = (collections: number[], brands: number[]) => {
-        updateQuery([
-            { key: "collections", value: collections.join(",") },
-            { key: "brands", value: brands.join(",") },
-        ]);
+    const handleApplyFilters = (collections: number[]) => {
+        updateQuery([{ key: "collections", value: collections.join(",") }]);
     };
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,9 +56,7 @@ export function ProductQuery({ collections, brands, selectedCollections, selecte
                         <DialogTitle>Filter Products</DialogTitle>
                     </DialogHeader>
                     <ProductFilter
-                        brands={brands}
                         collections={collections}
-                        selectedBrands={selectedBrands}
                         selectedCollections={selectedCollections}
                         onApplyFilters={handleApplyFilters}
                         onClose={filterState.close}

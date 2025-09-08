@@ -55,6 +55,31 @@ class SearchProduct(BaseModel):
     user_interactions: Any
 
 
+class SearchProduct(BaseModel):
+    id: int
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    slug: str
+    description: Optional[str] = None
+    image: Optional[str] = None
+    ratings: float
+    categories: Optional[List[Any]] = []
+    category_slugs: List[str]
+    collections: Optional[List[Any]] = []
+    collection_slugs: List[str]
+    tags: Optional[List[str]] = []
+    images: Optional[List[str]] = []
+    favorites: Optional[List[str]] = []
+    variants: Optional[List[ProductVariant]] = []
+    average_rating: Optional[float] = None
+    review_count: Optional[int] = None
+    max_variant_price: Optional[float] = None
+    min_variant_price: Optional[float] = None
+    active: Optional[bool] = True
+    sizes: Optional[List[str]] = None
+    colors: Optional[List[str]] = None
+
+
 class RecommendationResponse(BaseModel):
     user_id: int
     recommendations: List[SearchProduct]

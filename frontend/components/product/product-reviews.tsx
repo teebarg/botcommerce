@@ -34,7 +34,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     let hasPurchased = false;
 
     if (isLoggedIn && orders?.orders) {
-        hasPurchased = orders.orders.some((order) => order.order_items.some((item) => item.variant.product_id === product_id));
+        hasPurchased = orders.orders.some((order) => order.order_items.some((item) => item.variant?.product_id === product_id));
     }
 
     if (data?.reviews?.length === 0) {

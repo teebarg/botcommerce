@@ -39,11 +39,10 @@ class RecommendationEngine:
         try:
             async with database.pool.acquire() as conn:
                 products_query = """
-                    SELECT p.id, p.name, p.ratings, p.features, b.name as brand_name,
+                    SELECT p.id, p.name, p.ratings, p.features,
                            ARRAY_AGG(DISTINCT c.name) as categories,
                            COALESCE(pv.min_price, 0) as min_price
                     FROM products p
-                    LEFT JOIN brands b ON p.brand_id = b.id
                     LEFT JOIN "_ProductCategories" pc ON p.id = pc."A"
                     LEFT JOIN categories c ON pc."B" = c.id
                     LEFT JOIN (
@@ -51,7 +50,7 @@ class RecommendationEngine:
                         FROM product_variants
                         GROUP BY product_id
                     ) pv ON p.id = pv.product_id
-                    GROUP BY p.id, p.name, p.ratings, p.features, b.name, pv.min_price
+                    GROUP BY p.id, p.name, p.ratings, p.features, pv.min_price
                 """
 
                 products = await conn.fetch(products_query)
@@ -60,7 +59,6 @@ class RecommendationEngine:
                     self.products_data[product['id']] = {
                         'name': product['name'],
                         'categories': product['categories'] or [],
-                        'brand': product['brand_name'],
                         'features': product['features'] or [],
                         'ratings': float(product['ratings'] or 0),
                         'price': float(product['min_price'] or 0)
@@ -91,7 +89,7 @@ class RecommendationEngine:
                 self.user_item_matrix = self._create_sparse_matrix(user_items)
 
                 preferences_query = """
-                    SELECT user_id, category, brand, score
+                    SELECT user_id, category, score
                     FROM user_preferences
                 """
 
@@ -101,12 +99,10 @@ class RecommendationEngine:
                 for pref in preferences:
                     user_id = pref['user_id']
                     if user_id not in self.user_profiles:
-                        self.user_profiles[user_id] = {'categories': {}, 'brands': {}}
+                        self.user_profiles[user_id] = {'categories': {}}
 
                     if pref['category']:
                         self.user_profiles[user_id]['categories'][pref['category']] = float(pref['score'])
-                    if pref['brand']:
-                        self.user_profiles[user_id]['brands'][pref['brand']] = float(pref['score'])
 
                 logger.info(f"self.user_profiles: {self.user_profiles}")
 
@@ -125,7 +121,7 @@ class RecommendationEngine:
 
         if interaction_type == 'VIEW':
             return self.compute_view_weight(metadata, base_weight=base_weights['VIEW'])
-        
+
         return base_weights.get(interaction_type, 1.0)
 
 
@@ -181,9 +177,6 @@ class RecommendationEngine:
 
             if data.get('categories', []):
                 features.extend(str(cat) for cat in data['categories'] if cat is not None)
-
-            if data.get('brand'):
-                features.append(data['brand'])
 
             if data.get('features'):
                 features.extend([str(feat) for feat in data['features'] if feat])
@@ -313,10 +306,6 @@ class RecommendationEngine:
                 for category in product_data['categories']:
                     if category in user_profile.get('categories', {}):
                         score += user_profile['categories'][category]
-
-                # Brand preferences
-                if product_data['brand'] and product_data['brand'] in user_profile.get('brands', {}):
-                    score += user_profile['brands'][product_data['brand']]
 
                 # Rating bonus
                 score += product_data['ratings'] * 0.1

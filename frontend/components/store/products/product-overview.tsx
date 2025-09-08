@@ -98,11 +98,11 @@ const ProductOverview: React.FC<{
                     <X className="text-gray-600 dark:text-gray-300" size={20} />
                 </button>
 
-                <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
+                <div className="relative h-[60vh] overflow-hidden">
                     <Image
                         fill
                         alt={selectedImage || product.image || "placeholder"}
-                        className="object-cover h-full w-full rounded"
+                        className="object-contain h-full w-full rounded"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         src={selectedImage || product.image || "/placeholder.jpg"}
                     />

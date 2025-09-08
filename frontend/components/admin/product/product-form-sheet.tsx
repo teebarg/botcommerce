@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useCategories } from "@/lib/hooks/useCategories";
-import { useBrands } from "@/lib/hooks/useBrand";
 import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Product, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
@@ -16,8 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
 
-type FormProduct = Omit<Partial<Product>, "brand" | "images" | "variants" | "categories" | "collections"> & {
-    brand?: number;
+type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" | "collections"> & {
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
     variants: ProductVariant[];
@@ -37,13 +35,11 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
     const [errors, setErrors] = useState<Partial<FormProduct>>({});
     const { data: collections } = useCollections();
     const { data: categories } = useCategories();
-    const { data: brands } = useBrands();
     const [product, setProduct] = useState<FormProduct>({
         name: currentProduct?.name ?? "",
         description: currentProduct?.description ?? "",
         categories: currentProduct?.categories?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         collections: currentProduct?.collections?.map((c) => ({ value: c.id, label: c.name })) ?? [],
-        brand: 1,
         active: currentProduct?.active ?? true,
         variants: currentProduct?.variants ?? [],
     });
@@ -74,7 +70,6 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         const input: any = {
             name: product.name,
             description: product.description,
-            brand_id: product.brand || undefined,
             category_ids: product.categories?.map((c) => c.value) || [],
             collection_ids: product.collections?.map((c) => c.value) || [],
             active: product.active,
@@ -133,9 +128,9 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                 </Card>
 
                 <div className="flex items-center gap-2">
-                    <Checkbox id="active" checked={product.active} onCheckedChange={(checked) => updateField("active", checked)} />
+                    <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
                     <Label className="text-sm font-medium" htmlFor="active">
-                        Active
+                        Show in Store
                     </Label>
                 </div>
 
@@ -167,27 +162,6 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 value={product.collections}
                                 onChange={(value) => updateField("collections", value)}
                             />
-                        </div>
-                    </Card>
-
-                    <Card className="p-4 bg-card shadow-sm">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-primary" />
-                                Brand
-                            </Label>
-                            <Select value={product.brand?.toString()} onValueChange={(value) => updateField("brand", Number(value))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select brand" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {brands?.map((brand) => (
-                                        <SelectItem key={brand.id} value={brand.id.toString()}>
-                                            {brand.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
                         </div>
                     </Card>
                 </div>

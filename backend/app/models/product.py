@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from app.models.generic import ImageUpload
 
 from app.models.base import BM
-from prisma.models import Brand, Category, Collection, Tag, ProductImage, Review, ProductVariant
+from prisma.models import Category, Collection, Tag, ProductImage, Review, ProductVariant
 
 class VariantWithStatus(BaseModel):
     id: Optional[int] = None
@@ -50,7 +50,7 @@ class Product(BM):
     ratings: float
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
-    brand: Optional[Brand] = None
+    # brand: Optional[Brand] = None
     tags: Optional[List[Tag]] = []
     images: Optional[List[ProductImage]] = []
     reviews: Optional[List[Review]] = []
@@ -68,7 +68,7 @@ class SearchProduct(BaseModel):
     category_slugs: List[str]
     collections: Optional[List[Collection]] = []
     collection_slugs: List[str]
-    brand: Optional[str] = None
+    # brand: Optional[str] = None
     tags: Optional[List[str]] = []
     images: Optional[List[str]] = []
     reviews: Optional[List[Review]] = []
@@ -79,11 +79,15 @@ class SearchProduct(BaseModel):
     max_variant_price: Optional[float] = None
     min_variant_price: Optional[float] = None
     active: Optional[bool] = True
+    sizes: Optional[List[str]] = None
+    colors: Optional[List[str]] = None
 
 class Facets(BaseModel):
-    brand: Optional[dict[str, int]] = None
+    # brand: Optional[dict[str, int]] = None
     category_slugs: Optional[dict[str, int]] = None
     collection_slugs: Optional[dict[str, int]] = None
+    sizes: Optional[dict[str, int]] = None
+    colors: Optional[dict[str, int]] = None
 
 class SearchProducts(BaseModel):
     products: List[SearchProduct]

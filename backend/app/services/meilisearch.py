@@ -11,8 +11,8 @@ from meilisearch.errors import MeilisearchApiError
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
-REQUIRED_FILTERABLES = ["id", "brand", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
-                "review_count", "max_variant_price", "min_variant_price", "active"]
+REQUIRED_FILTERABLES = ["id", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
+                "review_count", "max_variant_price", "min_variant_price", "active", "sizes", "colors"]
 REQUIRED_SORTABLES = ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count", "active"]
 
 
@@ -42,6 +42,7 @@ def get_or_create_index(index_name: str) -> Any:
     try:
         return client.get_index(index_name)
     except MeilisearchApiError as e:
+        logger.error(f"MeilisearchApiError: {index_name}")
         error_code = getattr(e, "code", None)
         if error_code == "index_not_found":
             index = client.index(index_name)

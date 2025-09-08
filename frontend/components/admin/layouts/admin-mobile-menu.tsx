@@ -77,6 +77,7 @@ const AdminMobileMenu: React.FC = () => {
                 {menuItems.map((item, idx: number) => (
                     <Link
                         key={idx}
+                        prefetch
                         className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
                             pathname === item.href ? "bg-accent/50" : ""
                         }`}
