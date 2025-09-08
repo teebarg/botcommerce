@@ -11,7 +11,7 @@ const HeroSection: React.FC = () => {
     const router = useRouter();
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <Image priority alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" sizes="100vw" src={heroImage} />
                 <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent dark:from-background/85 dark:via-background/40" />
@@ -129,6 +129,11 @@ const HeroSection: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 bg-destructive text-white py-3">
+                <div className="max-w-7xl mx-auto px-4 text-center">
+                    <p className="text-lg font-medium">🎉 Free shipping on orders over ₦50,000</p>
                 </div>
             </div>
         </div>

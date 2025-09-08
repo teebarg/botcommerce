@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 
-import ProductCard from "@/components/store/products/product-card";
+import ProductCard from "@/components/store/products/product-card2";
 import { ProductSearch } from "@/schemas/product";
 import { useProductRecommendations } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";

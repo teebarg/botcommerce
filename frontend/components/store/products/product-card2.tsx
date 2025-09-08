@@ -11,18 +11,16 @@ import { DiscountBadge } from "@/components/store/products/discount-badge";
 import Overlay from "@/components/overlay";
 import { useUserWishlist } from "@/lib/hooks/useUser";
 import ProductOverview from "@/components/store/products/product-overview";
-import { cn } from "@/lib/utils";
 import { ProductSearch } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
-import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
     product: ProductSearch;
-    isSelected?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
     const dialogState = useOverlayTriggerState({});
@@ -38,16 +36,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }
             showCloseButton={false}
             title="Details"
             trigger={
-                <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
-                    {/* Product Image */}
+                <div className="group relative bg-gray-100 dark:bg-black rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
                     <div className="relative aspect-[3/4] overflow-hidden">
-                        <img
-                            src={product.images?.[0] || "/placeholder.jpg"}
+                        <Image
+                            fill
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            src={product.images?.[0] || "/placeholder.jpg"}
+                            onLoad={() => setImageLoaded(true)}
                         />
 
-                        {/* Badges */}
+                        {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
+
                         <div className="absolute top-4 left-2 right-4 flex items-start justify-between">
                             <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
                             <ProductCollectionIndicator product={product} />
@@ -67,11 +68,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }
                         )}
                     </div>
 
-                    {/* Product Info */}
                     <div className="p-4">
                         <p className="text-sm text-muted-foreground mb-1">{product.category_slugs?.[0]}</p>
                         <h3 className="font-medium text-card-foreground mb-2 line-clamp-2">{product.name}</h3>
-                        <PriceLabel oldPriceClassName="text-gray-300" priceClassName="text-gray-100 text-base" priceInfo={priceInfo} />
+                        <PriceLabel priceInfo={priceInfo} />
                     </div>
                 </div>
             }

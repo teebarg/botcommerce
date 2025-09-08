@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { ProductSearch, Shared } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { SocialShare } from "@/components/store/shared/shared-listing";
-import ProductCardBase from "@/components/store/products/product-card";
+import ProductCard from "@/components/store/products/product-card2";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 import { serverApi } from "@/apis/server-client";
 
@@ -57,7 +57,7 @@ export default async function SharedPage({ params }: { params: Params }) {
             {shared.products && shared.products.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {shared.products.map((product: ProductSearch, idx: number) => (
-                        <ProductCardBase key={idx} product={product} />
+                        <ProductCard key={idx} product={product} />
                     ))}
                 </div>
             ) : (

@@ -41,7 +41,7 @@ export default function SignInPage() {
             <div className="mt-8 text-center">
                 <p className="text-sm text-gray-500">
                     Need help?{" "}
-                    <Link className="text-emerald-600 hover:text-emerald-700 font-medium" href="/contact" prefetch>
+                    <Link prefetch className="text-emerald-600 hover:text-emerald-700 font-medium" href="/contact">
                         Contact support
                     </Link>
                 </p>

@@ -99,11 +99,11 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                                         <CollectionItem
                                             key={idx}
                                             collection={collection}
+                                            isPending={addProductMutation.isPending || removeProductMutation.isPending}
                                             productId={product.id}
                                             products={collection.products}
                                             onAdd={handleAddToCollection}
                                             onRemove={handleRemoveFromCollection}
-                                            isPending={addProductMutation.isPending || removeProductMutation.isPending}
                                         />
                                     ))}
                                 </div>
@@ -165,10 +165,10 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, 
                         <Button
                             className="text-xs"
                             disabled={!collection.is_active || isPending}
+                            isLoading={isPending}
                             size="sm"
                             variant="outline"
                             onClick={() => onAdd(collection.id)}
-                            isLoading={isPending}
                         >
                             <Plus className="h-3 w-3 mr-1" />
                             Add

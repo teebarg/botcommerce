@@ -4,7 +4,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { ProductSearch } from "@/schemas/product";
-import ProductCard from "@/components/store/products/product-card";
+import ProductCard from "@/components/store/products/product-card2";
 import { api } from "@/apis/client";
 import ComponentLoader from "@/components/component-loader";
 

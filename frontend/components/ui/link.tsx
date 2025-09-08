@@ -22,6 +22,7 @@ const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, cl
     return (
         <Link
             {...props}
+            prefetch
             className={cn(className, pathname == href && active)}
             href={href}
             onClick={(e) => {
@@ -33,7 +34,6 @@ const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, cl
                     progress.done();
                 });
             }}
-            prefetch
         >
             {children}
         </Link>

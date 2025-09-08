@@ -14,7 +14,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
                         <div className="w-8 h-8 bg-linear-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
                             <span className="text-lg font-bold text-white">M</span>
                         </div>
-                        <Link href="/" prefetch>
+                        <Link prefetch href="/">
                             <span className="text-xl font-semibold bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary">
                                 {siteConfig.name}
                             </span>

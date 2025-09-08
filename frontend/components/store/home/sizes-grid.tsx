@@ -55,6 +55,7 @@ const sizes = [
 
 const SizesGrid = () => {
     const router = useRouter();
+
     return (
         <section className="py-16 bg-secondary/30 px-4 md:px-2">
             <div className="max-w-7xl mx-auto">
