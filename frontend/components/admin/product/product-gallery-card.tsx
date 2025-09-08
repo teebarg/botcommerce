@@ -77,7 +77,7 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1">
                         {image.product?.variants?.map((item: ProductVariant, idx: number) => (
                             <Badge key={idx} variant="emerald">
-                                Size: {item.size}
+                                Uk Size: {item.size}
                             </Badge>
                         ))}
                     </div>

@@ -26,7 +26,7 @@ class RecentlyViewedService:
 
         await self.cache.zremrangebyrank(key, 0, -(self.max_items + 1))
 
-        await self.cache.invalidate_list_cache(f"recently_viewed:{user_id}")
+        await self.cache.invalidate_list_cache(f"user_recently_viewed:{user_id}")
 
         await manager.send_to_user(
             user_id=user_id,
@@ -34,20 +34,16 @@ class RecentlyViewedService:
             message_type="recently_viewed",
         )
 
-    async def remove_product(self, user_id: int, product_id: int):
-        """Remove a product from user's recently viewed list"""
-        key = await self.get_key(user_id)
-        await self.cache.zrem(key, str(product_id))
-
-        await self.cache.invalidate_list_cache(f"recently_viewed:{user_id}")
-
     async def remove_product_from_all(self, product_id: int):
         """Remove a product from all users' recently viewed list"""
         keys = await self.cache.keys("recently_viewed:*")
-        for key in keys:
-            await self.cache.zrem(key, str(product_id))
+        try:
+            for key in keys:
+                await self.cache.zrem(key, str(product_id))
 
-        await self.cache.invalidate_list_cache("recently_viewed")
+            await self.cache.invalidate_list_cache("user_recently_viewed")
+        except Exception as e:
+            logger.error(f"Error removing product from recently viewed list: {str(e)}")
 
     async def get_recently_viewed(self, user_id: int, limit: int = 10) -> List[dict]:
         """Get user's recently viewed products"""

@@ -277,7 +277,7 @@ async def change_password(
 
 
 @router.get("/recently-viewed")
-@cache_response(key_prefix="recently_viewed", key=lambda request, current_user, redis, limit: f"{current_user.id}:{limit}")
+@cache_response(key_prefix="user_recently_viewed", key=lambda request, current_user, redis, limit: f"{current_user.id}:{limit}")
 async def get_recently_viewed(
     request: Request,
     current_user: CurrentUser,

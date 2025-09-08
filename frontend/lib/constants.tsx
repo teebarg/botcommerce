@@ -37,9 +37,7 @@ export const COLOR_OPTIONS = [
     "Orange",
     "Pink",
     "Brown",
-    "Cyan",
     "Magenta",
-    "Teal",
     "Indigo",
     "Wine",
 ];

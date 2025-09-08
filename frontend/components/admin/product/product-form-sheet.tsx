@@ -203,6 +203,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                     <div className="space-y-2">
                         <Label className="text-sm">Measurement</Label>
                         <Input
+                            placeholder="Example: 41,42,43"
                             type="number"
                             value={newVariant.measurement || ""}
                             onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
