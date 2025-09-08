@@ -61,7 +61,7 @@ async def enhance_prompt_with_data(user_message: str, user_id: Optional[int] = N
                                'have you got', 'is the', 'do you sell', 'looking for', 'find me', 'i need a']
     product_patterns = ["product", "buy", "purchase", "latest products", "latest items", "products", 'bestsellers', 'deals', 'trending', 'new arrivals', 'available']
     category_patterns = ["category", "categories", "type", "types", "group"]
-    brand_patterns = ["brand", "make", "manufacturer"]
+    # brand_patterns = ["brand", "make", "manufacturer"]
     cart_patterns = ["cart", "basket", "bag", "add to cart", "checkout"]
     shipping_patterns = ["shipping", "delivery", "send", "track"]
     payment_patterns = ["payment", "pay", "credit card",
@@ -89,11 +89,11 @@ async def enhance_prompt_with_data(user_message: str, user_id: Optional[int] = N
             enhanced_info.append(categories_info)
 
     # Check for brand related queries
-    if any(pattern in user_message.lower() for pattern in brand_patterns):
-        brands_info, brand_id = await get_brands_info(query_terms)
-        if brands_info:
-            enhanced_info.append("Brand information that might be helpful:")
-            enhanced_info.append(brands_info)
+    # if any(pattern in user_message.lower() for pattern in brand_patterns):
+    #     brands_info, brand_id = await get_brands_info(query_terms)
+    #     if brands_info:
+    #         enhanced_info.append("Brand information that might be helpful:")
+    #         enhanced_info.append(brands_info)
 
     # Check for cart related queries (if user_id is provided)
     if user_id and any(pattern in user_message.lower() for pattern in cart_patterns):
@@ -145,7 +145,6 @@ async def get_relevant_products(query_terms: List[str], product_intent: bool = F
                     },
                     include={
                         "variants": True,
-                        "brand": True,
                         "categories": True,
                         "images": True
                     },
@@ -159,7 +158,6 @@ async def get_relevant_products(query_terms: List[str], product_intent: bool = F
                 where={"collections": {"name": "Trending"}},
                 include={
                     "variants": True,
-                    "brand": True,
                     "categories": True,
                     "images": True
                 },
@@ -192,9 +190,9 @@ async def get_relevant_products(query_terms: List[str], product_intent: bool = F
             image = product.images[0].image if product.images else product.image
 
             product_info += f"""---
-            ![{name}]({image})  
+            ![{name}]({image})
             **🛍️ {name}**
-            💵 **Price:** ₦{price}  
+            💵 **Price:** ₦{price}
             🔗 [View Product](/products/{product.slug})
             """
 
@@ -280,68 +278,68 @@ async def get_categories_info(query_terms: List[str]) -> tuple[str, Optional[str
         return "", None
 
 
-async def get_brands_info(query_terms: List[str]) -> tuple[str, Optional[str]]:
-    """
-    Get brand information based on query terms
-    Returns: (brand_info_text, top_brand_id)
-    """
-    try:
-        all_brands = []
+# async def get_brands_info(query_terms: List[str]) -> tuple[str, Optional[str]]:
+#     """
+#     Get brand information based on query terms
+#     Returns: (brand_info_text, top_brand_id)
+#     """
+#     try:
+#         all_brands = []
 
-        for term in query_terms:
-            if len(term) < 3:
-                continue
+#         for term in query_terms:
+#             if len(term) < 3:
+#                 continue
 
-            brands = await db.brand.find_many(
-                where={
-                    "OR": [
-                        {"name": {"contains": term, "mode": "insensitive"}},
-                        {"slug": {"contains": term, "mode": "insensitive"}}
-                    ]
-                },
-                include={
-                    "products": {
-                        "take": 3
-                    }
-                }
-            )
+#             brands = await db.brand.find_many(
+#                 where={
+#                     "OR": [
+#                         {"name": {"contains": term, "mode": "insensitive"}},
+#                         {"slug": {"contains": term, "mode": "insensitive"}}
+#                     ]
+#                 },
+#                 include={
+#                     "products": {
+#                         "take": 3
+#                     }
+#                 }
+#             )
 
-            all_brands.extend(brands)
+#             all_brands.extend(brands)
 
-        if not all_brands:
-            return "", None
+#         if not all_brands:
+#             return "", None
 
-        # Deduplicate brands
-        seen_brands = set()
-        unique_brands = []
+#         # Deduplicate brands
+#         seen_brands = set()
+#         unique_brands = []
 
-        for brand in all_brands:
-            if brand.id not in seen_brands:
-                seen_brands.add(brand.id)
-                unique_brands.append(brand)
+#         for brand in all_brands:
+#             if brand.id not in seen_brands:
+#                 seen_brands.add(brand.id)
+#                 unique_brands.append(brand)
 
-        # Limit to top 3 brands
-        unique_brands = unique_brands[:3]
+#         # Limit to top 3 brands
+#         unique_brands = unique_brands[:3]
 
-        # Get top brand ID for relation tracking
-        top_brand_id = str(unique_brands[0].id) if unique_brands else None
+#         # Get top brand ID for relation tracking
+#         top_brand_id = str(unique_brands[0].id) if unique_brands else None
 
-        # Format brand information
-        brand_info = ""
-        for brand in unique_brands:
-            brand_info += f"- {brand.name}\n"
+#         # Format brand information
+#         brand_info = ""
+#         for brand in unique_brands:
+#             brand_info += f"- {brand.name}\n"
 
-            if brand.products and len(brand.products) > 0:
-                brand_info += "  Popular products from this brand:\n"
-                for product in brand.products[:3]:  # Limit to 3 products
-                    brand_info += f"    - {product.name}: ₦{product.variants[0].price}\n"
+#             if brand.products and len(brand.products) > 0:
+#                 brand_info += "  Popular products from this brand:\n"
+#                 for product in brand.products[:3]:  # Limit to 3 products
+#                     brand_info += f"    - {product.name}: ₦{product.variants[0].price}\n"
 
-            brand_info += "\n"
+#             brand_info += "\n"
 
-        return brand_info, top_brand_id
-    except Exception as e:
-        print(f"Error fetching brands: {str(e)}")
-        return "", None
+#         return brand_info, top_brand_id
+#     except Exception as e:
+#         print(f"Error fetching brands: {str(e)}")
+#         return "", None
 
 
 async def get_user_cart_info(user_id: int) -> tuple[str, Optional[str]]:

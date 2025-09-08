@@ -13,7 +13,6 @@ import {
     Star,
     Activity,
     MessageSquare,
-    Tag,
     Layers,
     LayoutGrid,
     UserSquare,
@@ -115,11 +114,6 @@ const storeItems = [
         title: "Reviews",
         url: "/admin/reviews",
         icon: Star,
-    },
-    {
-        title: "Brands",
-        url: "/admin/brands",
-        icon: Tag,
     },
     {
         title: "Categories",

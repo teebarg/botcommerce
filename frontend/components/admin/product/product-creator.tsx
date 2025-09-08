@@ -28,12 +28,10 @@ export interface ProductDetails {
     description: string;
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
-    brand: number;
     sku: string;
 }
 
-export type FormProduct = Omit<Partial<Product>, "brand" | "images" | "variants" | "categories" | "collections"> & {
-    brand?: number;
+export type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" | "collections"> & {
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
     images: ProductImage[];
@@ -55,7 +53,6 @@ export function ProductCreator() {
         description: "",
         categories: [],
         collections: [],
-        brand: 0,
         sku: "",
         images: [],
         variants: [],
@@ -195,7 +192,6 @@ export function ProductCreator() {
             const payload: any = {
                 name: product.name,
                 description: product.description,
-                brand_id: product.brand || undefined,
                 category_ids: product.categories?.map((c) => c.value) || [],
                 collection_ids: product.collections?.map((c) => c.value) || [],
                 images: imagesPayload.length ? imagesPayload : undefined,

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { User } from "@/schemas";
-import { Brand, Category, Collection, Product } from "@/schemas/product";
+import { Category, Collection, Product } from "@/schemas/product";
 
 interface StoreState {
     count: number;
@@ -23,9 +23,6 @@ interface StoreState {
 
     categories: Category[];
     setCategories: (categories: Category[]) => void;
-
-    brands: Brand[];
-    setBrands: (brands: Brand[]) => void;
 
     user: User | null;
     setUser: (user: User | null) => void;
@@ -54,9 +51,6 @@ export const useStore = create<StoreState>((set) => ({
 
     categories: [],
     setCategories: (categories) => set(() => ({ categories })),
-
-    brands: [],
-    setBrands: (brands) => set(() => ({ brands })),
 
     user: null,
     setUser: (user: User | null) => set(() => ({ user })),

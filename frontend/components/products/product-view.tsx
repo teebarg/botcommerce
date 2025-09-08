@@ -7,12 +7,10 @@ import ProductImagesManager from "@/components/admin/product/product-images";
 import { Product } from "@/schemas/product";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useCategories } from "@/lib/hooks/useCategories";
-import { useBrands } from "@/lib/hooks/useBrand";
 
 export function ProductView({ product, onClose }: { product?: Product; onClose: () => void }) {
     const { data: collections } = useCollections();
     const { data: categories } = useCategories();
-    const { data: brands } = useBrands();
 
     return (
         <div className="w-full mx-auto overflow-y-auto py-6 px-4">
@@ -23,13 +21,7 @@ export function ProductView({ product, onClose }: { product?: Product; onClose: 
                     {product && <TabsTrigger value="images">Images</TabsTrigger>}
                 </TabsList>
                 <TabsContent value="details">
-                    <ProductForm
-                        brands={brands || []}
-                        categories={categories || []}
-                        collections={collections || []}
-                        product={product}
-                        onClose={onClose}
-                    />
+                    <ProductForm categories={categories || []} collections={collections || []} product={product} onClose={onClose} />
                 </TabsContent>
                 {product && (
                     <TabsContent value="variants">

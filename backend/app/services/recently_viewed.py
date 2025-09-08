@@ -4,6 +4,9 @@ from app.services.redis import CacheService
 from app.services.meilisearch import get_or_create_index
 from app.core.config import settings
 from app.services.websocket import manager
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 class RecentlyViewedService:
     def __init__(self, cache: CacheService):
@@ -29,6 +32,17 @@ class RecentlyViewedService:
             message_type="recently_viewed",
         )
 
+    async def remove_product(self, user_id: int, product_id: int):
+        """Remove a product from user's recently viewed list"""
+        key = await self.get_key(user_id)
+        await self.cache.zrem(key, str(product_id))
+
+    async def remove_product_from_all(self, product_id: int):
+        """Remove a product from all users' recently viewed list"""
+        keys = await self.cache.keys("recently_viewed:*")
+        for key in keys:
+            await self.cache.zrem(key, str(product_id))
+
     async def get_recently_viewed(self, user_id: int, limit: int = 10) -> List[dict]:
         """Get user's recently viewed products"""
         key = await self.get_key(user_id)
@@ -38,8 +52,11 @@ class RecentlyViewedService:
 
         products = []
         for pid in product_ids:
-            product = index.get_document(int(pid))
-            if product:
-                products.append(product)
+            try:
+                product = index.get_document(int(pid))
+                if product:
+                    products.append(product)
+            except Exception as e:
+                logger.error(f"Error getting product: {str(e)}")
 
         return products

@@ -155,13 +155,17 @@ class CacheService:
         Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
         """
         stream_key = f"events:{event_name}"
-        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)} 
+        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
         await self.redis.xadd(stream_key, data)
         return True
 
     @handle_redis_errors(default=False)
     async def zadd(self, key: str, mapping: dict) -> bool:
         return await self.redis.zadd(key, mapping)
+
+    @handle_redis_errors(default=False)
+    async def zrem(self, key: str, member: str) -> bool:
+        return await self.redis.zrem(key, member)
 
     @handle_redis_errors(default=[])
     async def zrevrange(self, key: str, start: int, end: int) -> list:

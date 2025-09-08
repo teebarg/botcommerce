@@ -7,7 +7,7 @@ import httpx
 from fastapi import (
     HTTPException,
 )
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook
 
 from app.services.websocket import manager
 from app.core.logging import logger
@@ -35,7 +35,6 @@ async def generate_excel_file(email: str) -> str:
         include={
             "categories": True,
             "collections": True,
-            "brand": True,
             "images": True,
             "variants": True,
         }
@@ -64,7 +63,6 @@ async def generate_excel_file(email: str) -> str:
         "is_active",
         "categories",
         "collections",
-        "brand",
         "images",
         "variants",
     ]
@@ -95,7 +93,6 @@ async def generate_excel_file(email: str) -> str:
                 True,
                 categories_str,
                 collections_str,
-                product.brand.name if product.brand else "",
                 images_str,
                 "|".join([variant.sku for variant in product.variants]),
             ]
@@ -151,24 +148,24 @@ async def parse_images(images_str: str) -> List[str]:
     return [img.strip() for img in images_str.split("|") if img.strip()]
 
 
-async def upsert_brand(brand_name: str) -> int:
-    """Upsert a brand and return its ID."""
-    if not brand_name or not brand_name.strip():
-        return None
+# async def upsert_brand(brand_name: str) -> int:
+#     """Upsert a brand and return its ID."""
+#     if not brand_name or not brand_name.strip():
+#         return None
 
-    slug = brand_name.lower().replace(" ", "-")
-    brand = await db.brand.upsert(
-        where={"slug": slug},
-        data={
-            "create": {
-                "name": brand_name,
-                "slug": slug,
-                "is_active": True
-            },
-            "update": {}
-        }
-    )
-    return brand.id
+#     slug = brand_name.lower().replace(" ", "-")
+#     brand = await db.brand.upsert(
+#         where={"slug": slug},
+#         data={
+#             "create": {
+#                 "name": brand_name,
+#                 "slug": slug,
+#                 "is_active": True
+#             },
+#             "update": {}
+#         }
+#     )
+#     return brand.id
 
 
 async def upsert_category(category_name: str) -> int:
@@ -220,8 +217,8 @@ async def bulk_upload_products(products: list[dict]):
                 coll_id = await upsert_collection(coll_name)
                 collection_ids.append(coll_id)
 
-            brand_name = product_data.get("brand", "")
-            brand_id = await upsert_brand(brand_name)
+            # brand_name = product_data.get("brand", "")
+            # brand_id = await upsert_brand(brand_name)
 
             image_urls = await parse_images(product_data.get("images", ""))
 
@@ -236,8 +233,8 @@ async def bulk_upload_products(products: list[dict]):
                 "collections": {"connect": [{"id": cid} for cid in collection_ids]},
             }
 
-            if brand_id:
-                create_data["brand"] = {"connect": {"id": brand_id}}
+            # if brand_id:
+            #     create_data["brand"] = {"connect": {"id": brand_id}}
 
             try:
                 product = await db.product.upsert(
@@ -248,7 +245,7 @@ async def bulk_upload_products(products: list[dict]):
                             "name": product_data["name"],
                             "description": product_data["description"],
                             "image": product_data["image"],
-                            "brand": {"connect": {"id": brand_id}} if brand_id else {"disconnect": True},
+                            # "brand": {"connect": {"id": brand_id}} if brand_id else {"disconnect": True},
                             "ratings": float(product_data["ratings"]) if product_data["ratings"] else 0.0,
                             "categories": {"set": [{"id": cid} for cid in category_ids]},
                             "collections": {"set": [{"id": cid} for cid in collection_ids]},
@@ -382,7 +379,6 @@ async def process_products(user_id: int) -> list[dict]:
                     "image": row_data.get("image", ""),
                     "categories": row_data.get("categories", ""),
                     "collections": row_data.get("collections", ""),
-                    "brand": row_data.get("brand", ""),
                     "images": row_data.get("images", ""),
                 }
 

@@ -1,26 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { useSearchParams } from "next/navigation";
 
 import { CheckboxGroup } from "@/components/store/collections/checkbox-group";
 import RangeSlider from "@/components/ui/range-slider";
-import { Checkbox } from "@/components/ui/checkbox";
 import LocalizedClientLink from "@/components/ui/link";
-import { Brand, Category, Collection, Facet } from "@/schemas/product";
+import { Category, Collection, Facet } from "@/schemas/product";
 import { Separator } from "@/components/ui/separator";
 import ClientOnly from "@/components/generic/client-only";
 
 interface ComponentProps {
-    brands?: Brand[];
     collections?: Collection[];
     categories?: Category[];
     facets?: Facet;
 }
 
-const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, categories, facets }) => {
-    const [dataSet, setDataSet] = useState(new Set());
+const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories, facets }) => {
+    // const [dataSet, setDataSet] = useState(new Set());
     const searchParams = useSearchParams();
     const { updateQuery } = useUpdateQuery();
 
@@ -33,26 +31,26 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
         ]);
     };
 
-    const onBrandChange = (checked: boolean, slug: string) => {
-        const newSet = new Set(dataSet);
+    // const onBrandChange = (checked: boolean, slug: string) => {
+    //     const newSet = new Set(dataSet);
 
-        if (checked) {
-            newSet.add(slug);
-        } else {
-            newSet.delete(slug);
-        }
+    //     if (checked) {
+    //         newSet.add(slug);
+    //     } else {
+    //         newSet.delete(slug);
+    //     }
 
-        setDataSet(newSet);
-        updateQuery([{ key: "brand_id", value: Array.from(newSet).join(",") }]);
-    };
+    //     setDataSet(newSet);
+    //     updateQuery([{ key: "brand_id", value: Array.from(newSet).join(",") }]);
+    // };
 
-    useEffect(() => {
-        const brandIdsFromURL = searchParams.get("brand_id")?.split(",") || [];
+    // useEffect(() => {
+    //     const brandIdsFromURL = searchParams.get("brand_id")?.split(",") || [];
 
-        const newSet = new Set(brandIdsFromURL);
+    //     const newSet = new Set(brandIdsFromURL);
 
-        setDataSet(newSet);
-    }, [searchParams]);
+    //     setDataSet(newSet);
+    // }, [searchParams]);
 
     return (
         <div className="h-full min-w-[20rem] md:max-w-[20rem] overflow-x-hidden overflow-y-scroll max-h-[90vh] sticky top-16 bg-content1 rounded-xl">
@@ -86,7 +84,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col mt-6">
+                    {/* <div className="flex flex-col mt-6">
                         <span className="text-sm">Brands</span>
                         <div className="max-h-[20vh] overflow-y-scroll">
                             {brands?.map((item: Brand, idx: number) => (
@@ -102,7 +100,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ brands, collections, cat
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </ClientOnly>
         </div>

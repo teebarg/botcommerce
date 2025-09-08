@@ -12,7 +12,7 @@ import { CollectionsSideBar } from "./checkbox-sidebar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { Brand, Category, Collection } from "@/schemas/product";
+import { Category, Collection } from "@/schemas/product";
 import { Separator } from "@/components/ui/separator";
 import ClientOnly from "@/components/generic/client-only";
 
@@ -20,12 +20,11 @@ interface ComponentProps {
     count: any;
     slug?: string;
     sortBy?: string;
-    brands?: Brand[];
     categories?: Category[];
     collections?: Collection[];
 }
 
-const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, brands = [], categories = [], collections = [] }) => {
+const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, categories = [], collections = [] }) => {
     const searchParams = useSearchParams();
     const { updateQuery } = useUpdateQuery();
     const state = useOverlayTriggerState({});
@@ -66,7 +65,7 @@ const CollectionsTopBar: React.FC<ComponentProps> = ({ slug, count, sortBy, bran
                                         <Separator />
                                     </DrawerTitle>
                                 </DrawerHeader>
-                                <CollectionsSideBar brands={brands} categories={categories} collections={collections} />
+                                <CollectionsSideBar categories={categories} collections={collections} />
                             </DrawerContent>
                         </Drawer>
                         <div className="hidden items-center gap-1 md:flex">
