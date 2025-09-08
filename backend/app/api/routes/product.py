@@ -102,7 +102,8 @@ async def get_trending_products(request: Request, type: str = "trending", active
 
 
 @router.get("/gallery")
-async def image_gallery(skip: int = Query(default=0), limit: int = Query(default=10)):
+@cache_response("products", key=lambda request, skip, limit, **kwargs: f"gallery:{skip}:{limit}")
+async def image_gallery(request: Request, skip: int = Query(default=0), limit: int = Query(default=10)):
     """
     Upload one or more product images.
     """
@@ -973,7 +974,7 @@ async def reorder_images(id: int, image_ids: list[int], redis: RedisClient):
 
 
 @router.post("/images/upload")
-async def upload_product_images(payload: ProductBulkImages):
+async def upload_product_images(payload: ProductBulkImages, redis: RedisClient):
     """
     Upload one or more product images.
     """
@@ -993,6 +994,8 @@ async def upload_product_images(payload: ProductBulkImages):
 
         if created_images:
             await db.productimage.create_many(data=created_images)
+
+        await redis.invalidate_list_cache("products:gallery")
 
         return {"success": True}
     except UniqueViolationError:
