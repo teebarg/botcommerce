@@ -42,6 +42,7 @@ def get_or_create_index(index_name: str) -> Any:
     try:
         return client.get_index(index_name)
     except MeilisearchApiError as e:
+        logger.error(f"MeilisearchApiError: {index_name}")
         error_code = getattr(e, "code", None)
         if error_code == "index_not_found":
             index = client.index(index_name)

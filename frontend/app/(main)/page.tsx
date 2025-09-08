@@ -12,6 +12,8 @@ import Trending from "@/components/store/home/trending";
 import Featured from "@/components/store/home/featured";
 import RecentlyViewedSection from "@/components/store/home/recently-viewed";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
     title: "Home",
     description: "Welcome to our store",

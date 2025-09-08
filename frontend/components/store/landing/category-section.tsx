@@ -23,7 +23,7 @@ const CategoriesSection: React.FC = () => {
                         <>
                             <div className="flex overflow-x-auto pb-4 gap-5 md:hidden">
                                 {(categories || []).map((category: Category, idx: number) => (
-                                    <Link key={idx} className="flex flex-col items-center min-w-max" href={`/collections?cat_ids=${category.slug}`}>
+                                    <Link key={idx} className="flex flex-col items-center min-w-max" href={`/collections?cat_ids=${category.slug}`} prefetch>
                                         <div className="relative w-24 h-24 rounded-full flex items-center justify-center mb-2 overflow-hidden">
                                             <Image
                                                 fill
@@ -43,7 +43,7 @@ const CategoriesSection: React.FC = () => {
 
                             <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
                                 {(categories || []).slice(0, 6).map((category: Category, idx: number) => (
-                                    <Link key={idx} className="flex flex-col items-center" href={`/collections?cat_ids=${category.slug}`}>
+                                    <Link key={idx} className="flex flex-col items-center" href={`/collections?cat_ids=${category.slug}`} prefetch>
                                         <div className="relative w-32 h-32 lg:w-40 lg:h-40 rounded-full flex items-center justify-center mb-3 overflow-hidden transition-transform hover:scale-105">
                                             <Image
                                                 fill

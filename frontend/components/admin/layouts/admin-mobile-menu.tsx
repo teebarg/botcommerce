@@ -81,6 +81,7 @@ const AdminMobileMenu: React.FC = () => {
                             pathname === item.href ? "bg-accent/50" : ""
                         }`}
                         href={item.href}
+                        prefetch
                     >
                         <div className="flex items-center space-x-3">
                             <span className={pathname === item.href ? "text-accent" : "text-default-500"}>{item.icon}</span>

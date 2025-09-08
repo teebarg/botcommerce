@@ -106,7 +106,7 @@ const NewsletterSection: React.FC = () => {
                         </div>
                         <h2 className="text-3xl font-bold text-default-foreground mb-2">Stay in the Loop</h2>
                         <p className="text-default-600 text-lg max-w-2xl mx-auto">
-                            Join over 50,000+ subscribers and get exclusive deals, product updates, and insider tips delivered straight to your inbox.
+                            Join over 5,000+ subscribers and get exclusive deals, product updates, and insider tips delivered straight to your inbox.
                         </p>
                     </div>
 
@@ -183,25 +183,6 @@ const NewsletterSection: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-8 text-center">
-                        <div className="flex items-center justify-center gap-2 text-sm text-default-600">
-                            <div className="flex -space-x-2">
-                                {[1, 2, 3, 4].map((idx: number) => (
-                                    <div
-                                        key={idx}
-                                        className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full border-2 border-content1 flex items-center justify-center text-xs font-bold text-white"
-                                    >
-                                        {String.fromCharCode(65 + idx)}
-                                    </div>
-                                ))}
-                                <div className="w-8 h-8 bg-content2 border-2 border-content1 rounded-full flex items-center justify-center text-xs font-bold text-default-600">
-                                    +
-                                </div>
-                            </div>
-                            <span>Join 50,000+ happy subscribers</span>
                         </div>
                     </div>
                 </div>

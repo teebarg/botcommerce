@@ -33,6 +33,7 @@ const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, cl
                     progress.done();
                 });
             }}
+            prefetch
         >
             {children}
         </Link>

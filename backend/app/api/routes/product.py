@@ -1072,6 +1072,7 @@ async def create_image_metadata(
                         raise HTTPException(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
+            await redis.invalidate_list_cache("products:gallery")
             background_tasks.add_task(
                 reindex_product, cache=redis, product_id=product.id)
 
@@ -1165,6 +1166,7 @@ async def update_image_metadata(
                     raise HTTPException(
                         status_code=400, detail=f"Failed to create variant: {str(e)}")
 
+            await redis.invalidate_list_cache("products:gallery")
             background_tasks.add_task(
                 reindex_product, cache=redis, product_id=existing_image.product_id)
 

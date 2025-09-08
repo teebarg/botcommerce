@@ -50,7 +50,7 @@ class RecommendationEngine:
                         FROM product_variants
                         GROUP BY product_id
                     ) pv ON p.id = pv.product_id
-                    GROUP BY p.id, p.name, p.ratings, p.features, b.name, pv.min_price
+                    GROUP BY p.id, p.name, p.ratings, p.features, pv.min_price
                 """
 
                 products = await conn.fetch(products_query)

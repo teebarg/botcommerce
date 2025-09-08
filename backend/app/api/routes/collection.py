@@ -30,7 +30,7 @@ from app.services.redis import cache_response
 router = APIRouter()
 
 @router.get("/all")
-@cache_response(key_prefix="collections")
+@cache_response(key_prefix="collections", key=lambda request, query: query)
 async def all_collections(request: Request, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
@@ -99,21 +99,6 @@ async def create(*, create_data: CollectionCreate, cache: RedisClient) -> Collec
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.get("/{id}")
-@cache_response(key_prefix="collection", key=lambda request, id: id)
-async def read(request: Request, id: int) -> Collection:
-    """
-    Get a specific collection by id with Redis caching.
-    """
-    collection = await db.collection.find_unique(
-        where={"id": id}
-    )
-    if not collection:
-        raise HTTPException(status_code=404, detail="Collection not found")
-
-    return collection
-
-
 @router.get("/slug/{slug}")
 @cache_response(key_prefix="collection", key=lambda request, slug: slug)
 async def get_by_slug(request: Request, slug: str) -> Collection:
@@ -151,7 +136,6 @@ async def update(
             data=update_data.model_dump()
         )
         await cache.invalidate_list_cache("collections")
-        await cache.bust_tag(f"collection:{id}")
         await cache.bust_tag(f"collection:{update.slug}")
         return update
     except PrismaError as e:
@@ -174,7 +158,6 @@ async def delete(id: int, cache: RedisClient) -> Message:
             where={"id": id}
         )
         await cache.invalidate_list_cache("collections")
-        await cache.bust_tag(f"collection:{id}")
         await cache.bust_tag(f"collection:{existing.slug}")
         return Message(message="Collection deleted successfully")
     except PrismaError as e:

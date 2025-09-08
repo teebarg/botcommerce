@@ -9,6 +9,8 @@ import { tryCatch } from "@/lib/try-catch";
 import ServerError from "@/components/generic/server-error";
 import { serverApi } from "@/apis/server-client";
 
+export const revalidate = 60;
+
 type SearchParams = Promise<{
     sortBy?: SortOptions;
     brand_id?: string;

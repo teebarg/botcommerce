@@ -19,7 +19,6 @@ async def reindex_product(cache: CacheService, product_id: int):
             include={
                 "variants": True,
                 "categories": True,
-                "tags": True,
                 "images": True,
                 "collections": True,
                 "reviews": True,

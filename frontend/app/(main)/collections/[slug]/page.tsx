@@ -10,11 +10,12 @@ import { tryCatch } from "@/lib/try-catch";
 import ServerError from "@/components/generic/server-error";
 import { serverApi } from "@/apis/server-client";
 
+export const revalidate = 60;
+
 type Params = Promise<{ slug: string }>;
 
 type SearchParams = Promise<{
     sortBy?: SortOptions;
-    brand_id?: string;
     cat_ids?: string;
     maxPrice?: string;
     minPrice?: string;
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 }
 
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
-    const { minPrice, maxPrice, brand_id, cat_ids, sortBy } = (await searchParams) || {};
+    const { minPrice, maxPrice, cat_ids, sortBy } = (await searchParams) || {};
     const { slug } = await params;
     const { data: collection } = await tryCatch<Collection>(serverApi.get(`/collection/slug/${slug}`));
 
@@ -47,7 +48,6 @@ export default async function CollectionPage({ params, searchParams }: { params:
         min_price: minPrice ?? 0,
         collections: collection?.slug,
         categories: cat_ids,
-        brand_id: brand_id,
     };
 
     const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/search", { params: { skip: 0, ...queryParams } }));

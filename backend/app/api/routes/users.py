@@ -1,6 +1,5 @@
 from typing import Any, Optional
-
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from pydantic import BaseModel, Field
 
 from app.core.deps import (
@@ -19,6 +18,7 @@ from math import ceil
 from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
 from app.models.product import SearchProduct
+from app.services.redis import cache_response
 
 router = APIRouter()
 
@@ -277,12 +277,14 @@ async def change_password(
 
 
 @router.get("/recently-viewed")
+@cache_response(key_prefix="recently_viewed", key=lambda request, current_user, redis, limit: f"{current_user.id}:{limit}")
 async def get_recently_viewed(
+    request: Request,
     current_user: CurrentUser,
-    cache: RedisClient,
+    redis: RedisClient,
     limit: int = Query(default=10, le=20)
 ) -> list[SearchProduct]:
     """Get current user's recently viewed products."""
-    service = RecentlyViewedService(cache)
+    service = RecentlyViewedService(cache=redis)
     products = await service.get_recently_viewed(current_user.id, limit)
     return products

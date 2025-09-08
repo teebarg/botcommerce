@@ -78,7 +78,7 @@ const CollectionsSideBar: React.FC<ComponentProps> = ({ collections, categories,
                     />
                     <div className="flex flex-col mt-6">
                         <span className="mb-2 text-sm">Categories</span>
-                        <div className="max-h-[20vh] overflow-y-scroll">
+                        <div className="max-h-[35vh] overflow-y-scroll">
                             {(categories || []).map((item: Category, idx: number) => (
                                 <CheckboxGroup key={idx} checkboxes={item.subcategories} facets={facets} groupName={item.slug} item={item as any} />
                             ))}

@@ -105,27 +105,6 @@ export function ProductDetailsForm({ product, onDetailsChange }: ProductDetailsF
                             />
                         </div>
                     </Card>
-
-                    {/* <Card className="p-4 bg-card shadow-sm">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-primary" />
-                                Brand
-                            </Label>
-                            <Select value={product.brand?.toString()} onValueChange={(value) => updateField("brand", Number(value))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select brand" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {brands?.map((brand) => (
-                                        <SelectItem key={brand.id} value={brand.id.toString()}>
-                                            {brand.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </Card> */}
                 </div>
             </div>
         </div>

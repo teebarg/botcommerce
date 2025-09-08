@@ -74,7 +74,7 @@ const HeroSection: React.FC = () => {
                         <div className="pt-8 border-t border-border/20">
                             <div className="flex items-center gap-6">
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold text-foreground">50K+</div>
+                                    <div className="text-2xl font-bold text-foreground">5K+</div>
                                     <div className="text-sm text-muted-foreground">Happy Customers</div>
                                 </div>
                                 <div className="w-px h-12 bg-border/30" />

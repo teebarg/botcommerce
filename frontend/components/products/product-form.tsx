@@ -145,30 +145,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                     </FormItem>
                                 )}
                             />
-                            {/* <FormField
-                                control={form.control}
-                                name="brand"
-                                render={({ field }) => (
-                                    <FormItem className="md:col-span-2">
-                                        <FormLabel>Brand</FormLabel>
-                                        <FormControl>
-                                            <Select defaultValue={field.value.toString()} onValueChange={(e) => field.onChange(Number(e))}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select brand" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {brands?.map((brand) => (
-                                                        <SelectItem key={brand.id} value={brand.id.toString()}>
-                                                            {brand.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
                             <FormField
                                 control={form.control}
                                 name="active"
