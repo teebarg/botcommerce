@@ -62,11 +62,11 @@ test: ## Run project tests
 	@$(MAKE) -s test-frontend
 	@$(MAKE) -s test-backend
 
-prep: ## Prepare postges database
+prep: ## Prepare postgres database
 	@echo "$(YELLOW)Preparing database...$(RESET)"
 	@cd backend && ./scripts/prestart.sh
 
-prep-docker: ## Prepare postges database
+prep-docker: ## Prepare postgres database
 	@echo "$(YELLOW)Preparing docker database...$(RESET)"
 	docker exec shop-backend ./scripts/prestart.sh
 
@@ -124,7 +124,7 @@ stage: docker-build docker-push
 
 docker-build: ## Build docker image
 	@echo "$(YELLOW)Building docker image...$(RESET)"
-	@docker build -t $(DOCKER_HUB)/$(APP_NAME):latest -t $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD) -f backend/Dockerfile backend
+	@cd backend && docker buildx build --platform linux/amd64 -t $(DOCKER_HUB)/$(APP_NAME):latest -t $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD) . --push
 
 
 docker-push: ## Push docker image (latest and sha)

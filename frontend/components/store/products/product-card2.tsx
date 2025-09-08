@@ -69,8 +69,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
 
                     <div className="p-4">
-                        <p className="text-sm text-muted-foreground mb-1">{product.category_slugs?.[0]}</p>
-                        <h3 className="font-medium text-card-foreground mb-2 line-clamp-2">{product.name}</h3>
+                        <p
+                            className={cn(
+                                "hidden text-default-500 font-medium",
+                                product.variants?.length && product.variants?.[0].size && "inline-block"
+                            )}
+                        >
+                            Size: {product.variants?.[0].size}
+                        </p>
+                        <h3 className="font-bold text-default-900 mb-2 line-clamp-2">{product.name}</h3>
                         <PriceLabel priceInfo={priceInfo} />
                     </div>
                 </div>

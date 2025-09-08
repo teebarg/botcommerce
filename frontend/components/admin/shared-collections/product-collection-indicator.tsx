@@ -27,7 +27,7 @@ export const ProductCollectionIndicator: React.FC<ProductCollectionIndicatorProp
     }
 
     return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 mt-2">
             <Check className="h-3 w-3 text-green-600" />
             <Badge className="text-xs" variant="blue">
                 In {collectionsWithProduct.length} collection{collectionsWithProduct.length > 1 ? "s" : ""}

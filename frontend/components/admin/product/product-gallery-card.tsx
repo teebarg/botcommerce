@@ -8,7 +8,7 @@ import { GalleryCardActions } from "./gallery-card-actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Collection, Product, ProductImage } from "@/schemas";
+import { Collection, Product, ProductImage, ProductVariant } from "@/schemas";
 import Overlay from "@/components/overlay";
 import ProductImagesManager from "@/components/admin/product/product-images";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
@@ -71,6 +71,13 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                         {image.product?.collections?.slice(0, 2).map((item: Collection, idx: number) => (
                             <Badge key={idx} variant="warning">
                                 {item.name}
+                            </Badge>
+                        ))}
+                    </div>
+                    <div className="absolute top-2 right-2 flex flex-wrap gap-1">
+                        {image.product?.variants?.map((item: ProductVariant, idx: number) => (
+                            <Badge key={idx} variant="emerald">
+                                Size: {item.size}
                             </Badge>
                         ))}
                     </div>

@@ -5,7 +5,7 @@ import { useInView } from "react-intersection-observer";
 
 import { ProductSearch } from "@/schemas/product";
 import { cn } from "@/lib/utils";
-import ProductCard from "@/components/store/products/product-card";
+import ProductCard from "@/components/store/products/product-card2";
 
 interface ProductCardProps {
     products: ProductSearch[];
