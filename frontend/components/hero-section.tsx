@@ -11,7 +11,7 @@ const HeroSection: React.FC = () => {
     const router = useRouter();
 
     return (
-        <div className="relative min-h-[75vh] flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <Image priority alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" sizes="100vw" src={heroImage} />
                 <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent dark:from-background/85 dark:via-background/40" />
@@ -29,7 +29,7 @@ const HeroSection: React.FC = () => {
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div className="text-left space-y-8 animate-fade-in">
+                    <div className="text-left space-y-4 lg:space-y-8 animate-fade-in">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent-foreground backdrop-blur-sm">
                             <Star className="w-4 h-4 text-accent" />
                             <span className="text-sm font-medium">New Collection</span>
@@ -40,7 +40,7 @@ const HeroSection: React.FC = () => {
                                 Elevate Your
                                 <span className="inline-block text-accent ml-2">Style</span>
                             </h1>
-                            <p className="text-lg sm:text-2xl text-muted-foreground max-w-lg">
+                            <p className="text-base lg:text-2xl text-muted-foreground max-w-lg">
                                 Discover our curated collection of premium fashion pieces that define elegance and sophistication.
                             </p>
                         </div>
@@ -60,7 +60,7 @@ const HeroSection: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <div className="flex flex-col sm:flex-row gap-4 pt-2">
                             <Button className="group" size="xl" variant="hero" onClick={() => router.push("/collections")}>
                                 Shop Collection
                                 <ArrowRight className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" />

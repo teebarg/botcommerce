@@ -14,8 +14,8 @@ const CategoriesSection: React.FC = () => {
     return (
         <ClientOnly>
             <div className="bg-content2">
-                <div className="max-w-8xl mx-auto p-4 w-full text-center">
-                    <h2 className="text-4xl font-bold mb-1 mt-12">Shop by category</h2>
+                <div className="max-w-8xl mx-auto px-4 py-8 w-full text-center">
+                    <h2 className="text-4xl font-bold mb-1 mt-6">Shop by category</h2>
                     <p className="text-default-600 text-lg mb-8">Discover our wide range of products across different categories</p>
                     {isLoading ? (
                         <ComponentLoader className="h-48" />

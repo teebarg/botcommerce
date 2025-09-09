@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Star } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Image from "next/image";
 
@@ -11,9 +10,8 @@ import { DiscountBadge } from "@/components/store/products/discount-badge";
 import Overlay from "@/components/overlay";
 import { useUserWishlist } from "@/lib/hooks/useUser";
 import ProductOverview from "@/components/store/products/product-overview";
-import { ProductSearch } from "@/schemas/product";
+import { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
-import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -49,14 +47,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
                         {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
-                        <div className="absolute top-4 left-2 right-4 flex items-start justify-between">
-                            <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
-                            <ProductCollectionIndicator product={product} />
-                        </div>
+                        <DiscountBadge
+                            className="absolute top-4 left-2"
+                            discount={priceInfo.maxDiscountPercent}
+                            isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
+                        />
 
-                        <div className="absolute top-4 right-4 flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="font-medium">{product.average_rating}</span>
+                        <div className="absolute top-4 right-2 flex lg:hidden flex-wrap gap-1">
+                            {product?.variants?.map((item: ProductVariant, idx: number) => (
+                                <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="emerald">
+                                    Uk Size {item.size}
+                                </Badge>
+                            ))}
                         </div>
 
                         {outOfStock && (
@@ -69,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
 
                     <div className="p-4">
-                        <div className="flex items-center gap-2">
+                        <div className="hidden lg:flex items-center gap-2">
                             <p
                                 className={cn(
                                     "hidden text-default-500 font-medium",
@@ -87,7 +89,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                                 Color: {product.variants?.[0].color}
                             </p>
                         </div>
-                        <h3 className="font-bold text-default-900 mb-2 line-clamp-2">{product.name}</h3>
+                        <h3 className="font-bold text-default-900 mb-2 line-clamp-1">{product.name}</h3>
                         <PriceLabel priceInfo={priceInfo} />
                     </div>
                 </div>

@@ -20,7 +20,7 @@ export default function Featured() {
 
     return (
         <section className="py-16 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-content1 dark:to-content2 transition-colors duration-300">
-            <div className="max-w-9xl mx-auto px-4 lg:px-0">
+            <div className="max-w-9xl mx-auto px-4">
                 <div className="text-center mb-12">
                     <div className="flex items-center justify-center mb-4">
                         <TrendingUp className="text-orange-500 mr-2" size={32} />

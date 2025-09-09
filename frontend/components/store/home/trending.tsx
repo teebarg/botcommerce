@@ -18,14 +18,14 @@ export default function Trending() {
 
     return (
         <section className="py-16 bg-content2">
-            <div className="max-w-8xl mx-auto px-6">
+            <div className="max-w-8xl mx-auto px-2">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold text-default-foreground mb-1">Trending Products</h2>
                     <p className="text-default-600">Discover our handpicked selection of premium products</p>
                 </div>
                 {isLoading && <ComponentLoader className="h-[400px]" />}
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4">
                     {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                 </div>
             </div>

@@ -17,8 +17,8 @@ export default function NewArrivals() {
     });
 
     return (
-        <section className="bg-content1">
-            <div className="max-w-9xl mx-auto px-4 lg:px-0 py-4">
+        <section className="bg-content3">
+            <div className="max-w-9xl mx-auto px-4 py-4">
                 <p className="text-3xl font-bold">New Arrivals</p>
                 <p className="text-default-600">Find the best thrifts for your kids</p>
                 {isLoading && <ComponentLoader className="h-[400px]" />}

@@ -73,7 +73,7 @@
     --aspect-product: 4 / 5;
 
     --container-8xl: 88rem;
-    --container-9xl: 104rem;
+    --container-9xl: 100rem;
 
     --text-xxs: 0.625rem;
     --text-xxs--line-height: calc(0.75 / 0.625);
