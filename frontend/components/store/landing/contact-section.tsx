@@ -22,7 +22,7 @@ export function ContactSection() {
 
                 <div className="grid lg:grid-cols-2 gap-12">
                     <div className="space-y-8">
-                        <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                             <div className="bg-content1 p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="p-2 bg-accent/10 rounded-lg">

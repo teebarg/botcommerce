@@ -25,7 +25,7 @@ export default function Trending() {
                 </div>
                 {isLoading && <ComponentLoader className="h-[400px]" />}
 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
                 </div>
             </div>

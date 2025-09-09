@@ -6,21 +6,21 @@ import { useQuery } from "@tanstack/react-query";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { ProductSearch } from "@/schemas/product";
-import ProductCard from "@/components/store/products/product-card2";
 import { api } from "@/apis/client";
 import ComponentLoader from "@/components/component-loader";
+import ScrollableListing from "@/components/store/products/scrollable-listing";
 
 export default function Featured() {
     const { data, isLoading } = useQuery({
         queryKey: ["products", "featured"],
         queryFn: async () => {
-            return await api.get<ProductSearch[]>("/product/collection/featured?limit=6");
+            return await api.get<ProductSearch[]>("/product/collection/featured?limit=5");
         },
     });
 
     return (
         <section className="py-16 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-content1 dark:to-content2 transition-colors duration-300">
-            <div className="max-w-8xl mx-auto px-6">
+            <div className="max-w-9xl mx-auto px-4 lg:px-0">
                 <div className="text-center mb-12">
                     <div className="flex items-center justify-center mb-4">
                         <TrendingUp className="text-orange-500 mr-2" size={32} />
@@ -30,10 +30,7 @@ export default function Featured() {
                 </div>
 
                 {isLoading && <ComponentLoader className="h-[400px]" />}
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
-                </div>
+                <ScrollableListing products={data || []} />
 
                 <div className="text-center mt-12">
                     <LocalizedClientLink

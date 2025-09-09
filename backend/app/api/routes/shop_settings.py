@@ -1,5 +1,4 @@
 from typing import Any
-from app.core.deps import RedisClient
 from fastapi import APIRouter, HTTPException, Request
 from app.models.shop_settings import (
     ShopSettingsCreate,
@@ -8,8 +7,8 @@ from app.models.shop_settings import (
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.models import ShopSettings
-from app.services.redis import cache_response
 from app.core.logging import get_logger
+from app.services.redis import cache_response, invalidate_list
 
 logger = get_logger(__name__)
 
@@ -51,20 +50,20 @@ async def get_setting(request: Request, id: int) -> ShopSettings:
     return setting
 
 @router.post("/")
-async def create_setting(cache: RedisClient, setting: ShopSettingsCreate) -> ShopSettings:
+async def create_setting(setting: ShopSettingsCreate) -> ShopSettings:
     """
     Create a new shop setting
     """
     try:
         res = await db.shopsettings.create(data=setting.model_dump())
-        await cache.invalidate_list_cache("shop-settings")
+        await invalidate_list("shop-settings")
         return res
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.patch("/sync-shop-details")
-async def sync_shop_details(cache: RedisClient, form_data: dict[str, Any]):
+async def sync_shop_details(form_data: dict[str, Any]):
     """
     Sync shop details
     """
@@ -86,13 +85,13 @@ async def sync_shop_details(cache: RedisClient, form_data: dict[str, Any]):
                     },
                 }
             )
-        await cache.invalidate_list_cache("shop-settings")
+        await invalidate_list("shop-settings")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.patch("/{id}", response_model=ShopSettings)
-async def update_setting(cache: RedisClient, id: int, setting: ShopSettingsUpdate) -> Any:
+async def update_setting(id: int, setting: ShopSettingsUpdate) -> Any:
     """
     Update an existing shop setting
     """
@@ -105,14 +104,14 @@ async def update_setting(cache: RedisClient, id: int, setting: ShopSettingsUpdat
             where={"id": id},
             data=setting.model_dump(exclude_unset=True)
         )
-        await cache.invalidate_list_cache("shop-settings")
+        await invalidate_list("shop-settings")
         return res
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.delete("/{id}", response_model=Message)
-async def delete_setting(cache: RedisClient, id: int) -> Any:
+async def delete_setting(id: int) -> Any:
     """
     Delete a shop setting
     """
@@ -122,7 +121,7 @@ async def delete_setting(cache: RedisClient, id: int) -> Any:
 
     try:
         await db.shopsettings.delete(where={"id": id})
-        await cache.invalidate_list_cache("shop-settings")
+        await invalidate_list("shop-settings")
         return {"message": "Setting deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

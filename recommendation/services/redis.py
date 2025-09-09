@@ -39,26 +39,8 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         except Exception:
             return str(o)
 
-
-class CacheService:
-    def __init__(self, redis: Redis):
-        self.redis = redis
-
-    @handle_redis_errors(default=False)
-    async def set(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION, tag: str = None) -> bool:
-        if isinstance(expire, timedelta):
-            expire = int(expire.total_seconds())
-        await self.redis.setex(key, expire, value)
-        if tag:
-            await self.redis.sadd(tag, key)
-
-    @handle_redis_errors()
-    async def get(self, key: str) -> str | None:
-        return await self.redis.get(key)
-
-
 async def get_redis_dependency(request: Request):
-    return CacheService(request.app.state.redis)
+    return request.app.state.redis
 
 
 def cache(key_prefix: str, key: Union[str, Callable[..., str], None] = None, expire: int = DEFAULT_EXPIRATION):
@@ -69,7 +51,7 @@ def cache(key_prefix: str, key: Union[str, Callable[..., str], None] = None, exp
             if not request:
                 raise ValueError("FastAPI Request not found")
 
-            cache = CacheService(request.app.state.redis)
+            redis = request.app.state.redis
 
             if isinstance(key, str):
                 raw_key = f"{key_prefix}:{key}"
@@ -79,14 +61,12 @@ def cache(key_prefix: str, key: Union[str, Callable[..., str], None] = None, exp
             else:
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
-            redis_key = hashlib.md5(raw_key.encode()).hexdigest()
-
-            cached = await cache.get(redis_key)
+            cached = await redis.get(raw_key)
             if cached:
                 return json.loads(cached)
 
             result = await func(*args, **kwargs)
-            await cache.set(redis_key, json.dumps(result, cls=EnhancedJSONEncoder), expire, tag=raw_key)
+            await redis.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
             return result
         return wrapper
     return decorator

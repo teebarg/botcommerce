@@ -8,13 +8,13 @@ from app.core.logging import logger
 from app.services.invoice import invoice_service
 
 from datetime import datetime
-from app.core.deps import supabase, RedisClient
+from app.core.deps import supabase
 from app.services.product import reindex_product
-from app.services.redis import CacheService
 from app.core.config import settings
 from app.services.events import publish_order_event
+from app.services.redis import invalidate_list
 
-async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str, redis: RedisClient) -> OrderResponse:
+async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
     """
     Create a new order from a cart
     """
@@ -62,7 +62,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
         logger.error(f"Failed to create order: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-    await publish_order_event(cache=redis, order=new_order, type="ORDER_CREATED")
+    await publish_order_event(order=new_order, type="ORDER_CREATED")
 
     return new_order
 
@@ -226,7 +226,7 @@ async def send_notification(id: int, user_id: int, notification):
         logger.error(f"Failed to send notification: {e}")
 
 
-async def create_invoice(cache, order_id: int) -> str:
+async def create_invoice(order_id: int) -> str:
     """Generate and upload invoice PDF to Supabase storage, returning the download URL"""
     try:
         order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
@@ -259,8 +259,8 @@ async def create_invoice(cache, order_id: int) -> str:
             data={"invoice_url": public_url}
         )
 
-        await cache.invalidate_list_cache("orders")
-        await cache.bust_tag(f"order:{order_id}")
+        await invalidate_list("orders")
+        await bust(f"order:{order_id}")
 
         return public_url
     except Exception as e:
@@ -268,7 +268,7 @@ async def create_invoice(cache, order_id: int) -> str:
         raise Exception("An unexpected error occurred while generating the invoice")
 
 
-async def decrement_variant_inventory_for_order(order_id: int, notification=None, cache: CacheService = None):
+async def decrement_variant_inventory_for_order(order_id: int, notification=None):
     """
     Decrement inventory for each variant in the order. If inventory reaches 0, set status to OUT_OF_STOCK and send notification.
     """
@@ -297,8 +297,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
                 update_data["status"] = "OUT_OF_STOCK"
                 out_of_stock = True
             await db.productvariant.update(where={"id": variant_id}, data=update_data)
-            if cache:
-                await reindex_product(cache=cache, product_id=variant.product_id)
+            await reindex_product(product_id=variant.product_id)
             if out_of_stock:
                 out_of_stock_variants.append(variant)
             logger.info(f"Decrementing inventory for variant {variant_id} in order {order_id}")

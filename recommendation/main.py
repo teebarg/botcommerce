@@ -14,9 +14,7 @@ from deps import RecommendationClient
 from meilisearch import Client
 from services.product_hydrator import ProductHydrator
 from starlette.middleware.cors import CORSMiddleware
-from services.redis import CacheService
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -30,8 +28,7 @@ async def lifespan(app: FastAPI):
         redis_client = redis.from_url(
             settings.REDIS_URL, decode_responses=True)
         await redis_client.ping()
-        cache_service = CacheService(redis_client)
-        app.state.redis = cache_service
+        app.state.redis = redis_client
         logger.info("✅ ~ connected to redis......:")
         meilisearch_client = Client(
             settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)

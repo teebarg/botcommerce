@@ -2,14 +2,13 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from app.core.deps import (
     CurrentUser,
     get_current_superuser,
-    RedisClient,
 )
 from typing import Optional
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders
-from app.services.redis import cache_response
+from app.services.redis import cache_response, invalidate_list, bust
 from pydantic import BaseModel
 from app.models.order import OrderTimelineEntry
 from app.core.logging import get_logger
@@ -20,14 +19,13 @@ router = APIRouter()
 
 @router.post("/", response_model=OrderResponse)
 async def create_order(
-    cache: RedisClient,
     order_in: OrderCreate,
     user: CurrentUser,
     cartId: str = Header(default=None),
 ):
     try:
-        order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId, redis=cache.redis)
-        await cache.invalidate_list_cache("orders")
+        order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId)
+        await invalidate_list("orders")
         return order
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")
@@ -69,7 +67,7 @@ async def get_orders(
     )
 
 @router.put("/orders/{order_id}", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
-async def update_order(cache: RedisClient, order_id: int, order_update: OrderUpdate):
+async def update_order( order_id: int, order_update: OrderUpdate):
     """
     Update a order.
     """
@@ -91,24 +89,24 @@ async def update_order(cache: RedisClient, order_id: int, order_update: OrderUpd
         where={"id": order_id},
         data=update_data,
     )
-    await cache.invalidate_list_cache("orders")
-    await cache.bust_tag(f"order:{order_id}")
+    await invalidate_list("orders")
+    await bust(f"order:{order_id}")
     return updated_order
 
 @router.delete("/{order_id}")
-async def delete_order(cache: RedisClient, order_id: int):
+async def delete_order(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
     await db.order.delete(where={"id": order_id})
-    await cache.invalidate_list_cache("orders")
-    await cache.bust_tag(f"order:{order_id}")
+    await invalidate_list("orders")
+    await bust(f"order:{order_id}")
     return {"message": "Order deleted successfully"}
 
 
 @router.patch("/{id}/status", response_model=OrderResponse)
-async def order_status(cache: RedisClient, id: int, status: OrderStatus):
+async def order_status(id: int, status: OrderStatus):
     """Change order status"""
     order = await db.order.find_unique(where={"id": id})
     if not order:
@@ -131,12 +129,12 @@ async def order_status(cache: RedisClient, id: int, status: OrderStatus):
         except Exception as e:
             logger.error(f"Failed to create order timeline: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-        await cache.invalidate_list_cache("orders")
-        await cache.bust_tag(f"order:{id}")
+        await invalidate_list("orders")
+        await bust(f"order:{id}")
         return updated_order
 
 @router.post("/{order_id}/fulfill", response_model=OrderResponse)
-async def fulfill_order(cache: RedisClient, order_id: int):
+async def fulfill_order(order_id: int):
     """Mark an order as fulfilled"""
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
@@ -149,15 +147,15 @@ async def fulfill_order(cache: RedisClient, order_id: int):
         where={"id": order_id},
         data={"status": OrderStatus.FULFILLED}
     )
-    await cache.invalidate_list_cache("orders")
-    await cache.bust_tag(f"order:{order_id}")
+    await invalidate_list("orders")
+    await bust(f"order:{order_id}")
     return updated_order
 
 class OrderNotesUpdate(BaseModel):
     notes: str
 
 @router.patch("/{order_id}/notes", response_model=OrderResponse)
-async def update_order_notes(cache: RedisClient, order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None):
+async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None):
     order = await db.order.find_unique(where={"id": order_id})
     if not order or order.user_id != user.id:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -165,8 +163,8 @@ async def update_order_notes(cache: RedisClient, order_id: int, notes_update: Or
         where={"id": order_id},
         data={"order_notes": notes_update.notes}
     )
-    await cache.invalidate_list_cache("orders")
-    await cache.bust_tag(f"order:{order.order_number}")
+    await invalidate_list("orders")
+    await bust(f"order:{order.order_number}")
     return updated_order
 
 

@@ -7,12 +7,12 @@ from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
 from app.services.websocket import manager
 from app.services.activity import log_activity
-from app.services.redis import CacheService
+from app.services.redis import invalidate_list, bust
 
 logger = get_logger(__name__)
 
 @with_prisma_connection
-async def reindex_product(cache: CacheService, product_id: int):
+async def reindex_product(product_id: int):
     try:
         product = await db.product.find_unique(
             where={"id": product_id},
@@ -35,10 +35,10 @@ async def reindex_product(cache: CacheService, product_id: int):
         await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
 
         logger.info(f"Successfully reindexed product {product_id}")
-        await cache.invalidate_list_cache("products")
-        await cache.invalidate_list_cache("shared")
-        await cache.invalidate_list_cache("sharedcollection")
-        await cache.bust_tag(f"product:{product.slug}")
+        await invalidate_list("products")
+        await invalidate_list("shared")
+        await invalidate_list("sharedcollection")
+        await bust(f"product:{product.slug}")
         await manager.broadcast_to_all(
             data={
                 "message": "Product re-indexed successfully",
@@ -51,7 +51,7 @@ async def reindex_product(cache: CacheService, product_id: int):
         logger.error(f"Error re-indexing product {product_id}: {e}")
 
 @with_prisma_connection
-async def index_products(cache: CacheService):
+async def index_products():
     """
     Re-index all products in the database to Meilisearch.
     """
@@ -77,10 +77,10 @@ async def index_products(cache: CacheService):
             index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 
         logger.info(f"Reindexed {len(documents)} products successfully.")
-        await cache.invalidate_list_cache("products")
-        await cache.invalidate_list_cache("product")
-        await cache.invalidate_list_cache("shared")
-        await cache.invalidate_list_cache("sharedcollection")
+        await invalidate_list("products")
+        await invalidate_list("product")
+        await invalidate_list("shared")
+        await invalidate_list("sharedcollection")
         await manager.broadcast_to_all(
             data={
                 "message": "Products re-indexed successfully",
@@ -93,12 +93,12 @@ async def index_products(cache: CacheService):
 
 
 @with_prisma_connection
-async def product_upload(cache: CacheService, user_id: str):
+async def product_upload(user_id: str):
     logger.info("Starting product upload processing...")
     try:
         num_rows = await process_products(user_id=user_id)
 
-        await index_products(cache=cache)
+        await index_products()
         logger.info("Re-indexing completed.")
         await manager.send_to_user(
             user_id=user_id,

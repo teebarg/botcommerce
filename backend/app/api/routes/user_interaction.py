@@ -3,41 +3,38 @@ from typing import List, Optional
 from app.schemas.user_interaction import UserInteractionCreate, UserInteractionResponse
 from app.services.user_interaction import log_user_interaction
 from app.prisma_client import prisma as db
-from app.core.logging import logger
-from app.services.redis import cache_response
-from app.core.deps import (
-    RedisClient
-)
+from app.core.logging import get_logger
+from app.services.redis import cache_response, invalidate_list
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
 @router.post("/")
-async def create_user_interaction(payload: UserInteractionCreate, cache: RedisClient):
+async def create_user_interaction(payload: UserInteractionCreate):
     try:
         await log_user_interaction(
-            redis=cache.redis,
             user_id=payload.user_id,
             product_id=payload.product_id,
             type=payload.type,
             metadata=payload.metadata,
         )
-        await cache.invalidate_list_cache("interactions")
+        await invalidate_list("interactions")
         return {"message": "success"}
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/batch")
-async def batch_user_interactions(cache: RedisClient, payload: List[UserInteractionCreate] = Body(...)):
+async def batch_user_interactions(payload: List[UserInteractionCreate] = Body(...)):
     for item in payload:
         await log_user_interaction(
-            redis=cache.redis,
             user_id=item.user_id,
             product_id=item.product_id,
             type=item.type,
             metadata=item.metadata,
         )
-    await cache.invalidate_list_cache("interactions")
+    await invalidate_list("interactions")
     return {"message": "success"}
 
 @router.get("/", response_model=List[UserInteractionResponse])

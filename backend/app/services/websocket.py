@@ -103,9 +103,8 @@ class InMemoryWebSocketManager:
             for user_id in to_disconnect:
                 logger.info(f"⏳ Disconnecting idle user {user_id}")
                 await self.disconnect(user_id)
-                cache.delete(f"session:{user_id}")
 
-            await asyncio.sleep(10)  # Check every 10 seconds
+            await asyncio.sleep(10)
 
 
 manager = InMemoryWebSocketManager()

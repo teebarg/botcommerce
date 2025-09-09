@@ -45,14 +45,14 @@ def limit(rate_string: str):
             if not request:
                 raise ValueError("FastAPI Request not found")
 
-            cache = request.app.state.redis
+            redis = request.app.state.redis
             client_ip = request.client.host
             key = f"rate_limit:{client_ip}:{func.__name__}"
 
-            current_count = await cache.incr(key)
+            current_count = await redis.incr(key)
 
             if current_count == 1:
-                await cache.expire(key, period_seconds)
+                await redis.expire(key, period_seconds)
 
             if current_count > max_requests:
                 raise HTTPException(

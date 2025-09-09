@@ -36,7 +36,7 @@ const flushBuffer = async () => {
 
 const scheduleFlush = () => {
     if (flushTimeout) clearTimeout(flushTimeout);
-    flushTimeout = setTimeout(flushBuffer, 5000);
+    flushTimeout = setTimeout(flushBuffer, 15000);
 };
 
 export const useTrackUserInteraction = () => {

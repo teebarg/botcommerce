@@ -2,13 +2,12 @@ from datetime import datetime, timedelta
 from functools import wraps
 from typing import Any, Callable, Union
 
-import asyncio
-import hashlib
 import json
 
 from fastapi import Request
 from redis import Redis
 
+from app.redis_client import redis_client
 from app.core.logging import logger
 import json
 
@@ -37,158 +36,40 @@ class EnhancedJSONEncoder(json.JSONEncoder):
             return str(o)
 
 
-class CacheService:
-    def __init__(self, redis: Redis):
-        self.redis = redis
+@handle_redis_errors(default=False)
+async def publish_event(event_name: str, payload: dict[str, Any]) -> bool:
+    """
+    Append an event to a Redis Stream for durable consumption by consumers.
+    Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
+    """
+    stream_key = f"events:{event_name}"
+    data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
+    await redis_client.xadd(stream_key, data)
+    return True
 
-    @handle_redis_errors(default=False)
-    def redis(self) -> Redis:
-        return self.redis
 
-    @handle_redis_errors(default=[])
-    def keys(self, pattern: str) -> list[str]:
-        return self.redis.keys(pattern)
+@handle_redis_errors(default=False)
+async def invalidate_list(entity: str):
+    """
+    Invalidate all list/search redis entries for a given entity (e.g., "products:*").
+    """
+    pattern = f"{entity}:*"
+    cursor = 0
 
-    @handle_redis_errors(default=False)
-    def ping(self) -> bool:
-        return self.redis.ping()
-
-    @handle_redis_errors(default=False)
-    def hset(self, key: str, mapping: dict) -> bool:
-        return self.redis.hset(key, mapping=mapping)
-
-    @handle_redis_errors(default=False)
-    def hset_field(self, key: str, field: str, value: Any) -> bool:
-        return self.redis.hset(key, field, value)
-
-    @handle_redis_errors()
-    def hget(self, key: str, field: str) -> str | None:
-        return self.redis.hget(key, field)
-
-    @handle_redis_errors()
-    def hgetall(self, key: str) -> dict[str, str] | None:
-        return self.redis.hgetall(key)
-
-    @handle_redis_errors(default=False)
-    async def fset(self, key: str, value: Any, expire: int | timedelta | None = DEFAULT_EXPIRATION, tag: str = None) -> bool:
-        if isinstance(expire, timedelta):
-            expire = int(expire.total_seconds())
-        await self.redis.setex(key, expire, value)
-        if tag:
-            await self.redis.sadd(tag, key)
-
-    @handle_redis_errors()
-    async def get(self, key: str) -> str | None:
-        return await self.redis.get(key)
-
-    @handle_redis_errors()
-    async def set(self, key: str, value: Any, ex: int | timedelta | None = DEFAULT_EXPIRATION) -> str | None:
-        return await self.redis.set(key, value, ex)
-
-    @handle_redis_errors(default=False)
-    async def bust_tag(self, tag: str):
-        keys = await self.redis.smembers(tag)
+    while True:
+        cursor, keys = await redis_client.scan(cursor=cursor, match=pattern, count=100)
         if keys:
-            await self.redis.delete(*keys)
-        await self.redis.delete(tag)
+            await redis_client.delete(*keys)
+        if cursor == 0:
+            break
 
-    @handle_redis_errors(default=False)
-    async def invalidate_list_cache(self, entity: str):
-        """
-        Invalidate all list/search cache entries for a given entity (e.g., "product", "collection").
-        This should match the prefix used in @cache_response for list views.
-        """
-        async for tag in self.redis.scan_iter(match=f"{entity}:*"):
-            await self.bust_tag(tag)
-
-    @handle_redis_errors(default=False)
-    async def delete(self, key: str) -> bool:
-        return bool(await self.redis.delete(key))
-
-    @handle_redis_errors(default=False)
-    async def exists(self, key: str) -> bool:
-        return bool(await self.redis.exists(key))
-
-    @handle_redis_errors(default=False)
-    async def clear(self) -> bool:
-        return bool(await self.redis.flushdb())
-
-    @handle_redis_errors(default=False)
-    async def invalidate(self, key: str) -> bool:
-        return await self.delete_pattern(f"{key}:*")
-
-    @handle_redis_errors(default=False)
-    async def delete_pattern(self, pattern: str) -> bool:
-        cursor = 0
-        while True:
-            cursor, keys = await self.redis.scan(cursor, pattern, count=100)
-            if keys:
-                await self.redis.delete(*keys)
-            if cursor == 0:
-                break
-        return True
-
-    @handle_redis_errors(default=0)
-    def incr(self, key: str) -> int:
-        return self.redis.incr(key)
-
-    @handle_redis_errors(default=False)
-    def expire(self, key: str, seconds: int) -> bool:
-        return self.redis.expire(key, seconds)
-
-    @handle_redis_errors(default=0)
-    async def publish(self, channel: str, message: Any) -> int:
-        """
-        Publish a message to a Redis Pub/Sub channel. Message will be JSON-encoded if not a string.
-        Returns the number of clients that received the message.
-        """
-        try:
-            payload = message if isinstance(message, str) else json.dumps(message, cls=EnhancedJSONEncoder)
-        except Exception:
-            payload = str(message)
-        return await self.redis.publish(channel, payload)
-
-    @handle_redis_errors(default=False)
-    async def publish_event(self, event_name: str, payload: dict[str, Any]) -> bool:
-        """
-        Append an event to a Redis Stream for durable consumption by consumers.
-        Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
-        """
-        stream_key = f"events:{event_name}"
-        data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
-        await self.redis.xadd(stream_key, data)
-        return True
-
-    @handle_redis_errors(default=False)
-    async def zadd(self, key: str, mapping: dict) -> bool:
-        return await self.redis.zadd(key, mapping)
-
-    @handle_redis_errors(default=False)
-    async def zrem(self, key: str, member: str) -> bool:
-        return await self.redis.zrem(key, member)
-
-    @handle_redis_errors(default=[])
-    async def zrevrange(self, key: str, start: int, end: int) -> list:
-        return await self.redis.zrevrange(key, start, end)
-
-    @handle_redis_errors(default=0)
-    async def zremrangebyrank(self, key: str, start: int, end: int) -> int:
-        return await self.redis.zremrangebyrank(key, start, end)
-
-    @handle_redis_errors(default=0)
-    async def zincrby(self, key: str, amount: float, member: str) -> float:
-        return await self.redis.zincrby(key, amount, member)
-
-    @handle_redis_errors(default=[])
-    async def zrange(self, key: str, start: int, end: int, withscores: bool = False) -> list:
-        return await self.redis.zrange(key, start, end, withscores=withscores)
+@handle_redis_errors(default=False)
+async def bust(key: str) -> bool:
+    """Delete a specific Redis key"""
+    return await redis_client.delete(key) > 0
 
 async def get_redis_dependency(request: Request):
-    return CacheService(request.app.state.redis)
-
-async def invalidate_cache(cache: CacheService, keys: list[str]):
-    for key in keys:
-        await cache.delete_pattern(key)
+    return request.app.state.redis
 
 
 def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = None, expire: int = DEFAULT_EXPIRATION):
@@ -199,7 +80,7 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
             if not request:
                 raise ValueError("FastAPI Request not found")
 
-            cache = CacheService(request.app.state.redis)
+            redis = request.app.state.redis
 
             if isinstance(key, str):
                 raw_key = f"{key_prefix}:{key}"
@@ -209,57 +90,12 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
             else:
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
-            redis_key = hashlib.md5(raw_key.encode()).hexdigest()
-
-            cached = await cache.get(redis_key)
+            cached = await redis.get(raw_key)
             if cached is not None:
                 return json.loads(cached)
 
             result = await func(*args, **kwargs)
-            await cache.fset(redis_key, json.dumps(result, cls=EnhancedJSONEncoder), expire, tag=raw_key)
+            await redis.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
             return result
         return wrapper
     return decorator
-
-
-STALE_TTL_SECONDS = 60 * 5
-
-def stale_while_revalidate(key_prefix: str, expire: int = DEFAULT_EXPIRATION):
-    def decorator(func: Callable):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            request: Request = kwargs["request"]
-            cache: CacheService = kwargs["cache"]
-
-            raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
-            hashed_key = hashlib.md5(raw_key.encode()).hexdigest()
-            data_key = f"{hashed_key}:data"
-            ts_key = f"{hashed_key}:ts"
-
-            cached_data = await cache.get(data_key)
-            cached_ts = await cache.get(ts_key)
-
-            if cached_data:
-                if cached_ts:
-                    ts = datetime.fromisoformat(cached_ts)
-                    age = (datetime.utcnow() - ts).total_seconds()
-
-                    if age > STALE_TTL_SECONDS:
-                        asyncio.create_task(_revalidate_and_cache(func, args, kwargs, cache, data_key, ts_key, expire))
-
-                return json.loads(cached_data)
-
-            return await _revalidate_and_cache(func, args, kwargs, cache, data_key, ts_key, expire)
-
-        return wrapper
-    return decorator
-
-
-async def _revalidate_and_cache(func, args, kwargs, cache, data_key, ts_key, expire):
-    result = await func(*args, **kwargs)
-    try:
-        await cache.set(data_key, json.dumps(result), expire)
-        await cache.set(ts_key, datetime.utcnow().isoformat(), expire)
-    except Exception as e:
-        logger.error(f"Error caching revalidated data: {str(e)}")
-    return result

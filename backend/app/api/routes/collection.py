@@ -6,12 +6,7 @@ from fastapi import (
     Request
 )
 
-
-from app.core.deps import (
-    get_current_user,
-    RedisClient
-    
-)
+from app.core.deps import get_current_user
 from app.models.collection import (
     CollectionCreate,
     Collection,
@@ -25,7 +20,7 @@ from app.core.utils import slugify
 from prisma.errors import PrismaError
 from typing import Optional
 from math import ceil
-from app.services.redis import cache_response
+from app.services.redis import cache_response, invalidate_list, bust
 
 router = APIRouter()
 
@@ -82,7 +77,7 @@ async def index(
 
 
 @router.post("/")
-async def create(*, create_data: CollectionCreate, cache: RedisClient) -> Collection:
+async def create(*, create_data: CollectionCreate) -> Collection:
     """
     Create new collection.
     """
@@ -93,7 +88,7 @@ async def create(*, create_data: CollectionCreate, cache: RedisClient) -> Collec
                 "slug": slugify(create_data.name)
             }
         )
-        await cache.invalidate_list_cache("collections")
+        await invalidate_list("collections")
         return collection
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -119,7 +114,6 @@ async def update(
     *,
     id: int,
     update_data: CollectionUpdate,
-    cache: RedisClient,
 ) -> Collection:
     """
     Update a collection and invalidate cache.
@@ -135,15 +129,15 @@ async def update(
             where={"id": id},
             data=update_data.model_dump()
         )
-        await cache.invalidate_list_cache("collections")
-        await cache.bust_tag(f"collection:{update.slug}")
+        await invalidate_list("collections")
+        await bust(f"collection:{update.slug}")
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}")
-async def delete(id: int, cache: RedisClient) -> Message:
+async def delete(id: int) -> Message:
     """
     Delete a collection.
     """
@@ -157,8 +151,8 @@ async def delete(id: int, cache: RedisClient) -> Message:
         await db.collection.delete(
             where={"id": id}
         )
-        await cache.invalidate_list_cache("collections")
-        await cache.bust_tag(f"collection:{existing.slug}")
+        await invalidate_list("collections")
+        await bust(f"collection:{existing.slug}")
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

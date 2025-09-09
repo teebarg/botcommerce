@@ -1,16 +1,16 @@
 from typing import List
 from datetime import datetime
-from app.services.redis import CacheService
 from app.services.meilisearch import get_or_create_index
 from app.core.config import settings
 from app.services.websocket import manager
 from app.core.logging import get_logger
+from app.redis_client import redis_client
+from app.services.redis import invalidate_list
 
 logger = get_logger(__name__)
 
 class RecentlyViewedService:
-    def __init__(self, cache: CacheService):
-        self.cache = cache
+    def __init__(self):
         self.max_items = 12
 
     async def get_key(self, user_id: int) -> str:
@@ -22,11 +22,11 @@ class RecentlyViewedService:
         timestamp = datetime.now().timestamp()
 
         # Add to sorted set with timestamp as score
-        await self.cache.zadd(key, {str(product_id): timestamp})
+        await redis_client.zadd(key, {str(product_id): timestamp})
 
-        await self.cache.zremrangebyrank(key, 0, -(self.max_items + 1))
+        await redis_client.zremrangebyrank(key, 0, -(self.max_items + 1))
 
-        await self.cache.invalidate_list_cache(f"user_recently_viewed:{user_id}")
+        await invalidate_list(f"user_recently_viewed:{user_id}")
 
         await manager.send_to_user(
             user_id=user_id,
@@ -36,12 +36,12 @@ class RecentlyViewedService:
 
     async def remove_product_from_all(self, product_id: int):
         """Remove a product from all users' recently viewed list"""
-        keys = await self.cache.keys("recently_viewed:*")
+        keys = await redis_client.keys("recently_viewed:*")
         try:
             for key in keys:
-                await self.cache.zrem(key, str(product_id))
+                await redis_client.zrem(key, str(product_id))
 
-            await self.cache.invalidate_list_cache("user_recently_viewed")
+            await invalidate_list("user_recently_viewed")
         except Exception as e:
             logger.error(f"Error removing product from recently viewed list: {str(e)}")
 
@@ -49,7 +49,7 @@ class RecentlyViewedService:
         """Get user's recently viewed products"""
         key = await self.get_key(user_id)
 
-        product_ids = await self.cache.zrevrange(key, 0, limit - 1)
+        product_ids = await redis_client.zrevrange(key, 0, limit - 1)
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
 
         products = []

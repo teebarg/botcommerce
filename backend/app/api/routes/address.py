@@ -5,7 +5,7 @@ from fastapi import (
     Request
 )
 
-from app.core.deps import CurrentUser, RedisClient
+from app.core.deps import CurrentUser
 from app.models.address import (
     AddressCreate,
     AddressUpdate,
@@ -16,7 +16,7 @@ from app.prisma_client import prisma as db
 from math import ceil
 from prisma.errors import PrismaError
 from app.core.logging import get_logger
-from app.services.redis import cache_response
+from app.services.redis import cache_response, invalidate_list, bust
 
 logger = get_logger(__name__)
 
@@ -57,7 +57,7 @@ async def index(
 
 @router.post("/")
 async def create(
-    *, user: CurrentUser, create_data: AddressCreate, redis: RedisClient
+    *, user: CurrentUser, create_data: AddressCreate
 ) -> Address:
     """
     Create new address.
@@ -69,7 +69,7 @@ async def create(
                 "user": {"connect": {"id": user.id}},
             }
         )
-        await redis.invalidate_list_cache("addresses")
+        await invalidate_list("addresses")
         return address
     except PrismaError as e:
         logger.error(e)
@@ -97,7 +97,6 @@ async def update(
     id: int,
     user: CurrentUser,
     update: AddressUpdate,
-    redis: RedisClient,
 ) -> Address:
     """
     Update a address.
@@ -122,8 +121,8 @@ async def update(
                 **update_data
             }
         )
-        await redis.invalidate_list_cache("addresses")
-        await redis.bust_tag(f"address:{user.id}:{id}")
+        await invalidate_list("addresses")
+        await bust(f"address:{user.id}:{id}")
         return update
     except PrismaError as e:
         raise HTTPException(
@@ -131,7 +130,7 @@ async def update(
 
 
 @router.delete("/{id}")
-async def delete(id: int, user: CurrentUser, redis: RedisClient) -> Message:
+async def delete(id: int, user: CurrentUser) -> Message:
     """
     Delete a address.
     """
@@ -150,8 +149,8 @@ async def delete(id: int, user: CurrentUser, redis: RedisClient) -> Message:
         await db.address.delete(
             where={"id": id}
         )
-        await redis.invalidate_list_cache("addresses")
-        await redis.bust_tag(f"address:{user.id}:{id}")
+        await invalidate_list("addresses")
+        await bust(f"address:{user.id}:{id}")
         return Message(message="Address deleted successfully")
     except PrismaError as e:
         raise HTTPException(
