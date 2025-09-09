@@ -11,7 +11,7 @@ const HeroSection: React.FC = () => {
     const router = useRouter();
 
     return (
-        <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[75vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <Image priority alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" sizes="100vw" src={heroImage} />
                 <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent dark:from-background/85 dark:via-background/40" />
@@ -35,12 +35,12 @@ const HeroSection: React.FC = () => {
                             <span className="text-sm font-medium">New Collection</span>
                         </div>
 
-                        <div className="space-y-4">
-                            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight text-foreground">
+                        <div className="space-y-3">
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
                                 Elevate Your
-                                <span className="block text-accent">Style</span>
+                                <span className="inline-block text-accent ml-2">Style</span>
                             </h1>
-                            <p className="text-xl sm:text-2xl text-muted-foreground max-w-lg">
+                            <p className="text-lg sm:text-2xl text-muted-foreground max-w-lg">
                                 Discover our curated collection of premium fashion pieces that define elegance and sophistication.
                             </p>
                         </div>
@@ -54,7 +54,7 @@ const HeroSection: React.FC = () => {
                                 <div className="w-2 h-2 rounded-full bg-accent" />
                                 <span>Sustainable Fashion</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="hidden lg:flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full bg-accent" />
                                 <span>Global Shipping</span>
                             </div>
@@ -71,7 +71,7 @@ const HeroSection: React.FC = () => {
                             </Button>
                         </div>
 
-                        <div className="pt-8 border-t border-border/20">
+                        <div className="pt-6 lg:pt-8 border-t border-border/20">
                             <div className="flex items-center gap-6">
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-foreground">5K+</div>

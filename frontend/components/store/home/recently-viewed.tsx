@@ -4,18 +4,17 @@ import React from "react";
 import { Eye } from "lucide-react";
 
 import { useUserRecentlyViewed } from "@/lib/hooks/useUser";
-import { ProductSearch } from "@/schemas";
-import ProductCard from "@/components/store/products/product-card2";
 import PromotionalBanner from "@/components/promotion";
+import ScrollableListing from "@/components/store/products/scrollable-listing";
 
 export default function RecentlyViewedSection() {
-    const { data } = useUserRecentlyViewed(4);
+    const { data } = useUserRecentlyViewed(5);
 
     if (!data || data.length === 0) return null;
 
     return (
-        <section className="py-16">
-            <div className="max-w-8xl mx-auto">
+        <section className="py-16 px-6">
+            <div className="max-w-9xl mx-auto">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                         <Eye className="h-5 w-5 text-primary" />
@@ -27,13 +26,11 @@ export default function RecentlyViewedSection() {
                         </p>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-                    {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
-                </div>
+                <ScrollableListing products={data || []} />
             </div>
             <PromotionalBanner
                 btnClass="text-purple-600"
-                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
+                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-9xl"
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />

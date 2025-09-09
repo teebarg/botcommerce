@@ -33,7 +33,7 @@ export default async function Home() {
 
             <PromotionalBanner
                 btnClass="text-purple-600"
-                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
+                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-9xl"
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
@@ -45,7 +45,7 @@ export default async function Home() {
             </LazyFadeIn>
             <PromotionalBanner
                 btnClass="text-purple-600"
-                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
+                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-9xl"
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
