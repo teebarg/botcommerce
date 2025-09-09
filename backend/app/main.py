@@ -17,6 +17,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
 import redis.asyncio as redis
+from app.redis_client import redis_client
 from app.services.meilisearch import get_or_create_index
 
 from app.core.logging import get_logger
@@ -36,8 +37,6 @@ async def lifespan(app: FastAPI):
     await db.connect()
     logger.debug("✅ ~ connected to prisma......:")
     try:
-        redis_client = redis.from_url(
-            settings.REDIS_URL, decode_responses=True)
         await redis_client.ping()
         app.state.redis = redis_client
         logger.debug("✅ ~ connected to redis......:")

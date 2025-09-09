@@ -47,20 +47,18 @@ const ProductOverview: React.FC<{
     const trackInteraction = useTrackUserInteraction();
 
     useEffect(() => {
-        handlePurchase("VIEW");
-
         const startTime = Date.now();
 
         return () => {
             const timeSpent = Date.now() - startTime;
 
-            handlePurchase("VIEW", { timeSpent });
+            handleUserInteraction("VIEW", { timeSpent });
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session?.id, product?.id]);
 
     const handleAddToCartAndTrack = () => {
-        handlePurchase("CART_ADD");
+        handleUserInteraction("CART_ADD");
         handleAddToCart();
     };
 
@@ -69,15 +67,15 @@ const ProductOverview: React.FC<{
 
     const addWishlist = async () => {
         createWishlist(product.id);
-        handlePurchase("WISHLIST_ADD");
+        handleUserInteraction("WISHLIST_ADD");
     };
 
     const removeWishlist = async () => {
         deleteWishlist(product.id);
-        handlePurchase("WISHLIST_REMOVE");
+        handleUserInteraction("WISHLIST_REMOVE");
     };
 
-    const handlePurchase = async (type: UserInteractionType, metadata?: Record<string, any>) => {
+    const handleUserInteraction = async (type: UserInteractionType, metadata?: Record<string, any>) => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
                 user_id: session.id,

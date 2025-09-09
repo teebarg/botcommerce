@@ -14,7 +14,8 @@ from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from prisma.models import User
 from supabase import create_client, Client
-from app.services.redis import get_redis_dependency, CacheService
+from app.services.redis import get_redis_dependency
+import redis.asyncio as redis
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -26,7 +27,7 @@ supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 # SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 
-RedisClient = Annotated[CacheService, Depends(get_redis_dependency)]
+RedisClient = Annotated[redis.Redis, Depends(get_redis_dependency)]
 
 async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
     try:

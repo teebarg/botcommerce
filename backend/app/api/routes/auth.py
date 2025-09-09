@@ -8,12 +8,10 @@ from app.core.config import settings
 from app.core.utils import generate_magic_link_email, send_email, generate_welcome_email, generate_verification_email
 from app.models.user import User
 from app.prisma_client import prisma
-from app.services.redis import CacheService
 from app.services.events import publish_user_registered
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from app.models.generic import Token
-from app.core import deps
 
 import httpx
 from typing import Optional
@@ -95,9 +93,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
     )
 
     try:
-        cache: CacheService = CacheService(request.app.state.redis)
         await publish_user_registered(
-            cache,
             user=user,
             source="email_password",
             created_at=user.created_at,
@@ -252,9 +248,7 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
 
         if not user_before:
             try:
-                cache: CacheService = CacheService(request.app.state.redis)
                 await publish_user_registered(
-                    cache,
                     user=user,
                     source="google_oauth",
                     created_at=user.created_at,
@@ -292,9 +286,7 @@ async def google(request: Request, payload: GooglePayload) -> Token:
 
     if not user_before:
         try:
-            cache: CacheService = CacheService(request.app.state.redis)
             await publish_user_registered(
-                cache,
                 user=user,
                 source="google_direct",
                 created_at=user.created_at,
@@ -353,9 +345,7 @@ async def send_magic_link(
         )
 
         try:
-            cache: CacheService = CacheService(request.app.state.redis)
             await publish_user_registered(
-                cache,
                 user=user,
                 source="magic_link_auto_create",
                 created_at=user.created_at,
@@ -385,7 +375,7 @@ class SyncUserPayload(BaseModel):
 
 
 @router.post("/sync-user")
-async def sync_user(request: Request, payload: SyncUserPayload, redis: deps.RedisClient) -> Message:
+async def sync_user(request: Request, payload: SyncUserPayload) -> Message:
     user = await prisma.user.find_first(
         where={
             "email": payload.email,
@@ -405,7 +395,6 @@ async def sync_user(request: Request, payload: SyncUserPayload, redis: deps.Redi
         )
         try:
             await publish_user_registered(
-                redis,
                 user=user,
                 source="sync_user",
                 created_at=user.created_at,

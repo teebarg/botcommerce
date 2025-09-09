@@ -10,7 +10,7 @@ from prisma.enums import Role
 from app.core.deps import get_current_superuser, RedisClient
 from typing import Literal, Optional
 from datetime import timedelta, datetime
-from app.services.redis import cache_response
+from app.services.redis import cache_response, invalidate_list
 from app.services.meilisearch import clear_index
 from app.core.config import settings
 
@@ -117,22 +117,21 @@ async def stats_trends(
 
 @router.post("/cache/bust", dependencies=[Depends(get_current_superuser)])
 async def bust_redis_cache(
-    cache: RedisClient,
     pattern: str = Body(..., embed=True, description="Key or pattern to delete from Redis cache"),
 ):
     """Bust Redis cache by key."""
     try:
-        result = await cache.delete_pattern(pattern)
+        result = await invalidate_list(pattern)
         return {"success": result, "pattern": pattern}
     except Exception as e:
         return {"success": False, "error": str(e), "pattern": pattern}
 
 @router.post("/cache/clear", dependencies=[Depends(get_current_superuser)])
-async def clear_redis_cache(cache: RedisClient):
-    """Clear the entire Redis database (admin only)."""
+async def clear_redis_cache(redis: RedisClient):
+    """Clear the entire Redis database"""
     try:
         clear_index(settings.MEILI_PRODUCTS_INDEX)
-        result = await cache.clear()
+        result = await redis.flushdb()
         return {"success": result}
     except Exception as e:
         return {"success": False, "error": str(e)}

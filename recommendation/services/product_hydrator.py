@@ -4,7 +4,6 @@ from models import SearchProduct
 from meilisearch import Client as MeiliClient
 import json
 import logging
-import hashlib
 from config import settings
 from datetime import datetime, timedelta
 
@@ -27,18 +26,16 @@ class ProductHydrator:
         self.meili = meili_client
         self.index = meili_client.index(settings.MEILI_PRODUCTS_INDEX)
 
-    def _cache_key(self, product_id: int) -> tuple[str, str]:
-        raw_key = f"product:{product_id}"
-        redis_key = hashlib.md5(raw_key.encode()).hexdigest()
-        return raw_key, redis_key
+    def _cache_key(self, product_id: int) -> str:
+        return f"product:{product_id}"
 
     async def cache_product(self, product: SearchProduct, ttl: int = DEFAULT_EXPIRATION):
-        raw_key, redis_key = self._cache_key(product.id)
-        await self.redis.set(key=redis_key, value=json.dumps(product, cls=EnhancedJSONEncoder), expire=ttl, tag=raw_key)
+        raw_key = self._cache_key(product.id)
+        await self.redis.setex(raw_key, ttl, json.dumps(product, cls=EnhancedJSONEncoder))
 
     async def get_from_cache(self, product_id: int) -> SearchProduct | None:
-        raw_key, redis_key = self._cache_key(product_id)
-        cached = await self.redis.get(redis_key)
+        raw_key = self._cache_key(product_id)
+        cached = await self.redis.get(raw_key)
         if cached:
             try:
                 return SearchProduct(**json.loads(cached))

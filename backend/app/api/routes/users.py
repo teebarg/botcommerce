@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 from app.core.deps import (
     CurrentUser,
-    get_current_superuser, RedisClient
+    get_current_superuser
 )
 from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists, WishlistCreate
@@ -55,7 +55,6 @@ async def update_user_me(
     """
     Update own user.
     """
-    # Check if email is being updated and if it's already taken
     if user_in.email:
         existing = await db.user.find_unique(
             where={
@@ -69,7 +68,6 @@ async def update_user_me(
             raise HTTPException(status_code=400, detail="Email already registered")
 
     try:
-        # Update user with provided fields
         update = await db.user.update(
             where={"id": user.id},
             data=user_in.model_dump(exclude_unset=True)
@@ -258,7 +256,6 @@ async def change_password(
     """
     Change user's password.
     """
-    # Verify old password
     if not verify_password(password_data.old_password, current_user.hashed_password):
         raise HTTPException(
             status_code=400,
@@ -266,7 +263,6 @@ async def change_password(
         )
 
     try:
-        # Update password
         await db.user.update(
             where={"id": current_user.id},
             data={"hashed_password": get_password_hash(password_data.new_password)}
@@ -277,14 +273,13 @@ async def change_password(
 
 
 @router.get("/recently-viewed")
-@cache_response(key_prefix="user_recently_viewed", key=lambda request, current_user, redis, limit: f"{current_user.id}:{limit}")
+@cache_response(key_prefix="user_recently_viewed", key=lambda request, current_user, limit: f"{current_user.id}:{limit}")
 async def get_recently_viewed(
     request: Request,
     current_user: CurrentUser,
-    redis: RedisClient,
     limit: int = Query(default=10, le=20)
 ) -> list[SearchProduct]:
     """Get current user's recently viewed products."""
-    service = RecentlyViewedService(cache=redis)
+    service = RecentlyViewedService()
     products = await service.get_recently_viewed(current_user.id, limit)
     return products

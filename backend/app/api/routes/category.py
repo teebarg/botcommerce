@@ -10,8 +10,8 @@ from app.models.generic import ImageUpload
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
-from app.services.redis import cache_response
-from app.core.deps import get_current_superuser, RedisClient
+from app.services.redis import cache_response, invalidate_list, bust
+from app.core.deps import get_current_superuser
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -45,7 +45,7 @@ async def index(
     )
 
 @router.post("/")
-async def create(*, data: CategoryCreate, cache: RedisClient) -> Category:
+async def create(*, data: CategoryCreate) -> Category:
     """
     Create new category.
     """
@@ -53,7 +53,7 @@ async def create(*, data: CategoryCreate, cache: RedisClient) -> Category:
         category = await db.category.create(
             data={**data.model_dump(), "slug": slugify(data.name)}
         )
-        await cache.invalidate_list_cache("categories")
+        await invalidate_list("categories")
         return category
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -99,7 +99,7 @@ class BulkOrderUpdate(BaseModel):
     categories: list[CategoryOrderUpdate]
 
 @router.patch("/reorder")
-async def reorder_categories(order_data: BulkOrderUpdate, cache: RedisClient):
+async def reorder_categories(order_data: BulkOrderUpdate):
     """Update display order for categories"""
     async with db.tx() as tx:
         try:
@@ -111,8 +111,8 @@ async def reorder_categories(order_data: BulkOrderUpdate, cache: RedisClient):
                         data={"display_order": category_update.display_order}
                     )
 
-            await cache.invalidate_list_cache("categories")
-            await cache.invalidate_list_cache("category")
+            await invalidate_list("categories")
+            await invalidate_list("category")
             return {"message": "categories reordered successfully"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
@@ -124,7 +124,6 @@ async def update(
     *,
     id: int,
     update_data: CategoryUpdate,
-    cache: RedisClient,
 ) -> Category:
     """
     Update a category and invalidate cache.
@@ -140,9 +139,9 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
-        await cache.invalidate_list_cache("categories")
-        await cache.bust_tag(f"category:{id}")
-        await cache.bust_tag(f"category:{update.slug}")
+        await invalidate_list("categories")
+        await bust(f"category:{id}")
+        await bust(f"category:{update.slug}")
         return update
     except PrismaError as e:
         logger.error(f"Failed to update category: {str(e)}")
@@ -150,7 +149,7 @@ async def update(
 
 
 @router.delete("/{id}")
-async def delete(id: int, cache: RedisClient) -> Message:
+async def delete(id: int) -> Message:
     """
     Delete a category.
     """
@@ -164,9 +163,9 @@ async def delete(id: int, cache: RedisClient) -> Message:
         await db.category.delete(
             where={"id": id}
         )
-        await cache.invalidate_list_cache("categories")
-        await cache.bust_tag(f"category:{id}")
-        await cache.bust_tag(f"category:{existing.slug}")
+        await invalidate_list("categories")
+        await bust(f"category:{id}")
+        await bust(f"category:{existing.slug}")
         return Message(message="Category deleted successfully")
     except PrismaError as e:
         logger.error(f"Failed to delete category: {str(e)}")
@@ -195,7 +194,7 @@ async def autocomplete(request: Request, query: str = "") -> Any:
 
 
 @router.patch("/{id}/image")
-async def add_image(id: int, image_data: ImageUpload, cache: RedisClient) -> Category:
+async def add_image(id: int, image_data: ImageUpload) -> Category:
     """
     Add an image to a category.
     """
@@ -212,9 +211,9 @@ async def add_image(id: int, image_data: ImageUpload, cache: RedisClient) -> Cat
             where={"id": id},
             data={"image": image_url}
         )
-        await cache.invalidate_list_cache("categories")
-        await cache.bust_tag(f"category:{id}")
-        await cache.bust_tag(f"category:{updated_category.slug}")
+        await invalidate_list("categories")
+        await bust(f"category:{id}")
+        await bust(f"category:{updated_category.slug}")
         return updated_category
 
     except Exception as e:
@@ -226,10 +225,7 @@ async def add_image(id: int, image_data: ImageUpload, cache: RedisClient) -> Cat
 
 
 @router.delete("/{id}/image", dependencies=[Depends(get_current_superuser)])
-async def delete_image(
-    id: int,
-    cache: RedisClient
-) -> Message:
+async def delete_image(id: int) -> Message:
     """
     Delete the image of a category.
     """
@@ -250,9 +246,9 @@ async def delete_image(
             where={"id": id},
             data={"image": None}
         )
-        await cache.invalidate_list_cache("categories")
-        await cache.bust_tag(f"category:{id}")
-        await cache.bust_tag(f"category:{category.slug}")
+        await invalidate_list("categories")
+        await bust(f"category:{id}")
+        await bust(f"category:{category.slug}")
         return Message(message="Category image deleted successfully")
 
     except Exception as e:

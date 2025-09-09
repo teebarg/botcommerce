@@ -3,9 +3,6 @@ from app.core.logging import get_logger
 from app.core.deps import get_notification_service
 from app.services.order import send_notification, decrement_variant_inventory_for_order, create_invoice
 from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod
-from app.core.config import settings
-from app.services.redis import CacheService
-import redis.asyncio as redis
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
 from prisma import Json
@@ -33,16 +30,10 @@ def get_notification():
     return notification
 
 
-def get_cache():
-    redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
-    cache = CacheService(redis_client)
-    return cache
-
-
 async def handle_order_paid(event):
     try:
-        await create_invoice(order_id=int(event["order_id"]), cache=get_cache())
-        await decrement_variant_inventory_for_order(cache=get_cache(), order_id=int(event["order_id"]), notification=get_notification())
+        await create_invoice(order_id=int(event["order_id"]))
+        await decrement_variant_inventory_for_order(order_id=int(event["order_id"]), notification=get_notification())
     except Exception as e:
         logger.error(f"Failed to create invoice or decrement variant inventory for order {event['order_id']}: {e}")
         raise Exception(f"Failed to create invoice or decrement variant inventory for order {event['order_id']}")
@@ -66,7 +57,7 @@ async def handle_order_created(event):
                 "variant": True,
             }
         )
-        service = PopularProductsService(cache=get_cache())
+        service = PopularProductsService()
         for item in order_items:
             await service.track_product_interaction(product_id=item.variant.product_id, interaction_type="purchase")
     except Exception as e:
@@ -115,7 +106,7 @@ async def handle_recently_viewed(event):
 
     try:
         if event["view_type"] == "VIEW":
-            recent_service = RecentlyViewedService(cache=get_cache())
+            recent_service = RecentlyViewedService()
             await recent_service.add_product(user_id=int(event["user_id"]), product_id=int(event["product_id"]))
 
             await handle_track_popular(product_id=int(event["product_id"]), interaction_type="view")
@@ -123,10 +114,10 @@ async def handle_recently_viewed(event):
             await handle_track_popular(product_id=int(event["product_id"]), interaction_type="add_to_cart")
 
     except Exception as e:
-        logger.error(f"Failed to add product to recently viewed in redis: {str(e)}")
+        logger.error(f"Failed to add product to recently viewed: {str(e)}")
         raise Exception(f"Redis error: {str(e)}")
 
 
 async def handle_track_popular(product_id: int, interaction_type: str):
-    recent_service = PopularProductsService(cache=get_cache())
+    recent_service = PopularProductsService()
     await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)

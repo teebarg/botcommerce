@@ -7,12 +7,11 @@ from app.models.collection import (
 from app.prisma_client import prisma as db
 from app.services.shared_collection import SharedCollectionService
 from math import ceil
-from app.services.redis import cache_response
+from app.services.redis import cache_response, invalidate_list, bust
 from app.services.product import to_product_card_view
 from app.core.utils import slugify
-from app.core.deps import RedisClient, get_current_superuser, UserDep
+from app.core.deps import get_current_superuser, UserDep
 from app.models.generic import Message
-from app.core.logging import logger
 
 router = APIRouter()
 
@@ -118,7 +117,6 @@ async def track_shared_collection_visit(
     request: Request,
     slug: str,
     user: UserDep,
-    cache: RedisClient
 ) -> dict:
     """
     Track a unique visit to a shared collection.
@@ -145,8 +143,8 @@ async def track_shared_collection_visit(
     )
 
     if is_new_visit:
-        await cache.invalidate_list_cache("shared")
-        await cache.bust_tag(f"sharedcollection:{slug}")
+        await invalidate_list("shared")
+        await bust(f"sharedcollection:{slug}")
 
     return {
         "success": True,
@@ -154,7 +152,7 @@ async def track_shared_collection_visit(
     }
 
 @router.post("/")
-async def create_shared_collection(data: SharedCollectionCreate, cache: RedisClient):
+async def create_shared_collection(data: SharedCollectionCreate):
     create_data = data.model_dump(exclude_unset=True)
 
     if data.products is not None:
@@ -163,11 +161,11 @@ async def create_shared_collection(data: SharedCollectionCreate, cache: RedisCli
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
 
-    await cache.invalidate_list_cache("shared")
+    await invalidate_list("shared")
     return res
 
 @router.patch("/{id}")
-async def update_shared_collection(id: int, data: SharedCollectionUpdate, cache: RedisClient):
+async def update_shared_collection(id: int, data: SharedCollectionUpdate):
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
@@ -178,23 +176,23 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate, cache:
         update_data["products"] = {"set": product_connect}
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
 
-    await cache.invalidate_list_cache("shared")
-    await cache.bust_tag(f"sharedcollection:{obj.slug}")
+    await invalidate_list("shared")
+    await bust(f"sharedcollection:{obj.slug}")
     return res
 
 @router.delete("/{id}")
-async def delete_shared_collection(id: int, cache: RedisClient) -> Message:
+async def delete_shared_collection(id: int) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
     await db.sharedcollection.delete(where={"id": id})
 
-    await cache.invalidate_list_cache("shared")
-    await cache.bust_tag(f"sharedcollection:{obj.slug}")
+    await invalidate_list("shared")
+    await bust(f"sharedcollection:{obj.slug}")
     return {"message": "SharedCollection deleted successfully"}
 
 @router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])
-async def add_product_to_shared_collection(id: int, product_id: int, cache: RedisClient) -> Message:
+async def add_product_to_shared_collection(id: int, product_id: int) -> Message:
     """Add a product to a shared collection"""
     shared_collection = await db.sharedcollection.find_unique(where={"id": id})
     if not shared_collection:
@@ -225,13 +223,13 @@ async def add_product_to_shared_collection(id: int, product_id: int, cache: Redi
         }
     )
 
-    await cache.invalidate_list_cache("shared")
-    await cache.bust_tag(f"sharedcollection:{shared_collection.slug}")
+    await invalidate_list("shared")
+    await bust(f"sharedcollection:{shared_collection.slug}")
 
     return {"message": "Product added to collection successfully"}
 
 @router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(get_current_superuser)])
-async def remove_product_from_shared_collection(id: int, product_id: int, cache: RedisClient) -> Message:
+async def remove_product_from_shared_collection(id: int, product_id: int) -> Message:
     """Remove a product from a shared collection"""
     shared_collection = await db.sharedcollection.find_unique(where={"id": id})
     if not shared_collection:
@@ -246,7 +244,7 @@ async def remove_product_from_shared_collection(id: int, product_id: int, cache:
         }
     )
 
-    await cache.invalidate_list_cache("shared")
-    await cache.bust_tag(f"sharedcollection:{shared_collection.slug}")
+    await invalidate_list("shared")
+    await bust(f"sharedcollection:{shared_collection.slug}")
 
     return {"message": "Product removed from collection successfully"}

@@ -5,7 +5,6 @@ from fastapi import ( APIRouter, HTTPException, Depends, HTTPException, Query, B
 from app.core.deps import (
     CurrentUser,
     get_current_superuser,
-    RedisClient
 )
 from app.models.generic import Message
 from app.prisma_client import prisma as db
@@ -107,7 +106,7 @@ async def read(id: int) -> Review:
     return review
 
 @router.post("/")
-async def create(review: ReviewCreate, user: CurrentUser, background_tasks: BackgroundTasks, redis: RedisClient) -> Review:
+async def create(review: ReviewCreate, user: CurrentUser, background_tasks: BackgroundTasks) -> Review:
     existing_review = await db.review.find_first(
         where={"user_id": user.id, "product_id": review.product_id}
     )
@@ -132,7 +131,7 @@ async def create(review: ReviewCreate, user: CurrentUser, background_tasks: Back
                 "user_id": user.id
             }
         )
-        background_tasks.add_task(reindex_product, cache=redis, product_id= review.product_id)
+        background_tasks.add_task(reindex_product, product_id=review.product_id)
 
         return review
     except PrismaError as e:

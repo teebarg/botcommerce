@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize
 from app.models.order import OrderCreate, OrderResponse
-from app.core.deps import CurrentUser, Notification, RedisClient, get_current_user
+from app.core.deps import CurrentUser, Notification, get_current_user
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -13,6 +13,7 @@ from prisma.models import Cart
 from app.services.order import create_order_from_cart, decrement_variant_inventory_for_order
 from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
+from app.services.redis import invalidate_list, bust
 
 logger = get_logger(__name__)
 
@@ -81,7 +82,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}", response_model=OrderResponse)
-async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient):
+async def verify_payment(reference: str, user: CurrentUser):
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -101,8 +102,8 @@ async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient):
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number, redis=cache.redis)
-            await publish_order_event(cache=cache.redis, order=order, type="ORDER_PAID")
+            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
+            await publish_order_event(order=order, type="ORDER_PAID")
 
             event = {
                 "type": "PAYMENT_SUCCESS",
@@ -113,7 +114,7 @@ async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient):
                 "status": PaymentStatus.SUCCESS,
                 "payment_method": PaymentMethod.PAYSTACK,
             }
-            await publish_event(cache=cache.redis, event=event)
+            await publish_event(event=event)
 
             return order
         else:
@@ -126,12 +127,12 @@ async def verify_payment(reference: str, user: CurrentUser, cache: RedisClient):
                 "status": PaymentStatus.FAILED,
                 "payment_method": PaymentMethod.PAYSTACK,
             }
-            await publish_event(cache=cache.redis, event=event)
+            await publish_event(event=event)
             raise HTTPException(status_code=500, detail="Payment verification failed")
 
 
 @router.post("/", dependencies=[Depends(get_current_user)])
-async def create(*, create: PaymentCreate, notification: Notification, cache: RedisClient, background_tasks: BackgroundTasks):
+async def create(*, create: PaymentCreate, notification: Notification, background_tasks: BackgroundTasks):
     """
     Create new payment.
     """
@@ -153,12 +154,12 @@ async def create(*, create: PaymentCreate, notification: Notification, cache: Re
                 "payment_method": PaymentMethod.PAYSTACK,
             }
         )
-    background_tasks.add_task(decrement_variant_inventory_for_order, create.order_id, notification, cache)
+    background_tasks.add_task(decrement_variant_inventory_for_order, create.order_id, notification)
     return payment
 
 
 @router.patch("/{id}/status", response_model=OrderResponse)
-async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, background_tasks: BackgroundTasks, notification: Notification):
+async def payment_status(id: int, status: PaymentStatus):
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id})
     if not order:
@@ -168,11 +169,11 @@ async def payment_status(cache: RedisClient, id: int, status: PaymentStatus, bac
 
     async with db.tx() as tx:
         updated_order = await tx.order.update(where={"id": id}, data=data)
-        await cache.invalidate_list_cache("orders")
-        await cache.bust_tag(f"order:{id}")
+        await invalidate_list("orders")
+        await bust(f"order:{id}")
 
         if status == PaymentStatus.SUCCESS:
-            await publish_order_event(cache=cache.redis, order=updated_order, type="ORDER_PAID")
+            await publish_order_event(order=updated_order, type="ORDER_PAID")
             try:
                 if order.status != OrderStatus.PENDING:
                     await tx.ordertimeline.create(
