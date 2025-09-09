@@ -239,11 +239,12 @@ async def log_error(error: dict, request: Request):
     logger.critical(slack_message)
 
 
-@app.get("/sitemap.xml", response_class=Response)
-async def generate_sitemap(cache: deps.RedisClient):
+@app.get("/api/sitemap.xml", response_class=Response)
+async def generate_sitemap(request: Request):
+    redis = request.app.state.redis
     base_url = settings.FRONTEND_HOST
 
-    cached_sitemap = await cache.get("sitemap")
+    cached_sitemap = await redis.get("sitemap")
     if cached_sitemap:
         return Response(content=cached_sitemap, media_type="application/xml")
 
@@ -281,7 +282,7 @@ async def generate_sitemap(cache: deps.RedisClient):
 
     sitemap = tostring(urlset, encoding="utf-8", method="xml")
 
-    await cache.set("sitemap", sitemap, expire=3600)
+    await redis.setex("sitemap", 3600, sitemap)
 
     return Response(content=sitemap, media_type="application/xml")
 

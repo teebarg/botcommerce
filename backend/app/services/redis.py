@@ -199,7 +199,7 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
             if not request:
                 raise ValueError("FastAPI Request not found")
 
-            cache = CacheService(request.app.state.redis)
+            redis = request.app.state.redis
 
             if isinstance(key, str):
                 raw_key = f"{key_prefix}:{key}"
@@ -209,14 +209,12 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
             else:
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
-            redis_key = hashlib.md5(raw_key.encode()).hexdigest()
-
-            cached = await cache.get(redis_key)
+            cached = await redis.get(raw_key)
             if cached is not None:
                 return json.loads(cached)
 
             result = await func(*args, **kwargs)
-            await cache.fset(redis_key, json.dumps(result, cls=EnhancedJSONEncoder), expire, tag=raw_key)
+            await redis.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
             return result
         return wrapper
     return decorator

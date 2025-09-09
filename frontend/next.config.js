@@ -43,8 +43,8 @@ const nextConfig = {
         return {
             beforeFiles: [
                 {
-                    source: "/sitemap.xml",
-                    destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/sitemap.xml`,
+                    source: "/api/sitemap.xml",
+                    destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sitemap.xml`,
                 },
             ],
         };
