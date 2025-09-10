@@ -7,7 +7,7 @@ from prisma.models import Category, Collection, Tag, ProductImage, Review, Produ
 
 class VariantWithStatus(BaseModel):
     id: Optional[int] = None
-    price: float = Field(..., gt=0)
+    price: Optional[float] = Field(None, gt=0)
     old_price: Optional[float] = 0.0
     inventory: int = Field(..., ge=0)
     size: Optional[str] = None

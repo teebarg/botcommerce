@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
@@ -13,6 +14,7 @@ import ProductOverview from "@/components/store/products/product-overview";
 import { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { ImageDownloadButton } from "@/components/store/image-download";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -22,6 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
     const dialogState = useOverlayTriggerState({});
+    const { data: session } = useSession();
 
     const { data } = useUserWishlist();
 
@@ -61,12 +64,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                             ))}
                         </div>
 
-                        {outOfStock && (
-                            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                                <Badge className="text-base px-6 py-2 backdrop-blur-sm" variant="secondary">
-                                    Out of Stock
-                                </Badge>
-                            </div>
+                        {session?.user?.isAdmin && (
+                            <ImageDownloadButton className="absolute bottom-2 left-2" url={product.images?.[0] || ""} fallbackName={product.slug} />
                         )}
                     </div>
 

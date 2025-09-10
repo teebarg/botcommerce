@@ -147,6 +147,7 @@ export const useCreateProduct = () => {
         mutationFn: async (input: any) => await api.post<Product>("/product", input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Product created");
         },
         onError: (error: any) => {
@@ -162,6 +163,7 @@ export const useUpdateProduct = () => {
         mutationFn: async ({ id, input }: { id: number; input: any }) => await api.put<Product>(`/product/${id}`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Product updated");
         },
         onError: (error: any) => {
@@ -177,6 +179,7 @@ export const useDeleteProduct = () => {
         mutationFn: async (id: number) => await api.delete<Message>(`/product/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Product deleted");
         },
         onError: (error: any) => {
@@ -204,6 +207,7 @@ export const useCreateVariant = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Variant created");
         },
         onError: (error: any) => {
@@ -212,7 +216,7 @@ export const useCreateVariant = () => {
     });
 };
 
-export const useUpdateVariant = () => {
+export const useUpdateVariant = (showToast = true) => {
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -232,7 +236,8 @@ export const useUpdateVariant = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
-            toast.success("Variant updated");
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
+            showToast && toast.success("Variant updated");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update variant");
@@ -247,6 +252,7 @@ export const useDeleteVariant = () => {
         mutationFn: async (id: number) => await api.delete<Message>(`/product/variants/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Variant deleted");
         },
         onError: (error: any) => {
@@ -256,12 +262,9 @@ export const useDeleteVariant = () => {
 };
 
 export const useExportProducts = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async () => await api.post<Message>(`/product/export`, {}),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Products exported successfully");
         },
         onError: (error: any) => {
@@ -277,6 +280,7 @@ export const useReIndexProducts = () => {
         mutationFn: async () => await api.post<Message>(`/product/reindex`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Products re-indexed successfully");
         },
         onError: (error: any) => {
@@ -292,6 +296,7 @@ export const useUploadImage = () => {
         mutationFn: async ({ id, data }: { id: number; data: any }) => await api.patch<Message>(`/product/${id}/image`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image uploaded successfully");
         },
         onError: (error: any) => {
@@ -323,6 +328,7 @@ export const useDeleteImage = () => {
         mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/product/${id}/image`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image deleted successfully");
         },
         onError: (error: any) => {

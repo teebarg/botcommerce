@@ -13,6 +13,9 @@ import { ProductVariantSelection } from "@/components/product/product-variant-se
 import { Product } from "@/schemas/product";
 import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useUpdateVariant } from "@/lib/hooks/useProduct";
 
 interface Props {
     product: Product;
@@ -27,6 +30,29 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const { data: session } = useSession();
     const trackInteraction = useTrackUserInteraction();
+    const updateVariant = useUpdateVariant(false);
+
+    const handleMarkVariantOutOfStock = async (variant: ProductVariant) => {
+        if (!variant?.id) return;
+        const previousInventory = typeof variant.inventory === "number" ? variant.inventory : 0;
+        updateVariant.mutateAsync({ id: variant.id, inventory: 0 }).then(() => {
+            toast.success(`Variant ${variant.sku} marked out of stock`, {
+                action: {
+                    label: "Undo",
+                    onClick: async () => {
+                        await updateVariant.mutateAsync({ id: variant.id, inventory: previousInventory });
+                    },
+                },
+                duration: 10000,
+                onAutoClose: () => {
+                    window.location.reload();
+                },
+                onDismiss: () => {
+                    window.location.reload();
+                },
+            });
+        });
+    };
 
     useEffect(() => {
         const startTime = Date.now();
@@ -132,6 +158,29 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     <div className="mt-4">
                         <p className="line-clamp-3 text-base text-default-500">{product.description}</p>
                     </div>
+                    {session?.user?.isAdmin && product?.variants?.length ? (
+                        <div className="flex flex-col gap-2 mt-4 border rounded-md p-3">
+                            {product.variants.map((v) => (
+                                <div key={v.id} className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-default-700">SKU: {v.sku}</span>
+                                        {v.size && <span>Size: {v.size}</span>}
+                                        {v.color && <span>Color: {v.color}</span>}
+                                        {typeof v.measurement === "number" && <span>Measure: {v.measurement}</span>}
+                                        <span>Inventory: {v.inventory}</span>
+                                        <span className={v.inventory > 0 ? "text-emerald-600" : "text-red-600"}>
+                                            {v.inventory > 0 ? "IN_STOCK" : "OUT_OF_STOCK"}
+                                        </span>
+                                    </div>
+                                    {v.inventory > 0 && (
+                                        <Button size="sm" variant="warning" onClick={() => handleMarkVariantOutOfStock(v)}>
+                                            Mark out of stock
+                                        </Button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : null}
                     <div className="mt-6 flex flex-col gap-1">
                         <div className="mb-4 flex items-center gap-2 text-default-900">
                             <Truck />
