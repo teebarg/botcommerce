@@ -107,14 +107,14 @@ export function ProductDetails() {
                                                 alt={product.name}
                                                 blurDataURL="/placeholder.jpg"
                                                 className="w-full"
-                                                height={40}
+                                                height={20}
                                                 placeholder="blur"
                                                 src={
                                                     product.images?.sort((a, b) => a.order - b.order)?.[0]?.image ||
                                                     product?.image ||
                                                     "/placeholder.jpg"
                                                 }
-                                                width={40}
+                                                width={20}
                                             />
                                         </div>
                                     </TableCell>

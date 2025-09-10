@@ -1,17 +1,24 @@
-from fastapi import APIRouter, HTTPException, Query, Request, Depends
+from fastapi import APIRouter, HTTPException, Query, Request, Depends, BackgroundTasks
 from typing import List
 from app.models.collection import (
     SharedCollections, SharedCollectionCreate, SharedCollectionUpdate,
-    SharedCollection, SharedCollectionView
+    SharedCollection, SharedCollectionView, Catalog
 )
 from app.prisma_client import prisma as db
 from app.services.shared_collection import SharedCollectionService
 from math import ceil
 from app.services.redis import cache_response, invalidate_list, bust
-from app.services.product import to_product_card_view
-from app.core.utils import slugify
+from app.services.product import to_product_card_view, index_products
 from app.core.deps import get_current_superuser, UserDep
 from app.models.generic import Message
+
+from app.core.logging import get_logger
+from app.core.utils import slugify, url_to_list
+from app.services.meilisearch import get_or_create_index, ensure_index_ready
+from app.core.config import settings
+from meilisearch.errors import MeilisearchApiError
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -87,29 +94,125 @@ async def list_shared_collections(
     }
 
 @router.get("/{slug}")
-@cache_response(key_prefix="sharedcollection", key=lambda request, slug, user: slug)
-async def get_shared_collection(request: Request, slug: str, user: UserDep) -> SharedCollection:
-    where={"slug": slug}
+@cache_response(key_prefix="sharedcollection")
+async def search(
+    request: Request,
+    slug: str, 
+    user: UserDep,
+    search: str = "",
+    sort: str = "created_at:desc",
+    categories: str = Query(default=""),
+    collections: str = Query(default=""),
+    max_price: int = Query(default=1000000, gt=0),
+    min_price: int = Query(default=1, gt=0),
+    sizes: str = Query(default=""),
+    colors: str = Query(default=""),
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, le=100),
+) -> Catalog:
+    """
+    Retrieve products using Meilisearch, sorted by latest.
+    """
+    where = {"slug": slug}
     if user is None or user.role != "ADMIN":
         where["is_active"] = True
-    obj = await db.sharedcollection.find_unique(where=where,
-        include={
-            "products": {
-                "include": {
-                    "images": True,
-                    "variants": True,
-                    "collections": True,
-                    "categories": True,
-                    "reviews": True
-                }
-            },
-        },
-    )
+    obj = await db.sharedcollection.find_unique(where=where)
     if not obj:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
-    transformed_products = [to_product_card_view(p) for p in obj.products]
-    obj.products = transformed_products
-    return obj
+
+    filters = [f"catalogs_slugs IN [{slug}]"]
+    if categories:
+        filters.append(f"category_slugs IN {url_to_list(categories)}")
+    if collections:
+        filters.append(f"collection_slugs IN [{collections}]")
+    if min_price and max_price:
+        filters.append(
+            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+    if sizes:
+        filters.append(f"sizes IN [{sizes}]")
+    if colors:
+        filters.append(f"colors IN [{colors}]")
+
+    search_params = {
+        "limit": limit,
+        "offset": skip,
+        "sort": [sort],
+    }
+
+    if filters:
+        search_params["filter"] = " AND ".join(filters)
+
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+    try:
+        search_results = index.search(
+            search,
+            {
+                **search_params
+            }
+        )
+
+    except MeilisearchApiError as e:
+        error_code = getattr(e, "code", None)
+        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
+            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+
+            ensure_index_ready(index)
+
+            search_results = index.search(
+                search,
+                {
+                    **search_params
+                }
+            )
+        logger.error(f"Meilisearch error: {e}")
+        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=400,
+            detail=e.message
+        )
+
+    total_count = search_results["estimatedTotalHits"]
+    total_pages = (total_count // limit) + (total_count % limit > 0)
+
+    return {
+        "title": obj.title,
+        "description": obj.description,
+        "is_active": obj.is_active,
+        "view_count": obj.view_count,
+        "products": search_results["hits"],
+        "skip": skip,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+    }
+
+
+# @router.get("/{slug}")
+# @cache_response(key_prefix="sharedcollection", key=lambda request, slug, user: slug)
+# async def get_shared_collection(request: Request, slug: str, user: UserDep) -> SharedCollection:
+#     where={"slug": slug}
+#     if user is None or user.role != "ADMIN":
+#         where["is_active"] = True
+#     obj = await db.sharedcollection.find_unique(where=where,
+#         include={
+#             "products": {
+#                 "include": {
+#                     "images": True,
+#                     "variants": True,
+#                     "collections": True,
+#                     "categories": True,
+#                     "reviews": True
+#                 }
+#             },
+#         },
+#     )
+#     if not obj:
+#         raise HTTPException(status_code=404, detail="SharedCollection not found")
+#     transformed_products = [to_product_card_view(p) for p in obj.products]
+#     obj.products = transformed_products
+#     return obj
 
 
 @router.post("/{slug}/track-visit")
@@ -192,7 +295,7 @@ async def delete_shared_collection(id: int) -> Message:
     return {"message": "SharedCollection deleted successfully"}
 
 @router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])
-async def add_product_to_shared_collection(id: int, product_id: int) -> Message:
+async def add_product_to_shared_collection(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
     """Add a product to a shared collection"""
     shared_collection = await db.sharedcollection.find_unique(where={"id": id})
     if not shared_collection:
@@ -223,6 +326,9 @@ async def add_product_to_shared_collection(id: int, product_id: int) -> Message:
         }
     )
 
+    background_tasks.add_task(index_products)
+
+    await invalidate_list("sharedcollection")
     await invalidate_list("shared")
     await bust(f"sharedcollection:{shared_collection.slug}")
 

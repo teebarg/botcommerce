@@ -26,26 +26,9 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     const state = useOverlayTriggerState({});
     const { data: sharedCollections, isLoading } = useSharedCollections();
 
-    const addProductMutation = useAddProductToSharedCollection();
-    const removeProductMutation = useRemoveProductFromSharedCollection();
-
     if (!session?.user?.isAdmin || !Boolean(product)) {
         return null;
     }
-
-    const handleAddToCollection = async (collectionId: number) => {
-        await addProductMutation.mutateAsync({
-            collectionId,
-            productId: product.id,
-        });
-    };
-
-    const handleRemoveFromCollection = async (collectionId: number) => {
-        await removeProductMutation.mutateAsync({
-            collectionId,
-            productId: product.id,
-        });
-    };
 
     return (
         <Overlay
@@ -96,15 +79,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                             <ScrollArea className="h-[calc(100vh-400px)]">
                                 <div className="space-y-2">
                                     {sharedCollections?.shared?.map((collection, idx: number) => (
-                                        <CollectionItem
-                                            key={idx}
-                                            collection={collection}
-                                            isPending={addProductMutation.isPending || removeProductMutation.isPending}
-                                            productId={product.id}
-                                            products={collection.products}
-                                            onAdd={handleAddToCollection}
-                                            onRemove={handleRemoveFromCollection}
-                                        />
+                                        <CollectionItem key={idx} collection={collection} productId={product.id} products={collection.products} />
                                     ))}
                                 </div>
                             </ScrollArea>
@@ -120,13 +95,27 @@ interface CollectionItemProps {
     collection: any;
     productId: number;
     products: ProductSearch[];
-    onAdd: (collectionId: number) => void;
-    onRemove: (collectionId: number) => void;
-    isPending: boolean;
 }
 
-const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, onAdd, onRemove, products, isPending = false }) => {
+const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, products }) => {
     const hasProduct = products?.some((product) => product.id === productId) || false;
+
+    const addProductMutation = useAddProductToSharedCollection();
+    const removeProductMutation = useRemoveProductFromSharedCollection();
+
+    const handleAddToCollection = async () => {
+        await addProductMutation.mutateAsync({
+            collectionId: collection.id,
+            productId,
+        });
+    };
+
+    const handleRemoveFromCollection = async () => {
+        await removeProductMutation.mutateAsync({
+            collectionId: collection.id,
+            productId,
+        });
+    };
 
     return (
         <Card className="border">
@@ -152,10 +141,11 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, 
                             </div>
                             <Button
                                 className="text-xs"
-                                disabled={!collection.is_active}
+                                disabled={!collection.is_active || removeProductMutation.isPending}
+                                isLoading={removeProductMutation.isPending}
                                 size="sm"
                                 variant="destructive"
-                                onClick={() => onRemove(collection.id)}
+                                onClick={handleRemoveFromCollection}
                             >
                                 <Trash2 className="h-3 w-3 mr-1" />
                                 Remove
@@ -164,11 +154,11 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, 
                     ) : (
                         <Button
                             className="text-xs"
-                            disabled={!collection.is_active || isPending}
-                            isLoading={isPending}
+                            disabled={!collection.is_active || addProductMutation.isPending}
+                            isLoading={addProductMutation.isPending}
                             size="sm"
                             variant="outline"
-                            onClick={() => onAdd(collection.id)}
+                            onClick={handleAddToCollection}
                         >
                             <Plus className="h-3 w-3 mr-1" />
                             Add

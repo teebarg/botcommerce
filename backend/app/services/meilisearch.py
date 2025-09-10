@@ -11,7 +11,7 @@ from meilisearch.errors import MeilisearchApiError
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
-REQUIRED_FILTERABLES = ["id", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
+REQUIRED_FILTERABLES = ["id", "catalogs_slugs", "category_slugs", "collection_slugs", "name", "variants", "average_rating",
                 "review_count", "max_variant_price", "min_variant_price", "active", "sizes", "colors"]
 REQUIRED_SORTABLES = ["created_at", "max_variant_price", "min_variant_price", "average_rating", "review_count", "active"]
 

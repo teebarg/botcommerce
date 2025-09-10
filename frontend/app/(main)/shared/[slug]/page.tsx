@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-import { ProductSearch, Shared } from "@/schemas";
+import { Catalog, Shared } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { SocialShare } from "@/components/store/shared/shared-listing";
-import ProductCard from "@/components/store/products/product-card2";
+import SharedInfinite from "@/components/store/shared/shared-infinite";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 import { serverApi } from "@/apis/server-client";
 
@@ -44,25 +44,17 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function SharedPage({ params }: { params: Params }) {
     const { slug } = await params;
-    const { data: shared, error } = await tryCatch<Shared>(serverApi.get(`/shared/${slug}`));
+    const { data: catalog, error } = await tryCatch<Catalog>(serverApi.get(`/shared/${slug}`));
 
-    if (!shared || error) return notFound();
+    if (!catalog || error) return notFound();
 
     return (
-        <div className="max-w-7xl mx-auto w-full p-4">
+        <div className="max-w-9xl mx-auto w-full p-4">
             <SharedCollectionVisitTracker slug={slug} />
-            <h1 className="text-3xl font-bold mb-2">{shared.title}</h1>
-            {shared.description && <p className="mb-4 text-lg text-default-600">{shared.description}</p>}
-            <SocialShare title={shared.title} view_count={shared.view_count} />
-            {shared.products && shared.products.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {shared.products.map((product: ProductSearch, idx: number) => (
-                        <ProductCard key={idx} product={product} />
-                    ))}
-                </div>
-            ) : (
-                <div>No products in this collection.</div>
-            )}
+            <h1 className="text-3xl font-bold mb-2">{catalog.title}</h1>
+            {catalog.description && <p className="mb-4 text-lg text-default-600">{catalog.description}</p>}
+            <SocialShare title={catalog.title} view_count={catalog.view_count} />
+            <SharedInfinite initialCatalog={catalog} slug={slug} />
         </div>
     );
 }

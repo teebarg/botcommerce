@@ -6,7 +6,6 @@ from app.redis_client import redis_client
 
 logger = get_logger(__name__)
 
-
 async def publish_user_registered(
     *,
     user: User,
@@ -45,6 +44,6 @@ async def publish_order_event(order: dict, type: str):
         "status": order.status,
     }
     try:
-        await redis.xadd("EVENT_STREAMS", event)
+        await redis_client.xadd("EVENT_STREAMS", event)
     except Exception as e:
         logger.error(f"Failed to publish event to EVENT_STREAMS: {str(e)}")

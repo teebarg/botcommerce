@@ -22,6 +22,7 @@ async def reindex_product(product_id: int):
                 "images": True,
                 "collections": True,
                 "reviews": True,
+                "shared_collections": True,
             }
         )
 
@@ -64,6 +65,7 @@ async def index_products():
                 "collections": True,
                 "images": True,
                 "reviews": True,
+                "shared_collections": True,
             }
         )
 
@@ -172,6 +174,9 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         product_dict["status"] = "OUT OF STOCK"
     product_dict["sizes"] = [v["size"] for v in variants if v.get("size") is not None]
     product_dict["colors"] = [v["color"] for v in variants if v.get("color") is not None]
+
+    product_dict["catalogs"] = [dict(sc) for sc in (product.shared_collections or [])]
+    product_dict["catalogs_slugs"] = [sc.slug for sc in (product.shared_collections or [])]
 
     return product_dict
 
