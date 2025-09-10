@@ -57,4 +57,4 @@ async def list_user_interactions(
         take=limit,
         order={"timestamp": "desc"},
     )
-    return interactions 
+    return interactions
