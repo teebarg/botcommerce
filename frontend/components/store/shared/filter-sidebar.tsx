@@ -3,22 +3,35 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 
+import { useCategories } from "@/lib/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import RangeSlider from "@/components/ui/range-slider";
+import { Facet } from "@/schemas/product";
 
-export function FilterSidebar() {
+interface Props {
+    facets?: Facet;
+}
+
+export function FilterSidebar({ facets }: Props) {
     const [openSections, setOpenSections] = useState({
+        categories: true,
+        price: true,
         sort: true,
         size: true,
-        color: false,
+        color: true,
     });
+    const { data: categories } = useCategories();
 
     const [sort, setSort] = useState<string>("created_at:desc");
     const [sizeSet, setSizeSet] = useState<Set<string>>(new Set());
     const [colorSet, setColorSet] = useState<Set<string>>(new Set());
+    const [categorySet, setCategorySet] = useState<Set<string>>(new Set());
+    const [minPrice, setMinPrice] = useState<string>("");
+    const [maxPrice, setMaxPrice] = useState<string>("");
 
     const searchParams = useSearchParams();
     const { updateQuery } = useUpdateQuery();
@@ -37,6 +50,13 @@ export function FilterSidebar() {
         const colorsFromURL = searchParams.get("colors")?.split(",").filter(Boolean) || [];
 
         setColorSet(new Set(colorsFromURL));
+
+        const catsFromURL = searchParams.get("cat_ids")?.split(",").filter(Boolean) || [];
+
+        setCategorySet(new Set(catsFromURL));
+
+        setMinPrice(searchParams.get("minPrice") || "");
+        setMaxPrice(searchParams.get("maxPrice") || "");
     }, [searchParams]);
 
     const onToggleSize = (slug: string) => {
@@ -55,10 +75,28 @@ export function FilterSidebar() {
         setColorSet(next);
     };
 
+    const onToggleCategory = (slug: string) => {
+        const next = new Set(categorySet);
+
+        if (next.has(slug)) next.delete(slug);
+        else next.add(slug);
+        setCategorySet(next);
+    };
+
     const onClearAll = () => {
         setSort("created_at:desc");
         setSizeSet(new Set());
         setColorSet(new Set());
+        setCategorySet(new Set());
+        setMinPrice("");
+        setMaxPrice("");
+    };
+
+    const onPriceChange = (values: number[]) => {
+        const [minPrice, maxPrice] = values;
+
+        setMinPrice(minPrice.toString());
+        setMaxPrice(maxPrice.toString());
     };
 
     const onApply = () => {
@@ -66,16 +104,72 @@ export function FilterSidebar() {
             { key: "sortBy", value: sort || "created_at:desc" },
             { key: "sizes", value: Array.from(sizeSet).join(",") },
             { key: "colors", value: Array.from(colorSet).join(",") },
+            { key: "cat_ids", value: Array.from(categorySet).join(",") },
+            { key: "minPrice", value: minPrice },
+            { key: "maxPrice", value: maxPrice },
         ]);
     };
 
     return (
-        <div className="p-6 h-full overflow-y-auto bg-content1">
-            <div className="flex items-center justify-between mb-6 sticky top-0 z-10">
+        <div className="px-6 h-full overflow-y-auto bg-content1 relative">
+            <div className="flex items-center justify-between mb-6 sticky top-0 z-10 bg-content1 py-4">
                 <h2 className="font-semibold text-lg">FILTER & SORT</h2>
-                <Button className="text-indigo-500 hover:text-indigo-600 px-0 justify-end" variant="transparent" onClick={onClearAll}>
+                <Button className="text-indigo-500 hover:text-indigo-600 px-0 justify-end mr-4" variant="transparent" onClick={onClearAll}>
                     Clear All
                 </Button>
+            </div>
+
+            <div className="mb-6">
+                <Button
+                    className="justify-between w-full p-0 font-semibold mb-3"
+                    variant="transparent"
+                    onClick={() => toggleSection("categories" as any)}
+                >
+                    CATEGORIES
+                    {(openSections as any) && (openSections as any).categories ? (
+                        <ChevronUp className="h-4 w-4" />
+                    ) : (
+                        <ChevronDown className="h-4 w-4" />
+                    )}
+                </Button>
+
+                {(openSections as any).categories && (
+                    <div className="grid grid-cols-2 gap-2 max-h-64 overflow-auto pr-1">
+                        {categories?.map((cat) => {
+                            const active = categorySet.has(cat.slug);
+
+                            return (
+                                <Button
+                                    key={cat.id}
+                                    className={cn("justify-between bg-content3", active && "bg-indigo-500 text-white")}
+                                    size="sm"
+                                    onClick={() => onToggleCategory(cat.slug)}
+                                >
+                                    {cat.name}
+                                    <span className={cn("", !facets && "hidden")}>({facets?.category_slugs?.[cat.slug] || 0})</span>
+                                </Button>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            <div className="mb-6">
+                <Button className="justify-between w-full p-0 font-semibold mb-3" variant="transparent" onClick={() => toggleSection("price" as any)}>
+                    PRICE RANGE
+                    {(openSections as any) && (openSections as any).price ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+
+                {(openSections as any).price && (
+                    <RangeSlider
+                        defaultValue={[Number(searchParams?.get("minPrice") ?? 1000), Number(searchParams?.get("maxPrice") ?? 50000)]}
+                        label="Price Range"
+                        max={100000}
+                        min={0}
+                        step={500}
+                        onChange={onPriceChange}
+                    />
+                )}
             </div>
 
             <div className="mb-6">
@@ -134,7 +228,8 @@ export function FilterSidebar() {
                                     variant={active ? "indigo" : "outline"}
                                     onClick={() => onToggleSize(size)}
                                 >
-                                    {size}
+                                    Uk{size}
+                                    <span className={cn("ml-2", !facets && "hidden")}>({facets?.sizes?.[size] || 0})</span>
                                 </Button>
                             );
                         })}
@@ -143,11 +238,7 @@ export function FilterSidebar() {
             </div>
 
             <div className="mb-6">
-                <Button
-                    className="flex items-center justify-between w-full p-0 font-semibold mb-3"
-                    variant="transparent"
-                    onClick={() => toggleSection("color")}
-                >
+                <Button className="justify-between w-full p-0 font-semibold mb-3" variant="transparent" onClick={() => toggleSection("color")}>
                     COLOR
                     {openSections.color ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
@@ -162,7 +253,7 @@ export function FilterSidebar() {
                                     key={color}
                                     aria-pressed={active}
                                     className={cn(
-                                        "flex flex-col items-center space-y-2 cursor-pointer hover:opacity-80 transition-opacity",
+                                        "flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity",
                                         active && "opacity-100"
                                     )}
                                     onClick={() => onToggleColor(color)}
@@ -171,8 +262,9 @@ export function FilterSidebar() {
                                         className={cn("w-8 h-8 rounded-full border border-border", active && "ring-2 ring-indigo-500 ring-offset-2")}
                                         style={{ backgroundColor: color }}
                                     />
-                                    <Label className="text-xs text-center" htmlFor={color}>
+                                    <Label className="text-center text-sm" htmlFor={color}>
                                         {color}
+                                        <span className={cn("ml-0.5", !facets && "hidden")}>({facets?.colors?.[color] || 0})</span>
                                     </Label>
                                 </button>
                             );
@@ -180,7 +272,7 @@ export function FilterSidebar() {
                     </div>
                 )}
             </div>
-            <div className="flex justify-center sticky bottom-0 px-4">
+            <div className="flex justify-center sticky bottom-0 px-4 py-4 bg-content1">
                 <Button className="w-full rounded-full py-6" variant="indigo" onClick={onApply}>
                     Apply
                 </Button>
