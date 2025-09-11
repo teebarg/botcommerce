@@ -18,6 +18,9 @@ import { Category, Collection, ProductSearch } from "@/schemas/product";
 import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
 import ClientOnly from "@/components/generic/client-only";
 import ProductCardListings from "@/components/store/products/product-card-listings";
+import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
+import MobileFilterControl from "../shared/mobile-filter-control";
+import { CollectionHeader } from "./collection-header";
 
 interface SearchParams {
     sortBy?: string;
@@ -55,9 +58,14 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
 
     return (
         <div className="flex gap-6">
-            <div className="hidden md:block">
+            {/* <div className="hidden md:block">
                 <CollectionsSideBar categories={filteredCategories} collections={collections} facets={facets} />
-            </div>
+            </div> */}
+            <aside className="hidden lg:block w-96 flex-shrink-0">
+                <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
+                    <FilterSidebar />
+                </div>
+            </aside>
             <div className="w-full flex-1 flex-col relative">
                 <PromotionalBanner
                     btnClass="text-blue-600"
@@ -66,7 +74,7 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                     subtitle="Get 20% Off Today"
                     title="Exclusive Offer!"
                 />
-                <ClientOnly>
+                {/* <ClientOnly>
                     <div className="px-4 my-6 md:hidden">
                         <div className="flex overflow-x-auto gap-3 pb-2">
                             <BtnLink
@@ -92,9 +100,10 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                             ))}
                         </div>
                     </div>
-                </ClientOnly>
+                </ClientOnly> */}
+                <CollectionHeader />
                 <div className="w-full">
-                    <nav className="hidden md:block mt-6" data-slot="base">
+                    {/* <nav className="hidden md:block mt-6" data-slot="base">
                         <ol className="flex flex-wrap list-none rounded-lg" data-slot="list">
                             <li className="flex items-center" data-slot="base">
                                 <LocalizedClientLink href="/">Home</LocalizedClientLink>
@@ -114,9 +123,9 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                                 </li>
                             )}
                         </ol>
-                    </nav>
+                    </nav> */}
                     <div className="w-full">
-                        <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-background py-2">
+                        {/* <div className="sticky md:relative top-14 md:top-0 z-30 md:z-10 bg-background py-2">
                             <CollectionsTopBar
                                 categories={filteredCategories}
                                 collections={collections}
@@ -124,7 +133,8 @@ export default function InfiniteScrollClient({ initialSearchParams, collection, 
                                 slug={collection?.slug}
                                 sortBy={"created_at:desc"}
                             />
-                        </div>
+                        </div> */}
+                        <MobileFilterControl />
                         <main className="w-full overflow-visible px-2 md:px-1 md:rounded-xl py-4 min-h-[50vh]">
                             <ProductCardListings className="w-full pb-4" md="grid-cols-4" products={products!} />
                             {products?.length == 0 && <NoProductsFound />}

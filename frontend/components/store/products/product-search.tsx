@@ -130,8 +130,8 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                 <div
                     className={cn(
                         "relative flex items-center rounded-xl border transition-all duration-200",
-                        "bg-search-background border-search-border hover:border-primary/30 hover:shadow-[var(--shadow-search)]",
-                        isOpen && "border-primary shadow-[var(--shadow-search)] bg-search-focus"
+                        "hover:border-primary/30 hover:shadow-[var(--shadow-search)] bg-content1",
+                        isOpen && "border-primary shadow-[var(--shadow-search)]"
                     )}
                 >
                     <Search className="absolute left-4 w-5 h-5 text-muted-foreground" />

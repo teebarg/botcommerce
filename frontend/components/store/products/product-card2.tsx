@@ -64,6 +64,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                             ))}
                         </div>
 
+                        {outOfStock && (
+                            <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
+                                <Badge className="text-sm backdrop-blur-sm" variant="secondary">
+                                    Out of Stock
+                                </Badge>
+                            </div>
+                        )}
+
                         {session?.user?.isAdmin && (
                             <ImageDownloadButton className="absolute bottom-2 left-2" fallbackName={product.slug} url={product.images?.[0] || ""} />
                         )}
