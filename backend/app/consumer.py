@@ -52,7 +52,6 @@ class RedisStreamConsumer:
                         count=10
                     )
 
-                    print("🚀 ~ file: consumer.py:53 ~ claimed:", claimed)
                     for msg_id, data in claimed[1]:
                         await self._process(msg_id, data)
                 except Exception as e:
@@ -65,7 +64,6 @@ class RedisStreamConsumer:
                     count=10,
                     block=60000,  # wait max 60s
                 )
-                print("🚀 ~ file: consumer.py:67 ~ events:", events)
 
                 if not events:
                     continue
