@@ -57,17 +57,14 @@ async def list_shared_collections(
         where_clause["AND"] = [
                 {"products": {"some": {"id": product_id}}}
             ]
+
     shared = await db.sharedcollection.find_many(
         where=where_clause,
         skip=skip,
         take=limit,
         order={"created_at": "desc"},
         include={
-            "products": {
-                "include": {
-                    "images": True,
-                }
-            }
+            "products": True
         }
     )
     shared_transformed = [
@@ -78,7 +75,7 @@ async def list_shared_collections(
             description=col.description,
             is_active=col.is_active,
             view_count=col.view_count,
-            products=[to_product_card_view(p) for p in col.products]
+            products=[to_product_card_view(p) for p in (col.products or [])]
         )
         for col in shared
     ]
@@ -288,7 +285,7 @@ async def add_product_to_shared_collection(id: int, product_id: int, background_
     return {"message": "Product added to collection successfully"}
 
 @router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(get_current_superuser)])
-async def remove_product_from_shared_collection(id: int, product_id: int) -> Message:
+async def remove_product_from_shared_collection(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
     """Remove a product from a shared collection"""
     shared_collection = await db.sharedcollection.find_unique(where={"id": id})
     if not shared_collection:

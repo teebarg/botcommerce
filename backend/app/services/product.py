@@ -147,7 +147,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
     product_dict["categories"] = [dict(c) for c in (product.categories or [])]
     product_dict["images"] = [img.image for img in sorted(
-        product.images, key=lambda img: img.order)]
+        (product.images or []), key=lambda img: img.order)]
 
     variants = [v.dict() for v in (product.variants or [])]
     product_dict["variants"] = variants

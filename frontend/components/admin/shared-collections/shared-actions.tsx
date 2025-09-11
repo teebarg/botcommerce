@@ -3,6 +3,8 @@
 import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Edit, Trash2 } from "lucide-react";
+import { Eye } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { SharedForm } from "./shared-form";
 
@@ -20,6 +22,7 @@ interface Props {
 const SharedActions: React.FC<Props> = ({ item }) => {
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
+    const router = useRouter();
 
     const deleteMutation = useDeleteSharedCollection();
 
@@ -31,6 +34,10 @@ const SharedActions: React.FC<Props> = ({ item }) => {
 
     return (
         <div className="relative flex items-center justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => router.push(`/shared/${item.slug}`)}>
+                <Eye className="h-5 w-5 mr-1" />
+                View
+            </Button>
             <Overlay
                 open={editState.isOpen}
                 sheetClassName="min-w-150"

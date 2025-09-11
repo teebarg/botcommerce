@@ -13,20 +13,43 @@ import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { cn } from "@/lib/utils";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import { SortOptions } from "@/types/models";
+
+interface SearchParams {
+    sortBy?: SortOptions;
+    sizes?: string;
+    colors?: string;
+    maxPrice?: string;
+    minPrice?: string;
+    limit?: number;
+}
 
 interface Props {
     slug: string;
     initialCatalog: Catalog;
+    initialSearchParams: SearchParams;
 }
 
-export default function SharedInfinite({ slug, initialCatalog }: Props) {
+export default function SharedInfinite({ slug, initialCatalog, initialSearchParams }: Props) {
     const editState = useOverlayTriggerState({});
     const pageSize = initialCatalog.limit || 20;
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+    const { updateQuery } = useUpdateQuery();
+
+    const onClearAll = () => {
+        updateQuery([
+            { key: "sortBy", value: "created_at:desc" },
+            { key: "sizes", value: "" },
+            { key: "colors", value: "" },
+        ]);
+    };
+
     const query = useInfiniteQuery<Catalog>({
-        queryKey: ["products", "shared-collections", slug, "infinite", pageSize],
-        queryFn: async ({ pageParam = 0 }) => await api.get<Catalog>(`/shared/${slug}`, { params: { skip: pageParam, limit: pageSize } }),
+        queryKey: ["products", "catalogs", slug, JSON.stringify(initialSearchParams)],
+        queryFn: async ({ pageParam = 0 }) =>
+            await api.get<Catalog>(`/shared/${slug}`, { params: { skip: pageParam, limit: pageSize, ...initialSearchParams } }),
         initialPageParam: 0,
         getNextPageParam: (lastPage: Catalog) => {
             const nextSkip = (lastPage.skip || 0) + (lastPage.limit || pageSize);
@@ -38,7 +61,7 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
     });
 
     const products = query.data?.pages.flatMap((p) => p.products) || [];
-    const totalProducts = query.data?.pages.flatMap((p) => p.total_count) || 0;
+    const totalProducts = query.data?.pages[0].total_count || 0;
 
     const { lastElementRef } = useInfiniteScroll({
         onIntersect: () => {
@@ -48,8 +71,6 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
         },
         isFetching: query.isFetchingNextPage,
     });
-
-    if (!products.length) return <div>No products in this collection.</div>;
 
     return (
         <main className="container mx-auto px-2 py-6">
@@ -118,7 +139,26 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
                         <p className="text-sm text-muted-foreground">Showing {totalProducts} products</p>
                     </div>
 
-                    <div className={`${viewMode === "grid" ? "grid grid-cols-2 lg:grid-cols-4 gap-4" : "space-y-4"}`}>
+                    {!products.length && (
+                        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                            <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+                                <Grid3X3 className="w-12 h-12 text-muted-foreground" />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2">No products found</h3>
+                            <p className="text-muted-foreground mb-6 max-w-md">
+                                {`We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.`}
+                            </p>
+                            <Button variant="indigo" onClick={onClearAll}>
+                                Clear all filters
+                            </Button>
+                        </div>
+                    )}
+
+                    <div
+                        className={`${
+                            viewMode === "grid" ? "grid grid-cols-2 lg:grid-cols-4 gap-4" : "space-y-4 block lg:grid lg:grid-cols-2 lg:gap-4"
+                        }`}
+                    >
                         {products.map((product: ProductSearch, idx: number) => {
                             const isLast = idx === products.length - 1;
 

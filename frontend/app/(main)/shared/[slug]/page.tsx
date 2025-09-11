@@ -6,10 +6,17 @@ import { tryCatch } from "@/lib/try-catch";
 import SharedInfinite from "@/components/store/shared/shared-infinite";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 import { serverApi } from "@/apis/server-client";
+import { SortOptions } from "@/types/models";
 
 export const revalidate = 60;
 
 type Params = Promise<{ slug: string }>;
+
+type SearchParams = Promise<{
+    sortBy?: SortOptions;
+    sizes?: string;
+    colors?: string;
+}>;
 
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
@@ -43,9 +50,18 @@ export async function generateMetadata({ params }: { params: Params }) {
     } as Metadata;
 }
 
-export default async function SharedPage({ params }: { params: Params }) {
+export default async function SharedPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
     const { slug } = await params;
-    const { data: catalog, error } = await tryCatch<Catalog>(serverApi.get(`/shared/${slug}`));
+    const { sortBy, sizes, colors } = (await searchParams) || {};
+
+    const queryParams: any = {
+        limit: 12,
+        sort: sortBy ?? "created_at:desc",
+        sizes: sizes,
+        colors: colors,
+    };
+
+    const { data: catalog, error } = await tryCatch<Catalog>(serverApi.get(`/shared/${slug}`, { params: { skip: 0, ...queryParams } }));
 
     if (!catalog || error) return notFound();
 
@@ -56,7 +72,7 @@ export default async function SharedPage({ params }: { params: Params }) {
                 <h1 className="text-3xl font-bold mb-2">{catalog.title}</h1>
                 {catalog.description && <p className="mb-4 text-lg text-default-600">{catalog.description}</p>}
             </div>
-            <SharedInfinite initialCatalog={catalog} slug={slug} />
+            <SharedInfinite initialCatalog={catalog} initialSearchParams={queryParams} slug={slug} />
         </div>
     );
 }
