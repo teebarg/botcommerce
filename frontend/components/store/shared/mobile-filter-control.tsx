@@ -8,12 +8,15 @@ import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { cn } from "@/lib/utils";
+import { Facet } from "@/schemas/product";
 
+interface Props {
+    facets?: Facet;
+}
 
-export default function MobileFilterControl() {
+export default function MobileFilterControl({ facets }: Props) {
     const editState = useOverlayTriggerState({});
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-
 
     return (
         <div className="sticky top-17 z-50 bg-content2 border-b border-border mb-6 lg:hidden py-4 px-4 -mx-2">
@@ -43,7 +46,7 @@ export default function MobileFilterControl() {
                         }
                         onOpenChange={editState.setOpen}
                     >
-                        <FilterSidebar />
+                        <FilterSidebar facets={facets} />
                     </Overlay>
                 </div>
             </div>

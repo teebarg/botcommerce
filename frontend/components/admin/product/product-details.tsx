@@ -102,7 +102,12 @@ export function ProductDetails() {
                                         {pagination?.skip * LIMIT + idx + 1}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <div className={cn("rounded-md overflow-hidden h-20 w-20 relative", product.active ? "" : "ring-2 ring-red-300")}>
+                                        <div
+                                            className={cn(
+                                                "rounded-md overflow-hidden h-20 w-20 relative",
+                                                product.active ? "" : "ring-2 ring-red-300"
+                                            )}
+                                        >
                                             <Image
                                                 fill
                                                 alt={product.name}

@@ -1,9 +1,10 @@
 "use client";
 
+import { useParams, useRouter } from "next/navigation";
+
 import { Badge } from "@/components/ui/badge";
 import { useCollections } from "@/lib/hooks/useCollection";
 import LocalizedClientLink from "@/components/ui/link";
-import { useParams, useRouter } from "next/navigation";
 
 export function CollectionHeader() {
     const { data: collections } = useCollections();
@@ -15,7 +16,7 @@ export function CollectionHeader() {
             <nav className="text-sm">
                 <ol className="flex items-center space-x-2 text-muted-foreground">
                     <li>
-                        <LocalizedClientLink href="/" className="hover:text-foreground transition-colors">
+                        <LocalizedClientLink className="hover:text-foreground transition-colors" href="/">
                             Home
                         </LocalizedClientLink>
                     </li>
@@ -27,10 +28,10 @@ export function CollectionHeader() {
             <div className="flex flex-wrap gap-2">
                 {collections?.map((collection) => (
                     <Badge
-                        onClick={() => router.push(`/collections/${collection.slug}`)}
                         key={collection.id}
-                        variant={params.slug === collection.slug ? "indigo" : "gray"}
                         className="cursor-pointer py-1 text-sm"
+                        variant={params.slug === collection.slug ? "indigo" : "gray"}
+                        onClick={() => router.push(`/collections/${collection.slug}`)}
                     >
                         {collection.name}
                     </Badge>

@@ -34,7 +34,7 @@ const SharedActions: React.FC<Props> = ({ item }) => {
 
     return (
         <div className="relative flex items-center justify-end gap-2 mt-4">
-            <Button variant="indigo" size="icon" onClick={() => router.push(`/shared/${item.slug}`)}>
+            <Button size="icon" variant="indigo" onClick={() => router.push(`/shared/${item.slug}`)}>
                 <Eye className="h-5 w-5" />
             </Button>
             <Overlay
