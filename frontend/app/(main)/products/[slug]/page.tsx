@@ -9,6 +9,7 @@ import ReviewsSection from "@/components/product/product-reviews";
 import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
+import RecentlyViewedSection from "@/components/store/home/recently-viewed";
 
 export const revalidate = 60;
 
@@ -55,10 +56,14 @@ export default async function ProductPage({ params }: { params: Params }) {
             </LazyFadeIn>
 
             <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products">
-                <LazyFadeIn delay={100}>
+                <LazyFadeIn delay={200}>
                     <RelatedProducts product={product} />
                 </LazyFadeIn>
             </div>
+
+            <LazyFadeIn delay={300}>
+                <RecentlyViewedSection showBanner={false} />
+            </LazyFadeIn>
         </div>
     );
 }

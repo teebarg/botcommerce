@@ -16,7 +16,6 @@ const ProductReviews = ({ productId, reviews }: ProductReviewsProps) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [allReviews, setAllReviews] = useState<Review[]>(reviews);
 
-    // Calculate average rating
     const averageRating = allReviews.length > 0 ? allReviews.reduce((acc, review) => acc + review.rating, 0) / allReviews.length : 0;
 
     const roundedRating = Math.round(averageRating * 10) / 10;

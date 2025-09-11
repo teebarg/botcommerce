@@ -23,7 +23,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
 
     return (
         <Card className="w-full max-w-6xl mx-auto text-center border-dashed border-2">
-            <div className="space-y-6 mb-4">
+            <div className="space-y-6 mb-4 px-2">
                 <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 via-accent/10 to-secondary/5 flex items-center justify-center">
                     <div className="relative z-10 text-center space-y-4">
                         <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-primary/20">

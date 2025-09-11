@@ -143,7 +143,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                             className="bg-card rounded-2xl shadow-sm border border-divider overflow-hidden hover:shadow-md transition-shadow"
                         >
                             <div className="group">
-                                <div className="p-6">
+                                <div className="py-4 px-2">
                                     <div className="flex items-center gap-4">
                                         <CategoryImage categoryId={category.id} image={category.image} />
 

@@ -164,10 +164,10 @@ export function ProductDetails() {
                     )}
 
                     <div className="flex justify-between mb-4">
-                        <Button className="text-xs" size="sm" variant="outline" onClick={handleManageCollections}>
+                        <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCollections}>
                             Collections
                         </Button>
-                        <Button className="text-xs" size="sm" variant="outline" onClick={handleManageCategories}>
+                        <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCategories}>
                             Categories
                         </Button>
                     </div>

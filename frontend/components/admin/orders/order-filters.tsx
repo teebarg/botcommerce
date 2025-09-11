@@ -89,7 +89,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                     </Button>
                 </div>
             </div>
-            <div className="flex md:hidden space-x-2 overflow-x-auto pb-2 mb-4">
+            <div className="flex flex-wrap md:hidden gap-2 overflow-x-auto pb-2 mb-4">
                 <button
                     className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${
                         !status ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
@@ -108,7 +108,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                     <button
                         key={idx}
                         className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${
-                            status === item.status ? item.color + " text-white" : "bg-gray-100 text-gray-700"
+                            status === item.status ? item.color + " text-white" : "bg-gray-200 text-gray-700"
                         }`}
                         onClick={() => updateStatusQuery(item.status as OrderStatus)}
                     >

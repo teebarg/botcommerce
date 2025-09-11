@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { Category, Product } from "@/schemas/product";
+import { Product } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
@@ -34,9 +34,6 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
                 </Badge>
             </div>
             <div className="p-3 flex flex-col justify-end flex-1">
-                <div className="text-sm text-primary font-medium mb-1">
-                    {product.categories?.map((category: Category) => category.name).join(", ")}
-                </div>
                 <h3 className="font-medium text-default-900 mb-1 truncate">{product.name}</h3>
                 <div>
                     <PriceLabel priceInfo={priceInfo} />

@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return (
         <Overlay
             open={dialogState.isOpen}
-            sheetClassName="min-w-[40vw]"
+            sheetClassName="min-w-[30vw]"
             showCloseButton={false}
             title="Details"
             trigger={

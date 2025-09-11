@@ -74,7 +74,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
     }
 
     return (
-        <div className="py-4 rounded-md">
+        <div className="py-4 rounded-md bg-content4">
             <p className="text-default-500 mt-8 font-semibold">Manage variant</p>
             <div className="bg-content1 p-4 rounded-lg">
                 <Form {...form}>

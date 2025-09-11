@@ -55,7 +55,7 @@ export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => 
                         <div className="space-y-3">
                             <div className="flex gap-2">
                                 {collection.products.slice(0, 4).map((product) => (
-                                    <div key={product.id} className="relative w-24 h-24 rounded bg-content3 overflow-hidden p-2">
+                                    <div key={product.id} className="relative w-20 h-20 rounded bg-content3 overflow-hidden p-2">
                                         <Image fill alt={product.name} className="object-contain" src={product.image || "/placeholder.jpg"} />
                                     </div>
                                 ))}

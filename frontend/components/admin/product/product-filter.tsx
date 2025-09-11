@@ -44,7 +44,7 @@ const ProductFilter = ({ collections, selectedCollections, onApplyFilters, onClo
                                 <button
                                     key={idx}
                                     className={`px-3 py-1.5 rounded-full text-sm ${
-                                        tempCollections.includes(collection.id) ? "bg-secondary text-white" : "bg-card text-default-800"
+                                        tempCollections.includes(collection.id) ? "bg-indigo-500 text-white" : "bg-content3 text-default-800"
                                     }`}
                                     onClick={() => handleToggleCollection(collection.id)}
                                 >
@@ -57,7 +57,7 @@ const ProductFilter = ({ collections, selectedCollections, onApplyFilters, onClo
             </div>
             <Separator />
             <div className="px-4 py-2 flex gap-3 justify-between">
-                <Button className="flex-1" variant="outline" onClick={handleReset}>
+                <Button className="flex-1" variant="destructive" onClick={handleReset}>
                     Reset
                 </Button>
                 <Button className="flex-1" variant="primary" onClick={handleApply}>
