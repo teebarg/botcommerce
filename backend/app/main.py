@@ -20,8 +20,7 @@ from app.redis_client import redis_client
 
 from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
-
-from app.services.consumer import handle_event
+from app.consumer import RedisStreamConsumer
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -31,22 +30,25 @@ logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.debug("🚀connecting to dbs......:")
+    logger.debug("🚀starting servers......:")
     await db.connect()
-    logger.debug("✅ ~ connected to prisma......:")
+
+    await redis_client.ping()
+    app.state.redis = redis_client
+
     try:
-        await redis_client.ping()
-        app.state.redis = redis_client
-        logger.debug("✅ ~ connected to redis......:")
-    except Exception as e:
-        logger.error(f"❌ ~ failed to connect to redis......: {e}")
+        await redis_client.xgroup_create(STREAM_NAME, GROUP_NAME, id="0", mkstream=True)
+    except Exception:
+        pass
+
+    consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
+    await consumer.start()
 
     yield
+
+    await consumer.stop()
     await db.disconnect()
-    try:
-        await redis_client.close()
-    except Exception as e:
-        logger.error(f"❌ ~ failed to close redis connection......: {e}")
+    await redis_client.close()
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)

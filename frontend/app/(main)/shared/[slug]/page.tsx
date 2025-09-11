@@ -67,11 +67,11 @@ export default async function SharedPage({ params, searchParams }: { params: Par
 
     return (
         <div className="bg-content2">
-            <div className="max-w-9xl mx-auto w-full p-4">
+            <div className="max-w-9xl mx-auto w-full py-4 px-2">
                 <SharedCollectionVisitTracker slug={slug} />
                 <div className="px-8">
-                    <h1 className="text-3xl font-bold mb-2">{catalog.title}</h1>
-                    {catalog.description && <p className="mb-4 text-lg text-default-600">{catalog.description}</p>}
+                    <h1 className="text-2xl font-bold">{catalog.title}</h1>
+                    {catalog.description && <p className="text-lg text-default-600">{catalog.description}</p>}
                 </div>
                 <SharedInfinite initialCatalog={catalog} initialSearchParams={queryParams} slug={slug} />
             </div>

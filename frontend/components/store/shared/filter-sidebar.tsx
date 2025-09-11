@@ -73,7 +73,7 @@ export function FilterSidebar() {
         <div className="p-6 h-full overflow-y-auto bg-content1">
             <div className="flex items-center justify-between mb-6 sticky top-0 z-10">
                 <h2 className="font-semibold text-lg">FILTER & SORT</h2>
-                <Button className="text-accent hover:text-accent-hover px-0 justify-end" variant="transparent" onClick={onClearAll}>
+                <Button className="text-indigo-500 hover:text-indigo-600 px-0 justify-end" variant="transparent" onClick={onClearAll}>
                     Clear All
                 </Button>
             </div>

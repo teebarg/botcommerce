@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Grid3X3, LayoutList, SlidersHorizontal } from "lucide-react";
+import { Grid3X3, SlidersHorizontal, RectangleVertical, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
@@ -73,7 +73,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
     });
 
     return (
-        <main className="container mx-auto px-2 py-6">
+        <main className="container mx-auto py-2">
             <div className="flex gap-6">
                 <aside className="hidden lg:block w-80 flex-shrink-0">
                     <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
@@ -82,48 +82,32 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
                 </aside>
 
                 <div className="flex-1">
-                    <div className="sticky top-16 z-50 bg-background border-b border-border mb-6 lg:hidden py-4">
+                    <div className="sticky top-17 z-50 bg-content2 border-b border-border mb-6 lg:hidden py-4 px-4 -mx-2">
                         <div className="flex items-center justify-center gap-2">
-                            <div className="rounded-full px-4 py-2 flex items-center gap-2 bg-content2 flex-1">
+                            <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 flex-1">
                                 <div
-                                    className={cn(
-                                        "rounded-full flex flex-1 items-center justify-center py-2",
-                                        viewMode === "grid" ? "bg-content3" : "bg-content2"
-                                    )}
+                                    className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}
                                 >
-                                    <Button
-                                        className="rounded-lg"
-                                        size="iconOnly"
-                                        variant={viewMode === "grid" ? "default" : "outline"}
-                                        onClick={() => setViewMode("grid")}
-                                    >
-                                        <Grid3X3 className="h-6 w-6" />
+                                    <Button size="iconOnly" onClick={() => setViewMode("grid")}>
+                                        <LayoutDashboard className="h-6 w-6" />
                                     </Button>
                                 </div>
                                 <div
-                                    className={cn(
-                                        "rounded-full flex flex-1 items-center justify-center py-2",
-                                        viewMode === "list" ? "bg-content3" : "bg-content2"
-                                    )}
+                                    className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-content1")}
                                 >
-                                    <Button
-                                        className="rounded-lg"
-                                        size="iconOnly"
-                                        variant={viewMode === "list" ? "default" : "outline"}
-                                        onClick={() => setViewMode("list")}
-                                    >
-                                        <LayoutList className="h-6 w-6" />
+                                    <Button size="iconOnly" onClick={() => setViewMode("list")}>
+                                        <RectangleVertical className="h-6 w-6" />
                                     </Button>
                                 </div>
                             </div>
 
-                            <div className="rounded-full px-4 py-2 bg-content2 flex-1 flex justify-center">
+                            <div className="rounded-full py-1 bg-gray-300 dark:bg-content3 flex-1 flex justify-center">
                                 <Overlay
                                     open={editState.isOpen}
                                     title="Edit Brand"
                                     trigger={
-                                        <Button className="flex items-center gap-2 rounded-lg" variant="transparent">
-                                            <SlidersHorizontal className="h-4 w-4" />
+                                        <Button className="gap-2 font-bold" variant="transparent">
+                                            <SlidersHorizontal className="h-5 w-5" />
                                             FILTER & SORT
                                         </Button>
                                     }
@@ -156,7 +140,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
 
                     <div
                         className={`${
-                            viewMode === "grid" ? "grid grid-cols-2 lg:grid-cols-4 gap-4" : "space-y-4 block lg:grid lg:grid-cols-2 lg:gap-4"
+                            viewMode === "grid" ? "grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4" : "space-y-4 block lg:grid lg:grid-cols-2 lg:gap-4"
                         }`}
                     >
                         {products.map((product: ProductSearch, idx: number) => {
