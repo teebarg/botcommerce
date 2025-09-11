@@ -2,8 +2,6 @@
 
 import { useRouter } from "next/navigation";
 
-import ProductUpload from "./product-upload";
-
 import { ProductDetails } from "@/components/admin/product/product-details";
 import { Button } from "@/components/ui/button";
 import { useBustCache, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
@@ -31,9 +29,6 @@ export function ProductInventory() {
             <div className="mb-8">
                 <h3 className="text-lg font-semibold">Product Inventory</h3>
                 <p className="text-sm text-default-500">Manage your product inventory and stock levels.</p>
-            </div>
-            <div className="max-w-120 mb-8 w-full">
-                <ProductUpload />
             </div>
             <div className="flex flex-wrap gap-2 mb-2">
                 <Button variant="primary" onClick={() => router.push("/admin/products/create")}>

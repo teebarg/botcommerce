@@ -8,8 +8,8 @@ import ProductVariantForm from "./product-variant-form";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/schemas";
-import { currency } from "@/lib/utils";
-import { useDeleteVariant } from "@/lib/hooks/useProduct";
+import { cn, currency } from "@/lib/utils";
+import { useDeleteVariant, useUpdateVariant } from "@/lib/hooks/useProduct";
 
 interface ProductVariantsProps {
     variants: ProductVariant[];
@@ -19,6 +19,7 @@ interface ProductVariantsProps {
 const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants = [] }) => {
     const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
     const deleteVariantMutation = useDeleteVariant();
+    const updateVariantMutation = useUpdateVariant();
 
     const handleEdit = (variant: ProductVariant) => {
         setEditingVariant(variant);
@@ -28,56 +29,49 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
         deleteVariantMutation.mutate(id);
     };
 
+    const markOutOfStock = (variant: ProductVariant) => {
+        if (!variant?.id) return;
+        updateVariantMutation.mutate({ id: variant.id, inventory: 0 });
+    };
+
     return (
         <div>
             <h4 className="text-lg font-medium text-default-800 mt-4">Product Variants</h4>
             <div className="py-4 rounded-md">
-                <div className="max-h-[250px] overflow-y-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead>
-                            <tr>
-                                {["SKU", "Price", "Inventory", "Size", "Color", "Measurement", "Status", "Actions"]?.map(
-                                    (variant: string, idx: number) => (
-                                        <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-default-500 uppercase tracking-wider">
-                                            {variant}
-                                        </th>
-                                    )
+                <div>
+                    {variants?.map((variant: ProductVariant, idx: number) => (
+                        <div key={idx} className="flex flex-col gap-2 rounded-md p-2 bg-card">
+                            <p className="text-sm font-medium text-default-800">Sku: {variant.sku}</p>
+                            <p className="text-sm font-medium text-default-800">Price: {currency(variant.price)}</p>
+                            <p className={cn("text-sm font-medium text-default-800", variant.size ? "" : "hidden")}>Size: {variant.size}</p>
+                            <p className={cn("text-sm font-medium text-default-800", variant.color ? "" : "hidden")}>Color: {variant.color}</p>
+                            <p className={cn("text-sm font-medium text-default-800", variant.measurement ? "" : "hidden")}>
+                                Measurement: {variant.measurement}
+                            </p>
+                            <p className="text-sm font-medium text-default-800">Inventory: {variant.inventory}</p>
+                            <p className="text-sm font-medium text-default-800">
+                                <Badge variant={variant.status === "IN_STOCK" ? "emerald" : "destructive"}>{variant.status}</Badge>
+                            </p>
+                            <div className="flex gap-2 justify-end">
+                                {variant.status === "IN_STOCK" && (
+                                    <Button className="min-w-28" size="sm" variant="warning" onClick={() => markOutOfStock(variant)}>
+                                        Mark out of stock
+                                    </Button>
                                 )}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {variants?.map((variant: ProductVariant, idx: number) => (
-                                <tr key={idx}>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">
-                                        <p className="max-w-32 overflow-hidden text-ellipsis">{variant.sku}</p>
-                                    </td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{currency(variant.price)}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.inventory}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.size || "-"}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.color || "-"}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">{variant.measurement || "-"}</td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500">
-                                        <Badge variant={variant.status === "IN_STOCK" ? "emerald" : "destructive"}>{variant.status}</Badge>
-                                    </td>
-                                    <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium flex items-center">
-                                        <Button size="icon" variant="ghost" onClick={() => handleEdit(variant)}>
-                                            <Edit className="h-5 w-5" />
-                                        </Button>
-                                        <Button size="icon" variant="ghost" onClick={() => deleteVariant(variant.id)}>
-                                            <Trash2 className="h-5 w-5 text-danger" />
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {variants.length === 0 && (
-                                <tr>
-                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-default-500 text-center" colSpan={8}>
-                                        No variants found
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                <Button size="icon" variant="ghost" onClick={() => handleEdit(variant)}>
+                                    <Edit className="h-5 w-5" />
+                                </Button>
+                                <Button size="icon" variant="ghost" onClick={() => deleteVariant(variant.id)}>
+                                    <Trash2 className="h-5 w-5 text-danger" />
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                    {variants.length === 0 && (
+                        <div>
+                            <p className="px-3 py-2 whitespace-nowrap text-sm text-default-500 text-center">No variants found</p>
+                        </div>
+                    )}
                 </div>
                 <ProductVariantForm productId={productId} variant={editingVariant} onCancel={() => setEditingVariant(null)} />
             </div>

@@ -44,6 +44,14 @@ class SharedCollection(SharedCollectionBase):
     products: list[SearchProduct]
     view_count: int = 0
 
+class Catalog(SharedCollectionBase):
+    products: list[SearchProduct]
+    view_count: int = 0
+    skip: int
+    limit: int
+    total_count: int
+    total_pages: int
+
 class SharedCollections(BaseModel):
     shared: list[SharedCollection]
     skip: int

@@ -5,7 +5,7 @@ import { getCookie } from "@/lib/util/server-utils";
 const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 type RequestOptions = RequestInit & {
-    params?: Record<string, string | number>;
+    params?: Record<string, string | number | unknown>;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {

@@ -13,6 +13,7 @@ import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
 import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
+import { ImageDownloadButton } from "@/components/store/image-download";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -120,6 +121,9 @@ const ProductOverview: React.FC<{
                             </div>
                         </div>
                     </div>
+                    {session?.user?.isAdmin && (
+                        <ImageDownloadButton className="absolute bottom-4 right-6" fallbackName={product.slug} url={product.images?.[0] || ""} />
+                    )}
                 </div>
             </div>
             <div className="flex flex-wrap gap-4 px-2 mt-4">

@@ -30,6 +30,7 @@ const buttonVariants = cva(
                 hero: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant transition-all duration-500 transform hover:scale-110 hover:shadow-luxury border border-border/20",
                 elegant:
                     "bg-transparent border-2 border-elegant text-elegant hover:bg-elegant hover:text-elegant-foreground transition-all duration-300",
+                transparent: "!bg-transparent !hover:bg-transparent",
             },
             size: {
                 default: "h-10 px-4 py-2 min-w-32",
