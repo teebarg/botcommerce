@@ -122,7 +122,7 @@ const ProductOverview: React.FC<{
                         </div>
                     </div>
                     {session?.user?.isAdmin && (
-                        <ImageDownloadButton className="absolute bottom-4 right-6" url={product.images?.[0] || ""} fallbackName={product.slug} />
+                        <ImageDownloadButton className="absolute bottom-4 right-6" fallbackName={product.slug} url={product.images?.[0] || ""} />
                     )}
                 </div>
             </div>

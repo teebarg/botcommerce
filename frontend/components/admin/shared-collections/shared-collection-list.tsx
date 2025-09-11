@@ -39,7 +39,7 @@ export default function SharedCollectionList() {
                 </Overlay>
             </div>
             {data?.shared?.length === 0 ? (
-                <div>No shared collections found.</div>
+                <div>No Catalogs found.</div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {data?.shared?.map((col: Shared, idx: number) => <SharedCard key={idx} collection={col} />)}

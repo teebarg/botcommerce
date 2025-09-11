@@ -1,6 +1,7 @@
+import { Download } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Download } from "lucide-react";
 
 interface ImageDownloadButtonProps {
     url: string;
@@ -15,16 +16,19 @@ export function ImageDownloadButton({ url, fallbackName = "file", className }: I
 
         try {
             const resp = await fetch(url);
+
             if (!resp.ok) throw new Error("Failed to fetch image");
 
             const blob = await resp.blob();
             const href = URL.createObjectURL(blob);
 
             const a = document.createElement("a");
+
             a.href = href;
 
             const contentType = resp.headers.get("Content-Type") || "";
             let ext = "jpg";
+
             if (contentType.includes("png")) ext = "png";
             else if (contentType.includes("jpeg")) ext = "jpeg";
             else if (contentType.includes("webp")) ext = "webp";

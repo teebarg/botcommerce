@@ -51,7 +51,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
             >
                 <ProductSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
             </Overlay>
-            <ImageDownloadButton className="" url={image.image} fallbackName={image.product.slug} />
+            <ImageDownloadButton fallbackName={image.product?.slug} url={image.image} />
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
                     <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">

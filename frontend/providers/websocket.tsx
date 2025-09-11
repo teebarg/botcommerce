@@ -66,6 +66,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
                 if (data?.type === "product-index" && data?.status === "completed") {
                     invalidate("products");
+                    invalidate("gallery");
                 }
 
                 if (data?.type === "recently_viewed") {

@@ -7,8 +7,8 @@ from app.models.collection import (
 from app.prisma_client import prisma as db
 from app.services.shared_collection import SharedCollectionService
 from math import ceil
-from app.services.redis import cache_response, invalidate_list, bust
-from app.services.product import to_product_card_view, index_products
+from app.services.redis import cache_response, invalidate_list
+from app.services.product import to_product_card_view, reindex_product
 from app.core.deps import get_current_superuser, UserDep
 from app.models.generic import Message
 
@@ -36,6 +36,8 @@ async def delete_shared_collection_view(id: int):
     await db.sharedcollectionview.delete(where={"id": id})
     return None
 
+
+# Catalogs
 @router.get("/", dependencies=[Depends(get_current_superuser)], response_model=SharedCollections)
 @cache_response(key_prefix="shared")
 async def list_shared_collections(
@@ -64,10 +66,6 @@ async def list_shared_collections(
             "products": {
                 "include": {
                     "images": True,
-                    "variants": True,
-                    "collections": True,
-                    "categories": True,
-                    "reviews": True
                 }
             }
         }
@@ -97,7 +95,7 @@ async def list_shared_collections(
 @cache_response(key_prefix="sharedcollection")
 async def search(
     request: Request,
-    slug: str, 
+    slug: str,
     user: UserDep,
     search: str = "",
     sort: str = "created_at:desc",
@@ -189,32 +187,6 @@ async def search(
     }
 
 
-# @router.get("/{slug}")
-# @cache_response(key_prefix="sharedcollection", key=lambda request, slug, user: slug)
-# async def get_shared_collection(request: Request, slug: str, user: UserDep) -> SharedCollection:
-#     where={"slug": slug}
-#     if user is None or user.role != "ADMIN":
-#         where["is_active"] = True
-#     obj = await db.sharedcollection.find_unique(where=where,
-#         include={
-#             "products": {
-#                 "include": {
-#                     "images": True,
-#                     "variants": True,
-#                     "collections": True,
-#                     "categories": True,
-#                     "reviews": True
-#                 }
-#             },
-#         },
-#     )
-#     if not obj:
-#         raise HTTPException(status_code=404, detail="SharedCollection not found")
-#     transformed_products = [to_product_card_view(p) for p in obj.products]
-#     obj.products = transformed_products
-#     return obj
-
-
 @router.post("/{slug}/track-visit")
 async def track_shared_collection_visit(
     request: Request,
@@ -230,7 +202,7 @@ async def track_shared_collection_visit(
 
     obj = await db.sharedcollection.find_unique(where=where)
     if not obj:
-        raise HTTPException(status_code=404, detail="SharedCollection not found")
+        raise HTTPException(status_code=404, detail="Catalog not found")
 
     client_ip = request.client.host
     if "x-forwarded-for" in request.headers:
@@ -247,7 +219,7 @@ async def track_shared_collection_visit(
 
     if is_new_visit:
         await invalidate_list("shared")
-        await bust(f"sharedcollection:{slug}")
+        await invalidate_list("sharedcollection")
 
     return {
         "success": True,
@@ -280,7 +252,8 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate):
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
 
     await invalidate_list("shared")
-    await bust(f"sharedcollection:{obj.slug}")
+    await invalidate_list("sharedcollection")
+
     return res
 
 @router.delete("/{id}")
@@ -291,7 +264,7 @@ async def delete_shared_collection(id: int) -> Message:
     await db.sharedcollection.delete(where={"id": id})
 
     await invalidate_list("shared")
-    await bust(f"sharedcollection:{obj.slug}")
+    await invalidate_list("sharedcollection")
     return {"message": "SharedCollection deleted successfully"}
 
 @router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])
@@ -305,32 +278,12 @@ async def add_product_to_shared_collection(id: int, product_id: int, background_
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    existing_product = await db.sharedcollection.find_first(
-        where={
-            "id": id,
-            "products": {
-                "some": {"id": product_id}
-            }
-        }
-    )
-
-    if existing_product:
-        raise HTTPException(status_code=400, detail="Product is already in this collection")
-
     await db.sharedcollection.update(
         where={"id": id},
-        data={
-            "products": {
-                "connect": {"id": product_id}
-            }
-        }
+        data={"products": {"connect": {"id": product_id}}}
     )
 
-    background_tasks.add_task(index_products)
-
-    await invalidate_list("sharedcollection")
-    await invalidate_list("shared")
-    await bust(f"sharedcollection:{shared_collection.slug}")
+    background_tasks.add_task(reindex_product, product_id=product_id)
 
     return {"message": "Product added to collection successfully"}
 
@@ -350,7 +303,6 @@ async def remove_product_from_shared_collection(id: int, product_id: int) -> Mes
         }
     )
 
-    await invalidate_list("shared")
-    await bust(f"sharedcollection:{shared_collection.slug}")
+    background_tasks.add_task(reindex_product, product_id=product_id)
 
     return {"message": "Product removed from collection successfully"}

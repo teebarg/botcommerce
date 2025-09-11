@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Backpack, ChevronRight, RefreshCw, Truck } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 import { cn, currency } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
@@ -14,7 +15,6 @@ import { Product } from "@/schemas/product";
 import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { useUpdateVariant } from "@/lib/hooks/useProduct";
 
 interface Props {
@@ -35,6 +35,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const handleMarkVariantOutOfStock = async (variant: ProductVariant) => {
         if (!variant?.id) return;
         const previousInventory = typeof variant.inventory === "number" ? variant.inventory : 0;
+
         updateVariant.mutateAsync({ id: variant.id, inventory: 0 }).then(() => {
             toast.success(`Variant ${variant.sku} marked out of stock`, {
                 action: {

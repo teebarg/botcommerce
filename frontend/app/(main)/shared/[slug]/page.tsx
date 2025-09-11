@@ -3,10 +3,11 @@ import { Metadata } from "next";
 
 import { Catalog, Shared } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import { SocialShare } from "@/components/store/shared/shared-listing";
 import SharedInfinite from "@/components/store/shared/shared-infinite";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 import { serverApi } from "@/apis/server-client";
+
+export const revalidate = 60;
 
 type Params = Promise<{ slug: string }>;
 
@@ -51,9 +52,10 @@ export default async function SharedPage({ params }: { params: Params }) {
     return (
         <div className="max-w-9xl mx-auto w-full p-4">
             <SharedCollectionVisitTracker slug={slug} />
-            <h1 className="text-3xl font-bold mb-2">{catalog.title}</h1>
-            {catalog.description && <p className="mb-4 text-lg text-default-600">{catalog.description}</p>}
-            <SocialShare title={catalog.title} view_count={catalog.view_count} />
+            <div className="px-8">
+                <h1 className="text-3xl font-bold mb-2">{catalog.title}</h1>
+                {catalog.description && <p className="mb-4 text-lg text-default-600">{catalog.description}</p>}
+            </div>
             <SharedInfinite initialCatalog={catalog} slug={slug} />
         </div>
     );

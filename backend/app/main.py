@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 from app.api.main import api_router
-from app.core import deps
 from app.core.config import settings
 from app.core.decorators import limit
 from app.core.utils import (generate_contact_form_email,
@@ -16,9 +15,8 @@ from fastapi import BackgroundTasks, FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
-import redis.asyncio as redis
-from app.redis_client import redis_client
 from app.services.meilisearch import get_or_create_index
+from app.redis_client import redis_client
 
 from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
@@ -30,6 +28,7 @@ GROUP_NAME = "notifications"
 CONSUMER_NAME = "notif-api-worker"
 
 logger = get_logger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -60,7 +59,7 @@ async def lifespan(app: FastAPI):
                     streams={STREAM_NAME: ">"},
                     count=10,
                     block=5000,
-                    )
+                )
                 if not events:
                     continue
 
@@ -71,7 +70,8 @@ async def lifespan(app: FastAPI):
                             await handle_event(data)
                             await redis_client.xack(STREAM_NAME, GROUP_NAME, msg_id)
                         except Exception as e:
-                            logger.error(f"Failed to handle order event: {str(e)}")
+                            logger.error(
+                                f"Failed to handle order event: {str(e)}")
         except Exception as e:
             logger.exception(f"Unexpected error in consumer: {e}")
             await asyncio.sleep(1)

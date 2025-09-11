@@ -65,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         </div>
 
                         {session?.user?.isAdmin && (
-                            <ImageDownloadButton className="absolute bottom-2 left-2" url={product.images?.[0] || ""} fallbackName={product.slug} />
+                            <ImageDownloadButton className="absolute bottom-2 left-2" fallbackName={product.slug} url={product.images?.[0] || ""} />
                         )}
                     </div>
 

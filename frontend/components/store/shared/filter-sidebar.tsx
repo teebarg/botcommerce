@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
+
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
-import { useSearchParams } from "next/navigation";
-import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
 import { cn } from "@/lib/utils";
 
 export function FilterSidebar() {
@@ -53,38 +54,38 @@ export function FilterSidebar() {
         <div className="filter-sidebar p-6 h-full overflow-y-auto">
             <div className="flex items-center justify-between mb-6 sticky top-0 z-10 bg-background">
                 <h2 className="font-semibold text-lg">FILTER & SORT</h2>
-                <Button variant="transparent" className="text-accent hover:text-accent-hover bg-background">
+                <Button className="text-accent hover:text-accent-hover bg-background" variant="transparent">
                     Clear All
                 </Button>
             </div>
 
             <div className="mb-6">
                 <Button
+                    className="justify-between w-full p-0 font-semibold mb-3 bg-transparent hover:bg-transparent"
                     variant="default"
                     onClick={() => toggleSection("sort")}
-                    className="justify-between w-full p-0 font-semibold mb-3 bg-transparent hover:bg-transparent"
                 >
                     SORT BY
                     {openSections.sort ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
 
                 {openSections.sort && (
-                    <RadioGroup value={value} onValueChange={handleSortChange} className="space-y-3">
+                    <RadioGroup className="space-y-3" value={value} onValueChange={handleSortChange}>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="price-low" id="price-low" />
-                            <Label htmlFor="price-low" className="text-sm">
+                            <RadioGroupItem id="price-low" value="price-low" />
+                            <Label className="text-sm" htmlFor="price-low">
                                 Price: Low to High
                             </Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="price-high" id="price-high" />
-                            <Label htmlFor="price-high" className="text-sm">
+                            <RadioGroupItem id="price-high" value="price-high" />
+                            <Label className="text-sm" htmlFor="price-high">
                                 Price: High to Low
                             </Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="newest" id="newest" />
-                            <Label htmlFor="newest" className="text-sm">
+                            <RadioGroupItem id="newest" value="newest" />
+                            <Label className="text-sm" htmlFor="newest">
                                 Newest
                             </Label>
                         </div>
@@ -93,11 +94,7 @@ export function FilterSidebar() {
             </div>
 
             <div className="mb-6">
-                <Button
-                    variant="transparent"
-                    onClick={() => toggleSection("size")}
-                    className="justify-between w-full p-0 font-semibold mb-3"
-                >
+                <Button className="justify-between w-full p-0 font-semibold mb-3" variant="transparent" onClick={() => toggleSection("size")}>
                     SIZE
                     {openSections.size ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
@@ -106,14 +103,14 @@ export function FilterSidebar() {
                     <div className="grid grid-cols-4 lg:grid-cols-3 gap-2">
                         {SIZE_OPTIONS.map((size) => (
                             <Button
-                                onClick={() => onSizeChange(true, size)}
                                 key={size}
-                                variant={dataSet.has(size) ? "indigo" : "outline"}
-                                size="iconOnly"
                                 className={cn(
                                     "h-12 text-lg bg-content2 hover:bg-primary hover:text-primary-foreground",
                                     dataSet.has(size) && "bg-indigo-500 text-white"
                                 )}
+                                size="iconOnly"
+                                variant={dataSet.has(size) ? "indigo" : "outline"}
+                                onClick={() => onSizeChange(true, size)}
                             >
                                 {size}
                             </Button>
@@ -124,9 +121,9 @@ export function FilterSidebar() {
 
             <div className="mb-6">
                 <Button
+                    className="flex items-center justify-between w-full p-0 font-semibold mb-3"
                     variant="transparent"
                     onClick={() => toggleSection("color")}
-                    className="flex items-center justify-between w-full p-0 font-semibold mb-3"
                 >
                     COLOR
                     {openSections.color ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -137,7 +134,7 @@ export function FilterSidebar() {
                         {COLOR_OPTIONS.map((color) => (
                             <div key={color} className="flex flex-col items-center space-y-2 cursor-pointer hover:opacity-80 transition-opacity">
                                 <div className="w-8 h-8 rounded-full border border-border" style={{ backgroundColor: color }} />
-                                <Label htmlFor={color} className="text-xs text-center">
+                                <Label className="text-xs text-center" htmlFor={color}>
                                     {color}
                                 </Label>
                             </div>
@@ -146,7 +143,7 @@ export function FilterSidebar() {
                 )}
             </div>
             <div className="flex justify-center sticky bottom-0 px-4">
-                <Button variant="indigo" className="w-full rounded-full py-6">
+                <Button className="w-full rounded-full py-6" variant="indigo">
                     Apply
                 </Button>
             </div>

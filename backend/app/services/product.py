@@ -142,14 +142,14 @@ async def product_export(email: str, user_id: str):
 def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
 
-    product_dict["collection_slugs"] = [c.slug for c in product.collections]
-    product_dict["collections"] = [dict(c) for c in product.collections]
-    product_dict["category_slugs"] = [c.slug for c in product.categories]
-    product_dict["categories"] = [dict(c) for c in product.categories]
+    product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
+    product_dict["collections"] = [dict(c) for c in (product.collections or [])]
+    product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
+    product_dict["categories"] = [dict(c) for c in (product.categories or [])]
     product_dict["images"] = [img.image for img in sorted(
         product.images, key=lambda img: img.order)]
 
-    variants = [v.dict() for v in product.variants]
+    variants = [v.dict() for v in (product.variants or [])]
     product_dict["variants"] = variants
 
     variant_prices = [v["price"]
@@ -160,7 +160,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["max_variant_price"] = max(
         variant_prices) if variant_prices else 0
 
-    reviews = [r.dict() for r in product.reviews]
+    reviews = [r.dict() for r in (product.reviews or [])]
     product_dict["reviews"] = reviews
 
     ratings = [r["rating"] for r in reviews if r.get("rating") is not None]

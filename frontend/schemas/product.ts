@@ -180,18 +180,17 @@ export const WishlistSchema = z.object({
     wishlists: z.array(WishItemSchema),
 });
 
-export const CatalogSchema = z
-    .object({
-        title: z.string(),
-        description: z.string().optional(), 
-        view_count: z.number(),
-        is_active: z.boolean(),
-        products: z.array(ProductSearchSchema),
-        skip: z.number(),
-        limit: z.number(),
-        total_count: z.number(),
-        total_pages: z.number(),
-    })
+export const CatalogSchema = z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    view_count: z.number(),
+    is_active: z.boolean(),
+    products: z.array(ProductSearchSchema),
+    skip: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
+});
 
 export type Product = z.infer<typeof ProductSchema>;
 export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
