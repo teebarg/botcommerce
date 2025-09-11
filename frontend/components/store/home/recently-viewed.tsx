@@ -13,27 +13,29 @@ export default function RecentlyViewedSection() {
     if (!data || data.length === 0) return null;
 
     return (
-        <section className="py-16 px-6">
-            <div className="max-w-9xl mx-auto px-4">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                        <Eye className="h-5 w-5 text-primary" />
+        <>
+            <section className="py-16 px-6 bg-content3">
+                <div className="max-w-9xl mx-auto px-4">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                            <Eye className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-foreground">Recently Viewed</h2>
+                            <p className="text-muted-foreground text-sm">
+                                {data?.length} item{data?.length !== 1 ? "s" : ""}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-2xl font-bold text-foreground">Recently Viewed</h2>
-                        <p className="text-muted-foreground text-sm">
-                            {data?.length} item{data?.length !== 1 ? "s" : ""}
-                        </p>
-                    </div>
+                    <ScrollableListing products={data || []} />
                 </div>
-                <ScrollableListing products={data || []} />
-            </div>
+            </section>
             <PromotionalBanner
                 btnClass="text-purple-600"
                 outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-9xl"
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
-        </section>
+        </>
     );
 }

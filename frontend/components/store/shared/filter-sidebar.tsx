@@ -13,7 +13,7 @@ export function FilterSidebar() {
     const [openSections, setOpenSections] = useState({
         sort: true,
         size: true,
-        color: true,
+        color: false,
     });
 
     const [sort, setSort] = useState<string>("created_at:desc");
@@ -70,10 +70,10 @@ export function FilterSidebar() {
     };
 
     return (
-        <div className="filter-sidebar p-6 h-full overflow-y-auto">
-            <div className="flex items-center justify-between mb-6 sticky top-0 z-10 bg-background">
+        <div className="p-6 h-full overflow-y-auto bg-content1">
+            <div className="flex items-center justify-between mb-6 sticky top-0 z-10">
                 <h2 className="font-semibold text-lg">FILTER & SORT</h2>
-                <Button className="text-accent hover:text-accent-hover bg-background" variant="transparent" onClick={onClearAll}>
+                <Button className="text-accent hover:text-accent-hover px-0 justify-end" variant="transparent" onClick={onClearAll}>
                     Clear All
                 </Button>
             </div>
@@ -89,7 +89,7 @@ export function FilterSidebar() {
                 </Button>
 
                 {openSections.sort && (
-                    <RadioGroup className="space-y-3" value={sort} onValueChange={setSort}>
+                    <RadioGroup value={sort} onValueChange={setSort}>
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem id="price-low" value="min_variant_price:asc" />
                             <Label className="text-sm" htmlFor="price-low">
@@ -127,7 +127,7 @@ export function FilterSidebar() {
                                 <Button
                                     key={size}
                                     className={cn(
-                                        "h-12 text-base bg-content2 hover:bg-primary hover:text-primary-foreground",
+                                        "h-12 text-base bg-content3 hover:bg-indigo-400 hover:text-white",
                                         active && "bg-indigo-500 text-white"
                                     )}
                                     size="iconOnly"

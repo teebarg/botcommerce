@@ -37,7 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             showCloseButton={false}
             title="Details"
             trigger={
-                <div className="group relative bg-gray-100 dark:bg-content1 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+                <div className="group relative bg-content1 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
                     <div className="relative aspect-[3/4] overflow-hidden">
                         <Image
                             fill
