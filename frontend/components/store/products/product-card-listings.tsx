@@ -9,19 +9,17 @@ import ProductCard from "@/components/store/products/product-card2";
 
 interface ProductCardProps {
     products: ProductSearch[];
-    sm?: "grid-cols-1" | "grid-cols-2" | "grid-cols-3" | "grid-cols-4";
-    md?: "grid-cols-1" | "grid-cols-2" | "grid-cols-3" | "grid-cols-4";
-    lg?: "grid-cols-1" | "grid-cols-2" | "grid-cols-3" | "grid-cols-4";
     className?: string;
+    viewMode?: "grid" | "list";
 }
 
-const ProductCardListings: React.FC<ProductCardProps> = ({ products, sm, md, lg, className }) => {
+const ProductCardListings: React.FC<ProductCardProps> = ({ products, className, viewMode }) => {
     const [ref, inView] = useInView({ triggerOnce: true });
 
     return (
         <div ref={ref}>
             {inView && (
-                <div className={cn("grid grid-cols-2 gap-3", className, sm && `sm:${sm}`, md && `md:${md}`, lg && `lg:${lg}`)}>
+                <div className={cn("grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 lg:gap-4", viewMode === "list" && "grid-cols-1", className)}>
                     {products.map((product, idx) => (
                         <ProductCard key={idx} product={product} />
                     ))}

@@ -35,7 +35,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
     };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center flex-wrap gap-2">
             <ManageSlate product={image.product} />
             <Overlay
                 open={editState.isOpen}

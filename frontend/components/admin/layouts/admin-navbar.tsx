@@ -13,7 +13,7 @@ const AdminNavbar = async () => {
     const session = await auth();
 
     return (
-        <NavigationBar>
+        <NavigationBar className="h-16 bg-content2">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit hidden sm:block">
                     <LocalizedClientLink href="/admin">

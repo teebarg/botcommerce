@@ -21,12 +21,34 @@ interface ProductParams {
     skip?: number;
     limit?: number;
     sort?: string;
+    collections?: string;
 }
 
 export const useProducts = (searchParams: ProductParams) => {
     return useQuery({
         queryKey: ["products", JSON.stringify(searchParams)],
         queryFn: async () => await api.get<PaginatedProduct>(`/product/`, { params: { ...searchParams } }),
+    });
+};
+
+export const useProductsInfinite = (searchParams: ProductParams) => {
+    return useInfiniteQuery({
+        queryKey: ["products", "infinite", JSON.stringify(searchParams)],
+        queryFn: async ({ pageParam = 0 }) =>
+            await api.get<PaginatedProduct>(`/product/`, {
+                params: {
+                    skip: pageParam,
+                    limit: searchParams.limit || 20,
+                    ...searchParams,
+                },
+            }),
+        getNextPageParam: (lastPage: PaginatedProduct) => {
+            const nextSkip = lastPage.skip + lastPage.limit;
+            const hasMore = nextSkip < lastPage.total_count;
+
+            return hasMore ? nextSkip : undefined;
+        },
+        initialPageParam: 0,
     });
 };
 

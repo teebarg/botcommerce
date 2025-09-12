@@ -7,27 +7,30 @@ import Image from "next/image";
 
 import { ProductQuery } from "./product-query";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ProductActions } from "@/components/admin/product/product-actions";
 import { Collection, Product, ProductVariant } from "@/schemas/product";
-import ProductListItem from "@/components/admin/product/product-list-item";
 import { Button } from "@/components/ui/button";
-import { useProducts } from "@/lib/hooks/useProduct";
+import { useProductsInfinite } from "@/lib/hooks/useProduct";
 import { useCollections } from "@/lib/hooks/useCollection";
+import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
-import PaginationUI from "@/components/pagination";
-import { cn } from "@/lib/utils";
 
-const LIMIT = 10;
+const LIMIT = 20;
 
 export function ProductDetails() {
     const router = useRouter();
     const { data: collections } = useCollections();
     const searchParams = useSearchParams();
-    const page = Number(searchParams.get("page")) || 1;
-    const { data, isLoading } = useProducts({ query: searchParams.get("search") || "", skip: (page - 1) * LIMIT });
+    const query = searchParams.get("search") || "";
+    const collectionsParam = searchParams.get("collections") || "";
+
+    const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProductsInfinite({
+        query,
+        limit: LIMIT,
+        collections: collectionsParam,
+    });
 
     const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
 
@@ -37,6 +40,15 @@ export function ProductDetails() {
         setSelectedCollections(collectionIdsFromURL.map(Number));
     }, [searchParams]);
 
+    const { lastElementRef } = useInfiniteScroll({
+        onIntersect: () => {
+            if (hasNextPage && !isFetchingNextPage) {
+                fetchNextPage();
+            }
+        },
+        isFetching: isFetchingNextPage,
+    });
+
     if (isLoading) {
         return <ComponentLoader className="h-96" />;
     }
@@ -45,7 +57,8 @@ export function ProductDetails() {
         return <ServerError />;
     }
 
-    const { products, ...pagination } = data;
+    // Flatten all products from all pages
+    const products = data.pages.flatMap((page) => page.products);
 
     const handleManageCollections = () => {
         router.push("/admin/collections");
@@ -68,131 +81,106 @@ export function ProductDetails() {
 
     return (
         <div>
-            <div className="hidden md:block">
+            <div className="py-4">
                 <ProductQuery collections={collections} selectedCollections={selectedCollections} />
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>S/N</TableHead>
-                            <TableHead>Image</TableHead>
-                            <TableHead>Product</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Variant</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow key="loading">
-                                <TableCell className="text-center" colSpan={8}>
-                                    Loading...
-                                </TableCell>
-                            </TableRow>
-                        ) : products?.length === 0 ? (
-                            <TableRow key="no-orders">
-                                <TableCell className="text-center" colSpan={8}>
-                                    No products found
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            products?.map((product: Product, idx: number) => (
-                                <TableRow key={idx} className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1">
-                                    <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">
-                                        {pagination?.skip * LIMIT + idx + 1}
-                                    </TableCell>
-                                    <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
-                                        <div
-                                            className={cn(
-                                                "rounded-md overflow-hidden h-20 w-20 relative",
-                                                product.active ? "" : "ring-2 ring-red-300"
-                                            )}
-                                        >
-                                            <Image
-                                                fill
-                                                alt={product.name}
-                                                blurDataURL="/placeholder.jpg"
-                                                className="object-cover object-center rounded-lg"
-                                                placeholder="blur"
-                                                sizes="(max-width: 768px) 64px, 80px"
-                                                src={
-                                                    product.images?.sort((a, b) => a.order - b.order)?.[0]?.image ||
-                                                    product?.image ||
-                                                    "/placeholder.jpg"
-                                                }
-                                            />
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="font-medium">{product.name}</TableCell>
-                                    <TableCell>{product.description}</TableCell>
-                                    <TableCell>{product.variants?.length}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>
+
+                {selectedCollections.length > 0 && (
+                    <div className="mb-4 flex gap-2 flex-wrap">
+                        {selectedCollections.map((id: number, idx: number) => {
+                            const collection = collections?.find((c: Collection) => c.id === id);
+
+                            if (!collection) return null;
+
+                            return (
+                                <div key={idx} className="bg-primary/10 text-primary text-sm rounded-full px-3 py-1 flex items-center">
+                                    <p>{collection.name}</p>
+                                    <button
+                                        className="ml-1"
+                                        onClick={() => {
+                                            setSelectedCollections(selectedCollections.filter((cId) => cId !== id));
+                                        }}
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                <div className="flex justify-between mb-4">
+                    <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCollections}>
+                        Collections
+                    </Button>
+                    <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCategories}>
+                        Categories
+                    </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {products?.map((product: Product, idx: number) => {
+                        const isLast = idx === products.length - 1;
+
+                        return (
+                            <div
+                                key={`${product.id}-${idx}`}
+                                ref={isLast ? (lastElementRef as any) : undefined}
+                                className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                            >
+                                <div className="relative h-48 w-full bg-content1 overflow-hidden">
+                                    <Image
+                                        fill
+                                        alt={product.name}
+                                        blurDataURL="/placeholder.jpg"
+                                        className="object-cover"
+                                        placeholder="blur"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                        src={product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"}
+                                    />
+
+                                    <div className="absolute top-2 right-2 flex flex-col gap-1">
+                                        <Badge className="shadow-sm" variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>
                                             {getStatus(product.variants)}
                                         </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <ProductActions product={product} />
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-            <div className="md:hidden">
-                <div className="py-4">
-                    <ProductQuery collections={collections} selectedCollections={selectedCollections} />
-
-                    {selectedCollections.length > 0 && (
-                        <div className="mb-4 flex gap-2 flex-wrap">
-                            {selectedCollections.map((id: number, idx: number) => {
-                                const collection = collections?.find((c: Collection) => c.id === id);
-
-                                if (!collection) return null;
-
-                                return (
-                                    <div key={idx} className="bg-primary/10 text-primary text-sm rounded-full px-3 py-1 flex items-center">
-                                        <p>{collection.name}</p>
-                                        <button
-                                            className="ml-1"
-                                            onClick={() => {
-                                                setSelectedCollections(selectedCollections.filter((cId) => cId !== id));
-                                            }}
-                                        >
-                                            <X size={14} />
-                                        </button>
+                                        <Badge className="shadow-sm" variant={product.active ? "emerald" : "destructive"}>
+                                            {product.active ? "Active" : "Inactive"}
+                                        </Badge>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                </div>
 
-                    <div className="flex justify-between mb-4">
-                        <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCollections}>
-                            Collections
-                        </Button>
-                        <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCategories}>
-                            Categories
-                        </Button>
-                    </div>
+                                <div className="p-4 flex flex-col justify-between flex-1">
+                                    <div className="mb-3">
+                                        <h3 className="font-semibold text-lg text-default-900 mb-2 line-clamp-2">{product.name}</h3>
+                                        <p className="text-sm text-default-600 line-clamp-2 mb-2">{product.description}</p>
+                                        <div className="flex items-center justify-between text-sm text-default-500">
+                                            <span>Variants: {product.variants?.length || 0}</span>
+                                            <span>#{idx + 1}</span>
+                                        </div>
+                                    </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                        {products?.map((product: Product, idx: number) => (
-                            <ProductListItem key={idx} actions={<ProductActions product={product} />} product={product} />
-                        ))}
-                    </div>
-
-                    {isLoading && <ComponentLoader className="h-[300px]" />}
-
-                    {products?.length === 0 && (
-                        <div className="text-center py-8">
-                            <p className="text-default-500">No products found</p>
-                        </div>
-                    )}
+                                    <div className="flex justify-end">
+                                        <ProductActions product={product} />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
+
+                {isFetchingNextPage && <ComponentLoader className="h-[200px]" />}
+
+                {products?.length === 0 && !isLoading && (
+                    <div className="text-center py-8">
+                        <p className="text-default-500">No products found</p>
+                    </div>
+                )}
+
+                {!hasNextPage && products?.length > 0 && (
+                    <div className="text-center py-4">
+                        <p className="text-sm text-default-500">You&apos;ve reached the end of the list</p>
+                    </div>
+                )}
             </div>
-            {pagination && pagination.total_pages > 1 && <PaginationUI pagination={pagination!} range={1} />}
         </div>
     );
 }

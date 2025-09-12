@@ -1,9 +1,10 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Grid3X3, SlidersHorizontal, RectangleVertical, LayoutDashboard } from "lucide-react";
+import { Grid3X3 } from "lucide-react";
 import { useState } from "react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+
+import MobileFilterControl from "./mobile-filter-control";
 
 import ProductCard from "@/components/store/products/product-card2";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
@@ -11,10 +12,9 @@ import { api } from "@/apis/client";
 import { Catalog, ProductSearch } from "@/schemas";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
-import Overlay from "@/components/overlay";
-import { cn } from "@/lib/utils";
 import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 import { SortOptions } from "@/types/models";
+import { cn } from "@/lib/utils";
 
 interface SearchParams {
     sortBy?: SortOptions;
@@ -32,7 +32,6 @@ interface Props {
 }
 
 export default function SharedInfinite({ slug, initialCatalog, initialSearchParams }: Props) {
-    const editState = useOverlayTriggerState({});
     const pageSize = initialCatalog.limit || 20;
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -82,42 +81,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
                 </aside>
 
                 <div className="flex-1">
-                    <div className="sticky top-17 z-50 bg-content2 border-b border-border mb-6 lg:hidden py-4 px-4 -mx-2">
-                        <div className="flex items-center justify-center gap-2">
-                            <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 flex-1">
-                                <div
-                                    className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}
-                                >
-                                    <Button size="iconOnly" onClick={() => setViewMode("grid")}>
-                                        <LayoutDashboard className="h-6 w-6" />
-                                    </Button>
-                                </div>
-                                <div
-                                    className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-content1")}
-                                >
-                                    <Button size="iconOnly" onClick={() => setViewMode("list")}>
-                                        <RectangleVertical className="h-6 w-6" />
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="rounded-full py-1 bg-gray-300 dark:bg-content3 flex-1 flex justify-center">
-                                <Overlay
-                                    open={editState.isOpen}
-                                    title="Edit Brand"
-                                    trigger={
-                                        <Button className="gap-2 font-bold" variant="transparent">
-                                            <SlidersHorizontal className="h-5 w-5" />
-                                            FILTER & SORT
-                                        </Button>
-                                    }
-                                    onOpenChange={editState.setOpen}
-                                >
-                                    <FilterSidebar />
-                                </Overlay>
-                            </div>
-                        </div>
-                    </div>
+                    <MobileFilterControl setViewMode={setViewMode} viewMode={viewMode} />
 
                     <div className="hidden lg:flex items-center justify-between mb-6">
                         <p className="text-sm text-muted-foreground">Showing {totalProducts} products</p>
@@ -138,11 +102,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
                         </div>
                     )}
 
-                    <div
-                        className={`${
-                            viewMode === "grid" ? "grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4" : "space-y-4 block lg:grid lg:grid-cols-2 lg:gap-4"
-                        }`}
-                    >
+                    <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
                         {products.map((product: ProductSearch, idx: number) => {
                             const isLast = idx === products.length - 1;
 

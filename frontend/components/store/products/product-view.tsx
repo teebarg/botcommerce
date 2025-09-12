@@ -160,14 +160,11 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         <p className="line-clamp-3 text-base text-default-500">{product.description}</p>
                     </div>
                     {session?.user?.isAdmin && product?.variants?.length ? (
-                        <div className="flex flex-col gap-2 mt-4 border rounded-md p-3">
+                        <div className="flex flex-col gap-2 mt-4">
                             {product.variants.map((v) => (
-                                <div key={v.id} className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-3">
+                                <div key={v.id} className="flex lg:flex-row items-center justify-between text-sm gap-2 bg-content1 p-2">
+                                    <div className="flex flex-col md:flex-row md:items-center gap-3">
                                         <span className="text-default-700">SKU: {v.sku}</span>
-                                        {v.size && <span>Size: {v.size}</span>}
-                                        {v.color && <span>Color: {v.color}</span>}
-                                        {typeof v.measurement === "number" && <span>Measure: {v.measurement}</span>}
                                         <span>Inventory: {v.inventory}</span>
                                         <span className={v.inventory > 0 ? "text-emerald-600" : "text-red-600"}>
                                             {v.inventory > 0 ? "IN_STOCK" : "OUT_OF_STOCK"}

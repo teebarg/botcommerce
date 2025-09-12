@@ -52,7 +52,7 @@ export default async function Collections({ searchParams }: Props) {
     }
 
     return (
-        <div className="max-w-9xl mx-auto w-full py-4 px-1">
+        <div className="max-w-9xl mx-auto w-full py-4 px-2">
             <Suspense fallback={<CollectionTemplateSkeleton />}>
                 <InfiniteScrollClient initialData={data?.products} initialSearchParams={queryParams} />
             </Suspense>

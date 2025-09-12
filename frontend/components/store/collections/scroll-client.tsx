@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Loader, Tag } from "lucide-react";
 
 import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
@@ -30,6 +30,7 @@ interface Props {
 }
 
 export default function InfiniteScrollClient({ initialSearchParams, initialData }: Props) {
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductInfiniteSearch(initialSearchParams);
 
     const { lastElementRef } = useInfiniteScroll({
@@ -61,9 +62,9 @@ export default function InfiniteScrollClient({ initialSearchParams, initialData 
                 />
                 <CollectionHeader />
                 <div className="w-full">
-                    <MobileFilterControl facets={facets} />
+                    <MobileFilterControl facets={facets} setViewMode={setViewMode} viewMode={viewMode} />
                     <main className="w-full overflow-visible px-2 md:px-1 md:rounded-xl py-4 min-h-[50vh]">
-                        <ProductCardListings className="w-full pb-4" md="grid-cols-4" products={products!} />
+                        <ProductCardListings className="w-full pb-4" products={products!} viewMode={viewMode} />
                         {products?.length == 0 && <NoProductsFound />}
                     </main>
                 </div>

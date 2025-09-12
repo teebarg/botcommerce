@@ -28,7 +28,7 @@ export function ProductInventory() {
         <div className="px-4 py-8 overflow-y-auto">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold">Product Inventory</h3>
-                <p className="text-sm text-default-500">Manage your product inventory and stock levels.</p>
+                <p className="text-sm text-default-500">Manage your product inventory and stock levels. Scroll down to load more products.</p>
             </div>
             <div className="flex flex-wrap gap-2 mb-2">
                 <Button variant="primary" onClick={() => router.push("/admin/products/create")}>
