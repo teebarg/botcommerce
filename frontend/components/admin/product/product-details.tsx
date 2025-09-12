@@ -127,7 +127,7 @@ export function ProductDetails() {
                                 ref={isLast ? (lastElementRef as any) : undefined}
                                 className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
-                                <div className="relative h-48 w-full bg-content1 overflow-hidden">
+                                <div className="relative aspect-product w-full bg-content1 overflow-hidden">
                                     <Image
                                         fill
                                         alt={product.name}
@@ -149,15 +149,7 @@ export function ProductDetails() {
                                 </div>
 
                                 <div className="p-4 flex flex-col justify-between flex-1">
-                                    <div className="mb-3">
-                                        <h3 className="font-semibold text-lg text-default-900 mb-2 line-clamp-2">{product.name}</h3>
-                                        <p className="text-sm text-default-600 line-clamp-2 mb-2">{product.description}</p>
-                                        <div className="flex items-center justify-between text-sm text-default-500">
-                                            <span>Variants: {product.variants?.length || 0}</span>
-                                            <span>#{idx + 1}</span>
-                                        </div>
-                                    </div>
-
+                                    <h3 className="font-semibold text-lg text-default-900 mb-2 line-clamp-1">{product.name}</h3>
                                     <div className="flex justify-end">
                                         <ProductActions product={product} />
                                     </div>
