@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import { useSession } from "next-auth/react";
 
 import { useInvalidate } from "@/lib/hooks/useApi";
+import { useQueryClient } from "@tanstack/react-query";
 
 type WebSocketContextType = {
     socket: WebSocket | null;
@@ -22,6 +23,7 @@ const MAX_RECONNECT_ATTEMPTS = 5;
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
 export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
+    const queryClient = useQueryClient();
     const { data: session } = useSession();
     const [messages, setMessages] = useState<any[]>([]);
     const [currentMessage, setCurrentMessage] = useState<any>(null);
@@ -38,6 +40,10 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     const userInitSentRef = useRef<boolean>(false);
     const userRef = useRef(session);
     const invalidate = useInvalidate();
+
+    function parseEventKey(eventKey: string): string[] {
+        return eventKey.split(":");
+    }
 
     const connect = async () => {
         try {
@@ -63,14 +69,15 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
             socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
+                if (data?.type === "invalidate") {
+                    const keys = parseEventKey(data?.key);
+
+                    queryClient.invalidateQueries({ queryKey: keys });
+                }
 
                 if (data?.type === "product-index" && data?.status === "completed") {
                     invalidate("products");
                     invalidate("gallery");
-                }
-
-                if (data?.type === "recently_viewed") {
-                    invalidate("recently-viewed");
                 }
 
                 setMessages((prev) => [...prev, data]);

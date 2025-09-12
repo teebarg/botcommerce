@@ -8,7 +8,7 @@ from app.prisma_client import prisma as db
 from app.services.shared_collection import SharedCollectionService
 from math import ceil
 from app.services.redis import cache_response, invalidate_list
-from app.services.product import to_product_card_view, reindex_product
+from app.services.product import reindex_catalog
 from app.core.deps import get_current_superuser, UserDep
 from app.models.generic import Message
 
@@ -39,57 +39,72 @@ async def delete_shared_collection_view(id: int):
 
 # Catalogs
 @router.get("/", dependencies=[Depends(get_current_superuser)], response_model=SharedCollections)
-@cache_response(key_prefix="shared")
+@cache_response(key_prefix="catalog")
 async def list_shared_collections(
     request: Request,
     query: str = "",
     product_id: int | None = None,
     skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, le=100)
+    limit: int = Query(default=20, le=100),
 ):
-    where_clause = {}
+    filters = []
     if query:
-        where_clause["OR"] = [
-                {"title": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
-            ]
+        filters.append(f"(sc.title ILIKE '%{query}%' OR sc.slug ILIKE '%{query}%')")
     if product_id:
-        where_clause["AND"] = [
-                {"products": {"some": {"id": product_id}}}
-            ]
+        filters.append(f"EXISTS (SELECT 1 FROM _SharedCollectionProducts ps WHERE ps.\"B\" = sc.id AND ps.\"A\" = {product_id})")
 
-    shared = await db.sharedcollection.find_many(
-        where=where_clause,
-        skip=skip,
-        take=limit,
-        order={"created_at": "desc"},
-        include={
-            "products": True
-        }
+    where_clause = " AND ".join(filters) if filters else "TRUE"
+
+    shared_rows = await db.query_raw(
+        f"""
+        SELECT sc.id, sc.slug, sc.title, sc.description, sc.is_active, sc.view_count,
+               COUNT(ps."A") AS products_count
+        FROM "shared_collections" sc
+        LEFT JOIN "_SharedCollectionProducts" ps ON sc.id = ps."B"
+        WHERE {where_clause}
+        GROUP BY sc.id
+        ORDER BY sc.created_at DESC
+        OFFSET {skip}
+        LIMIT {limit}
+        """
     )
+
     shared_transformed = [
         SharedCollection(
-            id=col.id,
-            slug=col.slug,
-            title=col.title,
-            description=col.description,
-            is_active=col.is_active,
-            view_count=col.view_count,
-            products=[to_product_card_view(p) for p in (col.products or [])]
+            id=row["id"],
+            slug=row["slug"],
+            title=row["title"],
+            description=row["description"],
+            is_active=row["is_active"],
+            view_count=row["view_count"],
+            products_count=row["products_count"],
+            products=[],
         )
-        for col in shared
+        for row in shared_rows
     ]
-    total = await db.sharedcollection.count(where=where_clause)
+
+    total_result = await db.query_raw(
+        f"""
+        SELECT COUNT(*)::int AS count
+        FROM (
+            SELECT sc.id
+            FROM "shared_collections" sc
+            WHERE {where_clause}
+        ) sub
+        """
+    )
+    total = total_result[0]["count"]
+
     return {
-        "shared":shared_transformed,
-        "skip":skip,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
+        "shared": shared_transformed,
+        "skip": skip,
+        "limit": limit,
+        "total_pages": ceil(total / limit) if limit else 1,
+        "total_count": total,
     }
 
 @router.get("/{slug}")
-@cache_response(key_prefix="sharedcollection")
+@cache_response(key_prefix="product:catalog")
 async def search(
     request: Request,
     slug: str,
@@ -280,7 +295,7 @@ async def add_product_to_shared_collection(id: int, product_id: int, background_
         data={"products": {"connect": {"id": product_id}}}
     )
 
-    background_tasks.add_task(reindex_product, product_id=product_id)
+    background_tasks.add_task(reindex_catalog, product_id=product_id)
 
     return {"message": "Product added to collection successfully"}
 
@@ -300,6 +315,6 @@ async def remove_product_from_shared_collection(id: int, product_id: int, backgr
         }
     )
 
-    background_tasks.add_task(reindex_product, product_id=product_id)
+    background_tasks.add_task(reindex_catalog, product_id=product_id)
 
     return {"message": "Product removed from collection successfully"}

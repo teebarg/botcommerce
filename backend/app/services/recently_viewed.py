@@ -30,8 +30,8 @@ class RecentlyViewedService:
 
         await manager.send_to_user(
             user_id=user_id,
-            data={"type": "recently_viewed"},
-            message_type="recently_viewed",
+            data={"key": "products:recently-viewed"},
+            message_type="invalidate",
         )
 
     async def remove_product_from_all(self, product_id: int):

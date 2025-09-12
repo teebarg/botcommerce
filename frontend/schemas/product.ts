@@ -143,6 +143,7 @@ export const SharedSchema = z
         slug: z.string(),
         description: z.string().optional(),
         products: z.array(ProductSearchSchema),
+        products_count: z.number(),
         view_count: z.number(),
         is_active: z.boolean(),
     })

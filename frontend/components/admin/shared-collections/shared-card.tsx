@@ -47,32 +47,9 @@ export const SharedCard: React.FC<{ collection: Shared }> = ({ collection }) => 
                     <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-foreground flex items-center gap-2">
                             <Package className="h-4 w-4" />
-                            Products ({collection.products.length})
+                            Products ({collection.products_count})
                         </span>
                     </div>
-
-                    {collection.products.length > 0 ? (
-                        <div className="space-y-3">
-                            <div className="flex gap-2">
-                                {collection.products.slice(0, 4).map((product) => (
-                                    <div key={product.id} className="relative w-20 h-20 rounded bg-content3 overflow-hidden p-2">
-                                        <Image fill alt={product.name} className="object-contain" src={product.image || "/placeholder.jpg"} />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {collection.products.length > 4 && (
-                                <div className="flex items-center justify-center bg-muted/30 rounded-lg p-3 text-sm text-default-500 border border-dashed border-border">
-                                    <Package className="h-4 w-4 mr-2" />+{collection.products.length - 4} more products
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="flex items-center justify-center bg-muted/30 rounded-lg p-4 text-sm text-default-500">
-                            <Package className="h-4 w-4 mr-2" />
-                            No products yet
-                        </div>
-                    )}
                 </div>
 
                 <SharedActions item={collection} />

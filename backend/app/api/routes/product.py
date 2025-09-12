@@ -1,3 +1,4 @@
+from itertools import product
 from typing import Any
 
 from fastapi import (
@@ -39,11 +40,12 @@ from math import ceil
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import index_products, reindex_product, product_upload, product_export
+from app.services.product import index_products, reindex_product, product_upload, product_export, sync_index_product
 from app.services.redis import cache_response, invalidate_list, bust
 from meilisearch.errors import MeilisearchApiError
 from app.services.popular_products import PopularProductsService
 from app.services.recently_viewed import RecentlyViewedService
+from app.services.websocket import manager
 
 logger = get_logger(__name__)
 
@@ -100,7 +102,7 @@ async def get_trending_products(request: Request, type: str = "trending", active
 
 
 @router.get("/gallery")
-@cache_response("products", key=lambda request, skip, limit, **kwargs: f"gallery:{skip}:{limit}")
+@cache_response("products:gallery", key=lambda request, skip, limit, **kwargs: f"{skip}:{limit}")
 async def image_gallery(request: Request, skip: int = Query(default=0), limit: int = Query(default=10)):
     """
     Upload one or more product images.
@@ -121,6 +123,7 @@ async def image_gallery(request: Request, skip: int = Query(default=0), limit: i
                         "collections": True,
                         "variants": True,
                         "images": True,
+                        "shared_collections": True,
                     }
                 }
             },
@@ -414,9 +417,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         data["tags"] = {"connect": tag_connect}
 
     try:
-        created_product = await db.product.create(
-            data=data,
-        )
+        created_product = await db.product.create(data=data)
     except UniqueViolationError as e:
         logger.error(e)
         raise HTTPException(
@@ -611,7 +612,12 @@ async def delete_product(id: int) -> Message:
     """
     Delete a product.
     """
-    product = await db.product.find_unique(where={"id": id})
+    product = await db.product.find_unique(
+        where={"id": id},
+        include={
+            "shared_collections": True,
+        }
+    )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     async with db.tx() as tx:
@@ -626,16 +632,12 @@ async def delete_product(id: int) -> Message:
             await tx.productvariant.delete_many(where={"product_id": id})
 
             await tx.product.delete(where={"id": id})
-
-            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX,
-                            document_id=str(id))
         except Exception as e:
             logger.error(e)
 
-        await invalidate_list("products")
-        await bust(f"product:{product.slug}")
         service = RecentlyViewedService()
         await service.remove_product_from_all(product_id=id)
+        await sync_index_product(product=product)
         return Message(message="Product deleted successfully")
 
 
@@ -859,7 +861,20 @@ async def delete_gallery_image(image_id: int) -> Message:
         supabase.storage.from_("product-images").remove([file_path])
         await db.productimage.delete(where={"id": image_id})
         await invalidate_list("products:gallery")
+        await manager.broadcast_to_all(
+            data={
+                "key": "products:gallery",
+            },
+            message_type="invalidate",
+        )
         return Message(message="Image deleted successfully")
+
+    product = await db.product.find_unique(
+        where={"id": image.product_id},
+        include={
+            "shared_collections": True,
+        }
+    )
 
     async with db.tx() as tx:
         product_id = image.product_id
@@ -882,12 +897,7 @@ async def delete_gallery_image(image_id: int) -> Message:
     service = RecentlyViewedService()
     await service.remove_product_from_all(product_id=product_id)
 
-    delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(image.product_id))
-    await reindex_product(product_id=image.product_id)
-    await invalidate_list("products")
-    await invalidate_list("shared")
-    await invalidate_list("sharedcollection")
-    # await invalidate_list("products:gallery")
+    await sync_index_product(product=product)
 
     return Message(message="Product and all related data deleted successfully")
 
@@ -1002,6 +1012,12 @@ async def upload_product_images(payload: ProductBulkImages):
             await db.productimage.create_many(data=created_images)
 
         await invalidate_list("products:gallery")
+        await manager.broadcast_to_all(
+                data={
+                    "key": "products:gallery",
+                },
+                message_type="invalidate",
+            )
 
         return {"success": True}
     except UniqueViolationError:
@@ -1035,9 +1051,6 @@ async def create_image_metadata(
                 "description": payload.description,
                 "active": True,
             }
-
-            # if payload.brand_id is not None:
-            #     data["brand"] = {"connect": {"id": payload.brand_id}}
 
             if payload.category_ids:
                 data["categories"] = {"connect": [{"id": id}
@@ -1077,7 +1090,6 @@ async def create_image_metadata(
                         raise HTTPException(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            await invalidate_list("products:gallery")
             background_tasks.add_task(reindex_product, product_id=product.id)
 
             return {"success": True}
@@ -1123,8 +1135,6 @@ async def update_image_metadata(
             if payload.collection_ids is not None:
                 collection_ids = [{"id": id} for id in payload.collection_ids]
                 update_data["collections"] = {"set": collection_ids}
-            # if payload.brand_id is not None:
-            #     update_data["brand"] = {"connect": {"id": payload.brand_id}}
             if payload.active is not None:
                 update_data["active"] = payload.active
 
@@ -1169,7 +1179,6 @@ async def update_image_metadata(
                     raise HTTPException(
                         status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            await invalidate_list("products:gallery")
             background_tasks.add_task(
                 reindex_product, product_id=existing_image.product_id)
 

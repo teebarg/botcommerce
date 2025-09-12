@@ -90,7 +90,7 @@ export const useUserRecentlyViewed = (limit: number = 12) => {
     const { data: session } = useSession();
 
     return useQuery({
-        queryKey: ["recently-viewed"],
+        queryKey: ["products", "recently-viewed"],
         queryFn: async () => await api.get<ProductSearch[]>("/users/recently-viewed", { params: { limit } }),
         enabled: Boolean(session?.user),
     });

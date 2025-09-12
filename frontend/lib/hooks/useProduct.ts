@@ -61,7 +61,7 @@ export const useProductSearch = (params: SearchParams) => {
 
 export const useProductInfiniteSearch = (params: SearchParams) => {
     return useInfiniteQuery({
-        queryKey: ["products", "infinite-search", JSON.stringify(params)],
+        queryKey: ["products", "search", "infinite", JSON.stringify(params)],
         queryFn: async ({ pageParam = 0 }) =>
             await api.get<PaginatedProductSearch>("/product/search", { params: { skip: pageParam, limit: 12, ...params } }),
         getNextPageParam: (lastPage: PaginatedProductSearch) => {
@@ -115,7 +115,7 @@ export const useSimilarProducts = (productId: number, num: number = 16) => {
 
 export const useImageGalleryInfinite = (pageSize: number = 24) => {
     return useInfiniteQuery({
-        queryKey: ["gallery", "infinite", pageSize],
+        queryKey: ["products", "gallery", "infinite", pageSize],
         queryFn: async ({ pageParam = 0 }) =>
             await api.get<{ images: ProductImage[]; skip: number; limit: number; total_count: number; total_pages: number }>("/product/gallery", {
                 params: { skip: pageParam, limit: pageSize },
@@ -131,13 +131,9 @@ export const useImageGalleryInfinite = (pageSize: number = 24) => {
 };
 
 export const useCreateImageMetadata = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ imageId, input }: { imageId: number; input: any }) => await api.post<Message>(`/product/${imageId}/metadata`, input),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image metadata created");
         },
         onError: (error: any) => {
@@ -147,13 +143,9 @@ export const useCreateImageMetadata = () => {
 };
 
 export const useUpdateImageMetadata = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ imageId, input }: { imageId: number; input: any }) => await api.patch<Message>(`/product/${imageId}/metadata`, input),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image metadata updated");
         },
         onError: (error: any) => {
@@ -163,13 +155,9 @@ export const useUpdateImageMetadata = () => {
 };
 
 export const useCreateProduct = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (input: any) => await api.post<Product>("/product", input),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Product created");
         },
         onError: (error: any) => {
@@ -179,13 +167,9 @@ export const useCreateProduct = () => {
 };
 
 export const useUpdateProduct = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id, input }: { id: number; input: any }) => await api.put<Product>(`/product/${id}`, input),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Product updated");
         },
         onError: (error: any) => {
@@ -195,13 +179,9 @@ export const useUpdateProduct = () => {
 };
 
 export const useDeleteProduct = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/product/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Product deleted");
         },
         onError: (error: any) => {
@@ -211,8 +191,6 @@ export const useDeleteProduct = () => {
 };
 
 export const useCreateVariant = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (input: {
             productId: number;
@@ -228,8 +206,6 @@ export const useCreateVariant = () => {
             return await api.post<ProductVariant>(`/product/${productId}/variants`, variantData);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Variant created");
         },
         onError: (error: any) => {
@@ -239,8 +215,6 @@ export const useCreateVariant = () => {
 };
 
 export const useUpdateVariant = (showToast = true) => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (input: {
             id: number;
@@ -257,8 +231,6 @@ export const useUpdateVariant = (showToast = true) => {
             return await api.put<ProductVariant>(`/product/variants/${id}`, variantData);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             showToast && toast.success("Variant updated");
         },
         onError: (error: any) => {
@@ -268,13 +240,9 @@ export const useUpdateVariant = (showToast = true) => {
 };
 
 export const useDeleteVariant = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/product/variants/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Variant deleted");
         },
         onError: (error: any) => {
@@ -296,13 +264,9 @@ export const useExportProducts = () => {
 };
 
 export const useReIndexProducts = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async () => await api.post<Message>(`/product/reindex`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Products re-indexed successfully");
         },
         onError: (error: any) => {
@@ -312,13 +276,9 @@ export const useReIndexProducts = () => {
 };
 
 export const useUploadImage = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: any }) => await api.patch<Message>(`/product/${id}/image`, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image uploaded successfully");
         },
         onError: (error: any) => {
@@ -328,13 +288,9 @@ export const useUploadImage = () => {
 };
 
 export const useUploadImages = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: any }) => await api.post<Message>(`/product/${id}/images`, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Images uploaded successfully");
         },
         onError: (error: any) => {
@@ -344,13 +300,9 @@ export const useUploadImages = () => {
 };
 
 export const useDeleteImage = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/product/${id}/image`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image deleted successfully");
         },
         onError: (error: any) => {
@@ -360,13 +312,9 @@ export const useDeleteImage = () => {
 };
 
 export const useDeleteImages = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id, imageId }: { id: number; imageId: number }) => await api.delete<Message>(`/product/${id}/images/${imageId}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image deleted successfully");
         },
         onError: (error: any) => {
@@ -376,12 +324,9 @@ export const useDeleteImages = () => {
 };
 
 export const useDeleteGalleryImage = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/product/gallery/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Image deleted successfully");
         },
         onError: (error: any) => {
@@ -391,13 +336,10 @@ export const useDeleteGalleryImage = () => {
 };
 
 export const useReorderImages = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id, imageIds }: { id: number; imageIds: number[] }) =>
             await api.patch<Message>(`/product/${id}/images/reorder`, imageIds),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Images reordered successfully");
         },
         onError: (error: any) => {

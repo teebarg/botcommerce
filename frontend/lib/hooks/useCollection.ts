@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
@@ -68,14 +68,14 @@ export const useSharedCollections = (query?: string) => {
     const { data: session } = useSession();
 
     return useQuery({
-        queryKey: ["shared-collections", query],
+        queryKey: ["catalog", query],
         queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { query: query || "" } }),
         enabled: Boolean(session?.user?.isAdmin),
     });
 };
 
 export const useCreateSharedCollection = () => {
-    const invalidate = useInvalidate();
+    const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (data: SharedFormValues) =>
@@ -83,7 +83,7 @@ export const useCreateSharedCollection = () => {
                 ...data,
             }),
         onSuccess: () => {
-            invalidate("shared-collections");
+            queryClient.invalidateQueries({ queryKey: ["catalog"] })
             toast.success("Shared collection created successfully");
         },
         onError: (error) => {
@@ -93,12 +93,12 @@ export const useCreateSharedCollection = () => {
 };
 
 export const useUpdateSharedCollection = () => {
-    const invalidate = useInvalidate();
+    const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: SharedFormValues }) => await api.patch<Shared>(`/shared/${id}`, data),
         onSuccess: () => {
-            invalidate("shared-collections");
+            queryClient.invalidateQueries({ queryKey: ["catalog"] })
             toast.success("Shared collection updated successfully");
         },
         onError: (error) => {
@@ -108,12 +108,12 @@ export const useUpdateSharedCollection = () => {
 };
 
 export const useDeleteSharedCollection = () => {
-    const invalidate = useInvalidate();
+    const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Shared>(`/shared/${id}`),
         onSuccess: () => {
-            invalidate("shared-collections");
+            queryClient.invalidateQueries({ queryKey: ["catalog"] })
             toast.success("Shared collection deleted successfully");
         },
         onError: (error) => {
@@ -129,7 +129,7 @@ export const useAddProductToSharedCollection = () => {
         mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
             await api.post<{ message: string }>(`/shared/${collectionId}/add-product/${productId}`),
         onSuccess: () => {
-            invalidate("shared-collections");
+            invalidate("catalog");
             toast.success("Product added to collection successfully");
         },
         onError: (error) => {
@@ -145,7 +145,7 @@ export const useRemoveProductFromSharedCollection = () => {
         mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
             await api.delete<{ message: string }>(`/shared/${collectionId}/remove-product/${productId}`),
         onSuccess: () => {
-            invalidate("shared-collections");
+            invalidate("catalog");
             toast.success("Product removed from collection successfully");
         },
         onError: (error) => {

@@ -12,7 +12,6 @@ import LocalizedClientLink from "@/components/ui/link";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
 import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
-import { ManageSlate } from "@/components/admin/shared-collections/manage-slate";
 import { ImageDownloadButton } from "@/components/store/image-download";
 
 const ProductOverview: React.FC<{
@@ -156,7 +155,6 @@ const ProductOverview: React.FC<{
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        <ManageSlate product={product} />
                         <button
                             className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
                             onClick={(e) => {

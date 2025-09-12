@@ -43,6 +43,7 @@ class SharedCollection(SharedCollectionBase):
     slug: str = Field(..., min_length=1)
     products: list[SearchProduct]
     view_count: int = 0
+    products_count: int = 0
 
 class Catalog(SharedCollectionBase):
     products: list[SearchProduct]

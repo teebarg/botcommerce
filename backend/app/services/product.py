@@ -1,7 +1,7 @@
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.services.meilisearch import add_documents_to_index, update_document, clear_index
+from app.services.meilisearch import add_documents_to_index, update_document, clear_index, delete_document
 from app.models.product import Product
 from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
@@ -10,6 +10,91 @@ from app.services.activity import log_activity
 from app.services.redis import invalidate_list, bust
 
 logger = get_logger(__name__)
+
+@with_prisma_connection
+async def sync_index_product(product: Product = None):
+    try:
+        await delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(product.id))
+    except Exception as e:
+        logger.debug(f"Error re-indexing product {product.id}: {e}")
+
+    for sc in (product.shared_collections or []):
+        await invalidate_list(f"product:catalog:{sc.slug}")
+        await manager.broadcast_to_all(
+            data={
+                "key": f"product:catalog:{sc.slug}",
+            },
+            message_type="invalidate",
+        )
+    await bust(f"product:{product.slug}")
+    await manager.broadcast_to_all(
+            data={
+                "key": f"product:{product.slug}",
+            },
+            message_type="invalidate",
+        )
+    await invalidate_list("products")
+    await manager.broadcast_to_all(
+            data={
+                "key": "products",
+            },
+            message_type="invalidate",
+        )
+
+
+@with_prisma_connection
+async def reindex_catalog(product_id: int):
+    try:
+        product = await db.product.find_unique(
+            where={"id": product_id},
+            include={
+                "variants": True,
+                "categories": True,
+                "images": True,
+                "collections": True,
+                "reviews": True,
+                "shared_collections": True,
+            }
+        )
+
+        if not product:
+            logger.warning(
+                f"Product with id {product_id} not found for re-indexing.")
+            return
+
+        product_data = prepare_product_data_for_indexing(product)
+
+        try:
+            await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+        except Exception as e:
+            logger.debug(f"Error re-indexing product {product_id}: {e}")
+
+        logger.info(f"Successfully reindexed product {product_id}")
+        for sc in (product.shared_collections or []):
+            await invalidate_list(f"product:catalog:{sc.slug}")
+            await manager.broadcast_to_all(
+                data={
+                    "key": f"product:catalog:{sc.slug}",
+                },
+                message_type="invalidate",
+            )
+        await invalidate_list("catalog")
+        await manager.broadcast_to_all(
+                data={
+                    "key": "catalog",
+                },
+                message_type="invalidate",
+            )
+        await invalidate_list("products:gallery")
+        await manager.broadcast_to_all(
+                data={
+                    "key": "products:gallery",
+                },
+                message_type="invalidate",
+            )
+
+    except Exception as e:
+        logger.error(f"Error re-indexing product {product_id}: {e}")
 
 @with_prisma_connection
 async def reindex_product(product_id: int):
@@ -33,20 +118,34 @@ async def reindex_product(product_id: int):
 
         product_data = prepare_product_data_for_indexing(product)
 
-        await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+        try:
+            await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+        except Exception as e:
+            logger.debug(f"Error re-indexing product {product_id}: {e}")
 
         logger.info(f"Successfully reindexed product {product_id}")
         await invalidate_list("products")
-        await invalidate_list("shared")
-        await invalidate_list("sharedcollection")
+        for sc in (product.shared_collections or []):
+            await invalidate_list(f"product:catalog:{sc.slug}")
+            await manager.broadcast_to_all(
+                data={
+                    "key": f"product:catalog:{sc.slug}",
+                },
+                message_type="invalidate",
+            )
         await bust(f"product:{product.slug}")
         await manager.broadcast_to_all(
-            data={
-                "message": "Product re-indexed successfully",
-                "status": "completed",
-            },
-            message_type="product-index",
-        )
+                data={
+                    "key": f"product:{product.slug}",
+                },
+                message_type="invalidate",
+            )
+        await manager.broadcast_to_all(
+                data={
+                    "key": "products",
+                },
+                message_type="invalidate",
+            )
 
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
@@ -81,15 +180,18 @@ async def index_products():
         logger.info(f"Reindexed {len(documents)} products successfully.")
         await invalidate_list("products")
         await invalidate_list("product")
-        await invalidate_list("shared")
-        await invalidate_list("sharedcollection")
         await manager.broadcast_to_all(
-            data={
-                "message": "Products re-indexed successfully",
-                "status": "completed",
-            },
-            message_type="product-index",
-        )
+                data={
+                    "key": "products",
+                },
+                message_type="invalidate",
+            )
+        await manager.broadcast_to_all(
+                data={
+                    "key": "product",
+                },
+                message_type="invalidate",
+            )
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 

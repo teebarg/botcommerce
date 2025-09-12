@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSharedCollections, useAddProductToSharedCollection, useRemoveProductFromSharedCollection } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
-import { ProductSearch, Product } from "@/schemas";
+import { ProductSearch, Product, Shared } from "@/schemas";
 import Overlay from "@/components/overlay";
 
 interface ManageSlateProps {
@@ -79,7 +79,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                             <ScrollArea className="h-[calc(100vh-400px)]">
                                 <div className="space-y-2">
                                     {sharedCollections?.shared?.map((collection, idx: number) => (
-                                        <CollectionItem key={idx} collection={collection} productId={product.id} products={collection.products} />
+                                        <CollectionItem key={idx} collection={collection} productId={product.id} product={product} />
                                     ))}
                                 </div>
                             </ScrollArea>
@@ -94,11 +94,11 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
 interface CollectionItemProps {
     collection: any;
     productId: number;
-    products: ProductSearch[];
+    product: any;
 }
 
-const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, products }) => {
-    const hasProduct = products?.some((product) => product.id === productId) || false;
+const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, product }) => {
+    const hasProduct = product?.shared_collections?.some((item: Shared) => item.id === collection.id) || false;
 
     const addProductMutation = useAddProductToSharedCollection();
     const removeProductMutation = useRemoveProductFromSharedCollection();
@@ -132,7 +132,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, 
             </CardHeader>
             <CardContent className="pt-0">
                 <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-muted-foreground">{collection.products?.length || 0} products</span>
+                    <span className="text-xs text-muted-foreground">{collection.products_count || 0} products</span>
                     {hasProduct ? (
                         <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1 text-green-600">

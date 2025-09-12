@@ -11,7 +11,6 @@ import { GalleryCard } from "./product-gallery-card";
 import { api } from "@/apis/client";
 import { useImageGalleryInfinite } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -26,7 +25,6 @@ export function ProductImageGallery() {
     const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(12);
     const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const invalidate = useInvalidate();
 
     useEffect(() => {
         if (!sentinelRef.current) return;
@@ -72,7 +70,6 @@ export function ProductImageGallery() {
             };
 
             await api.post("/product/images/upload", payload);
-            invalidate("gallery");
 
             toast.success("Product created successfully");
         } catch (error: any) {
