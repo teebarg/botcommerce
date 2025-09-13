@@ -5,6 +5,7 @@ __pycache__
 .docker
 .git
 .env
+.env.staging
 .env.docker
 
 .idea/
