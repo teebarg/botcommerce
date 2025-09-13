@@ -34,7 +34,6 @@ export const useUpdateCollection = () => {
         mutationFn: async ({ id, data }: { id: number; data: CollectionFormValues }) => await api.patch<Collection>(`/collection/${id}`, data),
         onSuccess: () => {
             toast.success("Collection updated successfully");
-            toast.success("Collection updated successfully");
         },
         onError: (error) => {
             toast.error("Failed to update collection" + error);

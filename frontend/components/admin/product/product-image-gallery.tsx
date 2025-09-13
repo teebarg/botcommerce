@@ -71,9 +71,9 @@ export function ProductImageGallery() {
 
             await api.post("/product/images/upload", payload);
 
-            toast.success("Product created successfully");
+            toast.success("Images uploaded successfully");
         } catch (error: any) {
-            toast.error(error?.message || "Failed to create product");
+            toast.error(error?.message || "Failed to upload images");
         } finally {
             setIsLoading(false);
         }
