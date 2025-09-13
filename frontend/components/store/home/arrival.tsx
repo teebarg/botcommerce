@@ -1,20 +1,13 @@
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
 
-import { ProductSearch } from "@/schemas/product";
-import { api } from "@/apis/client";
 import ComponentLoader from "@/components/component-loader";
 import ScrollableListing from "@/components/store/products/scrollable-listing";
+import { useProductSearch } from "@/lib/hooks/useProduct";
 
 export default function NewArrivals() {
-    const { data, isLoading } = useQuery({
-        queryKey: ["products", "new-arrivals"],
-        queryFn: async () => {
-            return await api.get<ProductSearch[]>("/product/collection/new-arrivals?limit=5");
-        },
-    });
+    const { data, isLoading } = useProductSearch({ collections: "new-arrivals", limit: 5 });
 
     return (
         <section className="bg-content2">
@@ -22,7 +15,7 @@ export default function NewArrivals() {
                 <p className="text-3xl font-bold">New Arrivals</p>
                 <p className="text-default-600">Find the best thrifts for your kids</p>
                 {isLoading && <ComponentLoader className="h-[400px]" />}
-                <ScrollableListing products={data || []} />
+                <ScrollableListing products={data?.products || []} />
             </div>
         </section>
     );

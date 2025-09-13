@@ -18,7 +18,7 @@ type SearchParams = {
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
         queryKey: ["products", "search", JSON.stringify(params)],
-        queryFn: async () => await api.get<PaginatedProductSearch>("/product", { params }),
+        queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
     });
 };
 

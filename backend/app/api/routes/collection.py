@@ -16,7 +16,7 @@ from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
 from typing import Optional
-from app.services.redis import cache_response, invalidate_list, bust
+from app.services.redis import cache_response, invalidate_pattern, invalidate_key
 
 router = APIRouter()
 
@@ -49,7 +49,7 @@ async def create(*, create_data: CollectionCreate) -> Collection:
                 "slug": slugify(create_data.name)
             }
         )
-        await invalidate_list("collections")
+        await invalidate_pattern("collections")
         return collection
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -90,8 +90,8 @@ async def update(
             where={"id": id},
             data=update_data.model_dump()
         )
-        await invalidate_list("collections")
-        await bust(f"collection:{update.slug}")
+        await invalidate_pattern("collections")
+        await invalidate_key(f"collection:{update.slug}")
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -112,8 +112,8 @@ async def delete(id: int) -> Message:
         await db.collection.delete(
             where={"id": id}
         )
-        await invalidate_list("collections")
-        await bust(f"collection:{existing.slug}")
+        await invalidate_pattern("collections")
+        await invalidate_key(f"collection:{existing.slug}")
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

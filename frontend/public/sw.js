@@ -1,5 +1,5 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "botcommerce-cache-v1";
+const CACHE_NAME = "shop-cache-v1";
 const ASSETS_TO_CACHE = [
     // "/", // Root URL
     "/careers",
