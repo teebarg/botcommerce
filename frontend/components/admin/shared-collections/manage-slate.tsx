@@ -79,7 +79,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                             <ScrollArea className="h-[calc(100vh-400px)]">
                                 <div className="space-y-2">
                                     {sharedCollections?.shared?.map((collection, idx: number) => (
-                                        <CollectionItem key={idx} collection={collection} productId={product.id} product={product} />
+                                        <CollectionItem key={idx} collection={collection} product={product} productId={product.id} />
                                     ))}
                                 </div>
                             </ScrollArea>

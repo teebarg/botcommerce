@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tansta
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, ProductVariant, PaginatedProduct, ProductImage } from "@/schemas";
+import { Product, PaginatedProductSearch, Message, ProductVariant, ProductImage } from "@/schemas";
 
 type SearchParams = {
     search?: string;
@@ -15,47 +15,10 @@ type SearchParams = {
     sort?: string;
 };
 
-interface ProductParams {
-    query?: string;
-    status?: string;
-    skip?: number;
-    limit?: number;
-    sort?: string;
-    collections?: string;
-}
-
-export const useProducts = (searchParams: ProductParams) => {
-    return useQuery({
-        queryKey: ["products", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedProduct>(`/product/`, { params: { ...searchParams } }),
-    });
-};
-
-export const useProductsInfinite = (searchParams: ProductParams) => {
-    return useInfiniteQuery({
-        queryKey: ["products", "infinite", JSON.stringify(searchParams)],
-        queryFn: async ({ pageParam = 0 }) =>
-            await api.get<PaginatedProduct>(`/product/`, {
-                params: {
-                    skip: pageParam,
-                    limit: searchParams.limit || 20,
-                    ...searchParams,
-                },
-            }),
-        getNextPageParam: (lastPage: PaginatedProduct) => {
-            const nextSkip = lastPage.skip + lastPage.limit;
-            const hasMore = nextSkip < lastPage.total_count;
-
-            return hasMore ? nextSkip : undefined;
-        },
-        initialPageParam: 0,
-    });
-};
-
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
         queryKey: ["products", "search", JSON.stringify(params)],
-        queryFn: async () => await api.get<PaginatedProductSearch>("/product/search", { params }),
+        queryFn: async () => await api.get<PaginatedProductSearch>("/product", { params }),
     });
 };
 
@@ -63,7 +26,7 @@ export const useProductInfiniteSearch = (params: SearchParams) => {
     return useInfiniteQuery({
         queryKey: ["products", "search", "infinite", JSON.stringify(params)],
         queryFn: async ({ pageParam = 0 }) =>
-            await api.get<PaginatedProductSearch>("/product/search", { params: { skip: pageParam, limit: 12, ...params } }),
+            await api.get<PaginatedProductSearch>("/product/", { params: { skip: pageParam, limit: 12, ...params } }),
         getNextPageParam: (lastPage: PaginatedProductSearch) => {
             const nextSkip = lastPage.skip + lastPage.limit;
             const hasMore = nextSkip < lastPage.total_count;

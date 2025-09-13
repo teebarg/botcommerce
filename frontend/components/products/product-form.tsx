@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
-import { Category, Collection, Product } from "@/schemas/product";
+import { Category, Collection, ProductSearch } from "@/schemas/product";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -25,7 +25,7 @@ const formSchema = z.object({
 });
 
 interface ProductFormProps {
-    product?: Product;
+    product?: ProductSearch;
     onClose: () => void;
     collections: Collection[];
     categories: Category[];

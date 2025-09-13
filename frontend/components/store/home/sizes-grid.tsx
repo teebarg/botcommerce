@@ -64,7 +64,7 @@ const SizesGrid = () => {
                     <p className="text-muted-foreground max-w-2xl mx-auto text-lg">Find your perfect fit with our size-specific collections</p>
                 </div>
 
-                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                <div className="grid grid-cols-4 lg:grid-cols-8 gap-4">
                     {sizes.map((size) => (
                         <div
                             key={size.id}
@@ -75,12 +75,10 @@ const SizesGrid = () => {
                         >
                             <div className="py-6 text-center">
                                 <div>
-                                    <div className={`text-4xl font-bold ${size.textColor} mb-1`}>{size.size}</div>
+                                    <div className={`text-3xl font-bold ${size.textColor} mb-1`}>{size.size}</div>
                                     <div className="text-xs text-muted-foreground font-medium">UK Size</div>
                                 </div>
                             </div>
-
-                            {/* Hover effect */}
                             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
                     ))}

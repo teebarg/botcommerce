@@ -40,7 +40,7 @@ const ProductCard: React.FC<{ product: ProductSearch; removeProduct: (productId:
                 alt={product.name}
                 className="object-contain rounded-lg"
                 height={80}
-                src={product.images[0] || product.image || "/placeholder.jpg"}
+                src={product.sorted_images[0] || product.image || "/placeholder.jpg"}
                 width={80}
             />
             <div className="flex-1">
@@ -173,11 +173,11 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
                     </div>
                     <div className="flex justify-end gap-2 bottom-0 sticky z-10 bg-background py-2">
                         {onClose && (
-                            <Button type="button" variant="outline" onClick={onClose}>
+                            <Button type="button" variant="destructive" onClick={onClose}>
                                 Cancel
                             </Button>
                         )}
-                        <Button disabled={isLoading || !form.watch("title")} isLoading={isLoading} type="submit" variant="primary">
+                        <Button disabled={isLoading || !form.watch("title")} isLoading={isLoading} type="submit" variant="indigo">
                             <Save className="h-5 w-5 mr-1" />
                             {current ? "Update" : "Create"}
                         </Button>

@@ -70,7 +70,8 @@ class SearchProduct(BaseModel):
     collection_slugs: List[str]
     # brand: Optional[str] = None
     tags: Optional[List[str]] = []
-    images: Optional[List[str]] = []
+    images: Optional[List[ProductImage]] = []
+    sorted_images: Optional[List[str]] = []
     reviews: Optional[List[Review]] = []
     favorites: Optional[List[str]] = []
     variants: Optional[List[ProductVariant]] = []

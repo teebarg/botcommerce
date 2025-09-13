@@ -1,5 +1,4 @@
 import { Eye, Calendar, Package } from "lucide-react";
-import Image from "next/image";
 
 import { SocialShare } from "./social-share";
 import { SharedActions } from "./shared-actions";

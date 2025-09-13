@@ -103,10 +103,6 @@ export const ProductSchema = z
     })
     .merge(AuditSchema);
 
-export const PaginatedProductSchema = PagSchema.extend({
-    products: z.array(ProductSchema),
-});
-
 export const ProductSearchSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -124,7 +120,8 @@ export const ProductSearchSchema = z.object({
     collections: z.array(CollectionSchema),
     collection_slugs: z.array(z.string()),
     tags: z.null(),
-    images: z.array(z.string()),
+    images: z.array(ProductImageSchema),
+    sorted_images: z.array(z.string()),
     reviews: z.array(z.any()).nullable(),
     favorites: z.null(),
     average_rating: z.number(),
@@ -194,7 +191,6 @@ export const CatalogSchema = z.object({
 });
 
 export type Product = z.infer<typeof ProductSchema>;
-export type PaginatedProduct = z.infer<typeof PaginatedProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type Facet = z.infer<typeof FacetSchema>;

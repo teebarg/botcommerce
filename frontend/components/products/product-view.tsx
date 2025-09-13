@@ -4,11 +4,11 @@ import ProductVariants from "@/components/products/product-variant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductForm from "@/components/products/product-form";
 import ProductImagesManager from "@/components/admin/product/product-images";
-import { Product } from "@/schemas/product";
+import { ProductSearch } from "@/schemas/product";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useCategories } from "@/lib/hooks/useCategories";
 
-export function ProductView({ product, onClose }: { product?: Product; onClose: () => void }) {
+export function ProductView({ product, onClose }: { product?: ProductSearch; onClose: () => void }) {
     const { data: collections } = useCollections();
     const { data: categories } = useCategories();
 
@@ -31,7 +31,7 @@ export function ProductView({ product, onClose }: { product?: Product; onClose: 
                 {product && (
                     <TabsContent value="images">
                         <div className="pb-6 pt-2">
-                            <ProductImagesManager initialImages={product?.images?.sort((a, b) => a.order - b.order) || []} productId={product.id} />
+                            <ProductImagesManager initialImages={product?.images || []} productId={product.id} />
                         </div>
                     </TabsContent>
                 )}

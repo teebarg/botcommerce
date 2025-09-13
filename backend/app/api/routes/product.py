@@ -1,4 +1,3 @@
-from itertools import product
 from typing import Any
 
 from fastapi import (
@@ -41,7 +40,7 @@ from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export, sync_index_product
-from app.services.redis import cache_response, invalidate_list, bust
+from app.services.redis import cache_response, invalidate_list
 from meilisearch.errors import MeilisearchApiError
 from app.services.popular_products import PopularProductsService
 from app.services.recently_viewed import RecentlyViewedService
@@ -158,51 +157,6 @@ async def export_products(
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get("/")
-@cache_response("products")
-async def index(
-    request: Request,
-    query: str = "",
-    active: bool = Query(default=True),
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, le=100),
-) -> Products:
-    """
-    Retrieve products.
-    """
-    where_clause = {
-        "active": active
-    }
-    # if brand:
-    #     where_clause["brand"] = {"name": {"contains": brand, "mode": "insensitive"}}
-    if query:
-        where_clause["OR"] = [
-            {"name": {"contains": query, "mode": "insensitive"}},
-            {"slug": {"contains": query, "mode": "insensitive"}},
-            {"description": {"contains": query, "mode": "insensitive"}}
-        ]
-    products = await db.product.find_many(
-        where=where_clause,
-        skip=skip,
-        take=limit,
-        order={"created_at": "desc"},
-        include={
-            "categories": True,
-            "collections": True,
-            "variants": True,
-            "images": True,
-        }
-    )
-    total = await db.product.count(where=where_clause)
-    return {
-        "products": products,
-        "skip": skip,
-        "limit": limit,
-        "total_pages": ceil(total/limit),
-        "total_count": total,
-    }
-
-
 @router.get("/search/public")
 @cache_response("products")
 async def public_search(
@@ -279,7 +233,7 @@ async def public_search(
     return search_results["hits"]
 
 
-@router.get("/search")
+@router.get("/")
 @cache_response("products")
 async def search(
     request: Request,

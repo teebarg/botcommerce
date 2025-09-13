@@ -4,7 +4,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Product } from "@/schemas/product";
+import { ProductSearch } from "@/schemas/product";
 import { ProductView } from "@/components/products/product-view";
 import { Confirm } from "@/components/generic/confirm";
 import Overlay from "@/components/overlay";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useDeleteProduct } from "@/lib/hooks/useProduct";
 
 interface ProductActionsProps {
-    product: Product;
+    product: ProductSearch;
 }
 
 export function ProductActions({ product }: ProductActionsProps) {

@@ -3,9 +3,9 @@
 import { usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useInvalidate } from "@/lib/hooks/useApi";
-import { useQueryClient } from "@tanstack/react-query";
 
 type WebSocketContextType = {
     socket: WebSocket | null;
@@ -69,6 +69,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
             socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
+
                 if (data?.type === "invalidate") {
                     const keys = parseEventKey(data?.key);
 

@@ -17,10 +17,20 @@ from app.core.utils import slugify, url_to_list
 from app.services.meilisearch import get_or_create_index, ensure_index_ready
 from app.core.config import settings
 from meilisearch.errors import MeilisearchApiError
+from app.services.websocket import manager
 
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+async def invalidate_catalog():
+    await invalidate_list("catalog")
+    await manager.broadcast_to_all(
+            data={
+                "key": "catalog",
+            },
+            message_type="invalidate",
+        )
 
 
 @router.get("/views", response_model=List[SharedCollectionView])
@@ -230,8 +240,7 @@ async def track_shared_collection_visit(
     )
 
     if is_new_visit:
-        await invalidate_list("shared")
-        await invalidate_list("sharedcollection")
+        await invalidate_catalog()
 
     return {
         "success": True,
@@ -248,7 +257,7 @@ async def create_shared_collection(data: SharedCollectionCreate):
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
 
-    await invalidate_list("shared")
+    await invalidate_catalog()
     return res
 
 @router.patch("/{id}")
@@ -263,8 +272,7 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate):
         update_data["products"] = {"set": product_connect}
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
 
-    await invalidate_list("shared")
-    await invalidate_list("sharedcollection")
+    await invalidate_catalog()
 
     return res
 
@@ -275,8 +283,7 @@ async def delete_shared_collection(id: int) -> Message:
         raise HTTPException(status_code=404, detail="SharedCollection not found")
     await db.sharedcollection.delete(where={"id": id})
 
-    await invalidate_list("shared")
-    await invalidate_list("sharedcollection")
+    await invalidate_catalog()
     return {"message": "SharedCollection deleted successfully"}
 
 @router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])

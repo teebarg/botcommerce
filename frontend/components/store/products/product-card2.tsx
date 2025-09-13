@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                             alt={product.name}
                             className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            src={product.images?.[0] || "/placeholder.jpg"}
+                            src={product.sorted_images?.[0] || "/placeholder.jpg"}
                             onLoad={() => setImageLoaded(true)}
                         />
 
@@ -73,7 +73,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         )}
 
                         {session?.user?.isAdmin && (
-                            <ImageDownloadButton className="absolute bottom-2 left-2" fallbackName={product.slug} url={product.images?.[0] || ""} />
+                            <ImageDownloadButton
+                                className="absolute bottom-2 left-2"
+                                fallbackName={product.slug}
+                                url={product.sorted_images?.[0] || ""}
+                            />
                         )}
                     </div>
 

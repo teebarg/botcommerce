@@ -38,9 +38,9 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
         <div>
             <h4 className="text-lg font-medium text-default-800 mt-4">Product Variants</h4>
             <div className="py-4 rounded-md">
-                <div>
+                <div className="space-y-2">
                     {variants?.map((variant: ProductVariant, idx: number) => (
-                        <div key={idx} className="flex flex-col gap-2 rounded-md p-2 bg-content3">
+                        <div key={idx} className="flex flex-col gap-2 rounded-md p-2 bg-content2">
                             <p className="text-sm font-medium text-default-800">Sku: {variant.sku}</p>
                             <p className="text-sm font-medium text-default-800">Price: {currency(variant.price)}</p>
                             <p className={cn("text-sm font-medium text-default-800", variant.size ? "" : "hidden")}>Size: {variant.size}</p>

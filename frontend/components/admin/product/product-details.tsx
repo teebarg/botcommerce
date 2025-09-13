@@ -9,9 +9,9 @@ import { ProductQuery } from "./product-query";
 
 import { Badge } from "@/components/ui/badge";
 import { ProductActions } from "@/components/admin/product/product-actions";
-import { Collection, Product, ProductVariant } from "@/schemas/product";
+import { Collection, ProductSearch, ProductVariant } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
-import { useProductsInfinite } from "@/lib/hooks/useProduct";
+import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import ComponentLoader from "@/components/component-loader";
@@ -26,8 +26,8 @@ export function ProductDetails() {
     const query = searchParams.get("search") || "";
     const collectionsParam = searchParams.get("collections") || "";
 
-    const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProductsInfinite({
-        query,
+    const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProductInfiniteSearch({
+        search: query,
         limit: LIMIT,
         collections: collectionsParam,
     });
@@ -57,7 +57,6 @@ export function ProductDetails() {
         return <ServerError />;
     }
 
-    // Flatten all products from all pages
     const products = data.pages.flatMap((page) => page.products);
 
     const handleManageCollections = () => {
@@ -68,7 +67,7 @@ export function ProductDetails() {
         router.push("/admin/categories");
     };
 
-    const getStatus = (variants: ProductVariant[] | undefined) => {
+    const getStatus = (variants: ProductVariant[] | undefined | null) => {
         if (!variants) return "Out of Stock";
         const variant = variants?.find((v) => v.inventory > 0);
 
@@ -118,7 +117,7 @@ export function ProductDetails() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {products?.map((product: Product, idx: number) => {
+                    {products?.map((product: ProductSearch, idx: number) => {
                         const isLast = idx === products.length - 1;
 
                         return (
@@ -135,7 +134,7 @@ export function ProductDetails() {
                                         className="object-cover"
                                         placeholder="blur"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                        src={product.images?.sort((a, b) => a.order - b.order)?.[0]?.image || product?.image || "/placeholder.jpg"}
+                                        src={product.sorted_images?.[0] || product?.image || "/placeholder.jpg"}
                                     />
 
                                     <div className="absolute top-2 right-2 flex flex-col gap-1">
