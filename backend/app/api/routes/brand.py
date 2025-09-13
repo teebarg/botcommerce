@@ -3,31 +3,26 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
-    Query,
 )
 
 from app.core.deps import get_current_user
 from app.models.brand import (
     BrandCreate,
-    Brands,
     BrandUpdate,
 )
 from app.models.generic import Message
 from app.prisma_client import prisma as db
-from math import ceil
 from app.core.utils import slugify
 from prisma.errors import PrismaError
 from prisma.models import Brand
 
-# Create a router for brands
 router = APIRouter()
 
-@router.get("/all")
-async def all_brands(query: str = "") -> Optional[list[Brand]]:
+@router.get("/")
+async def index(query: str = "") -> Optional[list[Brand]]:
     """
     Retrieve brands with Redis caching.
     """
-    # Define the where clause based on query parameter
     where_clause = None
     if query:
         where_clause = {
@@ -37,39 +32,6 @@ async def all_brands(query: str = "") -> Optional[list[Brand]]:
             ]
         }
     return await db.brand.find_many(where=where_clause, order={"created_at": "desc"})
-
-
-@router.get("/")
-async def index(
-    query: str = "",
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, le=100),
-) -> Brands:
-    """
-    Retrieve brands with Redis caching.
-    """
-    where_clause = None
-    if query:
-        where_clause = {
-            "OR": [
-                {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
-            ]
-        }
-    brands = await db.brand.find_many(
-        where=where_clause,
-        skip=skip,
-        take=limit,
-        order={"created_at": "desc"},
-    )
-    total = await db.brand.count(where=where_clause)
-    return {
-        "brands":brands,
-        "skip":skip,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
-    }
 
 
 @router.post("/")
@@ -92,7 +54,7 @@ async def create(*, create_data: BrandCreate) -> Brand:
 @router.get("/{id}")
 async def read(id: int):
     """
-    Get a specific brand by id with Redis caching.
+    Get a specific brand by id.
     """
     brand = await db.brand.find_unique(
         where={"id": id}
@@ -103,7 +65,7 @@ async def read(id: int):
     return brand
 
 
-@router.get("/slug/{slug}")
+@router.get("/{slug}")
 async def get_by_slug(slug: str) -> Brand:
     """
     Get a brand by its slug.

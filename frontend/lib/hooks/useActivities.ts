@@ -24,7 +24,7 @@ export const useActivities = () => {
 export const useMyActivities = () => {
     const { data: session } = useSession();
     return useQuery({
-        queryKey: ["activity", session?.id],
+        queryKey: ["activity", session?.id?.toString()],
         queryFn: async () => await api.get<Activity[]>(`/activities/me`),
         enabled: Boolean(session?.user),
     });

@@ -3,7 +3,7 @@ from prisma.models import ActivityLog
 from app.prisma_client import prisma as db
 from app.services.websocket import manager
 from app.core.logging import logger
-from app.services.cache import invalidate_pattern
+from app.services.redis import invalidate_pattern
 
 async def log_activity(
     user_id: int,

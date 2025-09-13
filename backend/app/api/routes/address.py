@@ -1,7 +1,6 @@
 from fastapi import (
     APIRouter,
     HTTPException,
-    Query,
     Request
 )
 
@@ -10,13 +9,12 @@ from app.models.address import (
     AddressCreate,
     AddressUpdate,
 )
-from app.models.address import Address, Addresses
+from app.models.address import Address
 from app.models.generic import Message
 from app.prisma_client import prisma as db
-from math import ceil
 from prisma.errors import PrismaError
 from app.core.logging import get_logger
-from app.services.redis import cache_response, invalidate_list, bust
+from app.services.redis import cache_response, invalidate_key
 
 logger = get_logger(__name__)
 
@@ -24,35 +22,18 @@ router = APIRouter()
 
 
 @router.get("/")
-@cache_response("addresses")
+@cache_response("addresses", key=lambda request, user: user.id)
 async def index(
     request: Request,
-    current_user: CurrentUser,
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=100),
-) -> Addresses:
-    """
-    Retrieve addresses.
-    """
-    where_clause = None
-    if not current_user.role == "ADMIN":
-        where_clause = {
-            "user_id": current_user.id
-        }
+    user: CurrentUser
+):
+    """Get current user addresses."""
     addresses = await db.address.find_many(
-        where=where_clause,
-        skip=skip,
-        take=limit,
-        order={"created_at": "desc"},
+        where={"user_id": user.id},
+        order={"created_at": "desc"}
     )
-    total = await db.address.count(where=where_clause)
-    return {
-        "addresses": addresses,
-        "skip": skip,
-        "limit": limit,
-        "total_pages": ceil(total/limit),
-        "total_count": total,
-    }
+    address_list = [address.dict() for address in addresses]
+    return {"addresses": address_list}
 
 
 @router.post("/")
@@ -69,7 +50,7 @@ async def create(
                 "user": {"connect": {"id": user.id}},
             }
         )
-        await invalidate_list("addresses")
+        await invalidate_key(f"addresses:{user.id}")
         return address
     except PrismaError as e:
         logger.error(e)
@@ -78,7 +59,7 @@ async def create(
 
 
 @router.get("/{id}")
-@cache_response("address", key=lambda request, id, user: f"{user.id}:{id}")
+@cache_response("address", key=lambda request, id, user: id)
 async def read(request: Request, id: int, user: CurrentUser) -> Address:
     """
     Get a specific address by id.
@@ -121,8 +102,8 @@ async def update(
                 **update_data
             }
         )
-        await invalidate_list("addresses")
-        await bust(f"address:{user.id}:{id}")
+        await invalidate_key(f"addresses:{user.id}")
+        await invalidate_key(f"address:{id}")
         return update
     except PrismaError as e:
         raise HTTPException(
@@ -149,8 +130,8 @@ async def delete(id: int, user: CurrentUser) -> Message:
         await db.address.delete(
             where={"id": id}
         )
-        await invalidate_list("addresses")
-        await bust(f"address:{user.id}:{id}")
+        await invalidate_key(f"addresses:{user.id}")
+        await invalidate_key(f"address:{id}")
         return Message(message="Address deleted successfully")
     except PrismaError as e:
         raise HTTPException(

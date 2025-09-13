@@ -16,24 +16,6 @@ export const useCart = () => {
     });
 };
 
-export const useAddress = (addressId: number) => {
-    return useQuery({
-        queryKey: ["cart-address", addressId],
-        queryFn: async () => await api.get<Address>(`/address/${addressId}`),
-    });
-};
-
-export const useUserAddresses = () => {
-    return useQuery({
-        queryKey: ["user-address"],
-        queryFn: async () => {
-            const res = await api.get<{ addresses: Address[] }>(`/users/address`);
-
-            return res;
-        },
-    });
-};
-
 export const useAddToCart = () => {
     const queryClient = useQueryClient();
 
