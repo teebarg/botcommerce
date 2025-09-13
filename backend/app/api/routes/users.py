@@ -18,7 +18,7 @@ from math import ceil
 from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
 from app.models.product import SearchProduct
-from app.services.redis import cache_response
+from app.services.redis import cache_response, invalidate_key
 
 router = APIRouter()
 
@@ -166,22 +166,10 @@ async def delete(id: int) -> Message:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-
-@router.get("/address")
-async def read_user_address(
-    user: CurrentUser
-):
-    """Get current user addresses."""
-    addresses = await db.address.find_many(
-        where={"user_id": user.id},
-        order={"created_at": "desc"}
-    )
-    address_dicts = [address.dict() for address in addresses]
-    return {"addresses": address_dicts}
-
-
 @router.get("/wishlist")
+@cache_response("products:wishlist", key=lambda request, user: user.id)
 async def read_wishlist(
+    request: Request,
     user: CurrentUser
 ) -> Wishlists:
     favorites = await db.favorite.find_many(
@@ -201,6 +189,7 @@ async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser):
                 "user_id": user.id
             }
         )
+        await invalidate_key(f"products:wishlist:{user.id}")
         return favorite
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -231,6 +220,7 @@ async def remove_wishlist_item(
                 }
             }
         )
+        await invalidate_key(f"products:wishlist:{user.id}")
         return Message(message="Product deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

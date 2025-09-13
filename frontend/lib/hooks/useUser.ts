@@ -80,7 +80,7 @@ export const useUserWishlist = () => {
     const { data: session } = useSession();
 
     return useQuery({
-        queryKey: ["wishlist"],
+        queryKey: ["products", "wishlist", session?.id?.toString()],
         queryFn: async () => await api.get<Wishlist>("/users/wishlist"),
         enabled: Boolean(session?.user),
     });
@@ -97,12 +97,9 @@ export const useUserRecentlyViewed = (limit: number = 12) => {
 };
 
 export const useUserCreateWishlist = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (product_id: number) => await api.post<Wishlist>("/users/wishlist", { product_id }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["wishlist"] });
             toast.success("Wishlist created successfully");
         },
         onError: (error) => {
@@ -112,12 +109,9 @@ export const useUserCreateWishlist = () => {
 };
 
 export const useUserDeleteWishlist = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Wishlist>(`/users/wishlist/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["wishlist"] });
             toast.success("Wishlist deleted successfully");
         },
         onError: (error) => {

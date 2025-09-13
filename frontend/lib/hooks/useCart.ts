@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
 import { getCookie } from "@/lib/util/server-utils";
-import { Address, Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
+import { Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
 import { api } from "@/apis/client";
 
 export const useCart = () => {
@@ -12,24 +12,6 @@ export const useCart = () => {
         queryKey: ["cart"],
         queryFn: async () => {
             return await api.get<Cart>("/cart/");
-        },
-    });
-};
-
-export const useAddress = (addressId: number) => {
-    return useQuery({
-        queryKey: ["cart-address", addressId],
-        queryFn: async () => await api.get<Address>(`/address/${addressId}`),
-    });
-};
-
-export const useUserAddresses = () => {
-    return useQuery({
-        queryKey: ["user-address"],
-        queryFn: async () => {
-            const res = await api.get<{ addresses: Address[] }>(`/users/address`);
-
-            return res;
         },
     });
 };

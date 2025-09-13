@@ -6,7 +6,6 @@ import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 
-import { useInvalidate } from "@/lib/hooks/useApi";
 import { api } from "@/apis/client";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/schemas";
@@ -20,7 +19,6 @@ interface ProductImageManagerProps {
 
 const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, initialImage = "", onClose }) => {
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
-    const invalidate = useInvalidate();
 
     const deleteImage = () => {
         setIsDeleting(true);
@@ -35,7 +33,6 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 }
 
                 toast.success("Image deleted successfully");
-                invalidate("categories");
                 onClose?.();
             } catch (error) {
                 toast.error(`Error - ${error as string}`);
@@ -80,7 +77,6 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                         }
 
                         toast.success("Image uploaded successfully", { id: toastId });
-                        invalidate("categories");
                         onClose?.();
                     } catch (error) {
                         toast.error(`Error - ${error as string}`, { id: toastId });

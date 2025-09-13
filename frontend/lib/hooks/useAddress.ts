@@ -1,30 +1,28 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
-import { PaginatedAddress, Address, Message } from "@/schemas";
+import { Address, Message } from "@/schemas";
 
-export const useAddresses = (params?: { search?: string; skip?: number; limit?: number }) => {
-    return useQuery({
-        queryKey: ["address", JSON.stringify(params)],
-        queryFn: async () => await api.get<PaginatedAddress>("/address/", { params }),
-    });
-};
+export const useUserAddresses = () => {
+    const { data: session } = useSession();
 
-export const useAddress = (id: number) => {
     return useQuery({
-        queryKey: ["address", id],
-        queryFn: async () => await api.get<Address>(`/address/${id}`),
+        queryKey: ["addresses", session?.id?.toString()],
+        queryFn: async () => {
+            const res = await api.get<{ addresses: Address[] }>("/address/");
+
+            return res;
+        },
+        enabled: Boolean(session?.user),
     });
 };
 
 export const useCreateAddress = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async (input: any) => await api.post<Address>(`/address/`, input),
+        mutationFn: async (input: any) => await api.post<Address>("/address/", input),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["address"] });
             toast.success("Address successfully created");
         },
         onError: (error: any) => {
@@ -34,12 +32,9 @@ export const useCreateAddress = () => {
 };
 
 export const useUpdateAddress = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ id, input }: { id: number; input: any }) => await api.patch<Address>(`/address/${id}`, input),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["address"] });
             toast.success("Address successfully updated");
         },
         onError: (error: any) => {
@@ -49,12 +44,9 @@ export const useUpdateAddress = () => {
 };
 
 export const useDeleteAddress = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/address/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["address"] });
             toast.success("Address successfully deleted");
         },
         onError: (error: any) => {

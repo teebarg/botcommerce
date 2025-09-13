@@ -20,14 +20,13 @@ from app.models.product import (
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
-    Product, Products, SearchProducts, SearchProduct,
+    Product, SearchProducts, SearchProduct,
     ProductCreateBundle,
     ProductBulkImages,
     ProductImageMetadata
 )
 from app.services.meilisearch import (
     clear_index,
-    delete_document,
     delete_index,
     get_or_create_index,
     ensure_index_ready,
@@ -40,7 +39,7 @@ from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
 from app.services.product import index_products, reindex_product, product_upload, product_export, sync_index_product
-from app.services.redis import cache_response, invalidate_list
+from app.services.redis import cache_response, invalidate_list, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.popular_products import PopularProductsService
 from app.services.recently_viewed import RecentlyViewedService
@@ -58,46 +57,6 @@ async def get_popular_products(
     service = PopularProductsService()
     products = await service.get_popular_products(limit)
     return products
-
-
-@router.get("/collection/{type}")
-@cache_response("products", key=lambda request, type, skip, limit, **kwargs: type)
-async def get_trending_products(request: Request, type: str = "trending", active: bool = Query(default=True), skip: int = Query(default=0), limit: int = Query(default=20)) -> list[SearchProduct]:
-    """
-    Retrieve collection products.
-    """
-    filters = [f"collection_slugs IN [{type}]", "min_variant_price >= 1"]
-    if active is not None:
-        filters.append(f"active = {active}")
-    search_params = {
-        "limit": limit,
-        "offset": skip,
-        "sort": ["created_at:desc"],
-        "filter": " AND ".join(filters) if filters else None,
-    }
-
-    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-
-    try:
-        search_results = index.search("", search_params)
-        return search_results["hits"]
-
-    except MeilisearchApiError as e:
-        error_code = getattr(e, "code", None)
-        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
-
-            ensure_index_ready(index)
-
-            retry_results = index.search("", search_params)
-            return retry_results["hits"]
-
-        logger.error(f"Meilisearch error: {e}")
-        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
-
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/gallery")
@@ -248,6 +207,8 @@ async def search(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
+    show_suggestions: bool = Query(default=False),
+    show_facets: bool = Query(default=False),
 ) -> SearchProducts:
     """
     Retrieve products using Meilisearch, sorted by latest.
@@ -273,8 +234,10 @@ async def search(
         "limit": limit,
         "offset": skip,
         "sort": [sort],
-        "facets": ["category_slugs", "collection_slugs", "sizes", "colors"],
     }
+
+    if show_facets:
+        search_params["facets"] = ["category_slugs", "collection_slugs", "sizes", "colors"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
@@ -287,16 +250,18 @@ async def search(
                 **search_params
             }
         )
-        suggestions_raw = index.search(
-            search,
-            {
-                "limit": 4,
-                "attributesToRetrieve": ["name"],
-                "matchingStrategy": "all"
-            }
-        )
-        suggestions = list(
-            {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+        suggestions = []
+        if show_suggestions:
+            suggestions_raw = index.search(
+                search,
+                {
+                    "limit": 4,
+                    "attributesToRetrieve": ["name"],
+                    "matchingStrategy": "all"
+                }
+            )
+            suggestions = list(
+                {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
 
     except MeilisearchApiError as e:
         error_code = getattr(e, "code", None)
@@ -311,16 +276,18 @@ async def search(
                     **search_params
                 }
             )
-            suggestions_raw = index.search(
-                search,
-                {
-                    "limit": 4,
-                    "attributesToRetrieve": ["name"],
-                    "matchingStrategy": "all"
-                }
-            )
-            suggestions = list(
-                {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+            suggestions = []
+            if show_suggestions:
+                suggestions_raw = index.search(
+                    search,
+                    {
+                        "limit": 4,
+                        "attributesToRetrieve": ["name"],
+                        "matchingStrategy": "all"
+                    }
+                )
+                suggestions = list(
+                    {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
 
         logger.error(f"Meilisearch error: {e}")
         raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
@@ -946,7 +913,7 @@ async def reorder_images(id: int, image_ids: list[int]):
 @router.post("/images/upload")
 async def upload_product_images(payload: ProductBulkImages):
     """
-    Upload one or more product images.
+    Upload one or more product images to gallery.
     """
     try:
         created_images = []
@@ -965,13 +932,7 @@ async def upload_product_images(payload: ProductBulkImages):
         if created_images:
             await db.productimage.create_many(data=created_images)
 
-        await invalidate_list("products:gallery")
-        await manager.broadcast_to_all(
-                data={
-                    "key": "products:gallery",
-                },
-                message_type="invalidate",
-            )
+        await invalidate_pattern("products:gallery")
 
         return {"success": True}
     except UniqueViolationError:

@@ -11,7 +11,7 @@ import AddAddressForm from "@/components/store/account/address/add-address-form"
 import { cn } from "@/lib/utils";
 import EditAddressForm from "@/components/store/account/address/edit-address-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useAddresses, useDeleteAddress } from "@/lib/hooks/useAddress";
+import { useDeleteAddress, useUserAddresses } from "@/lib/hooks/useAddress";
 import { Confirm } from "@/components/generic/confirm";
 import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";
@@ -85,7 +85,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
 
 const AddressBook: React.FC = () => {
     const addState = useOverlayTriggerState({});
-    const { data, isLoading, error } = useAddresses();
+    const { data, isLoading, error } = useUserAddresses();
 
     if (isLoading) {
         return <ComponentLoader className="h-[400px]" />;

@@ -5,13 +5,12 @@ from typing import Any, Callable, Union
 import json
 
 from fastapi import Request
-from redis import Redis
 
 from app.redis_client import redis_client
 from app.core.logging import logger
-import json
+from app.services.websocket import manager
 
-DEFAULT_EXPIRATION = int(timedelta(hours=24).total_seconds())
+DEFAULT_EXPIRATION = int(timedelta(days=7).total_seconds())
 
 def handle_redis_errors(default: Any = None):
     def decorator(func: Callable):
@@ -99,3 +98,22 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
             return result
         return wrapper
     return decorator
+
+
+async def invalidate_pattern(pattern: str):
+    await invalidate_list(pattern)
+    await manager.broadcast_to_all(
+        data={
+            "key": pattern,
+        },
+        message_type="invalidate",
+    )
+
+async def invalidate_key(key: str):
+    await bust(key)
+    await manager.broadcast_to_all(
+        data={
+            "key": key,
+        },
+        message_type="invalidate",
+    )
