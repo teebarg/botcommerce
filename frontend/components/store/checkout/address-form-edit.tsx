@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@components/ui/input";
-import { useQueryClient } from "@tanstack/react-query";
 
 import { Address, AddressSchema } from "@/schemas/address";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,6 @@ const addressEditSchema = AddressSchema.omit({
 type AddressEditFormValues = z.infer<typeof addressEditSchema>;
 
 const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onClose?: () => void }) => {
-    const queryClient = useQueryClient();
     const updateAddress = useUpdateAddress();
 
     const defaultValues: AddressEditFormValues = {
@@ -53,8 +51,6 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
 
     const onSubmit = async (values: AddressEditFormValues) => {
         await updateAddress.mutateAsync({ id: address?.id!, input: values });
-        queryClient.invalidateQueries({ queryKey: ["user-address"] });
-        queryClient.invalidateQueries({ queryKey: ["cart-address", address?.id] });
         onClose?.();
     };
 

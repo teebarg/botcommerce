@@ -2,21 +2,14 @@
 
 import React from "react";
 import { TrendingUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { ProductSearch } from "@/schemas/product";
-import { api } from "@/apis/client";
 import ComponentLoader from "@/components/component-loader";
 import ScrollableListing from "@/components/store/products/scrollable-listing";
+import { useProductSearch } from "@/lib/hooks/useProduct";
 
 export default function Featured() {
-    const { data, isLoading } = useQuery({
-        queryKey: ["products", "featured"],
-        queryFn: async () => {
-            return await api.get<ProductSearch[]>("/product/collection/featured?limit=5");
-        },
-    });
+    const { data, isLoading } = useProductSearch({ collections: "featured", limit: 5 });
 
     return (
         <section className="py-16 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-content1 dark:to-content2 transition-colors duration-300">
@@ -30,7 +23,7 @@ export default function Featured() {
                 </div>
 
                 {isLoading && <ComponentLoader className="h-[400px]" />}
-                <ScrollableListing products={data || []} />
+                <ScrollableListing products={data?.products || []} />
 
                 <div className="text-center mt-12">
                     <LocalizedClientLink

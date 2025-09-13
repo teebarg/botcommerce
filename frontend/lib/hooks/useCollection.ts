@@ -2,8 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
-import { useInvalidate } from "./useApi";
-
 import { api } from "@/apis/client";
 import { Collection, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
@@ -11,21 +9,18 @@ import { SharedFormValues } from "@/components/admin/shared-collections/shared-f
 
 export const useCollections = (query?: string) => {
     return useQuery({
-        queryKey: ["collections", "all", query],
-        queryFn: async () => await api.get<Collection[]>("/collection/all", { params: { query: query || "" } }),
+        queryKey: ["collections", query],
+        queryFn: async () => await api.get<Collection[]>("/collection/", { params: { query: query || "" } }),
     });
 };
 
 export const useCreateCollection = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async (data: CollectionFormValues) =>
             await api.post<Collection>("/collection/", {
                 ...data,
             }),
         onSuccess: () => {
-            invalidate("collections");
             toast.success("Collection created successfully");
         },
         onError: (error) => {
@@ -35,12 +30,9 @@ export const useCreateCollection = () => {
 };
 
 export const useUpdateCollection = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: CollectionFormValues }) => await api.patch<Collection>(`/collection/${id}`, data),
         onSuccess: () => {
-            invalidate("collections");
             toast.success("Collection updated successfully");
         },
         onError: (error) => {
@@ -50,12 +42,9 @@ export const useUpdateCollection = () => {
 };
 
 export const useDeleteCollection = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Collection>(`/collection/${id}`),
         onSuccess: () => {
-            invalidate("collections");
             toast.success("Collection deleted successfully");
         },
         onError: (error) => {

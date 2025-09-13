@@ -10,7 +10,7 @@ from prisma.enums import Role
 from app.core.deps import get_current_superuser, RedisClient
 from typing import Literal, Optional
 from datetime import timedelta, datetime
-from app.services.redis import cache_response, invalidate_list
+from app.services.redis import cache_response, invalidate_pattern
 from app.services.meilisearch import clear_index
 from app.core.config import settings
 
@@ -121,7 +121,7 @@ async def bust_redis_cache(
 ):
     """Bust Redis cache by key."""
     try:
-        result = await invalidate_list(pattern)
+        result = await invalidate_pattern(pattern)
         return {"success": result, "pattern": pattern}
     except Exception as e:
         return {"success": False, "error": str(e), "pattern": pattern}

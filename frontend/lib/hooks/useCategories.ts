@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { useInvalidate } from "./useApi";
-
 import { api } from "@/apis/client";
 import { Category } from "@/schemas";
 import { CategoryFormValues } from "@/components/admin/categories/category-form";
@@ -15,15 +13,12 @@ export const useCategories = (query?: string) => {
 };
 
 export const useCreateCategory = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async (data: CategoryFormValues) =>
             await api.post<Category>("/category/", {
                 ...data,
             }),
         onSuccess: () => {
-            invalidate("categories");
             toast.success("Category created successfully");
         },
         onError: (error) => {
@@ -33,12 +28,9 @@ export const useCreateCategory = () => {
 };
 
 export const useUpdateCategory = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: CategoryFormValues }) => await api.patch<Category>(`/category/${id}`, data),
         onSuccess: () => {
-            invalidate("categories");
             toast.success("Category updated successfully");
         },
         onError: (error) => {
@@ -48,12 +40,9 @@ export const useUpdateCategory = () => {
 };
 
 export const useDeleteCategory = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Category>(`/category/${id}`),
         onSuccess: () => {
-            invalidate("categories");
             toast.success("Category deleted successfully");
         },
         onError: (error) => {
@@ -63,12 +52,9 @@ export const useDeleteCategory = () => {
 };
 
 export const useReorderCategories = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async (data: { id: number; display_order: number }[]) => await api.patch<Category>(`/category/reorder`, { categories: data }),
         onSuccess: () => {
-            invalidate("categories");
             toast.success("Category reordered successfully");
         },
         onError: (error) => {

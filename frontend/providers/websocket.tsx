@@ -76,11 +76,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                     queryClient.invalidateQueries({ queryKey: keys });
                 }
 
-                if (data?.type === "product-index" && data?.status === "completed") {
-                    invalidate("products");
-                    invalidate("gallery");
-                }
-
                 setMessages((prev) => [...prev, data]);
                 setCurrentMessage(data);
             };

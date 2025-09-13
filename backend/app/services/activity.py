@@ -2,8 +2,8 @@ from typing import Optional
 from prisma.models import ActivityLog
 from app.prisma_client import prisma as db
 from app.services.websocket import manager
-from fastapi.encoders import jsonable_encoder
 from app.core.logging import logger
+from app.services.redis import invalidate_pattern
 
 async def log_activity(
     user_id: int,
@@ -25,11 +25,12 @@ async def log_activity(
                 "is_success": is_success
             }
         )
-        # broadcast
+
+        await invalidate_pattern("activities")
         await manager.send_to_user(
             user_id=user_id,
-            data=jsonable_encoder(activity),
-            message_type="activities",
+            data={"key": f"activity:{user_id}"},
+            message_type="invalidate",
         )
         return activity
     except Exception as exc:

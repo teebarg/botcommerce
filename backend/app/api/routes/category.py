@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from app.models.category import Category, CategoryCreate, CategoryUpdate
 from app.models.generic import Message
@@ -10,7 +10,7 @@ from app.models.generic import ImageUpload
 
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
-from app.services.redis import cache_response, invalidate_list, bust
+from app.services.redis import cache_response, invalidate_pattern
 from app.core.deps import get_current_superuser
 from app.core.logging import get_logger
 
@@ -41,7 +41,6 @@ async def index(
     return await db.category.find_many(
         where=where_clause,
         order={"display_order": "asc"},
-        include={"subcategories": True},
     )
 
 @router.post("/")
@@ -53,42 +52,10 @@ async def create(*, data: CategoryCreate) -> Category:
         category = await db.category.create(
             data={**data.model_dump(), "slug": slugify(data.name)}
         )
-        await invalidate_list("categories")
+        await invalidate_pattern("categories")
         return category
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/{id}")
-@cache_response(key_prefix="category", key=lambda request, id: id)
-async def read(id: int, request: Request) -> Any:
-    """
-    Get a specific category by id with Redis caching.
-    """
-    category = await db.category.find_unique(
-        where={"id": id},
-        include={"subcategories": True}
-    )
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-
-    return category
-
-
-@router.get("/slug/{slug}")
-@cache_response(key_prefix="category", key=lambda request, slug: slug)
-async def get_by_slug(slug: str, request: Request) -> Category:
-    """
-    Get a category by its slug.
-    """
-    category = await db.category.find_unique(
-        where={"slug": slug},
-        include={"subcategories": True}
-    )
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-
-    return category
 
 
 class CategoryOrderUpdate(BaseModel):
@@ -111,8 +78,7 @@ async def reorder_categories(order_data: BulkOrderUpdate):
                         data={"display_order": category_update.display_order}
                     )
 
-            await invalidate_list("categories")
-            await invalidate_list("category")
+            await invalidate_pattern("categories")
             return {"message": "categories reordered successfully"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
@@ -139,9 +105,7 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
-        await invalidate_list("categories")
-        await bust(f"category:{id}")
-        await bust(f"category:{update.slug}")
+        await invalidate_pattern("categories")
         return update
     except PrismaError as e:
         logger.error(f"Failed to update category: {str(e)}")
@@ -163,34 +127,11 @@ async def delete(id: int) -> Message:
         await db.category.delete(
             where={"id": id}
         )
-        await invalidate_list("categories")
-        await bust(f"category:{id}")
-        await bust(f"category:{existing.slug}")
+        await invalidate_pattern("categories")
         return Message(message="Category deleted successfully")
     except PrismaError as e:
         logger.error(f"Failed to delete category: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/autocomplete/")
-@cache_response(key_prefix="categories")
-async def autocomplete(request: Request, query: str = "") -> Any:
-    """
-    Retrieve categories for autocomplete.
-    """
-    where_clause = None
-    if query:
-        where_clause = {
-            "OR": [
-                {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
-            ]
-        }
-    categories = await db.category.find_many(
-        where=where_clause,
-        order={"display_order": "asc"},
-    )
-    return Search(results=categories)
 
 
 @router.patch("/{id}/image")
@@ -211,9 +152,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
             where={"id": id},
             data={"image": image_url}
         )
-        await invalidate_list("categories")
-        await bust(f"category:{id}")
-        await bust(f"category:{updated_category.slug}")
+        await invalidate_pattern("categories")
         return updated_category
 
     except Exception as e:
@@ -246,9 +185,7 @@ async def delete_image(id: int) -> Message:
             where={"id": id},
             data={"image": None}
         )
-        await invalidate_list("categories")
-        await bust(f"category:{id}")
-        await bust(f"category:{category.slug}")
+        await invalidate_pattern("categories")
         return Message(message="Category image deleted successfully")
 
     except Exception as e:

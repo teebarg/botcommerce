@@ -1,6 +1,6 @@
 import React from "react";
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -25,7 +25,6 @@ const bankDetailsFormSchema = BankDetailsSchema.omit({
 type BankDetailsFormValues = z.infer<typeof bankDetailsFormSchema>;
 
 const BankDetailsForm: React.FC<BankDetailsFormProps> = ({ onClose }) => {
-    const queryClient = useQueryClient();
     const form = useForm<BankDetailsFormValues>({
         resolver: zodResolver(bankDetailsFormSchema),
         defaultValues: {
@@ -38,7 +37,6 @@ const BankDetailsForm: React.FC<BankDetailsFormProps> = ({ onClose }) => {
     const { mutate: createBankDetails, isPending } = useMutation({
         mutationFn: async (input: BankDetailsFormValues) => await api.post("/bank-details/", input),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["bank-details"] });
             toast.success("Bank details added successfully");
             onClose();
             form.reset();

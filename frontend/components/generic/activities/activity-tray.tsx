@@ -1,25 +1,15 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { Bell } from "nui-react-icons";
+import React from "react";
 
 import ActivityView from "./activity";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useWebSocket } from "@/providers/websocket";
 import { useMyActivities } from "@/lib/hooks/useActivities";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { Bell } from "lucide-react";
 
 const ActivityTray: React.FC = () => {
-    const invalidate = useInvalidate();
-    const { currentMessage, messages } = useWebSocket();
     const { data: activities, isLoading } = useMyActivities();
-
-    useEffect(() => {
-        if (currentMessage?.type === "activities") {
-            invalidate("activities");
-        }
-    }, [messages]);
 
     return (
         <DropdownMenu>

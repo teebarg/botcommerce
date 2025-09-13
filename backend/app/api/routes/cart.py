@@ -7,7 +7,7 @@ from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.core.deps import TokenUser
 from prisma.models import Cart
-from app.services.redis import cache_response, bust
+from app.services.redis import cache_response, bust, invalidate_key
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -182,12 +182,13 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
     if user:
         update_data["user"] = {"connect": {"id": user.id}}
 
-    # update_data["user"] = {"connect": {"id": user.id}} if user else {"disconnect": True}
-
     updated_cart = await db.cart.update(
         where={"cart_number": cartId},
         data=update_data,
     )
+
+    if cart_update.shipping_address:
+        await invalidate_key(f"addresses:{user.id}")
 
     await bust(f"cart:{cartId}")
 

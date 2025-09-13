@@ -4,7 +4,7 @@ import React from "react";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Exclamation } from "nui-react-icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import BankDetailsForm from "./bank-details-form";
 
@@ -48,12 +48,9 @@ interface BankDetailsProps {
 }
 
 const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
-    const queryClient = useQueryClient();
-
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => await api.delete<Message>(`/bank-details/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["bank-details"] });
             toast.success("Bank details deleted successfully");
         },
         onError: (error: any) => {

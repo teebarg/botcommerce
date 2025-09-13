@@ -1,20 +1,13 @@
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
 
-import { ProductSearch } from "@/schemas/product";
-import ProductCard from "@/components/store/products/product-card2";
-import { api } from "@/apis/client";
 import ComponentLoader from "@/components/component-loader";
+import { useProductSearch } from "@/lib/hooks/useProduct";
+import ScrollableListing from "@/components/store/products/scrollable-listing";
 
 export default function Trending() {
-    const { data, isLoading } = useQuery({
-        queryKey: ["products", "trending"],
-        queryFn: async () => {
-            return await api.get<ProductSearch[]>("/product/collection/trending?limit=4");
-        },
-    });
+    const { data, isLoading } = useProductSearch({ collections: "trending", limit: 5 });
 
     return (
         <section className="py-16 bg-content2">
@@ -24,10 +17,7 @@ export default function Trending() {
                     <p className="text-default-600">Discover our handpicked selection of premium products</p>
                 </div>
                 {isLoading && <ComponentLoader className="h-[400px]" />}
-
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4">
-                    {data?.map((product: ProductSearch, idx: number) => <ProductCard key={idx} product={product} />)}
-                </div>
+                <ScrollableListing products={data?.products || []} />
             </div>
         </section>
     );
