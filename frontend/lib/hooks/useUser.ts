@@ -80,7 +80,7 @@ export const useUserWishlist = () => {
     const { data: session } = useSession();
 
     return useQuery({
-        queryKey: ["products","wishlist", session?.id?.toString()],
+        queryKey: ["products", "wishlist", session?.id?.toString()],
         queryFn: async () => await api.get<Wishlist>("/users/wishlist"),
         enabled: Boolean(session?.user),
     });

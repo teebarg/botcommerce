@@ -11,7 +11,7 @@ import AddAddressForm from "@/components/store/account/address/add-address-form"
 import { cn } from "@/lib/utils";
 import EditAddressForm from "@/components/store/account/address/edit-address-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import {  useDeleteAddress, useUserAddresses } from "@/lib/hooks/useAddress";
+import { useDeleteAddress, useUserAddresses } from "@/lib/hooks/useAddress";
 import { Confirm } from "@/components/generic/confirm";
 import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";

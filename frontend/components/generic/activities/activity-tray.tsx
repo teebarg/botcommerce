@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
+import { Bell } from "lucide-react";
 
 import ActivityView from "./activity";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useMyActivities } from "@/lib/hooks/useActivities";
-import { Bell } from "lucide-react";
 
 const ActivityTray: React.FC = () => {
     const { data: activities, isLoading } = useMyActivities();

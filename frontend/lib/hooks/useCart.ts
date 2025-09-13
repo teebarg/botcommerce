@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
 import { getCookie } from "@/lib/util/server-utils";
-import { Address, Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
+import { Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
 import { api } from "@/apis/client";
 
 export const useCart = () => {

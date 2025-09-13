@@ -1,12 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { Address, Message } from "@/schemas";
-import { useSession } from "next-auth/react";
 
 export const useUserAddresses = () => {
     const { data: session } = useSession();
+
     return useQuery({
         queryKey: ["addresses", session?.id?.toString()],
         queryFn: async () => {
