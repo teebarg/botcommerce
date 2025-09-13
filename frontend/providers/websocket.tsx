@@ -72,7 +72,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
                 if (data?.type === "invalidate") {
                     const keys = parseEventKey(data?.key);
-                    console.log("🚀 ~ file: websocket.tsx:75 ~ keys:", keys)
 
                     queryClient.invalidateQueries({ queryKey: keys });
                 }
