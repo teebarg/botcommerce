@@ -37,7 +37,7 @@ async def index(
     }
 
 @router.get("/me", response_model=List[ActivityLog])
-@cache_response("activities", key=lambda request, user: user.id)
+@cache_response("activity", key=lambda request, user: user.id)
 async def get_recent_activities(request: Request, user: CurrentUser):
     """
     Get current user's activities
@@ -62,7 +62,7 @@ async def delete_activity(id: int, user: CurrentUser):
             whereQuery.update({"user_id" : user.id})
         await db.activitylog.delete(where=whereQuery)
         await invalidate_list("activities")
-        await bust(f"activities:{user.id}")
+        await bust(f"activity:{user.id}")
         return Message(message="Activity deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

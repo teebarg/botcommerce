@@ -12,7 +12,7 @@ import { SharedFormValues } from "@/components/admin/shared-collections/shared-f
 export const useCollections = (query?: string) => {
     return useQuery({
         queryKey: ["collections", "all", query],
-        queryFn: async () => await api.get<Collection[]>("/collection/all", { params: { query: query || "" } }),
+        queryFn: async () => await api.get<Collection[]>("/collection/", { params: { query: query || "" } }),
     });
 };
 

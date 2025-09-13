@@ -2,7 +2,6 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
-    Query,
     Request
 )
 
@@ -10,23 +9,20 @@ from app.core.deps import get_current_user
 from app.models.collection import (
     CollectionCreate,
     Collection,
-    Collections,
     CollectionUpdate,
-    Search,
 )
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
 from typing import Optional
-from math import ceil
 from app.services.redis import cache_response, invalidate_list, bust
 
 router = APIRouter()
 
-@router.get("/all")
+@router.get("/")
 @cache_response(key_prefix="collections", key=lambda request, query: query)
-async def all_collections(request: Request, query: str = "") -> Optional[list[Collection]]:
+async def index(request: Request, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
     """
@@ -39,41 +35,6 @@ async def all_collections(request: Request, query: str = "") -> Optional[list[Co
             ]
         }
     return await db.collection.find_many(where=where_clause, order={"created_at": "desc"})
-
-
-@router.get("/")
-@cache_response(key_prefix="collections")
-async def index(
-    request: Request,
-    query: str = "",
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, le=100),
-) -> Collections:
-    """
-    Retrieve collections with Redis caching.
-    """
-    where_clause = None
-    if query:
-        where_clause = {
-            "OR": [
-                {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
-            ]
-        }
-    collections = await db.collection.find_many(
-        where=where_clause,
-        skip=skip,
-        take=limit,
-        order={"created_at": "desc"},
-    )
-    total = await db.collection.count(where=where_clause)
-    return {
-        "collections":collections,
-        "skip":skip,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
-    }
 
 
 @router.post("/")
@@ -94,7 +55,7 @@ async def create(*, create_data: CollectionCreate) -> Collection:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.get("/slug/{slug}")
+@router.get("/{slug}")
 @cache_response(key_prefix="collection", key=lambda request, slug: slug)
 async def get_by_slug(request: Request, slug: str) -> Collection:
     """
@@ -116,7 +77,7 @@ async def update(
     update_data: CollectionUpdate,
 ) -> Collection:
     """
-    Update a collection and invalidate cache.
+    Update a collection.
     """
     existing = await db.collection.find_unique(
         where={"id": id}
@@ -156,23 +117,3 @@ async def delete(id: int) -> Message:
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-@router.get("/autocomplete/")
-@cache_response(key_prefix="collections")
-async def autocomplete(search: str = "") -> Search:
-    """
-    Retrieve collections for autocomplete.
-    """
-    where_clause = None
-    if search:
-        where_clause = {
-            "OR": [
-                {"name": {"contains": search, "mode": "insensitive"}},
-                {"slug": {"contains": search, "mode": "insensitive"}}
-            ]
-        }
-    collections = await db.collection.find_many(
-        where=where_clause,
-        order={"created_at": "desc"},
-    )
-    return Search(results=collections)

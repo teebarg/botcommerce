@@ -248,6 +248,8 @@ async def search(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
+    show_suggestions: bool = Query(default=False),
+    show_facets: bool = Query(default=False),
 ) -> SearchProducts:
     """
     Retrieve products using Meilisearch, sorted by latest.
@@ -273,8 +275,10 @@ async def search(
         "limit": limit,
         "offset": skip,
         "sort": [sort],
-        "facets": ["category_slugs", "collection_slugs", "sizes", "colors"],
     }
+
+    if show_facets:
+        search_params["facets"] = ["category_slugs", "collection_slugs", "sizes", "colors"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
@@ -287,16 +291,18 @@ async def search(
                 **search_params
             }
         )
-        suggestions_raw = index.search(
-            search,
-            {
-                "limit": 4,
-                "attributesToRetrieve": ["name"],
-                "matchingStrategy": "all"
-            }
-        )
-        suggestions = list(
-            {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+        suggestions = []
+        if show_suggestions:
+            suggestions_raw = index.search(
+                search,
+                {
+                    "limit": 4,
+                    "attributesToRetrieve": ["name"],
+                    "matchingStrategy": "all"
+                }
+            )
+            suggestions = list(
+                {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
 
     except MeilisearchApiError as e:
         error_code = getattr(e, "code", None)
@@ -311,16 +317,18 @@ async def search(
                     **search_params
                 }
             )
-            suggestions_raw = index.search(
-                search,
-                {
-                    "limit": 4,
-                    "attributesToRetrieve": ["name"],
-                    "matchingStrategy": "all"
-                }
-            )
-            suggestions = list(
-                {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
+            suggestions = []
+            if show_suggestions:
+                suggestions_raw = index.search(
+                    search,
+                    {
+                        "limit": 4,
+                        "attributesToRetrieve": ["name"],
+                        "matchingStrategy": "all"
+                    }
+                )
+                suggestions = list(
+                    {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
 
         logger.error(f"Meilisearch error: {e}")
         raise HTTPException(status_code=502, detail="Search service temporarily unavailable")

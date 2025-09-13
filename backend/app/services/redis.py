@@ -11,7 +11,7 @@ from app.redis_client import redis_client
 from app.core.logging import logger
 import json
 
-DEFAULT_EXPIRATION = int(timedelta(hours=24).total_seconds())
+DEFAULT_EXPIRATION = int(timedelta(days=7).total_seconds())
 
 def handle_redis_errors(default: Any = None):
     def decorator(func: Callable):
