@@ -300,6 +300,31 @@ export const useDeleteGalleryImage = () => {
     });
 };
 
+export const useBulkDeleteGalleryImages = () => {
+    return useMutation({
+        mutationFn: async ({ imageIds }: { imageIds: number[] }) => await api.post<Message>(`/product/images/bulk-delete`, { files: imageIds }),
+        onSuccess: () => {
+            toast.success("Bulk delete started");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to start bulk delete");
+        },
+    });
+};
+
+export const useBulkProductUpdate = () => {
+    return useMutation({
+        mutationFn: async ({ imageIds, input }: { imageIds: number[]; input: any }) =>
+            await api.patch<Message>("/product/gallery/bulk-update", { image_ids: imageIds, data: input }),
+        onSuccess: () => {
+            toast.success("Bulk metadata started");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to start bulk metadata");
+        },
+    });
+};
+
 export const useReorderImages = () => {
     return useMutation({
         mutationFn: async ({ id, imageIds }: { id: number; imageIds: number[] }) =>

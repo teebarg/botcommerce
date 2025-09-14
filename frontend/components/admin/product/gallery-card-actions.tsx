@@ -13,7 +13,6 @@ import Overlay from "@/components/overlay";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useDeleteGalleryImage } from "@/lib/hooks/useProduct";
-import { ImageDownloadButton } from "@/components/store/image-download";
 
 type GalleryImage = ProductImage & {
     product: Product;
@@ -51,7 +50,6 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
             >
                 <ProductSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
             </Overlay>
-            <ImageDownloadButton fallbackName={image.product?.slug} url={image.image} />
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
                     <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">

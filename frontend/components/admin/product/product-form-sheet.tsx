@@ -14,6 +14,7 @@ import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useP
 import { Textarea } from "@/components/ui/textarea";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ImageDownloadButton } from "@/components/store/image-download";
 
 type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" | "collections"> & {
     categories: { value: number; label: string }[];
@@ -89,6 +90,8 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                 <h2 className="text-xl font-semibold text-card-foreground">Product Details</h2>
                 <p className="text-muted-foreground">Provide essential information about your product that customers will see.</p>
             </div>
+
+            {currentProduct && <ImageDownloadButton fallbackName={currentProduct.slug} url={currentProduct.image} />}
 
             <div className="grid gap-6">
                 <Card className="p-4 bg-card shadow-sm">
