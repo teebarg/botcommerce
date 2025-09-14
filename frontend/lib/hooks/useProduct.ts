@@ -13,6 +13,8 @@ type SearchParams = {
     skip?: number;
     limit?: number;
     sort?: string;
+    show_facets?: boolean;
+    show_suggestions?: boolean;
 };
 
 export const useProductSearch = (params: SearchParams) => {
