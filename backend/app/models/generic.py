@@ -44,3 +44,6 @@ class ImageUpload(BaseModel):
     file: str  # Base64 encoded file
     file_name: str
     content_type: str
+
+class ImageBulkDelete(BaseModel):
+    files: list[int]

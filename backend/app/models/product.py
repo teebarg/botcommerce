@@ -115,3 +115,19 @@ class ProductBulkImages(BaseModel):
 
 class ProductImageMetadata(ProductCreate):
     variants: Optional[List[VariantWithStatus]] = None
+
+class ImageMetadata(BaseModel):
+    category_ids: Optional[List[int]] = None
+    collection_ids: Optional[List[int]] = None
+    tag_ids: Optional[List[int]] = None
+    size: Optional[str] = None
+    color: Optional[str] = None
+    measurement: Optional[int] = None
+    inventory: Optional[int] = None
+    active: Optional[bool] = True
+    price: Optional[float] = None
+    old_price: Optional[float] = None
+
+class ImagesBulkUpdate(BaseModel):
+    image_ids: List[int]
+    data: ImageMetadata

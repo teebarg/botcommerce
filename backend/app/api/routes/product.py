@@ -1,4 +1,5 @@
 from typing import Any
+import random
 
 from fastapi import (
     APIRouter,
@@ -15,7 +16,7 @@ from app.core.deps import (
 )
 from app.core.logging import get_logger
 from app.core.utils import slugify, url_to_list, generate_sku
-from app.models.generic import Message, ImageUpload
+from app.models.generic import Message, ImageUpload, ImageBulkDelete
 from app.models.product import (
     ProductCreate,
     ProductUpdate,
@@ -23,7 +24,8 @@ from app.models.product import (
     Product, SearchProducts, SearchProduct,
     ProductCreateBundle,
     ProductBulkImages,
-    ProductImageMetadata
+    ProductImageMetadata,
+    ImagesBulkUpdate
 )
 from app.services.meilisearch import (
     clear_index,
@@ -91,9 +93,6 @@ async def process_image_uploads_background(images: list):
         await manager.broadcast_to_all(
             data={
                 "status": "completed",
-                "successful_uploads": len(created_images),
-                "failed_uploads": len(failed_uploads),
-                "message": f"Image upload job completed. {len(created_images)} successful, {len(failed_uploads)} failed."
             },
             message_type="image_upload"
         )
@@ -105,11 +104,181 @@ async def process_image_uploads_background(images: list):
         await manager.broadcast_to_all(
             data={
                 "status": "failed",
-                "error": str(e),
-                "message": f"Image upload job failed: {str(e)}"
             },
             message_type="image_upload"
         )
+
+
+async def process_bulk_delete_images(image_ids: list[int], images: list):
+    """
+    Process bulk deletion of gallery images.
+    """
+    logger.info(
+        f"Starting bulk delete processing for {len(image_ids)} images...")
+
+    try:
+        deleted_count = 0
+        failed_deletions = []
+        products_to_reindex = set()
+
+        for index, image in enumerate(images):
+            try:
+                await manager.broadcast_to_all(
+                    data={
+                        "status": "processing",
+                        "percent": (index + 1) / len(images) * 100
+                    },
+                    message_type="product_bulk_delete"
+                )
+
+                # Delete from storage if image exists
+                if image.image and "/storage/v1/object/public/product-images/" in image.image:
+                    try:
+                        file_path = image.image.split(
+                            "/storage/v1/object/public/product-images/")[1]
+                        supabase.storage.from_(
+                            "product-images").remove([file_path])
+                    except Exception as storage_error:
+                        logger.warning(
+                            f"Failed to delete from storage: {storage_error}")
+
+                await db.productimage.delete(where={"id": image.id})
+                deleted_count += 1
+
+                if image.product_id:
+                    products_to_reindex.add(image.product_id)
+
+                logger.info(
+                    f"Successfully deleted image {index + 1}/{len(images)}")
+
+            except Exception as e:
+                logger.error(f"Failed to delete image {index + 1}: {str(e)}")
+                failed_deletions.append({
+                    "image_id": image.id,
+                    "error": str(e)
+                })
+
+        for product_id in products_to_reindex:
+            try:
+                await reindex_product(product_id=product_id)
+            except Exception as e:
+                logger.error(
+                    f"Failed to reindex product {product_id}: {str(e)}")
+
+        # Invalidate cache
+        await invalidate_pattern("products:gallery")
+
+        # Broadcast completion status
+        await manager.broadcast_to_all(
+            data={
+                "status": "completed",
+            },
+            message_type="product_bulk_delete"
+        )
+
+        logger.info(
+            f"Bulk delete completed successfully. {deleted_count} deleted, {len(failed_deletions)} failed.")
+
+    except Exception as e:
+        logger.error(f"Error processing bulk delete: {str(e)}")
+        await manager.broadcast_to_all(
+            data={
+                "status": "failed",
+            },
+            message_type="product_bulk_delete"
+        )
+
+
+def build_variant_data(payload) -> dict[str, Any]:
+    data = {}
+    if payload.size is not None:
+        data["size"] = payload.size
+    if payload.color is not None:
+        data["color"] = payload.color
+    if payload.measurement is not None:
+        data["measurement"] = payload.measurement
+    if payload.inventory is not None:
+        data["inventory"] = payload.inventory
+        data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
+    if payload.price is not None:
+        data["price"] = payload.price
+    if payload.old_price is not None:
+        data["old_price"] = payload.old_price
+    return data
+
+
+def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any]:
+    data: dict[str, Any] = {}
+    if category_ids:
+        data["categories"] = {"connect": [{"id": id} for id in category_ids]}
+    if collection_ids:
+        data["collections"] = {"connect": [{"id": id} for id in collection_ids]}
+    return data
+
+
+async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
+    product_to_reindex: list[int] = []
+
+    async with db.tx() as tx:
+        for index, image in enumerate(images):
+            await manager.broadcast_to_all(
+                data={
+                    "status": "processing",
+                    "percent": (index + 1) / len(images) * 100,
+                },
+                message_type="product_bulk_update"
+            )
+            if image.product_id is None:
+                name = f"{random.choice(['Classic','Premium','Superior','Deluxe','Luxury'])} {random.randint(100, 999)}"
+                product_data: dict[str, Any] = {
+                    "name": name,
+                    "slug": slugify(name),
+                    "sku": generate_sku(),
+                    "active": payload.data.active,
+                    **build_relation_data(payload.data.category_ids, payload.data.collection_ids),
+                }
+                product = await tx.product.create(data=product_data)
+
+                await tx.productimage.update(
+                    where={"id": image.id},
+                    data={"product": {"connect": {"id": product.id}}},
+                )
+
+                variant_data = {"sku": generate_sku(), "product_id": product.id, **build_variant_data(payload.data)}
+                await tx.productvariant.create(data=variant_data)
+
+                product_to_reindex.append(product.id)
+
+            else:
+                relation_updates: dict[str, Any] = {}
+                if payload.data.category_ids:
+                    relation_updates["categories"] = {"set": [{"id": id} for id in payload.data.category_ids]}
+                if payload.data.collection_ids:
+                    relation_updates["collections"] = {"set": [{"id": id} for id in payload.data.collection_ids]}
+
+                if relation_updates:
+                    await tx.product.update(where={"id": image.product_id}, data=relation_updates)
+
+                variant_data = build_variant_data(payload.data)
+                if variant_data and image.product.variants:
+                    await tx.productvariant.update(
+                        where={"id": image.product.variants[0].id},
+                        data=variant_data,
+                    )
+
+                product_to_reindex.append(image.product_id)
+
+    await manager.broadcast_to_all(
+        data={
+            "status": "completed",
+        },
+        message_type="product_bulk_update"
+    )
+
+    # enqueue reindex in bulk
+    for product_id in set(product_to_reindex):
+        await reindex_product(product_id=product_id)
+
 
 router = APIRouter()
 
@@ -1007,6 +1176,45 @@ async def upload_product_images(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/images/bulk-delete")
+async def bulk_delete_gallery_images(
+    payload: ImageBulkDelete,
+    background_tasks: BackgroundTasks,
+):
+    """
+    Bulk delete gallery images.
+    """
+    print(payload)
+    try:
+        if not payload.files:
+            raise HTTPException(
+                status_code=400, detail="No image IDs provided")
+
+        # Get images to delete
+        images = await db.productimage.find_many(
+            where={"id": {"in": payload.files}},
+            include={"product": True}
+        )
+
+        if not images:
+            raise HTTPException(status_code=404, detail="No images found")
+
+        background_tasks.add_task(
+            process_bulk_delete_images,
+            image_ids=payload.files,
+            images=images
+        )
+
+        return {
+            "success": True,
+            "message": f"Bulk delete job started. Processing {len(payload.files)} images in background."
+        }
+
+    except Exception as e:
+        logger.error(f"Error starting bulk delete job: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.post("/{image_id}/metadata")
 async def create_image_metadata(
     image_id: int,
@@ -1168,3 +1376,18 @@ async def update_image_metadata(
         except Exception as e:
             logger.error(e)
             raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.patch("/gallery/bulk-update")
+async def bulk_update_products(payload: ImagesBulkUpdate, background_tasks: BackgroundTasks):
+    images = await db.productimage.find_many(
+        where={"id": {"in": payload.image_ids}},
+        include={"product": {"include": {"variants": True}}},
+    )
+
+    if not images or len(images) != len(payload.image_ids):
+        raise HTTPException(status_code=404, detail="Some images not found")
+
+    background_tasks.add_task(handle_bulk_update_products, payload, images)
+
+    return {"message": "Products update started"}

@@ -319,6 +319,7 @@
     --shadow-luxury: 0 25px 50px -12px hsl(var(--luxury) / 0.25);
     --shadow-accent: 0 10px 30px -10px var(--accent) / 0.3;
     --shadow-elegant: 0 4px 20px -4px hsl(20 14.3% 4.1% / 0.1);
+    --shadow-floating: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
     --sidebar: hsl(0 0% 98%);
     --sidebar-foreground: hsl(240 5.3% 26.1%);
     --sidebar-primary: hsl(240 5.9% 10%);

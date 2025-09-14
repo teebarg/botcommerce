@@ -7,6 +7,7 @@ import { GalleryCardActions } from "./gallery-card-actions";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Collection, Product, ProductImage, ProductVariant } from "@/schemas";
 import Overlay from "@/components/overlay";
@@ -20,21 +21,29 @@ type GalleryImage = ProductImage & {
 interface GalleryCardProps {
     image: GalleryImage;
     onClick?: () => void;
+    isSelected?: boolean;
+    onSelectionChange?: (imageId: number, selected: boolean) => void;
+    selectionMode?: boolean;
 }
 
-export function GalleryCard({ image, onClick }: GalleryCardProps) {
+export function GalleryCard({ image, onClick, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const { product } = image;
     const imgState = useOverlayTriggerState({});
     const { outOfStock } = useProductVariant(product);
 
+    const handleSelectionChange = (checked: boolean) => {
+        onSelectionChange?.(image.id, checked);
+    };
+
     return (
         <Card
             className={cn(
                 "group relative overflow-hidden border-0 bg-gradient-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
-                image.product?.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500"
+                image.product?.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
+                isSelected && "ring-2 ring-indigo-500 ring-offset-2"
             )}
-            onClick={onClick}
+            onClick={selectionMode ? undefined : onClick}
         >
             <CardContent className="p-0 md:p-0">
                 <div className="relative aspect-product overflow-hidden">
@@ -63,8 +72,14 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
                         </div>
                     )}
 
+                    {selectionMode && (
+                        <div className="absolute top-2 left-2 z-10">
+                            <Checkbox checked={isSelected} onCheckedChange={handleSelectionChange} />
+                        </div>
+                    )}
+
                     <div className="absolute inset-0 bg-black/20 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <GalleryCardActions image={image} />
+                        {!selectionMode && <GalleryCardActions image={image} />}
                     </div>
 
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
@@ -84,6 +99,10 @@ export function GalleryCard({ image, onClick }: GalleryCardProps) {
 
                     <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
                         {outOfStock && <Badge variant="destructive">Out of stock</Badge>}
+                    </div>
+
+                    <div className="absolute bottom-2 right-2">
+                        <p className="text-base font-semibold text-blue-800">#{image.id}</p>
                     </div>
 
                     {image.product?.images?.length > 0 && (
