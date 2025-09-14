@@ -13,6 +13,7 @@ import { useImageGalleryInfinite } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useWebSocket } from "@/providers/websocket";
 
 interface ProductImage {
     id: string;
@@ -25,6 +26,19 @@ export function ProductImageGallery() {
     const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(12);
     const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { currentMessage, messages } = useWebSocket();
+
+    useEffect(() => {
+        if (!currentMessage) return;
+        if (currentMessage?.type === "image_upload" && currentMessage?.status === "completed") {
+            toast.success("Products uploaded successfully");
+            setIsLoading(false);
+        }
+
+        if (currentMessage?.type === "image_upload" && currentMessage?.status === "processing" && !isLoading) {
+            setIsLoading(true);
+        }
+    }, [currentMessage?.percent, currentMessage?.status, messages]);
 
     useEffect(() => {
         if (!sentinelRef.current) return;
@@ -71,10 +85,9 @@ export function ProductImageGallery() {
 
             await api.post("/product/images/upload", payload);
 
-            toast.success("Images uploaded successfully");
+            toast.success("Images upload started");
         } catch (error: any) {
             toast.error(error?.message || "Failed to upload images");
-        } finally {
             setIsLoading(false);
         }
     };

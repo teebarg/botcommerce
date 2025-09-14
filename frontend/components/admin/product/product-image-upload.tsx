@@ -16,7 +16,7 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ images, onImagesChange, isLoading = false, showUploadArea = true }: ImageUploadProps) {
-    const [isDragOver, setIsDragOver] = useState(false);
+    const [isDragOver, setIsDragOver] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -72,13 +72,12 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
             <Card
                 className={cn(
                     "border-2 border-dashed transition-all duration-smooth cursor-pointer hover:border-primary/50",
-                    isDragOver ? "border-primary bg-accent/50 scale-[1.02]" : "border-border",
-                    "bg-gradient-card"
+                    isDragOver ? "border-primary bg-accent/50 scale-[1.02]" : "border-border"
                 )}
-                onClick={openFileDialog}
+                onClick={isLoading ? undefined : openFileDialog}
                 onDragLeave={handleDragLeave}
                 onDragOver={handleDragOver}
-                onDrop={handleDrop}
+                onDrop={isLoading ? undefined : handleDrop}
             >
                 <div className="px-8 py-4 text-center">
                     <div className="flex justify-center mb-4">
@@ -94,9 +93,12 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                     </Button>
                     <p className="text-xs text-muted-foreground mt-2">Supports JPG, PNG, WebP up to 5MB each</p>
                     {isLoading && (
-                        <div className="mb-4">
+                        <div className="mb-4 mt-2">
                             <div className="w-full bg-default-200 rounded-full h-2.5">
-                                <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />
+                                <div
+                                    className="bg-blue-500 h-2.5 rounded-full transition-all duration-200 animate-pulse"
+                                    style={{ width: `${52}%` }}
+                                />
                             </div>
                             <p className="text-sm text-blue-500 mt-1">Uploading...</p>
                         </div>
@@ -104,7 +106,7 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                 </div>
             </Card>
 
-            <input ref={fileInputRef} multiple accept="image/*" className="hidden" type="file" onChange={handleFileSelect} />
+            <input ref={fileInputRef} multiple accept="image/*" className="hidden" disabled={isLoading} type="file" onChange={handleFileSelect} />
             <div className={cn(!showUploadArea && "hidden")}>
                 {images.length > 0 && (
                     <div>

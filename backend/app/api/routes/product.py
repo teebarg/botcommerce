@@ -44,10 +44,75 @@ from meilisearch.errors import MeilisearchApiError
 from app.services.popular_products import PopularProductsService
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
+from app.core.storage import upload
 
 logger = get_logger(__name__)
 
+
+async def process_image_uploads_background(images: list):
+    """
+    Process image uploads.
+    """
+    logger.info(f"Starting image upload processing...")
+
+    try:
+        created_images = []
+        failed_uploads = []
+
+        for index, img_data in enumerate(images):
+            await manager.broadcast_to_all(
+                data={
+                    "status": "processing",
+                    "percent": (index + 1) / len(images) * 100,
+                },
+                message_type="image_upload"
+            )
+            try:
+                image_url = upload(bucket="product-images", data=img_data)
+                created_images.append({
+                    "image": image_url,
+                    "order": 0,
+                })
+                logger.info(
+                    f"Successfully uploaded image {index + 1}/{len(images)}")
+            except Exception as e:
+                logger.error(f"Failed to upload image {index + 1}: {str(e)}")
+                failed_uploads.append({
+                    "index": index,
+                    "error": str(e)
+                })
+
+        if created_images:
+            await db.productimage.create_many(data=created_images)
+            logger.info(f"Saved {len(created_images)} images to database")
+
+        await invalidate_pattern("products:gallery")
+
+        await manager.broadcast_to_all(
+            data={
+                "status": "completed",
+                "successful_uploads": len(created_images),
+                "failed_uploads": len(failed_uploads),
+                "message": f"Image upload job completed. {len(created_images)} successful, {len(failed_uploads)} failed."
+            },
+            message_type="image_upload"
+        )
+
+        logger.info(f"Image upload completed successfully")
+
+    except Exception as e:
+        logger.error(f"Error processing image upload job: {str(e)}")
+        await manager.broadcast_to_all(
+            data={
+                "status": "failed",
+                "error": str(e),
+                "message": f"Image upload job failed: {str(e)}"
+            },
+            message_type="image_upload"
+        )
+
 router = APIRouter()
+
 
 @router.get("/popular")
 async def get_popular_products(
@@ -60,7 +125,7 @@ async def get_popular_products(
 
 
 @router.get("/gallery")
-@cache_response("products:gallery", key=lambda request, skip, limit, **kwargs: f"{skip}:{limit}")
+@cache_response("products:gallery")
 async def image_gallery(request: Request, skip: int = Query(default=0), limit: int = Query(default=10)):
     """
     Upload one or more product images.
@@ -73,7 +138,7 @@ async def image_gallery(request: Request, skip: int = Query(default=0), limit: i
             where=where_clause,
             skip=skip,
             take=limit,
-            order={"created_at": "desc"},
+            order={"id": "desc"},
             include={
                 "product": {
                     "include": {
@@ -168,7 +233,8 @@ async def public_search(
     except MeilisearchApiError as e:
         error_code = getattr(e, "code", None)
         if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+            logger.warning(
+                f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
 
             ensure_index_ready(index)
 
@@ -181,7 +247,8 @@ async def public_search(
             return retry_results["hits"]
 
         logger.error(f"Meilisearch error: {e}")
-        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
+        raise HTTPException(
+            status_code=502, detail="Search service temporarily unavailable")
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -237,7 +304,8 @@ async def search(
     }
 
     if show_facets:
-        search_params["facets"] = ["category_slugs", "collection_slugs", "sizes", "colors"]
+        search_params["facets"] = ["category_slugs",
+                                   "collection_slugs", "sizes", "colors"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
@@ -266,7 +334,8 @@ async def search(
     except MeilisearchApiError as e:
         error_code = getattr(e, "code", None)
         if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+            logger.warning(
+                f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
 
             ensure_index_ready(index)
 
@@ -290,7 +359,8 @@ async def search(
                     {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit})
 
         logger.error(f"Meilisearch error: {e}")
-        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
+        raise HTTPException(
+            status_code=502, detail="Search service temporarily unavailable")
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -544,7 +614,8 @@ async def delete_product(id: int) -> Message:
     async with db.tx() as tx:
         try:
             images = await tx.productimage.find_many(where={"product_id": id})
-            paths = [image.image.split("/storage/v1/object/public/product-images/")[1] for image in images]
+            paths = [image.image.split(
+                "/storage/v1/object/public/product-images/")[1] for image in images]
             if paths:
                 supabase.storage.from_("product-images").remove(paths)
 
@@ -627,7 +698,8 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
             where={"id": variant_id},
             data=update_data,
         )
-        background_tasks.add_task(reindex_product, product_id=existing_variant.product_id)
+        background_tasks.add_task(
+            reindex_product, product_id=existing_variant.product_id)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
@@ -640,7 +712,8 @@ async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
     try:
         variant = await db.productvariant.delete(where={"id": variant_id})
 
-        background_tasks.add_task(reindex_product, product_id=variant.product_id)
+        background_tasks.add_task(
+            reindex_product, product_id=variant.product_id)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
@@ -765,7 +838,6 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
         return {"success": True}
 
 
-
 @router.delete("/gallery/{image_id}")
 async def delete_gallery_image(image_id: int) -> Message:
     """
@@ -778,7 +850,8 @@ async def delete_gallery_image(image_id: int) -> Message:
         raise HTTPException(status_code=404, detail="Image not found")
 
     if not image.product_id:
-        file_path = image.image.split("/storage/v1/object/public/product-images/")[1]
+        file_path = image.image.split(
+            "/storage/v1/object/public/product-images/")[1]
         supabase.storage.from_("product-images").remove([file_path])
         await db.productimage.delete(where={"id": image_id})
         await invalidate_list("products:gallery")
@@ -911,37 +984,26 @@ async def reorder_images(id: int, image_ids: list[int]):
 
 
 @router.post("/images/upload")
-async def upload_product_images(payload: ProductBulkImages):
+async def upload_product_images(
+    payload: ProductBulkImages,
+    background_tasks: BackgroundTasks,
+):
     """
-    Upload one or more product images to gallery.
+    Upload one or more product images to gallery using background task.
     """
     try:
-        created_images = []
-        for index, img in enumerate(payload.images):
-            try:
-                image_url = upload(bucket="product-images", data=img)
-                created_images.append({
-                    "image": image_url,
-                    "order": 0,
-                })
-            except Exception as e:
-                logger.error(e)
-                raise HTTPException(
-                    status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
+        background_tasks.add_task(
+            process_image_uploads_background,
+            images=payload.images,
+        )
 
-        if created_images:
-            await db.productimage.create_many(data=created_images)
+        return {
+            "success": True,
+            "message": f"Image upload job started. Processing {len(payload.images)} images in background."
+        }
 
-        await invalidate_pattern("products:gallery")
-
-        return {"success": True}
-    except UniqueViolationError:
-        raise HTTPException(
-            status_code=400, detail="Product with this name already exists")
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.error(e)
+        logger.error(f"Error starting image upload job: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

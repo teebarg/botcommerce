@@ -76,7 +76,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                     queryClient.invalidateQueries({ queryKey: keys });
                 }
 
-                setMessages((prev) => [...prev, data]);
+                setMessages((prev) => [data, ...prev]);
                 setCurrentMessage(data);
             };
 

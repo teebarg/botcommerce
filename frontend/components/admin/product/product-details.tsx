@@ -24,12 +24,11 @@ export function ProductDetails() {
     const { data: collections } = useCollections();
     const searchParams = useSearchParams();
     const query = searchParams.get("search") || "";
-    const collectionsParam = searchParams.get("collections") || "";
 
     const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProductInfiniteSearch({
         search: query,
+        skip: 0,
         limit: LIMIT,
-        collections: collectionsParam,
     });
 
     const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
