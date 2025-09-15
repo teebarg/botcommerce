@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, Depends, Backgroun
 from typing import List
 from app.models.collection import (
     SharedCollections, SharedCollectionCreate, SharedCollectionUpdate,
-    SharedCollection, SharedCollectionView, Catalog
+    SharedCollection, SharedCollectionView, Catalog, SharedCollectionBulkAdd
 )
 from app.prisma_client import prisma as db
 from app.services.shared_collection import SharedCollectionService
@@ -325,3 +325,27 @@ async def remove_product_from_shared_collection(id: int, product_id: int, backgr
     background_tasks.add_task(reindex_catalog, product_id=product_id)
 
     return {"message": "Product removed from collection successfully"}
+
+
+@router.post("/{id}/add-products", dependencies=[Depends(get_current_superuser)])
+async def bulk_add_products_to_shared_collection(id: int, data: SharedCollectionBulkAdd, background_tasks: BackgroundTasks) -> Message:
+    """Bulk add products to a shared collection"""
+    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
+    if not shared_collection:
+        raise HTTPException(status_code=404, detail="SharedCollection not found")
+
+    if not data.product_ids:
+        raise HTTPException(status_code=400, detail="No product_ids provided")
+
+    # Connect many products at once
+    await db.sharedcollection.update(
+        where={"id": id},
+        data={"products": {"connect": [{"id": pid} for pid in data.product_ids]}}
+    )
+
+    # Reindex all a bit later; enqueue per product
+    for pid in data.product_ids:
+        background_tasks.add_task(reindex_catalog, product_id=pid)
+
+    await invalidate_catalog()
+    return {"message": f"Added {len(data.product_ids)} product(s) to collection"}

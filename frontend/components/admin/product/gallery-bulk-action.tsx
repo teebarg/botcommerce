@@ -1,7 +1,8 @@
-import { Trash2, Edit3, X } from "lucide-react";
+import { Trash2, Edit3, X, Grid2x2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { BulkProductSheetForm } from "./bulk-product-form-sheet";
+import { CatalogBulkProductUpdate } from "./bulk-product-catalog-update";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,13 +11,22 @@ import Overlay from "@/components/overlay";
 interface ProductBulkActionsProps {
     selectedCount: number;
     selectedImageIds: number[];
+    selectedProductIds?: number[];
     onDelete?: () => void;
     onClearSelection: () => void;
     isLoading?: boolean;
 }
 
-export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, onClearSelection, isLoading }: ProductBulkActionsProps) => {
+export const ProductBulkActions = ({
+    selectedCount,
+    selectedImageIds,
+    selectedProductIds = [],
+    onDelete,
+    onClearSelection,
+    isLoading,
+}: ProductBulkActionsProps) => {
     const editState = useOverlayTriggerState({});
+    const addToSharedState = useOverlayTriggerState({});
 
     if (selectedCount === 0) return null;
 
@@ -40,6 +50,25 @@ export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, 
                     onOpenChange={editState.setOpen}
                 >
                     <BulkProductSheetForm imageIds={selectedImageIds} onClose={editState.close} />
+                </Overlay>
+
+                <Overlay
+                    open={addToSharedState.isOpen}
+                    sheetClassName="min-w-[40vw]"
+                    title="Add to Shared Collection"
+                    trigger={
+                        <Button className="h-8 px-2 sm:px-3" disabled={isLoading} size="sm" variant="ghost" onClick={addToSharedState.open}>
+                            <Grid2x2 className="h-5 w-5 sm:mr-1" />
+                            <span className="hidden sm:inline">Add to Slate</span>
+                        </Button>
+                    }
+                    onOpenChange={addToSharedState.setOpen}
+                >
+                    <CatalogBulkProductUpdate
+                        selectedCount={selectedCount}
+                        selectedImageIds={selectedImageIds}
+                        selectedProductIds={selectedProductIds}
+                    />
                 </Overlay>
 
                 {/* <Button className="h-8 px-2 sm:px-3" size="sm" variant="ghost" onClick={onDownload}>

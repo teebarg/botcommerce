@@ -209,6 +209,16 @@ export function ProductImageGallery() {
                     <ProductBulkActions
                         selectedCount={selectedImages.size}
                         selectedImageIds={Array.from(selectedImages)}
+                        selectedProductIds={(() => {
+                            const ids = new Set<number>();
+                            const all = data?.pages?.flatMap((p) => p.images) || [];
+
+                            for (const img of all) {
+                                if (selectedImages.has(img.id) && img.product_id) ids.add(img.product_id);
+                            }
+
+                            return Array.from(ids);
+                        })()}
                         onClearSelection={() => setSelectedImages(new Set())}
                         onDelete={handleBulkDelete}
                     />

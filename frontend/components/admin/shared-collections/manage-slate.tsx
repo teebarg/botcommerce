@@ -36,7 +36,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
             title="Manage Shared Collection"
             trigger={
                 <Button size="sm" variant="indigo">
-                    Manage Slate
+                    Catalogs
                 </Button>
             }
             onOpenChange={state.setOpen}

@@ -69,6 +69,10 @@ class SharedCollectionUpdate(BaseModel):
     is_active: bool | None = None
     products: list[int] | None = None
 
+
+class SharedCollectionBulkAdd(BaseModel):
+    product_ids: list[int]
+
 class SharedCollectionViewBase(BM):
     shared_collection_id: int
     user_id: int | None = None
