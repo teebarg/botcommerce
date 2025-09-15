@@ -170,7 +170,7 @@ export function ProductImageGallery() {
                 <ComponentLoader />
             ) : (
                 <div>
-                    <div className="lg:hidden mb-4 sticky top-16 z-50 bg-content2 -mx-4 px-4 py-4 flex gap-2">
+                    <div className="lg:hidden mb-4 sticky top-16 z-40 bg-content2 -mx-4 px-4 py-4 flex gap-2">
                         <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 w-1/2">
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}>
                                 <Button size="iconOnly" onClick={() => setViewMode("grid")}>

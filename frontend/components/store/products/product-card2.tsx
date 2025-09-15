@@ -15,10 +15,17 @@ import { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ImageDownloadButton } from "@/components/store/image-download";
+import { CldImage } from "next-cloudinary";
 
 interface ProductCardProps {
     product: ProductSearch;
 }
+
+const cloudinaryFetchUrl = (supabaseUrl: string) => {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const encodedUrl = encodeURIComponent(supabaseUrl);
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/${encodedUrl}`;
+};
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
@@ -39,14 +46,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             trigger={
                 <div className="group relative bg-content1 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
                     <div className="relative aspect-[3/4] overflow-hidden">
-                        <Image
+                        <CldImage
+                            width="960"
+                            height="600"
+                            src={cloudinaryFetchUrl(product.sorted_images?.[0] || "/placeholder.jpg")}
+                            sizes="100vw"
+                            alt={product.name}
+                        />
+                        {/* <CldImage
+                            width="960"
+                            height="600"
+                            src={cloudinaryFetchUrl(product.sorted_images?.[0] || "/placeholder.jpg")}
+                            sizes="100vw"
+                            alt={product.name}
+                        /> */}
+                        {/* <Image
                             fill
                             alt={product.name}
                             className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             src={product.sorted_images?.[0] || "/placeholder.jpg"}
                             onLoad={() => setImageLoaded(true)}
-                        />
+                        /> */}
 
                         {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
