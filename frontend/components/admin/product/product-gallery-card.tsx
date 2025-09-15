@@ -72,11 +72,14 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                         </div>
                     )}
 
-                    {selectionMode && (
-                        <div className="absolute top-2 left-2 z-10">
-                            <Checkbox checked={isSelected} onCheckedChange={handleSelectionChange} />
-                        </div>
-                    )}
+                    <div
+                        className={cn(
+                            "absolute top-2 left-2 z-10 opacity-0 lg:opacity-100 transition-opacity duration-300",
+                            selectionMode ? "opacity-100" : ""
+                        )}
+                    >
+                        <Checkbox checked={isSelected} onCheckedChange={handleSelectionChange} />
+                    </div>
 
                     <div className="absolute inset-0 bg-black/20 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                         {!selectionMode && <GalleryCardActions image={image} />}

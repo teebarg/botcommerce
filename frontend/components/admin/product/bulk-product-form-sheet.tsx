@@ -99,7 +99,6 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
     const handleSubmit = () => {
         const input: any = {};
 
-        // Only include fields that are selected
         if (selectedFields.has("categories")) {
             input.category_ids = product.categories?.map((c) => c.value) || [];
         }
@@ -132,15 +131,14 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
     };
 
     return (
-        <div className="space-y-4 px-4 pt-8 overflow-y-auto">
+        <div className="space-y-4 px-4 pt-8 min-h-[calc(100vh-5rem)] overflow-y-auto">
             <h2 className="text-xl font-semibold text-card-foreground">Bulk Product Details</h2>
 
-            {/* Field Selection Controls */}
             <Card className="p-4 bg-muted/50">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <Settings className="w-4 h-4 text-primary" />
-                        <Label className="text-sm font-medium">Select Fields to Update</Label>
+                        <Label className="text-sm font-medium">Select Fields</Label>
                     </div>
                     <div className="flex gap-2">
                         <Button

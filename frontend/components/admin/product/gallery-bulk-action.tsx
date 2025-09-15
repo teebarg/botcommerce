@@ -21,7 +21,7 @@ export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, 
     if (selectedCount === 0) return null;
 
     return (
-        <div className="bulk-actions animate-slide-up fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-card border border-border rounded-full px-6 py-2 flex items-center gap-2 transition-all duration-300 max-w-[calc(100vw-10rem)] w-auto">
+        <div className="animate-slide-up fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-card border border-border rounded-full px-6 py-3 flex items-center gap-2 transition-all duration-300 max-w-90vw w-auto">
             <Badge className="mr-2 text-sm whitespace-nowrap" variant="indigo">
                 {selectedCount} selected
             </Badge>
