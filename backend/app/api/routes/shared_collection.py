@@ -138,7 +138,7 @@ async def search(
         where["is_active"] = True
     obj = await db.sharedcollection.find_unique(where=where)
     if not obj:
-        raise HTTPException(status_code=404, detail="SharedCollection not found")
+        raise HTTPException(status_code=404, detail="Catalog not found")
 
     filters = [f"catalogs_slugs IN [{slug}]"]
     if categories:
@@ -216,7 +216,7 @@ async def track_shared_collection_visit(
     user: UserDep,
 ) -> dict:
     """
-    Track a unique visit to a shared collection.
+    Track a unique visit to a catalog.
     """
     where = {"slug": slug}
     if user is None or user.role != "ADMIN":
@@ -264,7 +264,7 @@ async def create_shared_collection(data: SharedCollectionCreate):
 async def update_shared_collection(id: int, data: SharedCollectionUpdate):
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
-        raise HTTPException(status_code=404, detail="SharedCollection not found")
+        raise HTTPException(status_code=404, detail="Catalog not found")
 
     update_data = data.model_dump(exclude_unset=True)
     if data.products is not None:
@@ -280,18 +280,18 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate):
 async def delete_shared_collection(id: int) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
-        raise HTTPException(status_code=404, detail="SharedCollection not found")
+        raise HTTPException(status_code=404, detail="Catalog not found")
     await db.sharedcollection.delete(where={"id": id})
 
     await invalidate_catalog()
-    return {"message": "SharedCollection deleted successfully"}
+    return {"message": "Catalog deleted successfully"}
 
 @router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])
 async def add_product_to_shared_collection(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
-    """Add a product to a shared collection"""
+    """Add a product to a catalog"""
     shared_collection = await db.sharedcollection.find_unique(where={"id": id})
     if not shared_collection:
-        raise HTTPException(status_code=404, detail="SharedCollection not found")
+        raise HTTPException(status_code=404, detail="Catalog not found")
 
     product = await db.product.find_unique(where={"id": product_id})
     if not product:
@@ -304,14 +304,14 @@ async def add_product_to_shared_collection(id: int, product_id: int, background_
 
     background_tasks.add_task(reindex_catalog, product_id=product_id)
 
-    return {"message": "Product added to collection successfully"}
+    return {"message": "Product added to catalog successfully"}
 
 @router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(get_current_superuser)])
 async def remove_product_from_shared_collection(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
-    """Remove a product from a shared collection"""
+    """Remove a product from a catalog"""
     shared_collection = await db.sharedcollection.find_unique(where={"id": id})
     if not shared_collection:
-        raise HTTPException(status_code=404, detail="SharedCollection not found")
+        raise HTTPException(status_code=404, detail="Catalog not found")
 
     await db.sharedcollection.update(
         where={"id": id},
@@ -329,23 +329,20 @@ async def remove_product_from_shared_collection(id: int, product_id: int, backgr
 
 @router.post("/{id}/add-products", dependencies=[Depends(get_current_superuser)])
 async def bulk_add_products_to_shared_collection(id: int, data: SharedCollectionBulkAdd, background_tasks: BackgroundTasks) -> Message:
-    """Bulk add products to a shared collection"""
+    """Bulk add products to a catalog"""
     shared_collection = await db.sharedcollection.find_unique(where={"id": id})
     if not shared_collection:
-        raise HTTPException(status_code=404, detail="SharedCollection not found")
+        raise HTTPException(status_code=404, detail="Catalog not found")
 
     if not data.product_ids:
         raise HTTPException(status_code=400, detail="No product_ids provided")
 
-    # Connect many products at once
     await db.sharedcollection.update(
         where={"id": id},
         data={"products": {"connect": [{"id": pid} for pid in data.product_ids]}}
     )
 
-    # Reindex all a bit later; enqueue per product
     for pid in data.product_ids:
         background_tasks.add_task(reindex_catalog, product_id=pid)
 
-    await invalidate_catalog()
-    return {"message": f"Added {len(data.product_ids)} product(s) to collection"}
+    return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}

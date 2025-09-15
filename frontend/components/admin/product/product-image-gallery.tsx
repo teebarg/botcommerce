@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useEffect, useRef } from "react";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
@@ -31,6 +31,17 @@ export function ProductImageGallery() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { currentMessage, messages } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
+
+    const selectedProductIds = useMemo(() => {
+        const ids = new Set<number>();
+        const all = data?.pages?.flatMap((p) => p.images) || [];
+
+        for (const img of all) {
+            if (selectedImages.has(img.id) && img.product_id) ids.add(img.product_id);
+        }
+
+        return Array.from(ids);
+    }, [selectedImages]);
 
     useEffect(() => {
         if (!currentMessage) return;
@@ -209,18 +220,10 @@ export function ProductImageGallery() {
                     <ProductBulkActions
                         selectedCount={selectedImages.size}
                         selectedImageIds={Array.from(selectedImages)}
-                        selectedProductIds={(() => {
-                            const ids = new Set<number>();
-                            const all = data?.pages?.flatMap((p) => p.images) || [];
-
-                            for (const img of all) {
-                                if (selectedImages.has(img.id) && img.product_id) ids.add(img.product_id);
-                            }
-
-                            return Array.from(ids);
-                        })()}
+                        selectedProductIds={selectedProductIds}
                         onClearSelection={() => setSelectedImages(new Set())}
                         onDelete={handleBulkDelete}
+                        isLoading={isDeleting}
                     />
                     <div ref={sentinelRef} />
                     {isFetchingNextPage && <ComponentLoader />}

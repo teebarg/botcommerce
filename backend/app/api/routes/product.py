@@ -165,7 +165,6 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
                 logger.error(
                     f"Failed to reindex product {product_id}: {str(e)}")
 
-        # Invalidate cache
         await invalidate_pattern("products:gallery")
 
         # Broadcast completion status

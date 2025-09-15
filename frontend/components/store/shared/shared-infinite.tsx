@@ -48,7 +48,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
     const query = useInfiniteQuery<Catalog>({
         queryKey: ["product", "catalog", slug, JSON.stringify(initialSearchParams)],
         queryFn: async ({ pageParam = 0 }) =>
-            await api.get<Catalog>(`/shared/${slug}`, { params: { skip: pageParam, limit: pageSize, ...initialSearchParams } }),
+            await api.get<Catalog>(`/shared/${slug}`, { params: { skip: pageParam, ...initialSearchParams } }),
         initialPageParam: 0,
         getNextPageParam: (lastPage: Catalog) => {
             const nextSkip = (lastPage.skip || 0) + (lastPage.limit || pageSize);

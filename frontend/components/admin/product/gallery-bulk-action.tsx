@@ -71,11 +71,6 @@ export const ProductBulkActions = ({
                     />
                 </Overlay>
 
-                {/* <Button className="h-8 px-2 sm:px-3" size="sm" variant="ghost" onClick={onDownload}>
-                    <Download className="h-5 w-5 sm:mr-1" />
-                    <span className="hidden sm:inline">Download</span>
-                </Button> */}
-
                 <Button
                     className="h-8 px-2 sm:px-3 text-destructive hover:text-destructive-foreground"
                     disabled={isLoading}

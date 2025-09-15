@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBulkAddProductsToSharedCollection, useSharedCollections } from "@/lib/hooks/useCollection";
+import { Shared } from "@/schemas";
 
 interface CatalogBulkProductUpdateProps {
     selectedCount: number;
@@ -10,14 +11,14 @@ interface CatalogBulkProductUpdateProps {
     selectedProductIds?: number[];
 }
 
-const CatalogItem: React.FC<{ catalog: any; selectedProductIds: number[] }> = ({ catalog, selectedProductIds }) => {
+const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> = ({ catalog, selectedProductIds }) => {
     const { mutateAsync: bulkAddToShared, isPending: isAdding } = useBulkAddProductsToSharedCollection();
 
     return (
         <Card key={catalog.id} className="border">
             <CardHeader className="py-3">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
-                    <span>{catalog.title}</span>
+                    <span>{catalog.title} ({catalog.products_count})</span>
                     <Badge className="text-xs" variant={catalog.is_active ? "emerald" : "destructive"}>
                         {catalog.is_active ? "Active" : "Inactive"}
                     </Badge>
@@ -28,7 +29,7 @@ const CatalogItem: React.FC<{ catalog: any; selectedProductIds: number[] }> = ({
                     disabled={!catalog.is_active || isAdding || selectedProductIds.length === 0}
                     isLoading={isAdding}
                     size="sm"
-                    variant="outline"
+                    variant="indigo"
                     onClick={async () => {
                         await bulkAddToShared({ collectionId: catalog.id, productIds: selectedProductIds });
                     }}

@@ -56,7 +56,7 @@ async def invalidate_list(entity: str):
     cursor = 0
 
     while True:
-        cursor, keys = await redis_client.scan(cursor=cursor, match=pattern, count=100)
+        cursor, keys = await redis_client.scan(cursor=cursor, match=pattern, count=5000)
         if keys:
             await redis_client.delete(*keys)
         if cursor == 0:
@@ -95,6 +95,7 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
 
             result = await func(*args, **kwargs)
             await redis.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
+
             return result
         return wrapper
     return decorator

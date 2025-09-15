@@ -133,10 +133,10 @@ export const useBulkAddProductsToSharedCollection = () => {
         mutationFn: async ({ collectionId, productIds }: { collectionId: number; productIds: number[] }) =>
             await api.post<{ message: string }>(`/shared/${collectionId}/add-products`, { product_ids: productIds }),
         onSuccess: () => {
-            toast.success("Products added to collection successfully");
+            toast.success("Products added to catalog successfully");
         },
         onError: (error) => {
-            toast.error("Failed to add products to collection: " + error);
+            toast.error("Failed to add products to catalog: " + error);
         },
     });
 };

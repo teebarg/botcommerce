@@ -33,7 +33,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     return (
         <Overlay
             open={state.isOpen}
-            title="Manage Shared Collection"
+            title="Manage Catalogs"
             trigger={
                 <Button size="sm" variant="indigo">
                     Catalogs
@@ -43,7 +43,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
         >
             <div className="bg-background overflow-auto">
                 <div className="p-4">
-                    <h3 className="text-lg font-semibold">Manage Shared Collection</h3>
+                    <h3 className="text-lg font-semibold">Manage Catalogs</h3>
                 </div>
 
                 <div className="p-4">
@@ -76,7 +76,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                         ) : sharedCollections?.shared?.length === 0 ? (
                             <p className="text-sm text-muted-foreground">No shared collections available.</p>
                         ) : (
-                            <ScrollArea className="h-[calc(100vh-400px)]">
+                            <ScrollArea className="h-[calc(100vh-250px)]">
                                 <div className="space-y-2">
                                     {sharedCollections?.shared?.map((collection, idx: number) => (
                                         <CollectionItem key={idx} collection={collection} product={product} productId={product.id} />
@@ -157,7 +157,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, productId, 
                             disabled={!collection.is_active || addProductMutation.isPending}
                             isLoading={addProductMutation.isPending}
                             size="sm"
-                            variant="outline"
+                            variant="indigo"
                             onClick={handleAddToCollection}
                         >
                             <Plus className="h-3 w-3 mr-1" />

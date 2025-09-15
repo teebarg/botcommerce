@@ -70,14 +70,21 @@ async def reindex_catalog(product_id: int):
             logger.debug(f"Error re-indexing product {product_id}: {e}")
 
         logger.info(f"Successfully reindexed product {product_id}")
-        for sc in (product.shared_collections or []):
-            await invalidate_list(f"product:catalog:{sc.slug}")
-            await manager.broadcast_to_all(
-                data={
-                    "key": f"product:catalog:{sc.slug}",
-                },
-                message_type="invalidate",
-            )
+        # for sc in (product.shared_collections or []):
+        #     await invalidate_list(f"product:catalog:{sc.slug}")
+        #     await manager.broadcast_to_all(
+        #         data={
+        #             "key": f"product:catalog:{sc.slug}",
+        #         },
+        #         message_type="invalidate",
+        #     )
+        await invalidate_list(f"product:catalog")
+        await manager.broadcast_to_all(
+            data={
+                "key": f"product:catalog",
+            },
+            message_type="invalidate",
+        )
         await invalidate_list("catalog")
         await manager.broadcast_to_all(
                 data={
