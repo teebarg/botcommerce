@@ -131,3 +131,6 @@ class ImageMetadata(BaseModel):
 class ImagesBulkUpdate(BaseModel):
     image_ids: List[int]
     data: ImageMetadata
+
+class ProductImageBulkUrls(BaseModel):
+    urls: list[str]

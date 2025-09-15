@@ -7,10 +7,6 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CldUploadButton } from "next-cloudinary";
-import SupabaseUploadButton from "@/components/generic/supabase-upload-button";
-import SupabaseUploadWidget from "@/components/generic/supabase-upload-button";
-import SupabaseUploader from "@/components/generic/supabase-upload-button";
 
 interface ImageUploadProps {
     images: ProductImage[];
@@ -22,7 +18,6 @@ interface ImageUploadProps {
 export function ImageUpload({ images, onImagesChange, isLoading = false, showUploadArea = true }: ImageUploadProps) {
     const [isDragOver, setIsDragOver] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -74,31 +69,6 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
 
     return (
         <div className="space-y-6">
-            {/* <SupabaseUploadButton
-                onUploadComplete={(urls) => {
-                    console.log("Uploaded URLs:", urls);
-                    // setImages((prev) => [...prev, ...urls]);
-
-                    // TODO: send URLs to your backend or DB
-                }}
-            /> */}
-            <SupabaseUploader
-                onComplete={(urls) => {
-                    console.log("Uploaded URLs:", urls);
-                    // setImages((prev) => [...prev, ...urls]);
-
-                    // TODO: send URLs to your backend or DB
-                }}
-            />
-            <CldUploadButton
-                uploadPreset="shop_test"
-                onSuccess={(result: any) => {
-                    // result.info contains the uploaded file details
-                    setImageUrl(result.info.secure_url);
-                    console.log("Uploaded:", result.info);
-                }}
-            />
-            <p>Image:{imageUrl}</p>
             <Card
                 className={cn(
                     "border-2 border-dashed transition-all duration-smooth cursor-pointer hover:border-primary/50",

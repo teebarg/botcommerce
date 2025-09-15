@@ -25,7 +25,8 @@ from app.models.product import (
     ProductCreateBundle,
     ProductBulkImages,
     ProductImageMetadata,
-    ImagesBulkUpdate
+    ImagesBulkUpdate,
+    ProductImageBulkUrls
 )
 from app.services.meilisearch import (
     clear_index,
@@ -211,7 +212,8 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
     if category_ids:
         data["categories"] = {"connect": [{"id": id} for id in category_ids]}
     if collection_ids:
-        data["collections"] = {"connect": [{"id": id} for id in collection_ids]}
+        data["collections"] = {"connect": [{"id": id}
+                                           for id in collection_ids]}
     return data
 
 
@@ -228,7 +230,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                 message_type="product_bulk_update"
             )
             if image.product_id is None:
-                name = f"{random.choice(['Classic','Premium','Superior','Deluxe','Luxury'])} {random.randint(100, 999)}"
+                name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(100, 999)}"
                 product_data: dict[str, Any] = {
                     "name": name,
                     "slug": slugify(name),
@@ -243,7 +245,8 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                     data={"product": {"connect": {"id": product.id}}},
                 )
 
-                variant_data = {"sku": generate_sku(), "product_id": product.id, **build_variant_data(payload.data)}
+                variant_data = {"sku": generate_sku(
+                ), "product_id": product.id, **build_variant_data(payload.data)}
                 await tx.productvariant.create(data=variant_data)
 
                 product_to_reindex.append(product.id)
@@ -251,9 +254,11 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
             else:
                 relation_updates: dict[str, Any] = {}
                 if payload.data.category_ids:
-                    relation_updates["categories"] = {"set": [{"id": id} for id in payload.data.category_ids]}
+                    relation_updates["categories"] = {
+                        "set": [{"id": id} for id in payload.data.category_ids]}
                 if payload.data.collection_ids:
-                    relation_updates["collections"] = {"set": [{"id": id} for id in payload.data.collection_ids]}
+                    relation_updates["collections"] = {
+                        "set": [{"id": id} for id in payload.data.collection_ids]}
 
                 if relation_updates:
                     await tx.product.update(where={"id": image.product_id}, data=relation_updates)
@@ -1172,6 +1177,37 @@ async def upload_product_images(
 
     except Exception as e:
         logger.error(f"Error starting image upload job: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/images/bulk-save-urls")
+async def bulk_save_image_urls(payload: ProductImageBulkUrls):
+    """
+    Save many image URLs into the gallery.
+    """
+    try:
+        if not payload.urls:
+            raise HTTPException(status_code=400, detail="No images provided")
+
+        create_rows = []
+        for idx, url in enumerate(payload.urls):
+            create_rows.append({
+                "image": url,
+                "order": 0,
+            })
+
+        if not create_rows:
+            raise HTTPException(
+                status_code=400, detail="No valid images to save")
+
+        await db.productimage.create_many(data=create_rows)
+        await invalidate_pattern("products:gallery")
+
+        return {"success": True, "count": len(create_rows)}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -18,7 +18,9 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
         <Card key={catalog.id} className="border">
             <CardHeader className="py-3">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
-                    <span>{catalog.title} ({catalog.products_count})</span>
+                    <span>
+                        {catalog.title} ({catalog.products_count})
+                    </span>
                     <Badge className="text-xs" variant={catalog.is_active ? "emerald" : "destructive"}>
                         {catalog.is_active ? "Active" : "Inactive"}
                     </Badge>

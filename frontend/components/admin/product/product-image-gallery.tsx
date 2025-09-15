@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { useEffect, useRef } from "react";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
 
-import { ImageUpload } from "./product-image-upload";
 import { GalleryCard } from "./product-gallery-card";
 import { ProductBulkActions } from "./gallery-bulk-action";
+import { GalleryImagesUpload } from "./gallery-images-upload";
 
 import { api } from "@/apis/client";
 import { useImageGalleryInfinite, useBulkDeleteGalleryImages } from "@/lib/hooks/useProduct";
@@ -163,7 +163,7 @@ export function ProductImageGallery() {
                 <p className="text-sm text-default-500">Manage your product images.</p>
             </div>
             <div className="mb-8 max-w-xl">
-                <ImageUpload images={[]} isLoading={isLoading} showUploadArea={false} onImagesChange={handleImagesChange} />
+                <GalleryImagesUpload />
             </div>
 
             {isImagesLoading ? (
@@ -218,12 +218,12 @@ export function ProductImageGallery() {
                             ))}
                     </div>
                     <ProductBulkActions
+                        isLoading={isDeleting}
                         selectedCount={selectedImages.size}
                         selectedImageIds={Array.from(selectedImages)}
                         selectedProductIds={selectedProductIds}
                         onClearSelection={() => setSelectedImages(new Set())}
                         onDelete={handleBulkDelete}
-                        isLoading={isDeleting}
                     />
                     <div ref={sentinelRef} />
                     {isFetchingNextPage && <ComponentLoader />}

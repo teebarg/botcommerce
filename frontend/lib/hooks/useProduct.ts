@@ -322,6 +322,18 @@ export const useBulkProductUpdate = () => {
     });
 };
 
+export const useBulkSaveImageUrls = () => {
+    return useMutation({
+        mutationFn: async ({ urls }: { urls: string[] }) => await api.post<Message>("/product/images/bulk-save-urls", { urls }),
+        onSuccess: () => {
+            toast.success("Bulk image URLs saved successfully");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to save bulk image URLs");
+        },
+    });
+};
+
 export const useReorderImages = () => {
     return useMutation({
         mutationFn: async ({ id, imageIds }: { id: number; imageIds: number[] }) =>
