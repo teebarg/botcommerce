@@ -17,12 +17,6 @@ import { Button } from "@/components/ui/button";
 import { useWebSocket } from "@/providers/websocket";
 import { SearchImageItem } from "@/schemas";
 
-interface ProductImage {
-    id: string;
-    file: File;
-    url: string;
-}
-
 export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
@@ -43,7 +37,7 @@ export function ProductImageGallery() {
         }
 
         return Array.from(ids);
-    }, [selectedImages]);
+    }, [selectedImages, images]);
 
     useEffect(() => {
         if (!currentMessage) return;

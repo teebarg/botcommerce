@@ -1158,6 +1158,9 @@ async def configure_filterable_attributes(
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         index.update_filterable_attributes(REQUIRED_FILTERABLES)
         index.update_sortable_attributes(REQUIRED_SORTABLES)
+        image_index = get_or_create_index(settings.MEILI_IMAGES_INDEX)
+        image_index.update_filterable_attributes(REQUIRED_FILTERABLES)
+        image_index.update_sortable_attributes(REQUIRED_SORTABLES)
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(

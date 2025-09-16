@@ -442,11 +442,15 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
 
     product_dict["collection_slugs"] = [
         c.slug for c in (product.collections or [])]
-    product_dict["collections"] = [dict(c)
+    # product_dict["collections"] = [dict(c)
+    #                                for c in (product.collections or [])]
+    product_dict["collections"] = [{"id": c.id, "slug": c.slug, "name": c.name}
                                    for c in (product.collections or [])]
     product_dict["category_slugs"] = [
         c.slug for c in (product.categories or [])]
-    product_dict["categories"] = [dict(c) for c in (product.categories or [])]
+    # product_dict["categories"] = [dict(c) for c in (product.categories or [])]
+    product_dict["categories"] = [{"id": c.id, "slug": c.slug, "name": c.name}
+                                    for c in (product.categories or [])]
     product_dict["images"] = [dict(i) for i in (product.images or [])]
     product_dict["sorted_images"] = [img.image for img in sorted(
         (product.images or []), key=lambda img: img.order)]
