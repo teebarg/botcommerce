@@ -41,13 +41,14 @@ from math import ceil
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import index_products, reindex_product, product_upload, product_export, sync_index_product
+from app.services.product import index_products, reindex_product, product_upload, product_export, sync_index_product, index_images
 from app.services.redis import cache_response, invalidate_list, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.popular_products import PopularProductsService
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.core.storage import upload
+from app.core.db import database
 
 logger = get_logger(__name__)
 
@@ -87,7 +88,7 @@ async def process_image_uploads_background(images: list):
 
         if created_images:
             await db.productimage.create_many(data=created_images)
-            logger.info(f"Saved {len(created_images)} images to database")
+            logger.info(f"Saved {len(created_images)} images to db")
 
         await invalidate_pattern("products:gallery")
 
@@ -297,8 +298,8 @@ async def get_popular_products(
     return products
 
 
-@router.get("/gallery")
-@cache_response("products:gallery")
+@router.get("/gallery2")
+# @cache_response("products:gallery2")
 async def image_gallery(request: Request, skip: int = Query(default=0), limit: int = Query(default=10)):
     """
     Upload one or more product images.
@@ -318,7 +319,6 @@ async def image_gallery(request: Request, skip: int = Query(default=0), limit: i
                         "categories": True,
                         "collections": True,
                         "variants": True,
-                        "images": True,
                         "shared_collections": True,
                     }
                 }
@@ -335,6 +335,117 @@ async def image_gallery(request: Request, skip: int = Query(default=0), limit: i
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/gallery3")
+# @cache_response("products:gallery3")
+async def image_gallery(
+    request: Request,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=10, le=100),
+):
+    """
+    Lightweight gallery endpoint.
+    Only returns product images and basic product info.
+    Relations (categories, collections, variants, shared_collections)
+    should be fetched on-demand in a detail endpoint.
+    """
+    try:
+        # ✅ raw SQL for optimized SELECT
+        query = """
+        SELECT pi.id, pi.image, pi.product_id,
+                p.name AS product_name,
+                p.slug AS product_slug
+        FROM "product_images" pi
+        LEFT JOIN "products" p ON p.id = pi.product_id
+        WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
+        ORDER BY pi.id DESC
+        OFFSET $1 LIMIT $2
+        """
+
+        total_query = """
+        SELECT COUNT(*)::int AS count
+        FROM "product_images" pi
+        LEFT JOIN "products" p ON p.id = pi.product_id
+        WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
+        """
+
+        async with database.pool.acquire() as conn:
+            images = await conn.fetch(query, skip, limit)
+            total = await conn.fetch(total_query)
+
+
+        return {
+            "images": [dict(record) for record in images],  # convert asyncpg.Record → dict
+            "skip": skip,
+            "limit": limit,
+            "total_pages": ceil(total[0]["count"] / limit) if limit else 1,
+            "total_count": total[0]["count"],
+        }
+
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/gallery")
+@cache_response("products:gallery")
+async def search(
+    request: Request,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=10, le=100),
+):
+    """
+    Retrieve products using Meilisearch, sorted by latest.
+    """
+
+    search_params = {
+        "limit": limit,
+        "offset": skip,
+        "sort": ["created_at:desc"],
+    }
+
+    index = get_or_create_index(settings.MEILI_IMAGES_INDEX)
+    try:
+        search_results = index.search(
+            "",
+            {
+                **search_params
+            }
+        )
+
+    except MeilisearchApiError as e:
+        error_code = getattr(e, "code", None)
+        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
+            logger.warning(
+                f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+
+            ensure_index_ready(index)
+
+            search_results = index.search(
+                "",
+                {
+                    **search_params
+                }
+            )
+
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=400,
+            detail=e.message
+            )
+
+    total_count = search_results["estimatedTotalHits"]
+    total_pages = (total_count // limit) + (total_count % limit > 0)
+
+    return {
+        "images": search_results["hits"],
+        "skip": skip,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+    }
 
 
 @router.post("/export")
@@ -692,10 +803,25 @@ async def create_product_bundle(
 @router.post("/reindex", response_model=Message)
 async def reindex_products(background_tasks: BackgroundTasks):
     """
-    Re-index all products in the database to Meilisearch.
+    Re-index all products in the db to Meilisearch.
     """
     try:
         background_tasks.add_task(index_products)
+        return Message(message="Re-indexing task enqueued.")
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
+@router.post("/reindex-image", response_model=Message)
+async def reindex_products(background_tasks: BackgroundTasks):
+    """
+    Re-index all products in the db to Meilisearch.
+    """
+    try:
+        background_tasks.add_task(index_images)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(e)

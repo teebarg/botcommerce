@@ -11,6 +11,7 @@ from app.services.redis import invalidate_list, bust
 
 logger = get_logger(__name__)
 
+
 @with_prisma_connection
 async def sync_index_product(product: Product = None):
     try:
@@ -28,18 +29,18 @@ async def sync_index_product(product: Product = None):
         )
     await bust(f"product:{product.slug}")
     await manager.broadcast_to_all(
-            data={
-                "key": f"product:{product.slug}",
-            },
-            message_type="invalidate",
-        )
+        data={
+            "key": f"product:{product.slug}",
+        },
+        message_type="invalidate",
+    )
     await invalidate_list("products")
     await manager.broadcast_to_all(
-            data={
-                "key": "products",
-            },
-            message_type="invalidate",
-        )
+        data={
+            "key": "products",
+        },
+        message_type="invalidate",
+    )
 
 
 @with_prisma_connection
@@ -87,21 +88,22 @@ async def reindex_catalog(product_id: int):
         )
         await invalidate_list("catalog")
         await manager.broadcast_to_all(
-                data={
-                    "key": "catalog",
-                },
-                message_type="invalidate",
-            )
+            data={
+                "key": "catalog",
+            },
+            message_type="invalidate",
+        )
         await invalidate_list("products:gallery")
         await manager.broadcast_to_all(
-                data={
-                    "key": "products:gallery",
-                },
-                message_type="invalidate",
-            )
+            data={
+                "key": "products:gallery",
+            },
+            message_type="invalidate",
+        )
 
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
+
 
 @with_prisma_connection
 async def reindex_product(product_id: int):
@@ -142,20 +144,21 @@ async def reindex_product(product_id: int):
             )
         await bust(f"product:{product.slug}")
         await manager.broadcast_to_all(
-                data={
-                    "key": f"product:{product.slug}",
-                },
-                message_type="invalidate",
-            )
+            data={
+                "key": f"product:{product.slug}",
+            },
+            message_type="invalidate",
+        )
         await manager.broadcast_to_all(
-                data={
-                    "key": "products",
-                },
-                message_type="invalidate",
-            )
+            data={
+                "key": "products",
+            },
+            message_type="invalidate",
+        )
 
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
+
 
 @with_prisma_connection
 async def index_products():
@@ -188,17 +191,17 @@ async def index_products():
         await invalidate_list("products")
         await invalidate_list("product")
         await manager.broadcast_to_all(
-                data={
-                    "key": "products",
-                },
-                message_type="invalidate",
-            )
+            data={
+                "key": "products",
+            },
+            message_type="invalidate",
+        )
         await manager.broadcast_to_all(
-                data={
-                    "key": "product",
-                },
-                message_type="invalidate",
-            )
+            data={
+                "key": "product",
+            },
+            message_type="invalidate",
+        )
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 
@@ -236,6 +239,7 @@ async def product_upload(user_id: str):
             is_success=False
         )
 
+
 @with_prisma_connection
 async def product_export(email: str, user_id: str):
     download_url = await generate_excel_file(email=email)
@@ -248,16 +252,129 @@ async def product_export(email: str, user_id: str):
     )
 
 
+@with_prisma_connection
+async def index_images():
+    """
+    Re-index all products in the database to Meilisearch.
+    """
+    try:
+        logger.info("Starting re-indexing..........")
+        images = await db.productimage.find_many(
+            where={
+                "order": 0,
+            },
+            include={
+                "product": {
+                    "include": {
+                        "categories": True,
+                        "collections": True,
+                        "variants": True,
+                        "shared_collections": True,
+                        "images": True,
+                    }
+                }
+            },
+        )
+
+        documents = []
+        for image in images:
+            image_dict = prepare_image_data_for_indexing(image)
+            documents.append(image_dict)
+
+        clear_index(settings.MEILI_IMAGES_INDEX)
+        add_documents_to_index(
+            index_name=settings.MEILI_IMAGES_INDEX, documents=documents)
+
+        logger.info(f"Reindexed {len(documents)} products successfully.")
+        # await invalidate_list("products")
+        # await invalidate_list("product")
+        # await manager.broadcast_to_all(
+        #         data={
+        #             "key": "products",
+        #         },
+        #         message_type="invalidate",
+        #     )
+        # await manager.broadcast_to_all(
+        #         data={
+        #             "key": "product",
+        #         },
+        #         message_type="invalidate",
+        #     )
+    except Exception as e:
+        logger.error(f"Error during product re-indexing: {e}")
+
+
+@with_prisma_connection
+async def reindex_image(image_id: int):
+    try:
+        image = await db.productimage.find_unique(
+            where={"id": image_id},
+            include={
+                "product": {
+                    "include": {
+                        "categories": True,
+                        "collections": True,
+                        "variants": True,
+                        "shared_collections": True,
+                    }
+                }
+            },
+        )
+
+        if not image:
+            logger.warning(
+                f"Product image with id {image_id} not found for re-indexing.")
+            return
+
+        image_data = prepare_image_data_for_indexing(image)
+
+        try:
+            await update_document(index_name="beafy", document=image_data)
+        except Exception as e:
+            logger.debug(f"Error re-indexing product image {image_id}: {e}")
+
+        logger.info(f"Successfully reindexed product image {image_id}")
+        # await invalidate_list("products")
+        # for sc in (image.product.shared_collections or []):
+        #     await invalidate_list(f"product:catalog:{sc.slug}")
+        #     await manager.broadcast_to_all(
+        #         data={
+        #             "key": f"product:catalog:{sc.slug}",
+        #         },
+        #         message_type="invalidate",
+        #     )
+        # await bust(f"product:{product.slug}")
+        # await manager.broadcast_to_all(
+        #         data={
+        #             "key": f"product:{product.slug}",
+        #         },
+        #         message_type="invalidate",
+        #     )
+        # await manager.broadcast_to_all(
+        #         data={
+        #             "key": "products",
+        #         },
+        #         message_type="invalidate",
+        #     )
+
+    except Exception as e:
+        logger.error(f"Error re-indexing product {product_id}: {e}")
+
+
 def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict = product.dict()
 
-    product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
-    product_dict["collections"] = [dict(c) for c in (product.collections or [])]
-    product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
+    product_dict["collection_slugs"] = [
+        c.slug for c in (product.collections or [])]
+    product_dict["collections"] = [dict(c)
+                                   for c in (product.collections or [])]
+    product_dict["category_slugs"] = [
+        c.slug for c in (product.categories or [])]
     product_dict["categories"] = [dict(c) for c in (product.categories or [])]
     product_dict["images"] = [dict(i) for i in (product.images or [])]
     product_dict["sorted_images"] = [img.image for img in sorted(
         (product.images or []), key=lambda img: img.order)]
+    product_dict["image"] = product_dict["sorted_images"][0] if product_dict["sorted_images"] else None
 
     variants = [v.dict() for v in (product.variants or [])]
     product_dict["variants"] = variants
@@ -282,13 +399,51 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         product_dict["status"] = "IN STOCK"
     else:
         product_dict["status"] = "OUT OF STOCK"
-    product_dict["sizes"] = [v["size"] for v in variants if v.get("size") is not None]
-    product_dict["colors"] = [v["color"] for v in variants if v.get("color") is not None]
+    product_dict["sizes"] = [v["size"]
+                             for v in variants if v.get("size") is not None]
+    product_dict["colors"] = [v["color"]
+                              for v in variants if v.get("color") is not None]
 
-    product_dict["catalogs"] = [dict(sc) for sc in (product.shared_collections or [])]
-    product_dict["catalogs_slugs"] = [sc.slug for sc in (product.shared_collections or [])]
+    product_dict["catalogs"] = [dict(sc)
+                                for sc in (product.shared_collections or [])]
+    product_dict["catalogs_slugs"] = [
+        sc.slug for sc in (product.shared_collections or [])]
 
     return product_dict
+
+
+def prepare_image_data_for_indexing(image) -> dict:
+    product = image.product
+    image_dict = {
+        "id": image.id,
+        "product_id": image.product_id,
+        "image": image.image,
+    }
+
+    if product:
+        image_dict["collections"] = [{"id": c.id, "slug": c.slug, "name": c.name}
+                                     for c in (product.collections or [])]
+        image_dict["categories"] = [{"id": c.id, "slug": c.slug, "name": c.name}
+                                    for c in (product.categories or [])]
+        image_dict["sorted_images"] = [img.image for img in sorted(
+            (product.images or []), key=lambda img: img.order)]
+        image_dict["image"] = image_dict["sorted_images"][0] if image_dict["sorted_images"] else None
+
+        variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "status": v.status} for v in (product.variants or [])]
+        image_dict["variants"] = variants
+
+        variant_prices = [v["price"]
+                          for v in variants if v.get("price") is not None]
+        image_dict["variant_prices"] = variant_prices
+
+        if any(v["inventory"] > 0 for v in variants):
+            image_dict["status"] = "IN STOCK"
+        else:
+            image_dict["status"] = "OUT OF STOCK"
+        image_dict["active"] = product.active
+
+    return image_dict
+
 
 def to_product_card_view(product: Product) -> dict:
     prepared = prepare_product_data_for_indexing(product)

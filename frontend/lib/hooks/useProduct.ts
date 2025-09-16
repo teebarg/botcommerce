@@ -80,7 +80,7 @@ export const useSimilarProducts = (productId: number, num: number = 16) => {
 
 export const useImageGalleryInfinite = (pageSize: number = 24) => {
     return useInfiniteQuery({
-        queryKey: ["products", "gallery", pageSize],
+        queryKey: ["products", "gallery"],
         queryFn: async ({ pageParam = 0 }) =>
             await api.get<{ images: ProductImage[]; skip: number; limit: number; total_count: number; total_pages: number }>("/product/gallery", {
                 params: { skip: pageParam, limit: pageSize },

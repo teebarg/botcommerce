@@ -190,6 +190,28 @@ export const CatalogSchema = z.object({
     total_pages: z.number(),
 });
 
+export const SearchImageItemSchema = z.object({
+    id: z.number(),
+    product_id: z.number().optional(),
+    image: z.string(),
+    active: z.boolean(),
+    variants: z.array(ProductVariantSchema).optional(),
+    status: ProductStatusSchema,
+    categories: z.array(CategorySchema),
+    collections: z.array(CollectionSchema),
+});
+
+export const SearchImageSchema = z.object({
+    images: z.array(SearchImageItemSchema),
+    skip: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
+});
+
+export type SearchImageItem = z.infer<typeof SearchImageItemSchema>;
+export type SearchImage = z.infer<typeof SearchImageSchema>;
+
 export type Product = z.infer<typeof ProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;

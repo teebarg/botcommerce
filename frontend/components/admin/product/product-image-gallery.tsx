@@ -15,6 +15,7 @@ import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useWebSocket } from "@/providers/websocket";
+import { SearchImageItem } from "@/schemas";
 
 interface ProductImage {
     id: string;
@@ -26,7 +27,7 @@ export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(20);
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(50);
     const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { currentMessage, messages } = useWebSocket();
@@ -123,39 +124,6 @@ export function ProductImageGallery() {
         }
     };
 
-    const handleImagesChange = async (images: ProductImage[]) => {
-        setIsLoading(true);
-        try {
-            const fileToBase64 = (file: File) =>
-                new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-
-                    reader.onload = () => resolve((reader.result as string).split(",")[1] || "");
-                    reader.onerror = (e) => reject(e);
-                    reader.readAsDataURL(file);
-                });
-
-            const imagesPayload = await Promise.all(
-                (images || []).map(async (img: ProductImage) => ({
-                    file: img.file ? await fileToBase64(img.file) : "",
-                    file_name: img.file?.name || "image.jpg",
-                    content_type: img.file?.type || "image/jpeg",
-                }))
-            );
-
-            const payload: any = {
-                images: imagesPayload.length ? imagesPayload : undefined,
-            };
-
-            await api.post("/product/images/upload", payload);
-
-            toast.success("Images upload started");
-        } catch (error: any) {
-            toast.error(error?.message || "Failed to upload images");
-            setIsLoading(false);
-        }
-    };
-
     return (
         <div className="px-4 py-8">
             <div className="mb-8">
@@ -207,7 +175,7 @@ export function ProductImageGallery() {
                     >
                         {data?.pages
                             ?.flatMap((p) => p.images)
-                            .map((img: any, idx: number) => (
+                            .map((img: SearchImageItem, idx: number) => (
                                 <GalleryCard
                                     key={`${img.id}-${idx}`}
                                     image={img}
