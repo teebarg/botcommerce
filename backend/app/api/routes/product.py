@@ -41,8 +41,8 @@ from math import ceil
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import index_products, reindex_product, product_upload, product_export, sync_index_product, index_images
-from app.services.redis import cache_response, invalidate_list, invalidate_pattern
+from app.services.product import reindex_product, product_upload, product_export, sync_index_product, index_images, reindex_image, sync_index_image
+from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.popular_products import PopularProductsService
 from app.services.recently_viewed import RecentlyViewedService
@@ -121,7 +121,6 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
     try:
         deleted_count = 0
         failed_deletions = []
-        products_to_reindex = set()
 
         for index, image in enumerate(images):
             try:
@@ -133,7 +132,6 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
                     message_type="product_bulk_delete"
                 )
 
-                # Delete from storage if image exists
                 if image.image and "/storage/v1/object/public/product-images/" in image.image:
                     try:
                         file_path = image.image.split(
@@ -147,9 +145,6 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
                 await db.productimage.delete(where={"id": image.id})
                 deleted_count += 1
 
-                if image.product_id:
-                    products_to_reindex.add(image.product_id)
-
                 logger.info(
                     f"Successfully deleted image {index + 1}/{len(images)}")
 
@@ -160,16 +155,9 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
                     "error": str(e)
                 })
 
-        for product_id in products_to_reindex:
-            try:
-                await reindex_product(product_id=product_id)
-            except Exception as e:
-                logger.error(
-                    f"Failed to reindex product {product_id}: {str(e)}")
+        for image in images:
+            await sync_index_image(image_id=str(image.id), product=image.product)
 
-        await invalidate_pattern("products:gallery")
-
-        # Broadcast completion status
         await manager.broadcast_to_all(
             data={
                 "status": "completed",
@@ -219,8 +207,6 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 
 
 async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
-    product_to_reindex: list[int] = []
-
     async with db.tx() as tx:
         for index, image in enumerate(images):
             await manager.broadcast_to_all(
@@ -230,48 +216,51 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                 },
                 message_type="product_bulk_update"
             )
-            if image.product_id is None:
-                name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(100, 999)}"
-                product_data: dict[str, Any] = {
-                    "name": name,
-                    "slug": slugify(name),
-                    "sku": generate_sku(),
-                    "active": payload.data.active,
-                    **build_relation_data(payload.data.category_ids, payload.data.collection_ids),
-                }
-                product = await tx.product.create(data=product_data)
+            try:
+                if image.product_id is None:
+                    name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(100, 999)}"
+                    product_data: dict[str, Any] = {
+                        "name": name,
+                        "slug": slugify(name),
+                        "sku": generate_sku(),
+                        "active": payload.data.active,
+                        **build_relation_data(payload.data.category_ids, payload.data.collection_ids),
+                    }
+                    product = await tx.product.create(data=product_data)
 
-                await tx.productimage.update(
-                    where={"id": image.id},
-                    data={"product": {"connect": {"id": product.id}}},
-                )
-
-                variant_data = {"sku": generate_sku(
-                ), "product_id": product.id, **build_variant_data(payload.data)}
-                await tx.productvariant.create(data=variant_data)
-
-                product_to_reindex.append(product.id)
-
-            else:
-                relation_updates: dict[str, Any] = {}
-                if payload.data.category_ids:
-                    relation_updates["categories"] = {
-                        "set": [{"id": id} for id in payload.data.category_ids]}
-                if payload.data.collection_ids:
-                    relation_updates["collections"] = {
-                        "set": [{"id": id} for id in payload.data.collection_ids]}
-
-                if relation_updates:
-                    await tx.product.update(where={"id": image.product_id}, data=relation_updates)
-
-                variant_data = build_variant_data(payload.data)
-                if variant_data and image.product.variants:
-                    await tx.productvariant.update(
-                        where={"id": image.product.variants[0].id},
-                        data=variant_data,
+                    await tx.productimage.update(
+                        where={"id": image.id},
+                        data={"product": {"connect": {"id": product.id}}},
                     )
 
-                product_to_reindex.append(image.product_id)
+                    variant_data = {"sku": generate_sku(
+                    ), "product_id": product.id, **build_variant_data(payload.data)}
+                    await tx.productvariant.create(data=variant_data)
+
+                else:
+                    relation_updates: dict[str, Any] = {}
+                    if payload.data.category_ids:
+                        relation_updates["categories"] = {
+                            "set": [{"id": id} for id in payload.data.category_ids]}
+                    if payload.data.collection_ids:
+                        relation_updates["collections"] = {
+                            "set": [{"id": id} for id in payload.data.collection_ids]}
+
+                    if relation_updates:
+                        await tx.product.update(where={"id": image.product_id}, data=relation_updates)
+
+                    variant_data = build_variant_data(payload.data)
+                    if variant_data and image.product.variants:
+                        await tx.productvariant.update(
+                            where={"id": image.product.variants[0].id},
+                            data=variant_data,
+                        )
+            except Exception as e:
+                logger.error(f"Error processing image {image.id}: {e}")
+                continue
+
+    for image in images:
+        await reindex_image(image_id=image.id)
 
     await manager.broadcast_to_all(
         data={
@@ -279,10 +268,6 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
         },
         message_type="product_bulk_update"
     )
-
-    # enqueue reindex in bulk
-    for product_id in set(product_to_reindex):
-        await reindex_product(product_id=product_id)
 
 
 router = APIRouter()
@@ -296,46 +281,6 @@ async def get_popular_products(
     service = PopularProductsService()
     products = await service.get_popular_products(limit)
     return products
-
-
-@router.get("/gallery2")
-# @cache_response("products:gallery2")
-async def image_gallery(request: Request, skip: int = Query(default=0), limit: int = Query(default=10)):
-    """
-    Upload one or more product images.
-    """
-    try:
-        where_clause = {
-            "order": 0,
-        }
-        images = await db.productimage.find_many(
-            where=where_clause,
-            skip=skip,
-            take=limit,
-            order={"id": "desc"},
-            include={
-                "product": {
-                    "include": {
-                        "categories": True,
-                        "collections": True,
-                        "variants": True,
-                        "shared_collections": True,
-                    }
-                }
-            },
-        )
-        total = await db.productimage.count(where=where_clause)
-        return {
-            "images": images,
-            "skip": skip,
-            "limit": limit,
-            "total_pages": ceil(total/limit),
-            "total_count": total,
-        }
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/gallery3")
 # @cache_response("products:gallery3")
@@ -806,7 +751,7 @@ async def reindex_products(background_tasks: BackgroundTasks):
     Re-index all products in the db to Meilisearch.
     """
     try:
-        background_tasks.add_task(index_products)
+        background_tasks.add_task(index_images, product_only=True, invalidate_products=True)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(e)
@@ -816,12 +761,12 @@ async def reindex_products(background_tasks: BackgroundTasks):
         )
 
 @router.post("/reindex-image", response_model=Message)
-async def reindex_products(background_tasks: BackgroundTasks):
+async def reindex_images(background_tasks: BackgroundTasks):
     """
-    Re-index all products in the db to Meilisearch.
+    Re-index all images in the db to Meilisearch.
     """
     try:
-        background_tasks.add_task(index_images)
+        background_tasks.add_task(index_images, invalidate_products=True)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(e)
@@ -1149,17 +1094,15 @@ async def delete_gallery_image(image_id: int) -> Message:
         raise HTTPException(status_code=404, detail="Image not found")
 
     if not image.product_id:
-        file_path = image.image.split(
-            "/storage/v1/object/public/product-images/")[1]
-        supabase.storage.from_("product-images").remove([file_path])
+        try:
+            file_path = image.image.split(
+                "/storage/v1/object/public/product-images/")[1]
+            supabase.storage.from_("product-images").remove([file_path])
+        except Exception as e:
+            logger.error(f"Error deleting image {image.image}: {e}")
         await db.productimage.delete(where={"id": image_id})
-        await invalidate_list("products:gallery")
-        await manager.broadcast_to_all(
-            data={
-                "key": "products:gallery",
-            },
-            message_type="invalidate",
-        )
+        await sync_index_image(image_id=image_id)
+
         return Message(message="Image deleted successfully")
 
     product = await db.product.find_unique(
@@ -1190,7 +1133,7 @@ async def delete_gallery_image(image_id: int) -> Message:
     service = RecentlyViewedService()
     await service.remove_product_from_all(product_id=product_id)
 
-    await sync_index_product(product=product)
+    await sync_index_image(image_id=image.id, product=product)
 
     return Message(message="Product and all related data deleted successfully")
 
@@ -1327,7 +1270,7 @@ async def bulk_save_image_urls(payload: ProductImageBulkUrls):
                 status_code=400, detail="No valid images to save")
 
         await db.productimage.create_many(data=create_rows)
-        await invalidate_pattern("products:gallery")
+        await index_images()
 
         return {"success": True, "count": len(create_rows)}
     except HTTPException:
@@ -1351,7 +1294,6 @@ async def bulk_delete_gallery_images(
             raise HTTPException(
                 status_code=400, detail="No image IDs provided")
 
-        # Get images to delete
         images = await db.productimage.find_many(
             where={"id": {"in": payload.files}},
             include={"product": True}
@@ -1436,7 +1378,7 @@ async def create_image_metadata(
                         raise HTTPException(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            background_tasks.add_task(reindex_product, product_id=product.id)
+            background_tasks.add_task(reindex_image, image_id=image_id)
 
             return {"success": True}
         except UniqueViolationError:
@@ -1526,7 +1468,7 @@ async def update_image_metadata(
                         status_code=400, detail=f"Failed to create variant: {str(e)}")
 
             background_tasks.add_task(
-                reindex_product, product_id=existing_image.product_id)
+                reindex_image, image_id=existing_image.id)
 
             return {"success": True}
         except UniqueViolationError:

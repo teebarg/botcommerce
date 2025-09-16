@@ -27,7 +27,9 @@ export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(50);
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(40);
+    const images = data?.pages?.flatMap((p) => p.images) || [];
+
     const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { currentMessage, messages } = useWebSocket();
@@ -35,9 +37,8 @@ export function ProductImageGallery() {
 
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
-        const all = data?.pages?.flatMap((p) => p.images) || [];
 
-        for (const img of all) {
+        for (const img of images) {
             if (selectedImages.has(img.id) && img.product_id) ids.add(img.product_id);
         }
 
@@ -173,17 +174,15 @@ export function ProductImageGallery() {
                             viewMode === "grid" ? "" : "grid-cols-1"
                         )}
                     >
-                        {data?.pages
-                            ?.flatMap((p) => p.images)
-                            .map((img: SearchImageItem, idx: number) => (
-                                <GalleryCard
-                                    key={`${img.id}-${idx}`}
-                                    image={img}
-                                    isSelected={selectedImages.has(img.id)}
-                                    selectionMode={selectionMode}
-                                    onSelectionChange={handleSelectionChange}
-                                />
-                            ))}
+                        {images.map((img: SearchImageItem, idx: number) => (
+                            <GalleryCard
+                                key={idx}
+                                image={img}
+                                isSelected={selectedImages.has(img.id)}
+                                selectionMode={selectionMode}
+                                onSelectionChange={handleSelectionChange}
+                            />
+                        ))}
                     </div>
                     <ProductBulkActions
                         isLoading={isDeleting}

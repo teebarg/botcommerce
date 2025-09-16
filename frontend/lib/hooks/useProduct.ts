@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tansta
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, ProductVariant, ProductImage } from "@/schemas";
+import { Product, PaginatedProductSearch, Message, ProductVariant, SearchImageItem } from "@/schemas";
 
 type SearchParams = {
     search?: string;
@@ -82,7 +82,7 @@ export const useImageGalleryInfinite = (pageSize: number = 24) => {
     return useInfiniteQuery({
         queryKey: ["products", "gallery"],
         queryFn: async ({ pageParam = 0 }) =>
-            await api.get<{ images: ProductImage[]; skip: number; limit: number; total_count: number; total_pages: number }>("/product/gallery", {
+            await api.get<{ images: SearchImageItem[]; skip: number; limit: number; total_count: number; total_pages: number }>("/product/gallery", {
                 params: { skip: pageParam, limit: pageSize },
             }),
         getNextPageParam: (lastPage) => {

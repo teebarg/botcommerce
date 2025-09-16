@@ -95,11 +95,11 @@ const AccountItems = [
 ];
 
 const storeItems = [
-    {
-        title: "Products",
-        url: "/admin/products",
-        icon: Box,
-    },
+    // {
+    //     title: "Products",
+    //     url: "/admin/products",
+    //     icon: Box,
+    // },
     {
         title: "Gallery",
         url: "/admin/gallery",

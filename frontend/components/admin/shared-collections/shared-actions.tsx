@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useDeleteSharedCollection } from "@/lib/hooks/useCollection";
 import { Confirm } from "@/components/generic/confirm";
-import { Shared } from "@/schemas/product";
+import { DBCatalog } from "@/schemas/product";
 
 interface Props {
-    item: Shared;
+    item: DBCatalog;
 }
 
 const SharedActions: React.FC<Props> = ({ item }) => {

@@ -8,18 +8,14 @@ import { ManageSlate } from "../shared-collections/manage-slate";
 import { ProductSheetForm } from "./product-form-sheet";
 
 import { Button } from "@/components/ui/button";
-import { Product, ProductImage } from "@/schemas";
+import { SearchImageItem } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useDeleteGalleryImage } from "@/lib/hooks/useProduct";
 
-type GalleryImage = ProductImage & {
-    product: Product;
-};
-
 interface GalleryCardActionProps {
-    image: GalleryImage;
+    image: SearchImageItem;
 }
 
 export function GalleryCardActions({ image }: GalleryCardActionProps) {
@@ -35,7 +31,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
 
     return (
         <div className="flex items-center flex-wrap gap-2">
-            <ManageSlate product={image.product} />
+            {image.product_id && <ManageSlate product={image} />}
             <Overlay
                 open={editState.isOpen}
                 sheetClassName="min-w-[40vw]"
@@ -48,7 +44,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
                 }
                 onOpenChange={editState.setOpen}
             >
-                <ProductSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
+                <ProductSheetForm currentProduct={image} imageId={image.id} onClose={editState.close} />
             </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>

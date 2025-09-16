@@ -7,15 +7,15 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import { SharedCard } from "./shared-card";
 import { SharedForm } from "./shared-form";
 
-import { useSharedCollections } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
-import { Shared } from "@/schemas";
+import { DBCatalog } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
+import { useAllSharedCollections } from "@/lib/hooks/useCollection";
 
 export default function SharedCollectionList() {
     const state = useOverlayTriggerState({});
-    const { data, isLoading } = useSharedCollections();
+    const { data: catalogs, isLoading } = useAllSharedCollections();
 
     if (isLoading) return <ComponentLoader className="h-[400px]" />;
 
@@ -38,11 +38,11 @@ export default function SharedCollectionList() {
                     <SharedForm current={undefined} onClose={() => state.close()} />
                 </Overlay>
             </div>
-            {data?.shared?.length === 0 ? (
+            {catalogs?.length === 0 ? (
                 <div>No Catalogs found.</div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {data?.shared?.map((col: Shared, idx: number) => <SharedCard key={idx} collection={col} />)}
+                    {catalogs?.map((col: DBCatalog, idx: number) => <SharedCard key={idx} catalog={col} />)}
                 </div>
             )}
         </div>

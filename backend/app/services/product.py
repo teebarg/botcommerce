@@ -13,9 +13,43 @@ logger = get_logger(__name__)
 
 
 @with_prisma_connection
+async def sync_index_image(image_id:str, product: Product = None):
+    try:
+        if product is not None:
+            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(product.id))
+        delete_document(index_name=settings.MEILI_IMAGES_INDEX, document_id=str(image_id))
+    except Exception as e:
+        logger.debug(f"Error re-indexing image {image_id}: {e}")
+
+    if product is not None:
+        await bust(f"product:{product.slug}")
+        await manager.broadcast_to_all(
+            data={
+                "key": f"product:{product.slug}",
+            },
+            message_type="invalidate",
+        )
+        await invalidate_list("products")
+        await manager.broadcast_to_all(
+            data={
+                "key": "products",
+            },
+            message_type="invalidate",
+        )
+    else:
+        await invalidate_list("products:gallery")
+        await manager.broadcast_to_all(
+            data={
+                "key": "products:gallery",
+            },
+            message_type="invalidate",
+        )
+
+
+@with_prisma_connection
 async def sync_index_product(product: Product = None):
     try:
-        await delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(product.id))
+        delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(product.id))
     except Exception as e:
         logger.debug(f"Error re-indexing product {product.id}: {e}")
 
@@ -48,14 +82,7 @@ async def reindex_catalog(product_id: int):
     try:
         product = await db.product.find_unique(
             where={"id": product_id},
-            include={
-                "variants": True,
-                "categories": True,
-                "images": True,
-                "collections": True,
-                "reviews": True,
-                "shared_collections": True,
-            }
+            include={"images": True}
         )
 
         if not product:
@@ -63,22 +90,13 @@ async def reindex_catalog(product_id: int):
                 f"Product with id {product_id} not found for re-indexing.")
             return
 
-        product_data = prepare_product_data_for_indexing(product)
-
         try:
-            await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+            for image in product.images:
+                await reindex_image(image_id=image.id)
+            logger.info(f"Successfully reindexed product {product_id}")
         except Exception as e:
             logger.debug(f"Error re-indexing product {product_id}: {e}")
 
-        logger.info(f"Successfully reindexed product {product_id}")
-        # for sc in (product.shared_collections or []):
-        #     await invalidate_list(f"product:catalog:{sc.slug}")
-        #     await manager.broadcast_to_all(
-        #         data={
-        #             "key": f"product:catalog:{sc.slug}",
-        #         },
-        #         message_type="invalidate",
-        #     )
         await invalidate_list(f"product:catalog")
         await manager.broadcast_to_all(
             data={
@@ -86,23 +104,43 @@ async def reindex_catalog(product_id: int):
             },
             message_type="invalidate",
         )
-        await invalidate_list("catalog")
-        await manager.broadcast_to_all(
-            data={
-                "key": "catalog",
-            },
-            message_type="invalidate",
+    except Exception as e:
+        logger.error(f"Error re-indexing reindex_catalog {product_id}: {e}")
+
+
+@with_prisma_connection
+async def reindex_catalogs(product_ids: list[int]):
+    try:
+        products = await db.product.find_many(
+            where={"id": {"in": product_ids}},
+            include={
+                "images": True,
+            }
         )
-        await invalidate_list("products:gallery")
+
+        if not products:
+            logger.warning(
+                f"Products with ids {product_ids} not found for re-indexing.")
+            return
+
+        try:
+            for product in products:
+                for image in product.images:
+                    await reindex_image(image_id=image.id)
+            logger.info(f"Successfully reindexed products {product_ids}")
+        except Exception as e:
+            logger.debug(f"Error re-indexing products {product_ids}: {e}")
+
+        await invalidate_list(f"product:catalog")
         await manager.broadcast_to_all(
             data={
-                "key": "products:gallery",
+                "key": f"product:catalog",
             },
             message_type="invalidate",
         )
 
     except Exception as e:
-        logger.error(f"Error re-indexing product {product_id}: {e}")
+        logger.error(f"Error re-indexing products {product_ids}: {e}")
 
 
 @with_prisma_connection
@@ -111,12 +149,12 @@ async def reindex_product(product_id: int):
         product = await db.product.find_unique(
             where={"id": product_id},
             include={
-                "variants": True,
-                "categories": True,
+                # "variants": True,
+                # "categories": True,
                 "images": True,
-                "collections": True,
-                "reviews": True,
-                "shared_collections": True,
+                # "collections": True,
+                # "reviews": True,
+                # "shared_collections": True,
             }
         )
 
@@ -125,36 +163,36 @@ async def reindex_product(product_id: int):
                 f"Product with id {product_id} not found for re-indexing.")
             return
 
-        product_data = prepare_product_data_for_indexing(product)
+        # product_data = prepare_product_data_for_indexing(product)
+
+        # try:
+        #     await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+        # except Exception as e:
+        #     logger.debug(f"Error re-indexing product {product_id}: {e}")
 
         try:
-            await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+            for image in product.images:
+                await reindex_image(image_id=image.id)
+            logger.info(f"Successfully reindexed product {product_id}")
         except Exception as e:
             logger.debug(f"Error re-indexing product {product_id}: {e}")
 
-        logger.info(f"Successfully reindexed product {product_id}")
-        await invalidate_list("products")
-        for sc in (product.shared_collections or []):
-            await invalidate_list(f"product:catalog:{sc.slug}")
-            await manager.broadcast_to_all(
-                data={
-                    "key": f"product:catalog:{sc.slug}",
-                },
-                message_type="invalidate",
-            )
-        await bust(f"product:{product.slug}")
-        await manager.broadcast_to_all(
-            data={
-                "key": f"product:{product.slug}",
-            },
-            message_type="invalidate",
-        )
-        await manager.broadcast_to_all(
-            data={
-                "key": "products",
-            },
-            message_type="invalidate",
-        )
+        # logger.info(f"Successfully reindexed product {product_id}")
+
+        # await bust(f"product:{product.slug}")
+        # await manager.broadcast_to_all(
+        #     data={
+        #         "key": f"product:{product.slug}",
+        #     },
+        #     message_type="invalidate",
+        # )
+        # await invalidate_list("products")
+        # await manager.broadcast_to_all(
+        #     data={
+        #         "key": "products",
+        #     },
+        #     message_type="invalidate",
+        # )
 
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
@@ -169,39 +207,47 @@ async def index_products():
         logger.info("Starting re-indexing..........")
         products = await db.product.find_many(
             include={
-                "variants": True,
-                "categories": True,
-                "collections": True,
+                # "variants": True,
+                # "categories": True,
+                # "collections": True,
                 "images": True,
-                "reviews": True,
-                "shared_collections": True,
+                # "reviews": True,
+                # "shared_collections": True,
             }
         )
 
-        documents = []
-        for product in products:
-            product_dict = prepare_product_data_for_indexing(product)
-            documents.append(product_dict)
+        try:
+            for product in products:
+                for image in product.images:
+                    await reindex_image(image_id=image.id)
+            logger.info(f"Successfully reindexed products images")
+        except Exception as e:
+            logger.debug(f"Error re-indexing products images: {e}")
 
-        clear_index(settings.MEILI_PRODUCTS_INDEX)
-        add_documents_to_index(
-            index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+        # documents = []
+        # for product in products:
+        #     product_dict = prepare_product_data_for_indexing(product)
+        #     documents.append(product_dict)
 
-        logger.info(f"Reindexed {len(documents)} products successfully.")
-        await invalidate_list("products")
-        await invalidate_list("product")
-        await manager.broadcast_to_all(
-            data={
-                "key": "products",
-            },
-            message_type="invalidate",
-        )
-        await manager.broadcast_to_all(
-            data={
-                "key": "product",
-            },
-            message_type="invalidate",
-        )
+        # clear_index(settings.MEILI_PRODUCTS_INDEX)
+        # add_documents_to_index(
+        #     index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+
+        # logger.info(f"Reindexed {len(documents)} products successfully.")
+        # await invalidate_list("products")
+        # await invalidate_list("product")
+        # await manager.broadcast_to_all(
+        #     data={
+        #         "key": "products",
+        #     },
+        #     message_type="invalidate",
+        # )
+        # await manager.broadcast_to_all(
+        #     data={
+        #         "key": "product",
+        #     },
+        #     message_type="invalidate",
+        # )
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 
@@ -253,16 +299,18 @@ async def product_export(email: str, user_id: str):
 
 
 @with_prisma_connection
-async def index_images():
+async def index_images(invalidate_products: bool = False, product_only: bool = False):
     """
     Re-index all products in the database to Meilisearch.
     """
     try:
         logger.info("Starting re-indexing..........")
+        where_clause = {"order": 0}
+        if product_only:
+            where_clause["product"] = {"is_not": None}
         images = await db.productimage.find_many(
-            where={
-                "order": 0,
-            },
+            where=where_clause,
+            order={"id": "desc"},
             include={
                 "product": {
                     "include": {
@@ -285,21 +333,44 @@ async def index_images():
         add_documents_to_index(
             index_name=settings.MEILI_IMAGES_INDEX, documents=documents)
 
-        logger.info(f"Reindexed {len(documents)} products successfully.")
-        # await invalidate_list("products")
-        # await invalidate_list("product")
-        # await manager.broadcast_to_all(
-        #         data={
-        #             "key": "products",
-        #         },
-        #         message_type="invalidate",
-        #     )
-        # await manager.broadcast_to_all(
-        #         data={
-        #             "key": "product",
-        #         },
-        #         message_type="invalidate",
-        #     )
+        logger.info(f"Reindexed {len(documents)} images successfully.")
+
+        if invalidate_products:
+            documents = []
+            for image in images:
+                if image.product:
+                    product_dict = prepare_product_data_for_indexing(image.product)
+                    documents.append(product_dict)
+
+            clear_index(settings.MEILI_PRODUCTS_INDEX)
+            add_documents_to_index(
+                index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+
+            logger.info(f"Reindexed {len(documents)} products successfully.")
+
+        if invalidate_products:
+            await invalidate_list("products")
+            await manager.broadcast_to_all(
+                    data={
+                        "key": "products",
+                    },
+                message_type="invalidate",
+            )
+            await invalidate_list("product")
+            await manager.broadcast_to_all(
+                data={
+                    "key": "product",
+                },
+                message_type="invalidate",
+            )
+        else:
+            await invalidate_list("products:gallery")
+            await manager.broadcast_to_all(
+                    data={
+                        "key": "products:gallery",
+                    },
+                message_type="invalidate",
+            )
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 
@@ -315,6 +386,7 @@ async def reindex_image(image_id: int):
                         "categories": True,
                         "collections": True,
                         "variants": True,
+                        "images": True,
                         "shared_collections": True,
                     }
                 }
@@ -326,36 +398,40 @@ async def reindex_image(image_id: int):
                 f"Product image with id {image_id} not found for re-indexing.")
             return
 
-        image_data = prepare_image_data_for_indexing(image)
-
         try:
-            await update_document(index_name="beafy", document=image_data)
+            image_data = prepare_image_data_for_indexing(image)
+            await update_document(index_name=settings.MEILI_IMAGES_INDEX, document=image_data)
+            if image.product:
+                product_data = prepare_product_data_for_indexing(image.product)
+                await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
         except Exception as e:
             logger.debug(f"Error re-indexing product image {image_id}: {e}")
 
         logger.info(f"Successfully reindexed product image {image_id}")
-        # await invalidate_list("products")
-        # for sc in (image.product.shared_collections or []):
-        #     await invalidate_list(f"product:catalog:{sc.slug}")
-        #     await manager.broadcast_to_all(
-        #         data={
-        #             "key": f"product:catalog:{sc.slug}",
-        #         },
-        #         message_type="invalidate",
-        #     )
-        # await bust(f"product:{product.slug}")
-        # await manager.broadcast_to_all(
-        #         data={
-        #             "key": f"product:{product.slug}",
-        #         },
-        #         message_type="invalidate",
-        #     )
-        # await manager.broadcast_to_all(
-        #         data={
-        #             "key": "products",
-        #         },
-        #         message_type="invalidate",
-        #     )
+
+        if image.product:
+            await bust(f"product:{image.product.slug}")
+            await manager.broadcast_to_all(
+                    data={
+                        "key": f"product:{image.product.slug}",
+                    },
+                message_type="invalidate",
+            )
+            await invalidate_list("products")
+            await manager.broadcast_to_all(
+                    data={
+                        "key": "products",
+                    },
+                    message_type="invalidate",
+                )
+        else:
+            await invalidate_list("products:gallery")
+            await manager.broadcast_to_all(
+                    data={
+                        "key": "products:gallery",
+                    },
+                    message_type="invalidate",
+                )
 
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
@@ -418,29 +494,34 @@ def prepare_image_data_for_indexing(image) -> dict:
         "id": image.id,
         "product_id": image.product_id,
         "image": image.image,
+        "created_at": image.created_at,
     }
 
     if product:
+        image_dict["name"] = product.name
+        image_dict["description"] = product.description
+        image_dict["slug"] = product.slug
         image_dict["collections"] = [{"id": c.id, "slug": c.slug, "name": c.name}
                                      for c in (product.collections or [])]
         image_dict["categories"] = [{"id": c.id, "slug": c.slug, "name": c.name}
                                     for c in (product.categories or [])]
-        image_dict["sorted_images"] = [img.image for img in sorted(
+        sorted_images = [img.image for img in sorted(
             (product.images or []), key=lambda img: img.order)]
-        image_dict["image"] = image_dict["sorted_images"][0] if image_dict["sorted_images"] else None
+        image_dict["image"] = sorted_images[0] if sorted_images else None
 
         variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "status": v.status} for v in (product.variants or [])]
         image_dict["variants"] = variants
 
-        variant_prices = [v["price"]
-                          for v in variants if v.get("price") is not None]
-        image_dict["variant_prices"] = variant_prices
+        # variant_prices = [v["price"]
+        #                   for v in variants if v.get("price") is not None]
+        # image_dict["variant_prices"] = variant_prices
 
         if any(v["inventory"] > 0 for v in variants):
-            image_dict["status"] = "IN STOCK"
+            image_dict["status"] = "IN_STOCK"
         else:
-            image_dict["status"] = "OUT OF STOCK"
+            image_dict["status"] = "OUT_OF_STOCK"
         image_dict["active"] = product.active
+        image_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
     return image_dict
 

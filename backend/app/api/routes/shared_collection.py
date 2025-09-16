@@ -8,7 +8,7 @@ from app.prisma_client import prisma as db
 from app.services.shared_collection import SharedCollectionService
 from math import ceil
 from app.services.redis import cache_response, invalidate_list
-from app.services.product import reindex_catalog
+from app.services.product import reindex_catalog, reindex_catalogs
 from app.core.deps import get_current_superuser, UserDep
 from app.models.generic import Message
 
@@ -47,7 +47,11 @@ async def delete_shared_collection_view(id: int):
     return None
 
 
-# Catalogs
+@router.get("/all")
+@cache_response(key_prefix="catalog", key="all")
+async def list_all_shared_collections(request: Request):
+    return await db.sharedcollection.find_many(order={"created_at": "desc"})
+
 @router.get("/", dependencies=[Depends(get_current_superuser)], response_model=SharedCollections)
 @cache_response(key_prefix="catalog")
 async def list_shared_collections(
@@ -342,7 +346,6 @@ async def bulk_add_products_to_shared_collection(id: int, data: SharedCollection
         data={"products": {"connect": [{"id": pid} for pid in data.product_ids]}}
     )
 
-    for pid in data.product_ids:
-        background_tasks.add_task(reindex_catalog, product_id=pid)
+    background_tasks.add_task(reindex_catalogs, product_ids=data.product_ids)
 
     return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}

@@ -190,15 +190,28 @@ export const CatalogSchema = z.object({
     total_pages: z.number(),
 });
 
+export const DBCatalogSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    slug: z.string(),
+    description: z.string().optional(),
+    view_count: z.number(),
+    is_active: z.boolean(),
+});
+
 export const SearchImageItemSchema = z.object({
     id: z.number(),
     product_id: z.number().optional(),
+    name: z.string(),
+    slug: z.string(),
+    description: z.string(),
     image: z.string(),
     active: z.boolean(),
-    variants: z.array(ProductVariantSchema).optional(),
     status: ProductStatusSchema,
     categories: z.array(CategorySchema),
     collections: z.array(CollectionSchema),
+    variants: z.array(ProductVariantSchema).optional(),
+    catalogs: z.array(z.string()),
 });
 
 export const SearchImageSchema = z.object({
@@ -209,6 +222,8 @@ export const SearchImageSchema = z.object({
     total_pages: z.number(),
 });
 
+
+export type DBCatalog = z.infer<typeof DBCatalogSchema>;
 export type SearchImageItem = z.infer<typeof SearchImageItemSchema>;
 export type SearchImage = z.infer<typeof SearchImageSchema>;
 
