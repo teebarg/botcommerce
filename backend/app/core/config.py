@@ -103,6 +103,10 @@ class Settings(BaseSettings):
     GOOGLE_SPREADSHEET_ID: str = ""
     GOOGLE_GID: str = ""
 
+    FIREBASE_PROJECT_ID: str = ""
+    FIREBASE_CLIENT_EMAIL: str = ""
+    FIREBASE_PRIVATE_KEY: str = ""
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",

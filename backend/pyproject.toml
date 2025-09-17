@@ -26,6 +26,8 @@ dependencies = [
     "reportlab<5.0.0,>=4.0.0",
     "sentry-sdk[fastapi]<3.0.0,>=1.40.6",
     "asyncpg==0.30.0",
+    "boto3==1.40.32",
+    "firebase-admin==7.1.0",
 ]
 
 [tool.uv]

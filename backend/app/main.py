@@ -22,6 +22,9 @@ from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
 from app.core.db import database
+import boto3
+import firebase_admin
+from firebase_admin import credentials
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -32,6 +35,15 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
+    if not firebase_admin._apps:
+        cred = credentials.Certificate({
+            "type": "service_account",
+        })
+
+        firebase_admin.initialize_app(
+            cred,
+            {"storageBucket": f"{settings.FIREBASE_PROJECT_ID}.appspot.com"}
+        )
     await database.connect()
     await db.connect()
 
@@ -290,3 +302,45 @@ async def notify_order(order_id: int):
     formatted_text = f"New order received: {order_id}\nsecond line"
     logger.publish(formatted_text, extra={"channel": "orders"})
     return {"message": f"Order notification sent for order {order_id}"}
+
+
+R2_BUCKET = "myshop-images"
+R2_ENDPOINT = "https://id.r2.cloudflarestorage.com"
+R2_ACCESS_KEY = "key"
+R2_SECRET_KEY = "secret"
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url=R2_ENDPOINT,
+    aws_access_key_id=R2_ACCESS_KEY,
+    aws_secret_access_key=R2_SECRET_KEY,
+)
+
+@app.post("/r2/signed-url")
+async def get_signed_url(filename: str, content_type: str):
+    try:
+        key = f"products/{filename}"
+        url = s3.generate_presigned_url(
+            "put_object",
+            Params={
+                "Bucket": R2_BUCKET,
+                "Key": key,
+                "ContentType": content_type,
+                "ACL": "public-read"
+            },
+            ExpiresIn=3600,  # 1 hour
+        )
+        public_url = f"https://pub-id.r2.dev/{R2_BUCKET}/{key}"
+        return {"signedUrl": url, "publicUrl": public_url, "path": key}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.delete("/r2/delete")
+async def delete_file(path: str):
+    try:
+        s3.delete_object(Bucket=R2_BUCKET, Key=path)
+        return {"message": "deleted"}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
