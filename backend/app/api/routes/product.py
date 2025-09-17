@@ -269,18 +269,17 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
         message_type="product_bulk_update"
     )
 
-
 router = APIRouter()
 
 
-@router.get("/popular")
-async def get_popular_products(
-    limit: int = Query(default=10, le=20)
-) -> list[SearchProduct]:
-    """Get popular products."""
-    service = PopularProductsService()
-    products = await service.get_popular_products(limit)
-    return products
+# @router.get("/popular")
+# async def get_popular_products(
+#     limit: int = Query(default=10, le=20)
+# ) -> list[SearchProduct]:
+#     """Get popular products."""
+#     service = PopularProductsService()
+#     products = await service.get_popular_products(limit)
+#     return products
 
 @router.get("/gallery3")
 # @cache_response("products:gallery3")
@@ -424,7 +423,7 @@ async def public_search(
     colors: str = Query(default=""),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
-) -> list[SearchProduct]:
+):
     """
     Retrieve products using Meilisearch, sorted by latest.
     """
@@ -505,7 +504,7 @@ async def search(
     active: bool = Query(default=True),
     show_suggestions: bool = Query(default=False),
     show_facets: bool = Query(default=False),
-) -> SearchProducts:
+):
     """
     Retrieve products using Meilisearch, sorted by latest.
     """

@@ -438,7 +438,15 @@ async def reindex_image(image_id: int):
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
-    product_dict = product.dict()
+    # product_dict = product.dict()
+    product_dict = {
+        "id": product.id,
+        "name": product.name,
+        "slug": product.slug,
+        "description": product.description,
+        "sku": product.sku,
+        "active": product.active,
+    }
 
     product_dict["collection_slugs"] = [
         c.slug for c in (product.collections or [])]
@@ -484,8 +492,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["colors"] = [v["color"]
                               for v in variants if v.get("color") is not None]
 
-    product_dict["catalogs"] = [dict(sc)
-                                for sc in (product.shared_collections or [])]
+    # product_dict["catalogs"] = [dict(sc)
+    #                             for sc in (product.shared_collections or [])]
     product_dict["catalogs_slugs"] = [
         sc.slug for sc in (product.shared_collections or [])]
 

@@ -9,7 +9,6 @@ import { GalleryCard } from "./product-gallery-card";
 import { ProductBulkActions } from "./gallery-bulk-action";
 import { GalleryImagesUpload } from "./gallery-images-upload";
 
-import { api } from "@/apis/client";
 import { useImageGalleryInfinite, useBulkDeleteGalleryImages } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
