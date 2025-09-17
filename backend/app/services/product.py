@@ -459,12 +459,14 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     # product_dict["categories"] = [dict(c) for c in (product.categories or [])]
     product_dict["categories"] = [{"id": c.id, "slug": c.slug, "name": c.name}
                                     for c in (product.categories or [])]
-    product_dict["images"] = [dict(i) for i in (product.images or [])]
-    product_dict["sorted_images"] = [img.image for img in sorted(
-        (product.images or []), key=lambda img: img.order)]
-    product_dict["image"] = product_dict["sorted_images"][0] if product_dict["sorted_images"] else None
+    # product_dict["images"] = [dict(i) for i in (product.images or [])]
+    product_dict["images"] = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
+    product_dict["image"] = product_dict["images"][0] if product_dict["images"] else None
 
-    variants = [v.dict() for v in (product.variants or [])]
+    # variants = [v.dict() for v in (product.variants or [])]
+    # product_dict["variants"] = variants
+
+    variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "status": v.status} for v in (product.variants or [])]
     product_dict["variants"] = variants
 
     variant_prices = [v["price"]
@@ -476,7 +478,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         variant_prices) if variant_prices else 0
 
     reviews = [r.dict() for r in (product.reviews or [])]
-    product_dict["reviews"] = reviews
+    # product_dict["reviews"] = reviews
 
     ratings = [r["rating"] for r in reviews if r.get("rating") is not None]
     product_dict["review_count"] = len(ratings)
@@ -494,8 +496,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
 
     # product_dict["catalogs"] = [dict(sc)
     #                             for sc in (product.shared_collections or [])]
-    product_dict["catalogs_slugs"] = [
-        sc.slug for sc in (product.shared_collections or [])]
+    product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
     return product_dict
 
@@ -515,9 +516,9 @@ def prepare_image_data_for_indexing(image) -> dict:
         image_dict["slug"] = product.slug
         image_dict["collections"] = [{"id": c.id, "name": c.name} for c in (product.collections or [])]
         image_dict["categories"] = [{"id": c.id, "name": c.name} for c in (product.categories or [])]
-        sorted_images = [img.image for img in sorted(
-            (product.images or []), key=lambda img: img.order)]
-        image_dict["image"] = sorted_images[0] if sorted_images else None
+        images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
+        image_dict["images"] = images
+        image_dict["image"] = images[0] if images else None
 
         variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "status": v.status} for v in (product.variants or [])]
         image_dict["variants"] = variants

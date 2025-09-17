@@ -3,7 +3,6 @@
 import React from "react";
 import { Plus, Check, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 
 import { SocialShare } from "./social-share";
@@ -12,11 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-    useAddProductToSharedCollection,
-    useRemoveProductFromSharedCollection,
-    useAllSharedCollections,
-} from "@/lib/hooks/useCollection";
+import { useAddProductToSharedCollection, useRemoveProductFromSharedCollection, useAllSharedCollections } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
 import { DBCatalog, SearchImageItem } from "@/schemas";
 import Overlay from "@/components/overlay";
@@ -55,7 +50,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                         <h4 className="font-medium mb-2">Product:</h4>
                         <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                             <div key={product.id} className="relative w-12 h-12 rounded-md bg-content3 overflow-hidden p-2">
-                                <Image fill alt={product.name} className="object-contain" src={product.image || "/placeholder.jpg"} />
+                                <img alt={product.name} className="object-contain" src={product.image || "/placeholder.jpg"} />
                             </div>
                             <div>
                                 <p className="font-medium text-sm">{product.name}</p>

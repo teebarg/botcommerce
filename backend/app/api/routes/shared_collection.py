@@ -144,7 +144,7 @@ async def search(
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
-    filters = [f"catalogs_slugs IN [{slug}]"]
+    filters = [f"catalogs IN [{slug}]"]
     if categories:
         filters.append(f"category_slugs IN {url_to_list(categories)}")
     if collections:

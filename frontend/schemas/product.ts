@@ -120,8 +120,8 @@ export const ProductSearchSchema = z.object({
     collections: z.array(CollectionSchema),
     collection_slugs: z.array(z.string()),
     tags: z.null(),
-    images: z.array(ProductImageSchema),
-    sorted_images: z.array(z.string()),
+    // images: z.array(ProductImageSchema),
+    images: z.array(z.string()),
     reviews: z.array(z.any()).nullable(),
     favorites: z.null(),
     average_rating: z.number(),
@@ -221,7 +221,6 @@ export const SearchImageSchema = z.object({
     total_count: z.number(),
     total_pages: z.number(),
 });
-
 
 export type DBCatalog = z.infer<typeof DBCatalogSchema>;
 export type SearchImageItem = z.infer<typeof SearchImageItemSchema>;

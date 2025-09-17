@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, isSelected = false }
                             alt={product.name}
                             className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            src={product.sorted_images?.[0] || "/placeholder.jpg"}
+                            src={product.images?.[0] || "/placeholder.jpg"}
                             onLoad={() => setImageLoaded(true)}
                         />
 

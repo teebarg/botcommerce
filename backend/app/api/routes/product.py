@@ -281,55 +281,55 @@ router = APIRouter()
 #     products = await service.get_popular_products(limit)
 #     return products
 
-@router.get("/gallery3")
+# @router.get("/gallery3")
 # @cache_response("products:gallery3")
-async def image_gallery(
-    request: Request,
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, le=100),
-):
-    """
-    Lightweight gallery endpoint.
-    Only returns product images and basic product info.
-    Relations (categories, collections, variants, shared_collections)
-    should be fetched on-demand in a detail endpoint.
-    """
-    try:
-        # ✅ raw SQL for optimized SELECT
-        query = """
-        SELECT pi.id, pi.image, pi.product_id,
-                p.name AS product_name,
-                p.slug AS product_slug
-        FROM "product_images" pi
-        LEFT JOIN "products" p ON p.id = pi.product_id
-        WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
-        ORDER BY pi.id DESC
-        OFFSET $1 LIMIT $2
-        """
+# async def image_gallery(
+#     request: Request,
+#     skip: int = Query(default=0, ge=0),
+#     limit: int = Query(default=10, le=100),
+# ):
+#     """
+#     Lightweight gallery endpoint.
+#     Only returns product images and basic product info.
+#     Relations (categories, collections, variants, shared_collections)
+#     should be fetched on-demand in a detail endpoint.
+#     """
+#     try:
+#         # ✅ raw SQL for optimized SELECT
+#         query = """
+#         SELECT pi.id, pi.image, pi.product_id,
+#                 p.name AS product_name,
+#                 p.slug AS product_slug
+#         FROM "product_images" pi
+#         LEFT JOIN "products" p ON p.id = pi.product_id
+#         WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
+#         ORDER BY pi.id DESC
+#         OFFSET $1 LIMIT $2
+#         """
 
-        total_query = """
-        SELECT COUNT(*)::int AS count
-        FROM "product_images" pi
-        LEFT JOIN "products" p ON p.id = pi.product_id
-        WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
-        """
+#         total_query = """
+#         SELECT COUNT(*)::int AS count
+#         FROM "product_images" pi
+#         LEFT JOIN "products" p ON p.id = pi.product_id
+#         WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
+#         """
 
-        async with database.pool.acquire() as conn:
-            images = await conn.fetch(query, skip, limit)
-            total = await conn.fetch(total_query)
+#         async with database.pool.acquire() as conn:
+#             images = await conn.fetch(query, skip, limit)
+#             total = await conn.fetch(total_query)
 
 
-        return {
-            "images": [dict(record) for record in images],  # convert asyncpg.Record → dict
-            "skip": skip,
-            "limit": limit,
-            "total_pages": ceil(total[0]["count"] / limit) if limit else 1,
-            "total_count": total[0]["count"],
-        }
+#         return {
+#             "images": [dict(record) for record in images],  # convert asyncpg.Record → dict
+#             "skip": skip,
+#             "limit": limit,
+#             "total_pages": ceil(total[0]["count"] / limit) if limit else 1,
+#             "total_count": total[0]["count"],
+#         }
 
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+#     except Exception as e:
+#         logger.error(e)
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/gallery")
@@ -504,7 +504,7 @@ async def search(
     active: bool = Query(default=True),
     show_suggestions: bool = Query(default=False),
     show_facets: bool = Query(default=False),
-):
+) -> SearchProducts:
     """
     Retrieve products using Meilisearch, sorted by latest.
     """
