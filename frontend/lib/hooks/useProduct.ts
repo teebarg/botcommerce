@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tansta
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, ProductVariant, SearchImageItem } from "@/schemas";
+import { Product, PaginatedProductSearch, Message, ProductVariant } from "@/schemas";
 
 type SearchParams = {
     search?: string;

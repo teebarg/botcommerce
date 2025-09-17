@@ -113,19 +113,19 @@ export const SearchVariantSchema = z.object({
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
     measurement: z.number().nullable().optional(),
-})
+});
 
 export const SearchCollectionSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
-})
+});
 
 export const SearchCategorySchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
-})
+});
 
 export const ProductSearchSchema = z.object({
     id: z.number(),
@@ -242,6 +242,9 @@ export const SearchImageSchema = z.object({
     total_pages: z.number(),
 });
 
+export type SearchCategory = z.infer<typeof SearchCategorySchema>;
+export type SearchCollection = z.infer<typeof SearchCollectionSchema>;
+export type SearchVariant = z.infer<typeof SearchVariantSchema>;
 export type DBCatalog = z.infer<typeof DBCatalogSchema>;
 export type SearchImageItem = z.infer<typeof SearchImageItemSchema>;
 export type SearchImage = z.infer<typeof SearchImageSchema>;

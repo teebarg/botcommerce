@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { api } from "@/apis/client";
 import { Message, SearchImageItem } from "@/schemas";
 
-
 export const useImageGalleryInfinite = (pageSize: number = 24) => {
     return useInfiniteQuery({
         queryKey: ["products", "gallery"],

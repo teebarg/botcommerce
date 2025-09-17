@@ -9,7 +9,6 @@ import {
     LogOut,
     PanelLeftIcon,
     User,
-    Box,
     Star,
     Activity,
     MessageSquare,
