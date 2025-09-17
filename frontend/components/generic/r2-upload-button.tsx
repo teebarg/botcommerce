@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { AlertCircle, CircleCheck, Trash2, Upload, Image as ImageIcon } from "lucide-react";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -65,12 +66,14 @@ export default function R2Uploader({
                         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/r2/signed-url?filename=${encodeURIComponent(item.file.name)}&content_type=${encodeURIComponent(item.file.type)}`,
                         { method: "POST" }
                     );
+
                     if (!res.ok) throw new Error("Failed to get signed URL");
                     const { signedUrl, publicUrl, path } = await res.json();
 
                     // 2. Upload to R2 with progress
                     await new Promise<void>((resolve, reject) => {
                         const xhr = new XMLHttpRequest();
+
                         xhr.open("PUT", signedUrl, true);
                         xhr.setRequestHeader("Content-Type", item.file.type);
 

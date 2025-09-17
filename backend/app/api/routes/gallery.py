@@ -8,7 +8,6 @@ from fastapi import (
     BackgroundTasks,
     Request
 )
-from app.core.deps import supabase
 from app.core.logging import get_logger
 from app.core.utils import slugify, generate_sku
 from app.models.generic import Message, ImageBulkDelete
@@ -46,16 +45,6 @@ async def process_bulk_delete_images(images: list):
 
         for index, image in enumerate(images):
             try:
-                # if image.image and "/storage/v1/object/public/product-images/" in image.image:
-                #     try:
-                #         file_path = image.image.split(
-                #             "/storage/v1/object/public/product-images/")[1]
-                #         supabase.storage.from_(
-                #             "product-images").remove([file_path])
-                #     except Exception as storage_error:
-                #         logger.warning(
-                #             f"Failed to delete from storage: {storage_error}")
-
                 if image.image:
                     try:
                         await delete_images(image.image)
@@ -321,9 +310,6 @@ async def delete_gallery_image(image_id: int) -> Message:
 
     if not image.product_id:
         try:
-            # file_path = image.image.split(
-            #     "/storage/v1/object/public/product-images/")[1]
-            # supabase.storage.from_("product-images").remove([file_path])
             await delete_images(image.image)
         except Exception as e:
             logger.error(f"Error deleting image {image.image}: {e}")
@@ -346,16 +332,6 @@ async def delete_gallery_image(image_id: int) -> Message:
         image_urls = [img.image for img in images]
 
         await delete_images(image_urls)
-
-        # images = await tx.productimage.find_many(where={"product_id": product_id})
-        # file_paths = [
-        #     img.image.split("/storage/v1/object/public/product-images/")[1]
-        #     for img in images
-        #     if "/storage/v1/object/public/product-images/" in img.image
-        # ]
-
-        # if file_paths:
-        #     supabase.storage.from_("product-images").remove(file_paths)
 
         await tx.productimage.delete_many(where={"product_id": product_id})
         await tx.review.delete_many(where={"product_id": product_id})

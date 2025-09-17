@@ -2,14 +2,19 @@
 
 import React, { useRef, useState } from "react";
 import { AlertCircle, CircleCheck, Trash2, Upload, Image as ImageIcon } from "lucide-react";
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
-
-const firebaseConfig = {};
+const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.appspot.com`,
+};
 
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
@@ -77,6 +82,7 @@ export default function FirebaseUploader({
                 "state_changed",
                 (snapshot: { bytesTransferred: number; totalBytes: number }) => {
                     const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+
                     item.progress = percent;
                     setFiles((prev) => [...prev]);
                 },
@@ -87,6 +93,7 @@ export default function FirebaseUploader({
                 },
                 async () => {
                     const url = await getDownloadURL(uploadTask.snapshot.ref);
+
                     item.url = url;
                     item.status = "success";
                     item.path = path;
@@ -101,6 +108,7 @@ export default function FirebaseUploader({
 
         try {
             const storageRef = ref(storage, file.path);
+
             await deleteObject(storageRef);
             setFiles((prev) => prev.filter((f) => f !== file));
         } catch (error) {

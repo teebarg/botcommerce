@@ -2,13 +2,15 @@ from typing import Union, List
 from firebase_admin import storage as fb_storage
 from app.core.logging import get_logger
 from app.core.deps import supabase
+import urllib.parse
+from typing import List, Union
 
 logger = get_logger(__name__)
 
 async def delete_images(images: Union[str, List[str]]):
     """
     Deletes images from Supabase or Firebase depending on the URL.
-    
+
     Args:
         images (str | list[str]): Image URL or list of image URLs
     """
@@ -23,14 +25,16 @@ async def delete_images(images: Union[str, List[str]]):
             continue
 
         if "/storage/v1/object/public/product-images/" in img:
+            # Supabase public URL → extract relative path
             supabase_paths.append(
                 img.split("/storage/v1/object/public/product-images/")[1]
             )
         elif "firebasestorage.googleapis.com" in img:
-            # Extract firebase path
             try:
+                # Extract path after `/o/` and before `?`
                 parts = img.split("/o/")[-1].split("?")[0]
-                firebase_paths.append(parts.replace("%2F", "/"))
+                # Decode all URL encodings like %20 → space
+                firebase_paths.append(urllib.parse.unquote(parts))
             except Exception as e:
                 logger.error(f"Failed to parse Firebase URL {img}: {e}")
         else:
@@ -44,7 +48,6 @@ async def delete_images(images: Union[str, List[str]]):
         except Exception as e:
             logger.error(f"Error deleting Supabase images: {e}")
 
-    # Delete Firebase images individually
     if firebase_paths:
         bucket = fb_storage.bucket()
         for path in firebase_paths:

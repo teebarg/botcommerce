@@ -43,14 +43,14 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                                     "w-full h-full object-cover transition-all duration-500 group-hover:scale-110",
                                     imageLoaded ? "opacity-100" : "opacity-0"
                                 )}
+                                loading="lazy"
+                                sizes="(max-width: 768px) 100vw, 300px"
                                 src={`${image.image}?width=200&quality=70`}
                                 srcSet={`
                                     ${image.image}?width=200&quality=70 200w,
                                     ${image.image}?width=400&quality=70 400w,
                                     ${image.image}?width=800&quality=70 800w
                                   `}
-                                loading="lazy"
-                                sizes="(max-width: 768px) 100vw, 300px"
                                 onLoad={() => setImageLoaded(true)}
                             />
                             {!imageLoaded && (
