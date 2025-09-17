@@ -513,10 +513,8 @@ def prepare_image_data_for_indexing(image) -> dict:
         image_dict["name"] = product.name
         image_dict["description"] = product.description
         image_dict["slug"] = product.slug
-        image_dict["collections"] = [{"id": c.id, "slug": c.slug, "name": c.name}
-                                     for c in (product.collections or [])]
-        image_dict["categories"] = [{"id": c.id, "slug": c.slug, "name": c.name}
-                                    for c in (product.categories or [])]
+        image_dict["collections"] = [{"id": c.id, "name": c.name} for c in (product.collections or [])]
+        image_dict["categories"] = [{"id": c.id, "name": c.name} for c in (product.categories or [])]
         sorted_images = [img.image for img in sorted(
             (product.images or []), key=lambda img: img.order)]
         image_dict["image"] = sorted_images[0] if sorted_images else None
