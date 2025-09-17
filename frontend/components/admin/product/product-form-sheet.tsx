@@ -10,7 +10,7 @@ import { useCategories } from "@/lib/hooks/useCategories";
 import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Product, ProductVariant, SearchImageItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useProduct";
+import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";

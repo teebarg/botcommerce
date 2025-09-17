@@ -12,7 +12,7 @@ import { SearchImageItem } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
-import { useDeleteGalleryImage } from "@/lib/hooks/useProduct";
+import { useDeleteGalleryImage } from "@/lib/hooks/useGallery";
 
 interface GalleryCardActionProps {
     image: SearchImageItem;

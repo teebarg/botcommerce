@@ -3,13 +3,13 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import SupabaseUploader from "@/components/generic/supabase-upload-button";
-import { useBulkSaveImageUrls } from "@/lib/hooks/useProduct";
+import { useBulkUploadImages } from "@/lib/hooks/useGallery";
 
 export function GalleryImagesUpload() {
     const editState = useOverlayTriggerState({});
     const [isUploading, setIsUploading] = useState<boolean>(false);
 
-    const { mutateAsync: bulkSaveImageUrls } = useBulkSaveImageUrls();
+    const { mutateAsync: bulkSaveImageUrls } = useBulkUploadImages();
 
     const handleUpload = async (urls: string[]) => {
         setIsUploading(true);

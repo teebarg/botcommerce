@@ -9,7 +9,7 @@ import { GalleryCard } from "./product-gallery-card";
 import { ProductBulkActions } from "./gallery-bulk-action";
 import { GalleryImagesUpload } from "./gallery-images-upload";
 
-import { useImageGalleryInfinite, useBulkDeleteGalleryImages } from "@/lib/hooks/useProduct";
+import { useImageGalleryInfinite, useBulkDeleteGalleryImages, useReIndexGallery } from "@/lib/hooks/useGallery";
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ export function ProductImageGallery() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { currentMessage, messages } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
+    const { mutateAsync: reIndexGallery, isPending: isReIndexing } = useReIndexGallery();
 
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
@@ -134,8 +135,11 @@ export function ProductImageGallery() {
                 <h3 className="text-lg font-semibold">Image Gallery</h3>
                 <p className="text-sm text-default-500">Manage your product images.</p>
             </div>
-            <div className="mb-8 max-w-xl">
+            <div className="mb-8 max-w-xl flex gap-2">
                 <GalleryImagesUpload />
+                <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
+                    Re-index
+                </Button>
             </div>
 
             {isImagesLoading ? (

@@ -130,9 +130,6 @@ class ProductCreateBundle(ProductCreate):
     images: Optional[List[ImageUpload]] = None
     variants: Optional[List[VariantWithStatus]] = None
 
-class ProductBulkImages(BaseModel):
-    images: Optional[List[ImageUpload]] = None
-
 class ProductImageMetadata(ProductCreate):
     variants: Optional[List[VariantWithStatus]] = None
 

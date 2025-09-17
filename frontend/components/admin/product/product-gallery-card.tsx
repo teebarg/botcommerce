@@ -19,7 +19,6 @@ interface GalleryCardProps {
 
 export function GalleryCard({ image, onClick, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
-    // const imgState = useOverlayTriggerState({});
 
     const handleSelectionChange = (checked: boolean) => {
         onSelectionChange?.(image.id, checked);
