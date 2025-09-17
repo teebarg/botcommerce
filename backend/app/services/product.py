@@ -17,7 +17,7 @@ async def sync_index_image(image_id:str, product: Product = None):
     try:
         if product is not None:
             delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(product.id))
-        delete_document(index_name=settings.MEILI_IMAGES_INDEX, document_id=str(image_id))
+        delete_document(index_name=settings.MEILI_GALLERY_INDEX, document_id=str(image_id))
     except Exception as e:
         logger.debug(f"Error re-indexing image {image_id}: {e}")
 
@@ -227,9 +227,9 @@ async def index_images(invalidate_products: bool = False, product_only: bool = F
             image_dict = prepare_image_data_for_indexing(image)
             documents.append(image_dict)
 
-        clear_index(settings.MEILI_IMAGES_INDEX)
+        clear_index(settings.MEILI_GALLERY_INDEX)
         add_documents_to_index(
-            index_name=settings.MEILI_IMAGES_INDEX, documents=documents)
+            index_name=settings.MEILI_GALLERY_INDEX, documents=documents)
 
         logger.info(f"Reindexed {len(documents)} images successfully.")
 
@@ -280,7 +280,7 @@ async def reindex_image(image_id: int):
 
         try:
             image_data = prepare_image_data_for_indexing(image)
-            await update_document(index_name=settings.MEILI_IMAGES_INDEX, document=image_data)
+            await update_document(index_name=settings.MEILI_GALLERY_INDEX, document=image_data)
             if image.product:
                 product_data = prepare_product_data_for_indexing(image.product)
                 await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
@@ -300,7 +300,6 @@ async def reindex_image(image_id: int):
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
-    # product_dict = product.dict()
     product_dict = {
         "id": product.id,
         "name": product.name,
@@ -310,23 +309,14 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         "active": product.active,
     }
 
-    product_dict["collection_slugs"] = [
-        c.slug for c in (product.collections or [])]
-    # product_dict["collections"] = [dict(c)
-    #                                for c in (product.collections or [])]
+    product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
     product_dict["collections"] = [{"id": c.id, "slug": c.slug, "name": c.name}
                                    for c in (product.collections or [])]
-    product_dict["category_slugs"] = [
-        c.slug for c in (product.categories or [])]
-    # product_dict["categories"] = [dict(c) for c in (product.categories or [])]
+    product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
     product_dict["categories"] = [{"id": c.id, "slug": c.slug, "name": c.name}
                                     for c in (product.categories or [])]
-    # product_dict["images"] = [dict(i) for i in (product.images or [])]
     product_dict["images"] = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
     product_dict["image"] = product_dict["images"][0] if product_dict["images"] else None
-
-    # variants = [v.dict() for v in (product.variants or [])]
-    # product_dict["variants"] = variants
 
     variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "status": v.status} for v in (product.variants or [])]
     product_dict["variants"] = variants
@@ -340,7 +330,6 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         variant_prices) if variant_prices else 0
 
     reviews = [r.dict() for r in (product.reviews or [])]
-    # product_dict["reviews"] = reviews
 
     ratings = [r["rating"] for r in reviews if r.get("rating") is not None]
     product_dict["review_count"] = len(ratings)
@@ -355,9 +344,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
                              for v in variants if v.get("size") is not None]
     product_dict["colors"] = [v["color"]
                               for v in variants if v.get("color") is not None]
-
-    # product_dict["catalogs"] = [dict(sc)
-    #                             for sc in (product.shared_collections or [])]
+    product_dict["measurements"] = [v["measurement"]
+                                    for v in variants if v.get("measurement") is not None]
     product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
     return product_dict
@@ -384,10 +372,6 @@ def prepare_image_data_for_indexing(image) -> dict:
 
         variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "status": v.status} for v in (product.variants or [])]
         image_dict["variants"] = variants
-
-        # variant_prices = [v["price"]
-        #                   for v in variants if v.get("price") is not None]
-        # image_dict["variant_prices"] = variant_prices
 
         if any(v["inventory"] > 0 for v in variants):
             image_dict["status"] = "IN_STOCK"

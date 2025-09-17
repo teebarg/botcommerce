@@ -82,16 +82,11 @@ class SearchProduct(BaseModel):
     slug: str
     description: Optional[str] = None
     image: Optional[str] = None
-    # ratings: float
     categories: Optional[List[SearchCategory]] = []
     category_slugs: List[str]
     collections: Optional[List[SearchCollection]] = []
     collection_slugs: List[str]
-    # brand: Optional[str] = None
-    # tags: Optional[List[str]] = []
-    # images: Optional[List[ProductImage]] = []
     images: Optional[List[str]] = []
-    # reviews: Optional[List[Review]] = []
     favorites: Optional[List[str]] = []
     variants: Optional[List[SearchVariant]] = []
     average_rating: Optional[float] = None
@@ -104,7 +99,6 @@ class SearchProduct(BaseModel):
     catalogs: Optional[List[str]] = None
 
 class Facets(BaseModel):
-    # brand: Optional[dict[str, int]] = None
     category_slugs: Optional[dict[str, int]] = None
     collection_slugs: Optional[dict[str, int]] = None
     sizes: Optional[dict[str, int]] = None

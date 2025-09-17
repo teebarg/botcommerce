@@ -9,11 +9,11 @@ export function GalleryImagesUpload() {
     const editState = useOverlayTriggerState({});
     const [isUploading, setIsUploading] = useState<boolean>(false);
 
-    const { mutateAsync: bulkSaveImageUrls } = useBulkUploadImages();
+    const { mutateAsync: bulkUpload } = useBulkUploadImages();
 
     const handleUpload = async (urls: string[]) => {
         setIsUploading(true);
-        await bulkSaveImageUrls({ urls });
+        await bulkUpload({ urls });
         editState.close();
         setIsUploading(false);
     };

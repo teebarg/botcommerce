@@ -703,7 +703,7 @@ async def configure_filterable_attributes(
         index.update_sortable_attributes(REQUIRED_SORTABLES)
         # index.update_non_separator_tokens(["-"])
 
-        image_index = get_or_create_index(settings.MEILI_IMAGES_INDEX)
+        image_index = get_or_create_index(settings.MEILI_GALLERY_INDEX)
         image_index.update_filterable_attributes(REQUIRED_FILTERABLES)
         image_index.update_sortable_attributes(REQUIRED_SORTABLES)
 

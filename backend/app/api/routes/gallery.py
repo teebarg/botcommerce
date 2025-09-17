@@ -244,7 +244,7 @@ async def index(
         "sort": ["id:desc"],
     }
 
-    index = get_or_create_index(settings.MEILI_IMAGES_INDEX)
+    index = get_or_create_index(settings.MEILI_GALLERY_INDEX)
     try:
         search_results = index.search(
             "",

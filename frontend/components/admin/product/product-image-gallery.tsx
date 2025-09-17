@@ -76,11 +76,11 @@ export function ProductImageGallery() {
         }
 
         if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "processing") {
-            toast.loading("Bulk catalog upload in progress...", { id: "bulk_product_catalog" });
+            toast.loading("Catalog bulk upload in progress...", { id: "bulk_product_catalog" });
         }
 
         if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "completed") {
-            toast.success("Bulk catalog upload completed", { id: "bulk_product_catalog" });
+            toast.success("Catalog bulk upload completed", { id: "bulk_product_catalog" });
             setSelectedImages(new Set());
             setSelectionMode(false);
         }

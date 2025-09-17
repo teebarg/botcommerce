@@ -103,6 +103,30 @@ export const ProductSchema = z
     })
     .merge(AuditSchema);
 
+export const SearchVariantSchema = z.object({
+    id: z.number(),
+    sku: z.string(),
+    status: ProductStatusSchema,
+    price: z.number(),
+    old_price: z.number().nullable().optional(),
+    inventory: z.number(),
+    size: z.string().nullable().optional(),
+    color: z.string().nullable().optional(),
+    measurement: z.number().nullable().optional(),
+})
+
+export const SearchCollectionSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+})
+
+export const SearchCategorySchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+})
+
 export const ProductSearchSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -113,17 +137,12 @@ export const ProductSearchSchema = z.object({
     old_price: z.number(),
     image: z.string(),
     status: ProductStatusSchema,
-    variants: z.array(ProductVariantSchema).nullable(),
-    ratings: z.number(),
-    categories: z.array(CategorySchema),
+    variants: z.array(SearchVariantSchema).nullable(),
+    categories: z.array(SearchCategorySchema),
     category_slugs: z.array(z.string()),
-    collections: z.array(CollectionSchema),
+    collections: z.array(SearchCollectionSchema),
     collection_slugs: z.array(z.string()),
-    tags: z.null(),
-    // images: z.array(ProductImageSchema),
     images: z.array(z.string()),
-    reviews: z.array(z.any()).nullable(),
-    favorites: z.null(),
     average_rating: z.number(),
     review_count: z.number(),
     max_variant_price: z.number(),
@@ -131,6 +150,7 @@ export const ProductSearchSchema = z.object({
     active: z.boolean(),
     sizes: z.array(z.string()),
     colors: z.array(z.string()),
+    measurements: z.array(z.number()),
 });
 
 export const SharedSchema = z
