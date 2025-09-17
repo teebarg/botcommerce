@@ -56,6 +56,25 @@ class Product(BM):
     reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
 
+class SearchCategory(BaseModel):
+    id: int
+    name: Optional[str] = None
+    slug: str
+
+class SearchCollection(BaseModel):
+    id: int
+    name: Optional[str] = None
+    slug: str
+
+class SearchVariant(BaseModel):
+    id: int
+    price: Optional[float] = None
+    old_price: Optional[float] = None
+    inventory: int = 0
+    size: Optional[str] = None
+    color: Optional[str] = None
+    measurement: Optional[int] = None
+
 class SearchProduct(BaseModel):
     id: int
     name: Optional[str] = None
@@ -63,18 +82,13 @@ class SearchProduct(BaseModel):
     slug: str
     description: Optional[str] = None
     image: Optional[str] = None
-    ratings: float
-    categories: Optional[List[Category]] = []
+    categories: Optional[List[SearchCategory]] = []
     category_slugs: List[str]
-    collections: Optional[List[Collection]] = []
+    collections: Optional[List[SearchCollection]] = []
     collection_slugs: List[str]
-    # brand: Optional[str] = None
-    tags: Optional[List[str]] = []
-    images: Optional[List[ProductImage]] = []
-    sorted_images: Optional[List[str]] = []
-    reviews: Optional[List[Review]] = []
+    images: Optional[List[str]] = []
     favorites: Optional[List[str]] = []
-    variants: Optional[List[ProductVariant]] = []
+    variants: Optional[List[SearchVariant]] = []
     average_rating: Optional[float] = None
     review_count: Optional[int] = None
     max_variant_price: Optional[float] = None
@@ -82,9 +96,9 @@ class SearchProduct(BaseModel):
     active: Optional[bool] = True
     sizes: Optional[List[str]] = None
     colors: Optional[List[str]] = None
+    catalogs: Optional[List[str]] = None
 
 class Facets(BaseModel):
-    # brand: Optional[dict[str, int]] = None
     category_slugs: Optional[dict[str, int]] = None
     collection_slugs: Optional[dict[str, int]] = None
     sizes: Optional[dict[str, int]] = None
@@ -110,9 +124,6 @@ class ProductCreateBundle(ProductCreate):
     images: Optional[List[ImageUpload]] = None
     variants: Optional[List[VariantWithStatus]] = None
 
-class ProductBulkImages(BaseModel):
-    images: Optional[List[ImageUpload]] = None
-
 class ProductImageMetadata(ProductCreate):
     variants: Optional[List[VariantWithStatus]] = None
 
@@ -131,3 +142,6 @@ class ImageMetadata(BaseModel):
 class ImagesBulkUpdate(BaseModel):
     image_ids: List[int]
     data: ImageMetadata
+
+class ProductImageBulkUrls(BaseModel):
+    urls: list[str]

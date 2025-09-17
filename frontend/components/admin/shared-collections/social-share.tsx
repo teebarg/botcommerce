@@ -3,19 +3,19 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Shared } from "@/schemas";
+import { DBCatalog } from "@/schemas";
 import { cn } from "@/lib/utils";
 
 interface SocialShareProps {
-    collection: Shared;
+    catalog: DBCatalog;
     className?: string;
 }
 
-export function SocialShare({ collection, className }: SocialShareProps) {
-    const targetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/shared/${collection.slug}`;
+export function SocialShare({ catalog, className }: SocialShareProps) {
+    const targetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/shared/${catalog.slug}`;
     const shareUrl = encodeURIComponent(targetUrl);
-    const shareText = encodeURIComponent(`Check out this amazing ${collection.title}`);
-    const shareTitle = encodeURIComponent(collection.title);
+    const shareText = encodeURIComponent(`Check out this amazing ${catalog.title}`);
+    const shareTitle = encodeURIComponent(catalog.title);
 
     const socialLinks = [
         {
@@ -55,8 +55,8 @@ export function SocialShare({ collection, className }: SocialShareProps) {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: collection.title,
-                    text: `Check out this amazing ${collection.title}`,
+                    title: catalog.title,
+                    text: `Check out this amazing ${catalog.title}`,
                     url: targetUrl,
                 });
             } catch (err) {

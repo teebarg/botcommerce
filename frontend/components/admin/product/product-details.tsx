@@ -133,7 +133,7 @@ export function ProductDetails() {
                                         className="object-cover"
                                         placeholder="blur"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                        src={product.sorted_images?.[0] || product?.image || "/placeholder.jpg"}
+                                        src={product.images?.[0] || product?.image || "/placeholder.jpg"}
                                     />
 
                                     <div className="absolute top-2 right-2 flex flex-col gap-1">

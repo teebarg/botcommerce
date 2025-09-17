@@ -14,6 +14,7 @@ from app.api.routes import (
     faq,
     conversation,
     order,
+    gallery,
     payments,
     product,
     tag,
@@ -42,6 +43,7 @@ api_router.include_router(config.router, prefix="/config", tags=["config"])
 api_router.include_router(faq.router, prefix="/faq", tags=["faq"])
 api_router.include_router(order.router, prefix="/order", tags=["order"])
 api_router.include_router(product.router, prefix="/product", tags=["product"])
+api_router.include_router(gallery.router, prefix="/gallery", tags=["gallery"])
 api_router.include_router(payments.router, prefix="/payment", tags=["payment"])
 api_router.include_router(tag.router, prefix="/tag", tags=["tag"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])

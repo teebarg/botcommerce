@@ -9,7 +9,6 @@ import {
     LogOut,
     PanelLeftIcon,
     User,
-    Box,
     Star,
     Activity,
     MessageSquare,
@@ -95,11 +94,11 @@ const AccountItems = [
 ];
 
 const storeItems = [
-    {
-        title: "Products",
-        url: "/admin/products",
-        icon: Box,
-    },
+    // {
+    //     title: "Products",
+    //     url: "/admin/products",
+    //     icon: Box,
+    // },
     {
         title: "Gallery",
         url: "/admin/gallery",

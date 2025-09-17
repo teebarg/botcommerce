@@ -49,9 +49,9 @@ export default async function CollectionPage({ params, searchParams }: { params:
         max_price: maxPrice ?? 100000000,
         min_price: minPrice ?? 0,
         collections: collection?.slug,
-        categories: cat_ids,
-        sizes: sizes,
-        colors: colors,
+        cat_ids,
+        sizes,
+        colors,
     };
 
     const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/", { params: { skip: 0, ...queryParams } }));

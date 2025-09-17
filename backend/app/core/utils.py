@@ -45,9 +45,8 @@ def format_naira(value: int):
 def format_image(image: str):
     return image
 
-
 def url_to_list(url: str) -> list[str]:
-    return [f'{item.replace("-", " ")}' for item in url.split(",")]
+    return [f'{item}' for item in url.split(",")]
 
 
 def slugify(text) -> str:

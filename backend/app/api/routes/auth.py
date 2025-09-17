@@ -15,6 +15,9 @@ from app.models.generic import Token
 
 import httpx
 from typing import Optional
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 

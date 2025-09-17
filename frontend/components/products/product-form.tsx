@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
-import { Category, Collection, ProductSearch } from "@/schemas/product";
+import { Category, Collection, ProductSearch, SearchCategory, SearchCollection } from "@/schemas/product";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -41,8 +41,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
         defaultValues: {
             name: product?.name || "",
             description: product?.description || "",
-            categories: product?.categories?.map((category: Category) => ({ value: category.id, label: category.name })) || [],
-            collections: product?.collections?.map((collection: Collection) => ({ value: collection.id, label: collection.name })) || [],
+            categories: product?.categories?.map((category: SearchCategory) => ({ value: category.id, label: category.name })) || [],
+            collections: product?.collections?.map((collection: SearchCollection) => ({ value: collection.id, label: collection.name })) || [],
             active: product?.active,
         },
     });

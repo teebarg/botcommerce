@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
-import { Collection, PaginatedShared, Shared } from "@/schemas";
+import { Collection, DBCatalog, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
 
@@ -59,6 +59,16 @@ export const useSharedCollections = (query?: string) => {
     return useQuery({
         queryKey: ["catalog", query],
         queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { query: query || "" } }),
+        enabled: Boolean(session?.user?.isAdmin),
+    });
+};
+
+export const useAllSharedCollections = () => {
+    const { data: session } = useSession();
+
+    return useQuery({
+        queryKey: ["catalog"],
+        queryFn: async () => await api.get<DBCatalog[]>("/shared/all"),
         enabled: Boolean(session?.user?.isAdmin),
     });
 };
@@ -128,13 +138,10 @@ export const useRemoveProductFromSharedCollection = () => {
     });
 };
 
-export const useBulkAddProductsToSharedCollection = () => {
+export const useBulkAddProductsToCatalog = () => {
     return useMutation({
         mutationFn: async ({ collectionId, productIds }: { collectionId: number; productIds: number[] }) =>
             await api.post<{ message: string }>(`/shared/${collectionId}/add-products`, { product_ids: productIds }),
-        onSuccess: () => {
-            toast.success("Products added to catalog successfully");
-        },
         onError: (error) => {
             toast.error("Failed to add products to catalog: " + error);
         },

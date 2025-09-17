@@ -5,43 +5,39 @@ import { toast } from "sonner";
 import { useEffect, useRef } from "react";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
 
-import { ImageUpload } from "./product-image-upload";
 import { GalleryCard } from "./product-gallery-card";
 import { ProductBulkActions } from "./gallery-bulk-action";
+import { GalleryImagesUpload } from "./gallery-images-upload";
 
-import { api } from "@/apis/client";
-import { useImageGalleryInfinite, useBulkDeleteGalleryImages } from "@/lib/hooks/useProduct";
+import { useImageGalleryInfinite, useBulkDeleteGalleryImages, useReIndexGallery } from "@/lib/hooks/useGallery";
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useWebSocket } from "@/providers/websocket";
-
-interface ProductImage {
-    id: string;
-    file: File;
-    url: string;
-}
+import { SearchImageItem } from "@/schemas";
 
 export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(20);
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(40);
+    const images = data?.pages?.flatMap((p) => p.images) || [];
+
     const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { currentMessage, messages } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
+    const { mutateAsync: reIndexGallery, isPending: isReIndexing } = useReIndexGallery();
 
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
-        const all = data?.pages?.flatMap((p) => p.images) || [];
 
-        for (const img of all) {
+        for (const img of images) {
             if (selectedImages.has(img.id) && img.product_id) ids.add(img.product_id);
         }
 
         return Array.from(ids);
-    }, [selectedImages]);
+    }, [selectedImages, images]);
 
     useEffect(() => {
         if (!currentMessage) return;
@@ -77,6 +73,16 @@ export function ProductImageGallery() {
 
         if (currentMessage?.type === "product_bulk_update" && currentMessage?.status === "processing") {
             toast.loading("Bulk update in progress...", { id: "bulk_update" });
+        }
+
+        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "processing") {
+            toast.loading("Catalog bulk upload in progress...", { id: "bulk_product_catalog" });
+        }
+
+        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "completed") {
+            toast.success("Catalog bulk upload completed", { id: "bulk_product_catalog" });
+            setSelectedImages(new Set());
+            setSelectionMode(false);
         }
     }, [currentMessage?.percent, currentMessage?.status, messages]);
 
@@ -123,54 +129,24 @@ export function ProductImageGallery() {
         }
     };
 
-    const handleImagesChange = async (images: ProductImage[]) => {
-        setIsLoading(true);
-        try {
-            const fileToBase64 = (file: File) =>
-                new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-
-                    reader.onload = () => resolve((reader.result as string).split(",")[1] || "");
-                    reader.onerror = (e) => reject(e);
-                    reader.readAsDataURL(file);
-                });
-
-            const imagesPayload = await Promise.all(
-                (images || []).map(async (img: ProductImage) => ({
-                    file: img.file ? await fileToBase64(img.file) : "",
-                    file_name: img.file?.name || "image.jpg",
-                    content_type: img.file?.type || "image/jpeg",
-                }))
-            );
-
-            const payload: any = {
-                images: imagesPayload.length ? imagesPayload : undefined,
-            };
-
-            await api.post("/product/images/upload", payload);
-
-            toast.success("Images upload started");
-        } catch (error: any) {
-            toast.error(error?.message || "Failed to upload images");
-            setIsLoading(false);
-        }
-    };
-
     return (
         <div className="px-4 py-8">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold">Image Gallery</h3>
                 <p className="text-sm text-default-500">Manage your product images.</p>
             </div>
-            <div className="mb-8 max-w-xl">
-                <ImageUpload images={[]} isLoading={isLoading} showUploadArea={false} onImagesChange={handleImagesChange} />
+            <div className="mb-8 max-w-xl flex gap-2">
+                <GalleryImagesUpload />
+                <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
+                    Re-index
+                </Button>
             </div>
 
             {isImagesLoading ? (
                 <ComponentLoader />
             ) : (
                 <div>
-                    <div className="lg:hidden mb-4 sticky top-16 z-50 bg-content2 -mx-4 px-4 py-4 flex gap-2">
+                    <div className="lg:hidden mb-4 sticky top-16 z-40 bg-content2 -mx-4 px-4 py-4 flex gap-2">
                         <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 w-1/2">
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}>
                                 <Button size="iconOnly" onClick={() => setViewMode("grid")}>
@@ -205,25 +181,23 @@ export function ProductImageGallery() {
                             viewMode === "grid" ? "" : "grid-cols-1"
                         )}
                     >
-                        {data?.pages
-                            ?.flatMap((p) => p.images)
-                            .map((img: any, idx: number) => (
-                                <GalleryCard
-                                    key={`${img.id}-${idx}`}
-                                    image={img}
-                                    isSelected={selectedImages.has(img.id)}
-                                    selectionMode={selectionMode}
-                                    onSelectionChange={handleSelectionChange}
-                                />
-                            ))}
+                        {images.map((img: SearchImageItem, idx: number) => (
+                            <GalleryCard
+                                key={idx}
+                                image={img}
+                                isSelected={selectedImages.has(img.id)}
+                                selectionMode={selectionMode}
+                                onSelectionChange={handleSelectionChange}
+                            />
+                        ))}
                     </div>
                     <ProductBulkActions
+                        isLoading={isDeleting}
                         selectedCount={selectedImages.size}
                         selectedImageIds={Array.from(selectedImages)}
                         selectedProductIds={selectedProductIds}
                         onClearSelection={() => setSelectedImages(new Set())}
                         onDelete={handleBulkDelete}
-                        isLoading={isDeleting}
                     />
                     <div ref={sentinelRef} />
                     {isFetchingNextPage && <ComponentLoader />}

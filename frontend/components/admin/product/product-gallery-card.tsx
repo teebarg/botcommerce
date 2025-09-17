@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Package } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { GalleryCardActions } from "./gallery-card-actions";
 
@@ -8,17 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { Collection, Product, ProductImage, ProductVariant } from "@/schemas";
-import Overlay from "@/components/overlay";
-import ProductImagesManager from "@/components/admin/product/product-images";
-import { useProductVariant } from "@/lib/hooks/useProductVariant";
-
-type GalleryImage = ProductImage & {
-    product: Product;
-};
+import { Collection, ProductVariant, SearchImageItem } from "@/schemas";
 
 interface GalleryCardProps {
-    image: GalleryImage;
+    image: SearchImageItem;
     onClick?: () => void;
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
@@ -27,9 +19,6 @@ interface GalleryCardProps {
 
 export function GalleryCard({ image, onClick, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
-    const { product } = image;
-    const imgState = useOverlayTriggerState({});
-    const { outOfStock } = useProductVariant(product);
 
     const handleSelectionChange = (checked: boolean) => {
         onSelectionChange?.(image.id, checked);
@@ -39,7 +28,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
         <Card
             className={cn(
                 "group relative overflow-hidden border-0 bg-gradient-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
-                image.product?.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
+                image.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
                 isSelected && "ring-2 ring-indigo-500 ring-offset-2"
             )}
             onClick={selectionMode ? undefined : onClick}
@@ -83,14 +72,14 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                     </div>
 
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                        {image.product?.collections?.slice(0, 2).map((item: Collection, idx: number) => (
+                        {image.collections?.slice(0, 2).map((item: Collection, idx: number) => (
                             <Badge key={idx} variant="warning">
                                 {item.name}
                             </Badge>
                         ))}
                     </div>
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1">
-                        {image.product?.variants?.map((item: ProductVariant, idx: number) => (
+                        {image.variants?.map((item: ProductVariant, idx: number) => (
                             <Badge key={idx} variant="emerald">
                                 Uk Size: {item.size}
                             </Badge>
@@ -98,14 +87,14 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                     </div>
 
                     <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
-                        {outOfStock && <Badge variant="destructive">Out of stock</Badge>}
+                        {image.status === "OUT_OF_STOCK" && <Badge variant="destructive">Out of stock</Badge>}
                     </div>
 
                     <div className="absolute bottom-2 right-2">
-                        <p className="text-base font-semibold text-blue-800">#{image.id}</p>
+                        <p className="text-lg font-bold text-white">#{image.id}</p>
                     </div>
 
-                    {image.product?.images?.length > 0 && (
+                    {/* {image.product?.images?.length > 0 && (
                         <Overlay
                             open={imgState.isOpen}
                             sheetClassName="min-w-[40vw]"
@@ -127,50 +116,8 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                                 />
                             </div>
                         </Overlay>
-                    )}
+                    )} */}
                 </div>
-
-                {/* {product && (
-                    <div className="p-4 space-y-3">
-                        <div>
-                            <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{product?.name}</h3>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                {product?.brand && (
-                                    <Badge className="text-xs" variant="outline">
-                                        {product?.brand?.name}
-                                    </Badge>
-                                )}
-                                {product?.variants?.length && (
-                                    <span className="text-xs text-muted-foreground">
-                                        {product?.variants?.length} variant{product?.variants?.length !== 1 ? "s" : ""}
-                                    </span>
-                                )}
-                            </div>
-
-                            {product?.variants?.length && (
-                                <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-primary">{currency(product?.variants?.[0].price)}</span>
-                                    {product?.variants?.[0].old_price > 0 && (
-                                        <span className="text-sm font-semibold line-through text-primary">
-                                            {currency(product?.variants?.[0].old_price)}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-1">
-                            {product?.categories?.slice(0, 3).map((category: Category, idx: number) => (
-                                <Badge key={idx} className="text-xs" variant="secondary">
-                                    {category?.name}
-                                </Badge>
-                            ))}
-                        </div>
-                    </div>
-                )} */}
             </CardContent>
         </Card>
     );

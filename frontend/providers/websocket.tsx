@@ -5,8 +5,6 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import { useSession } from "next-auth/react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { useInvalidate } from "@/lib/hooks/useApi";
-
 type WebSocketContextType = {
     socket: WebSocket | null;
     messages: any[];
@@ -39,7 +37,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     const shouldReconnectRef = useRef<boolean>(true);
     const userInitSentRef = useRef<boolean>(false);
     const userRef = useRef(session);
-    const invalidate = useInvalidate();
 
     function parseEventKey(eventKey: string): string[] {
         return eventKey.split(":");

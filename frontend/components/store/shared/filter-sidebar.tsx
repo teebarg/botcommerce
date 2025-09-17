@@ -141,7 +141,7 @@ export function FilterSidebar({ facets }: Props) {
                             return (
                                 <Button
                                     key={cat.id}
-                                    className={cn("justify-between bg-content3", active && "bg-indigo-500 text-white")}
+                                    className={cn("justify-between bg-content3", active && "bg-indigo-500 hover:bg-indigo-600 text-white")}
                                     size="sm"
                                     onClick={() => onToggleCategory(cat.slug)}
                                 >
@@ -197,7 +197,7 @@ export function FilterSidebar({ facets }: Props) {
                             </Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem id="newest" value="created_at:desc" />
+                            <RadioGroupItem id="newest" value="id:desc" />
                             <Label className="text-sm" htmlFor="newest">
                                 Newest
                             </Label>

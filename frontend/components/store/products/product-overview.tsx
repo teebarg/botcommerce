@@ -63,7 +63,7 @@ const ProductOverview: React.FC<{
     };
 
     const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
-    const selectedImage = product.sorted_images[selectedImageIdx];
+    const selectedImage = product.images[selectedImageIdx];
 
     const addWishlist = async () => {
         createWishlist(product.id);
@@ -121,16 +121,12 @@ const ProductOverview: React.FC<{
                         </div>
                     </div>
                     {session?.user?.isAdmin && (
-                        <ImageDownloadButton
-                            className="absolute bottom-4 right-6"
-                            fallbackName={product.slug}
-                            url={product.sorted_images?.[0] || ""}
-                        />
+                        <ImageDownloadButton className="absolute bottom-4 right-6" fallbackName={product.slug} url={product.images?.[0] || ""} />
                     )}
                 </div>
             </div>
             <div className="flex flex-wrap gap-4 px-2 mt-4">
-                {product.sorted_images.map((image: string, idx: number) => (
+                {product.images.map((image: string, idx: number) => (
                     <button
                         key={idx}
                         className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${

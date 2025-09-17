@@ -9,7 +9,7 @@ import { useCollections } from "@/lib/hooks/useCollection";
 import { useCategories } from "@/lib/hooks/useCategories";
 import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
-import { useBulkProductUpdate } from "@/lib/hooks/useProduct";
+import { useBulkProductUpdate } from "@/lib/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
