@@ -73,6 +73,16 @@ export function ProductImageGallery() {
         if (currentMessage?.type === "product_bulk_update" && currentMessage?.status === "processing") {
             toast.loading("Bulk update in progress...", { id: "bulk_update" });
         }
+
+        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "processing") {
+            toast.loading("Bulk catalog upload in progress...", { id: "bulk_product_catalog" });
+        }
+
+        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "completed") {
+            toast.success("Bulk catalog upload completed", { id: "bulk_product_catalog" });
+            setSelectedImages(new Set());
+            setSelectionMode(false);
+        }
     }, [currentMessage?.percent, currentMessage?.status, messages]);
 
     useEffect(() => {

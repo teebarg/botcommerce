@@ -13,7 +13,6 @@ export const revalidate = 60;
 
 type SearchParams = Promise<{
     sortBy?: SortOptions;
-    brand_id?: string;
     cat_ids?: string;
     maxPrice?: string;
     minPrice?: string;
@@ -32,17 +31,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Collections({ searchParams }: Props) {
-    const { minPrice, maxPrice, brand_id, cat_ids, sortBy, sizes, colors } = (await searchParams) || {};
+    const { minPrice, maxPrice, cat_ids, sortBy, sizes, colors } = (await searchParams) || {};
 
     const queryParams: any = {
         limit: 12,
         sort: sortBy ?? "created_at:desc",
         max_price: maxPrice ?? 100000000,
         min_price: minPrice ?? 0,
-        categories: cat_ids,
-        brand_id: brand_id,
-        sizes: sizes,
-        colors: colors,
+        cat_ids,
+        sizes,
+        colors,
     };
 
     const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/", { params: { skip: 0, ...queryParams } }));

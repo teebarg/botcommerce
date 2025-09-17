@@ -7,7 +7,7 @@ from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
 from app.services.websocket import manager
 from app.services.activity import log_activity
-from app.services.redis import invalidate_list, bust
+from app.services.redis import invalidate_pattern, invalidate_key
 
 logger = get_logger(__name__)
 
@@ -22,28 +22,10 @@ async def sync_index_image(image_id:str, product: Product = None):
         logger.debug(f"Error re-indexing image {image_id}: {e}")
 
     if product is not None:
-        await bust(f"product:{product.slug}")
-        await manager.broadcast_to_all(
-            data={
-                "key": f"product:{product.slug}",
-            },
-            message_type="invalidate",
-        )
-        await invalidate_list("products")
-        await manager.broadcast_to_all(
-            data={
-                "key": "products",
-            },
-            message_type="invalidate",
-        )
+        await invalidate_key(f"product:{product.slug}")
+        await invalidate_pattern("products")
     else:
-        await invalidate_list("products:gallery")
-        await manager.broadcast_to_all(
-            data={
-                "key": "products:gallery",
-            },
-            message_type="invalidate",
-        )
+        await invalidate_pattern("products:gallery")
 
 
 @with_prisma_connection
@@ -54,27 +36,9 @@ async def sync_index_product(product: Product = None):
         logger.debug(f"Error re-indexing product {product.id}: {e}")
 
     for sc in (product.shared_collections or []):
-        await invalidate_list(f"product:catalog:{sc.slug}")
-        await manager.broadcast_to_all(
-            data={
-                "key": f"product:catalog:{sc.slug}",
-            },
-            message_type="invalidate",
-        )
-    await bust(f"product:{product.slug}")
-    await manager.broadcast_to_all(
-        data={
-            "key": f"product:{product.slug}",
-        },
-        message_type="invalidate",
-    )
-    await invalidate_list("products")
-    await manager.broadcast_to_all(
-        data={
-            "key": "products",
-        },
-        message_type="invalidate",
-    )
+        await invalidate_pattern(f"product:catalog:{sc.slug}")
+    await invalidate_key(f"product:{product.slug}")
+    await invalidate_pattern("products")
 
 
 @with_prisma_connection
@@ -97,19 +61,18 @@ async def reindex_catalog(product_id: int):
         except Exception as e:
             logger.debug(f"Error re-indexing product {product_id}: {e}")
 
-        await invalidate_list(f"product:catalog")
-        await manager.broadcast_to_all(
-            data={
-                "key": f"product:catalog",
-            },
-            message_type="invalidate",
-        )
+        await invalidate_pattern(f"product:catalog")
     except Exception as e:
         logger.error(f"Error re-indexing reindex_catalog {product_id}: {e}")
 
 
 @with_prisma_connection
 async def reindex_catalogs(product_ids: list[int]):
+    await manager.broadcast_to_all(
+        data={"status": "processing"},
+        message_type="catalog_bulk_update",
+    )
+
     try:
         products = await db.product.find_many(
             where={"id": {"in": product_ids}},
@@ -131,12 +94,10 @@ async def reindex_catalogs(product_ids: list[int]):
         except Exception as e:
             logger.debug(f"Error re-indexing products {product_ids}: {e}")
 
-        await invalidate_list(f"product:catalog")
+        await invalidate_pattern(f"product:catalog")
         await manager.broadcast_to_all(
-            data={
-                "key": f"product:catalog",
-            },
-            message_type="invalidate",
+            data={"status": "completed"},
+            message_type="catalog_bulk_update",
         )
 
     except Exception as e:
@@ -148,14 +109,7 @@ async def reindex_product(product_id: int):
     try:
         product = await db.product.find_unique(
             where={"id": product_id},
-            include={
-                # "variants": True,
-                # "categories": True,
-                "images": True,
-                # "collections": True,
-                # "reviews": True,
-                # "shared_collections": True,
-            }
+            include={"images": True}
         )
 
         if not product:
@@ -163,36 +117,12 @@ async def reindex_product(product_id: int):
                 f"Product with id {product_id} not found for re-indexing.")
             return
 
-        # product_data = prepare_product_data_for_indexing(product)
-
-        # try:
-        #     await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-        # except Exception as e:
-        #     logger.debug(f"Error re-indexing product {product_id}: {e}")
-
         try:
             for image in product.images:
                 await reindex_image(image_id=image.id)
             logger.info(f"Successfully reindexed product {product_id}")
         except Exception as e:
             logger.debug(f"Error re-indexing product {product_id}: {e}")
-
-        # logger.info(f"Successfully reindexed product {product_id}")
-
-        # await bust(f"product:{product.slug}")
-        # await manager.broadcast_to_all(
-        #     data={
-        #         "key": f"product:{product.slug}",
-        #     },
-        #     message_type="invalidate",
-        # )
-        # await invalidate_list("products")
-        # await manager.broadcast_to_all(
-        #     data={
-        #         "key": "products",
-        #     },
-        #     message_type="invalidate",
-        # )
 
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
@@ -206,14 +136,7 @@ async def index_products():
     try:
         logger.info("Starting re-indexing..........")
         products = await db.product.find_many(
-            include={
-                # "variants": True,
-                # "categories": True,
-                # "collections": True,
-                "images": True,
-                # "reviews": True,
-                # "shared_collections": True,
-            }
+            include={"images": True}
         )
 
         try:
@@ -223,31 +146,6 @@ async def index_products():
             logger.info(f"Successfully reindexed products images")
         except Exception as e:
             logger.debug(f"Error re-indexing products images: {e}")
-
-        # documents = []
-        # for product in products:
-        #     product_dict = prepare_product_data_for_indexing(product)
-        #     documents.append(product_dict)
-
-        # clear_index(settings.MEILI_PRODUCTS_INDEX)
-        # add_documents_to_index(
-        #     index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
-
-        # logger.info(f"Reindexed {len(documents)} products successfully.")
-        # await invalidate_list("products")
-        # await invalidate_list("product")
-        # await manager.broadcast_to_all(
-        #     data={
-        #         "key": "products",
-        #     },
-        #     message_type="invalidate",
-        # )
-        # await manager.broadcast_to_all(
-        #     data={
-        #         "key": "product",
-        #     },
-        #     message_type="invalidate",
-        # )
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 
@@ -349,28 +247,10 @@ async def index_images(invalidate_products: bool = False, product_only: bool = F
             logger.info(f"Reindexed {len(documents)} products successfully.")
 
         if invalidate_products:
-            await invalidate_list("products")
-            await manager.broadcast_to_all(
-                    data={
-                        "key": "products",
-                    },
-                message_type="invalidate",
-            )
-            await invalidate_list("product")
-            await manager.broadcast_to_all(
-                data={
-                    "key": "product",
-                },
-                message_type="invalidate",
-            )
+            await invalidate_pattern("products")
+            await invalidate_pattern("product")
         else:
-            await invalidate_list("products:gallery")
-            await manager.broadcast_to_all(
-                    data={
-                        "key": "products:gallery",
-                    },
-                message_type="invalidate",
-            )
+            await invalidate_pattern("products:gallery")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 
@@ -410,31 +290,13 @@ async def reindex_image(image_id: int):
         logger.info(f"Successfully reindexed product image {image_id}")
 
         if image.product:
-            await bust(f"product:{image.product.slug}")
-            await manager.broadcast_to_all(
-                    data={
-                        "key": f"product:{image.product.slug}",
-                    },
-                message_type="invalidate",
-            )
-            await invalidate_list("products")
-            await manager.broadcast_to_all(
-                    data={
-                        "key": "products",
-                    },
-                    message_type="invalidate",
-                )
+            await invalidate_key(f"product:{image.product.slug}")
+            await invalidate_pattern("products")
         else:
-            await invalidate_list("products:gallery")
-            await manager.broadcast_to_all(
-                    data={
-                        "key": "products:gallery",
-                    },
-                    message_type="invalidate",
-                )
+            await invalidate_pattern("products:gallery")
 
     except Exception as e:
-        logger.error(f"Error re-indexing product {product_id}: {e}")
+        logger.error(f"Error re-indexing product image {image_id}: {e}")
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:

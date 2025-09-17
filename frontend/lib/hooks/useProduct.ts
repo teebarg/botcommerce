@@ -24,7 +24,8 @@ export const useProductSearch = (params: SearchParams) => {
     });
 };
 
-export const useProductInfiniteSearch = (params: SearchParams) => {
+export const 
+useProductInfiniteSearch = (params: SearchParams) => {
     return useInfiniteQuery({
         queryKey: ["products", "search", "infinite", JSON.stringify(params)],
         queryFn: async ({ pageParam = 0 }) =>
@@ -313,9 +314,6 @@ export const useBulkProductUpdate = () => {
     return useMutation({
         mutationFn: async ({ imageIds, input }: { imageIds: number[]; input: any }) =>
             await api.patch<Message>("/product/gallery/bulk-update", { image_ids: imageIds, data: input }),
-        onSuccess: () => {
-            toast.success("Bulk metadata started");
-        },
         onError: (error: any) => {
             toast.error(error.message || "Failed to start bulk metadata");
         },

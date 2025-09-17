@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBulkAddProductsToSharedCollection, useSharedCollections } from "@/lib/hooks/useCollection";
+import { useBulkAddProductsToCatalog, useSharedCollections } from "@/lib/hooks/useCollection";
 import { Shared } from "@/schemas";
 
 interface CatalogBulkProductUpdateProps {
@@ -12,7 +12,7 @@ interface CatalogBulkProductUpdateProps {
 }
 
 const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> = ({ catalog, selectedProductIds }) => {
-    const { mutateAsync: bulkAddToShared, isPending: isAdding } = useBulkAddProductsToSharedCollection();
+    const { mutateAsync: bulkAddToCatalog, isPending: isAdding } = useBulkAddProductsToCatalog();
 
     return (
         <Card key={catalog.id} className="border">
@@ -33,7 +33,7 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
                     size="sm"
                     variant="indigo"
                     onClick={async () => {
-                        await bulkAddToShared({ collectionId: catalog.id, productIds: selectedProductIds });
+                        await bulkAddToCatalog({ collectionId: catalog.id, productIds: selectedProductIds });
                     }}
                 >
                     Add {selectedProductIds.length} product(s)

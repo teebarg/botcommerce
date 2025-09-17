@@ -124,7 +124,7 @@ async def search(
     slug: str,
     user: UserDep,
     search: str = "",
-    sort: str = "created_at:desc",
+    sort: str = "id:desc",
     categories: str = Query(default=""),
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),

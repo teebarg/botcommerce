@@ -21,7 +21,7 @@ from app.models.product import (
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
-    Product, SearchProducts, SearchProduct,
+    Product, SearchProducts,
     ProductCreateBundle,
     ProductBulkImages,
     ProductImageMetadata,
@@ -37,18 +37,15 @@ from app.services.meilisearch import (
     REQUIRED_SORTABLES
 )
 from app.prisma_client import prisma as db
-from math import ceil
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
 from app.services.product import reindex_product, product_upload, product_export, sync_index_product, index_images, reindex_image, sync_index_image
 from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
-from app.services.popular_products import PopularProductsService
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.core.storage import upload
-from app.core.db import database
 
 logger = get_logger(__name__)
 
@@ -111,12 +108,14 @@ async def process_image_uploads_background(images: list):
         )
 
 
-async def process_bulk_delete_images(image_ids: list[int], images: list):
+async def process_bulk_delete_images(images: list):
     """
     Process bulk deletion of gallery images.
     """
-    logger.info(
-        f"Starting bulk delete processing for {len(image_ids)} images...")
+    await manager.broadcast_to_all(
+        data={"status": "processing"},
+        message_type="product_bulk_delete"
+    )
 
     try:
         deleted_count = 0
@@ -124,14 +123,6 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
 
         for index, image in enumerate(images):
             try:
-                await manager.broadcast_to_all(
-                    data={
-                        "status": "processing",
-                        "percent": (index + 1) / len(images) * 100
-                    },
-                    message_type="product_bulk_delete"
-                )
-
                 if image.image and "/storage/v1/object/public/product-images/" in image.image:
                     try:
                         file_path = image.image.split(
@@ -159,9 +150,7 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
             await sync_index_image(image_id=str(image.id), product=image.product)
 
         await manager.broadcast_to_all(
-            data={
-                "status": "completed",
-            },
+            data={"status": "completed"},
             message_type="product_bulk_delete"
         )
 
@@ -171,9 +160,7 @@ async def process_bulk_delete_images(image_ids: list[int], images: list):
     except Exception as e:
         logger.error(f"Error processing bulk delete: {str(e)}")
         await manager.broadcast_to_all(
-            data={
-                "status": "failed",
-            },
+            data={"status": "failed"},
             message_type="product_bulk_delete"
         )
 
@@ -207,15 +194,12 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 
 
 async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
+    await manager.broadcast_to_all(
+        data={"status": "processing"},
+        message_type="product_bulk_update"
+    )
     async with db.tx() as tx:
         for index, image in enumerate(images):
-            await manager.broadcast_to_all(
-                data={
-                    "status": "processing",
-                    "percent": (index + 1) / len(images) * 100,
-                },
-                message_type="product_bulk_update"
-            )
             try:
                 if image.product_id is None:
                     name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(100, 999)}"
@@ -234,7 +218,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                     )
 
                     variant_data = {"sku": generate_sku(
-                    ), "product_id": product.id, **build_variant_data(payload.data)}
+                    ), "product_id": product.id, "price": payload.data.price or 1, "inventory": payload.data.inventory or 0, **build_variant_data(payload.data)}
                     await tx.productvariant.create(data=variant_data)
 
                 else:
@@ -263,9 +247,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
         await reindex_image(image_id=image.id)
 
     await manager.broadcast_to_all(
-        data={
-            "status": "completed",
-        },
+        data={"status": "completed"},
         message_type="product_bulk_update"
     )
 
@@ -346,7 +328,7 @@ async def search(
     search_params = {
         "limit": limit,
         "offset": skip,
-        "sort": ["created_at:desc"],
+        "sort": ["id:desc"],
     }
 
     index = get_or_create_index(settings.MEILI_IMAGES_INDEX)
@@ -377,8 +359,8 @@ async def search(
         logger.error(e)
         raise HTTPException(
             status_code=400,
-            detail=e.message
-            )
+            detail=str(e)
+        )
 
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
@@ -409,91 +391,13 @@ async def export_products(
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get("/search/public")
-@cache_response("products")
-async def public_search(
-    request: Request,
-    q: str = "",
-    sort: str = "created_at:desc",
-    categories: str = Query(default=""),
-    collections: str = Query(default=""),
-    max_price: int = Query(default=1000000, gt=0),
-    min_price: int = Query(default=1, gt=0),
-    sizes: str = Query(default=""),
-    colors: str = Query(default=""),
-    limit: int = Query(default=20, le=100),
-    active: bool = Query(default=True),
-):
-    """
-    Retrieve products using Meilisearch, sorted by latest.
-    """
-    filters = []
-    if categories:
-        filters.append(f"category_slugs IN {url_to_list(categories)}")
-    if collections:
-        filters.append(f"collection_slugs IN [{collections}]")
-    if min_price and max_price:
-        filters.append(
-            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
-    if sizes:
-        filters.append(f"sizes IN [{sizes}]")
-    if colors:
-        filters.append(f"colors IN [{colors}]")
-    filters.append(f"active = {active}")
-
-    search_params = {
-        "limit": limit,
-        "sort": [sort],
-    }
-
-    if filters:
-        search_params["filter"] = " AND ".join(filters)
-
-    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-
-    try:
-        search_results = index.search(
-            q,
-            {
-                **search_params
-            }
-        )
-    except MeilisearchApiError as e:
-        error_code = getattr(e, "code", None)
-        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-            logger.warning(
-                f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
-
-            ensure_index_ready(index)
-
-            retry_results = index.search(
-                q,
-                {
-                    **search_params
-                }
-            )
-            return retry_results["hits"]
-
-        logger.error(f"Meilisearch error: {e}")
-        raise HTTPException(
-            status_code=502, detail="Search service temporarily unavailable")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=e.message
-        )
-
-    return search_results["hits"]
-
-
 @router.get("/")
 @cache_response("products")
 async def search(
     request: Request,
     search: str = "",
-    sort: str = "created_at:desc",
-    categories: str = Query(default=""),
+    sort: str = "id:desc",
+    cat_ids: str = Query(default=""),
     collections: str = Query(default=""),
     max_price: int = Query(default=1000000, gt=0),
     min_price: int = Query(default=1, gt=0),
@@ -512,8 +416,8 @@ async def search(
     # if brand_id:
     #     brands = brand_id.split(",")
     #     filters.append(" OR ".join([f'brand = "{brand}"' for brand in brands]))
-    if categories:
-        filters.append(f"category_slugs IN {url_to_list(categories)}")
+    if cat_ids:
+        filters.append(f"category_slugs IN {url_to_list(cat_ids)}")
     if collections:
         filters.append(f"collection_slugs IN [{collections}]")
     if min_price and max_price:
@@ -593,7 +497,7 @@ async def search(
         logger.error(e)
         raise HTTPException(
             status_code=400,
-            detail=e.message
+            detail=str(e)
         )
 
     total_count = search_results["estimatedTotalHits"]
@@ -1157,6 +1061,8 @@ async def configure_filterable_attributes(
         index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         index.update_filterable_attributes(REQUIRED_FILTERABLES)
         index.update_sortable_attributes(REQUIRED_SORTABLES)
+        # index.update_non_separator_tokens(["-"])
+
         image_index = get_or_create_index(settings.MEILI_IMAGES_INDEX)
         image_index.update_filterable_attributes(REQUIRED_FILTERABLES)
         image_index.update_sortable_attributes(REQUIRED_SORTABLES)
@@ -1304,11 +1210,7 @@ async def bulk_delete_gallery_images(
         if not images:
             raise HTTPException(status_code=404, detail="No images found")
 
-        background_tasks.add_task(
-            process_bulk_delete_images,
-            image_ids=payload.files,
-            images=images
-        )
+        background_tasks.add_task(process_bulk_delete_images, images=images)
 
         return {
             "success": True,
