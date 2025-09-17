@@ -20,7 +20,7 @@ export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(40);
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(30);
     const images = data?.pages?.flatMap((p) => p.images) || [];
 
     const sentinelRef = useRef<HTMLDivElement | null>(null);

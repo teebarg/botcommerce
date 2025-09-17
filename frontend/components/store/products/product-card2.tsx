@@ -41,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         <img
                             alt={product.name}
                             className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
-                            src={product.images?.[0] || "/placeholder.jpg"}
+                            src={`${product.images?.[0]}?width=300&quality=70` || "/placeholder.jpg"}
                             onLoad={() => setImageLoaded(true)}
                         />
 
