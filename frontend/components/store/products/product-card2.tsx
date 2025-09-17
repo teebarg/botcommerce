@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
@@ -39,11 +38,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             trigger={
                 <div className="group relative bg-content1 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
                     <div className="relative aspect-[3/4] overflow-hidden">
-                        <Image
-                            fill
+                        <img
                             alt={product.name}
                             className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             src={product.sorted_images?.[0] || "/placeholder.jpg"}
                             onLoad={() => setImageLoaded(true)}
                         />

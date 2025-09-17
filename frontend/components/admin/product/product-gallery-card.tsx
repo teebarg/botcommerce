@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Package } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import Image from "next/image";
 
 import { GalleryCardActions } from "./gallery-card-actions";
 
@@ -49,14 +48,12 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                 <div className="relative aspect-product overflow-hidden">
                     {image.image ? (
                         <>
-                            <Image
-                                fill
+                            <img
                                 alt="product image"
                                 className={cn(
                                     "w-full h-full object-cover transition-all duration-500 group-hover:scale-110",
                                     imageLoaded ? "opacity-100" : "opacity-0"
                                 )}
-                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 src={image.image}
                                 onLoad={() => setImageLoaded(true)}
                             />
