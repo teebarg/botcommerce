@@ -1,7 +1,6 @@
 import type { FormProduct } from "./product-creator";
 
 import { Package, Image as ImageIcon, Palette } from "lucide-react";
-import Image from "next/image";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,13 +35,7 @@ export function ProductReview({ product }: ProductReviewProps) {
 
                         {images.length > 0 && (
                             <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
-                                <Image
-                                    fill
-                                    alt="Main product image"
-                                    className="w-full h-full object-cover"
-                                    sizes="(max-width: 1024px) 50vw, 33vw"
-                                    src={images[0].url}
-                                />
+                                <img alt="Main product image" className="w-full h-full object-cover" src={images[0].url} />
                             </div>
                         )}
                     </div>
@@ -59,13 +52,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                             <div className="grid grid-cols-4 gap-2">
                                 {images.slice(0, 4).map((image, index) => (
                                     <div key={image.id} className="aspect-square rounded overflow-hidden bg-muted relative">
-                                        <Image
-                                            fill
-                                            alt={`Product image ${index + 1}`}
-                                            className="w-full h-full object-cover"
-                                            sizes="25vw"
-                                            src={image.url}
-                                        />
+                                        <img alt={`Product image ${index + 1}`} className="w-full h-full object-cover" src={image.url} />
                                         {index === 0 && <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded">Main</div>}
                                     </div>
                                 ))}

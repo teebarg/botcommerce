@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 
 import { useCategories } from "@/lib/hooks/useCategories";
 import { Category } from "@/schemas/product";
@@ -30,14 +29,10 @@ const CategoriesSection: React.FC = () => {
                                         href={`/collections?cat_ids=${category.slug}`}
                                     >
                                         <div className="relative w-24 h-24 rounded-full flex items-center justify-center mb-2 overflow-hidden">
-                                            <Image
-                                                fill
+                                            <img
                                                 alt=""
                                                 aria-hidden="true"
-                                                blurDataURL="/placeholder.jpg"
                                                 className="object-cover rounded-full"
-                                                placeholder="blur"
-                                                sizes="(max-width: 1024px) 96px"
                                                 src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>
@@ -50,14 +45,10 @@ const CategoriesSection: React.FC = () => {
                                 {(categories || []).slice(0, 6).map((category: Category, idx: number) => (
                                     <Link key={idx} prefetch className="flex flex-col items-center" href={`/collections?cat_ids=${category.slug}`}>
                                         <div className="relative w-32 h-32 lg:w-40 lg:h-40 rounded-full flex items-center justify-center mb-3 overflow-hidden transition-transform hover:scale-105">
-                                            <Image
-                                                fill
+                                            <img
                                                 alt=""
                                                 aria-hidden="true"
-                                                blurDataURL="/placeholder.jpg"
                                                 className="object-cover rounded-full"
-                                                placeholder="blur"
-                                                sizes="(max-width: 1024px) 128px, 160px"
                                                 src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>

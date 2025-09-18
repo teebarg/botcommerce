@@ -724,14 +724,14 @@ async def config_clear_index():
         ) from e
 
 
-@router.get("/search/delete-index")
-async def config_delete_index() -> dict:
+@router.post("/search/delete-index")
+async def config_delete_index(index_name: str) -> dict:
     """
     Drop the products index in Meilisearch.
     """
     try:
-        delete_index(settings.MEILI_PRODUCTS_INDEX)
-        return {"message": "Index dropping"}
+        delete_index(index_name)
+        return {"message": "Index dropped"}
     except Exception as e:
         logger.error(e)
         raise HTTPException(

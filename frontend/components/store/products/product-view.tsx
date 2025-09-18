@@ -113,7 +113,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                     }`}
                                     onClick={() => setSelectedImageId(image.id)}
                                 >
-                                    <Image fill alt={`Thumbnail - ${image.image}`} className="object-cover" sizes="64px" src={image.image} />
+                                    <Image fill alt={image.image} className="object-cover" sizes="64px" src={image.image} />
                                 </button>
                             ))}
                     </div>

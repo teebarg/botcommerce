@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { Product } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
@@ -16,15 +14,7 @@ const ProductListItem = ({ product, actions }: ProductListItemProps) => {
     return (
         <div className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col">
             <div className="relative h-40 w-full bg-content1 overflow-hidden">
-                <Image
-                    fill
-                    alt={product.name}
-                    blurDataURL="/placeholder.jpg"
-                    className="object-cover"
-                    placeholder="blur"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    src={product.images?.[0]?.image || product?.image || "/placeholder.jpg"}
-                />
+                <img alt={product.name} className="object-cover" src={product.images?.[0]?.image || product?.image || "/placeholder.jpg"} />
 
                 <Badge className="absolute top-2 right-2 shadow-sm" variant={outOfStock ? "destructive" : "emerald"}>
                     {outOfStock ? "Out of Stock" : "In Stock"}

@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
-import Image from "next/image";
 
 import { api } from "@/apis/client";
 import { Button } from "@/components/ui/button";
@@ -104,15 +103,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
             {initialImage && (
                 <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                    <Image
-                        fill
-                        alt="Category image"
-                        blurDataURL="/placeholder.jpg"
-                        className="object-cover"
-                        placeholder="blur"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        src={initialImage || "/placeholder.jpg"}
-                    />
+                    <img alt="Category image" className="object-cover" src={initialImage || "/placeholder.jpg"} />
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
                         <Button className="rounded-full" size="icon" variant="destructive" onClick={deleteImage}>
                             <Trash2 className="w-5 h-5" />

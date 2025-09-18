@@ -67,6 +67,7 @@ def add_documents_to_index(index_name: str, documents: list) -> None:
     """
     index = get_or_create_index(index_name)
     index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
+    logger.info(f"Added {len(documents)} documents to index {index_name}")
 
 
 def get_document_by_id(index_name: str, doc_id: str):
@@ -87,7 +88,7 @@ async def update_document(index_name: str, document: dict) -> None:
     """
     index = get_or_create_index(index_name)
     index.update_documents([document], serializer=CustomEncoder)
-
+    logger.info(f"Updated document {document['id']} in index {index_name}")
 
 def delete_document(index_name: str, document_id: str) -> None:
     """
@@ -95,6 +96,7 @@ def delete_document(index_name: str, document_id: str) -> None:
     """
     index = get_or_create_index(index_name)
     index.delete_document(document_id)
+    logger.info(f"Deleted document {document_id} from index {index_name}")
 
 
 def clear_index(index_name: str) -> None:
@@ -103,10 +105,11 @@ def clear_index(index_name: str) -> None:
     """
     index = get_or_create_index(index_name)
     index.delete_all_documents()
-
+    logger.info(f"Cleared index {index_name}")
 
 def delete_index(index_name: str) -> None:
     """
     Clear index from a Meilisearch.
     """
     client.delete_index(index_name)
+    logger.info(f"Deleted index {index_name}")

@@ -16,7 +16,6 @@ import {
     XCircle,
     RotateCcw,
 } from "lucide-react";
-import Image from "next/image";
 
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
@@ -104,12 +103,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 <div key={idx} className="px-6 py-4">
                                     <div className="flex flex-col sm:flex-row">
                                         <div className="shrink-0 mr-4 mb-4 sm:mb-0">
-                                            <Image
+                                            <img
                                                 alt={item.name}
-                                                blurDataURL="/placeholder.jpg"
                                                 className="object-cover rounded"
                                                 height={80}
-                                                placeholder="blur"
                                                 src={item.image || "/placeholder.jpg"}
                                                 width={80}
                                             />

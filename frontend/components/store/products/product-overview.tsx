@@ -134,7 +134,7 @@ const ProductOverview: React.FC<{
                         }`}
                         onClick={() => setSelectedImageIdx(idx)}
                     >
-                        <Image fill alt={`Thumbnail - ${image}`} className="object-cover" sizes="64px" src={image} />
+                        <Image fill alt={image} className="object-cover" sizes="64px" src={image} />
                     </button>
                 ))}
             </div>

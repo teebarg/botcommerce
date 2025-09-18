@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 
 import CartControl from "./cart-control";
 
@@ -13,15 +12,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     return (
         <div className="flex gap-3">
             <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
-                <Image
-                    fill
-                    alt={item.name}
-                    blurDataURL="/placeholder.jpg"
-                    className="object-cover object-center rounded-lg"
-                    placeholder="blur"
-                    sizes="(max-width: 768px) 64px, 80px"
-                    src={item?.image || "/placeholder.jpg"}
-                />
+                <img alt={item.name} className="object-cover object-center rounded-lg" src={item?.image || "/placeholder.jpg"} />
             </div>
 
             <div className="flex-1 min-w-0">

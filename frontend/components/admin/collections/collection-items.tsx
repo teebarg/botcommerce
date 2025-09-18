@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { CollectionActions } from "./collection-actions";
 
 import { Badge } from "@/components/ui/badge";
@@ -12,15 +10,7 @@ interface CollectionItemProps {
 const CollectionItem = ({ collection }: CollectionItemProps) => {
     return (
         <div className="border border-divider rounded-lg overflow-hidden bg-content1 flex">
-            <Image
-                alt={collection.name}
-                blurDataURL="/placeholder.jpg"
-                className="object-cover rounded"
-                height={100}
-                placeholder="blur"
-                src="/placeholder.jpg"
-                width={100}
-            />
+            <img alt={collection.name} className="object-cover rounded" height={100} src="/placeholder.jpg" width={100} />
             <div className="p-3 flex-1">
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium text-default-900 mb-1">{collection.name}</h3>
