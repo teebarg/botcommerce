@@ -61,13 +61,20 @@ def get_or_create_index(index_name: str) -> Any:
         return client.index(index_name)
 
 
-def add_documents_to_index(index_name: str, documents: list) -> None:
+def add_documents_to_index(index_name: str, documents: list, wait: bool = True) -> None:
     """
     Add documents to a Meilisearch index.
+
+    Args:
+        index_name (str): The Meilisearch index name.
+        documents (list): List of documents to add.
+        wait (bool): If True, wait until indexing is complete.
     """
     index = get_or_create_index(index_name)
-    index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
-    logger.info(f"Added {len(documents)} documents to index {index_name}")
+    task = index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
+
+    if wait:
+        index.wait_for_task(task.task_uid)
 
 
 def get_document_by_id(index_name: str, doc_id: str):
@@ -82,30 +89,98 @@ def get_document_by_id(index_name: str, doc_id: str):
         logger.error(f"Error fetching document by ID: {e}")
 
 
-async def update_document(index_name: str, document: dict) -> None:
+async def update_document(
+    index_name: str, 
+    document: dict, 
+    wait: bool = True
+) -> None:
     """
     Update a document in a Meilisearch index.
+
+    Args:
+        index_name (str): The Meilisearch index name.
+        document (dict): The document to update.
+        wait (bool): If True, wait until indexing is complete.
     """
     index = get_or_create_index(index_name)
-    index.update_documents([document], serializer=CustomEncoder)
-    logger.info(f"Updated document {document['id']} in index {index_name}")
 
-def delete_document(index_name: str, document_id: str) -> None:
+    task = index.update_documents([document], serializer=CustomEncoder)
+
+    if wait:
+        index.wait_for_task(task.task_uid)
+
+
+async def update_document(index_name: str, document: dict, wait: bool = False) -> None:
+    """
+    Update a document in a Meilisearch index.
+
+    Args:
+        index_name (str): The index name.
+        document (dict): The document to update.
+        wait (bool): If True, wait until indexing completes.
+    """
+    index = get_or_create_index(index_name)
+
+    # Fire the task
+    task = index.update_documents([document], serializer=CustomEncoder)
+
+    if wait:
+        # Wait is blocking, so run it in a thread to not block the event loop
+        from anyio import to_thread
+        await to_thread.run_sync(index.wait_for_task, task.task_uid)
+        logger.info(f"Indexed document {document['id']} in index {index_name}")
+    else:
+        logger.info(f"Queued document {document['id']} for indexing in {index_name}")
+
+
+
+# async def update_document(index_name: str, document: dict) -> None:
+#     """
+#     Update a document in a Meilisearch index.
+#     """
+#     index = get_or_create_index(index_name)
+#     index.update_documents([document], serializer=CustomEncoder)
+#     logger.info(f"Updated document {document['id']} in index {index_name}")
+
+# def delete_document(index_name: str, document_id: str) -> None:
+#     """
+#     Delete a document from a Meilisearch index.
+#     """
+#     index = get_or_create_index(index_name)
+#     index.delete_document(document_id)
+#     logger.info(f"Deleted document {document_id} from index {index_name}")
+
+
+# def clear_index(index_name: str) -> None:
+#     """
+#     Clear index from a Meilisearch.
+#     """
+#     index = get_or_create_index(index_name)
+#     index.delete_all_documents()
+#     logger.info(f"Cleared index {index_name}")
+
+
+def delete_document(index_name: str, document_id: str, wait: bool = False) -> None:
     """
     Delete a document from a Meilisearch index.
     """
     index = get_or_create_index(index_name)
-    index.delete_document(document_id)
-    logger.info(f"Deleted document {document_id} from index {index_name}")
+    task = index.delete_document(document_id)
+
+    if wait:
+        index.wait_for_task(task.task_uid)
 
 
-def clear_index(index_name: str) -> None:
+def clear_index(index_name: str, wait: bool = False) -> None:
     """
-    Clear index from a Meilisearch.
+    Clear all documents from a Meilisearch index.
     """
     index = get_or_create_index(index_name)
-    index.delete_all_documents()
-    logger.info(f"Cleared index {index_name}")
+    task = index.delete_all_documents()
+
+    if wait:
+        index.wait_for_task(task.task_uid)
+
 
 def delete_index(index_name: str) -> None:
     """
