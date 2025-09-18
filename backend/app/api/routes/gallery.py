@@ -313,8 +313,8 @@ async def delete_gallery_image(image_id: int) -> Message:
             await delete_images(image.image)
         except Exception as e:
             logger.error(f"Error deleting image {image.image}: {e}")
-        await db.productimage.delete(where={"id": image_id})
-        await sync_index_image(image_id=image_id)
+        # await db.productimage.delete(where={"id": image_id})
+        # await sync_index_image(image_id=image_id)
 
         return Message(message="Image deleted successfully")
 

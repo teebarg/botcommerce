@@ -64,7 +64,6 @@ Shop is an e-commerce platform that leverages modern web technologies to provide
 5. Set up Supabase Storage Buckets
    - Create the following buckets in your Supabase project:
      - `images` - for general images
-     - `product-images` - for product images
      - `exports` - for exported files
      - `invoices` - for invoice PDFs
    - Ensure all buckets have public access enabled for file downloads

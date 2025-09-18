@@ -27,6 +27,7 @@ dependencies = [
     "sentry-sdk[fastapi]<3.0.0,>=1.40.6",
     "asyncpg==0.30.0",
     "firebase-admin==7.1.0",
+    "cloudinary==1.44.1"
 ]
 
 [tool.uv]

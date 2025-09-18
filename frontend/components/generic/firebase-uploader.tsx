@@ -13,7 +13,7 @@ const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseapp.com`,
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.appspot.com`,
+    storageBucket: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebasestorage.app`,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -121,7 +121,7 @@ export default function FirebaseUploader({
     }
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 bottom-0">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 bottom-0 as">
             <div className="bg-content2 rounded-lg shadow-lg w-full md:max-w-2xl h-[100vh] md:h-[75vh] flex flex-col">
                 <div className="flex justify-between items-center border-b px-4 py-4 bg-content1">
                     <h2 className="font-semibold">Upload Queue</h2>

@@ -39,8 +39,8 @@ from app.services.product import reindex_product, product_upload, product_export
 from app.services.redis import cache_response
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
-from app.services.websocket import manager
 from app.core.storage import upload
+from app.services.generic import delete_images
 
 logger = get_logger(__name__)
 
@@ -456,11 +456,7 @@ async def delete_product(id: int) -> Message:
         raise HTTPException(status_code=404, detail="Product not found")
     async with db.tx() as tx:
         try:
-            images = await tx.productimage.find_many(where={"product_id": id})
-            paths = [image.image.split(
-                "/storage/v1/object/public/product-images/")[1] for image in images]
-            if paths:
-                supabase.storage.from_("product-images").remove(paths)
+            await delete_images(images)
 
             await tx.productimage.delete_many(where={"product_id": id})
             await tx.review.delete_many(where={"product_id": id})
@@ -630,10 +626,7 @@ async def delete_image(id: int):
         raise HTTPException(status_code=404, detail="Product not found")
 
     try:
-        file_path = product.image.split(
-            "/storage/v1/object/public/product-images/")[1]
-
-        supabase.storage.from_("product-images").remove([file_path])
+        await delete_images(product.image)
 
         await db.product.update(where={"id": id}, data={"image": None})
         await reindex_product(product_id=id)
@@ -645,7 +638,7 @@ async def delete_image(id: int):
 
 
 @router.delete("/{id}/images/{image_id}")
-async def delete_images(id: int, image_id: int, background_tasks: BackgroundTasks):
+async def delete_product_image(id: int, image_id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product images.
     """
@@ -659,10 +652,7 @@ async def delete_images(id: int, image_id: int, background_tasks: BackgroundTask
 
     async with db.tx() as tx:
         try:
-            file_path = image.image.split(
-                "/storage/v1/object/public/product-images/")[1]
-
-            supabase.storage.from_("product-images").remove([file_path])
+            await delete_images(image.image)
             await tx.productimage.delete(where={"id": image_id})
         except Exception as e:
             logger.error(e)
