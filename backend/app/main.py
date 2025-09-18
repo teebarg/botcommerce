@@ -29,6 +29,7 @@ CONSUMER_NAME = "notif-api-worker"
 
 logger = get_logger(__name__)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
@@ -43,7 +44,8 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
-    consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
+    consumer = RedisStreamConsumer(
+        redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
     await consumer.start()
 
     yield
@@ -290,3 +292,4 @@ async def notify_order(order_id: int):
     formatted_text = f"New order received: {order_id}\nsecond line"
     logger.publish(formatted_text, extra={"channel": "orders"})
     return {"message": f"Order notification sent for order {order_id}"}
+

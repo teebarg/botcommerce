@@ -1,31 +1,56 @@
-import { useOverlayTriggerState } from "@react-stately/overlays";
+"use client";
+
+import { CldUploadWidget } from "next-cloudinary";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import SupabaseUploader from "@/components/generic/supabase-upload-button";
 import { useBulkUploadImages } from "@/lib/hooks/useGallery";
 
 export function GalleryImagesUpload() {
-    const editState = useOverlayTriggerState({});
-    const [isUploading, setIsUploading] = useState<boolean>(false);
+    // const editState = useOverlayTriggerState({});
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
 
-    const { mutateAsync: bulkUpload } = useBulkUploadImages();
+    const { mutateAsync: bulkUpload, isPending } = useBulkUploadImages();
 
-    const handleUpload = async (urls: string[]) => {
-        setIsUploading(true);
-        await bulkUpload({ urls });
-        editState.close();
-        setIsUploading(false);
+    // const handleUpload = async (urls: string[]) => {
+    //     await bulkUpload({ urls });
+    //     editState.close();
+    // };
+
+    const onComplete = async () => {
+        await bulkUpload({ urls: imageUrls });
+        setImageUrls([]);
     };
 
     return (
-        <div className="space-y-6">
-            <Button variant="indigo" onClick={editState.open}>
+        <div className="space-y-6 flex gap-2">
+            {/* <Button variant="indigo" onClick={editState.open}>
                 Upload Images
-            </Button>
-            {editState.isOpen && (
-                <SupabaseUploader bucket="product-images" isUploading={isUploading} onClose={editState.close} onComplete={handleUpload} />
+            </Button> */}
+            <CldUploadWidget
+                uploadPreset="shop_test"
+                onSuccess={(result: any) => {
+                    if (result.event === "success") {
+                        setImageUrls((prev) => [...prev, result.info.secure_url]);
+                    }
+                }}
+            >
+                {({ open }) => {
+                    return (
+                        <Button variant="default" onClick={() => open()}>
+                            Upload Images
+                        </Button>
+                    );
+                }}
+            </CldUploadWidget>
+            {imageUrls.length > 0 && (
+                <Button disabled={isPending} variant="indigo" onClick={onComplete}>
+                    {isPending ? "Saving..." : "Save Images"}
+                </Button>
             )}
+            {/* {editState.isOpen && (
+                <SupabaseUploader bucket="product-images" isUploading={isPending} onClose={editState.close} onComplete={handleUpload} />
+            )} */}
         </div>
     );
 }

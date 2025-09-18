@@ -82,7 +82,7 @@ class Settings(BaseSettings):
     MEILI_MASTER_KEY: str = "masterKey"
     MEILI_HOST: str = "http://meilisearch:7700"
     MEILI_PRODUCTS_INDEX: str = "products"
-    MEILI_GALLERY_INDEX: str = "beafy"
+    MEILI_GALLERY_INDEX: str = "gallery"
 
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
@@ -102,6 +102,10 @@ class Settings(BaseSettings):
 
     GOOGLE_SPREADSHEET_ID: str = ""
     GOOGLE_GID: str = ""
+
+    CLOUDINARY_NAME: str = ""
+    CLOUDINARY_API_KEY: str = ""
+    CLOUDINARY_API_SECRET: str = ""
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

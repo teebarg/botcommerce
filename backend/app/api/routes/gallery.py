@@ -8,7 +8,6 @@ from fastapi import (
     BackgroundTasks,
     Request
 )
-from app.core.deps import supabase
 from app.core.logging import get_logger
 from app.core.utils import slugify, generate_sku
 from app.models.generic import Message, ImageBulkDelete
@@ -26,6 +25,7 @@ from app.services.redis import cache_response
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
+from app.services.generic import delete_images
 
 logger = get_logger(__name__)
 
@@ -45,15 +45,11 @@ async def process_bulk_delete_images(images: list):
 
         for index, image in enumerate(images):
             try:
-                if image.image and "/storage/v1/object/public/product-images/" in image.image:
+                if image.image:
                     try:
-                        file_path = image.image.split(
-                            "/storage/v1/object/public/product-images/")[1]
-                        supabase.storage.from_(
-                            "product-images").remove([file_path])
+                        await delete_images(image.image)
                     except Exception as storage_error:
-                        logger.warning(
-                            f"Failed to delete from storage: {storage_error}")
+                        logger.warning(f"Failed to delete from storage: {storage_error}")
 
                 await db.productimage.delete(where={"id": image.id})
                 deleted_count += 1
@@ -303,7 +299,7 @@ async def reindex_images(background_tasks: BackgroundTasks):
 
 
 @router.delete("/{image_id}")
-async def delete_gallery_image(image_id: int) -> Message:
+async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks) -> Message:
     """
     Delete a gallery image.
     If the image is linked to a product, delete the entire product
@@ -313,14 +309,10 @@ async def delete_gallery_image(image_id: int) -> Message:
         raise HTTPException(status_code=404, detail="Image not found")
 
     if not image.product_id:
-        try:
-            file_path = image.image.split(
-                "/storage/v1/object/public/product-images/")[1]
-            supabase.storage.from_("product-images").remove([file_path])
-        except Exception as e:
-            logger.error(f"Error deleting image {image.image}: {e}")
         await db.productimage.delete(where={"id": image_id})
         await sync_index_image(image_id=image_id)
+
+        background_tasks.add_task(delete_images, image.image)
 
         return Message(message="Image deleted successfully")
 
@@ -335,19 +327,14 @@ async def delete_gallery_image(image_id: int) -> Message:
         product_id = image.product_id
 
         images = await tx.productimage.find_many(where={"product_id": product_id})
-        file_paths = [
-            img.image.split("/storage/v1/object/public/product-images/")[1]
-            for img in images
-            if "/storage/v1/object/public/product-images/" in img.image
-        ]
-
-        if file_paths:
-            supabase.storage.from_("product-images").remove(file_paths)
+        image_urls = [img.image for img in images]
 
         await tx.productimage.delete_many(where={"product_id": product_id})
         await tx.review.delete_many(where={"product_id": product_id})
         await tx.productvariant.delete_many(where={"product_id": product_id})
         await tx.product.delete(where={"id": product_id})
+
+    background_tasks.add_task(delete_images, image_urls)
 
     service = RecentlyViewedService()
     await service.remove_product_from_all(product_id=product_id)
