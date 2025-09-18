@@ -299,7 +299,7 @@ async def reindex_images(background_tasks: BackgroundTasks):
 
 
 @router.delete("/{image_id}")
-async def delete_gallery_image(image_id: int) -> Message:
+async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks) -> Message:
     """
     Delete a gallery image.
     If the image is linked to a product, delete the entire product
@@ -309,12 +309,10 @@ async def delete_gallery_image(image_id: int) -> Message:
         raise HTTPException(status_code=404, detail="Image not found")
 
     if not image.product_id:
-        try:
-            await delete_images(image.image)
-        except Exception as e:
-            logger.error(f"Error deleting image {image.image}: {e}")
-        # await db.productimage.delete(where={"id": image_id})
-        # await sync_index_image(image_id=image_id)
+        await db.productimage.delete(where={"id": image_id})
+        await sync_index_image(image_id=image_id)
+
+        background_tasks.add_task(delete_images, image.image)
 
         return Message(message="Image deleted successfully")
 
@@ -331,12 +329,12 @@ async def delete_gallery_image(image_id: int) -> Message:
         images = await tx.productimage.find_many(where={"product_id": product_id})
         image_urls = [img.image for img in images]
 
-        await delete_images(image_urls)
-
         await tx.productimage.delete_many(where={"product_id": product_id})
         await tx.review.delete_many(where={"product_id": product_id})
         await tx.productvariant.delete_many(where={"product_id": product_id})
         await tx.product.delete(where={"id": product_id})
+
+    background_tasks.add_task(delete_images, image_urls)
 
     service = RecentlyViewedService()
     await service.remove_product_from_all(product_id=product_id)

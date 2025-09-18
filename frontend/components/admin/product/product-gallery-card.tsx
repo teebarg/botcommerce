@@ -45,12 +45,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                                 )}
                                 loading="lazy"
                                 sizes="(max-width: 768px) 100vw, 300px"
-                                src={`${image.image}?width=200&quality=70`}
-                                srcSet={`
-                                    ${image.image}?width=200&quality=70 200w,
-                                    ${image.image}?width=400&quality=70 400w,
-                                    ${image.image}?width=800&quality=70 800w
-                                  `}
+                                src={image.image}
                                 onLoad={() => setImageLoaded(true)}
                             />
                             {!imageLoaded && (
