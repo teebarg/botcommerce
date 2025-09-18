@@ -246,6 +246,7 @@ async def index_images(invalidate_products: bool = False, product_only: bool = F
 
             logger.info(f"Reindexed {len(documents)} products successfully.")
 
+        logger.info("Re-indexing completed, invalidating cache.")
         if invalidate_products:
             await invalidate_pattern("products")
             await invalidate_pattern("product")

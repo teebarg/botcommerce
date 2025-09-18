@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Search, X, Clock, TrendingUp, Star } from "lucide-react";
+import { Search, X, Clock, TrendingUp } from "lucide-react";
 import { useDebounce } from "use-debounce";
-import { useSession } from "next-auth/react";
 
 import { ProductSearch } from "@/schemas";
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { cn, currency } from "@/lib/utils";
-import { useProductRecommendations, useProductSearch } from "@/lib/hooks/useProduct";
+import { useProductSearch } from "@/lib/hooks/useProduct";
 
 const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product: ProductSearch) => void }> = ({ product, onProductSelect }) => {
     const { priceInfo } = useProductVariant(product);
@@ -60,7 +59,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
     placeholder = "Search for products...",
     closeOnSelect = true,
 }) => {
-    const { data: session } = useSession();
+    // const { data: session } = useSession();
     const [query, setQuery] = useState(initialQuery);
     const [debouncedQuery] = useDebounce(query, searchDelay);
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -73,7 +72,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
 
     const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 5, skip: 0, show_suggestions: true });
     const { data: trendingData } = useProductSearch({ collections: "trending", limit: 5, skip: 0 });
-    const { data: recommendedData } = useProductRecommendations(session?.id, 5);
+    // const { data: recommendedData } = useProductRecommendations(session?.id, 5);
 
     useEffect(() => {
         const savedHistory = localStorage.getItem("searchHistory");
@@ -253,7 +252,8 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                                     </div>
                                 </div>
 
-                                <div>
+                                {/* TODO: Implement recommended products */}
+                                {/* <div>
                                     <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground">
                                         <Star className="w-4 h-4" />
                                         Recommended for You
@@ -263,7 +263,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                                             <ProductCard key={idx} product={product} onProductSelect={handleProductSelect} />
                                         ))}
                                     </div>
-                                </div>
+                                </div> */}
                             </>
                         )}
                     </div>

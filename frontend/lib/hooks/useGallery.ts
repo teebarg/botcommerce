@@ -9,7 +9,7 @@ export const useImageGalleryInfinite = (pageSize: number = 24) => {
         queryKey: ["products", "gallery"],
         queryFn: async ({ pageParam = 0 }) =>
             await api.get<{ images: SearchImageItem[]; skip: number; limit: number; total_count: number; total_pages: number }>("/gallery/", {
-                params: { skip: pageParam, limit: pageSize },
+                params: { skip: pageParam || 0, limit: pageSize },
             }),
         getNextPageParam: (lastPage) => {
             const nextSkip = lastPage.skip + lastPage.limit;
