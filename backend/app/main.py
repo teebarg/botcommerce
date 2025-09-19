@@ -1,5 +1,5 @@
 import asyncio
-from backend.app.services.redis import invalidate_list
+from app.services.redis import invalidate_list
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager

@@ -365,7 +365,7 @@ async def reindex_products(background_tasks: BackgroundTasks):
     Re-index all products in the db to Meilisearch.
     """
     try:
-        background_tasks.add_task(index_images, product_only=True, invalidate_products=True)
+        background_tasks.add_task(index_images, image_only=False, invalidate_products=True)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(e)
@@ -715,7 +715,7 @@ async def config_clear_index():
     Clear the products index in Meilisearch.
     """
     try:
-        clear_index(settings.MEILI_PRODUCTS_INDEX)
+        await clear_index(settings.MEILI_PRODUCTS_INDEX)
         return {"message": "Index cleared"}
     except Exception as e:
         logger.error(e)
