@@ -95,14 +95,14 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => 
     const handleAddToCollection = async () => {
         await addProductMutation.mutateAsync({
             collectionId: catalog.id,
-            productId: product.product_id!,
+            productId: product.id!,
         });
     };
 
     const handleRemoveFromCollection = async () => {
         await removeProductMutation.mutateAsync({
             collectionId: catalog.id,
-            productId: product.product_id!,
+            productId: product.id!,
         });
     };
 

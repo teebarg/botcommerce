@@ -34,6 +34,7 @@ async def delete_image_index(images: Union[ProductImage, List[ProductImage]]):
 @with_prisma_connection
 async def reindex_catalog(product_id: int):
     try:
+        await invalidate_pattern(f"gallery")
         product = await db.product.find_unique(
             where={"id": product_id},
             include={"images": True}
@@ -56,11 +57,6 @@ async def reindex_catalog(product_id: int):
 
 @with_prisma_connection
 async def reindex_catalogs(product_ids: list[int]):
-    await manager.broadcast_to_all(
-        data={"status": "processing"},
-        message_type="catalog_bulk_update",
-    )
-
     try:
         products = await db.product.find_many(
             where={"id": {"in": product_ids}},
@@ -76,17 +72,8 @@ async def reindex_catalogs(product_ids: list[int]):
 
         image_ids = list(set([image.id for product in products for image in product.images]))
 
-        try:
-            await reindex_image(image_ids=image_ids)
-            logger.info(f"Successfully reindexed products {product_ids}")
-        except Exception as e:
-            logger.debug(f"Error re-indexing products {product_ids}: {e}")
-
+        await reindex_image(image_ids=image_ids)
         await invalidate_pattern(f"product:catalog")
-        await manager.broadcast_to_all(
-            data={"status": "completed"},
-            message_type="catalog_bulk_update",
-        )
 
     except Exception as e:
         logger.error(f"Error re-indexing products {product_ids}: {e}")

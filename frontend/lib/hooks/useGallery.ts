@@ -4,32 +4,15 @@ import { toast } from "sonner";
 import { api } from "@/apis/client";
 import { GalleryImageItem, Message } from "@/schemas";
 
-// export const useImageGalleryInfinite2 = (pageSize: number = 24) => {
-//     return useInfiniteQuery({
-//         queryKey: ["products", "gallery"],
-//         queryFn: async ({ pageParam = 0 }) =>
-//             await api.get<{ images: SearchImageItem[]; skip: number; limit: number; total_count: number; total_pages: number }>("/gallery/", {
-//                 params: { skip: pageParam || 0, limit: pageSize },
-//             }),
-//         getNextPageParam: (lastPage) => {
-//             const nextSkip = lastPage.skip + lastPage.limit;
-//             const hasMore = nextSkip < lastPage.total_count;
-
-//             return hasMore ? nextSkip : undefined;
-//         },
-//         initialPageParam: 0,
-//     });
-// };
-
-export const useImageGalleryInfinite = (pageSize: number = 24) => {
+export const useImageGalleryInfinite = (pageSize: number = 20) => {
     return useInfiniteQuery({
         queryKey: ["gallery"],
-        queryFn: async ({ pageParam = null }) =>
+        queryFn: async ({ pageParam }: { pageParam: number | null }) =>
             await api.get<{ images: GalleryImageItem[]; next_cursor: number | null }>("/gallery/", {
                 params: { cursor: pageParam, limit: pageSize },
             }),
-        getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
-        initialPageParam: null,
+        getNextPageParam: (lastPage) => lastPage.next_cursor,
+        initialPageParam: null as number | null,
     });
 };
 

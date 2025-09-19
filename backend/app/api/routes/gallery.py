@@ -76,10 +76,6 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 
 
 async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
-    await manager.broadcast_to_all(
-        data={"status": "processing"},
-        message_type="product_bulk_update"
-    )
     async with db.tx() as tx:
         for index, image in enumerate(images):
             try:
@@ -124,13 +120,14 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
             except Exception as e:
                 logger.error(f"Error processing image {image.id}: {e}")
                 continue
-    await invalidate_pattern("gallery")
-    await reindex_image(image_ids=[image.id for image in images])
 
+    await invalidate_pattern("gallery")
     await manager.broadcast_to_all(
         data={"status": "completed"},
-        message_type="product_bulk_update"
+        message_type="bulk_action"
     )
+
+    await reindex_image(image_ids=[image.id for image in images])
 
 router = APIRouter()
 
@@ -257,8 +254,8 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
 
     if not image.product_id:
         await db.productimage.delete(where={"id": image_id})
-        await delete_image_index(images=image)
-
+        await invalidate_pattern("gallery")
+        background_tasks.add_task(delete_image_index, images=image)
         background_tasks.add_task(remove_image_from_storage, image.image)
 
         return Message(message="Image deleted successfully")
@@ -274,12 +271,12 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
         await tx.productvariant.delete_many(where={"product_id": product_id})
         await tx.product.delete(where={"id": product_id})
 
-    background_tasks.add_task(remove_image_from_storage, image_urls)
-
     service = RecentlyViewedService()
     await service.remove_product_from_all(product_id=product_id)
 
-    await delete_image_index(images=image)
+    await invalidate_pattern("gallery")
+    background_tasks.add_task(delete_image_index, images=image)
+    background_tasks.add_task(remove_image_from_storage, image_urls)
 
     return Message(message="Product and all related data deleted successfully")
 
@@ -346,7 +343,11 @@ async def bulk_delete_gallery_images(
         )
 
         await invalidate_pattern("gallery")
-        # background_tasks.add_task(process_bulk_delete_images, images=images)
+        background_tasks.add_task(process_bulk_delete_images, images=images)
+        await manager.broadcast_to_all(
+            data={"status": "completed"},
+            message_type="bulk_action"
+        )
 
         return {
             "success": True,

@@ -7,7 +7,7 @@ from app.models.collection import (
 from app.prisma_client import prisma as db
 from app.services.shared_collection import SharedCollectionService
 from math import ceil
-from app.services.redis import cache_response, invalidate_list
+from app.services.redis import cache_response, invalidate_list, invalidate_pattern
 from app.services.product import reindex_catalog, reindex_catalogs
 from app.core.deps import get_current_superuser, UserDep
 from app.models.generic import Message
@@ -346,6 +346,38 @@ async def bulk_add_products_to_shared_collection(id: int, data: SharedCollection
         data={"products": {"connect": [{"id": pid} for pid in data.product_ids]}}
     )
 
+    await invalidate_pattern(f"gallery")
+    await manager.broadcast_to_all(
+        data={"status": "completed"},
+        message_type="bulk_action",
+    )
+
     background_tasks.add_task(reindex_catalogs, product_ids=data.product_ids)
 
     return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}
+
+
+@router.post("/{id}/remove-products", dependencies=[Depends(get_current_superuser)])
+async def bulk_remove_products_from_shared_collection(id: int, data: SharedCollectionBulkAdd, background_tasks: BackgroundTasks) -> Message:
+    """Bulk remove products from a catalog"""
+    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
+    if not shared_collection:
+        raise HTTPException(status_code=404, detail="Catalog not found")
+
+    if not data.product_ids:
+        raise HTTPException(status_code=400, detail="No product_ids provided")
+
+    await db.sharedcollection.update(
+        where={"id": id},
+        data={"products": {"disconnect": [{"id": pid} for pid in data.product_ids]}}
+    )
+
+    await invalidate_pattern(f"gallery")
+    await manager.broadcast_to_all(
+        data={"status": "completed"},
+        message_type="bulk_action",
+    )
+
+    background_tasks.add_task(reindex_catalogs, product_ids=data.product_ids)
+
+    return {"message": f"Removed {len(data.product_ids)} product(s) from catalog"}

@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useCategories } from "@/lib/hooks/useCategories";
 import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
-import { GalleryImageItem, GalleryProduct, Product, ProductVariant, SearchImageItem } from "@/schemas";
+import { GalleryProduct, Product, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";

@@ -218,29 +218,6 @@ export const DBCatalogSchema = z.object({
     is_active: z.boolean(),
 });
 
-export const SearchImageItemSchema = z.object({
-    id: z.number(),
-    product_id: z.number().optional(),
-    name: z.string(),
-    slug: z.string(),
-    description: z.string(),
-    image: z.string(),
-    active: z.boolean(),
-    status: ProductStatusSchema,
-    categories: z.array(CategorySchema),
-    collections: z.array(CollectionSchema),
-    variants: z.array(ProductVariantSchema).optional(),
-    catalogs: z.array(z.string()),
-});
-
-export const SearchImageSchema = z.object({
-    images: z.array(SearchImageItemSchema),
-    skip: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
-});
-
 export const GalleryProductSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -280,8 +257,6 @@ export type SearchCategory = z.infer<typeof SearchCategorySchema>;
 export type SearchCollection = z.infer<typeof SearchCollectionSchema>;
 export type SearchVariant = z.infer<typeof SearchVariantSchema>;
 export type DBCatalog = z.infer<typeof DBCatalogSchema>;
-export type SearchImageItem = z.infer<typeof SearchImageItemSchema>;
-export type SearchImage = z.infer<typeof SearchImageSchema>;
 
 export type Product = z.infer<typeof ProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
