@@ -23,7 +23,7 @@ export function GalleryImagesUpload() {
     };
 
     return (
-        <div className="space-y-6 flex gap-2">
+        <div className="space-y-6 flex gap-2 flex-wrap">
             {/* <Button variant="indigo" onClick={editState.open}>
                 Upload Images
             </Button> */}
@@ -45,7 +45,7 @@ export function GalleryImagesUpload() {
             </CldUploadWidget>
             {imageUrls.length > 0 && (
                 <Button disabled={isPending} variant="indigo" onClick={onComplete}>
-                    {isPending ? "Saving..." : "Save Images"}
+                    {isPending ? "Saving..." : "Complete"}
                 </Button>
             )}
             {/* {editState.isOpen && (
