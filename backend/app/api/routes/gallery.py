@@ -20,7 +20,7 @@ from app.services.meilisearch import get_or_create_index, ensure_index_ready
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import index_images, reindex_image, sync_index_image
+from app.services.product import index_images, reindex_image, delete_image_index
 from app.services.redis import cache_response
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
@@ -64,8 +64,7 @@ async def process_bulk_delete_images(images: list):
                     "error": str(e)
                 })
 
-        for image in images:
-            await sync_index_image(image_id=str(image.id), product=image.product)
+        await delete_image_index(images)
 
         await manager.broadcast_to_all(
             data={"status": "completed"},
@@ -161,8 +160,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                 logger.error(f"Error processing image {image.id}: {e}")
                 continue
 
-    for image in images:
-        await reindex_image(image_id=image.id)
+    await reindex_image(image_ids=[image.id for image in images])
 
     await manager.broadcast_to_all(
         data={"status": "completed"},
@@ -310,18 +308,11 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
 
     if not image.product_id:
         await db.productimage.delete(where={"id": image_id})
-        await sync_index_image(image_id=image_id)
+        await delete_image_index(images=image)
 
         background_tasks.add_task(delete_images, image.image)
 
         return Message(message="Image deleted successfully")
-
-    product = await db.product.find_unique(
-        where={"id": image.product_id},
-        include={
-            "shared_collections": True,
-        }
-    )
 
     async with db.tx() as tx:
         product_id = image.product_id
@@ -339,13 +330,13 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
     service = RecentlyViewedService()
     await service.remove_product_from_all(product_id=product_id)
 
-    await sync_index_image(image_id=image.id, product=product)
+    await delete_image_index(images=image)
 
     return Message(message="Product and all related data deleted successfully")
 
 
 @router.post("/bulk-upload")
-async def bulk_save_image_urls(payload: ProductImageBulkUrls):
+async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: BackgroundTasks):
     """
     Save many image URLs into the gallery.
     """
@@ -365,7 +356,7 @@ async def bulk_save_image_urls(payload: ProductImageBulkUrls):
                 status_code=400, detail="No valid images to save")
 
         await db.productimage.create_many(data=create_rows)
-        await index_images()
+        background_tasks.add_task(index_images, image_only=True)
 
         return {"success": True, "count": len(create_rows)}
     except HTTPException:
@@ -417,7 +408,6 @@ async def create_image_metadata(
 ):
     """
     Create a product, images and variants.
-    - Creates variants (if provided)
     """
     async with db.tx() as tx:
         try:
@@ -469,7 +459,7 @@ async def create_image_metadata(
                         raise HTTPException(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            background_tasks.add_task(reindex_image, image_id=image_id)
+            background_tasks.add_task(reindex_image, image_ids=[image_id])
 
             return {"success": True}
         except UniqueViolationError:
@@ -558,8 +548,7 @@ async def update_image_metadata(
                     raise HTTPException(
                         status_code=400, detail=f"Failed to create variant: {str(e)}")
 
-            background_tasks.add_task(
-                reindex_image, image_id=existing_image.id)
+            background_tasks.add_task(reindex_image, image_ids=[existing_image.id])
 
             return {"success": True}
         except UniqueViolationError:

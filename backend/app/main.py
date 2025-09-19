@@ -1,4 +1,5 @@
 import asyncio
+from app.services.redis import invalidate_list
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager
@@ -293,3 +294,19 @@ async def notify_order(order_id: int):
     logger.publish(formatted_text, extra={"channel": "orders"})
     return {"message": f"Order notification sent for order {order_id}"}
 
+
+@app.post("/api/invalidate-react")
+async def invalidate_react(key: str):
+    await manager.broadcast_to_all(
+        data={
+            "key": key,
+        },
+        message_type="invalidate",
+    )
+    return {"message": "success"}
+
+
+@app.post("/api/invalidate-redis")
+async def invalidate_redis(key: str):
+    await invalidate_list(key)
+    return {"message": "success"}

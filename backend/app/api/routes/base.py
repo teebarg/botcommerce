@@ -130,7 +130,7 @@ async def bust_redis_cache(
 async def clear_redis_cache(redis: RedisClient):
     """Clear the entire Redis database"""
     try:
-        clear_index(settings.MEILI_PRODUCTS_INDEX)
+        await clear_index(settings.MEILI_PRODUCTS_INDEX)
         result = await redis.flushdb()
         return {"success": result}
     except Exception as e:
