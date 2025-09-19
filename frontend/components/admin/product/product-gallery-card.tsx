@@ -7,10 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { Collection, ProductVariant, SearchImageItem } from "@/schemas";
+import { Collection, GalleryImageItem, ProductVariant, SearchImageItem } from "@/schemas";
 
 interface GalleryCardProps {
-    image: SearchImageItem;
+    image: GalleryImageItem;
     onClick?: () => void;
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
@@ -28,7 +28,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
         <Card
             className={cn(
                 "group relative overflow-hidden border-0 bg-gradient-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
-                image.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
+                image.product?.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
                 isSelected && "ring-2 ring-indigo-500 ring-offset-2"
             )}
             onClick={selectionMode ? undefined : onClick}
@@ -74,14 +74,14 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                     </div>
 
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                        {image.collections?.slice(0, 2).map((item: Collection, idx: number) => (
+                        {image.product?.collections?.slice(0, 2).map((item: Collection, idx: number) => (
                             <Badge key={idx} variant="warning">
                                 {item.name}
                             </Badge>
                         ))}
                     </div>
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1">
-                        {image.variants?.map((item: ProductVariant, idx: number) => (
+                        {image.product?.variants?.map((item: ProductVariant, idx: number) => (
                             <Badge key={idx} variant="emerald">
                                 Uk Size: {item.size}
                             </Badge>
@@ -89,7 +89,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                     </div>
 
                     <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
-                        {image.status === "OUT_OF_STOCK" && <Badge variant="destructive">Out of stock</Badge>}
+                        {image.product?.status === "OUT_OF_STOCK" && <Badge variant="destructive">Out of stock</Badge>}
                     </div>
 
                     <div className="absolute bottom-2 right-2">

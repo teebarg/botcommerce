@@ -20,7 +20,7 @@ export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(30);
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(32);
     const images = data?.pages?.flatMap((p) => p.images) || [];
 
     const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -51,20 +51,6 @@ export function ProductImageGallery() {
             setIsLoading(true);
         }
 
-        if (currentMessage?.type === "product_bulk_delete" && currentMessage?.status === "completed") {
-            toast.success("Bulk delete completed", { id: "product_bulk_delete" });
-            setSelectedImages(new Set());
-            setSelectionMode(false);
-        }
-
-        if (currentMessage?.type === "product_bulk_delete" && currentMessage?.status === "processing") {
-            toast.loading("Bulk delete in progress...", { id: "product_bulk_delete" });
-        }
-
-        if (currentMessage?.type === "product_bulk_delete" && currentMessage?.status === "failed") {
-            toast.error(`Bulk delete failed: ${currentMessage.message}`, { id: "product_bulk_delete" });
-        }
-
         if (currentMessage?.type === "product_bulk_update" && currentMessage?.status === "completed") {
             toast.success("Bulk update completed", { id: "bulk_update" });
             setSelectedImages(new Set());
@@ -75,15 +61,6 @@ export function ProductImageGallery() {
             toast.loading("Bulk update in progress...", { id: "bulk_update" });
         }
 
-        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "processing") {
-            toast.loading("Catalog bulk upload in progress...", { id: "bulk_product_catalog" });
-        }
-
-        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "completed") {
-            toast.success("Catalog bulk upload completed", { id: "bulk_product_catalog" });
-            setSelectedImages(new Set());
-            setSelectionMode(false);
-        }
     }, [currentMessage?.percent, currentMessage?.status, messages]);
 
     useEffect(() => {

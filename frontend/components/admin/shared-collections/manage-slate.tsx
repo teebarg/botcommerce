@@ -13,11 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAddProductToSharedCollection, useRemoveProductFromSharedCollection, useAllSharedCollections } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
-import { DBCatalog, SearchImageItem } from "@/schemas";
+import { DBCatalog, GalleryProduct } from "@/schemas";
 import Overlay from "@/components/overlay";
 
 interface ManageSlateProps {
-    product: SearchImageItem;
+    product: GalleryProduct;
 }
 
 export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
@@ -83,11 +83,11 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
 
 interface CollectionItemProps {
     catalog: DBCatalog;
-    product: SearchImageItem;
+    product: GalleryProduct;
 }
 
 const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => {
-    const hasProduct = product?.catalogs?.some((item: string) => item === catalog.slug) || false;
+    const hasProduct = product?.shared_collections?.some((item: DBCatalog) => item.slug === catalog.slug) || false;
 
     const addProductMutation = useAddProductToSharedCollection();
     const removeProductMutation = useRemoveProductFromSharedCollection();

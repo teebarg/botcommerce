@@ -100,7 +100,6 @@ class SearchProduct(BaseModel):
 
 class Facets(BaseModel):
     category_slugs: Optional[dict[str, int]] = None
-    collection_slugs: Optional[dict[str, int]] = None
     sizes: Optional[dict[str, int]] = None
     colors: Optional[dict[str, int]] = None
 

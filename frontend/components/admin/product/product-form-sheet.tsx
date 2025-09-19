@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCollections } from "@/lib/hooks/useCollection";
 import { useCategories } from "@/lib/hooks/useCategories";
 import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
-import { Product, ProductVariant, SearchImageItem } from "@/schemas";
+import { GalleryImageItem, GalleryProduct, Product, ProductVariant, SearchImageItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +25,7 @@ type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" |
 interface ProductSheetFormProps {
     imageId: number;
     onClose: () => void;
-    currentProduct?: SearchImageItem;
+    currentProduct?: GalleryProduct;
 }
 
 export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSheetFormProps) {
@@ -77,7 +77,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
             variants: [newVariant],
         };
 
-        if (currentProduct?.product_id) {
+        if (currentProduct?.id) {
             updateImageMetadata({ imageId, input }).then(() => onClose());
         } else {
             createImageMetadata({ imageId, input }).then(() => onClose());

@@ -35,12 +35,12 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import reindex_product, product_upload, product_export, sync_index_product, index_images
+from app.services.product import reindex_product, product_upload, product_export, index_images, delete_image_index
 from app.services.redis import cache_response
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
 from app.core.storage import upload
-from app.services.generic import delete_images
+from app.services.generic import remove_image_from_storage
 
 logger = get_logger(__name__)
 
@@ -124,9 +124,6 @@ async def search(
     Retrieve products using Meilisearch, sorted by latest.
     """
     filters = []
-    # if brand_id:
-    #     brands = brand_id.split(",")
-    #     filters.append(" OR ".join([f'brand = "{brand}"' for brand in brands]))
     if cat_ids:
         filters.append(f"category_slugs IN {url_to_list(cat_ids)}")
     if collections:
@@ -147,8 +144,7 @@ async def search(
     }
 
     if show_facets:
-        search_params["facets"] = ["category_slugs",
-                                   "collection_slugs", "sizes", "colors"]
+        search_params["facets"] = ["category_slugs", "sizes", "colors"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
@@ -365,7 +361,7 @@ async def reindex_products(background_tasks: BackgroundTasks):
     Re-index all products in the db to Meilisearch.
     """
     try:
-        background_tasks.add_task(index_images, image_only=False, invalidate_products=True)
+        background_tasks.add_task(index_images)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(e)
@@ -449,14 +445,14 @@ async def delete_product(id: int) -> Message:
     product = await db.product.find_unique(
         where={"id": id},
         include={
-            "shared_collections": True,
+            "images": True,
         }
     )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     async with db.tx() as tx:
         try:
-            await delete_images(images)
+            await remove_image_from_storage(images=[img.image for img in product.images])
 
             await tx.productimage.delete_many(where={"product_id": id})
             await tx.review.delete_many(where={"product_id": id})
@@ -468,7 +464,7 @@ async def delete_product(id: int) -> Message:
 
         service = RecentlyViewedService()
         await service.remove_product_from_all(product_id=id)
-        await sync_index_product(product=product)
+        await delete_image_index(images=product.images)
         return Message(message="Product deleted successfully")
 
 
@@ -626,7 +622,7 @@ async def delete_image(id: int):
         raise HTTPException(status_code=404, detail="Product not found")
 
     try:
-        await delete_images(product.image)
+        await remove_image_from_storage(product.image)
 
         await db.product.update(where={"id": id}, data={"image": None})
         await reindex_product(product_id=id)
@@ -652,7 +648,7 @@ async def delete_product_image(id: int, image_id: int, background_tasks: Backgro
 
     async with db.tx() as tx:
         try:
-            await delete_images(image.image)
+            await remove_image_from_storage(image.image)
             await tx.productimage.delete(where={"id": image_id})
         except Exception as e:
             logger.error(e)
@@ -692,10 +688,6 @@ async def configure_filterable_attributes(
         index.update_filterable_attributes(REQUIRED_FILTERABLES)
         index.update_sortable_attributes(REQUIRED_SORTABLES)
         # index.update_non_separator_tokens(["-"])
-
-        image_index = get_or_create_index(settings.MEILI_GALLERY_INDEX)
-        image_index.update_filterable_attributes(REQUIRED_FILTERABLES)
-        image_index.update_sortable_attributes(REQUIRED_SORTABLES)
 
         logger.info(f"Updated filterable attributes: {attributes}")
         return Message(
