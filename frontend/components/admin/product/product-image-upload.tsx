@@ -2,7 +2,6 @@ import type { ProductImage } from "./product-creator";
 
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon, Plus } from "lucide-react";
-import Image from "next/image";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -115,11 +114,9 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                             {images.map((image: ProductImage, idx: number) => (
                                 <Card key={idx} className="relative group overflow-hidden bg-card shadow-sm">
                                     <div className="aspect-square">
-                                        <Image
-                                            fill
+                                        <img
                                             alt={`Product image ${idx + 1}`}
                                             className="w-full h-full object-cover transition-transform duration-smooth group-hover:scale-105"
-                                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                             src={image.url}
                                         />
                                     </div>

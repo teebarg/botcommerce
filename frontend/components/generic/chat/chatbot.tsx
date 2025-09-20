@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Send, Paperclip, Minus, X } from "lucide-react";
 import { toast } from "sonner";
-import Image from "next/image";
 
 import ChatBody from "./chatbody";
 
@@ -105,16 +104,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
     return (
         <div className="w-full md:max-w-md flex flex-col h-[90vh] rounded-xl rounded-b-none md:rounded-b-xl shadow-2xl animate-fade-in z-70">
             <header className="flex items-center px-4 py-3 bg-[#222d31] rounded-t-xl border-b border-[#232930]">
-                <Image
-                    alt="AI Assistant"
-                    blurDataURL="/placeholder.jpg"
-                    className="rounded-full mr-4"
-                    height={40}
-                    placeholder="blur"
-                    priority={false}
-                    src="/profile-1.jpeg"
-                    width={40}
-                />
+                <img alt="AI Assistant" className="rounded-full mr-4" height={40} src="/profile-1.jpeg" width={40} />
                 <div className="flex-1">
                     <div className="font-semibold text-white text-base">Online Assistant</div>
                     <div className="text-xs text-[#b2b8bd]">Online</div>

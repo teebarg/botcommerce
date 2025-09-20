@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
 
 import { ProductQuery } from "./product-query";
 
@@ -126,13 +125,9 @@ export function ProductDetails() {
                                 className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
                                 <div className="relative aspect-product w-full bg-content1 overflow-hidden">
-                                    <Image
-                                        fill
+                                    <img
                                         alt={product.name}
-                                        blurDataURL="/placeholder.jpg"
                                         className="object-cover"
-                                        placeholder="blur"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                                         src={product.images?.[0] || product?.image || "/placeholder.jpg"}
                                     />
 

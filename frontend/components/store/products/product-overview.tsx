@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 
 import { DiscountBadge } from "./discount-badge";
@@ -97,11 +96,9 @@ const ProductOverview: React.FC<{
                 </button>
 
                 <div className="relative h-[60vh] overflow-hidden">
-                    <Image
-                        fill
+                    <img
                         alt={product.name}
                         className="object-contain h-full w-full rounded"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         src={selectedImage || product.images[0] || "/placeholder.jpg"}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
@@ -134,7 +131,7 @@ const ProductOverview: React.FC<{
                         }`}
                         onClick={() => setSelectedImageIdx(idx)}
                     >
-                        <Image fill alt={image} className="object-cover" sizes="64px" src={image} />
+                        <img alt={image} className="object-cover" src={image} />
                     </button>
                 ))}
             </div>
