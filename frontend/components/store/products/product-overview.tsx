@@ -99,10 +99,10 @@ const ProductOverview: React.FC<{
                 <div className="relative h-[60vh] overflow-hidden">
                     <Image
                         fill
-                        alt={selectedImage || product.image || "placeholder"}
+                        alt={product.name}
                         className="object-contain h-full w-full rounded"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        src={selectedImage || product.image || "/placeholder.jpg"}
+                        src={selectedImage || product.images[0] || "/placeholder.jpg"}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 

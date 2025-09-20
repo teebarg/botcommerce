@@ -121,10 +121,10 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         <div className="h-[60vh] flex items-center justify-center p-4 relative">
                             <Image
                                 fill
-                                alt={selectedImage?.image || product.image || "placeholder"}
+                                alt={product.name}
                                 className="object-contain h-full w-full rounded"
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                src={selectedImage?.image || product.image || "/placeholder.jpg"}
+                                src={selectedImage?.image || product.images?.[0]?.image || "/placeholder.jpg"}
                             />
                         </div>
                     </div>
