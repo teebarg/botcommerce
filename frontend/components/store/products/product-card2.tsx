@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useSession } from "next-auth/react";
 
+import ProductActions from "./product-actions";
+
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
@@ -74,7 +76,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         )}
                     </div>
 
-                    <div className="p-4">
+                    <div className="py-4 px-2 space-y-2">
                         <div className="hidden lg:flex items-center gap-2">
                             <p
                                 className={cn(
@@ -93,8 +95,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                                 Color: {product.variants?.[0].color}
                             </p>
                         </div>
-                        <h3 className="font-bold text-default-900 mb-2 line-clamp-1">{product.name}</h3>
                         <PriceLabel priceInfo={priceInfo} />
+                        <ProductActions product={product} />
                     </div>
                 </div>
             }

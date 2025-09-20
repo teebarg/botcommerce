@@ -312,7 +312,7 @@ const ProductOverview: React.FC<{
                         </div>
                     </div>
 
-                    <div className={cn("flex gap-3 flex-row md:flex-row")}>
+                    <div className={cn("flex gap-3 flex-row")}>
                         <Button
                             disabled={loading || !selectedVariant || outOfStock}
                             isLoading={loading}
