@@ -172,7 +172,6 @@ export const PaginatedSharedSchema = PagSchema.extend({
 
 export const FacetSchema = z.object({
     category_slugs: z.record(z.string()).optional(),
-    collection_slugs: z.record(z.string()).optional(),
     sizes: z.record(z.string()).optional(),
     colors: z.record(z.string()).optional(),
 });
@@ -219,35 +218,45 @@ export const DBCatalogSchema = z.object({
     is_active: z.boolean(),
 });
 
-export const SearchImageItemSchema = z.object({
+export const GalleryProductSchema = z.object({
     id: z.number(),
-    product_id: z.number().optional(),
     name: z.string(),
     slug: z.string(),
+    sku: z.string(),
     description: z.string(),
     image: z.string(),
-    active: z.boolean(),
-    status: ProductStatusSchema,
+    variants: z.array(ProductVariantSchema).optional(),
+    ratings: z.number(),
     categories: z.array(CategorySchema),
     collections: z.array(CollectionSchema),
-    variants: z.array(ProductVariantSchema).optional(),
-    catalogs: z.array(z.string()),
+    images: z.array(ProductImageSchema),
+    reviews: z.array(ReviewSchema),
+    active: z.boolean(),
+    product_id: z.number().optional(),
+    status: ProductStatusSchema,
+    shared_collections: z.array(DBCatalogSchema),
 });
 
-export const SearchImageSchema = z.object({
-    images: z.array(SearchImageItemSchema),
-    skip: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
+export const GalleryImageItemSchema = z.object({
+    id: z.number(),
+    image: z.string(),
+    product: GalleryProductSchema.optional(),
+    product_id: z.number().optional(),
 });
+
+export const GalleryImageSchema = z.object({
+    images: z.array(GalleryImageItemSchema),
+    next_cursor: z.number().optional(),
+});
+
+export type GalleryProduct = z.infer<typeof GalleryProductSchema>;
+export type GalleryImageItem = z.infer<typeof GalleryImageItemSchema>;
+export type GalleryImage = z.infer<typeof GalleryImageSchema>;
 
 export type SearchCategory = z.infer<typeof SearchCategorySchema>;
 export type SearchCollection = z.infer<typeof SearchCollectionSchema>;
 export type SearchVariant = z.infer<typeof SearchVariantSchema>;
 export type DBCatalog = z.infer<typeof DBCatalogSchema>;
-export type SearchImageItem = z.infer<typeof SearchImageItemSchema>;
-export type SearchImage = z.infer<typeof SearchImageSchema>;
 
 export type Product = z.infer<typeof ProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;

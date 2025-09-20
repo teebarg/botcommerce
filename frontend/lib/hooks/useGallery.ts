@@ -2,22 +2,17 @@ import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Message, SearchImageItem } from "@/schemas";
+import { GalleryImageItem, Message } from "@/schemas";
 
-export const useImageGalleryInfinite = (pageSize: number = 24) => {
+export const useImageGalleryInfinite = (pageSize: number = 20) => {
     return useInfiniteQuery({
-        queryKey: ["products", "gallery"],
-        queryFn: async ({ pageParam = 0 }) =>
-            await api.get<{ images: SearchImageItem[]; skip: number; limit: number; total_count: number; total_pages: number }>("/gallery/", {
-                params: { skip: pageParam || 0, limit: pageSize },
+        queryKey: ["gallery"],
+        queryFn: async ({ pageParam }: { pageParam: number | null }) =>
+            await api.get<{ images: GalleryImageItem[]; next_cursor: number | null }>("/gallery/", {
+                params: { cursor: pageParam, limit: pageSize },
             }),
-        getNextPageParam: (lastPage) => {
-            const nextSkip = lastPage.skip + lastPage.limit;
-            const hasMore = nextSkip < lastPage.total_count;
-
-            return hasMore ? nextSkip : undefined;
-        },
-        initialPageParam: 0,
+        getNextPageParam: (lastPage) => lastPage.next_cursor,
+        initialPageParam: null as number | null,
     });
 };
 
@@ -84,6 +79,9 @@ export const useDeleteGalleryImage = () => {
 export const useBulkDeleteGalleryImages = () => {
     return useMutation({
         mutationFn: async ({ imageIds }: { imageIds: number[] }) => await api.post<Message>(`/gallery/bulk-delete`, { files: imageIds }),
+        onSuccess: () => {
+            toast.success("Bulk delete successfully");
+        },
         onError: (error: any) => {
             toast.error(error.message || "Failed to start bulk delete");
         },
@@ -94,6 +92,9 @@ export const useBulkProductUpdate = () => {
     return useMutation({
         mutationFn: async ({ imageIds, input }: { imageIds: number[]; input: any }) =>
             await api.patch<Message>("/gallery/bulk-update", { image_ids: imageIds, data: input }),
+        onSuccess: () => {
+            toast.success("Bulk metadata updated successfully");
+        },
         onError: (error: any) => {
             toast.error(error.message || "Failed to start bulk metadata");
         },

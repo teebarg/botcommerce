@@ -16,7 +16,7 @@ cloudinary.config(
 
 logger = get_logger(__name__)
 
-async def delete_images(images: Union[str, List[str]]):
+async def remove_image_from_storage(images: Union[str, List[str]]):
     """
     Deletes images from Supabase, Firebase, or Cloudinary depending on the URL.
 

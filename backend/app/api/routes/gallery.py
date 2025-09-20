@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 import random
 
 from fastapi import (
@@ -25,61 +25,26 @@ from app.services.redis import cache_response
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
-from app.services.generic import delete_images
+from app.services.generic import remove_image_from_storage
+from app.core.db import database
+from app.services.redis import invalidate_pattern, invalidate_key
+from app.models.product import ProductImage
 
 logger = get_logger(__name__)
 
 
-async def process_bulk_delete_images(images: list):
+async def process_bulk_delete_images(images: list[ProductImage]):
     """
     Process bulk deletion of gallery images.
     """
-    await manager.broadcast_to_all(
-        data={"status": "processing"},
-        message_type="product_bulk_delete"
-    )
-
     try:
-        deleted_count = 0
-        failed_deletions = []
-
-        for index, image in enumerate(images):
-            try:
-                if image.image:
-                    try:
-                        await delete_images(image.image)
-                    except Exception as storage_error:
-                        logger.warning(f"Failed to delete from storage: {storage_error}")
-
-                await db.productimage.delete(where={"id": image.id})
-                deleted_count += 1
-
-                logger.info(
-                    f"Successfully deleted image {index + 1}/{len(images)}")
-
-            except Exception as e:
-                logger.error(f"Failed to delete image {index + 1}: {str(e)}")
-                failed_deletions.append({
-                    "image_id": image.id,
-                    "error": str(e)
-                })
-
+        await remove_image_from_storage([image.image for image in images])
         await delete_image_index(images)
 
-        await manager.broadcast_to_all(
-            data={"status": "completed"},
-            message_type="product_bulk_delete"
-        )
-
-        logger.info(
-            f"Bulk delete completed successfully. {deleted_count} deleted, {len(failed_deletions)} failed.")
+        logger.info("Bulk delete completed successfully")
 
     except Exception as e:
         logger.error(f"Error processing bulk delete: {str(e)}")
-        await manager.broadcast_to_all(
-            data={"status": "failed"},
-            message_type="product_bulk_delete"
-        )
 
 
 def build_variant_data(payload) -> dict[str, Any]:
@@ -111,10 +76,6 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 
 
 async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
-    await manager.broadcast_to_all(
-        data={"status": "processing"},
-        message_type="product_bulk_update"
-    )
     async with db.tx() as tx:
         for index, image in enumerate(images):
             try:
@@ -160,18 +121,19 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                 logger.error(f"Error processing image {image.id}: {e}")
                 continue
 
-    await reindex_image(image_ids=[image.id for image in images])
-
+    await invalidate_pattern("gallery")
     await manager.broadcast_to_all(
         data={"status": "completed"},
-        message_type="product_bulk_update"
+        message_type="bulk_action"
     )
+
+    await reindex_image(image_ids=[image.id for image in images])
 
 router = APIRouter()
 
 
-# @router.get("/gallery3")
-# @cache_response("products:gallery3")
+# @router.get("/gallery")
+# @cache_response("gallery")
 # async def image_gallery(
 #     request: Request,
 #     skip: int = Query(default=0, ge=0),
@@ -220,65 +182,48 @@ router = APIRouter()
 #         logger.error(e)
 #         raise HTTPException(status_code=500, detail=str(e))
 
-
 @router.get("/")
-@cache_response("products:gallery")
-async def index(
+@cache_response("gallery")
+async def image_gallery(
     request: Request,
-    skip: int = Query(default=0, ge=0),
+    cursor: Optional[int] = Query(default=None),
     limit: int = Query(default=10, le=100),
 ):
     """
-    Retrieve products using Meilisearch, sorted by latest.
+    Gallery endpoint using cursor-based pagination.
     """
-
-    search_params = {
-        "limit": limit,
-        "offset": skip,
-        "sort": ["id:desc"],
-    }
-
-    index = get_or_create_index(settings.MEILI_GALLERY_INDEX)
     try:
-        search_results = index.search(
-            "",
-            {
-                **search_params
-            }
+        where_clause = {
+            "order": 0,
+        }
+
+        images = await db.productimage.find_many(
+            where=where_clause,
+            take=limit,
+            skip=1 if cursor else 0,
+            cursor={"id": cursor} if cursor else None,
+            order={"id": "desc"},
+            include={
+                "product": {
+                    "include": {
+                        "categories": True,
+                        "collections": True,
+                        "variants": True,
+                        "images": True,
+                        "shared_collections": True,
+                    }
+                }
+            },
         )
 
-    except MeilisearchApiError as e:
-        error_code = getattr(e, "code", None)
-        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-            logger.warning(
-                f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
-
-            ensure_index_ready(index)
-
-            search_results = index.search(
-                "",
-                {
-                    **search_params
-                }
-            )
+        return {
+            "images": images,
+            "next_cursor": images[-1].id if images else None,
+        }
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=str(e)
-        )
-
-    total_count = search_results["estimatedTotalHits"]
-    total_pages = (total_count // limit) + (total_count % limit > 0)
-
-    return {
-        "images": search_results["hits"],
-        "skip": skip,
-        "limit": limit,
-        "total_count": total_count,
-        "total_pages": total_pages,
-    }
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/reindex", response_model=Message)
 async def reindex_images(background_tasks: BackgroundTasks):
@@ -286,7 +231,8 @@ async def reindex_images(background_tasks: BackgroundTasks):
     Re-index all images in the db to Meilisearch.
     """
     try:
-        background_tasks.add_task(index_images, invalidate_products=True)
+        await invalidate_pattern("gallery")
+        background_tasks.add_task(index_images)
         return Message(message="Re-indexing task enqueued.")
     except Exception as e:
         logger.error(e)
@@ -308,9 +254,9 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
 
     if not image.product_id:
         await db.productimage.delete(where={"id": image_id})
-        await delete_image_index(images=image)
-
-        background_tasks.add_task(delete_images, image.image)
+        await invalidate_pattern("gallery")
+        background_tasks.add_task(delete_image_index, images=image)
+        background_tasks.add_task(remove_image_from_storage, image.image)
 
         return Message(message="Image deleted successfully")
 
@@ -325,12 +271,12 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
         await tx.productvariant.delete_many(where={"product_id": product_id})
         await tx.product.delete(where={"id": product_id})
 
-    background_tasks.add_task(delete_images, image_urls)
-
     service = RecentlyViewedService()
     await service.remove_product_from_all(product_id=product_id)
 
-    await delete_image_index(images=image)
+    await invalidate_pattern("gallery")
+    background_tasks.add_task(delete_image_index, images=image)
+    background_tasks.add_task(remove_image_from_storage, image_urls)
 
     return Message(message="Product and all related data deleted successfully")
 
@@ -356,7 +302,8 @@ async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: 
                 status_code=400, detail="No valid images to save")
 
         await db.productimage.create_many(data=create_rows)
-        background_tasks.add_task(index_images, image_only=True)
+        await invalidate_pattern("gallery")
+        background_tasks.add_task(index_images)
 
         return {"success": True, "count": len(create_rows)}
     except HTTPException:
@@ -374,7 +321,6 @@ async def bulk_delete_gallery_images(
     """
     Bulk delete gallery images.
     """
-    print(payload)
     try:
         if not payload.files:
             raise HTTPException(
@@ -388,11 +334,24 @@ async def bulk_delete_gallery_images(
         if not images:
             raise HTTPException(status_code=404, detail="No images found")
 
+        await db.productimage.delete_many(
+            where={
+                'id': {
+                    'in': [image.id for image in images]
+                }
+            }
+        )
+
+        await invalidate_pattern("gallery")
         background_tasks.add_task(process_bulk_delete_images, images=images)
+        await manager.broadcast_to_all(
+            data={"status": "completed"},
+            message_type="bulk_action"
+        )
 
         return {
             "success": True,
-            "message": f"Bulk delete job started. Processing {len(payload.files)} images in background."
+            "message": "Bulk delete completed."
         }
 
     except Exception as e:
@@ -459,6 +418,7 @@ async def create_image_metadata(
                         raise HTTPException(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
+            await invalidate_pattern("gallery")
             background_tasks.add_task(reindex_image, image_ids=[image_id])
 
             return {"success": True}
@@ -548,6 +508,7 @@ async def update_image_metadata(
                     raise HTTPException(
                         status_code=400, detail=f"Failed to create variant: {str(e)}")
 
+            await invalidate_pattern("gallery")
             background_tasks.add_task(reindex_image, image_ids=[existing_image.id])
 
             return {"success": True}

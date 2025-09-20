@@ -14,14 +14,14 @@ import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useWebSocket } from "@/providers/websocket";
-import { SearchImageItem } from "@/schemas";
+import { GalleryImageItem } from "@/schemas";
 
 export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(30);
-    const images = data?.pages?.flatMap((p) => p.images) || [];
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(32);
+    const images = data?.pages?.flatMap((p: any) => p.images) || [];
 
     const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -51,36 +51,7 @@ export function ProductImageGallery() {
             setIsLoading(true);
         }
 
-        if (currentMessage?.type === "product_bulk_delete" && currentMessage?.status === "completed") {
-            toast.success("Bulk delete completed", { id: "product_bulk_delete" });
-            setSelectedImages(new Set());
-            setSelectionMode(false);
-        }
-
-        if (currentMessage?.type === "product_bulk_delete" && currentMessage?.status === "processing") {
-            toast.loading("Bulk delete in progress...", { id: "product_bulk_delete" });
-        }
-
-        if (currentMessage?.type === "product_bulk_delete" && currentMessage?.status === "failed") {
-            toast.error(`Bulk delete failed: ${currentMessage.message}`, { id: "product_bulk_delete" });
-        }
-
-        if (currentMessage?.type === "product_bulk_update" && currentMessage?.status === "completed") {
-            toast.success("Bulk update completed", { id: "bulk_update" });
-            setSelectedImages(new Set());
-            setSelectionMode(false);
-        }
-
-        if (currentMessage?.type === "product_bulk_update" && currentMessage?.status === "processing") {
-            toast.loading("Bulk update in progress...", { id: "bulk_update" });
-        }
-
-        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "processing") {
-            toast.loading("Catalog bulk upload in progress...", { id: "bulk_product_catalog" });
-        }
-
-        if (currentMessage?.type === "catalog_bulk_update" && currentMessage?.status === "completed") {
-            toast.success("Catalog bulk upload completed", { id: "bulk_product_catalog" });
+        if (currentMessage?.type === "bulk_action" && currentMessage?.status === "completed") {
             setSelectedImages(new Set());
             setSelectionMode(false);
         }
@@ -181,7 +152,7 @@ export function ProductImageGallery() {
                             viewMode === "grid" ? "" : "grid-cols-1"
                         )}
                     >
-                        {images.map((img: SearchImageItem, idx: number) => (
+                        {images.map((img: GalleryImageItem, idx: number) => (
                             <GalleryCard
                                 key={idx}
                                 image={img}
@@ -191,14 +162,16 @@ export function ProductImageGallery() {
                             />
                         ))}
                     </div>
-                    <ProductBulkActions
-                        isLoading={isDeleting}
-                        selectedCount={selectedImages.size}
-                        selectedImageIds={Array.from(selectedImages)}
-                        selectedProductIds={selectedProductIds}
-                        onClearSelection={() => setSelectedImages(new Set())}
-                        onDelete={handleBulkDelete}
-                    />
+                    {selectedImages.size > 0 && (
+                        <ProductBulkActions
+                            isLoading={isDeleting}
+                            selectedCount={selectedImages.size}
+                            selectedImageIds={Array.from(selectedImages)}
+                            selectedProductIds={selectedProductIds}
+                            onClearSelection={() => setSelectedImages(new Set())}
+                            onDelete={handleBulkDelete}
+                        />
+                    )}
                     <div ref={sentinelRef} />
                     {isFetchingNextPage && <ComponentLoader />}
                 </div>
