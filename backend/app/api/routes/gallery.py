@@ -16,18 +16,14 @@ from app.models.product import (
     ImagesBulkUpdate,
     ProductImageBulkUrls
 )
-from app.services.meilisearch import get_or_create_index, ensure_index_ready
 from app.prisma_client import prisma as db
-from app.core.config import settings
 from prisma.errors import UniqueViolationError
 from app.services.product import index_images, reindex_image, delete_image_index
 from app.services.redis import cache_response
-from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
-from app.core.db import database
-from app.services.redis import invalidate_pattern, invalidate_key
+from app.services.redis import invalidate_pattern
 from app.models.product import ProductImage
 
 logger = get_logger(__name__)

@@ -41,6 +41,7 @@ from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
 from app.core.storage import upload
 from app.services.generic import remove_image_from_storage
+from app.services.redis import invalidate_pattern
 
 logger = get_logger(__name__)
 
@@ -253,6 +254,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         raise HTTPException(
             status_code=400, detail="Product with this name already exists")
 
+    await invalidate_pattern("gallery")
     background_tasks.add_task(reindex_product, product_id=created_product.id)
 
     return created_product
@@ -337,6 +339,7 @@ async def create_product_bundle(
                         raise HTTPException(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
+            await invalidate_pattern("gallery")
             background_tasks.add_task(reindex_product, product_id=product.id)
 
             full = await tx.product.find_unique(
@@ -432,6 +435,7 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
 
+    await invalidate_pattern("gallery")
     background_tasks.add_task(reindex_product, product_id=id)
 
     return updated_product
@@ -465,6 +469,7 @@ async def delete_product(id: int) -> Message:
         service = RecentlyViewedService()
         await service.remove_product_from_all(product_id=id)
         await delete_image_index(images=product.images)
+        await invalidate_pattern("gallery")
         return Message(message="Product deleted successfully")
 
 
@@ -496,6 +501,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
 
+    await invalidate_pattern("gallery")
     background_tasks.add_task(reindex_product, product_id=id)
 
     return created_variant
@@ -533,6 +539,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
             where={"id": variant_id},
             data=update_data,
         )
+        await invalidate_pattern("gallery")
         background_tasks.add_task(
             reindex_product, product_id=existing_variant.product_id)
     except Exception as e:
@@ -573,6 +580,7 @@ async def add_image(id: int, image_data: ImageUpload, background_tasks: Backgrou
             data={"image": image_url}
         )
 
+        await invalidate_pattern("gallery")
         background_tasks.add_task(reindex_product, product_id=id)
 
         return updated_product
@@ -604,6 +612,8 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
                 "order": len(product.images)
             }
         )
+
+        await invalidate_pattern("gallery")
         background_tasks.add_task(reindex_product, product_id=id)
 
         return image
@@ -662,6 +672,7 @@ async def delete_product_image(id: int, image_id: int, background_tasks: Backgro
                 data={"order": index}
             )
 
+        await invalidate_pattern("gallery")
         background_tasks.add_task(reindex_product, product_id=id)
 
         return {"success": True}

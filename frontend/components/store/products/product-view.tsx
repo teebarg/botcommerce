@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowUpRight, Backpack, ChevronRight, RefreshCw, Truck } from "lucide-react";
+import { ArrowUpRight, ChevronRight, Truck } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
@@ -177,10 +177,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </div>
                     ) : null}
                     <div className="mt-6 flex flex-col gap-1">
-                        <div className="mb-4 flex items-center gap-2 text-default-900">
-                            <Truck />
-                            <p className="text-sm font-medium">Free shipping and 30 days return</p>
-                        </div>
                         <LocalizedClientLink
                             className="inline-flex items-center text-sm hover:opacity-80 transition-opacity my-2 text-default-500"
                             href={"/"}
@@ -199,7 +195,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-start gap-x-2">
+                        {/* <div className="flex items-start gap-x-2">
                             <RefreshCw className="h-6 w-6" />
                             <div>
                                 <span className="font-semibold">Simple exchanges</span>
@@ -215,7 +211,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                     sure your return is hassle-free.
                                 </p>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

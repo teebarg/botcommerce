@@ -242,6 +242,7 @@ async def reindex_image(image_ids: Union[str, List[str]]):
 
     if has_product:
         await invalidate_pattern("products")
+        await invalidate_pattern("product:catalog")
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:

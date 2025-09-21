@@ -19,7 +19,8 @@ async def calculate_cart_totals(cart: Cart):
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
 
     subtotal = sum(item.price * item.quantity for item in cart_items)
-    tax = subtotal * 0.075  # 7.5% tax rate
+    # tax = subtotal * 0.075  # 7.5% tax rate
+    tax = 0
 
     total = subtotal + tax + cart.shipping_fee
 
@@ -90,7 +91,8 @@ async def add_item_to_cart(
 
         increment = item.price * item.quantity
         subtotal = cart.subtotal + increment
-        tax = subtotal * 0.075
+        # tax = subtotal * 0.075
+        tax = 0
         total = subtotal + tax + cart.shipping_fee
 
         await tx.cart.update(
@@ -219,7 +221,8 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
 
     decrement = cart_item.price * cart_item.quantity
     subtotal = cart.subtotal - decrement
-    tax = subtotal * 0.075
+    # tax = subtotal * 0.075
+    tax = 0
     total = subtotal + tax + cart.shipping_fee
 
     async with db.tx() as tx:
@@ -258,7 +261,8 @@ async def update_cart_item(item_id: int, quantity: int, cartId: str = Header(def
         )
 
         subtotal = cart_item.cart.subtotal + diff
-        tax = subtotal * 0.075
+        # tax = subtotal * 0.075
+        tax = 0
         total = subtotal + tax + cart_item.cart.shipping_fee
 
         await tx.cart.update(

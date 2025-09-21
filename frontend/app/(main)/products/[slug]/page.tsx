@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import React from "react";
+import { Metadata } from "next";
 
 import RelatedProducts from "@/components/store/products/related-products";
 import { serverApi } from "@/apis/server-client";
@@ -10,7 +11,6 @@ import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
 import RecentlyViewedSection from "@/components/store/home/recently-viewed";
-import { Metadata } from "next";
 
 export const revalidate = 60;
 
