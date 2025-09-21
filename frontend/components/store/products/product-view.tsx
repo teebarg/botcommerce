@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { ArrowUpRight, Backpack, ChevronRight, RefreshCw, Truck } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -113,18 +112,16 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                     }`}
                                     onClick={() => setSelectedImageId(image.id)}
                                 >
-                                    <Image fill alt={image.image} className="object-cover" sizes="64px" src={image.image} />
+                                    <img alt={image.image} className="object-cover" src={image.image} />
                                 </button>
                             ))}
                     </div>
                     <div className="flex-1">
                         <div className="h-[60vh] flex items-center justify-center p-4 relative">
-                            <Image
-                                fill
-                                alt={selectedImage?.image || product.image || "placeholder"}
+                            <img
+                                alt={product.name}
                                 className="object-contain h-full w-full rounded"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                src={selectedImage?.image || product.image || "/placeholder.jpg"}
+                                src={selectedImage?.image || product.images?.[0]?.image || "/placeholder.jpg"}
                             />
                         </div>
                     </div>

@@ -21,7 +21,7 @@ const ProductCard: React.FC<{ product: ProductSearch; onProductSelect?: (product
                 <img
                     alt={product.name}
                     className="object-cover group-hover:scale-105 transition-transform duration-200"
-                    src={product.images[0] || product.image || "/placeholder.jpg"}
+                    src={product.images[0] || "/placeholder.jpg"}
                 />
             </div>
 

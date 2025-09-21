@@ -7,6 +7,7 @@ import SharedInfinite from "@/components/store/shared/shared-infinite";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 import { serverApi } from "@/apis/server-client";
 import { SortOptions } from "@/types/models";
+import ShareButton from "@/components/share";
 
 export const revalidate = 60;
 
@@ -67,11 +68,16 @@ export default async function SharedPage({ params, searchParams }: { params: Par
 
     return (
         <div className="bg-content2">
-            <div className="max-w-9xl mx-auto w-full py-4 px-2">
+            <div className="max-w-8xl mx-auto w-full py-4 px-1.5 lg:px-0">
                 <SharedCollectionVisitTracker slug={slug} />
-                <div className="px-8">
-                    <h1 className="text-2xl font-bold">{catalog.title}</h1>
-                    {catalog.description && <p className="text-lg text-default-600">{catalog.description}</p>}
+                <div className="flex lg:flex-row flex-col lg:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold">{catalog.title}</h1>
+                        {catalog.description && <p className="text-lg text-default-600">{catalog.description}</p>}
+                    </div>
+                    <div className="flex justify-end">
+                        <ShareButton />
+                    </div>
                 </div>
                 <SharedInfinite initialCatalog={catalog} initialSearchParams={queryParams} slug={slug} />
             </div>

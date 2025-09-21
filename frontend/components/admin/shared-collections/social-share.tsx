@@ -92,12 +92,12 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                        <Button className="w-full" variant="outline" onClick={copyToClipboard}>
+                        <Button className="w-full" variant="warning" onClick={copyToClipboard}>
                             <Link className="h-5 w-5 mr-1" />
                             <span className="text-xs">Copy Link</span>
                         </Button>
 
-                        <Button className="w-full" variant="outline" onClick={handleNativeShare}>
+                        <Button className="w-full" variant="emerald" onClick={handleNativeShare}>
                             <Share className="h-5 w-5 mr-1" />
                             <span className="text-xs">More</span>
                         </Button>

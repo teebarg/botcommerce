@@ -50,7 +50,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                         <h4 className="font-medium mb-2">Product:</h4>
                         <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                             <div key={product.id} className="relative w-12 h-12 rounded-md bg-content3 overflow-hidden p-2">
-                                <img alt={product.name} className="object-contain" src={product.image || "/placeholder.jpg"} />
+                                <img alt={product.name} className="object-contain" src={product.images?.[0]?.image || "/placeholder.jpg"} />
                             </div>
                             <div>
                                 <p className="font-medium text-sm">{product.name}</p>
