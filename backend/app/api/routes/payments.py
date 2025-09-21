@@ -13,7 +13,7 @@ from prisma.models import Cart
 from app.services.order import create_order_from_cart, decrement_variant_inventory_for_order
 from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
-from app.services.redis import invalidate_list, bust
+from app.services.redis import invalidate_list, invalidate_key
 
 logger = get_logger(__name__)
 
@@ -170,7 +170,7 @@ async def payment_status(id: int, status: PaymentStatus):
     async with db.tx() as tx:
         updated_order = await tx.order.update(where={"id": id}, data=data)
         await invalidate_list("orders")
-        await bust(f"order:{id}")
+        await invalidate_key(f"order:{id}")
 
         if status == PaymentStatus.SUCCESS:
             await publish_order_event(order=updated_order, type="ORDER_PAID")

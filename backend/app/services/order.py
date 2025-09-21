@@ -12,7 +12,7 @@ from app.core.deps import supabase
 from app.services.product import reindex_product
 from app.core.config import settings
 from app.services.events import publish_order_event
-from app.services.redis import invalidate_list
+from app.services.redis import invalidate_list, invalidate_key
 
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
     """
@@ -57,7 +57,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
 
     try:
-        new_order = await db.order.create(data=data) 
+        new_order = await db.order.create(data=data)
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -260,7 +260,7 @@ async def create_invoice(order_id: int) -> str:
         )
 
         await invalidate_list("orders")
-        await bust(f"order:{order_id}")
+        await invalidate_key(f"order:{order_id}")
 
         return public_url
     except Exception as e:

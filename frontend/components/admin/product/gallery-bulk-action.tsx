@@ -7,6 +7,8 @@ import { CatalogBulkProductUpdate } from "./bulk-product-catalog-update";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Overlay from "@/components/overlay";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Confirm } from "@/components/generic/confirm";
 
 interface ProductBulkActionsProps {
     selectedCount: number;
@@ -26,6 +28,7 @@ export const ProductBulkActions = ({
     isLoading,
 }: ProductBulkActionsProps) => {
     const editState = useOverlayTriggerState({});
+    const deleteState = useOverlayTriggerState({});
     const addToSharedState = useOverlayTriggerState({});
 
     if (selectedCount === 0) return null;
@@ -71,16 +74,25 @@ export const ProductBulkActions = ({
                     />
                 </Overlay>
 
-                <Button
-                    className="h-8 px-2 sm:px-3 text-destructive hover:text-destructive-foreground"
-                    disabled={isLoading}
-                    size="sm"
-                    variant="ghost"
-                    onClick={onDelete}
-                >
-                    <Trash2 className="h-5 w-5 sm:mr-1" />
-                    <span className="hidden sm:inline">Delete</span>
-                </Button>
+                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                    <DialogTrigger asChild>
+                        <Button
+                            className="h-8 px-2 sm:px-3 text-destructive hover:text-destructive-foreground"
+                            disabled={isLoading}
+                            size="sm"
+                            variant="ghost"
+                        >
+                            <Trash2 className="h-5 w-5 sm:mr-1" />
+                            <span className="hidden sm:inline">Delete</span>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>Delete</DialogTitle>
+                        </DialogHeader>
+                        <Confirm onClose={deleteState.close} onConfirm={onDelete} />
+                    </DialogContent>
+                </Dialog>
 
                 <div className="w-px h-4 bg-border mx-1" />
 

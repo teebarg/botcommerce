@@ -8,7 +8,7 @@ from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders
-from app.services.redis import cache_response, invalidate_list, bust
+from app.services.redis import cache_response, invalidate_list, bust, invalidate_key
 from pydantic import BaseModel
 from app.models.order import OrderTimelineEntry
 from app.core.logging import get_logger
@@ -29,7 +29,7 @@ async def create_order(
         return order
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e)) 
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{order_id}", response_model=OrderResponse)
 @cache_response(key_prefix="order", key=lambda request, order_id: order_id)
@@ -90,7 +90,7 @@ async def update_order( order_id: int, order_update: OrderUpdate):
         data=update_data,
     )
     await invalidate_list("orders")
-    await bust(f"order:{order_id}")
+    await invalidate_key(f"order:{order_id}")
     return updated_order
 
 @router.delete("/{order_id}")
@@ -101,7 +101,7 @@ async def delete_order(order_id: int):
 
     await db.order.delete(where={"id": order_id})
     await invalidate_list("orders")
-    await bust(f"order:{order_id}")
+    await invalidate_key(f"order:{order_id}")
     return {"message": "Order deleted successfully"}
 
 
@@ -130,7 +130,7 @@ async def order_status(id: int, status: OrderStatus):
             logger.error(f"Failed to create order timeline: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
         await invalidate_list("orders")
-        await bust(f"order:{id}")
+        await invalidate_key(f"order:{id}")
         return updated_order
 
 @router.post("/{order_id}/fulfill", response_model=OrderResponse)
@@ -148,7 +148,7 @@ async def fulfill_order(order_id: int):
         data={"status": OrderStatus.FULFILLED}
     )
     await invalidate_list("orders")
-    await bust(f"order:{order_id}")
+    await invalidate_key(f"order:{order_id}")
     return updated_order
 
 class OrderNotesUpdate(BaseModel):

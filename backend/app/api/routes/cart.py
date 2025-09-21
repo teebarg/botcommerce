@@ -7,7 +7,7 @@ from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.core.deps import TokenUser
 from prisma.models import Cart
-from app.services.redis import cache_response, bust, invalidate_key
+from app.services.redis import cache_response, invalidate_key
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -101,7 +101,7 @@ async def add_item_to_cart(
         )
 
     background_tasks.add_task(calculate_cart_totals, cart)
-    await bust(f"cart:{cartId}")
+    await invalidate_key(f"cart:{cartId}")
 
     return item
 
@@ -192,7 +192,7 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
     if cart_update.shipping_address:
         await invalidate_key(f"addresses:{user.id}")
 
-    await bust(f"cart:{cartId}")
+    await invalidate_key(f"cart:{cartId}")
 
     return updated_cart
 
@@ -207,7 +207,7 @@ async def delete(cartId: str = Header(default=None)) -> Message:
         raise HTTPException(status_code=404, detail="cart not found")
 
     await db.cart.delete(where={"cart_number": cartId})
-    await bust(f"cart:{cartId}")
+    await invalidate_key(f"cart:{cartId}")
     return {"message": "cart deleted successfully"}
 
 
@@ -232,7 +232,7 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
 
-    await bust(f"cart:{cartId}")
+    await invalidate_key(f"cart:{cartId}")
     return {"message": "Item removed from cart successfully"}
 
 
@@ -269,5 +269,5 @@ async def update_cart_item(item_id: int, quantity: int, cartId: str = Header(def
             where={"cart_number": cartId},
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
-    await bust(f"cart:{cartId}")
+    await invalidate_key(f"cart:{cartId}")
     return updated_item
