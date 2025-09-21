@@ -1,8 +1,3 @@
-/**
- * Global WhatsApp message state management
- * Tracks whether the first WhatsApp message has been sent in the current session
- */
-
 const WHATSAPP_STORAGE_KEY = 'whatsapp_first_message_sent';
 
 export const isFirstWhatsAppMessage = (): boolean => {
