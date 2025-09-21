@@ -10,6 +10,7 @@ import { useStoreSettings } from "@/providers/store-provider";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
+import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/lib/utils/whatsapp-message-state";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();
@@ -163,13 +164,22 @@ export const useProductVariant = (product: Product | ProductSearch) => {
               )}`
             : "";
 
-        const message = `Hi! I'd like to order:\n\n*${product.name}*\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
-            typeof window !== "undefined" ? window.location.origin : ""
-        }/products/${product.slug}\n\nPlease let me know the next steps for payment and delivery. Thank you!`;
+        let message: string;
+        
+        if (isFirstWhatsAppMessage()) {
+            message = `Hi! I'd like to order:\n\n*${product.name}*\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
+                typeof window !== "undefined" ? window.location.origin : ""
+            }/products/${product.slug}\n\nPlease let me know the next steps for payment and delivery. Thank you!`;
+        } else {
+            message = `*${product.name}*\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
+                typeof window !== "undefined" ? window.location.origin : ""
+            }/products/${product.slug}`;
+        }
 
         const whatsappUrl = `https://wa.me/${settings?.whatsapp}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, "_blank");
+        markFirstWhatsAppMessageSent();
     };
 
     return {
