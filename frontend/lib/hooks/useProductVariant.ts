@@ -163,18 +163,20 @@ export const useProductVariant = (product: Product | ProductSearch) => {
                   selectedVariant.size && `Size: ${selectedVariant.size}`,
                   selectedVariant.color && `Color: ${selectedVariant.color}`,
                   selectedVariant.measurement && `Measurement: ${selectedVariant.measurement}`,
-                  `Price: ${currency(selectedVariant.price)}`
-              ].filter(Boolean).join('\n')
+                  `Price: ${currency(selectedVariant.price)}`,
+              ]
+                  .filter(Boolean)
+                  .join("\n")
             : "";
 
         let message: string;
-        
+
         if (isFirstWhatsAppMessage()) {
-            message = `Hi! I'd like to order:\n\n*${product.name}*\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
+            message = `Hi! I'd like to order:\n\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
                 typeof window !== "undefined" ? window.location.origin : ""
             }/products/${product.slug}\n\nPlease let me know the next steps for payment and delivery. Thank you!`;
         } else {
-            message = `*${product.name}*\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
+            message = `${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
                 typeof window !== "undefined" ? window.location.origin : ""
             }/products/${product.slug}`;
         }
