@@ -10,27 +10,43 @@ import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
 import { LazyFadeIn } from "@/components/LazyFadeIn";
 import RecentlyViewedSection from "@/components/store/home/recently-viewed";
+import { Metadata } from "next";
 
 export const revalidate = 60;
 
 type Params = Promise<{ slug: string }>;
 
-export async function generateMetadata({ params }: { params: Params }) {
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
     const { slug } = await params;
     const { data: product, error } = await tryCatch<Product>(serverApi.get(`/product/${slug}`));
 
-    if (error) {
+    if (error || !product) {
         return {};
     }
 
     return {
-        title: product?.name,
-        description: product?.description,
+        title: product.name,
+        description: product.description,
         openGraph: {
-            title: product?.name,
-            description: product?.description,
-            images: product?.images?.[0]?.image ? [product?.images?.[0]?.image] : [],
+            title: product.name,
+            description: product.description,
             url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${slug}`,
+            type: "website",
+            siteName: "YourShop",
+            images: [
+                {
+                    url: product?.images?.[0]?.image,
+                    width: 800,
+                    height: 600,
+                    alt: product.name,
+                },
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: product.name,
+            description: product.description,
+            images: [product?.images?.[0]?.image],
         },
     };
 }
