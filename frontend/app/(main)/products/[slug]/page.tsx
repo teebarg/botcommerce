@@ -32,12 +32,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
             description: product.description,
             url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${slug}`,
             type: "website",
-            siteName: "YourShop",
+            siteName: "Thrift",
             images: [
                 {
                     url: product?.images?.[0]?.image,
                     width: 800,
-                    height: 600,
+                    height: 800,
                     alt: product.name,
                 },
             ],

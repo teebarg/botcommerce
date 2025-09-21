@@ -159,9 +159,12 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         e.stopPropagation();
 
         const variantInfo = selectedVariant
-            ? `\nSize: ${selectedVariant.size || "N/A"}\nColor: ${selectedVariant.color || "N/A"}\nMeasurement: ${selectedVariant.measurement || "N/A"}\nPrice: ${currency(
-                  selectedVariant.price
-              )}`
+            ? [
+                  selectedVariant.size && `Size: ${selectedVariant.size}`,
+                  selectedVariant.color && `Color: ${selectedVariant.color}`,
+                  selectedVariant.measurement && `Measurement: ${selectedVariant.measurement}`,
+                  `Price: ${currency(selectedVariant.price)}`
+              ].filter(Boolean).join('\n')
             : "";
 
         let message: string;
