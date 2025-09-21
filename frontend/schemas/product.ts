@@ -215,7 +215,9 @@ export const DBCatalogSchema = z.object({
     slug: z.string(),
     description: z.string().optional(),
     view_count: z.number(),
+    products_count: z.number().optional(),
     is_active: z.boolean(),
+    created_at: z.string().optional(),
 });
 
 export const GalleryProductSchema = z.object({

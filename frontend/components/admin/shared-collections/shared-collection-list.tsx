@@ -11,11 +11,11 @@ import ComponentLoader from "@/components/component-loader";
 import { DBCatalog } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
-import { useAllSharedCollections } from "@/lib/hooks/useCollection";
+import { useSharedCollections } from "@/lib/hooks/useCollection";
 
 export default function SharedCollectionList() {
     const state = useOverlayTriggerState({});
-    const { data: catalogs, isLoading } = useAllSharedCollections();
+    const { data, isLoading } = useSharedCollections();
 
     if (isLoading) return <ComponentLoader className="h-[400px]" />;
 
@@ -38,11 +38,11 @@ export default function SharedCollectionList() {
                     <SharedForm current={undefined} onClose={() => state.close()} />
                 </Overlay>
             </div>
-            {catalogs?.length === 0 ? (
+            {data?.shared?.length === 0 ? (
                 <div>No Catalogs found.</div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {catalogs?.map((col: DBCatalog, idx: number) => <SharedCard key={idx} catalog={col} />)}
+                    {data?.shared?.map((col: DBCatalog, idx: number) => <SharedCard key={idx} catalog={col} />)}
                 </div>
             )}
         </div>
