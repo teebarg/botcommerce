@@ -5,7 +5,7 @@ import { ArrowRight, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useSharedCollections } from "@/lib/hooks/useCollection";
-import LocalizedClientLink from "@/components/ui/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface SaleBannerProps {
@@ -15,6 +15,7 @@ interface SaleBannerProps {
 const SaleBanner: React.FC<SaleBannerProps> = ({ className = "" }) => {
     const { data } = useSharedCollections(undefined, true);
     const catalog = data?.shared[0];
+    const router = useRouter();
 
     return (
         <div className={cn("relative overflow-hidden", className)}>
@@ -52,15 +53,14 @@ const SaleBanner: React.FC<SaleBannerProps> = ({ className = "" }) => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <LocalizedClientLink href={`/shared/${catalog?.slug}`}>
-                            <Button
-                                className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:from-yellow-300 hover:to-orange-400 font-semibold shadow-lg hover:shadow-xl hover:scale-105"
-                                size="lg"
-                            >
-                                Shop Now
-                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                            </Button>
-                        </LocalizedClientLink>
+                        <Button
+                            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:from-yellow-300 hover:to-orange-400 font-semibold shadow-lg hover:shadow-xl hover:scale-105"
+                            size="lg"
+                            onClick={() => router.push(`/shared/${catalog?.slug}`)}
+                        >
+                            Shop Now
+                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
                     </div>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
