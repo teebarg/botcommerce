@@ -134,16 +134,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     const handleAddToCart = async () => {
         if (!selectedVariant) return;
 
-        const totalQuantity = variantInCart ? variantInCart.quantity + quantity : quantity;
-
-        if (totalQuantity > selectedVariant.inventory) {
-            toast.error(
-                `Not enough inventory. You can add ${selectedVariant.inventory - (variantInCart?.quantity || 0)} more items (only ${selectedVariant.inventory} available in stock).`
-            );
-
-            return;
-        }
-
         if (variantInCart) {
             await updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity });
 

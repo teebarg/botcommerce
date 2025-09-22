@@ -48,6 +48,9 @@ def format_image(image: str):
 def url_to_list(url: str) -> list[str]:
     return [f'{item}' for item in url.split(",")]
 
+def format_date(date: datetime) -> str:
+    return date.strftime("%B %d, %Y")
+
 
 def slugify(text) -> str:
     """
@@ -94,6 +97,7 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
     env = Environment(loader=FileSystemLoader(template_path))
     env.filters["naira"] = format_naira
     env.filters["image"] = format_image
+    env.filters["date"] = format_date
 
     # Load and render the template
     template = env.get_template(template_name)
@@ -165,6 +169,19 @@ async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
         },
     )
     return EmailData(html_content=html_content, subject="Order Confirmation")
+
+
+async def generate_payment_receipt(order: OrderResponse, user: User) -> EmailData:
+    html_content = render_email_template(
+        template_name="payment_receipt.html",
+        context={
+            "order": order,
+            "user": user,
+            "current_year": datetime.now().year,
+            **(await merge_metadata({"description": ""}))
+        },
+    )
+    return EmailData(html_content=html_content, subject="Payment Receipt")
 
 
 async def generate_new_account_email(

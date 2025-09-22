@@ -141,7 +141,7 @@ async def search(
     search_params = {
         "limit": limit,
         "offset": skip,
-        "sort": [sort],
+        "sort": [sort or "id:desc"],
     }
 
     if show_facets:

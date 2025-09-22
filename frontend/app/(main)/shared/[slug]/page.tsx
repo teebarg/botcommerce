@@ -57,7 +57,7 @@ export default async function SharedPage({ params, searchParams }: { params: Par
 
     const queryParams: any = {
         limit: 20,
-        sort: sortBy ?? "created_at:desc",
+        sort: sortBy ?? "id:desc",
         sizes: sizes,
         colors: colors,
     };

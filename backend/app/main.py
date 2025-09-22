@@ -22,7 +22,6 @@ from app.redis_client import redis_client
 from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
-from app.core.db import database
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -34,7 +33,6 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
-    await database.connect()
     await db.connect()
 
     await redis_client.ping()
@@ -54,7 +52,6 @@ async def lifespan(app: FastAPI):
     await consumer.stop()
     await db.disconnect()
     await redis_client.close()
-    await database.disconnect()
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)

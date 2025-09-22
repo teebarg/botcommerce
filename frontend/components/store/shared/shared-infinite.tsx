@@ -39,7 +39,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
 
     const onClearAll = () => {
         updateQuery([
-            { key: "sortBy", value: "created_at:desc" },
+            { key: "sortBy", value: "id:desc" },
             { key: "sizes", value: "" },
             { key: "colors", value: "" },
         ]);

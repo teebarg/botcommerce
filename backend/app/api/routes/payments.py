@@ -10,7 +10,7 @@ from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from pydantic import BaseModel
 from prisma.models import Cart
-from app.services.order import create_order_from_cart, decrement_variant_inventory_for_order
+from app.services.order import create_order_from_cart, process_order_payment
 from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
 from app.services.redis import invalidate_list, invalidate_key
@@ -154,7 +154,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
                 "payment_method": PaymentMethod.PAYSTACK,
             }
         )
-    background_tasks.add_task(decrement_variant_inventory_for_order, create.order_id, notification)
+    background_tasks.add_task(process_order_payment, create.order_id, notification)
     return payment
 
 

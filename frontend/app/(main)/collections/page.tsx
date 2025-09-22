@@ -35,7 +35,7 @@ export default async function Collections({ searchParams }: Props) {
 
     const queryParams: any = {
         limit: 12,
-        sort: sortBy ?? "created_at:desc",
+        sort: sortBy ?? "id:desc",
         max_price: maxPrice ?? 100000000,
         min_price: minPrice ?? 0,
         cat_ids,
