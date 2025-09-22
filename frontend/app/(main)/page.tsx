@@ -12,6 +12,7 @@ import Trending from "@/components/store/home/trending";
 import Featured from "@/components/store/home/featured";
 import RecentlyViewedSection from "@/components/store/home/recently-viewed";
 import SizesGrid from "@/components/store/home/sizes-grid";
+import SaleBanner from "@/components/store/sale-banner";
 
 export const revalidate = 60;
 
@@ -26,7 +27,7 @@ export default async function Home() {
             <HeroSection />
 
             <CategoriesSection />
-
+            <SaleBanner />
             <LazyFadeIn delay={100}>
                 <SizesGrid />
             </LazyFadeIn>

@@ -57,6 +57,7 @@ async def list_all_shared_collections(request: Request):
 async def list_shared_collections(
     request: Request,
     query: str = "",
+    is_active: bool | None = None,
     product_id: int | None = None,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
@@ -66,6 +67,8 @@ async def list_shared_collections(
         filters.append(f"(sc.title ILIKE '%{query}%' OR sc.slug ILIKE '%{query}%')")
     if product_id:
         filters.append(f"EXISTS (SELECT 1 FROM _SharedCollectionProducts ps WHERE ps.\"B\" = sc.id AND ps.\"A\" = {product_id})")
+    if is_active is not None:
+        filters.append(f"sc.is_active = {is_active}")
 
     where_clause = " AND ".join(filters) if filters else "TRUE"
 
