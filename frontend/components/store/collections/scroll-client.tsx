@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Loader, Tag } from "lucide-react";
+import { Loader } from "lucide-react";
 
 import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
 import { CollectionHeader } from "@/components/store/collections/collection-header";
-import PromotionalBanner from "@/components/promotion";
 import NoProductsFound from "@/components/store/products/no-products";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { Collection, ProductSearch } from "@/schemas/product";
@@ -13,6 +12,7 @@ import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
 import ClientOnly from "@/components/generic/client-only";
 import ProductCardListings from "@/components/store/products/product-card-listings";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
+import SaleBanner from "@/components/store/sale-banner";
 
 interface SearchParams {
     sortBy?: string;
@@ -53,13 +53,7 @@ export default function InfiniteScrollClient({ initialSearchParams, initialData 
                 </div>
             </aside>
             <div className="w-full flex-1 flex-col relative">
-                <PromotionalBanner
-                    btnClass="text-blue-600"
-                    icon={<Tag className="text-white w-8 h-8 bg-white/20 p-1.5 rounded-lg animate-spin" />}
-                    outerClass="from-blue-600 to-purple-700"
-                    subtitle="Get 20% Off Today"
-                    title="Exclusive Offer!"
-                />
+                <SaleBanner />
                 <CollectionHeader />
                 <div className="w-full">
                     <MobileFilterControl facets={facets} setViewMode={setViewMode} viewMode={viewMode} />
