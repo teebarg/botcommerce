@@ -2,10 +2,10 @@
 
 import React from "react";
 import { ArrowRight, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { useSharedCollections } from "@/lib/hooks/useCollection";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface SaleBannerProps {

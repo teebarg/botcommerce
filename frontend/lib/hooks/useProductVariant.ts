@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import { useAddToCart, useChangeCartQuantity } from "./useCart";
 
