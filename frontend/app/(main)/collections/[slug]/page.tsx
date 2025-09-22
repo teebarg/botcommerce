@@ -45,7 +45,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
 
     const queryParams: any = {
         limit: 12,
-        sort: sortBy ?? "created_at:desc",
+        sort: sortBy ?? "id:desc",
         max_price: maxPrice ?? 100000000,
         min_price: minPrice ?? 0,
         collections: collection?.slug,

@@ -8,7 +8,7 @@ from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders
-from app.services.redis import cache_response, invalidate_list, bust, invalidate_key
+from app.services.redis import cache_response, invalidate_list, invalidate_key
 from pydantic import BaseModel
 from app.models.order import OrderTimelineEntry
 from app.core.logging import get_logger
@@ -164,7 +164,7 @@ async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user
         data={"order_notes": notes_update.notes}
     )
     await invalidate_list("orders")
-    await bust(f"order:{order.order_number}")
+    await invalidate_key(f"order:{order.order_number}")
     return updated_order
 
 

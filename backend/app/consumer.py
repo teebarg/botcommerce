@@ -3,7 +3,7 @@ from app.core.logging import get_logger
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.core.deps import get_notification_service
-from app.services.order import send_notification, decrement_variant_inventory_for_order, create_invoice
+from app.services.order import send_notification, process_order_payment
 from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
@@ -104,11 +104,10 @@ class RedisStreamConsumer:
 
     async def handle_order_paid(self, event):
         try:
-            await create_invoice(order_id=int(event["order_id"]))
-            await decrement_variant_inventory_for_order(order_id=int(event["order_id"]), notification=self.get_notification())
+            await process_order_payment(order_id=int(event["order_id"]), notification=self.get_notification())
         except Exception as e:
-            logger.error(f"Failed to create invoice or decrement variant inventory for order {event['order_id']}: {e}")
-            raise Exception(f"Failed to create invoice or decrement variant inventory for order {event['order_id']}")
+            logger.error(f"Failed to process order payment for order {event['order_id']}: {e}")
+            raise Exception(f"Failed to process order payment for order {event['order_id']}")
 
 
     async def handle_order_created(self, event):

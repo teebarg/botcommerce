@@ -3,16 +3,16 @@ import uuid
 from fastapi import HTTPException
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderCreate
-from app.core.utils import generate_invoice_email
+from app.core.utils import generate_invoice_email, generate_payment_receipt
 from app.core.logging import logger
 from app.services.invoice import invoice_service
 
 from datetime import datetime
-from app.core.deps import supabase
+from app.core.deps import supabase, Notification
 from app.services.product import reindex_product
 from app.core.config import settings
 from app.services.events import publish_order_event
-from app.services.redis import invalidate_list, invalidate_key
+from app.services.redis import invalidate_list, invalidate_key, invalidate_pattern
 
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
     """
@@ -301,6 +301,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
             if out_of_stock:
                 out_of_stock_variants.append(variant)
             logger.info(f"Decrementing inventory for variant {variant_id} in order {order_id}")
+        await invalidate_pattern("gallery")
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
         raise Exception("Failed to decrement variant inventory for order")
@@ -332,3 +333,29 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
             )
         except Exception as e:
             logger.error(f"Failed to send out-of-stock slack: {e}")
+
+
+async def send_payment_receipt(order_id: int, notification: Notification):
+    order = await db.order.find_unique(where={"id": order_id}, include={"order_items": {
+                    "include": {
+                        "variant": True,
+                    }
+                }, "user": True}
+            )
+    try:
+        email_data = await generate_payment_receipt(order=order, user=order.user)
+        notification.send_notification(
+            channel_name="email",
+            recipient=order.user.email,
+            subject=email_data.subject,
+            message=email_data.html_content
+        )
+        logger.info(f"Invoice email sent to user: {order.user_id}")
+    except Exception as e:
+        logger.error(f"Failed to generate invoice email: {e}")
+
+
+async def process_order_payment(order_id: int, notification: Notification):
+    await create_invoice(order_id)
+    await decrement_variant_inventory_for_order(order_id, notification)
+    await send_payment_receipt(order_id, notification)

@@ -212,7 +212,6 @@ async def index_images():
 
 @with_prisma_connection
 async def reindex_image(image_ids: Union[str, List[str]]):
-    has_product = False
     if isinstance(image_ids, str):
         image_ids = [image_ids]
 
@@ -236,13 +235,11 @@ async def reindex_image(image_ids: Union[str, List[str]]):
                 product_data = prepare_product_data_for_indexing(image.product)
                 await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
                 await invalidate_key(f"product:{image.product.slug}")
-                has_product = True
         except Exception as e:
             logger.debug(f"Error re-indexing product image {image.id}: {e}")
 
-    if has_product:
-        await invalidate_pattern("products")
-        await invalidate_pattern("product:catalog")
+    await invalidate_pattern("products")
+    await invalidate_pattern("product:catalog")
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:

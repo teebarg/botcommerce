@@ -46,7 +46,7 @@ export async function generateMetadata() {
         },
         description: siteConfig.description,
         icons: {
-            icon: [{ url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }],
+            icon: [{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" }],
             apple: [{ url: "/apple-touch-icon.png" }],
         },
         appleTouchIcon: "/apple-touch-icon.png",
@@ -80,7 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className, nunitoSans.variable)} lang="en">
             <head>
                 <ThemeScript />
-                <link href="/favicon-96x96.png" rel="icon" sizes="96x96" type="image/png" />
+                <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
                 <link href="/favicon.ico" rel="shortcut icon" />
                 <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />

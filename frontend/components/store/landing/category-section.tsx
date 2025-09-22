@@ -44,11 +44,11 @@ const CategoriesSection: React.FC = () => {
                             <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
                                 {(categories || []).slice(0, 6).map((category: Category, idx: number) => (
                                     <Link key={idx} prefetch className="flex flex-col items-center" href={`/collections?cat_ids=${category.slug}`}>
-                                        <div className="relative w-32 h-32 lg:w-40 lg:h-40 rounded-full flex items-center justify-center mb-3 overflow-hidden transition-transform hover:scale-105">
+                                        <div className="relative w-32 h-32 rounded-full flex items-center justify-center mb-3 overflow-hidden transition-transform hover:scale-105">
                                             <img
                                                 alt=""
                                                 aria-hidden="true"
-                                                className="object-cover rounded-full"
+                                                className="object-cover rounded-full w-32 h-32"
                                                 src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>
