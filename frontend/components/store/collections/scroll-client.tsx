@@ -30,7 +30,7 @@ interface Props {
 }
 
 export default function InfiniteScrollClient({ initialSearchParams, initialData }: Props) {
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [viewMode, setViewMode] = useState<"grid" | "list">("list");
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductInfiniteSearch({ ...initialSearchParams, show_facets: true });
 
     const { lastElementRef } = useInfiniteScroll({

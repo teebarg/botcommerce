@@ -17,6 +17,8 @@ const SaleBanner: React.FC<SaleBannerProps> = ({ className = "" }) => {
     const catalog = data?.shared[0];
     const router = useRouter();
 
+    if (!catalog) return null;
+
     return (
         <div className={cn("relative overflow-hidden", className)}>
             <div className="relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4 py-6">

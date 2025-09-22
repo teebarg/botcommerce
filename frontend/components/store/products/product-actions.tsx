@@ -35,7 +35,7 @@ const ProductActions: React.FC<{
     return (
         <div className="flex gap-1.5">
             <Button
-                className="w-full"
+                className="w-full !h-11"
                 disabled={loading || !selectedVariant || outOfStock}
                 isLoading={loading}
                 size="sm"
@@ -47,7 +47,7 @@ const ProductActions: React.FC<{
             </Button>
 
             <Button
-                className="w-full"
+                className="w-full !h-11"
                 disabled={loading || !selectedVariant || outOfStock}
                 size="sm"
                 variant="emerald"

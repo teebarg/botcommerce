@@ -33,7 +33,7 @@ interface Props {
 
 export default function SharedInfinite({ slug, initialCatalog, initialSearchParams }: Props) {
     const pageSize = initialCatalog.limit || 20;
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
     const { updateQuery } = useUpdateQuery();
 
