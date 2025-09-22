@@ -39,8 +39,6 @@ async def seed():
             }
         )
 
-    # await upsert_user("teebarg01@gmail.com", "ADMIN")
-
     logger.info("Seeding brands...")
     brands = [
         {"name": "Nike", "slug": "nike"},

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
@@ -16,6 +16,18 @@ export const useShopSettingsPublic = () => {
     return useQuery({
         queryKey: ["shop-settings", "public"],
         queryFn: async () => api.get<Record<string, string | number>>("/shop-settings/public"),
+    });
+};
+
+export const useSyncShopDetails = () => {
+    return useMutation({
+        mutationFn: async (input: Record<string, string>) => await api.patch<ShopSettings>("/shop-settings/sync-shop-details", input),
+        onSuccess: () => {
+            toast.success("Shop details synced successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to sync shop details" + error.message);
+        },
     });
 };
 
@@ -42,21 +54,6 @@ export const useContactForm = () => {
         },
         onError: (error) => {
             toast.error("Failed to send message" + error);
-        },
-    });
-};
-
-export const useSyncShopDetails = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (input: Record<string, string>) => await api.patch<ShopSettings>("/shop-settings/sync-shop-details", input),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["shop-settings"] });
-            toast.success("Shop details synced successfully");
-        },
-        onError: (error) => {
-            toast.error("Failed to sync shop details" + error.message);
         },
     });
 };

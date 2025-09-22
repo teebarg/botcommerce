@@ -16,6 +16,7 @@ from prisma.models import User
 from supabase import create_client, Client
 from app.services.redis import get_redis_dependency
 import redis.asyncio as redis
+from app.services.shop_settings import ShopSettingsService
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -121,3 +122,8 @@ def get_notification_service() -> NotificationService:
     return notification_service
 
 Notification = Annotated[NotificationService, Depends(get_notification_service)]
+
+async def get_shop_settings_service() -> ShopSettingsService:
+    return ShopSettingsService()
+
+ShopSettingsServiceDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]

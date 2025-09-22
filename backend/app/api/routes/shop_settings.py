@@ -1,14 +1,10 @@
 from typing import Any
 from fastapi import APIRouter, HTTPException, Request
-from app.models.shop_settings import (
-    ShopSettingsCreate,
-    ShopSettingsUpdate
-)
-from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.models import ShopSettings
 from app.core.logging import get_logger
-from app.services.redis import cache_response, invalidate_list
+from app.services.redis import cache_response, invalidate_pattern
+from app.services.shop_settings import ShopSettingsService
 
 logger = get_logger(__name__)
 
@@ -38,90 +34,20 @@ async def get_public_settings(request: Request) -> dict[str, str]:
         raise HTTPException(status_code=400, detail=e.detail)
 
 
-@router.get("/{id}")
-@cache_response(key_prefix="shop-settings", key=lambda request, id: id)
-async def get_setting(request: Request, id: int) -> ShopSettings:
-    """
-    Get a specific setting by id
-    """
-    setting = await db.shopsettings.find_unique(where={"id": id})
-    if not setting:
-        raise HTTPException(status_code=404, detail="Setting not found")
-    return setting
-
-@router.post("/")
-async def create_setting(setting: ShopSettingsCreate) -> ShopSettings:
-    """
-    Create a new shop setting
-    """
-    try:
-        res = await db.shopsettings.create(data=setting.model_dump())
-        await invalidate_list("shop-settings")
-        return res
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
 @router.patch("/sync-shop-details")
 async def sync_shop_details(form_data: dict[str, Any]):
     """
     Sync shop details
     """
+    service = ShopSettingsService()
 
     try:
         for key, value in form_data.items():
             if not value:
                 continue
-            await db.shopsettings.upsert(
-                where={"key": key},
-                data={
-                    "create": {
-                        "key": key,
-                        "value": str(value),
-                        "type": "SHOP_DETAIL",
-                    },
-                    "update": {
-                        "value": value
-                    },
-                }
-            )
-        await invalidate_list("shop-settings")
+            await service.set(key, str(value), type_="SHOP_DETAIL")
+        await invalidate_pattern("shop-settings")
+        return {"message": "Shop details synced successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-@router.patch("/{id}", response_model=ShopSettings)
-async def update_setting(id: int, setting: ShopSettingsUpdate) -> Any:
-    """
-    Update an existing shop setting
-    """
-    existing = await db.shopsettings.find_unique(where={"id": id})
-    if not existing:
-        raise HTTPException(status_code=404, detail="Setting not found")
-
-    try:
-        res = await db.shopsettings.update(
-            where={"id": id},
-            data=setting.model_dump(exclude_unset=True)
-        )
-        await invalidate_list("shop-settings")
-        return res
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@router.delete("/{id}", response_model=Message)
-async def delete_setting(id: int) -> Any:
-    """
-    Delete a shop setting
-    """
-    existing = await db.shopsettings.find_unique(where={"id": id})
-    if not existing:
-        raise HTTPException(status_code=404, detail="Setting not found")
-
-    try:
-        await db.shopsettings.delete(where={"id": id})
-        await invalidate_list("shop-settings")
-        return {"message": "Setting deleted successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))

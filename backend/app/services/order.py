@@ -13,6 +13,7 @@ from app.services.product import reindex_product
 from app.core.config import settings
 from app.services.events import publish_order_event
 from app.services.redis import invalidate_list, invalidate_key, invalidate_pattern
+from app.services.shop_settings import ShopSettingsService
 
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
     """
@@ -314,10 +315,11 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
         for v in out_of_stock_variants:
             message_lines.append(f"- SKU: {v.sku}, Product ID: {v.product_id}")
         message = "\n".join(message_lines)
+        service = ShopSettingsService()
         try:
             notification.send_notification(
                 channel_name="email",
-                recipient="teebarg01@gmail.com",
+                recipient=await service.get("shop_email"),
                 subject=subject,
                 message=message
             )
