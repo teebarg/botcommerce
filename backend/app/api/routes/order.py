@@ -1,8 +1,5 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
-from app.core.deps import (
-    CurrentUser,
-    get_current_superuser,
-)
+from app.core.deps import CurrentUser, get_current_superuser
 from typing import Optional
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders

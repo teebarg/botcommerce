@@ -2,10 +2,7 @@ from typing import Any, Optional
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from pydantic import BaseModel, Field
 
-from app.core.deps import (
-    CurrentUser,
-    get_current_superuser
-)
+from app.core.deps import CurrentUser, get_current_superuser
 from app.models.order import OrderResponse
 from app.models.wishlist import Wishlist, Wishlists, WishlistCreate
 from app.models.generic import Message

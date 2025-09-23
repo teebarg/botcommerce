@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Body, Request
+from fastapi import APIRouter, Query, Body, Request
 from typing import List, Optional
 from app.schemas.user_interaction import UserInteractionCreate, UserInteractionResponse
 from app.services.user_interaction import log_user_interaction
@@ -9,21 +9,6 @@ from app.services.redis import cache_response, invalidate_list
 logger = get_logger(__name__)
 
 router = APIRouter()
-
-@router.post("/")
-async def create_user_interaction(payload: UserInteractionCreate):
-    try:
-        await log_user_interaction(
-            user_id=payload.user_id,
-            product_id=payload.product_id,
-            type=payload.type,
-            metadata=payload.metadata,
-        )
-        await invalidate_list("interactions")
-        return {"message": "success"}
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/batch")
 async def batch_user_interactions(payload: List[UserInteractionCreate] = Body(...)):
