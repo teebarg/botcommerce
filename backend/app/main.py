@@ -23,6 +23,7 @@ from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
 from app.core.deps import ShopSettingsServiceDep
+from pydantic import BaseModel
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -310,4 +311,15 @@ async def invalidate_react(key: str):
 @app.post("/api/invalidate-redis")
 async def invalidate_redis(key: str):
     await invalidate_list(key)
+    return {"message": "success"}
+
+class FCMIn(BaseModel):
+    endpoint: str
+    p256dh: str
+    auth: str
+
+
+@app.post("/api/push-fcm")
+async def push_fcm(data: FCMIn):
+    await redis_client.xadd("FCM", data.dict())
     return {"message": "success"}
