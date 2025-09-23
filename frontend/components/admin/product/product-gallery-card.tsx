@@ -44,7 +44,6 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                                     imageLoaded ? "opacity-100" : "opacity-0"
                                 )}
                                 loading="lazy"
-                                sizes="(max-width: 768px) 100vw, 300px"
                                 src={image.image}
                                 onLoad={() => setImageLoaded(true)}
                             />
