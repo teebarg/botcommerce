@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAddProductToSharedCollection, useRemoveProductFromSharedCollection, useAllSharedCollections } from "@/lib/hooks/useCollection";
+import { useAddProductToCatalog, useRemoveProductFromCatalog, useCatalogs } from "@/lib/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
 import { DBCatalog, GalleryProduct } from "@/schemas";
 import Overlay from "@/components/overlay";
@@ -23,7 +23,7 @@ interface ManageSlateProps {
 export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     const { data: session } = useSession();
     const state = useOverlayTriggerState({});
-    const { data: catalogs, isLoading } = useAllSharedCollections();
+    const { data, isLoading } = useCatalogs("", true);
 
     if (!session?.user?.isAdmin || !Boolean(product)) {
         return null;
@@ -63,12 +63,12 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                         <h4 className="font-medium mb-2">Available Collections:</h4>
                         {isLoading ? (
                             <ComponentLoader className="h-32" />
-                        ) : catalogs && catalogs?.length === 0 ? (
+                        ) : data?.shared && data?.shared?.length === 0 ? (
                             <p className="text-sm text-muted-foreground">No catalogs available.</p>
                         ) : (
                             <ScrollArea className="h-[calc(100vh-250px)]">
                                 <div className="space-y-2">
-                                    {catalogs?.map((catalog: DBCatalog, idx: number) => (
+                                    {data?.shared?.map((catalog: DBCatalog, idx: number) => (
                                         <CollectionItem key={idx} catalog={catalog} product={product} />
                                     ))}
                                 </div>
@@ -89,8 +89,8 @@ interface CollectionItemProps {
 const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => {
     const hasProduct = product?.shared_collections?.some((item: DBCatalog) => item.slug === catalog.slug) || false;
 
-    const addProductMutation = useAddProductToSharedCollection();
-    const removeProductMutation = useRemoveProductFromSharedCollection();
+    const addProductMutation = useAddProductToCatalog();
+    const removeProductMutation = useRemoveProductFromCatalog();
 
     const handleAddToCollection = async () => {
         await addProductMutation.mutateAsync({
@@ -121,7 +121,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => 
             </CardHeader>
             <CardContent className="pt-0">
                 <div className="flex items-center justify-between mt-2">
-                    {/* <span className="text-xs text-muted-foreground">{collection.products_count || 0} products</span> */}
+                    <span className="text-xs text-muted-foreground">{catalog.products_count || 0} products</span>
                     {hasProduct ? (
                         <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1 text-green-600">

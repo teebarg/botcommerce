@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
-import { useSharedCollections } from "@/lib/hooks/useCollection";
+import { useCatalogs } from "@/lib/hooks/useCollection";
 
 interface ProductCollectionIndicatorProps {
     product: { id: number; name: string; [key: string]: any };
@@ -13,14 +13,14 @@ interface ProductCollectionIndicatorProps {
 
 export const ProductCollectionIndicator: React.FC<ProductCollectionIndicatorProps> = ({ product }) => {
     const { data: session } = useSession();
-    const { data: sharedCollections } = useSharedCollections();
+    const { data } = useCatalogs();
 
     if (!session?.user?.isAdmin) {
         return null;
     }
 
-    const activeCollections = sharedCollections?.shared?.filter((collection) => collection.is_active) || [];
-    const collectionsWithProduct = activeCollections.filter((collection) => collection.products?.some((p) => p.id === product.id));
+    const activeCollections = data?.shared?.filter((catalog) => catalog.is_active) || [];
+    const collectionsWithProduct = activeCollections.filter((catalog) => catalog.products?.some((p) => p.id === product.id));
 
     if (collectionsWithProduct.length === 0) {
         return null;
@@ -30,7 +30,7 @@ export const ProductCollectionIndicator: React.FC<ProductCollectionIndicatorProp
         <div className="flex items-center gap-1 mt-2">
             <Check className="h-3 w-3 text-green-600" />
             <Badge className="text-xs" variant="blue">
-                In {collectionsWithProduct.length} collection{collectionsWithProduct.length > 1 ? "s" : ""}
+                In {collectionsWithProduct.length} catalog{collectionsWithProduct.length > 1 ? "s" : ""}
             </Badge>
         </div>
     );

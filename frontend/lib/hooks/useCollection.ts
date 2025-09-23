@@ -53,7 +53,7 @@ export const useDeleteCollection = () => {
     });
 };
 
-export const useSharedCollections = (query?: string, is_active?: boolean) => {
+export const useCatalogs = (query?: string, is_active?: boolean) => {
     const { data: session } = useSession();
 
     return useQuery({
@@ -63,17 +63,7 @@ export const useSharedCollections = (query?: string, is_active?: boolean) => {
     });
 };
 
-export const useAllSharedCollections = () => {
-    const { data: session } = useSession();
-
-    return useQuery({
-        queryKey: ["catalog"],
-        queryFn: async () => await api.get<DBCatalog[]>("/shared/all"),
-        enabled: Boolean(session?.user?.isAdmin),
-    });
-};
-
-export const useCreateSharedCollection = () => {
+export const useCreateCatalog = () => {
     return useMutation({
         mutationFn: async (data: SharedFormValues) =>
             await api.post<Shared>("/shared/", {
@@ -88,7 +78,7 @@ export const useCreateSharedCollection = () => {
     });
 };
 
-export const useUpdateSharedCollection = () => {
+export const useUpdateCatalog = () => {
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: SharedFormValues }) => await api.patch<Shared>(`/shared/${id}`, data),
         onSuccess: () => {
@@ -100,7 +90,7 @@ export const useUpdateSharedCollection = () => {
     });
 };
 
-export const useDeleteSharedCollection = () => {
+export const useDeleteCatalog = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Shared>(`/shared/${id}`),
         onSuccess: () => {
@@ -112,7 +102,7 @@ export const useDeleteSharedCollection = () => {
     });
 };
 
-export const useAddProductToSharedCollection = () => {
+export const useAddProductToCatalog = () => {
     return useMutation({
         mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
             await api.post<{ message: string }>(`/shared/${collectionId}/add-product/${productId}`),
@@ -125,7 +115,7 @@ export const useAddProductToSharedCollection = () => {
     });
 };
 
-export const useRemoveProductFromSharedCollection = () => {
+export const useRemoveProductFromCatalog = () => {
     return useMutation({
         mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
             await api.delete<{ message: string }>(`/shared/${collectionId}/remove-product/${productId}`),

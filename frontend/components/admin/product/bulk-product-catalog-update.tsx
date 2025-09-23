@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBulkAddProductsToCatalog, useSharedCollections } from "@/lib/hooks/useCollection";
+import { useBulkAddProductsToCatalog, useCatalogs } from "@/lib/hooks/useCollection";
 import { Shared } from "@/schemas";
 
 interface CatalogBulkProductUpdateProps {
@@ -44,11 +44,11 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
 };
 
 export const CatalogBulkProductUpdate = ({ selectedProductIds = [] }: CatalogBulkProductUpdateProps) => {
-    const { data: sharedCollections } = useSharedCollections();
+    const { data: sharedCollections } = useCatalogs("", true);
 
     return (
         <div className="p-4">
-            <p className="text-sm text-muted-foreground mb-3">Select a shared collection to add {selectedProductIds.length} product(s).</p>
+            <p className="text-sm text-muted-foreground mb-3">Select a catalog to add {selectedProductIds.length} product(s).</p>
             <ScrollArea className="h-[60vh]">
                 <div className="space-y-2">
                     {sharedCollections?.shared?.map((collection: any) => (

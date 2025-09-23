@@ -5,7 +5,7 @@ import { ArrowRight, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { useSharedCollections } from "@/lib/hooks/useCollection";
+import { useCatalogs } from "@/lib/hooks/useCollection";
 import { cn } from "@/lib/utils";
 
 interface SaleBannerProps {
@@ -13,7 +13,7 @@ interface SaleBannerProps {
 }
 
 const SaleBanner: React.FC<SaleBannerProps> = ({ className = "" }) => {
-    const { data } = useSharedCollections(undefined, true);
+    const { data } = useCatalogs(undefined, true);
     const catalog = data?.shared[0];
     const router = useRouter();
 

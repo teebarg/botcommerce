@@ -38,11 +38,6 @@ async def list_shared_collection_views():
     return await db.sharedcollectionview.find_many()
 
 
-@router.get("/all")
-@cache_response(key_prefix="catalog", key="all")
-async def list_all_shared_collections(request: Request):
-    return await db.sharedcollection.find_many(order={"created_at": "desc"})
-
 @router.get("/", dependencies=[Depends(get_current_superuser)], response_model=SharedCollections)
 @cache_response(key_prefix="catalog")
 async def list_shared_collections(
