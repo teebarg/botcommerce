@@ -5,10 +5,10 @@ from app.core.config import settings
 
 from app.core import security
 from app.core.config import settings
-from app.core.utils import generate_magic_link_email, send_email, generate_welcome_email, generate_verification_email
+from app.core.utils import generate_magic_link_email, send_email, generate_verification_email
 from app.models.user import User
 from app.prisma_client import prisma
-from app.services.events import publish_user_registered
+from app.services.events import publish_user_registered, publish_event
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from app.models.generic import Token
@@ -110,7 +110,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
             first_name=payload.first_name,
             verification_link=f"{settings.FRONTEND_HOST}/verify-email?token={verification_token}"
         )
-        send_email(
+        await send_email(
             email_to=payload.email,
             subject=verification_email.subject,
             html_content=verification_email.html_content,
@@ -163,15 +163,14 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
         }
     )
 
-    welcome_email = await generate_welcome_email(
-        email_to=user.email,
-        first_name=user.first_name
-    )
-    send_email(
-        email_to=user.email,
-        subject=welcome_email.subject,
-        html_content=welcome_email.html_content,
-    )
+    event = {
+        "type": "USER_REGISTERED",
+        "user_id": user.id,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+    }
+    await publish_event(event=event)
 
     access_token = security.create_access_token(
         data=tokenData(user=user),
@@ -358,7 +357,7 @@ async def send_magic_link(
 
     async def send_magic_link_email(name: str, email: str, url: Optional[str] = None):
         email_data = await generate_magic_link_email(email_to=email, magic_link=url, first_name=name)
-        send_email(
+        await send_email(
             email_to=email,
             subject=email_data.subject,
             html_content=email_data.html_content,

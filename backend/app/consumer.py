@@ -9,6 +9,7 @@ from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
 from prisma import Json
 from datetime import datetime
+from app.core.utils import generate_welcome_email
 
 logger = get_logger(__name__)
 
@@ -95,6 +96,8 @@ class RedisStreamConsumer:
             await self.handle_payment_failed(event)
         elif event["type"] == "RECENTLY_VIEWED":
             await self.handle_recently_viewed(event)
+        elif event["type"] == "USER_REGISTERED":
+            await self.handle_user_registered(event)
 
 
     def get_notification(self):
@@ -192,3 +195,20 @@ class RedisStreamConsumer:
     async def handle_track_popular(self, product_id: int, interaction_type: str):
         recent_service = PopularProductsService()
         await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)
+
+    async def handle_user_registered(self, event):
+        notification=self.get_notification()
+        try:
+            welcome_email = await generate_welcome_email(
+                email_to=event["email"],
+                first_name=event["first_name"]
+            )
+            await notification.send_notification(
+                channel_name="email",
+                recipient=event["email"],
+                subject=welcome_email.subject,
+                message=welcome_email.html_content
+            )
+        except Exception as e:
+            logger.error(f"Failed to send welcome email: {str(e)}")
+            raise Exception(f"Email error: {str(e)}")

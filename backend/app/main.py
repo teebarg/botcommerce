@@ -22,6 +22,7 @@ from app.redis_client import redis_client
 from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
+from app.core.deps import ShopSettingsServiceDep
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -119,14 +120,17 @@ async def health():
 
 
 @app.post("/api/contact-form")
-async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreate):
+async def contact_form(background_tasks: BackgroundTasks, service: ShopSettingsServiceDep, data: ContactFormCreate):
     async def send_email_task():
         email_data = await generate_contact_form_email(
             name=data.name, email=data.email, phone=data.phone, message=data.message
         )
 
-        shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
-        send_email(
+        shop_email = await service.get("shop_email")
+        if not shop_email:
+            logger.error("Shop email not found")
+            return
+        await send_email(
             email_to=shop_email.value,
             subject=email_data.subject,
             html_content=email_data.html_content,
@@ -137,18 +141,18 @@ async def contact_form(background_tasks: BackgroundTasks, data: ContactFormCreat
 
 
 @app.post("/api/newsletter")
-async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
+async def newsletter(background_tasks: BackgroundTasks, service: ShopSettingsServiceDep, data: NewsletterCreate):
     async def send_email_task():
         try:
             email_data = await generate_newsletter_email(
                 email=data.email,
             )
-            shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
+            shop_email = await service.get("shop_email")
             if not shop_email:
                 logger.error("Shop email not found")
                 return
-            send_email(
-                email_to=shop_email.value,
+            await send_email(
+                email_to=data.email,
                 subject=email_data.subject,
                 html_content=email_data.html_content,
             )
@@ -159,7 +163,7 @@ async def newsletter(background_tasks: BackgroundTasks, data: NewsletterCreate):
 
 
 @app.post("/api/bulk-purchase")
-async def bulk_purchase(background_tasks: BackgroundTasks, data: BulkPurchaseCreate):
+async def bulk_purchase(background_tasks: BackgroundTasks, service: ShopSettingsServiceDep, data: BulkPurchaseCreate):
     async def send_email_task():
         try:
             email_data = await generate_bulk_purchase_email(
@@ -170,11 +174,11 @@ async def bulk_purchase(background_tasks: BackgroundTasks, data: BulkPurchaseCre
                 quantity=data.quantity,
                 message=data.message,
             )
-            shop_email = await db.shopsettings.find_unique(where={"key": "shop_email"})
+            shop_email = await service.get("shop_email")
             if not shop_email:
                 logger.error("Shop email not found")
                 return
-            send_email(
+            await send_email(
                 email_to=shop_email.value,
                 subject=email_data.subject,
                 html_content=email_data.html_content,
