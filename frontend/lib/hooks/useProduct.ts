@@ -168,18 +168,6 @@ export const useDeleteVariant = () => {
     });
 };
 
-export const useExportProducts = () => {
-    return useMutation({
-        mutationFn: async () => await api.post<Message>(`/product/export`, {}),
-        onSuccess: () => {
-            toast.success("Products exported successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to export products");
-        },
-    });
-};
-
 export const useReIndexProducts = () => {
     return useMutation({
         mutationFn: async () => await api.post<Message>(`/product/reindex`),
@@ -212,18 +200,6 @@ export const useUploadImages = () => {
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to upload images");
-        },
-    });
-};
-
-export const useDeleteImage = () => {
-    return useMutation({
-        mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/product/${id}/image`),
-        onSuccess: () => {
-            toast.success("Image deleted successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to delete image");
         },
     });
 };

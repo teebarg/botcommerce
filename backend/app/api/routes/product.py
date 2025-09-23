@@ -622,27 +622,6 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.delete("/{id}/image")
-async def delete_image(id: int):
-    """
-    Delete an image from a product.
-    """
-    product = await db.product.find_unique(where={"id": id})
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-
-    try:
-        await remove_image_from_storage(product.image)
-
-        await db.product.update(where={"id": id}, data={"image": None})
-        await reindex_product(product_id=id)
-
-        return {"success": True}
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-
 @router.delete("/{id}/images/{image_id}")
 async def delete_product_image(id: int, image_id: int, background_tasks: BackgroundTasks):
     """

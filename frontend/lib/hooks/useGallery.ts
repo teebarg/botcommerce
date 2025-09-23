@@ -52,18 +52,6 @@ export const useReIndexGallery = () => {
     });
 };
 
-export const useUploadImage = () => {
-    return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: any }) => await api.patch<Message>(`/product/${id}/image`, data),
-        onSuccess: () => {
-            toast.success("Image uploaded successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to upload image");
-        },
-    });
-};
-
 export const useDeleteGalleryImage = () => {
     return useMutation({
         mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/gallery/${id}`),

@@ -19,18 +19,6 @@ export const MessageSchema = z.object({
     error: z.boolean().default(false),
 });
 
-export const SiteConfigSchema = z.object({
-    id: z.number(),
-    key: z.string(),
-    value: z.string(),
-    created_at: z.string(),
-    updated_at: z.string(),
-});
-
-export const PaginatedSiteConfigSchema = PagSchema.extend({
-    configs: z.array(SiteConfigSchema),
-});
-
 export const ShopSettingsSchema = z.object({
     id: z.number(),
     key: z.string(),
@@ -90,8 +78,6 @@ export type ImageUpload = z.infer<typeof ImageUploadSchema>;
 export type Token = z.infer<typeof TokenSchema>;
 export type Pag = z.infer<typeof PagSchema>;
 export type Message = z.infer<typeof MessageSchema>;
-export type SiteConfig = z.infer<typeof SiteConfigSchema>;
-export type PaginatedSiteConfig = z.infer<typeof PaginatedSiteConfigSchema>;
 export type ShopSettings = z.infer<typeof ShopSettingsSchema>;
 export type BankDetails = z.infer<typeof BankDetailsSchema>;
 export type PaystackResponse = z.infer<typeof PaystackResponseSchema>;
