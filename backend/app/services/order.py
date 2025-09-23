@@ -198,9 +198,8 @@ async def send_notification(id: int, user_id: int, notification):
         logger.info(f"Slack notification sent to user: {user_id}")
 
         try:
-            contact = await db.shopsettings.find_unique(
-                where={"key": "whatsapp"}
-            )
+            service = ShopSettingsService()
+            contact = await service.get("whatsapp")
             whatsapp_available = hasattr(notification, "channels") and "whatsapp" in getattr(notification, "channels", {})
             if contact and whatsapp_available:
                 normalized = contact.value.replace(" ", "").replace("+", "")
