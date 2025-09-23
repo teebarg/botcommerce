@@ -32,7 +32,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 export default function PushPermission() {
-    const [permission, setPermission] = useState("default");
+    const [permission, setPermission] = useState("granted");
     const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
 
@@ -49,7 +49,7 @@ export default function PushPermission() {
             setIsDismissed(true);
             registerServiceWorker();
         }
-    }, []);
+    }, [permission]);
 
     async function registerServiceWorker() {
         const registration = await navigator.serviceWorker.ready;
