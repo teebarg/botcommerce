@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { DBCatalog } from "@/schemas";
-import { useUpdateSharedCollection, useCreateSharedCollection } from "@/lib/hooks/useCollection";
+import { useUpdateCatalog, useCreateCatalog } from "@/lib/hooks/useCollection";
 
 interface SharedFormProps {
     current?: DBCatalog;
@@ -36,8 +36,8 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
         } as any,
     });
 
-    const createShared = useCreateSharedCollection();
-    const updateShared = useUpdateSharedCollection();
+    const createShared = useCreateCatalog();
+    const updateShared = useUpdateCatalog();
 
     const isLoading = createShared.isPending || updateShared.isPending;
 

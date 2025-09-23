@@ -1,24 +1,24 @@
 {% include "partials/header.html" %}
 <tr>
     <td style="padding: 20px">
-        <div class="content">
+        <div>
             <div class="welcome-text">Hi {{ first_name }},</div>
 
-            <p>Thank you for joining {{ project_name }}! We're excited to have you as part of our community.</p>
+            <p style="margin-top: 8px;">Thank you for joining {{ project_name }}! We're excited to have you as part of our community.</p>
 
-            <p>Your account has been successfully created. Here's what you can do now:</p>
+            <p style="margin-top: 8px;">Your account has been successfully created. Here's what you can do now:</p>
 
-            <div class="features">
-                <div class="feature-item">Browse our extensive collection of products</div>
-                <div class="feature-item">Create your wishlist</div>
-                <div class="feature-item">Track your orders</div>
-                <div class="feature-item">Save your favorite items</div>
-            </div>
+            <ul style="list-style-type:disc; padding:0; margin-top: 4px; padding-left: 20px;">
+                <li style="padding-bottom: 5px;">Browse our extensive collection of products</li>
+                <li style="padding-bottom: 5px;">Create your wishlist</li>
+                <li style="padding-bottom: 5px;">Track your orders</li>
+                <li style="padding-bottom: 5px;">Save your favorite items</li>
+            </ul>
 
-            <p>Ready to start shopping? Click the button below to log in to your account:</p>
+            <p style="margin-top: 8px;">Ready to start shopping? Click the button below to log in to your account:</p>
 
-            <div style="text-align: center">
-                <a href="{{ frontend_host }}/login" class="button">Log In to Your Account</a>
+            <div style="text-align: center; margin-top: 20px; margin-bottom: 20px">
+                <a href="{{ frontend_host }}/auth/signin" class="button" style="color: white !important">Log In to Your Account</a>
             </div>
 
             <p>If you have any questions or need assistance, our customer support team is here to help!</p>

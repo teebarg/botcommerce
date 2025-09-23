@@ -11,11 +11,11 @@ import ComponentLoader from "@/components/component-loader";
 import { DBCatalog } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
-import { useSharedCollections } from "@/lib/hooks/useCollection";
+import { useCatalogs } from "@/lib/hooks/useCollection";
 
 export default function SharedCollectionList() {
     const state = useOverlayTriggerState({});
-    const { data, isLoading } = useSharedCollections();
+    const { data, isLoading } = useCatalogs();
 
     if (isLoading) return <ComponentLoader className="h-[400px]" />;
 
@@ -26,7 +26,7 @@ export default function SharedCollectionList() {
                 <Overlay
                     open={state.isOpen}
                     sheetClassName="min-w-[450px]"
-                    title="Add New Collection"
+                    title="Add New Catalog"
                     trigger={
                         <Button variant="primary" onClick={state.open}>
                             <Plus className="w-4 h-4 mr-2" />

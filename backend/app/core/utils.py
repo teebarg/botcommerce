@@ -1,7 +1,5 @@
 import random
-import re
 import string
-import unicodedata
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -13,6 +11,7 @@ from app.core.logging import logger
 from app.models.order import OrderResponse
 from app.models.user import User
 from jinja2 import Environment, FileSystemLoader, Template
+from app.services.shop_settings import ShopSettingsService
 
 
 @dataclass
@@ -73,20 +72,19 @@ def slugify(text) -> str:
     return slug
 
 async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, Any]:
-    from app.prisma_client import prisma as db
-
-    shop_settings = await db.shopsettings.find_many(where={"type": "SHOP_DETAIL"})
-    config = {setting.key: setting.value for setting in shop_settings}
+    service = ShopSettingsService()
+    shop_name = await service.get("shop_name")
+    shop_address = await service.get("address")
 
     return {
-        "project_name": config.get("shop_name"),
-        "address": config.get("address"),
+        "project_name": shop_name,
+        "address": shop_address,
         "description": "Exclusive offers just for you",
         "frontend_host": settings.FRONTEND_HOST,
-        "facebook": config.get("facebook"),
-        "instagram": config.get("instagram"),
-        "tiktok": config.get("tiktok"),
-        "support_email": config.get("shop_email"),
+        "facebook": await service.get("facebook"),
+        "instagram": await service.get("instagram"),
+        "tiktok": await service.get("tiktok"),
+        "support_email": await service.get("shop_email"),
         **metadata
     }
 
@@ -112,30 +110,46 @@ def render_email_template2(*, template_name: str, context: dict[str, Any]) -> st
     return html_content
 
 
-def send_email(
+async def send_email(
     *,
     email_to: str,
     subject: str = "",
     html_content: str = "",
+    cc_list: list[str] = [],
 ) -> None:
     if not settings.EMAILS_ENABLED:
         return
-    message = emails.Message(
-        subject=subject,
-        html=html_content,
-        mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
-    )
-    smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT}
-    if settings.SMTP_TLS:
-        smtp_options["tls"] = True
-    elif settings.SMTP_SSL:
-        smtp_options["ssl"] = True
-    if settings.SMTP_USER:
-        smtp_options["user"] = settings.SMTP_USER
-    if settings.SMTP_PASSWORD:
-        smtp_options["password"] = settings.SMTP_PASSWORD
-    response = message.send(to=email_to, smtp=smtp_options)
-    logger.info(f"send email result: {response}")
+    service = ShopSettingsService()
+    shop_email = await service.get("shop_email")
+    cc_list.append(shop_email)
+    try:
+        headers = {
+            "Cc": ", ".join(cc_list) if cc_list else "",
+            "X-Priority": "1",               # High priority
+            "X-MSMail-Priority": "High",     # Outlook/Exchange
+            "Importance": "High",            # Gmail/others
+            "Disposition-Notification-To": settings.EMAILS_FROM_EMAIL,  # Read receipt
+            "Return-Receipt-To": settings.EMAILS_FROM_EMAIL,            # Delivery receipt
+        }
+        message = emails.Message(
+            subject=subject,
+            html=html_content,
+            mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
+            headers={k: v for k, v in headers.items() if v},
+        )
+        smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT}
+        if settings.SMTP_TLS:
+            smtp_options["tls"] = True
+        elif settings.SMTP_SSL:
+            smtp_options["ssl"] = True
+        if settings.SMTP_USER:
+            smtp_options["user"] = settings.SMTP_USER
+        if settings.SMTP_PASSWORD:
+            smtp_options["password"] = settings.SMTP_PASSWORD
+        response = message.send(to=email_to, smtp=smtp_options)
+        logger.info(f"send email result: {response}")  
+    except Exception as e:
+        logger.error(f"Email sending failed: {str(e)}")
 
 
 def generate_test_email(email_to: str) -> EmailData:
@@ -290,6 +304,9 @@ async def generate_magic_link_email(email_to: str, magic_link: str, first_name: 
 
 
 async def generate_welcome_email(email_to: str, first_name: str) -> EmailData:
+    service = ShopSettingsService()
+    shop_name = await service.get("shop_name")
+
     html_content = render_email_template(
         template_name="welcome.html",
         context={
@@ -299,7 +316,7 @@ async def generate_welcome_email(email_to: str, first_name: str) -> EmailData:
             **(await merge_metadata({"description": ""}))
         },
     )
-    return EmailData(html_content=html_content, subject=subject)
+    return EmailData(html_content=html_content, subject="Welcome to " + shop_name)
 
 
 async def generate_verification_email(email_to: str, first_name: str, verification_link: str) -> EmailData:

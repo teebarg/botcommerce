@@ -313,7 +313,13 @@ const BulkPurchase: React.FC = () => {
                                             <p className="text-sm text-muted-foreground">* Please select a bulk option above</p>
                                         )}
 
-                                        <Button className="w-full" disabled={!form.watch("bulkType") || isSubmitting} size="lg" type="submit">
+                                        <Button
+                                            className="w-full"
+                                            disabled={!form.watch("bulkType") || isSubmitting}
+                                            size="lg"
+                                            type="submit"
+                                            variant="indigo"
+                                        >
                                             {isSubmitting ? "Submitting..." : "Submit Interest & Get Quote"}
                                         </Button>
                                     </form>

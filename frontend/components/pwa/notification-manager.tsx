@@ -1,37 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
-
-import { saveSubscription, syncSubscription } from "./actions";
 
 import { Button } from "@/components/ui/button";
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-    try {
-        // Add padding to make length a multiple of 4
-        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-
-        // Decode the base64 string
-        const rawData = window.atob(base64);
-
-        // Convert binary string to Uint8Array
-        const outputArray = new Uint8Array(rawData.length);
-
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
-        }
-
-        return outputArray;
-    } catch (error) {
-        throw new Error(`Error decoding Base64 string - ${error}`);
-    }
-}
-
 const PushNotificationManager: React.FC = () => {
-    const [isSupported, setIsSupported] = useState<boolean>(true);
-    const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
     const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
     const [show, setShow] = useState<boolean>(false);
     const [offline, setOffline] = useState<boolean>(false);
@@ -71,94 +44,15 @@ const PushNotificationManager: React.FC = () => {
         // Only check if push is supported, don't register yet
         if ("serviceWorker" in navigator && "PushManager" in window) {
             registerServiceWorker();
-            setIsSupported(true);
         }
     }, []);
-
-    async function requestNotificationPermission() {
-        if ("Notification" in window) {
-            // await Notification.requestPermission();
-
-            // return permission === "granted";
-            return true;
-        }
-
-        return false;
-    }
 
     async function registerServiceWorker() {
         const registration = await navigator.serviceWorker.register("/sw.js", {
             scope: "/",
             updateViaCache: "none",
         });
-        const sub = await registration.pushManager.getSubscription();
-
-        if (!sub) {
-            // Don't auto-subscribe, let user initiate
-            setSubscription(null);
-            handleNotificationOptIn();
-
-            return;
-        }
-
-        await syncSubscription({
-            endpoint: sub.endpoint,
-            p256dh: sub.toJSON().keys?.p256dh || "",
-            auth: sub.toJSON().keys?.auth || "",
-        });
-
-        setSubscription(sub);
     }
-
-    // Add a new function to handle user opt-in
-    async function handleNotificationOptIn() {
-        if (!isSupported) {
-            toast.error("Push notifications are not supported in your browser");
-
-            return;
-        }
-        if (subscription) return;
-        // await registerServiceWorker();
-        await subscribeToPush();
-    }
-
-    async function subscribeToPush() {
-        const permissionGranted = await requestNotificationPermission();
-
-        if (!permissionGranted) {
-            toast.error("Please grant notification permission");
-
-            return;
-        }
-        const registration = await navigator.serviceWorker.ready;
-        const sub = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
-        });
-
-        // Send subscription to your backend
-        const subscriptionData = {
-            endpoint: sub.endpoint,
-            p256dh: sub.toJSON().keys?.p256dh || "",
-            auth: sub.toJSON().keys?.auth || "",
-        };
-
-        const res = await saveSubscription(subscriptionData);
-
-        if (!res.success) {
-            toast.error(res.message as string);
-
-            return;
-        }
-
-        setSubscription(sub);
-    }
-
-    // async function unsubscribeFromPush() {
-    //     await subscription?.unsubscribe();
-    //     setSubscription(null);
-    //     await unsubscribeUser();
-    // }
 
     const handleRefresh = () => {
         waitingWorker?.postMessage({ type: "SKIP_WAITING" });

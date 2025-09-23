@@ -1,6 +1,4 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
-
+from pydantic import BaseModel
 
 class ContactFormCreate(BaseModel):
     name: str

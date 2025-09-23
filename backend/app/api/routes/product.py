@@ -283,9 +283,6 @@ async def create_product_bundle(
                 "active": True,
             }
 
-            # if payload.brand_id is not None:
-            #     data["brand"] = {"connect": {"id": payload.brand_id}}
-
             if payload.category_ids:
                 data["categories"] = {"connect": [{"id": id}
                                                   for id in payload.category_ids]}

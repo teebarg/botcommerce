@@ -30,22 +30,6 @@ function downloadCSV(filename: string, csv: string) {
     URL.revokeObjectURL(url);
 }
 
-function downloadExcel(filename: string, rows: any[], columns: string[]) {
-    // TODO: implement
-    // const worksheet = XLSX.utils.json_to_sheet(
-    //     rows.map((row) => {
-    //         const obj: any = {};
-    //         columns.forEach((col) => {
-    //             obj[col] = row[col];
-    //         });
-    //         return obj;
-    //     })
-    // );
-    // const workbook = XLSX.utils.book_new();
-    // XLSX.utils.book_append_sheet(workbook, worksheet, "Analytics");
-    // XLSX.writeFile(workbook, filename);
-}
-
 const AnalyticsDashboard: React.FC = () => {
     const [interactions, setInteractions] = useState<UserInteraction[] | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -71,7 +55,6 @@ const AnalyticsDashboard: React.FC = () => {
         fetchData();
     }, []);
 
-    // Filtering
     const filtered = interactions?.filter((i) => {
         return (
             (!typeFilter || i.type === typeFilter) &&
@@ -128,16 +111,6 @@ const AnalyticsDashboard: React.FC = () => {
                     }}
                 >
                     Export CSV
-                </Button>
-                <Button
-                    variant="success"
-                    onClick={() => {
-                        const columns = ["id", "user_id", "product_id", "type", "timestamp", "metadata"];
-
-                        downloadExcel("user_interactions.xlsx", filtered!, columns);
-                    }}
-                >
-                    Export Excel
                 </Button>
             </div>
             <div className="mb-4 flex gap-2">

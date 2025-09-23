@@ -163,7 +163,7 @@ async def send_notification(id: int, user_id: int, notification):
 
         try:
             email_data = await generate_invoice_email(order=order, user=user)
-            notification.send_notification(
+            await notification.send_notification(
                 channel_name="email",
                 recipient=user.email,
                 subject=email_data.subject,
@@ -191,16 +191,15 @@ async def send_notification(id: int, user_id: int, notification):
             )
         }
 
-        notification.send_notification(
+        await notification.send_notification(
             channel_name="slack",
             slack_message=slack_message
         )
         logger.info(f"Slack notification sent to user: {user_id}")
 
         try:
-            contact = await db.shopsettings.find_unique(
-                where={"key": "whatsapp"}
-            )
+            service = ShopSettingsService()
+            contact = await service.get("whatsapp")
             whatsapp_available = hasattr(notification, "channels") and "whatsapp" in getattr(notification, "channels", {})
             if contact and whatsapp_available:
                 normalized = contact.value.replace(" ", "").replace("+", "")
@@ -213,7 +212,7 @@ async def send_notification(id: int, user_id: int, notification):
                     f"Items:\n{items_overview}\n\n"
                     f"View order: {order_link}\n"
                 )
-                notification.send_notification(
+                await notification.send_notification(
                     channel_name="whatsapp",
                     recipient=normalized,
                     message=whatsapp_text,
@@ -317,7 +316,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
         message = "\n".join(message_lines)
         service = ShopSettingsService()
         try:
-            notification.send_notification(
+            await notification.send_notification(
                 channel_name="email",
                 recipient=await service.get("shop_email"),
                 subject=subject,
@@ -329,7 +328,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
             slack_text = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order_id}\n" + "\n".join([
                 f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants
             ])
-            notification.send_notification(
+            await notification.send_notification(
                 channel_name="slack",
                 slack_message={"text": slack_text}
             )
@@ -346,7 +345,7 @@ async def send_payment_receipt(order_id: int, notification: Notification):
             )
     try:
         email_data = await generate_payment_receipt(order=order, user=order.user)
-        notification.send_notification(
+        await notification.send_notification(
             channel_name="email",
             recipient=order.user.email,
             subject=email_data.subject,

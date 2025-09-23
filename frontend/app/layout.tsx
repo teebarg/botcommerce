@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
+import PushPermission from "@/components/pwa/push-permission";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -92,6 +93,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <ProgressBar className="h-1 bg-indigo-500">
                     <div className="relative flex flex-col min-h-screen">
                         <PushNotificationManager />
+                        <PushPermission />
                         <InstallPrompt />
                         <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
                         <TanstackProviders>

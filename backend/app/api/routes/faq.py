@@ -7,7 +7,6 @@ from typing import Optional, List
 
 router = APIRouter()
 
-
 class FAQCreate(BaseModel):
     question: str
     answer: str
@@ -20,7 +19,6 @@ class FAQUpdate(BaseModel):
     answer: Optional[str] = None
     category: Optional[str] = None
     is_active: Optional[bool] = None
-
 
 
 @router.get("/", response_model=List[FAQ])

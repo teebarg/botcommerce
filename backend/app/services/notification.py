@@ -5,11 +5,11 @@ import requests
 
 from app.core.config import settings
 from app.core.logging import logger
-
+from app.services.shop_settings import ShopSettingsService
 
 class NotificationChannel(ABC):
     @abstractmethod
-    def send(self, recipient: str, message: str, **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, **kwargs) -> bool:
         """Send notification through the channel."""
         pass
 
@@ -20,14 +20,27 @@ class EmailChannel(NotificationChannel):
         self.username = username
         self.password = password
 
-    def send(self, recipient: str, message: str, subject: str = "Notification", **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, subject: str = "Notification", cc_list: list[str] = [], **kwargs) -> bool:
         try:
             if not settings.EMAILS_ENABLED:
                 return
+            service = ShopSettingsService()
+            shop_email = await service.get("shop_email")
+            cc_list.append(shop_email)
+
+            headers = {
+                "Cc": ", ".join(cc_list) if cc_list else "",
+                "X-Priority": "1",               # High priority
+                "X-MSMail-Priority": "High",     # Outlook/Exchange
+                "Importance": "High",            # Gmail/others
+                "Disposition-Notification-To": settings.EMAILS_FROM_EMAIL,
+                "Return-Receipt-To": settings.EMAILS_FROM_EMAIL,
+            }
             message = emails.Message(
                 subject=subject,
                 html=message,
                 mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
+                headers={k: v for k, v in headers.items() if v},
             )
             smtp_options = {"host": self.smtp_host, "port": self.smtp_port}
             if settings.SMTP_TLS:
@@ -50,7 +63,7 @@ class SlackChannel(NotificationChannel):
     def __init__(self, webhook_url: str):
         self.webhook_url = webhook_url
 
-    def send(self, recipient: str, message: str, slack_message: dict, **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, slack_message: dict, **kwargs) -> bool:
         try:
             response = requests.post(self.webhook_url, json=slack_message)
             return response.status_code == 200
@@ -63,7 +76,7 @@ class WhatsAppChannel(NotificationChannel):
         self.token = token
         self.phone_number_id = phone_number_id
 
-    def send(self, recipient: str, message: str, **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, **kwargs) -> bool:
         try:
             if not recipient:
                 return False
@@ -90,7 +103,7 @@ class SMSChannel(NotificationChannel):
         self.api_secret = api_secret
         self.from_number = from_number
 
-    def send(self, recipient: str, message: str, **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, **kwargs) -> bool:
         #TODO: Implementation would depend on your SMS provider (e.g., Twilio, MessageBird)
         try:
             return True
@@ -106,12 +119,12 @@ class NotificationService:
         """Register a new notification channel."""
         self.channels[channel_name] = channel
 
-    def send_notification(self, channel_name: str, recipient: str = "", message: str = "", **kwargs) -> bool:
+    async def send_notification(self, channel_name: str, recipient: str = "", message: str = "", **kwargs) -> bool:
         """Send notification through specified channel."""
         channel = self.channels.get(channel_name)
         if not channel:
             raise ValueError(f"Channel {channel_name} not found")
-        return channel.send(recipient, message, **kwargs)
+        return await channel.send(recipient, message, **kwargs)
 
 # Usage example:
 """

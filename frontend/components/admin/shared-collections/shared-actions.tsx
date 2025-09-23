@@ -11,7 +11,7 @@ import { SharedForm } from "./shared-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { useDeleteSharedCollection } from "@/lib/hooks/useCollection";
+import { useDeleteCatalog } from "@/lib/hooks/useCollection";
 import { Confirm } from "@/components/generic/confirm";
 import { DBCatalog } from "@/schemas/product";
 
@@ -24,7 +24,7 @@ const SharedActions: React.FC<Props> = ({ item }) => {
     const editState = useOverlayTriggerState({});
     const router = useRouter();
 
-    const deleteMutation = useDeleteSharedCollection();
+    const deleteMutation = useDeleteCatalog();
 
     const onConfirmDelete = async () => {
         deleteMutation.mutateAsync(item.id).then(() => {

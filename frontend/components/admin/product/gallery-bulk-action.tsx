@@ -62,7 +62,7 @@ export const ProductBulkActions = ({
                     trigger={
                         <Button className="h-8 px-2 sm:px-3" disabled={isLoading} size="sm" variant="ghost" onClick={addToSharedState.open}>
                             <Grid2x2 className="h-5 w-5 sm:mr-1" />
-                            <span className="hidden sm:inline">Add to Slate</span>
+                            <span className="hidden sm:inline">Catalog</span>
                         </Button>
                     }
                     onOpenChange={addToSharedState.setOpen}
