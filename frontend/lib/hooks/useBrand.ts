@@ -10,7 +10,7 @@ import { BrandFormValues } from "@/components/admin/brands/brand-form";
 export const useBrands = (query?: string) => {
     return useQuery({
         queryKey: ["brands", query],
-        queryFn: async () => await api.get<Brand[]>(`/brand/all`, { params: { query: query ?? "" } }),
+        queryFn: async () => await api.get<Brand[]>(`/brand/`, { params: { query: query ?? "" } }),
     });
 };
 

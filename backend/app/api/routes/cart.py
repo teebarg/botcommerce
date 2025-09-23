@@ -5,7 +5,7 @@ from app.models.generic import Message
 from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks
 from app.prisma_client import prisma as db
-from app.core.deps import TokenUser
+from app.core.deps import TokenUser, ShopSettingsServiceDep
 from prisma.models import Cart
 from app.services.redis import cache_response, invalidate_key
 from app.core.logging import get_logger
@@ -14,13 +14,12 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-async def calculate_cart_totals(cart: Cart):
+async def calculate_cart_totals(cart: Cart, tax_rate: float):
     """Helper function to calculate cart totals"""
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
 
     subtotal = sum(item.price * item.quantity for item in cart_items)
-    # tax = subtotal * 0.075  # 7.5% tax rate
-    tax = 0
+    tax = subtotal * (tax_rate / 100)
 
     total = subtotal + tax + cart.shipping_fee
 
@@ -47,6 +46,7 @@ async def get_or_create_cart(cartId: Optional[str]):
 @router.post("/items")
 async def add_item_to_cart(
     item_in: CartItemCreate,
+    shop_settings_service: ShopSettingsServiceDep,
     background_tasks: BackgroundTasks,
     cartId: str = Header(default=None)
 ):
@@ -75,6 +75,8 @@ async def add_item_to_cart(
                 detail=f"Not enough inventory. You can add {available_quantity} more items (only {variant.inventory} available in stock)."
             )
 
+    tax_rate = float(await shop_settings_service.get("tax_rate"))
+
     async with db.tx() as tx:
         item = await tx.cartitem.create(
             data={
@@ -91,8 +93,7 @@ async def add_item_to_cart(
 
         increment = item.price * item.quantity
         subtotal = cart.subtotal + increment
-        # tax = subtotal * 0.075
-        tax = 0
+        tax = subtotal * (tax_rate / 100)
         total = subtotal + tax + cart.shipping_fee
 
         await tx.cart.update(
@@ -100,7 +101,7 @@ async def add_item_to_cart(
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
 
-    background_tasks.add_task(calculate_cart_totals, cart)
+    background_tasks.add_task(calculate_cart_totals, cart, tax_rate)
     await invalidate_key(f"cart:{cartId}")
 
     return item
@@ -212,7 +213,7 @@ async def delete(cartId: str = Header(default=None)) -> Message:
 
 
 @router.delete("/items/{item_id}")
-async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
+async def delete_cart_item(item_id: int, shop_settings_service: ShopSettingsServiceDep, cartId: str = Header(default=None)):
     cart_item = await db.cartitem.find_unique(where={"id": item_id})
     if not cart_item or cart_item.cart_number != cartId:
         raise HTTPException(status_code=404, detail="cart item not found")
@@ -221,8 +222,7 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
 
     decrement = cart_item.price * cart_item.quantity
     subtotal = cart.subtotal - decrement
-    # tax = subtotal * 0.075
-    tax = 0
+    tax = subtotal * (float(await shop_settings_service.get("tax_rate")) / 100)
     total = subtotal + tax + cart.shipping_fee
 
     async with db.tx() as tx:
@@ -237,7 +237,7 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
 
 
 @router.put("/items/{item_id}")
-async def update_cart_item(item_id: int, quantity: int, cartId: str = Header(default=None)):
+async def update_cart_item(item_id: int, quantity: int, shop_settings_service: ShopSettingsServiceDep, cartId: str = Header(default=None)):
     cart_item = await db.cartitem.find_unique(
         where={"id": item_id},
         include={"cart": True, "variant": True}
@@ -261,8 +261,7 @@ async def update_cart_item(item_id: int, quantity: int, cartId: str = Header(def
         )
 
         subtotal = cart_item.cart.subtotal + diff
-        # tax = subtotal * 0.075
-        tax = 0
+        tax = subtotal * (float(await shop_settings_service.get("tax_rate")) / 100)
         total = subtotal + tax + cart_item.cart.shipping_fee
 
         await tx.cart.update(

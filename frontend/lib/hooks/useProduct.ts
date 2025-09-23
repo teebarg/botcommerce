@@ -19,14 +19,14 @@ type SearchParams = {
 
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
-        queryKey: ["products", "search"],
+        queryKey: ["products", "search", JSON.stringify(params)],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
     });
 };
 
 export const useProductInfiniteSearch = (params: SearchParams) => {
     return useInfiniteQuery({
-        queryKey: ["products", "search", "infinite"],
+        queryKey: ["products", "search", "infinite", JSON.stringify(params)],
         queryFn: async ({ pageParam = 0 }) =>
             await api.get<PaginatedProductSearch>("/product/", { params: { skip: pageParam, limit: 12, ...params } }),
         getNextPageParam: (lastPage: PaginatedProductSearch) => {
@@ -36,13 +36,6 @@ export const useProductInfiniteSearch = (params: SearchParams) => {
             return hasMore ? nextSkip : undefined;
         },
         initialPageParam: 0,
-    });
-};
-
-export const useProduct = (slug: string) => {
-    return useQuery({
-        queryKey: ["product", slug],
-        queryFn: async () => await api.get<Product>(`/product/${slug}`),
     });
 };
 
@@ -175,18 +168,6 @@ export const useDeleteVariant = () => {
     });
 };
 
-export const useExportProducts = () => {
-    return useMutation({
-        mutationFn: async () => await api.post<Message>(`/product/export`, {}),
-        onSuccess: () => {
-            toast.success("Products exported successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to export products");
-        },
-    });
-};
-
 export const useReIndexProducts = () => {
     return useMutation({
         mutationFn: async () => await api.post<Message>(`/product/reindex`),
@@ -219,18 +200,6 @@ export const useUploadImages = () => {
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to upload images");
-        },
-    });
-};
-
-export const useDeleteImage = () => {
-    return useMutation({
-        mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/product/${id}/image`),
-        onSuccess: () => {
-            toast.success("Image deleted successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to delete image");
         },
     });
 };

@@ -9,7 +9,6 @@ from app.api.routes import (
     cart,
     category,
     collection,
-    config,
     delivery,
     faq,
     conversation,
@@ -39,7 +38,6 @@ api_router.include_router(cart.router, prefix="/cart", tags=["cart"])
 api_router.include_router(category.router, prefix="/category", tags=["category"])
 api_router.include_router(collection.router, prefix="/collection", tags=["collection"])
 api_router.include_router(conversation.router, prefix="/conversation", tags=["conversation"])
-api_router.include_router(config.router, prefix="/config", tags=["config"])
 api_router.include_router(faq.router, prefix="/faq", tags=["faq"])
 api_router.include_router(order.router, prefix="/order", tags=["order"])
 api_router.include_router(product.router, prefix="/product", tags=["product"])

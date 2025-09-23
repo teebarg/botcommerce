@@ -38,15 +38,6 @@ async def list_shared_collection_views():
     return await db.sharedcollectionview.find_many()
 
 
-@router.delete("/views/{id}")
-async def delete_shared_collection_view(id: int):
-    obj = await db.sharedcollectionview.find_unique(where={"id": id})
-    if not obj:
-        raise HTTPException(status_code=404, detail="SharedCollectionView not found")
-    await db.sharedcollectionview.delete(where={"id": id})
-    return None
-
-
 @router.get("/all")
 @cache_response(key_prefix="catalog", key="all")
 async def list_all_shared_collections(request: Request):
