@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Bell, X } from "lucide-react";
 
 import { api } from "@/apis/client";
 import { Message } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import { Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
@@ -32,7 +32,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 export default function PushPermission() {
-    const [permission, setPermission] = useState(Notification.permission);
+    const [permission, setPermission] = useState("default");
     const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
 
@@ -40,6 +40,11 @@ export default function PushPermission() {
         if (localStorage.getItem("push_synced") === "true") {
             setIsDismissed(true);
         }
+
+        if (typeof window !== "undefined" && "Notification" in window) {
+            setPermission(Notification.permission);
+        }
+
         if (permission === "granted" && localStorage.getItem("push_synced") !== "true") {
             setIsDismissed(true);
             registerServiceWorker();
@@ -52,6 +57,7 @@ export default function PushPermission() {
 
         if (!sub) {
             setIsDismissed(false);
+
             return;
         }
 
@@ -89,6 +95,7 @@ export default function PushPermission() {
 
     async function subscribeToPush() {
         const perm = await Notification.requestPermission();
+
         setPermission(perm);
 
         if (perm !== "granted") return null;
@@ -142,18 +149,18 @@ export default function PushPermission() {
 
                     <div className="flex items-center space-x-2">
                         <Button
+                            className="bg-white text-primary hover:bg-white/90 h-8 px-3 text-xs font-semibold"
                             size="sm"
                             onClick={handleNotificationOptIn}
-                            className="bg-white text-primary hover:bg-white/90 h-8 px-3 text-xs font-semibold"
                         >
                             Enable
                         </Button>
 
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setIsDismissed(true)}
                             className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setIsDismissed(true)}
                         >
                             <X className="h-4 w-4" />
                         </Button>

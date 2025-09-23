@@ -314,11 +314,11 @@ const BulkPurchase: React.FC = () => {
                                         )}
 
                                         <Button
-                                            variant="indigo"
                                             className="w-full"
                                             disabled={!form.watch("bulkType") || isSubmitting}
                                             size="lg"
                                             type="submit"
+                                            variant="indigo"
                                         >
                                             {isSubmitting ? "Submitting..." : "Submit Interest & Get Quote"}
                                         </Button>
