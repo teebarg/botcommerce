@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+
 import { Button } from "@/components/ui/button";
 
 export default function ImpersonationBanner() {

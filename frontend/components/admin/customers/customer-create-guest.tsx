@@ -3,13 +3,13 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useCreateGuestUser } from "@/lib/hooks/useUser";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
 const formSchema = z.object({
     first_name: z.string().min(1, { message: "First name is required" }),
@@ -78,7 +78,7 @@ export default function CustomerCreateGuest() {
                             <Button type="button" variant="destructive" onClick={() => createState.close()}>
                                 Cancel
                             </Button>
-                            <Button type="submit" variant="primary" disabled={isPending} isLoading={isPending}>
+                            <Button disabled={isPending} isLoading={isPending} type="submit" variant="primary">
                                 Create
                             </Button>
                         </div>
