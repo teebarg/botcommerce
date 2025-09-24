@@ -40,13 +40,7 @@ async def lifespan(app: FastAPI):
     await redis_client.ping()
     app.state.redis = redis_client
 
-    try:
-        await redis_client.xgroup_create(STREAM_NAME, GROUP_NAME, id="0", mkstream=True)
-    except Exception:
-        pass
-
-    consumer = RedisStreamConsumer(
-        redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
+    consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
     await consumer.start()
 
     yield
