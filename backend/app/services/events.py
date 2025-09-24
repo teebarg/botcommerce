@@ -22,7 +22,7 @@ async def publish_user_registered(
         "source": source,
     }
     if created_at is not None:
-        payload["created_at"] = created_at
+        payload["created_at"] = created_at.isoformat()
 
     await redis_client.xadd("USER_REGISTERED", payload)
 

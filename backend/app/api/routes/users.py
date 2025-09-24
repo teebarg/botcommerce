@@ -118,6 +118,45 @@ async def index(
     }
 
 
+class GuestUserCreate(BaseModel):
+    first_name: str = Field(min_length=1, max_length=255)
+    last_name: str = Field(min_length=1, max_length=255)
+
+
+@router.post("/create-guest", dependencies=[Depends(get_current_superuser)])
+async def create_guest_user(payload: GuestUserCreate) -> User:
+    """
+    Admin-only: Create a new user with an email in the guest.com domain.
+    """
+    def normalize(value: str) -> str:
+        safe = "".join(ch for ch in value.strip().lower().replace(" ", ".") if ch.isalnum() or ch == "." or ch == "-")
+        while ".." in safe:
+            safe = safe.replace("..", ".")
+        return safe.strip('.')
+
+    username = f"{normalize(payload.first_name)}.{normalize(payload.last_name)}"
+    email = f"{username}@guest.com"
+
+    existing = await db.user.find_unique(where={"email": email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    try:
+        created = await db.user.create(
+            data={
+                "email": email,
+                "first_name": payload.first_name,
+                "last_name": payload.last_name,
+                "hashed_password": get_password_hash("ChangeMe123!"),
+                "role": "CUSTOMER",
+                "status": "ACTIVE",
+            }
+        )
+        return created
+    except PrismaError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
 @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update(
     *,

@@ -91,24 +91,26 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
 
     return (
         <>
-            <Dialog open={paymentState.isOpen} onOpenChange={paymentState.setOpen}>
-                <DialogTrigger asChild>
-                    <Button className="flex-1 w-full" variant="luxury">
-                        Update Payment
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-content1">
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Update Payment Status</DialogTitle>
-                    </DialogHeader>
-                    <PaymentStatusManager
-                        currentStatus={order.payment_status}
-                        id={order.id}
-                        orderNumber={order.order_number}
-                        onClose={paymentState.close}
-                    />
-                </DialogContent>
-            </Dialog>
+            {order.payment_status !== "SUCCESS" && (
+                <Dialog open={paymentState.isOpen} onOpenChange={paymentState.setOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="flex-1 w-full" variant="luxury">
+                            Update Payment
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-content1">
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>Update Payment Status</DialogTitle>
+                        </DialogHeader>
+                        <PaymentStatusManager
+                            currentStatus={order.payment_status}
+                            id={order.id}
+                            orderNumber={order.order_number}
+                            onClose={paymentState.close}
+                        />
+                    </DialogContent>
+                </Dialog>
+            )}
             {order.payment_status === "SUCCESS" && config.nextStatus && (
                 <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
                     <DialogTrigger asChild>
@@ -126,14 +128,14 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                                 <Separator />
                                 <p className="text-sm text-default-500 mt-2 font-medium">Are you sure you want to change the status of this order?</p>
                                 <div className="flex justify-end gap-2 mt-8">
-                                    <Button aria-label="close" className="min-w-36" variant="outline" onClick={stateState.close}>
+                                    <Button aria-label="close" className="min-w-36" variant="destructive" onClick={stateState.close}>
                                         Close
                                     </Button>
                                     <Button
                                         aria-label="confirm"
                                         className="min-w-36"
                                         isLoading={isPending}
-                                        variant="primary"
+                                        variant="indigo"
                                         onClick={() => handleStatusChange(order.id, config.nextStatus)}
                                     >
                                         Confirm

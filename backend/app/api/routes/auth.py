@@ -101,7 +101,8 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
             source="email_password",
             created_at=user.created_at,
         )
-    except Exception:
+    except Exception as e:
+        logger.error(f"Failed to publish USER_REGISTERED event: {e}")
         pass
 
     async def send_verification_email():

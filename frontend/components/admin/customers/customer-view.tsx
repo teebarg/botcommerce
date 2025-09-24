@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal } from "lucide-react";
 
 import CustomerFilter from "./customer-filter";
+import CustomerCreateGuest from "./customer-create-guest";
 import CustomerActions from "./customer-actions";
 import CustomerCard from "./customer-card";
 
@@ -51,9 +52,12 @@ const CustomerView: React.FC = () => {
 
     return (
         <div className="px-3 md:px-10 py-8">
-            <div className="mb-4">
-                <h3 className="text-xl font-semibold">Customers view</h3>
-                <p className="text-sm text-default-500">Manage your customers.</p>
+            <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                    <h3 className="text-xl font-semibold">Customers view</h3>
+                    <p className="text-sm text-default-500">Manage your customers.</p>
+                </div>
+                <CustomerCreateGuest />
             </div>
             <>
                 <div key="table" className="md:block hidden">

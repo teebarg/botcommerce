@@ -148,20 +148,11 @@ export default function PushPermission() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <Button
-                            className="bg-white text-primary hover:bg-white/90 h-8 px-3 text-xs font-semibold"
-                            size="sm"
-                            onClick={handleNotificationOptIn}
-                        >
+                        <Button className="bg-white text-gray-800 hover:bg-white/90 h-8 px-3" size="sm" onClick={handleNotificationOptIn}>
                             Enable
                         </Button>
 
-                        <Button
-                            className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => setIsDismissed(true)}
-                        >
+                        <Button size="icon" variant="destructive" onClick={() => setIsDismissed(true)}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
