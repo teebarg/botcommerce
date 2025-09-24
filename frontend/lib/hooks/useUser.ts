@@ -61,6 +61,21 @@ export const useUpdateUser = () => {
     });
 };
 
+export const useCreateGuestUser = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (input: { first_name: string; last_name: string }) => await api.post<User>("/users/create-guest", input),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+            toast.success("Guest user created successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to create guest user" + error);
+        },
+    });
+};
+
 export const useDeleteUser = () => {
     const queryClient = useQueryClient();
 

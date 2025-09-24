@@ -119,6 +119,9 @@ async def send_email(
 ) -> None:
     if not settings.EMAILS_ENABLED:
         return
+    if email_to.lower().endswith("@guest.com"):
+        logger.info("Skipping email send to guest.com address: %s", email_to)
+        return
     service = ShopSettingsService()
     shop_email = await service.get("shop_email")
     cc_list.append(shop_email)
