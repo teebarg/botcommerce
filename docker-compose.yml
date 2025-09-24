@@ -48,7 +48,7 @@ services:
       - traefik-public
       - default
     env_file:
-      - ./backend/.env
+      - ./backend/.env.staging
     build:
       context: ./backend
       args:
