@@ -41,7 +41,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             id: "http-email",
             name: "Email",
             type: "email",
-            maxAge: 60 * 60 * 24 * 7,
+            maxAge: 60 * 60 * 24 * 30 * 12,
             async sendVerificationRequest({ identifier: email, url }) {
                 const { error } = await tryCatch<Message>(serverApi.post<Message>("/auth/send-magic-link", { email, url }));
 
@@ -59,7 +59,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     ],
     session: {
         strategy: "jwt",
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: 60 * 60 * 24 * 30 * 12,
     },
     pages: {
         signIn: "/auth/signin",

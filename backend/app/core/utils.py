@@ -124,10 +124,16 @@ async def send_email(
         return
     service = ShopSettingsService()
     shop_email = await service.get("shop_email")
-    cc_list.append(shop_email)
+    if shop_email:
+        cc_list.append(shop_email)
+    bcc_raw = await service.get("email_bcc")
+    bcc_list = []
+    if bcc_raw:
+        bcc_list = [x.strip() for x in bcc_raw.split(',') if x.strip()]
     try:
         headers = {
             "Cc": ", ".join(cc_list) if cc_list else "",
+            "Bcc": ", ".join(bcc_list) if bcc_list else "",
             "X-Priority": "1",               # High priority
             "X-MSMail-Priority": "High",     # Outlook/Exchange
             "Importance": "High",            # Gmail/others
@@ -150,7 +156,7 @@ async def send_email(
         if settings.SMTP_PASSWORD:
             smtp_options["password"] = settings.SMTP_PASSWORD
         response = message.send(to=email_to, smtp=smtp_options)
-        logger.info(f"send email result: {response}")  
+        logger.info(f"send email result: {response}")
     except Exception as e:
         logger.error(f"Email sending failed: {str(e)}")
 

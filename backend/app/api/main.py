@@ -24,6 +24,7 @@ from app.api.routes import (
     carousel,
     user_interaction,
     shared_collection,
+    notification,
 )
 
 api_router = APIRouter()
@@ -38,6 +39,7 @@ api_router.include_router(category.router, prefix="/category", tags=["category"]
 api_router.include_router(collection.router, prefix="/collection", tags=["collection"])
 api_router.include_router(conversation.router, prefix="/conversation", tags=["conversation"])
 api_router.include_router(faq.router, prefix="/faq", tags=["faq"])
+api_router.include_router(notification.router, prefix="/notification", tags=["notification"])
 api_router.include_router(order.router, prefix="/order", tags=["order"])
 api_router.include_router(product.router, prefix="/product", tags=["product"])
 api_router.include_router(gallery.router, prefix="/gallery", tags=["gallery"])

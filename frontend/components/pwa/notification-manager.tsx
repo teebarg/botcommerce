@@ -26,6 +26,7 @@ const PushNotificationManager: React.FC = () => {
                     }
                 });
             });
+            registerServiceWorker();
         }
         // Listen for online/offline events
         const handleOnline = () => setOffline(false);
@@ -40,15 +41,8 @@ const PushNotificationManager: React.FC = () => {
         };
     }, []);
 
-    useEffect(() => {
-        // Only check if push is supported, don't register yet
-        if ("serviceWorker" in navigator && "PushManager" in window) {
-            registerServiceWorker();
-        }
-    }, []);
-
     async function registerServiceWorker() {
-        const registration = await navigator.serviceWorker.register("/sw.js", {
+        await navigator.serviceWorker.register("/sw.js", {
             scope: "/",
             updateViaCache: "none",
         });

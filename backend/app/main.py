@@ -306,14 +306,3 @@ async def invalidate_react(key: str):
 async def invalidate_redis(key: str):
     await invalidate_list(key)
     return {"message": "success"}
-
-class FCMIn(BaseModel):
-    endpoint: str
-    p256dh: str
-    auth: str
-
-
-@app.post("/api/push-fcm")
-async def push_fcm(data: FCMIn):
-    await redis_client.xadd("FCM", data.dict())
-    return {"message": "success"}

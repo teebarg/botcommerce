@@ -164,6 +164,16 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
         }
     )
 
+    try:
+        await publish_user_registered(
+            user=user,
+            source="verification",
+            created_at=user.created_at,
+        )
+    except Exception as e:
+        logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+        pass
+
     event = {
         "type": "USER_REGISTERED",
         "user_id": user.id,
@@ -402,7 +412,14 @@ async def sync_user(request: Request, payload: SyncUserPayload) -> Message:
                 source="sync_user",
                 created_at=user.created_at,
             )
+            event = {
+                "type": "USER_REGISTERED",
+                "user_id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+            }
+            await publish_event(event=event)
         except Exception as e:
             logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-            pass
     return {"message": "User synced successfully"}
