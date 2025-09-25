@@ -1,11 +1,9 @@
 "use client";
 
 import { ArrowRight, Sparkles, Star } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import heroImage from "@/public/banner3.jpg";
 
 const HeroSection: React.FC = () => {
     const router = useRouter();
@@ -13,7 +11,7 @@ const HeroSection: React.FC = () => {
     return (
         <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
-                <Image priority alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" sizes="100vw" src={heroImage} />
+                <img alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" src="/banner3.jpg" />
                 <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent dark:from-background/85 dark:via-background/40" />
             </div>
 

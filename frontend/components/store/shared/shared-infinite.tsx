@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import MobileFilterControl from "./mobile-filter-control";
 
-import ProductCard from "@/components/store/products/product-card2";
+import ProductCard from "@/components/store/products/product-card";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { api } from "@/apis/client";
 import { Catalog, ProductSearch } from "@/schemas";

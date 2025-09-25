@@ -3,7 +3,6 @@
 import React from "react";
 import { Edit3, Trash2, Eye, EyeOff, ExternalLink, Edit2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import Image from "next/image";
 
 import BannerForm from "./banner-form";
 import BannerImageManager from "./banner-image-upload";
@@ -49,13 +48,7 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
                         <div className="relative rounded-xl overflow-hidden bg-default-200 aspect-[2/1]">
                             {banner.image ? (
                                 <>
-                                    <Image
-                                        fill
-                                        alt={banner.title}
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 320px"
-                                        src={banner.image}
-                                    />
+                                    <img alt={banner.title} className="object-cover" src={banner.image} />
                                     <Dialog open={updateImageState.isOpen} onOpenChange={updateImageState.setOpen}>
                                         <DialogTrigger asChild>
                                             <Button className="absolute top-2 right-2" size="icon" variant="ghost">

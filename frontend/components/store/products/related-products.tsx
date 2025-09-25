@@ -3,7 +3,7 @@
 import { Product, ProductSearch } from "@/schemas/product";
 import { useSimilarProducts } from "@/lib/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
-import ProductCard from "@/components/store/products/product-card2";
+import ProductCard from "@/components/store/products/product-card";
 
 type RelatedProductsProps = {
     product: Product;
