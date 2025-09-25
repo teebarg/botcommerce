@@ -40,6 +40,11 @@ const defaultShopDetails = [
         type: "email",
     },
     {
+        key: "email_bcc",
+        label: "Email BCC (comma-separated)",
+        type: "text",
+    },
+    {
         key: "shop_description",
         label: "Shop Description",
         type: "textarea",
@@ -61,6 +66,7 @@ export function ShopDetailsForm({ settings }: ShopDetailsProps) {
         shop_name: "",
         contact_email: "",
         shop_email: "",
+        email_bcc: "",
         shop_description: "",
         contact_phone: "",
         address: "",

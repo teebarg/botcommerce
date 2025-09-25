@@ -1,7 +1,5 @@
 from fastapi import APIRouter
-from app.prisma_client import prisma as db
 from app.models.generic import Message
-
 from app.core.logging import get_logger
 from app.services.redis import redis_client
 
@@ -31,7 +29,6 @@ router = APIRouter()
 
 @router.post("/push-event")
 async def create_push_event(data: PushEventSchema):
-    print("🚀 ~ file: notification.py:34 ~ data:", data)
     await redis_client.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
     return Message(message="success")
 

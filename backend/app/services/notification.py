@@ -29,10 +29,16 @@ class EmailChannel(NotificationChannel):
                 return
             service = ShopSettingsService()
             shop_email = await service.get("shop_email")
-            cc_list.append(shop_email)
+            if shop_email:
+                cc_list.append(shop_email)
+            bcc_raw = await service.get("email_bcc")
+            bcc_list = []
+            if bcc_raw:
+                bcc_list = [x.strip() for x in bcc_raw.split(',') if x.strip()]
 
             headers = {
                 "Cc": ", ".join(cc_list) if cc_list else "",
+                "Bcc": ", ".join(bcc_list) if bcc_list else "",
                 "X-Priority": "1",               # High priority
                 "X-MSMail-Priority": "High",     # Outlook/Exchange
                 "Importance": "High",            # Gmail/others

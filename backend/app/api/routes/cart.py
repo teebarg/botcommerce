@@ -97,12 +97,12 @@ async def add_item_to_cart(
         total = subtotal + tax + cart.shipping_fee
 
         await tx.cart.update(
-            where={"cart_number": cartId},
+            where={"cart_number": cart.cart_number},
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
 
     background_tasks.add_task(calculate_cart_totals, cart, tax_rate)
-    await invalidate_key(f"cart:{cartId}")
+    await invalidate_key(f"cart:{cart.cart_number}")
 
     return item
 
