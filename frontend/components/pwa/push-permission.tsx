@@ -67,7 +67,7 @@ export default function PushPermission() {
             auth: sub.toJSON().keys?.auth || "",
         };
 
-        const { error } = await tryCatch(api.post<Message>("/push-fcm", subscriptionData));
+        const { error } = await tryCatch(api.post<Message>("/notification/push-fcm", subscriptionData));
 
         if (error) {
             toast.error(error);
@@ -119,7 +119,7 @@ export default function PushPermission() {
             auth: sub.toJSON().keys?.auth || "",
         };
 
-        const { error } = await tryCatch(api.post<Message>("/push-fcm", subscriptionData));
+        const { error } = await tryCatch(api.post<Message>("/notification/push-fcm", subscriptionData));
 
         if (error) {
             toast.error(error);
