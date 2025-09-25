@@ -41,7 +41,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                             open={state.isOpen}
                             sheetClassName="min-w-[70vw]"
                             trigger={
-                                <Button className="flex items-center gap-2" size="sm" variant="outline">
+                                <Button className="flex items-center gap-2" size="sm" variant="indigo">
                                     <Eye className="h-4 w-4" />
                                     <span className="hidden sm:inline">See details</span>
                                 </Button>
@@ -54,13 +54,15 @@ const OrderCard = ({ order }: { order: Order }) => {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                <div className="flex flex-wrap gap-4">
                     {order.order_items.slice(0, 6).map((item: OrderItem, idx: number) => (
-                        <div key={idx} className="flex flex-col items-center group">
-                            <div className="h-20 w-20 relative group-hover:scale-105 transition-transform duration-200 rounded-lg">
-                                {item.image && <img alt={item.variant?.product?.name || item.image} src={item.image} />}
-                            </div>
-                            <span className="text-xs font-medium text-center text-default-500">x{item.quantity}</span>
+                        <div
+                            key={idx}
+                            className="aspect-product h-40 w-40 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden"
+                        >
+                            {item.image && (
+                                <img alt={item.variant?.product?.name || item.image} className="object-cover w-full h-full" src={item.image} />
+                            )}
                         </div>
                     ))}
                     {order.order_items.length > 6 && (

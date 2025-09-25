@@ -2,8 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
-import { useInvalidate } from "./useApi";
-
 import { api } from "@/apis/client";
 import { Order, OrderStatus, PaginatedOrder, PaymentStatus } from "@/schemas";
 
@@ -34,14 +32,10 @@ export const useOrder = (orderNumber: string) => {
 };
 
 export const useChangeOrderStatus = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async ({ id, status }: { id: number; status: OrderStatus }) => await api.patch<Order>(`/order/${id}/status?status=${status}`),
         onSuccess: () => {
             toast.success("Successfully changed order status");
-            invalidate("orders");
-            invalidate("order-timeline");
         },
         onError: (error) => {
             toast.error("Failed to change order status" + error);
@@ -50,18 +44,12 @@ export const useChangeOrderStatus = () => {
 };
 
 export const useChangePaymentStatus = () => {
-    const invalidate = useInvalidate();
-
     return useMutation({
         mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) => await api.patch<Order>(`/payment/${id}/status?status=${status}`),
         onSuccess: () => {
             toast.success("Successful!", {
                 description: "Payment status changed successfully",
             });
-            invalidate("orders");
-            invalidate("order-timeline");
-            invalidate("gallery");
-            invalidate("products");
         },
         onError: (error) => {
             toast.error("An error occurred!", {
@@ -85,5 +73,18 @@ export const useOrderTimeline = (orderId?: number) => {
         queryKey: ["order-timeline", orderId],
         enabled: !!orderId,
         queryFn: async () => await api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
+    });
+};
+
+export const useReturnOrderItem = () => {
+    return useMutation({
+        mutationFn: async ({ orderId, itemId }: { orderId: number; itemId: number }) =>
+            await api.post<Order>(`/order/${orderId}/return`, { item_id: itemId }),
+        onSuccess: () => {
+            toast.success("Item returned. Inventory updated and totals recalculated.");
+        },
+        onError: (error) => {
+            toast.error("Failed to return item" + error);
+        },
     });
 };

@@ -13,7 +13,7 @@ from prisma.models import Cart
 from app.services.order import create_order_from_cart, process_order_payment
 from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
-from app.services.redis import invalidate_list, invalidate_key
+from app.services.redis import invalidate_pattern, invalidate_key
 
 logger = get_logger(__name__)
 
@@ -169,20 +169,21 @@ async def payment_status(id: int, status: PaymentStatus):
 
     async with db.tx() as tx:
         updated_order = await tx.order.update(where={"id": id}, data=data)
-        await invalidate_list("orders")
+        await invalidate_pattern("orders")
         await invalidate_key(f"order:{id}")
 
         if status == PaymentStatus.SUCCESS:
             await publish_order_event(order=updated_order, type="ORDER_PAID")
             try:
-                if order.status != OrderStatus.PENDING:
-                    await tx.ordertimeline.create(
-                        data={
-                            "order": {"connect": {"id": id}},
-                            "from_status": order.status,
-                            "to_status": OrderStatus.PENDING,
-                        }
-                    )
+                await tx.ordertimeline.create(
+                    data={
+                        "order": {"connect": {"id": id}},
+                        "from_status": order.status,
+                        "to_status": order.status,
+                        "message": "Payment successful",
+                    }
+                )
+                await invalidate_key(f"order-timeline:{id}")
             except Exception as e:
                 logger.error(f"Failed to create order timeline: {str(e)}")
                 raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")

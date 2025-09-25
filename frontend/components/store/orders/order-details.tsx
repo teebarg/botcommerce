@@ -1,6 +1,5 @@
 import React from "react";
 import { ArrowLeft, Package, MapPin, Download } from "lucide-react";
-import Image from "next/image";
 
 import OrderOverview from "./order-overview";
 
@@ -48,9 +47,13 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                 {order.order_items.map((item: OrderItem, idx: number) => (
                                     <div key={idx}>
                                         <div className="flex items-center gap-4">
-                                            <div className="h-20 w-20 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden">
+                                            <div className="h-36 w-36 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden">
                                                 {item.image && (
-                                                    <Image fill alt={item.variant?.product?.name || item.image} sizes="80px" src={item.image} />
+                                                    <img
+                                                        alt={item.variant?.product?.name || item.image}
+                                                        className="object-cover w-full h-full"
+                                                        src={item.image}
+                                                    />
                                                 )}
                                             </div>
                                             <div className="flex-1">

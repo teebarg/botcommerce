@@ -22,6 +22,8 @@ import { OrderStatusBadge } from "./order-status-badge";
 
 import { useOrderTimeline } from "@/lib/hooks/useOrder";
 import { Order, OrderItem } from "@/schemas";
+import { Button } from "@/components/ui/button";
+import { useReturnOrderItem } from "@/lib/hooks/useOrder";
 import { currency, formatDate } from "@/lib/utils";
 
 interface OrderDetailsProps {
@@ -67,6 +69,39 @@ const orderStatusMap = {
     },
 };
 
+const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ orderItem, orderId }) => {
+    const { mutateAsync: returnItem, isPending } = useReturnOrderItem();
+
+    return (
+        <div className="flex gap-4 px-2 py-4">
+            <div className="h-28 w-28 rounded-lg overflow-hidden">
+                <img alt={orderItem.name} className="object-cover w-full h-full" src={orderItem.image || "/placeholder.jpg"} />
+            </div>
+            <div className="grow">
+                <h3 className="text-sm font-medium text-default-900">{orderItem.name}</h3>
+                <p className="text-sm text-default-500">SKU: {orderItem.variant_id}</p>
+                <div className="mt-1 flex flex-col gap-2">
+                    <div className="flex items-center text-sm text-default-500">
+                        <span>Qty: {orderItem.quantity}</span>
+                    </div>
+                    <div className="font-semibold text-default-900">{currency(orderItem.price)}</div>
+                </div>
+            </div>
+            <div>
+                <Button
+                    disabled={isPending}
+                    isLoading={isPending}
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => returnItem({ orderId, itemId: orderItem.id })}
+                >
+                    Return item
+                </Button>
+            </div>
+        </div>
+    );
+};
+
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     const { data: timeline } = useOrderTimeline(order?.id);
 
@@ -100,29 +135,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
                         <div className="divide-y divide-default-100">
                             {order.order_items.map((item: OrderItem, idx: number) => (
-                                <div key={idx} className="px-6 py-4">
-                                    <div className="flex flex-col sm:flex-row">
-                                        <div className="shrink-0 mr-4 mb-4 sm:mb-0">
-                                            <img
-                                                alt={item.name}
-                                                className="object-cover rounded"
-                                                height={80}
-                                                src={item.image || "/placeholder.jpg"}
-                                                width={80}
-                                            />
-                                        </div>
-                                        <div className="grow">
-                                            <h3 className="text-sm font-medium text-default-900">{item.name}</h3>
-                                            <p className="text-sm text-default-500">SKU: {item.variant_id}</p>
-                                            <div className="mt-1 flex flex-col sm:flex-row sm:justify-between">
-                                                <div className="flex items-center text-sm text-default-500">
-                                                    <span>Qty: {item.quantity}</span>
-                                                </div>
-                                                <div className="font-semibold text-default-900">{currency(item.price)}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <OrderItemCard key={idx} orderId={order.id} orderItem={item} />
                             ))}
                         </div>
                         <div className="border-t border-divider px-6 py-4">
@@ -290,10 +303,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                         </span>
                                                     </div>
                                                     <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                                        <div>
+                                                        <div className="flex-1">
                                                             <p className="text-sm text-default-500">
                                                                 {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].label}
                                                             </p>
+                                                            {evt.message && <p className="text-sm text-default-500">{evt.message}</p>}
                                                         </div>
                                                         <div className="text-right text-sm whitespace-nowrap text-default-500">
                                                             <time>{formatDate(evt.created_at)}</time>

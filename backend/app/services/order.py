@@ -1,6 +1,6 @@
 from typing import Optional
 import uuid
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderCreate
 from app.core.utils import generate_invoice_email, generate_payment_receipt
@@ -12,7 +12,7 @@ from app.core.deps import supabase, Notification
 from app.services.product import reindex_product
 from app.core.config import settings
 from app.services.events import publish_order_event
-from app.services.redis import invalidate_list, invalidate_key, invalidate_pattern
+from app.services.redis import invalidate_key, invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
 
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
@@ -259,7 +259,7 @@ async def create_invoice(order_id: int) -> str:
             data={"invoice_url": public_url}
         )
 
-        await invalidate_list("orders")
+        await invalidate_pattern("orders")
         await invalidate_key(f"order:{order_id}")
 
         return public_url
@@ -360,3 +360,90 @@ async def process_order_payment(order_id: int, notification: Notification):
     await create_invoice(order_id)
     await decrement_variant_inventory_for_order(order_id, notification)
     await send_payment_receipt(order_id, notification)
+
+async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> OrderResponse:
+    """
+    Return an item from an order:
+    - Remove the order item
+    - Increment the variant inventory
+    - Recalculate order subtotal, tax and total
+    - Create an order timeline entry
+    - Invalidate caches and reindex product if needed
+    """
+    order_item = await db.orderitem.find_unique(
+        where={"id": item_id},
+        include={"variant": True, "order": True},
+    )
+
+    if not order_item or order_item.order_id != order_id:
+        raise HTTPException(status_code=404, detail="Order item not found")
+
+    variant_id = order_item.variant_id
+    quantity = order_item.quantity
+
+    async with db.tx() as tx:
+        updated_variant = None
+        if variant_id is not None:
+            variant = await tx.productvariant.find_unique(where={"id": variant_id})
+            if variant and order_item.order.payment_status == "SUCCESS":
+                logger.info(f"Incrementing inventory for variant {variant_id} in order {order_id}")
+                new_inventory = (variant.inventory or 0) + quantity
+                update_data = {
+                    "inventory": new_inventory,
+                    "status": "IN_STOCK" if new_inventory > 0 else variant.status,
+                }
+                updated_variant = await tx.productvariant.update(
+                    where={"id": variant_id},
+                    data=update_data,
+                )
+
+        await tx.orderitem.delete(where={"id": item_id})
+
+        order = await tx.order.find_unique(where={"id": order_id})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+
+        line_amount = float(order_item.price) * int(order_item.quantity)
+        new_subtotal = max(0.0, float(order.subtotal or 0) - line_amount)
+
+        settings_service = ShopSettingsService()
+        tax_rate_str = await settings_service.get("tax_rate")
+        tax_rate = float(tax_rate_str or 0)
+        new_tax = new_subtotal * (tax_rate / 100.0)
+        new_total = new_subtotal + new_tax + float(order.shipping_fee or 0)
+
+        updated_order = await tx.order.update(
+            where={"id": order_id},
+            data={
+                "subtotal": new_subtotal,
+                "tax": new_tax,
+                "total": new_total,
+            },
+        )
+
+        try:
+            message = f"Returned item: {order_item.name} x{order_item.quantity}"
+            await tx.ordertimeline.create(
+                data={
+                    "order": {"connect": {"id": order_id}},
+                    "from_status": updated_order.status,
+                    "to_status": updated_order.status,
+                    "message": message,
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to append order timeline for return: {e}")
+
+    async def invalidate_caches():
+        try:
+            await invalidate_pattern("orders")
+            await invalidate_key(f"order:{order_id}")
+            await invalidate_pattern("gallery")
+            if order_item.variant and order_item.variant.product_id:
+                await reindex_product(product_id=order_item.variant.product_id)
+        except Exception as e:
+            logger.error(f"Failed to invalidate caches/reindex after return: {e}")
+
+    background_tasks.add_task(invalidate_caches)
+
+    return {"message": "Item returned successfully"}

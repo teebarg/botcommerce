@@ -10,6 +10,7 @@ from app.services.popular_products import PopularProductsService
 from prisma import Json
 from datetime import datetime
 from app.core.utils import generate_welcome_email
+from app.services.redis import invalidate_pattern
 
 logger = get_logger(__name__)
 
@@ -139,6 +140,7 @@ class RedisStreamConsumer:
             raise Exception(f"Database error: {str(e)}")
 
         await send_notification(id=int(event["order_id"]), user_id=int(event["user_id"]), notification=self.get_notification())
+        await invalidate_pattern("users")
 
 
     async def handle_payment_success(self, event):

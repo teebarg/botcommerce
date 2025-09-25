@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, BackgroundTasks
 from app.core.deps import CurrentUser, get_current_superuser
 from typing import Optional
 from app.prisma_client import prisma as db
 from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
 from prisma.enums import OrderStatus
-from app.services.order import create_order_from_cart, retrieve_order, list_orders
-from app.services.redis import cache_response, invalidate_list, invalidate_key
+from app.services.order import create_order_from_cart, retrieve_order, list_orders, return_order_item
+from app.services.redis import cache_response, invalidate_key, invalidate_pattern
 from pydantic import BaseModel
 from app.models.order import OrderTimelineEntry
 from app.core.logging import get_logger
+from app.models.generic import Message
 
 logger = get_logger(__name__)
 
@@ -22,7 +23,7 @@ async def create_order(
 ):
     try:
         order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId)
-        await invalidate_list("orders")
+        await invalidate_pattern("orders")
         return order
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")
@@ -86,7 +87,7 @@ async def update_order( order_id: int, order_update: OrderUpdate):
         where={"id": order_id},
         data=update_data,
     )
-    await invalidate_list("orders")
+    await invalidate_pattern("orders")
     await invalidate_key(f"order:{order_id}")
     return updated_order
 
@@ -97,7 +98,7 @@ async def delete_order(order_id: int):
         raise HTTPException(status_code=404, detail="Order not found")
 
     await db.order.delete(where={"id": order_id})
-    await invalidate_list("orders")
+    await invalidate_pattern("orders")
     await invalidate_key(f"order:{order_id}")
     return {"message": "Order deleted successfully"}
 
@@ -126,8 +127,9 @@ async def order_status(id: int, status: OrderStatus):
         except Exception as e:
             logger.error(f"Failed to create order timeline: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-        await invalidate_list("orders")
+        await invalidate_pattern("orders")
         await invalidate_key(f"order:{id}")
+        await invalidate_key(f"order-timeline:{id}")
         return updated_order
 
 @router.post("/{order_id}/fulfill", response_model=OrderResponse)
@@ -144,8 +146,9 @@ async def fulfill_order(order_id: int):
         where={"id": order_id},
         data={"status": OrderStatus.FULFILLED}
     )
-    await invalidate_list("orders")
+    await invalidate_pattern("orders")
     await invalidate_key(f"order:{order_id}")
+    await invalidate_key(f"order-timeline:{order_id}")
     return updated_order
 
 class OrderNotesUpdate(BaseModel):
@@ -160,7 +163,7 @@ async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user
         where={"id": order_id},
         data={"order_notes": notes_update.notes}
     )
-    await invalidate_list("orders")
+    await invalidate_pattern("orders")
     await invalidate_key(f"order:{order.order_number}")
     return updated_order
 
@@ -174,3 +177,20 @@ async def get_order_timeline(order_id: int):
         where={"order_id": order_id}, order={"created_at": "asc"}
     )
     return entries
+
+
+class ReturnItemPayload(BaseModel):
+    item_id: int
+
+
+@router.post("/{order_id}/return", dependencies=[Depends(get_current_superuser)], response_model=Message)
+async def return_item(order_id: int, payload: ReturnItemPayload, background_tasks: BackgroundTasks):
+    """Return an item from an order, update totals and inventory."""
+    try:
+        await return_order_item(order_id=order_id, item_id=payload.item_id, background_tasks=background_tasks)
+        return {"message": "Item returned successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to return order item: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
