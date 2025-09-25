@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { ChevronDown, FileImage, Plus, Save } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
@@ -24,25 +23,19 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
     const stateState = useOverlayTriggerState({});
 
     return (
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-            <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
-                <DialogTrigger>
-                    <Image
-                        fill
-                        alt={image || "placeholder"}
-                        className="cursor-pointer"
-                        sizes="(max-width: 768px) 64px, 80px"
-                        src={image || "/placeholder.jpg"}
-                    />
-                </DialogTrigger>
-                <DialogContent className="bg-content1">
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Update Category Image</DialogTitle>
-                    </DialogHeader>
-                    <CategoryImageManager categoryId={categoryId} initialImage={image} onClose={stateState.close} />
-                </DialogContent>
-            </Dialog>
-        </div>
+        <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
+            <DialogTrigger>
+                <div className="relative w-20 h-20 overflow-hidden rounded-xl">
+                    <img alt={image || "placeholder"} className="cursor-pointer w-full h-full object-cover" src={image || "/placeholder.jpg"} />
+                </div>
+            </DialogTrigger>
+            <DialogContent className="bg-content1">
+                <DialogHeader className="sr-only">
+                    <DialogTitle>Update Category Image</DialogTitle>
+                </DialogHeader>
+                <CategoryImageManager categoryId={categoryId} initialImage={image} onClose={stateState.close} />
+            </DialogContent>
+        </Dialog>
     );
 };
 

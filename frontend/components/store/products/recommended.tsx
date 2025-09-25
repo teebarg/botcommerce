@@ -1,9 +1,8 @@
 "use client";
 
-// TODO: Implement recommended products
 // import { useSession } from "next-auth/react";
 
-// import ProductCard from "@/components/store/products/product-card2";
+// import ProductCard from "@/components/store/products/product-card";
 // import { ProductSearch } from "@/schemas/product";
 // import { useProductRecommendations } from "@/lib/hooks/useProduct";
 // import ComponentLoader from "@/components/component-loader";

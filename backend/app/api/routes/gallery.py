@@ -76,7 +76,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
         for index, image in enumerate(images):
             try:
                 if image.product_id is None:
-                    name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(100, 999)}"
+                    name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(10000, 99999)}"
                     product_data: dict[str, Any] = {
                         "name": name,
                         "slug": slugify(name),

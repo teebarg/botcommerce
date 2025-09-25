@@ -24,58 +24,102 @@ class RedisStreamConsumer:
         self.task = None
 
     async def start(self):
-        """Start consumer loop"""
-        self.task = asyncio.create_task(self.consume())
-        logger.info("Redis consumer started...")
+        """Start consumer with auto-restart supervision"""
+        self.shutdown_event.clear()
+
+        async def supervise(coro, name: str):
+            """Run a task, restart on unexpected failure until shutdown."""
+            while not self.shutdown_event.is_set():
+                try:
+                    logger.info(f"Starting task: {name}")
+                    await coro()
+                except asyncio.CancelledError:
+                    logger.info(f"Task cancelled: {name}")
+                    raise
+                except Exception as e:
+                    logger.exception(f"Task {name} crashed with error: {e}, restarting...")
+                    await asyncio.sleep(1)
+            logger.info(f"Task stopped: {name}")
+
+        self.consume_task = asyncio.create_task(
+            supervise(self.consume, "redis-consume"), name="redis-consume-supervisor"
+        )
+        self.claim_task = asyncio.create_task(
+            supervise(self.claim_stale_messages, "redis-claim-stale"), name="redis-claim-stale-supervisor"
+        )
+
+        logger.info("Redis consumer started with supervision...")
 
     async def stop(self):
-        """Stop consumer loop gracefully"""
+        """Stop consumer loops gracefully"""
         self.shutdown_event.set()
-        if self.task:
-            self.task.cancel()
+
+        tasks = [t for t in [self.consume_task, self.claim_task] if t]
+
+        for task in tasks:
+            logger.info(f"Cancelling task: {task.get_name()}")
+            task.cancel()
+
+        if tasks:
             try:
-                await asyncio.wait_for(self.task, timeout=5.0)
+                await asyncio.wait_for(
+                    asyncio.gather(*tasks, return_exceptions=True),
+                    timeout=5.0,
+                )
             except asyncio.TimeoutError:
-                logger.warning("Consumer task didn’t stop gracefully")
-            except asyncio.CancelledError:
-                pass
+                logger.warning("Some consumer tasks didn’t stop gracefully")
+
         logger.info("Redis consumer stopped.")
 
     async def consume(self):
         try:
             while not self.shutdown_event.is_set():
                 try:
-                    claimed = await self.redis.xautoclaim(
-                        self.stream,
+                    events = await self.redis.xreadgroup(
                         self.group,
                         self.consumer,
-                        60000,
-                        "0-0",
-                        count=10
+                        streams={self.stream: ">"},
+                        count=10,
+                        block=60000,  # wait up to 60s
                     )
 
-                    for msg_id, data in claimed[1]:
-                        await self._process(msg_id, data)
+                    if not events:
+                        continue
+
+                    for stream, messages in events:
+                        for msg_id, data in messages:
+                            await self._process(msg_id, data)
+
                 except Exception as e:
-                    logger.error(f"XAUTOCLAIM error: {e}")
-
-                events = await self.redis.xreadgroup(
-                    self.group,
-                    self.consumer,
-                    streams={self.stream: ">"},
-                    count=10,
-                    block=60000,  # wait max 60s
-                )
-
-                if not events:
-                    continue
-
-                for stream, messages in events:
-                    for msg_id, data in messages:
-                        await self._process(msg_id, data)
+                    logger.error(f"XREADGROUP error: {e}")
         except Exception as e:
             logger.exception(f"Consumer error: {e}")
             await asyncio.sleep(1)
+
+
+    async def claim_stale_messages(self):
+        """Run occasionally to recover stuck messages."""
+        start_id = "0-0"
+        while not self.shutdown_event.is_set():
+            try:
+                next_id, messages = await self.redis.xautoclaim(
+                    self.stream,
+                    self.group,
+                    self.consumer,
+                    min_idle_time=60000,  # 1 minute
+                    start_id=start_id,
+                    count=10,
+                )
+
+                for msg_id, data in messages:
+                    await self._process(msg_id, data)
+
+                start_id = next_id
+            except Exception as e:
+                logger.error(f"XAUTOCLAIM error: {e}")
+
+            await asyncio.sleep(60)  # only sweep every 60s (tunable)
+
 
     async def _process(self, msg_id, data):
         try:
