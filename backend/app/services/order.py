@@ -438,6 +438,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
         try:
             await invalidate_pattern("orders")
             await invalidate_key(f"order:{order_id}")
+            await invalidate_key(f"order-timeline:{order_id}")
             await invalidate_pattern("gallery")
             if order_item.variant and order_item.variant.product_id:
                 await reindex_product(product_id=order_item.variant.product_id)

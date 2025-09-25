@@ -70,7 +70,7 @@ export interface OrderTimelineEntry {
 
 export const useOrderTimeline = (orderId?: number) => {
     return useQuery({
-        queryKey: ["order-timeline", orderId],
+        queryKey: ["order-timeline", orderId?.toString()],
         enabled: !!orderId,
         queryFn: async () => await api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
     });

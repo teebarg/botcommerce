@@ -16,15 +16,17 @@ import {
     XCircle,
     RotateCcw,
 } from "lucide-react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
 
 import { useOrderTimeline } from "@/lib/hooks/useOrder";
 import { Order, OrderItem } from "@/schemas";
-import { Button } from "@/components/ui/button";
 import { useReturnOrderItem } from "@/lib/hooks/useOrder";
 import { currency, formatDate } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Confirm } from "@/components/generic/confirm";
 
 interface OrderDetailsProps {
     order: Order;
@@ -70,7 +72,14 @@ const orderStatusMap = {
 };
 
 const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ orderItem, orderId }) => {
-    const { mutateAsync: returnItem, isPending } = useReturnOrderItem();
+    const deleteState = useOverlayTriggerState({});
+    const { mutateAsync: returnItem } = useReturnOrderItem();
+
+    const handleRemove = () => {
+        returnItem({ orderId, itemId: orderItem.id }).then(() => {
+            deleteState.close();
+        });
+    };
 
     return (
         <div className="flex gap-4 px-2 py-4">
@@ -87,17 +96,17 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
                     <div className="font-semibold text-default-900">{currency(orderItem.price)}</div>
                 </div>
             </div>
-            <div>
-                <Button
-                    disabled={isPending}
-                    isLoading={isPending}
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => returnItem({ orderId, itemId: orderItem.id })}
-                >
-                    Return item
-                </Button>
-            </div>
+            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                <DialogTrigger>
+                    <div className="font-semibold bg-destructive text-white px-4 py-2 rounded-md cursor-pointer">Return item</div>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader className="sr-only">
+                        <DialogTitle>Delete {orderItem.name}</DialogTitle>
+                    </DialogHeader>
+                    <Confirm onClose={deleteState.close} onConfirm={handleRemove} />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
