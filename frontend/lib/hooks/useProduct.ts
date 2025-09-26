@@ -19,16 +19,16 @@ type SearchParams = {
 
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
-        queryKey: ["products", "search", JSON.stringify(params)],
+        queryKey: ["products", "search", params],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
     });
 };
 
 export const useProductInfiniteSearch = (params: SearchParams) => {
     return useInfiniteQuery({
-        queryKey: ["products", "search", "infinite", JSON.stringify(params)],
+        queryKey: ["products", "search", "infinite", params],
         queryFn: async ({ pageParam = 0 }) =>
-            await api.get<PaginatedProductSearch>("/product/", { params: { skip: pageParam, limit: 12, ...params } }),
+            await api.get<PaginatedProductSearch>("/product/", { params: { skip: pageParam, limit: 24, ...params } }),
         getNextPageParam: (lastPage: PaginatedProductSearch) => {
             const nextSkip = lastPage.skip + lastPage.limit;
             const hasMore = nextSkip < lastPage.total_count;

@@ -111,13 +111,13 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2">
-                    <Button disabled={isPending} variant="default" onClick={onClose}>
+                    <Button disabled={isPending} variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
                         disabled={!hasChanges || isPending}
                         isLoading={isPending}
-                        variant={hasChanges ? "luxury" : "outline"}
+                        variant={hasChanges ? "indigo" : "outline"}
                         onClick={handleStatusUpdate}
                     >
                         {hasChanges ? "Update Status" : "No Changes"}

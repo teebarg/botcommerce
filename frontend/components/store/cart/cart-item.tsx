@@ -11,8 +11,8 @@ import { Badge } from "@/components/ui/badge";
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     return (
         <div className="flex gap-3">
-            <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
-                <img alt={item.name} className="object-cover object-center rounded-lg" src={item?.image || "/placeholder.jpg"} />
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
+                <img alt={item.name} className="object-cover w-full h-full rounded-lg" src={item?.image || "/placeholder.jpg"} />
             </div>
 
             <div className="flex-1 min-w-0">

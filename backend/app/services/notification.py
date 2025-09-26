@@ -1,11 +1,7 @@
 from abc import ABC, abstractmethod
-
-import emails  # type: ignore
 import requests
 
-from app.core.config import settings
 from app.core.logging import logger
-from app.services.shop_settings import ShopSettingsService
 from app.core.utils import send_email
 
 class NotificationChannel(ABC):
@@ -29,59 +25,8 @@ class EmailChannel(NotificationChannel):
                 email_to=recipient,
                 subject=subject,
                 html_content=message,
+                cc_list=cc_list,
             )
-            return True
-        except Exception as e:
-            logger.error(f"Email sending failed: {str(e)}")
-            return False
-
-    async def send2(self, recipient: str, message: str, subject: str = "Notification", cc_list: list[str] = [], **kwargs) -> bool:
-        try:
-            if not settings.EMAILS_ENABLED:
-                return
-            if recipient.lower().endswith("@guest.com"):
-                logger.info(
-                    "Skipping email send to guest.com address: %s", recipient)
-                return
-            service = ShopSettingsService()
-            shop_email = await service.get("shop_email")
-            if shop_email:
-                cc_list.append(shop_email)
-            bcc_raw = await service.get("email_bcc")
-            bcc_list = []
-            if bcc_raw:
-                bcc_list = [x.strip() for x in bcc_raw.split(',') if x.strip()]
-
-            headers = {
-                "X-Priority": "1",               # High priority
-                "X-MSMail-Priority": "High",     # Outlook/Exchange
-                "Importance": "High",            # Gmail/others
-                "Disposition-Notification-To": settings.EMAILS_FROM_EMAIL,
-                "Return-Receipt-To": settings.EMAILS_FROM_EMAIL,
-            }
-            message = emails.Message(
-                subject=subject,
-                # cc=cc_list,
-                # bcc=bcc_list,
-                html=message,
-                mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
-                # headers={k: v for k, v in headers.items() if v},
-            )
-            smtp_options = {"host": self.smtp_host, "port": self.smtp_port}
-            if settings.SMTP_TLS:
-                smtp_options["tls"] = True
-            elif settings.SMTP_SSL:
-                smtp_options["ssl"] = True
-            if self.username:
-                smtp_options["user"] = self.username
-            if self.password:
-                smtp_options["password"] = self.password
-            response = message.send(to=recipient, smtp=smtp_options)
-            logger.info(f"Send email result: {response}")
-
-            if not response.status_code or response.status_code != 250:
-                raise Exception("Email sending failed")
-
             return True
         except Exception as e:
             logger.error(f"Email sending failed: {str(e)}")

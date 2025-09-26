@@ -163,11 +163,15 @@ async def send_notification(id: int, user_id: int, notification):
 
         try:
             email_data = await generate_invoice_email(order=order, user=user)
+            service = ShopSettingsService()
+            shop_email = await service.get("shop_email")
+            cc_list = [shop_email] if shop_email else []
             await notification.send_notification(
                 channel_name="email",
                 recipient=user.email,
                 subject=email_data.subject,
-                message=email_data.html_content
+                message=email_data.html_content,
+                cc_list=cc_list,
             )
             logger.info(f"Invoice email sent to user: {user_id}")
         except Exception as e:
@@ -307,23 +311,24 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
         raise Exception("Failed to decrement variant inventory for order")
 
     if out_of_stock_variants and notification:
-        subject = f"Product Variants OUT OF STOCK in Order {order_id}"
-        message_lines = [
-            f"The following product variants are now OUT OF STOCK due to order {order_id}:"
-        ]
-        for v in out_of_stock_variants:
-            message_lines.append(f"- SKU: {v.sku}, Product ID: {v.product_id}")
-        message = "\n".join(message_lines)
-        service = ShopSettingsService()
-        try:
-            await notification.send_notification(
-                channel_name="email",
-                recipient=await service.get("shop_email"),
-                subject=subject,
-                message=message
-            )
-        except Exception as e:
-            logger.error(f"Failed to send out-of-stock email: {e}")
+        logger.info(f"Out of stock variants found for order {order_id}: {out_of_stock_variants}")
+        # subject = f"Product Variants OUT OF STOCK in Order {order_id}"
+        # message_lines = [
+        #     f"The following product variants are now OUT OF STOCK due to order {order_id}:"
+        # ]
+        # for v in out_of_stock_variants:
+        #     message_lines.append(f"- SKU: {v.sku}, Product ID: {v.product_id}")
+        # message = "\n".join(message_lines)
+        # service = ShopSettingsService()
+        # try:
+        #     await notification.send_notification(
+        #         channel_name="email",
+        #         recipient=await service.get("shop_email"),
+        #         subject=subject,
+        #         message=message
+        #     )
+        # except Exception as e:
+        #     logger.error(f"Failed to send out-of-stock email: {e}")
         try:
             slack_text = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order_id}\n" + "\n".join([
                 f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants
@@ -345,11 +350,15 @@ async def send_payment_receipt(order_id: int, notification: Notification):
             )
     try:
         email_data = await generate_payment_receipt(order=order, user=order.user)
+        service = ShopSettingsService()
+        shop_email = await service.get("shop_email")
+        cc_list = [shop_email] if shop_email else []
         await notification.send_notification(
             channel_name="email",
             recipient=order.user.email,
             subject=email_data.subject,
-            message=email_data.html_content
+            message=email_data.html_content,
+            cc_list=cc_list,
         )
         logger.info(f"Invoice email sent to user: {order.user_id}")
     except Exception as e:
