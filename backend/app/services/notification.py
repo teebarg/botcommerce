@@ -6,12 +6,14 @@ import requests
 from app.core.config import settings
 from app.core.logging import logger
 from app.services.shop_settings import ShopSettingsService
+from app.core.utils import send_email
 
 class NotificationChannel(ABC):
     @abstractmethod
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
         """Send notification through the channel."""
         pass
+
 
 class EmailChannel(NotificationChannel):
     def __init__(self, smtp_host: str, smtp_port: int, username: str, password: str):
@@ -20,12 +22,26 @@ class EmailChannel(NotificationChannel):
         self.username = username
         self.password = password
 
+
     async def send(self, recipient: str, message: str, subject: str = "Notification", cc_list: list[str] = [], **kwargs) -> bool:
+        try:
+            await send_email(
+                email_to=recipient,
+                subject=subject,
+                html_content=message,
+            )
+            return True
+        except Exception as e:
+            logger.error(f"Email sending failed: {str(e)}")
+            return False
+
+    async def send2(self, recipient: str, message: str, subject: str = "Notification", cc_list: list[str] = [], **kwargs) -> bool:
         try:
             if not settings.EMAILS_ENABLED:
                 return
             if recipient.lower().endswith("@guest.com"):
-                logger.info("Skipping email send to guest.com address: %s", recipient)
+                logger.info(
+                    "Skipping email send to guest.com address: %s", recipient)
                 return
             service = ShopSettingsService()
             shop_email = await service.get("shop_email")
@@ -37,8 +53,6 @@ class EmailChannel(NotificationChannel):
                 bcc_list = [x.strip() for x in bcc_raw.split(',') if x.strip()]
 
             headers = {
-                "Cc": ", ".join(cc_list) if cc_list else "",
-                "Bcc": ", ".join(bcc_list) if bcc_list else "",
                 "X-Priority": "1",               # High priority
                 "X-MSMail-Priority": "High",     # Outlook/Exchange
                 "Importance": "High",            # Gmail/others
@@ -47,9 +61,11 @@ class EmailChannel(NotificationChannel):
             }
             message = emails.Message(
                 subject=subject,
+                # cc=cc_list,
+                # bcc=bcc_list,
                 html=message,
                 mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
-                headers={k: v for k, v in headers.items() if v},
+                # headers={k: v for k, v in headers.items() if v},
             )
             smtp_options = {"host": self.smtp_host, "port": self.smtp_port}
             if settings.SMTP_TLS:
@@ -63,10 +79,14 @@ class EmailChannel(NotificationChannel):
             response = message.send(to=recipient, smtp=smtp_options)
             logger.info(f"Send email result: {response}")
 
+            if not response.status_code or response.status_code != 250:
+                raise Exception("Email sending failed")
+
             return True
         except Exception as e:
             logger.error(f"Email sending failed: {str(e)}")
             return False
+
 
 class SlackChannel(NotificationChannel):
     def __init__(self, webhook_url: str):
@@ -79,6 +99,7 @@ class SlackChannel(NotificationChannel):
         except Exception as e:
             logger.error(f"Slack notification failed: {str(e)}")
             return False
+
 
 class WhatsAppChannel(NotificationChannel):
     def __init__(self, token: str, phone_number_id: str):
@@ -100,11 +121,13 @@ class WhatsAppChannel(NotificationChannel):
                 "type": "text",
                 "text": {"preview_url": True, "body": message},
             }
-            response = requests.post(url, json=payload, headers=headers, timeout=10)
+            response = requests.post(
+                url, json=payload, headers=headers, timeout=10)
             return 200 <= response.status_code < 300
         except Exception as e:
             logger.error(f"WhatsApp notification failed: {str(e)}")
             return False
+
 
 class SMSChannel(NotificationChannel):
     def __init__(self, api_key: str, api_secret: str, from_number: str):
@@ -113,12 +136,13 @@ class SMSChannel(NotificationChannel):
         self.from_number = from_number
 
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
-        #TODO: Implementation would depend on your SMS provider (e.g., Twilio, MessageBird)
+        # TODO: Implementation would depend on your SMS provider (e.g., Twilio, MessageBird)
         try:
             return True
         except Exception as e:
             logger.error(f"SMS sending failed: {str(e)}")
             return False
+
 
 class NotificationService:
     def __init__(self):
@@ -134,6 +158,7 @@ class NotificationService:
         if not channel:
             raise ValueError(f"Channel {channel_name} not found")
         return await channel.send(recipient, message, **kwargs)
+
 
 # Usage example:
 """

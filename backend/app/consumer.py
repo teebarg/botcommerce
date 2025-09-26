@@ -144,19 +144,18 @@ class RedisStreamConsumer:
         elif event["type"] == "USER_REGISTERED":
             await self.handle_user_registered(event)
 
-
     def get_notification(self):
         notification = get_notification_service()
         return notification
-
 
     async def handle_order_paid(self, event):
         try:
             await process_order_payment(order_id=int(event["order_id"]), notification=self.get_notification())
         except Exception as e:
-            logger.error(f"Failed to process order payment for order {event['order_id']}: {e}")
-            raise Exception(f"Failed to process order payment for order {event['order_id']}")
-
+            logger.error(
+                f"Failed to process order payment for order {event['order_id']}: {e}")
+            raise Exception(
+                f"Failed to process order payment for order {event['order_id']}")
 
     async def handle_order_created(self, event):
         try:
@@ -185,7 +184,6 @@ class RedisStreamConsumer:
 
         await send_notification(id=int(event["order_id"]), user_id=int(event["user_id"]), notification=self.get_notification())
         await invalidate_pattern("users")
-
 
     async def handle_payment_success(self, event):
         try:
@@ -223,7 +221,6 @@ class RedisStreamConsumer:
             logger.error(f"Failed to create order: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
-
         try:
             if event["view_type"] == "VIEW":
                 recent_service = RecentlyViewedService()
@@ -237,13 +234,12 @@ class RedisStreamConsumer:
             logger.error(f"Failed to add product to recently viewed: {str(e)}")
             raise Exception(f"Redis error: {str(e)}")
 
-
     async def handle_track_popular(self, product_id: int, interaction_type: str):
         recent_service = PopularProductsService()
         await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)
 
     async def handle_user_registered(self, event):
-        notification=self.get_notification()
+        notification = self.get_notification()
         try:
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],

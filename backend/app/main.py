@@ -23,7 +23,6 @@ from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
 from app.core.deps import ShopSettingsServiceDep
-from pydantic import BaseModel
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"

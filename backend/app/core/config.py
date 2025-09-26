@@ -106,6 +106,8 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY: str = ""
     CLOUDINARY_API_SECRET: str = ""
 
+    BREVO_API_KEY: str = ""
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",
