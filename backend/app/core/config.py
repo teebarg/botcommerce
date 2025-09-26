@@ -44,7 +44,6 @@ class Settings(BaseSettings):
             return f"http://{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
 
-    EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
     FIRST_SUPERUSER_FIRSTNAME: str = "admin"
     FIRST_SUPERUSER_LASTNAME: str = "admin"
     FIRST_SUPERUSER: EmailStr = "admin@email.com"
@@ -93,7 +92,6 @@ class Settings(BaseSettings):
     WHATSAPP_TOKEN: str | None = None
     WHATSAPP_PHONE_NUMBER_ID: str | None = None
 
-    # OAuth Settings
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
 
@@ -106,7 +104,7 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY: str = ""
     CLOUDINARY_API_SECRET: str = ""
 
-    BREVO_API_KEY: str = ""
+    BREVO_API_KEY: str = "key"
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

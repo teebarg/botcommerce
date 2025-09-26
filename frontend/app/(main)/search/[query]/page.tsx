@@ -28,7 +28,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
 
     const queryParams: any = {
         search: query,
-        limit: 12,
+        limit: 24,
         sort: sortBy ?? "id:desc",
         max_price: maxPrice ?? 100000000,
         min_price: minPrice ?? 0,

@@ -16,7 +16,7 @@ import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
 
-const LIMIT = 20;
+const LIMIT = 24;
 
 export function ProductDetails() {
     const router = useRouter();

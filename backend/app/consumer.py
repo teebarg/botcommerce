@@ -99,22 +99,19 @@ class RedisStreamConsumer:
 
     async def claim_stale_messages(self):
         """Run occasionally to recover stuck messages."""
-        start_id = "0-0"
         while not self.shutdown_event.is_set():
             try:
-                next_id, messages = await self.redis.xautoclaim(
+                claimed = await self.redis.xautoclaim(
                     self.stream,
                     self.group,
                     self.consumer,
-                    min_idle_time=60000,  # 1 minute
-                    start_id=start_id,
-                    count=10,
+                    60000,
+                    "0-0",
+                    count=10
                 )
 
-                for msg_id, data in messages:
+                for msg_id, data in claimed[1]:
                     await self._process(msg_id, data)
-
-                start_id = next_id
             except Exception as e:
                 logger.error(f"XAUTOCLAIM error: {e}")
 

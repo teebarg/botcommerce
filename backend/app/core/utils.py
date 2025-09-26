@@ -112,58 +112,50 @@ def render_email_template2(*, template_name: str, context: dict[str, Any]) -> st
     return html_content
 
 
-# async def send_email2(
-#     *,
-#     email_to: str,
-#     subject: str = "",
-#     html_content: str = "",
-#     cc_list: list[str] = [],
-# ) -> None:
-#     if not settings.EMAILS_ENABLED:
-#         return
-#     if email_to.lower().endswith("@guest.com"):
-#         logger.info("Skipping email send to guest.com address: %s", email_to)
-#         return
-#     service = ShopSettingsService()
-#     shop_email = await service.get("shop_email")
-#     if shop_email:
-#         cc_list.append(shop_email)
-#     bcc_raw = await service.get("email_bcc")
-#     bcc_list = []
-#     if bcc_raw:
-#         bcc_list = [x.strip() for x in bcc_raw.split(',') if x.strip()]
-#     try:
-#         headers = {
-#             "X-Priority": "1",               # High priority
-#             "X-MSMail-Priority": "High",     # Outlook/Exchange
-#             "Importance": "High",            # Gmail/others
-#             "Disposition-Notification-To": settings.EMAILS_FROM_EMAIL,  # Read receipt
-#             "Return-Receipt-To": settings.EMAILS_FROM_EMAIL,            # Delivery receipt
-#         }
-#         message = emails.Message(
-#             subject=subject,
-#             cc=cc_list,
-#             bcc=bcc_list,
-#             html=html_content,
-#             mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
-#             headers={k: v for k, v in headers.items() if v},
-#         )
-#         smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT}
-#         if settings.SMTP_TLS:
-#             smtp_options["tls"] = True
-#         elif settings.SMTP_SSL:
-#             smtp_options["ssl"] = True
-#         if settings.SMTP_USER:
-#             smtp_options["user"] = settings.SMTP_USER
-#         if settings.SMTP_PASSWORD:
-#             smtp_options["password"] = settings.SMTP_PASSWORD
-#         response = message.send(to=email_to, smtp=smtp_options)
-#         logger.info(f"send email result: {response}")
-#         if not response.status_code or response.status_code != 250:
-#             raise Exception("Email sending failed")
-#     except Exception as e:
-#         logger.error(f"Email sending failed: {str(e)}")
-#         raise Exception(f"Email sending failed: {str(e)}")
+async def send_email_smtp(
+    *,
+    email_to: str,
+    subject: str = "",
+    html_content: str = "",
+    cc_list: list[str] = [],
+) -> None:
+    if not settings.EMAILS_ENABLED:
+        return
+    if email_to.lower().endswith("@guest.com"):
+        logger.info("Skipping email send to guest.com address: %s", email_to)
+        return
+
+    try:
+        headers = {
+            "X-Priority": "1",               # High priority
+            "X-MSMail-Priority": "High",     # Outlook/Exchange
+            "Importance": "High",            # Gmail/others
+            "Disposition-Notification-To": settings.EMAILS_FROM_EMAIL,  # Read receipt
+            "Return-Receipt-To": settings.EMAILS_FROM_EMAIL,            # Delivery receipt
+        }
+        message = emails.Message(
+            subject=subject,
+            cc=cc_list,
+            html=html_content,
+            mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
+            headers={k: v for k, v in headers.items() if v},
+        )
+        smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT}
+        if settings.SMTP_TLS:
+            smtp_options["tls"] = True
+        elif settings.SMTP_SSL:
+            smtp_options["ssl"] = True
+        if settings.SMTP_USER:
+            smtp_options["user"] = settings.SMTP_USER
+        if settings.SMTP_PASSWORD:
+            smtp_options["password"] = settings.SMTP_PASSWORD
+        response = message.send(to=email_to, smtp=smtp_options)
+        logger.info(f"send email result: {response}")
+        if not response.status_code or response.status_code != 250:
+            raise Exception("Email sending failed")
+    except Exception as e:
+        logger.error(f"Email sending failed: {str(e)}")
+        raise Exception(f"Email sending failed: {str(e)}")
 
 
 async def send_email_brevo(
@@ -178,7 +170,7 @@ async def send_email_brevo(
 
     Required environment variables:
     - BREVO_API_KEY: Your Brevo API key
-    - EMAILS_FROM_EMAIL: Sender email (must be verified in Brevo)
+    - EMAILS_FROM_EMAIL: Sender email
     - EMAILS_FROM_NAME: Sender name
     """
 
@@ -190,22 +182,10 @@ async def send_email_brevo(
         logger.info("Skipping email send to guest.com address: %s", email_to)
         return
 
-    # Check if Brevo API key is configured
     if not hasattr(settings, 'BREVO_API_KEY') or not settings.BREVO_API_KEY:
         logger.error("BREVO_API_KEY not configured")
         raise Exception("BREVO_API_KEY not configured")
 
-    # service = ShopSettingsService()
-    # shop_email = await service.get("shop_email")
-    # if shop_email:
-    #     cc_list.append(shop_email)
-
-    # bcc_raw = await service.get("email_bcc")
-    bcc_list = []
-    # if bcc_raw:
-    #     bcc_list = [x.strip() for x in bcc_raw.split(',') if x.strip()]
-
-    # Build the email payload
     payload = {
         "sender": {
             "name": settings.EMAILS_FROM_NAME,
@@ -221,17 +201,11 @@ async def send_email_brevo(
         }
     }
 
-    # Add CC recipients if any
     if cc_list:
         payload["cc"] = [{"email": email} for email in cc_list]
 
-    # Add BCC recipients if any
-    if bcc_list:
-        payload["bcc"] = [{"email": email} for email in bcc_list]
-
-    # Add text content if no HTML (Brevo requires at least one content type)
     if not html_content:
-        payload["textContent"] = subject  # Fallback text content
+        payload["textContent"] = subject
 
     headers = {
         "Accept": "application/json",
@@ -240,7 +214,6 @@ async def send_email_brevo(
     }
 
     logger.info(f"Sending email via Brevo to: {email_to}")
-    logger.info(f"CC: {cc_list}, BCC: {bcc_list}")
 
     try:
         async with httpx.AsyncClient() as client:
@@ -251,8 +224,6 @@ async def send_email_brevo(
                 timeout=30
             )
 
-        logger.info(f"Brevo API response status: {response.status_code}")
-
         if response.status_code == 201:
             response_data = response.json()
             message_id = response_data.get("messageId", "unknown")
@@ -261,14 +232,7 @@ async def send_email_brevo(
             error_text = response.text
             logger.error(f"Brevo API error: {response.status_code} - {error_text}")
 
-            # Try to parse error details
-            try:
-                error_data = response.json()
-                error_message = error_data.get("message", error_text)
-                error_code = error_data.get("code", "unknown")
-                raise Exception(f"Brevo API error [{error_code}]: {error_message}")
-            except json.JSONDecodeError:
-                raise Exception(f"Brevo API error: {response.status_code} - {error_text}")
+            raise Exception(f"Brevo API error: {response.status_code} - {error_text}")
 
     except httpx.TimeoutException:
         logger.error("Brevo API request timed out")
@@ -288,13 +252,20 @@ async def send_email(
     html_content: str = "",
     cc_list: list[str] = [],
 ) -> None:
-    """Main email function - now using Brevo API"""
     try:
-        await send_email_brevo(
-            email_to=email_to,
-            subject=subject,
-            html_content=html_content,
-            cc_list=cc_list
+        if settings.ENVIRONMENT == "local":
+            await send_email_smtp(
+                email_to=email_to,
+                subject=subject,
+                html_content=html_content,
+                cc_list=cc_list
+            )
+        else:
+            await send_email_brevo(
+                email_to=email_to,
+                subject=subject,
+                html_content=html_content,
+                cc_list=cc_list
         )
     except Exception as e:
         logger.error(f"Email sending failed: {str(e)}")
