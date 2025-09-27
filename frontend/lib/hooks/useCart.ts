@@ -29,21 +29,17 @@ export const useAddToCart = () => {
             return res;
         },
         onMutate: async ({ variant_id, quantity }) => {
-            // Cancel any outgoing refetches
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
-            // Snapshot the previous value
             const previousCart = queryClient.getQueryData<Cart>(["cart"]);
 
             if (previousCart) {
                 queryClient.setQueryData<Cart>(["cart"], (old) => {
                     if (!old) return old;
 
-                    // Check if item already exists in cart
                     const existingItemIndex = old.items.findIndex((item) => item.variant_id === variant_id);
 
                     if (existingItemIndex >= 0) {
-                        // Update existing item quantity
                         const updatedItems = [...old.items];
 
                         updatedItems[existingItemIndex] = {
@@ -64,7 +60,6 @@ export const useAddToCart = () => {
             return { previousCart };
         },
         onSuccess: () => {
-            // Invalidate to get updated cart with correct totals from background task
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Added to cart", { duration: 1000 });
         },
@@ -85,10 +80,8 @@ export const useChangeCartQuantity = () => {
             return await api.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`);
         },
         onMutate: async ({ item_id, quantity }) => {
-            // Cancel any outgoing refetches
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
-            // Snapshot the previous value
             const previousCart = queryClient.getQueryData<Cart>(["cart"]);
 
             if (previousCart) {
@@ -107,32 +100,13 @@ export const useChangeCartQuantity = () => {
             return { previousCart };
         },
         onSuccess: () => {
-            // Invalidate to get updated cart with correct totals from background task
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Cart updated");
         },
         onError: (error: any, variables, context) => {
-            // If the mutation fails, use the context returned from onMutate to roll back
             if (context?.previousCart) {
                 queryClient.setQueryData<Cart>(["cart"], context.previousCart);
             }
-            toast.error(error.message || "Failed to update cart");
-        },
-    });
-};
-
-export const useUpdateCart = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async ({ product_id, quantity }: { product_id: number; quantity: number }) => {
-            return await api.patch<Cart>("/cart/update", { product_id, quantity });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Cart updated");
-        },
-        onError: (error: any) => {
             toast.error(error.message || "Failed to update cart");
         },
     });
