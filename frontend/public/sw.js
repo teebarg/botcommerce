@@ -93,7 +93,7 @@ self.addEventListener("push", function (event) {
             body: data.body,
             icon: "/icon.png", // small icon
             image: data.imageUrl ?? "/promo-banner.webp", // large image
-            badge: "/icon.png", // monochrome badge (Android only)
+            badge: data.imageUrl ?? "/icon.png", // monochrome badge (Android only)
             actions: [
                 { action: "view", title: "View" },
                 { action: "dismiss", title: "Dismiss" },

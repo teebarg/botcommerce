@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import NextAuth, { DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
@@ -122,25 +123,32 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             if (token?.accessToken) {
                 session.accessToken = token.accessToken as string;
             }
-            if (token?.sub && token.user) {
-                const user = token.user as User;
+            try {
+                if (token?.sub && token.user) {
+                    const user = token.user as User;
 
-                session.id = user.id;
-                session.user.first_name = user.first_name;
-                session.user.last_name = user.last_name;
-                session.user.image = user.image;
-                session.user.status = user.status;
-                session.user.role = user.role as Role;
-                session.user.isAdmin = user.role === "ADMIN";
-                session.user.isActive = user.status === "ACTIVE";
-                session.impersonated = token.impersonated as boolean;
-                session.impersonatedBy = token.impersonatedBy as string;
-                session.user.addresses = token.addresses as Address[];
+                    session.id = user.id;
+                    session.user.first_name = user.first_name;
+                    session.user.last_name = user.last_name;
+                    session.user.image = user.image;
+                    session.user.status = user.status;
+                    session.user.role = user.role as Role;
+                    session.user.isAdmin = user.role === "ADMIN";
+                    session.user.isActive = user.status === "ACTIVE";
+                    session.impersonated = token.impersonated as boolean;
+                    session.impersonatedBy = token.impersonatedBy as string;
+                    session.user.addresses = token.addresses as Address[];
+                }
+
+                return session;
+            } catch (error) {
+                console.error("Error fetching user:", error);
+                return session;
             }
-
-            return session;
         },
     },
+    debug: process.env.NODE_ENV === "development",
+    secret: process.env.AUTH_SECRET,
 });
 
 async function generateJoseToken(email: string) {
