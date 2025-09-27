@@ -7,7 +7,7 @@ from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.core.deps import TokenUser, ShopSettingsServiceDep
 from prisma.models import Cart
-from app.services.redis import cache_response, invalidate_key
+from app.services.redis import cache_response, invalidate_key, bust
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -28,6 +28,8 @@ async def calculate_cart_totals(cart: Cart, tax_rate: float):
         data={"subtotal": subtotal, "tax": tax, "total": total}
     )
 
+    await bust(f"cart:{cart.cart_number}")
+
 
 async def get_or_create_cart(cartId: Optional[str]):
     """Retrieve an existing cart or create a new one if it doesn't exist"""
@@ -43,7 +45,7 @@ async def get_or_create_cart(cartId: Optional[str]):
     return await db.cart.create(data={"cart_number": new_cart_id})
 
 
-@router.post("/items")
+@router.post("/items", response_model=CartItemResponse)
 async def add_item_to_cart(
     item_in: CartItemCreate,
     shop_settings_service: ShopSettingsServiceDep,
@@ -75,34 +77,22 @@ async def add_item_to_cart(
                 detail=f"Not enough inventory. You can add {available_quantity} more items (only {variant.inventory} available in stock)."
             )
 
+    item = await db.cartitem.create(
+        data={
+            "cart_id": cart.id,
+            "cart_number": cart.cart_number,
+            "name": variant.product.name,
+            "slug": variant.product.slug,
+            "variant_id": item_in.variant_id,
+            "quantity": item_in.quantity,
+            "price": variant.price,
+            "image": variant.product.images[0].image if variant.product.images else variant.product.image
+        },
+        include={"variant": True}
+    )
+
     tax_rate = float(await shop_settings_service.get("tax_rate"))
-
-    async with db.tx() as tx:
-        item = await tx.cartitem.create(
-            data={
-                "cart_id": cart.id,
-                "cart_number": cart.cart_number,
-                "name": variant.product.name,
-                "slug": variant.product.slug,
-                "variant_id": item_in.variant_id,
-                "quantity": item_in.quantity,
-                "price": variant.price,
-                "image": variant.product.images[0].image if variant.product.images else variant.product.image
-            }
-        )
-
-        increment = item.price * item.quantity
-        subtotal = cart.subtotal + increment
-        tax = subtotal * (tax_rate / 100)
-        total = subtotal + tax + cart.shipping_fee
-
-        await tx.cart.update(
-            where={"cart_number": cart.cart_number},
-            data={"subtotal": subtotal, "tax": tax, "total": total},
-        )
-
     background_tasks.add_task(calculate_cart_totals, cart, tax_rate)
-    await invalidate_key(f"cart:{cart.cart_number}")
 
     return item
 
@@ -198,20 +188,6 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
     return updated_cart
 
 
-@router.delete("/")
-async def delete(cartId: str = Header(default=None)) -> Message:
-    """
-    Delete item from cart.
-    """
-    cart = await db.cart.find_unique(where={"cart_number": cartId})
-    if not cart:
-        raise HTTPException(status_code=404, detail="cart not found")
-
-    await db.cart.delete(where={"cart_number": cartId})
-    await invalidate_key(f"cart:{cartId}")
-    return {"message": "cart deleted successfully"}
-
-
 @router.delete("/items/{item_id}")
 async def delete_cart_item(item_id: int, shop_settings_service: ShopSettingsServiceDep, cartId: str = Header(default=None)):
     cart_item = await db.cartitem.find_unique(where={"id": item_id})
@@ -236,8 +212,8 @@ async def delete_cart_item(item_id: int, shop_settings_service: ShopSettingsServ
     return {"message": "Item removed from cart successfully"}
 
 
-@router.put("/items/{item_id}")
-async def update_cart_item(item_id: int, quantity: int, shop_settings_service: ShopSettingsServiceDep, cartId: str = Header(default=None)):
+@router.put("/items/{item_id}", response_model=CartItemResponse)
+async def update_cart_item(item_id: int, quantity: int, shop_settings_service: ShopSettingsServiceDep, background_tasks: BackgroundTasks, cartId: str = Header(default=None)):
     cart_item = await db.cartitem.find_unique(
         where={"id": item_id},
         include={"cart": True, "variant": True}
@@ -251,22 +227,13 @@ async def update_cart_item(item_id: int, quantity: int, shop_settings_service: S
             detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available in stock."
         )
 
-    old_qty = cart_item.quantity
-    diff = (quantity - old_qty) * cart_item.price
+    updated_item = await db.cartitem.update(
+        where={"id": item_id},
+        data={"quantity": quantity},
+        include={"variant": True}
+    )
 
-    async with db.tx() as tx:
-        updated_item = await tx.cartitem.update(
-            where={"id": item_id},
-            data={"quantity": quantity},
-        )
+    tax_rate = float(await shop_settings_service.get("tax_rate"))
+    background_tasks.add_task(calculate_cart_totals, cart_item.cart, tax_rate)
 
-        subtotal = cart_item.cart.subtotal + diff
-        tax = subtotal * (float(await shop_settings_service.get("tax_rate")) / 100)
-        total = subtotal + tax + cart_item.cart.shipping_fee
-
-        await tx.cart.update(
-            where={"cart_number": cartId},
-            data={"subtotal": subtotal, "tax": tax, "total": total},
-        )
-    await invalidate_key(f"cart:{cartId}")
     return updated_item

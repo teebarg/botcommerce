@@ -37,13 +37,18 @@ const ProductActions: React.FC<{
             <Button
                 className="w-full !h-11"
                 disabled={loading || !selectedVariant || outOfStock}
-                isLoading={loading}
                 size="sm"
                 variant="default"
                 onClick={handleAddToCartAndTrack}
             >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Add
+                {loading ? (
+                    "Adding..."
+                ) : (
+                    <>
+                        <ShoppingCart className="w-5 h-5 mr-2" />
+                        Add
+                    </>
+                )}
             </Button>
 
             <Button
