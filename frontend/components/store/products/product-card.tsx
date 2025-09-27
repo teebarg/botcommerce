@@ -55,7 +55,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                             isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
                         />
 
-                        <div className="absolute top-4 right-2 flex lg:hidden flex-wrap gap-1">
+                        <div className="absolute top-4 right-2 flex flex-wrap gap-1">
                             {product?.variants?.map((item: ProductVariant, idx: number) => (
                                 <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="emerald">
                                     Uk Size {item.size}
@@ -77,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
 
                     <div className="py-4 px-2 space-y-2">
-                        <div className="hidden lg:flex items-center gap-2">
+                        {/* <div className="hidden lg:flex items-center gap-2">
                             <p
                                 className={cn(
                                     "hidden text-default-500 font-medium",
@@ -94,7 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                             >
                                 Color: {product.variants?.[0].color}
                             </p>
-                        </div>
+                        </div> */}
                         <PriceLabel priceInfo={priceInfo} />
                         <ProductActions product={product} />
                     </div>
