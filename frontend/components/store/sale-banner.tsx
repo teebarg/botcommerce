@@ -6,13 +6,8 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { useCatalogs } from "@/lib/hooks/useCollection";
-import { cn } from "@/lib/utils";
 
-interface SaleBannerProps {
-    className?: string;
-}
-
-const SaleBanner: React.FC<SaleBannerProps> = ({ className = "" }) => {
+const SaleBanner: React.FC = () => {
     const { data } = useCatalogs(undefined, true);
     const catalog = data?.shared[0];
     const router = useRouter();
@@ -20,7 +15,7 @@ const SaleBanner: React.FC<SaleBannerProps> = ({ className = "" }) => {
     if (!catalog) return null;
 
     return (
-        <div className={cn("relative overflow-hidden", className)}>
+        <div className="relative overflow-hidden">
             <div className="relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4 py-6">
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />

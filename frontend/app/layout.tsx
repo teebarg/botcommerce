@@ -46,6 +46,28 @@ export async function generateMetadata() {
             default: siteConfig.name,
         },
         description: siteConfig.description,
+        openGraph: {
+            title: `${siteConfig.name}`,
+            description: `${siteConfig.description}`,
+            url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
+            siteName: `${siteConfig.name}`,
+            images: [
+                {
+                    url: "/default-og.png",
+                    width: 1200,
+                    height: 630,
+                    alt: `${siteConfig.name}`,
+                },
+            ],
+            locale: "en_NG",
+            type: "website",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${siteConfig.name}`,
+            description: `${siteConfig.description}`,
+            images: ["/default-og.png"],
+        },
         icons: {
             icon: [{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" }],
             apple: [{ url: "/apple-touch-icon.png" }],

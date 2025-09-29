@@ -1,4 +1,3 @@
-import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
 
@@ -9,6 +8,7 @@ import { Collection, PaginatedProductSearch } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import ServerError from "@/components/generic/server-error";
 import { serverApi } from "@/apis/server-client";
+import { getSiteConfig } from "@/lib/config";
 
 export const revalidate = 60;
 
@@ -26,12 +26,35 @@ type SearchParams = Promise<{
 export async function generateMetadata({ params }: { params: Params }) {
     const { slug } = await params;
     const { data: collection } = await tryCatch<Collection>(serverApi.get(`/collection/${slug}`));
+    const siteConfig = await getSiteConfig();
 
     if (!collection) {
         notFound();
     }
 
-    return { title: collection.name } as Metadata;
+    return {
+        title: `${collection.name} Collection`,
+        description: `Explore ${collection.name} at ${siteConfig?.name}`,
+        openGraph: {
+            title: `${collection.name} Collection`,
+            description: `Explore ${collection.name} at ${siteConfig?.name}`,
+            url: `${process.env.NEXT_PUBLIC_BASE_URL}/collections/${slug}`,
+            images: [
+                {
+                    url: "/default-og.png",
+                    width: 1200,
+                    height: 630,
+                    alt: collection.name,
+                },
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${collection.name} Collection`,
+            description: `Explore ${collection.name} at ${siteConfig?.name}`,
+            images: ["/default-og.png"],
+        },
+    };
 }
 
 export default async function CollectionPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {

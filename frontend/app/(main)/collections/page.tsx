@@ -1,4 +1,3 @@
-import { Metadata } from "next";
 import { Suspense } from "react";
 
 import { SortOptions } from "@/types/models";
@@ -23,12 +22,6 @@ type SearchParams = Promise<{
 type Props = {
     searchParams: SearchParams;
 };
-
-export async function generateMetadata(): Promise<Metadata> {
-    const metadata = { title: "Collections" } as Metadata;
-
-    return metadata;
-}
 
 export default async function Collections({ searchParams }: Props) {
     const { minPrice, maxPrice, cat_ids, sortBy, sizes, colors } = (await searchParams) || {};
