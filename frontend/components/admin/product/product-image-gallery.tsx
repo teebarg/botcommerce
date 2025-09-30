@@ -118,39 +118,6 @@ export function ProductImageGallery() {
             ) : (
                 <div>
                     <div className="lg:hidden mb-4 sticky top-12 z-40 bg-content2 py-4 -px-2">
-                        {/* <div className="flex gap-2">
-                            <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 w-1/2">
-                                <div
-                                    className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}
-                                >
-                                    <Button size="iconOnly" onClick={() => setViewMode("grid")}>
-                                        <LayoutDashboard className="h-6 w-6" />
-                                    </Button>
-                                </div>
-                                <div
-                                    className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-content1")}
-                                >
-                                    <Button size="iconOnly" onClick={() => setViewMode("list")}>
-                                        <RectangleVertical className="h-6 w-6" />
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 w-1/2">
-                                <Button
-                                    className="w-full rounded-full"
-                                    size="lg"
-                                    variant={selectionMode ? "destructive" : "outline"}
-                                    onClick={() => {
-                                        setSelectionMode(!selectionMode);
-                                        if (selectionMode) {
-                                            setSelectedImages(new Set());
-                                        }
-                                    }}
-                                >
-                                    {selectionMode ? "Cancel Bulk" : "Select Bulk"}
-                                </Button>
-                            </div>
-                        </div> */}
                         <MobileFilterControl setViewMode={setViewMode} viewMode={viewMode} />
                         <Button
                             className="rounded-full ml-3 -mt-8"
