@@ -38,7 +38,7 @@ const ProductActions: React.FC<{
                 className="w-full !h-11"
                 disabled={loading || !selectedVariant || outOfStock}
                 size="sm"
-                variant="default"
+                variant="indigo"
                 onClick={handleAddToCartAndTrack}
             >
                 {loading ? (

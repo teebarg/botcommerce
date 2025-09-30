@@ -9,11 +9,12 @@ import { useSession } from "next-auth/react";
 import CustomerForm from "./customer-form";
 
 import { User } from "@/schemas";
-import { useDeleteUser } from "@/lib/hooks/useUser";
+import { useDeleteUser, useInvalidateMe } from "@/lib/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useInvalidateCart } from "@/lib/hooks/useCart";
 
 interface CustomerActionsProps {
     user: User;
@@ -24,6 +25,8 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const { data: session, update } = useSession();
+    const invalidateMe = useInvalidateMe();
+    const invalidateCart = useInvalidateCart();
 
     const onDelete = () => {
         mutate(user.id);
@@ -31,6 +34,8 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
 
     const handleUpdateName = async () => {
         await update({ impersonatedBy: session?.user?.email!, email: user.email, impersonated: true, mode: "impersonate" });
+        invalidateMe();
+        invalidateCart();
         toast.success("Exited impersonation");
         window.location.reload();
     };

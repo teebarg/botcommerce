@@ -86,7 +86,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
                         <span className="text-sm">You can find frequently asked questions and answers on our customer service page.</span>
                     </div>
                     <div>
-                        <LocalizedClientLink className="text-indigo-600" href="/customer-service">
+                        <LocalizedClientLink className="text-indigo-400" href="/customer-service">
                             Customer Service
                         </LocalizedClientLink>
                     </div>

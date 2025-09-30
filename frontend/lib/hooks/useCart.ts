@@ -167,3 +167,13 @@ export const useCompleteCart = () => {
         },
     });
 };
+
+export const useInvalidateCart = () => {
+    const queryClient = useQueryClient();
+
+    const invalidate = () => {
+        queryClient.removeQueries({ queryKey: ["cart"] });
+    };
+
+    return invalidate;
+};
