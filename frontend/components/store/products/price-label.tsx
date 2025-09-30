@@ -40,7 +40,7 @@ export const PriceLabel: React.FC<PriceLabelProps> = ({
         if (hasDiscount) {
             return (
                 <div className={cn("text-xl font-bold", className, priceClassName)}>
-                    From <span className="font-semibold">{currency(minPrice)}</span>
+                    <span className="text-sm">From</span> <span className="font-semibold">{currency(minPrice)}</span>
                 </div>
             );
         }
@@ -52,11 +52,11 @@ export const PriceLabel: React.FC<PriceLabelProps> = ({
         <div className={cn("text-xl font-bold", className, priceClassName)}>
             {hasDiscount ? (
                 <span>
-                    From {currency(minPrice)} to {currency(maxPrice)}
+                    <span className="text-sm">From</span> {currency(minPrice)} <span className="text-sm">to</span> {currency(maxPrice)}
                 </span>
             ) : (
                 <span>
-                    From {currency(minPrice)} to {currency(maxPrice)}
+                    <span className="text-sm">From</span> {currency(minPrice)} <span className="text-sm">to</span> {currency(maxPrice)}
                 </span>
             )}
         </div>

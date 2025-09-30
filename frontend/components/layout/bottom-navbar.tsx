@@ -35,17 +35,19 @@ const ButtonNav = async ({ className }: { className?: string }) => {
     return (
         <nav
             className={cn(
-                "flex md:hidden z-40 w-full items-center justify-between fixed bottom-0 inset-x-0 py-4 px-8 bg-background shadow-xl",
+                "flex md:hidden z-40 w-full items-center justify-between fixed bottom-0 inset-x-0 py-4 px-8 bg-background shadow-xl text-xs",
                 className
             )}
         >
             {nav.map((item: NavLink, idx: number) => (
-                <LocalizedClientLink key={idx} active="text-accent" className={cn("flex flex-col items-center")} href={item.href}>
-                    {item.icon}
+                <div key={idx} className="flex flex-col items-center text-xs">
+                    <LocalizedClientLink active="bg-indigo-500 text-white rounded-xl" className={cn("p-1.5")} href={item.href}>
+                        {item.icon}
+                    </LocalizedClientLink>
                     {item.label}
-                </LocalizedClientLink>
+                </div>
             ))}
-            <span className="flex flex-col items-center">
+            <span className="flex flex-col items-center gap-1.5 text-xs">
                 <CartComponent />
                 Cart
             </span>

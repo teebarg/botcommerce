@@ -6,50 +6,50 @@ const sizes = [
     {
         id: 1,
         size: "8",
-        color: "bg-gradient-to-br from-campaign-primary/20 to-campaign-primary/5",
-        textColor: "text-campaign-primary",
+        color: "bg-gradient-to-br from-indigo-500/20 to-indigo-500/5",
+        textColor: "text-indigo-500",
     },
     {
         id: 2,
         size: "10",
-        color: "bg-gradient-to-br from-primary/20 to-primary/5",
-        textColor: "text-primary",
+        color: "bg-gradient-to-br from-blue-500/30 to-blue-500/10",
+        textColor: "text-blue-500",
     },
     {
         id: 3,
         size: "12",
-        color: "bg-gradient-to-br from-campaign-primary/20 to-campaign-primary/5",
-        textColor: "text-campaign-primary",
+        color: "bg-gradient-to-br from-green-500/30 to-green-500/10",
+        textColor: "text-green-500",
     },
     {
         id: 4,
         size: "14",
-        color: "bg-gradient-to-br from-accent/20 to-accent/5",
-        textColor: "text-accent-foreground",
+        color: "bg-gradient-to-br from-yellow-500/50 to-yellow-500/20",
+        textColor: "text-yellow-500",
     },
     {
         id: 5,
         size: "16",
-        color: "bg-gradient-to-br from-primary/20 to-primary/5",
-        textColor: "text-primary",
+        color: "bg-gradient-to-br from-orange-500/50 to-orange-500/20",
+        textColor: "text-orange-500",
     },
     {
         id: 6,
         size: "18",
-        color: "bg-gradient-to-br from-secondary/20 to-secondary/5",
-        textColor: "text-secondary-foreground",
+        color: "bg-gradient-to-br from-pink-500/10 to-pink-500/5",
+        textColor: "text-pink-500",
     },
     {
         id: 7,
         size: "20",
-        color: "bg-gradient-to-br from-accent/20 to-accent/5",
-        textColor: "text-accent-foreground",
+        color: "bg-gradient-to-br from-indigo-500/20 to-indigo-500/10",
+        textColor: "text-indigo-500",
     },
     {
         id: 8,
         size: "22",
-        color: "bg-gradient-to-br from-muted/40 to-muted/10",
-        textColor: "text-muted-foreground",
+        color: "bg-gradient-to-br from-indigo-500/10 to-indigo-500/5",
+        textColor: "text-indigo-500",
     },
 ];
 
@@ -60,7 +60,7 @@ const SizesGrid = () => {
         <section className="py-16 bg-secondary/30 px-4 md:px-2">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="text-4xl font-bold mb-4">Shop by Size</h2>
+                    <h2 className="text-4xl font-bold mb-3">Shop by Size</h2>
                     <p className="text-muted-foreground max-w-2xl mx-auto text-lg">Find your perfect fit with our size-specific collections</p>
                 </div>
 

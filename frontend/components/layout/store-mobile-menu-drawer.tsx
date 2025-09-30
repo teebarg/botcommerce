@@ -20,7 +20,7 @@ const StoreMenuComp: React.FC = () => {
     return (
         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
             <DrawerTrigger>
-                <span className="flex flex-col items-center">
+                <span className="flex flex-col items-center gap-1.5 text-xs">
                     <MenuIcon className="h-8 w-8" />
                     Menu
                 </span>

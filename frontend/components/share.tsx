@@ -27,7 +27,6 @@ export default function ShareButton() {
                     url: window.location.href,
                 });
             } catch (error: any) {
-                // User cancelled or error occurred
                 if (error.name !== "AbortError") {
                     toast.error("Share Failed", {
                         description: "Unable to share via native sharing.",
@@ -63,7 +62,7 @@ export default function ShareButton() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="secondary">
+                <Button variant="destructive">
                     <Share2 className="h-4 w-4 mr-1" />
                     Share
                 </Button>

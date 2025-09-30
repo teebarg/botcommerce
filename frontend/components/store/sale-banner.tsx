@@ -40,10 +40,12 @@ const SaleBanner: React.FC = () => {
                                     70% Off
                                 </span>
                             </h2>
-                            <p className="text-white/80 mt-2 font-light text-base sm:text-lg">Premium products at unbeatable prices</p>
+                            <p className="text-white/80 mt-2 font-light text-base sm:text-lg hidden lg:block">
+                                Premium products at unbeatable prices
+                            </p>
                         </div>
 
-                        <div className="flex items-center gap-2 justify-center sm:justify-start">
+                        <div className="hidden lg:flex items-center gap-2 justify-center sm:justify-start">
                             <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
                             <span className="text-white/70 text-sm font-medium">Limited time offer</span>
                         </div>
