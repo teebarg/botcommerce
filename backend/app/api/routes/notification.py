@@ -29,11 +29,13 @@ router = APIRouter()
 
 @router.post("/push-event")
 async def create_push_event(data: PushEventSchema):
+    logger.error(data)
     await redis_client.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
     return Message(message="success")
 
 
 @router.post("/push-fcm")
 async def push_fcm(data: FCMIn):
+    logger.error(data)
     await redis_client.xadd("FCM", jsonable_encoder(data, exclude_none=True))
     return {"message": "success"}
