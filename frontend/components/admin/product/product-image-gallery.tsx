@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useEffect, useRef } from "react";
+import { LayoutDashboard, RectangleVertical } from "lucide-react";
 
 import { GalleryCard } from "./product-gallery-card";
 import { ProductBulkActions } from "./gallery-bulk-action";
@@ -14,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useWebSocket } from "@/providers/websocket";
 import { GalleryImageItem } from "@/schemas";
-import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
 
 export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -106,7 +106,7 @@ export function ProductImageGallery() {
                 <h3 className="text-lg font-semibold">Image Gallery</h3>
                 <p className="text-sm text-default-500">Manage your product images.</p>
             </div>
-            <div className="mb-4 max-w-xl flex gap-2">
+            <div className="mb-8 max-w-xl flex gap-2">
                 <GalleryImagesUpload />
                 <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
                     Re-index
@@ -117,21 +117,34 @@ export function ProductImageGallery() {
                 <ComponentLoader />
             ) : (
                 <div>
-                    <div className="lg:hidden mb-4 sticky top-12 z-40 bg-content2 py-4 -px-2">
-                        <MobileFilterControl setViewMode={setViewMode} viewMode={viewMode} />
-                        <Button
-                            className="rounded-full ml-3 -mt-8"
-                            size="lg"
-                            variant={selectionMode ? "destructive" : "indigo"}
-                            onClick={() => {
-                                setSelectionMode(!selectionMode);
-                                if (selectionMode) {
-                                    setSelectedImages(new Set());
-                                }
-                            }}
-                        >
-                            {selectionMode ? "Cancel Bulk" : "Select Bulk"}
-                        </Button>
+                    <div className="lg:hidden mb-4 sticky top-16 z-40 bg-content2 -mx-4 px-4 py-4 flex gap-2">
+                        <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 w-1/2">
+                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}>
+                                <Button size="iconOnly" onClick={() => setViewMode("grid")}>
+                                    <LayoutDashboard className="h-6 w-6" />
+                                </Button>
+                            </div>
+                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-content1")}>
+                                <Button size="iconOnly" onClick={() => setViewMode("list")}>
+                                    <RectangleVertical className="h-6 w-6" />
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 w-1/2">
+                            <Button
+                                className="w-full rounded-full"
+                                size="lg"
+                                variant={selectionMode ? "destructive" : "indigo"}
+                                onClick={() => {
+                                    setSelectionMode(!selectionMode);
+                                    if (selectionMode) {
+                                        setSelectedImages(new Set());
+                                    }
+                                }}
+                            >
+                                {selectionMode ? "Cancel Bulk" : "Select Bulk"}
+                            </Button>
+                        </div>
                     </div>
                     <div
                         className={cn(
