@@ -82,7 +82,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1">
                         {image.product?.variants?.map((item: ProductVariant, idx: number) => (
                             <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="emerald">
-                                Uk Size: {item.size}
+                                UK: {item.size}
                             </Badge>
                         ))}
                     </div>

@@ -59,7 +59,7 @@ export const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {
         },
         ["SHIPPED"]: {
             icon: <Package className="mr-1" size={14} />,
-            label: "Shipped",
+            label: "Order Packed",
             variant: "secondary",
         },
         ["OUT_FOR_DELIVERY"]: {

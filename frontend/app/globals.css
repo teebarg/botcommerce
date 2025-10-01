@@ -218,6 +218,8 @@
 }
 
 :root {
+    --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
     /* --background: #f8fafc; */
     --foreground: #0f172a;
 
@@ -479,7 +481,7 @@
         height: env(safe-area-inset-top);
         height: constant(safe-area-inset-top);
         background: black;
-    }
+    } 
 }
 
 /* Thin scrollbar for WebKit */
