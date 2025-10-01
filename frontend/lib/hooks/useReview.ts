@@ -11,13 +11,6 @@ export const useReviews = (params: { product_id?: number; skip?: number; limit?:
     });
 };
 
-export const useReview = (id: number) => {
-    return useQuery({
-        queryKey: ["reviews", id],
-        queryFn: async () => await api.get<Review>(`/reviews/${id}`),
-    });
-};
-
 export const useCreateReview = () => {
     const queryClient = useQueryClient();
 

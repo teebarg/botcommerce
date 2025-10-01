@@ -31,12 +31,6 @@ class OrderBase(BaseModel):
     total: float
     notes: Optional[str] = None
 
-class OrderUpdate(BaseModel):
-    status: Optional[OrderStatus] = None
-    notes: Optional[str] = None
-    shipping_address_id: Optional[int] = None
-    billing_address_id: Optional[int] = None
-
 class OrderResponse(OrderBase):
     id: int
     order_number: str

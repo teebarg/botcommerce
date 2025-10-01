@@ -5,7 +5,7 @@ from fastapi import (
     HTTPException,
 )
 
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, get_current_superuser
 from app.models.brand import (
     BrandCreate,
     BrandUpdate,
@@ -34,7 +34,7 @@ async def index(query: str = "") -> Optional[list[Brand]]:
     return await db.brand.find_many(where=where_clause, order={"created_at": "desc"})
 
 
-@router.post("/")
+@router.post("/", dependencies=[Depends(get_current_superuser)])
 async def create(*, create_data: BrandCreate) -> Brand:
     """
     Create new brand.
@@ -49,20 +49,6 @@ async def create(*, create_data: BrandCreate) -> Brand:
         return brand
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/{id}")
-async def read(id: int):
-    """
-    Get a specific brand by id.
-    """
-    brand = await db.brand.find_unique(
-        where={"id": id}
-    )
-    if not brand:
-        raise HTTPException(status_code=404, detail="Brand not found")
-
-    return brand
 
 
 @router.get("/{slug}")

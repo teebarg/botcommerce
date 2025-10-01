@@ -74,7 +74,7 @@ async def update_user_me(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.get("/")
+@router.get("/", dependencies=[Depends(get_current_superuser)])
 async def index(
     query: str = "",
     role: Optional[Role] = None,

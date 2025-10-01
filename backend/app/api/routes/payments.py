@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize
 from app.models.order import OrderCreate, OrderResponse
-from app.core.deps import CurrentUser, Notification, get_current_user
+from app.core.deps import CurrentUser, Notification, get_current_user, get_current_superuser
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -158,7 +158,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
     return payment
 
 
-@router.patch("/{id}/status", response_model=OrderResponse)
+@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
 async def payment_status(id: int, status: PaymentStatus):
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id})

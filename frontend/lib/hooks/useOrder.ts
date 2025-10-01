@@ -6,7 +6,7 @@ import { api } from "@/apis/client";
 import { Order, OrderStatus, PaginatedOrder, PaymentStatus } from "@/schemas";
 
 interface OrderSearchParams {
-    query?: string;
+    order_number?: string;
     status?: string;
     skip?: number;
     take?: number;

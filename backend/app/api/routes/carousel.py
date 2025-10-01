@@ -38,14 +38,6 @@ async def get_active_banners() -> list[CarouselBanner]:
         order={"order": "asc"}
     )
 
-@router.get("/{id}")
-async def get_banner(id: int) -> CarouselBanner:
-    """Get a specific carousel banner by ID"""
-    banner = await db.carouselbanner.find_unique(where={"id": id})
-    if not banner:
-        raise HTTPException(status_code=404, detail="Banner not found")
-    return banner
-
 @router.post("/", dependencies=[Depends(get_current_superuser)])
 async def create_banner(banner: CarouselBannerCreate) -> CarouselBanner:
     """Create a new carousel banner"""
@@ -77,7 +69,6 @@ async def delete_banner(id: int) -> Message:
         if not banner:
             raise HTTPException(status_code=404, detail="Banner not found")
 
-        # Extract file path from URL
         if banner.image:
             file_path = banner.image.split("/storage/v1/object/public/images/")[1]
             delete_image(bucket="images", file_path=file_path)

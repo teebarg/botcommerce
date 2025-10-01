@@ -92,7 +92,7 @@ async def list_orders(
     skip: int = 0,
     take: int = 20,
     status: Optional[str] = None,
-    search: Optional[str] = None,
+    order_number: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
@@ -107,8 +107,8 @@ async def list_orders(
         where["status"] = status
     if customer_id:
         where["user_id"] = customer_id
-    if search:
-        where["order_number"] = search
+    if order_number:
+        where["order_number"] = order_number
     if user_role == "CUSTOMER":
         where["user_id"] = user_id
     if start_date:
@@ -367,8 +367,12 @@ async def send_payment_receipt(order_id: int, notification: Notification):
 
 async def process_order_payment(order_id: int, notification: Notification):
     await create_invoice(order_id)
-    await decrement_variant_inventory_for_order(order_id, notification)
     await send_payment_receipt(order_id, notification)
+    try:
+        await decrement_variant_inventory_for_order(order_id, notification)
+    except Exception as e:
+        logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
+    
 
 async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> OrderResponse:
     """

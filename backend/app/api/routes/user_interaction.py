@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Query, Body, Request
+from fastapi import APIRouter, Query, Body, Request, Depends
 from typing import List, Optional
 from app.schemas.user_interaction import UserInteractionCreate, UserInteractionResponse
 from app.services.user_interaction import log_user_interaction
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_list
+from app.core.deps import get_current_user
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-@router.post("/batch")
+@router.post("/batch", dependencies=[Depends(get_current_user)])
 async def batch_user_interactions(payload: List[UserInteractionCreate] = Body(...)):
     for item in payload:
         await log_user_interaction(

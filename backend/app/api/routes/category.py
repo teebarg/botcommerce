@@ -43,7 +43,7 @@ async def index(
         order={"display_order": "asc"},
     )
 
-@router.post("/")
+@router.post("/", dependencies=[Depends(get_current_superuser)])
 async def create(*, data: CategoryCreate) -> Category:
     """
     Create new category.
@@ -65,7 +65,7 @@ class CategoryOrderUpdate(BaseModel):
 class BulkOrderUpdate(BaseModel):
     categories: list[CategoryOrderUpdate]
 
-@router.patch("/reorder")
+@router.patch("/reorder", dependencies=[Depends(get_current_superuser)])
 async def reorder_categories(order_data: BulkOrderUpdate):
     """Update display order for categories"""
     async with db.tx() as tx:
@@ -112,7 +112,7 @@ async def update(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
 async def delete(id: int) -> Message:
     """
     Delete a category.
@@ -134,7 +134,7 @@ async def delete(id: int) -> Message:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}/image")
+@router.patch("/{id}/image", dependencies=[Depends(get_current_superuser)])
 async def add_image(id: int, image_data: ImageUpload) -> Category:
     """
     Add an image to a category.

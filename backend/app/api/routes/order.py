@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, B
 from app.core.deps import CurrentUser, get_current_superuser
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderUpdate, OrderCreate, Orders
+from app.models.order import OrderResponse, OrderCreate, Orders
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders, return_order_item
 from app.services.redis import cache_response, invalidate_key, invalidate_pattern
@@ -46,7 +46,7 @@ async def get_orders(
     take: int = Query(default=20, ge=1, le=100),
     status: Optional[OrderStatus] = None,
     sort: Optional[str] = "desc",
-    search: Optional[str] = None,
+    order_number: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
@@ -56,7 +56,7 @@ async def get_orders(
         skip=skip,
         take=take,
         status=status,
-        search=search,
+        order_number=order_number,
         start_date=start_date,
         end_date=end_date,
         customer_id=customer_id,
@@ -64,34 +64,7 @@ async def get_orders(
         sort=sort
     )
 
-@router.put("/orders/{order_id}", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
-async def update_order( order_id: int, order_update: OrderUpdate):
-    """
-    Update a order.
-    """
-    order = await db.order.find_unique(where={"id": order_id})
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-
-    update_data = {}
-    if order_update.status:
-        update_data["status"] = order_update.status
-    if order_update.payment_status:
-        update_data["payment_status"] = order_update.payment_status
-    if order_update.shipping_method:
-        update_data["shipping_method"] = order_update.shipping_method
-    if order_update.shipping_fee is not None:
-        update_data["shipping_fee"] = order_update.shipping_fee
-
-    updated_order = await db.order.update(
-        where={"id": order_id},
-        data=update_data,
-    )
-    await invalidate_pattern("orders")
-    await invalidate_key(f"order:{order_id}")
-    return updated_order
-
-@router.delete("/{order_id}")
+@router.delete("/{order_id}", dependencies=[Depends(get_current_superuser)])
 async def delete_order(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
@@ -103,7 +76,7 @@ async def delete_order(order_id: int):
     return {"message": "Order deleted successfully"}
 
 
-@router.patch("/{id}/status", response_model=OrderResponse)
+@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
 async def order_status(id: int, status: OrderStatus):
     """Change order status"""
     order = await db.order.find_unique(where={"id": id})
@@ -132,25 +105,6 @@ async def order_status(id: int, status: OrderStatus):
         await invalidate_key(f"order-timeline:{id}")
         return updated_order
 
-@router.post("/{order_id}/fulfill", response_model=OrderResponse)
-async def fulfill_order(order_id: int):
-    """Mark an order as fulfilled"""
-    order = await db.order.find_unique(where={"id": order_id})
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-
-    if order.status != OrderStatus.PROCESSING:
-        raise HTTPException(status_code=400, detail="Order must be in processing status")
-
-    updated_order = await db.order.update(
-        where={"id": order_id},
-        data={"status": OrderStatus.FULFILLED}
-    )
-    await invalidate_pattern("orders")
-    await invalidate_key(f"order:{order_id}")
-    await invalidate_key(f"order-timeline:{order_id}")
-    return updated_order
-
 class OrderNotesUpdate(BaseModel):
     notes: str
 
@@ -168,7 +122,7 @@ async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user
     return updated_order
 
 
-@router.get("/{order_id}/timeline", response_model=list[OrderTimelineEntry])
+@router.get("/{order_id}/timeline", dependencies=[Depends(get_current_superuser)], response_model=list[OrderTimelineEntry])
 async def get_order_timeline(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:

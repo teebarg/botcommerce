@@ -5,7 +5,7 @@ from fastapi import (
     Request
 )
 
-from app.core.deps import get_current_user
+from app.core.deps import get_current_superuser
 from app.models.collection import (
     CollectionCreate,
     Collection,
@@ -37,7 +37,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Collection]]
     return await db.collection.find_many(where=where_clause, order={"created_at": "desc"})
 
 
-@router.post("/")
+@router.post("/", dependencies=[Depends(get_current_superuser)])
 async def create(*, create_data: CollectionCreate) -> Collection:
     """
     Create new collection.
@@ -70,7 +70,7 @@ async def get_by_slug(request: Request, slug: str) -> Collection:
     return collection
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_user)])
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update(
     *,
     id: int,
@@ -97,7 +97,7 @@ async def update(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
 async def delete(id: int) -> Message:
     """
     Delete a collection.

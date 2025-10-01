@@ -1,23 +1,25 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 
 from app.prisma_client import prisma as db
 from prisma.models import FAQ
 from pydantic import BaseModel
 from typing import Optional, List
+from app.core.deps import get_current_superuser
 
 router = APIRouter()
 
-class FAQCreate(BaseModel):
+class FAQBase(BaseModel):
+    category: Optional[str] = None
+
+class FAQCreate(FAQBase):
     question: str
     answer: str
-    category: Optional[str] = None
     is_active: bool = True
 
 
-class FAQUpdate(BaseModel):
+class FAQUpdate(FAQBase):
     question: Optional[str] = None
     answer: Optional[str] = None
-    category: Optional[str] = None
     is_active: Optional[bool] = None
 
 
@@ -40,16 +42,7 @@ async def list_faqs(
     return faqs
 
 
-@router.get("/{id}", response_model=FAQ)
-async def get_faq(id: int):
-    """Get a specific FAQ entry by ID"""
-    faq = await db.faq.find_unique(where={"id": id})
-    if not faq:
-        raise HTTPException(status_code=404, detail="FAQ not found")
-    return faq
-
-
-@router.post("/", response_model=FAQ)
+@router.post("/", dependencies=[Depends(get_current_superuser)], response_model=FAQ)
 async def create_faq(faq: FAQCreate):
     """Create a new FAQ entry"""
     try:
@@ -68,7 +61,7 @@ async def create_faq(faq: FAQCreate):
         raise
 
 
-@router.patch("/{id}", response_model=FAQ)
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)], response_model=FAQ)
 async def update_faq(faq_update: FAQUpdate, id: int):
     """Update a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
@@ -97,7 +90,7 @@ async def update_faq(faq_update: FAQUpdate, id: int):
         raise
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
 async def delete_faq(id: int):
     """Delete a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})

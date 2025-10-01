@@ -44,7 +44,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             color: "bg-primary/20 text-primary",
             label: "Processing",
             nextStatus: "SHIPPED" as const,
-            actionLabel: "Mark Shipped",
+            actionLabel: "Order Packed",
             variant: "secondary",
         },
         SHIPPED: {

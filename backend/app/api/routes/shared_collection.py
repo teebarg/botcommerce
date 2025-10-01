@@ -240,7 +240,7 @@ async def track_shared_collection_visit(
         "is_new_visit": is_new_visit,
     }
 
-@router.post("/")
+@router.post("/", dependencies=[Depends(get_current_superuser)])
 async def create_shared_collection(data: SharedCollectionCreate):
     create_data = data.model_dump(exclude_unset=True)
 
@@ -253,7 +253,7 @@ async def create_shared_collection(data: SharedCollectionCreate):
     await invalidate_catalog()
     return res
 
-@router.patch("/{id}")
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update_shared_collection(id: int, data: SharedCollectionUpdate):
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
@@ -269,7 +269,7 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate):
 
     return res
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
 async def delete_shared_collection(id: int) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:

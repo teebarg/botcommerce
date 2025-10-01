@@ -101,7 +101,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                 {[
                     { status: "PENDING", label: "PENDING", color: "bg-warning" },
                     { status: "PROCESSING", label: "PROCESSING", color: "bg-primary" },
-                    { status: "SHIPPED", label: "SHIPPED", color: "bg-blue-500" },
+                    { status: "SHIPPED", label: "PACKED", color: "bg-blue-500" },
                     { status: "DELIVERED", label: "DELIVERED", color: "bg-green-500" },
                     { status: "REFUNDED", label: "REFUNDED", color: "bg-gray-100" },
                 ].map((item: { status: string; label: string; color: string }, idx: number) => (

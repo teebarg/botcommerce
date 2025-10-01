@@ -87,21 +87,6 @@ async def index(
         }
     }
 
-
-
-@router.get("/{id}")
-async def read(id: int) -> Review:
-    """
-    Get a specific review by id with Redis caching.
-    """
-    review = await db.review.find_unique(
-        where={"id": id}
-    )
-    if not review:
-        raise HTTPException(status_code=404, detail="Review not found")
-
-    return review
-
 @router.post("/")
 async def create(review: ReviewCreate, user: CurrentUser, background_tasks: BackgroundTasks) -> Review:
     existing_review = await db.review.find_first(

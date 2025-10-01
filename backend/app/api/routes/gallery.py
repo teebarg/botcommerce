@@ -6,7 +6,8 @@ from fastapi import (
     HTTPException,
     Query,
     BackgroundTasks,
-    Request
+    Request,
+    Depends
 )
 from app.core.logging import get_logger
 from app.core.utils import slugify, generate_sku
@@ -25,6 +26,7 @@ from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
 from app.models.product import ProductImage
+from app.core.deps import get_current_superuser
 
 logger = get_logger(__name__)
 
@@ -128,56 +130,6 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
 router = APIRouter()
 
 
-# @router.get("/gallery")
-# @cache_response("gallery")
-# async def image_gallery(
-#     request: Request,
-#     skip: int = Query(default=0, ge=0),
-#     limit: int = Query(default=10, le=100),
-# ):
-#     """
-#     Lightweight gallery endpoint.
-#     Only returns product images and basic product info.
-#     Relations (categories, collections, variants, shared_collections)
-#     should be fetched on-demand in a detail endpoint.
-#     """
-#     try:
-#         # ✅ raw SQL for optimized SELECT
-#         query = """
-#         SELECT pi.id, pi.image, pi.product_id,
-#                 p.name AS product_name,
-#                 p.slug AS product_slug
-#         FROM "product_images" pi
-#         LEFT JOIN "products" p ON p.id = pi.product_id
-#         WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
-#         ORDER BY pi.id DESC
-#         OFFSET $1 LIMIT $2
-#         """
-
-#         total_query = """
-#         SELECT COUNT(*)::int AS count
-#         FROM "product_images" pi
-#         LEFT JOIN "products" p ON p.id = pi.product_id
-#         WHERE (COALESCE(pi."order", 0) = 0 OR pi.product_id IS NULL)
-#         """
-
-#         async with database.pool.acquire() as conn:
-#             images = await conn.fetch(query, skip, limit)
-#             total = await conn.fetch(total_query)
-
-
-#         return {
-#             "images": [dict(record) for record in images],  # convert asyncpg.Record → dict
-#             "skip": skip,
-#             "limit": limit,
-#             "total_pages": ceil(total[0]["count"] / limit) if limit else 1,
-#             "total_count": total[0]["count"],
-#         }
-
-#     except Exception as e:
-#         logger.error(e)
-#         raise HTTPException(status_code=500, detail=str(e))
-
 @router.get("/")
 @cache_response("gallery")
 async def image_gallery(
@@ -221,7 +173,7 @@ async def image_gallery(
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/reindex", response_model=Message)
+@router.post("/reindex", dependencies=[Depends(get_current_superuser)], response_model=Message)
 async def reindex_images(background_tasks: BackgroundTasks):
     """
     Re-index all images in the db to Meilisearch.
@@ -238,7 +190,7 @@ async def reindex_images(background_tasks: BackgroundTasks):
         )
 
 
-@router.delete("/{image_id}")
+@router.delete("/{image_id}", dependencies=[Depends(get_current_superuser)])
 async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks) -> Message:
     """
     Delete a gallery image.
@@ -277,7 +229,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
     return Message(message="Product and all related data deleted successfully")
 
 
-@router.post("/bulk-upload")
+@router.post("/bulk-upload", dependencies=[Depends(get_current_superuser)])
 async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: BackgroundTasks):
     """
     Save many image URLs into the gallery.
@@ -309,7 +261,7 @@ async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: 
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/bulk-delete")
+@router.post("/bulk-delete", dependencies=[Depends(get_current_superuser)])
 async def bulk_delete_gallery_images(
     payload: ImageBulkDelete,
     background_tasks: BackgroundTasks,
@@ -355,7 +307,7 @@ async def bulk_delete_gallery_images(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/{image_id}/metadata")
+@router.post("/{image_id}/metadata", dependencies=[Depends(get_current_superuser)])
 async def create_image_metadata(
     image_id: int,
     payload: ProductImageMetadata,
@@ -428,7 +380,7 @@ async def create_image_metadata(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/{image_id}/metadata")
+@router.patch("/{image_id}/metadata", dependencies=[Depends(get_current_superuser)])
 async def update_image_metadata(
     image_id: int,
     payload: ProductImageMetadata,
@@ -518,7 +470,7 @@ async def update_image_metadata(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/bulk-update")
+@router.patch("/bulk-update", dependencies=[Depends(get_current_superuser)])
 async def bulk_update_products(payload: ImagesBulkUpdate, background_tasks: BackgroundTasks):
     images = await db.productimage.find_many(
         where={"id": {"in": payload.image_ids}},

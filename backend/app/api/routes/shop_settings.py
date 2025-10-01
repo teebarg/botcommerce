@@ -1,10 +1,11 @@
 from typing import Any
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from app.prisma_client import prisma as db
 from prisma.models import ShopSettings
 from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
+from app.core.deps import get_current_superuser
 
 logger = get_logger(__name__)
 
@@ -34,7 +35,7 @@ async def get_public_settings(request: Request) -> dict[str, str]:
         raise HTTPException(status_code=400, detail=e.detail)
 
 
-@router.patch("/sync-shop-details")
+@router.patch("/sync-shop-details", dependencies=[Depends(get_current_superuser)])
 async def sync_shop_details(form_data: dict[str, Any]):
     """
     Sync shop details

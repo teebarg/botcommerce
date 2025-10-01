@@ -46,7 +46,7 @@ const orderStatusMap = {
     },
     SHIPPED: {
         icon: <Package className="h-5 w-5 text-white" />,
-        label: "Shipped",
+        label: "Order Packed",
         color: "bg-primary",
     },
     OUT_FOR_DELIVERY: {

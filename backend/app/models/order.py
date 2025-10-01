@@ -15,13 +15,6 @@ class OrderCreate(BaseModel):
     payment_status: Optional[PaymentStatus] = PaymentStatus.PENDING
     coupon_id: Optional[int] = None
 
-class OrderUpdate(BaseModel):
-    status: Optional[OrderStatus] = None
-    payment_status: Optional[PaymentStatus] = None
-    shipping_method: Optional[ShippingMethod] = None
-    shipping_fee: Optional[float] = None
-
-
 class OrderResponse(BaseModel):
     id: int
     email: Optional[EmailStr] = None
