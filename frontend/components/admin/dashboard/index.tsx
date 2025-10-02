@@ -41,7 +41,7 @@ const RecentOrdersList = () => {
     return (
         <div className="px-4 md:px-10 py-8">
             <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-medium">Recent Orders</h3>
+                <h3 className="text-lg font-medium font-outfit">Recent Orders</h3>
                 <Link prefetch className="text-sm font-medium text-primary hover:underline" href="/admin/orders">
                     View all
                 </Link>
