@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
-import ProductCard from "./products/product-card";
+import ProductCard from "@/components/store/products/product-card";
 
-import { cn } from "@/lib/utils";
 import { ProductSearch } from "@/schemas";
+import ComponentLoader from "@/components/component-loader";
+import { cn } from "@/lib/utils";
 
 interface ScrollState {
     atStart: boolean;
@@ -16,11 +17,12 @@ interface ScrollState {
 
 interface IconCollectionsProps {
     products: ProductSearch[];
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
+    isLoading?: boolean;
 }
 
-const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, description }) => {
+const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, description, isLoading = false }) => {
     const headingId = useId();
     const listRef = useRef<HTMLUListElement>(null);
     const [scrollState, setScrollState] = useState<ScrollState>({
@@ -105,11 +107,14 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
 
     return (
         <section aria-labelledby={headingId} aria-live="polite" className="relative overflow-hidden">
-            <div className="relative mx-auto flex max-w-[1400px] flex-col pb-16 pt-14">
+            <div className="relative mx-auto flex max-w-[1400px] flex-col pb-4 pt-2">
                 <header className="flex gap-6 sm:items-end justify-between">
                     <div>
-                        <p className="text-xs font-medium uppercase text-default-500">{title}</p>
-                        <h2 className="mt-1 font-display text-xl font-medium tracking-tight text-default-900 md:text-2xl" id={headingId}>
+                        <p className={cn("font-medium uppercase text-default-500 font-outfit", !title && "hidden")}>{title}</p>
+                        <h2
+                            className={cn("text-xl font-medium tracking-tight text-default-900 md:text-2xl", !description && "hidden")}
+                            id={headingId}
+                        >
                             {description}
                         </h2>
                     </div>
@@ -117,23 +122,18 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                         <div aria-label="Carousel controls" className="flex items-center gap-3" role="group">
                             <Button
                                 aria-label="Scroll collections backward"
-                                className={cn("h-12 w-12 rounded-full border bg-white hover:bg-white/90 text-gray-500")}
+                                className="h-12 w-12 rounded-full bg-white hover:bg-white/90 text-gray-500"
                                 disabled={scrollState.activeIndex <= 0}
                                 size="icon"
-                                type="button"
                                 onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
                             >
                                 <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
                             </Button>
                             <Button
                                 aria-label="Scroll collections forward"
-                                className={cn(
-                                    "relative h-12 w-12 rounded-full border border-neutral-300 bg-white text-neutral-500",
-                                    "hover:bg-neutral-100 hover:text-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
-                                )}
+                                className="h-12 w-12 rounded-full bg-white hover:bg-white/90 text-gray-500"
                                 disabled={scrollState.activeIndex >= products.length - 1}
                                 size="icon"
-                                type="button"
                                 onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
                             >
                                 <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
@@ -141,19 +141,18 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                         </div>
                     </div>
                 </header>
-
                 <div className="relative mt-10">
+                    {isLoading && <ComponentLoader className="h-[400px]" />}
                     <ul
                         ref={listRef}
                         aria-label="Products"
-                        className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-12 pr-8 sm:pr-0"
-                        style={{ scrollbarColor: "rgba(30,30,30,0.4) transparent" }}
+                        className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
                     >
                         {products.map((product: ProductSearch, idx: number) => (
                             <li
                                 key={idx}
                                 data-card
-                                className="group/card relative flex-shrink-0 basis-[85%] snap-start snap-always sm:basis-[25%] min-w-[280px]"
+                                className="group/card relative flex-shrink-0 basis-[85%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
                             >
                                 <ProductCard product={product} />
                             </li>

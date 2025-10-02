@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Viewport } from "next";
 
-import { Lexend, Outfit, Nunito_Sans } from "next/font/google";
+import { Outfit, Nunito_Sans, Lexend } from "next/font/google";
 import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -100,7 +100,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html suppressHydrationWarning className={cn("scroll-smooth antialiased", lexend.variable, outfit.className, nunitoSans.variable)} lang="en">
+        <html suppressHydrationWarning className={cn("scroll-smooth antialiased", outfit.variable, nunitoSans.variable, lexend.variable)} lang="en">
             <head>
                 <ThemeScript />
                 <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
