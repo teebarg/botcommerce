@@ -3,6 +3,7 @@
 import React from "react";
 
 import ProductsCarousel from "../product-carousel";
+
 import { useProductSearch } from "@/lib/hooks/useProduct";
 
 export default function NewArrivals() {
@@ -12,9 +13,9 @@ export default function NewArrivals() {
         <div className="bg-content2 py-8">
             <ProductsCarousel
                 description="Find the best thrifts for your kids"
+                isLoading={isLoading}
                 products={data?.products || []}
                 title="New Arrivals"
-                isLoading={isLoading}
             />
         </div>
     );

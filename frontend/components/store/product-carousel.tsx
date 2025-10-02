@@ -2,9 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-
 import ProductCard from "@/components/store/products/product-card";
-
 import { ProductSearch } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
@@ -143,11 +141,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                 </header>
                 <div className="relative mt-10">
                     {isLoading && <ComponentLoader className="h-[400px]" />}
-                    <ul
-                        ref={listRef}
-                        aria-label="Products"
-                        className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
-                    >
+                    <ul ref={listRef} aria-label="Products" className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
                         {products.map((product: ProductSearch, idx: number) => (
                             <li
                                 key={idx}

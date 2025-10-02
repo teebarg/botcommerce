@@ -19,7 +19,7 @@ export default function Featured() {
                 </div>
                 <p className="text-xl text-default-600">Handpicked selections from our premium collection</p>
             </div>
-            <ProductsCarousel products={data?.products || []} isLoading={isLoading} />
+            <ProductsCarousel isLoading={isLoading} products={data?.products || []} />
             <div className="text-center">
                 <LocalizedClientLink
                     className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg hover:from-yellow-500 hover:to-orange-600 transition-all duration-300 transform hover:scale-105"
