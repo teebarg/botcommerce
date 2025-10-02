@@ -105,7 +105,7 @@ class RedisStreamConsumer:
                     self.stream,
                     self.group,
                     self.consumer,
-                    60000,
+                    600000,
                     "0-0",
                     count=10
                 )

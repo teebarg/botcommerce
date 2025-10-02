@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { Button } from "../ui/button";
+
+import ProductCard from "./products/product-card";
+
 import { cn } from "@/lib/utils";
 import { ProductSearch } from "@/schemas";
-import ProductCard from "./products/product-card";
 
 interface ScrollState {
     atStart: boolean;
@@ -27,6 +31,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
 
     const updateScrollState = useCallback(() => {
         const node = listRef.current;
+
         if (!node) return;
 
         const { scrollLeft, scrollWidth, clientWidth } = node;
@@ -43,6 +48,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
             items.forEach((item, index) => {
                 const itemCenter = item.offsetLeft + item.offsetWidth / 2;
                 const distance = Math.abs(itemCenter - viewportCenter);
+
                 if (distance < closestDistance) {
                     closestDistance = distance;
                     activeIndex = index;
@@ -59,11 +65,13 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
 
     useEffect(() => {
         const node = listRef.current;
+
         if (!node) return;
 
         updateScrollState();
 
         const onScroll = () => updateScrollState();
+
         node.addEventListener("scroll", onScroll, { passive: true });
         window.addEventListener("resize", updateScrollState);
 
@@ -76,13 +84,16 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
     const scrollToIndex = useCallback(
         (targetIndex: number) => {
             const node = listRef.current;
+
             if (!node) return;
 
             const items = node.querySelectorAll<HTMLElement>("li[data-card]");
+
             if (items.length === 0) return;
 
             const clampedIndex = Math.min(Math.max(targetIndex, 0), items.length - 1);
             const item = items[clampedIndex];
+
             if (!item) return;
 
             item.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
@@ -93,43 +104,40 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
     );
 
     return (
-        <section aria-live="polite" aria-labelledby={headingId} className="relative overflow-hidden">
+        <section aria-labelledby={headingId} aria-live="polite" className="relative overflow-hidden">
             <div className="relative mx-auto flex max-w-[1400px] flex-col pb-16 pt-14">
                 <header className="flex gap-6 sm:items-end justify-between">
                     <div>
-                        <p className="text-xs font-medium uppercase tracking-[0.48em] text-default-500">{title}</p>
-                        <h2 id={headingId} className="mt-1 font-display text-xl font-medium tracking-tight text-default-900 md:text-2xl">
+                        <p className="text-xs font-medium uppercase text-default-500">{title}</p>
+                        <h2 className="mt-1 font-display text-xl font-medium tracking-tight text-default-900 md:text-2xl" id={headingId}>
                             {description}
                         </h2>
                     </div>
                     <div>
-                        <div role="group" aria-label="Carousel controls" className="flex items-center gap-3">
-                            <button
+                        <div aria-label="Carousel controls" className="flex items-center gap-3" role="group">
+                            <Button
+                                aria-label="Scroll collections backward"
+                                className={cn("h-12 w-12 rounded-full border bg-white hover:bg-white/90 text-gray-500")}
+                                disabled={scrollState.activeIndex <= 0}
+                                size="icon"
                                 type="button"
                                 onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
-                                disabled={scrollState.activeIndex <= 0}
-                                aria-label="Scroll collections backward"
-                                className={cn(
-                                    "relative flex h-12 w-12 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-500 transition duration-300 ease-out",
-                                    "hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2",
-                                    "disabled:cursor-not-allowed disabled:opacity-40"
-                                )}
                             >
-                                <ChevronLeft strokeWidth={1.5} className="h-5 w-5" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
-                                disabled={scrollState.activeIndex >= products.length - 1}
+                                <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
+                            </Button>
+                            <Button
                                 aria-label="Scroll collections forward"
                                 className={cn(
-                                    "relative flex h-12 w-12 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-500 transition duration-300 ease-out",
-                                    "hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2",
-                                    "disabled:cursor-not-allowed disabled:opacity-40"
+                                    "relative h-12 w-12 rounded-full border border-neutral-300 bg-white text-neutral-500",
+                                    "hover:bg-neutral-100 hover:text-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
                                 )}
+                                disabled={scrollState.activeIndex >= products.length - 1}
+                                size="icon"
+                                type="button"
+                                onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
                             >
-                                <ChevronRight strokeWidth={1.5} className="h-5 w-5" />
-                            </button>
+                                <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
+                            </Button>
                         </div>
                     </div>
                 </header>

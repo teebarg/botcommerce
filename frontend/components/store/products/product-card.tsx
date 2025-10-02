@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+
 import ProductActions from "./product-actions";
 
 import { useProductVariant } from "@/lib/hooks/useProductVariant";

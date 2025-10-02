@@ -481,7 +481,7 @@
         height: env(safe-area-inset-top);
         height: constant(safe-area-inset-top);
         background: black;
-    } 
+    }
 }
 
 /* Thin scrollbar for WebKit */
