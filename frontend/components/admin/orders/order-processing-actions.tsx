@@ -27,7 +27,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
         }
     > = {
         REFUNDED: {
-            color: "bg-danger/20 text-danger",
+            color: "bg-destructive/20 text-destructive",
             label: "Refunded",
             nextStatus: null,
             actionLabel: "",
@@ -69,7 +69,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             variant: "destructive",
         },
         CANCELED: {
-            color: "bg-danger/20 text-danger",
+            color: "bg-destructive/20 text-destructive",
             label: "Cancelled",
             nextStatus: null,
             actionLabel: "",

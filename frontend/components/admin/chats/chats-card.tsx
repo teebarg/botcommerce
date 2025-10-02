@@ -21,7 +21,7 @@ const getStatusBadge = (status?: ConversationStatus) => {
 const ChatsCard = ({ conversation, actions }: CustomerCardProps) => {
     return (
         <Card className="mb-3 overflow-hidden hover:shadow-md transition-shadow">
-            <div key={conversation.id} className="bg-content1 rounded-lg overflow-hidden shadow-md p-4">
+            <div key={conversation.id} className="bg-secondary rounded-lg overflow-hidden shadow-md p-4">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="m-0 text-lg">Conversation #{conversation.id}</h3>
                     {getStatusBadge(conversation.status)}

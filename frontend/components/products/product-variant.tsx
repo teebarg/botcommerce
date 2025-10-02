@@ -62,7 +62,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                                     <Edit className="h-5 w-5" />
                                 </Button>
                                 <Button size="icon" variant="ghost" onClick={() => deleteVariant(variant.id)}>
-                                    <Trash2 className="h-5 w-5 text-danger" />
+                                    <Trash2 className="h-5 w-5 text-destructive" />
                                 </Button>
                             </div>
                         </div>

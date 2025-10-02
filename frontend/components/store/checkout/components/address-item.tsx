@@ -57,7 +57,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
     return (
         <div
             className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden ${
-                isSelected ? "ring-2 ring-accent bg-accent/10" : "border border-divider bg-content2 hover:border-accent/50 hover:shadow-md"
+                isSelected ? "ring-2 ring-accent bg-accent/10" : "border border-divider bg-secondary hover:border-accent/50 hover:shadow-md"
             }`}
             onClick={() => !isSelected && handleSelect(address.id)}
         >
@@ -82,17 +82,17 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     </div>
                     <div>
                         <h3 className="font-semibold text-default-800 text-lg">{address.label}</h3>
-                        <p className="text-default-500 text-sm">{address?.first_name + " " + address?.last_name}</p>
+                        <p className="text-muted-foreground text-sm">{address?.first_name + " " + address?.last_name}</p>
                     </div>
                 </div>
 
                 <div className="space-y-0.5 text-sm">
-                    <p className="text-default-800 font-medium">{address.address_1}</p>
-                    <p className="text-default-500">
+                    <p className="text-foreground font-medium">{address.address_1}</p>
+                    <p className="text-muted-foreground">
                         {address.city}, {address.state}
                     </p>
                     {address.phone && (
-                        <p className="flex items-center gap-2 text-default-500 mt-2">
+                        <p className="flex items-center gap-2 text-muted-foreground mt-2">
                             <Phone className="w-3.5 h-3.5" />
                             <span>{address.phone}</span>
                         </p>

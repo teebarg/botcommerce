@@ -1,10 +1,9 @@
 import React from "react";
-import { CreditCard, ArrowLeft } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { paymentInfoMap } from "@lib/constants";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
 import { Cart, PaymentMethod } from "@/schemas";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
 import { PaystackPayment } from "@/components/store/payment/paystack-payment";
@@ -23,7 +22,7 @@ interface PaymentStepProps {
     onBack?: () => void;
 }
 
-const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
+const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     const { settings } = useStoreSettings();
     const updateCartDetails = useUpdateCartDetails();
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
@@ -33,14 +32,8 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
         updateCartDetails.mutate({ payment_method: providerId });
     };
 
-    const handleBack = () => {
-        if (onBack) {
-            onBack();
-        }
-    };
-
     return (
-        <Card className="shadow-elegant animate-fade-in w-full">
+        <Card className="animate-fade-in w-full">
             <CardHeader>
                 <CardTitle className="text-2xl font-semibold flex items-center space-x-2">
                     <CreditCard className="h-6 w-6 text-accent" />
@@ -91,12 +84,6 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart, onBack }) => {
                 {cart?.payment_method === "BANK_TRANSFER" && <BankTransfer amount={cart.total} />}
 
                 {cart?.payment_method === "CASH_ON_DELIVERY" && <Pickup amount={cart.total} />}
-                <div className="pt-4">
-                    <Button className="flex items-center gap-2" variant="outline" onClick={handleBack}>
-                        <ArrowLeft className="h-4 w-4" />
-                        {cart?.shipping_method === "PICKUP" ? "Back to Delivery" : "Back to Address"}
-                    </Button>
-                </div>
             </CardContent>
         </Card>
     );

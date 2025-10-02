@@ -62,12 +62,12 @@ const orderStatusMap = {
     CANCELED: {
         icon: <XCircle className="h-5 w-5 text-white" />,
         label: "Cancelled",
-        color: "bg-danger",
+        color: "bg-destructive",
     },
     REFUNDED: {
         icon: <RotateCcw className="h-5 w-5 text-white" />,
         label: "Refunded",
-        color: "bg-danger",
+        color: "bg-destructive",
     },
 };
 

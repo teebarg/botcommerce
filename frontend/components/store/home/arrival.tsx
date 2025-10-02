@@ -10,7 +10,7 @@ export default function NewArrivals() {
     const { data, isLoading } = useProductSearch({ collections: "new-arrivals", limit: 10 });
 
     return (
-        <div className="bg-content2 py-8">
+        <div className="bg-secondary text-secondary-foreground py-8">
             <ProductsCarousel
                 description="Find the best thrifts for your kids"
                 isLoading={isLoading}

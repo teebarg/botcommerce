@@ -57,12 +57,12 @@ const CustomerView: React.FC = () => {
                 <div className="mb-4 flex items-center justify-between gap-3">
                     <div>
                         <h3 className="text-xl font-semibold">Customers view</h3>
-                        <p className="text-sm text-default-500">Manage your customers.</p>
+                        <p className="text-sm text-muted-foreground">Manage your customers.</p>
                     </div>
                     <CustomerCreateGuest />
                 </div>
                 <>
-                    <div key="table" className="md:block hidden">
+                    <div key="table" className="md:block hidden bg-secondary">
                         <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                         <Table>
                             <TableHeader>
@@ -91,14 +91,14 @@ const CustomerView: React.FC = () => {
                                     </TableRow>
                                 ) : (
                                     users?.map((user: User, idx: number) => (
-                                        <TableRow key={idx} className="even:bg-content1">
+                                        <TableRow key={idx} className="even:bg-background">
                                             <TableCell className="font-medium">{idx + 1}</TableCell>
                                             <TableCell>
                                                 <div>
                                                     <p>
                                                         {user?.first_name} {user?.last_name}
                                                     </p>
-                                                    <p className="text-default-500">{user.email}</p>
+                                                    <p className="text-muted-foreground">{user.email}</p>
                                                 </div>
                                             </TableCell>
                                             <TableCell>

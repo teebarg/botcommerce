@@ -15,7 +15,7 @@ const radioVariants = {
     },
     card: {
         container: "grid gap-3",
-        item: "group relative flex items-center gap-3 rounded-lg border-2 border-default-200 bg-content1 p-4 transition-all duration-200 hover:border-accent hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-accent data-[state=checked]:bg-accent/10",
+        item: "group relative cursor-pointer flex items-center gap-3 rounded-lg border-2 border-input bg-secondary p-4 transition-all duration-200 hover:border-accent hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-accent data-[state=checked]:bg-accent/10",
         indicator: "absolute right-4 top-4 flex items-center justify-center",
         icon: "size-5 text-accent opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },

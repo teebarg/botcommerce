@@ -59,7 +59,7 @@ export default function Footer() {
 
     return (
         <ClientOnly>
-            <footer className="flex w-full flex-col pb-20 md:pb-12 bg-content1 border-t border-divider">
+            <footer className="flex w-full flex-col pb-20 md:pb-12 bg-card text-card-foreground border-t border-divider">
                 <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                     <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                         <div className="md:pr-8">
@@ -89,8 +89,8 @@ export default function Footer() {
                             {collections && collections?.length > 0 && (
                                 <div className="hidden md:block">
                                     <div>
-                                        <h3 className="text-base font-semibold text-default-foreground">Collections</h3>
-                                        <ul className="mt-2 space-y-2 text-default-600">
+                                        <h3 className="text-base font-semibold">Collections</h3>
+                                        <ul className="mt-2 space-y-2">
                                             {collections?.slice(0, 6).map((c: any, idx: number) => (
                                                 <li key={idx}>
                                                     <LocalizedClientLink
@@ -107,7 +107,7 @@ export default function Footer() {
                             )}
                             {categories && categories?.length > 0 && (
                                 <div className="hidden md:block">
-                                    <h3 className="text-base font-semibold text-default-foreground">Categories</h3>
+                                    <h3 className="text-base font-semibold">Categories</h3>
                                     <ul className="mt-2 space-y-2 text-default-600" data-testid="footer-categories">
                                         {categories?.map((c: Category, idx: number) => {
                                             return (
@@ -141,7 +141,7 @@ export default function Footer() {
                                 </div>
                             )}
                             <div>
-                                <h3 className="text-base font-semibold text-default-foreground">Support</h3>
+                                <h3 className="text-base font-semibold">Support</h3>
                                 <ul className="mt-2 space-y-2 text-default-600">
                                     {support.map((item, idx: number) => (
                                         <li key={idx}>
@@ -153,7 +153,7 @@ export default function Footer() {
                                 </ul>
                             </div>
                             <div>
-                                <h3 className="text-base font-semibold text-default-foreground">Company</h3>
+                                <h3 className="text-base font-semibold">Company</h3>
                                 <ul className="mt-2 space-y-2 text-default-600">
                                     {company.map((item, idx: number) => (
                                         <li key={idx}>
@@ -168,7 +168,7 @@ export default function Footer() {
                     </div>
                     <Separator className="my-4" />
                     <div>
-                        <p className="text-sm text-default-500">
+                        <p className="text-sm text-muted-foreground">
                             &copy; {new Date().getFullYear()} {settings?.shop_name}. All rights reserved.
                         </p>
                     </div>

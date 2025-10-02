@@ -42,23 +42,23 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
-                <div className="bg-card rounded-xl shadow-sm p-4 mb-6 mt-4">
-                    <h3 className="text-lg font-medium text-default-900 mb-4">Bank Transfer Details</h3>
+                <div className="bg-secondary rounded-xl shadow-sm p-4 mb-6 mt-4">
+                    <h3 className="text-lg font-medium mb-4">Bank Transfer Details</h3>
                     <div className="space-y-1">
                         <div className="flex items-center justify-between">
-                            <span className="text-default-500 text-sm">Bank Name</span>
+                            <span className="text-muted-foreground text-sm">Bank Name</span>
                             <span className="font-medium">{bankDetails?.[0]?.bank_name}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-default-500 text-sm">Account Name</span>
+                            <span className="text-muted-foreground text-sm">Account Name</span>
                             <span className="font-medium">{bankDetails?.[0]?.account_name}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-default-500 text-sm">Account Number</span>
+                            <span className="text-muted-foreground text-sm">Account Number</span>
                             <span className="font-medium">{bankDetails?.[0]?.account_number}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-default-500 text-sm">Reference</span>
+                            <span className="text-muted-foreground text-sm">Reference</span>
                             <span className="font-medium">{order.order_number}</span>
                         </div>
                     </div>
@@ -67,17 +67,17 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             {order?.payment_method === "BANK_TRANSFER" && (
                 <FadeInComponent delay="200ms">
-                    <div className="mb-8 p-6 bg-orange-100 dark:bg-orange-900/20 border border-orange-200 rounded-2xl">
+                    <div className="mb-8 p-6 bg-gradient-to-r from-secondary/20 to-accent/20 border border-orange-200 rounded-2xl">
                         <div className="flex items-center justify-center gap-2 mb-4">
-                            <AlertCircle className="w-5 h-5 text-orange-600" />
-                            <span className="font-medium text-orange-900">Payment Pending</span>
+                            <AlertCircle className="w-5 h-5 text-accent" />
+                            <span className="font-medium text-accent">Payment Pending</span>
                         </div>
-                        <p className="text-sm text-orange-700 mb-4">
+                        <p className="text-sm text-accent mb-4">
                             Your order is currently pending payment. Please complete your bank transfer using the details provided.
                         </p>
-                        <div className="p-4 bg-white rounded-lg border border-orange-200">
-                            <h4 className="font-medium text-gray-900 mb-2">Next Steps:</h4>
-                            <ul className="text-sm text-gray-600 space-y-1 text-left">
+                        <div className="p-4 bg-secondary rounded-lg">
+                            <h4 className="font-medium mb-2">Next Steps:</h4>
+                            <ul className="text-sm text-muted-foreground space-y-1 text-left">
                                 <li>• Transfer the exact amount to our bank account</li>
                                 <li>• Include your order number ({order.order_number}) in the transfer description</li>
                                 <li>• We will process your order once payment is confirmed</li>

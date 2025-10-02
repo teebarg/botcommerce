@@ -37,7 +37,7 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     };
 
     return (
-        <div className="group bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-border">
+        <div className="group bg-secondary rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
             <div className="p-4 sm:p-6">
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
@@ -56,8 +56,8 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
 
                 <div className="space-y-3">
                     <div>
-                        <p className="text-sm sm:text-base font-medium text-default-900 leading-relaxed">{activity.description}</p>
-                        <p className="text-xs sm:text-sm text-default-500 mt-1">
+                        <p className="text-sm sm:text-base font-medium leading-relaxed">{activity.description}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                             {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
                         </p>
                     </div>
@@ -94,18 +94,18 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
 export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
     if (!activities.length) {
         return (
-            <div className="text-center py-12 bg-content1">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
-                    <ActivityIcon className="w-8 h-8 text-default-500" />
+            <div className="text-center py-12 bg-secondary">
+                <div className="w-16 h-16 mx-auto mb-4 bg-accent/50 rounded-full flex items-center justify-center">
+                    <ActivityIcon className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-medium text-default-800">No activities yet</h3>
-                <p className="text-default-500">Activities will appear here</p>
+                <h3 className="text-xl font-medium">No activities yet</h3>
+                <p className="text-muted-foreground">Activities will appear here</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-6xl mx-auto py-4 px-1 md:px-6 md:py-12 bg-content1">
+        <div className="max-w-6xl mx-auto py-4 px-1 md:px-6 md:py-12">
             <div className="space-y-2 sm:space-y-6">
                 {activities.map((activity: Activity, idx: number) => (
                     <ActivityListItem key={idx} activity={activity} />

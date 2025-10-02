@@ -50,8 +50,8 @@ const ChatsView: React.FC = () => {
     return (
         <div className="px-2 md:px-10 py-8">
             <h3 className="text-2xl font-medium">Conversations view</h3>
-            <p className="text-default-500 text-sm mb-4">Manage your conversations.</p>
-            <div key="table" className="md:block hidden">
+            <p className="text-muted-foreground text-sm mb-4">Manage your conversations.</p>
+            <div key="table" className="md:block hidden bg-secondary">
                 <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                 <Table>
                     <TableHeader>
@@ -81,7 +81,7 @@ const ChatsView: React.FC = () => {
                             </TableRow>
                         ) : (
                             conversations?.map((conversation: Conversation, idx: number) => (
-                                <TableRow key={idx} className="even:bg-content1">
+                                <TableRow key={idx} className="odd:bg-background">
                                     <TableCell className="font-medium">{idx + 1}</TableCell>
                                     <TableCell>{conversation.conversation_uuid}</TableCell>
                                     <TableCell>{conversation.messages?.length}</TableCell>

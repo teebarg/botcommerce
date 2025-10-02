@@ -13,7 +13,7 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default: "bg-content3 text-default-900 hover:bg-content3/90",
-                destructive: "bg-danger text-danger-foreground hover:bg-danger/90",
+                destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
                 outline: "border border-input bg-background hover:bg-content1",
                 primary: "bg-primary text-primary-foreground hover:bg-primary/90",
                 secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
@@ -26,7 +26,7 @@ const buttonVariants = cva(
                 borderedSecondary: "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary-500 hover:text-white",
                 indigo: "bg-indigo-500 text-white hover:bg-indigo-600",
                 luxury: "bg-luxury text-luxury-foreground hover:bg-luxury/90 shadow-luxury transition-all duration-300 transform hover:scale-105",
-                accent: "bg-gradient-accent text-accent-foreground transition-all duration-300 transform hover:scale-105 font-semibold",
+                accent: "bg-accent text-accent-foreground transition-all duration-300 transform hover:scale-105 font-semibold",
                 hero: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant transition-all duration-500 transform hover:scale-110 hover:shadow-luxury border border-border/20",
                 elegant:
                     "bg-transparent border-2 border-elegant text-elegant hover:bg-elegant hover:text-elegant-foreground transition-all duration-300",

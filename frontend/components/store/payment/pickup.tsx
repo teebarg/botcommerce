@@ -49,7 +49,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                 disabled={completeCart.isPending}
                 isLoading={completeCart.isPending}
                 size="lg"
-                variant="luxury"
+                variant="accent"
                 onClick={onPaymentCompleted}
             >
                 Confirm Order for Pickup

@@ -49,7 +49,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
             </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger>
-                    <Trash2 className="h-5 w-5 text-danger" />
+                    <Trash2 className="h-5 w-5 text-destructive" />
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">
