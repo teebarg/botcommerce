@@ -27,7 +27,9 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
     const updateBanner = useUpdateCarouselBanner();
 
     const handleDelete = async () => {
-        await deleteBanner.mutateAsync(banner.id);
+        deleteBanner.mutateAsync(banner.id).then(() => {
+            deleteState.close();
+        });
     };
 
     const handleUpdate = async () => {

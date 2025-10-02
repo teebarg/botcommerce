@@ -24,7 +24,7 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
                     <div className="flex">
                         <div className="flex items-center">
                             <div className="flex grow flex-col gap-1">
-                                <h2 className="text-lg font-semibold leading-6 text-default-900">{title}</h2>
+                                <h2 className="text-lg font-semibold leading-6 text-default-900 font-outfit">{title}</h2>
                             </div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
                     </p>
                 </div>
                 <div className="flex justify-end gap-2 mt-8">
-                    <Button aria-label="submit" className="min-w-36" variant="outline" onClick={onClose}>
+                    <Button aria-label="submit" className="min-w-36" onClick={onClose}>
                         Close
                     </Button>
                     <Button aria-label="submit" className="min-w-36" isLoading={isPending} type="submit" variant="destructive" onClick={onSubmit}>

@@ -11,4 +11,4 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         -   name: Apply labels using labeler
-            uses: actions/labeler@v5
+            uses: actions/labeler@v6

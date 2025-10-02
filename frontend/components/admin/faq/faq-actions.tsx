@@ -21,7 +21,7 @@ interface FaqActionsProps {
 const FaqActions = ({ faq }: FaqActionsProps) => {
     const invalidate = useInvalidate();
     const [faqToDelete, setFaqToDelete] = useState<number | null>(null);
-    const state = useOverlayTriggerState({});
+    const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
 
     const { mutateAsync } = useDeleteFaq();
@@ -31,7 +31,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
         mutateAsync(faqToDelete).then(() => {
             invalidate("faqs");
             setFaqToDelete(null);
-            state.close();
+            deleteState.close();
         });
     };
 
@@ -54,7 +54,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                     }}
                 />
             </Overlay>
-            <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
+            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
                     <Button size="icon" variant="ghost" onClick={() => setFaqToDelete(faq.id)}>
                         <Trash2 className="h-5 w-5 text-red-500" />
@@ -64,7 +64,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                     <DialogHeader className="sr-only">
                         <DialogTitle>Delete</DialogTitle>
                     </DialogHeader>
-                    <Confirm onClose={state.close} onConfirm={handleDelete} />
+                    <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
                 </DialogContent>
             </Dialog>
         </div>
