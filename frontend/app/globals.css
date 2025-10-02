@@ -4,10 +4,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: var(--font-inter);
-    --font-display: var(--font-lexend);
     --font-outfit: var(--font-outfit);
     --font-nunito: var(--font-nunito);
+    --font-lexend: var(--font-lexend);
 
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -218,7 +217,6 @@
 }
 
 :root {
-    /* --background: #f8fafc; */
     --foreground: #0f172a;
 
     --background: hsl(0 0% 100%);
@@ -242,26 +240,6 @@
     --default-900: hsl(240 5.88% 10%);
     --default-foreground: hsl(0 0% 0%);
     --default: hsl(240 4.88% 83.92%);
-
-    /* --content1: #ffffff;
-    --content2: #f8fafc;
-    --content3: #f1f5f9; */
-
-    /* --default-50: #f8fafc;
-    --default-100: #f1f5f9;
-    --default-200: #e2e8f0;
-    --default-300: #cbd5e1;
-    --default-400: #94a3b8;
-    --default-500: #64748b;
-    --default-600: #475569;
-    --default-700: #334155;
-    --default-800: #1e293b;
-    --default-900: #0f172a;
-    --default-foreground: #0f172a;
-    --default: #64748b; */
-
-    /* --primary: #2563eb;
-    --primary-foreground: #ffffff; */
 
     --primary: hsl(20 14.3% 4.1%);
     --primary-foreground: hsl(60 9.1% 97.8%);
@@ -336,7 +314,6 @@
 }
 
 .dark {
-    /* --background: #09090b; */
     --foreground: #fafafa;
 
     --background: hsl(0 0% 0%);
@@ -360,23 +337,6 @@
     --default-900: hsl(0 0% 98.04%);
     --default-foreground: hsl(0 0% 100%);
     --default: hsl(240 5.26% 26.08%);
-
-    /* --content1: #18181b;
-    --content2: #27272a;
-    --content3: #3f3f46; */
-
-    /* --default-50: #09090b;
-    --default-100: #18181b;
-    --default-200: #27272a;
-    --default-300: #3f3f46;
-    --default-400: #52525b;
-    --default-500: #71717a;
-    --default-600: #a1a1aa;
-    --default-700: #d4d4d8;
-    --default-800: #e4e4e7;
-    --default-900: #f4f4f5;
-    --default-foreground: #fafafa;
-    --default: #71717a; */
 
     /* --primary: #2563eb;
     --primary-foreground: #ffffff; */
@@ -456,6 +416,7 @@
         margin: 0;
         min-height: 100vh;
         /* touch-action: none; */
+        font-family: var(--font-lexend);
     }
 }
 
@@ -490,7 +451,7 @@
 
 ::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
+    border-radius: 6px;
 }
 
 ::-webkit-scrollbar-track {

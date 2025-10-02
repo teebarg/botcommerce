@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+
 import ProductActions from "./product-actions";
 
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
@@ -54,7 +55,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         <div className="absolute top-4 right-2 flex flex-wrap gap-1">
                             {product?.variants?.map((item: ProductVariant, idx: number) => (
                                 <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="emerald">
-                                    Uk Size {item.size}
+                                    UK: {item.size}
                                 </Badge>
                             ))}
                         </div>
@@ -76,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                                     product.variants?.length && product.variants?.[0].size && "inline-block"
                                 )}
                             >
-                                Uk Size: {product.variants?.[0].size}
+                                UK: {product.variants?.[0].size}
                             </p>
                             <p
                                 className={cn(

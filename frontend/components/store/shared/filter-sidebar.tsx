@@ -228,7 +228,7 @@ export function FilterSidebar({ facets }: Props) {
                                     variant={active ? "indigo" : "outline"}
                                     onClick={() => onToggleSize(size)}
                                 >
-                                    Uk{size}
+                                    UK {size}
                                     <span className={cn("ml-2", !facets && "hidden")}>({facets?.sizes?.[size] || 0})</span>
                                 </Button>
                             );

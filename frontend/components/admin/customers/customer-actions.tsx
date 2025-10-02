@@ -21,7 +21,7 @@ interface CustomerActionsProps {
 }
 
 const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
-    const { mutate } = useDeleteUser();
+    const { mutateAsync } = useDeleteUser();
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const { data: session, update } = useSession();
@@ -29,7 +29,9 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     const invalidateCart = useInvalidateCart();
 
     const onDelete = () => {
-        mutate(user.id);
+        mutateAsync(user.id).then(() => {
+            deleteState.close();
+        });
     };
 
     const handleUpdateName = async () => {

@@ -3,9 +3,9 @@
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+
 import { useInvalidateMe } from "@/lib/hooks/useUser";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
-
 import { Button } from "@/components/ui/button";
 
 export default function ImpersonationBanner() {

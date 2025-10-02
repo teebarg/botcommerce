@@ -143,6 +143,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 return session;
             } catch (error) {
                 console.error("Error fetching user:", error);
+
                 return session;
             }
         },

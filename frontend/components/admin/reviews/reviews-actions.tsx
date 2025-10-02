@@ -19,13 +19,13 @@ interface Props {
 
 const ReviewActions: React.FC<Props> = ({ review }) => {
     const editState = useOverlayTriggerState({});
-    const state = useOverlayTriggerState({});
+    const deleteState = useOverlayTriggerState({});
     const { mutate: updateReview, isPending } = useUpdateReview();
     const { mutateAsync: deleteReview } = useDeleteReview();
 
     const onConfirmDelete = async () => {
         deleteReview(review.id).then(() => {
-            state.close();
+            deleteState.close();
         });
     };
 
@@ -47,7 +47,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
             >
                 <UpdateReviewForm review={review} onClose={editState.close} />
             </Overlay>
-            <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
+            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger>
                     <Trash2 className="h-5 w-5 text-danger" />
                 </DialogTrigger>
@@ -55,7 +55,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                     <DialogHeader className="sr-only">
                         <DialogTitle>Delete</DialogTitle>
                     </DialogHeader>
-                    <Confirm onClose={state.close} onConfirm={onConfirmDelete} />
+                    <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} />
                 </DialogContent>
             </Dialog>
             {review.verified ? (

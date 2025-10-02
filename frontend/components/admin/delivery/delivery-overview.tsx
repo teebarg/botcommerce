@@ -43,6 +43,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
         if (!error) {
             toast.success("Delivery option deleted successfully");
             invalidate("delivery");
+            deleteState.close();
         }
     };
 
