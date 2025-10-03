@@ -39,7 +39,7 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
     return (
         <div className="space-y-6">
             <div className="max-w-7xl mx-auto px-4">
-                <p className="text-default-700 mt-2 mb-6 text-center font-semibold">Customer Reviews & Ratings</p>
+                <p className="text-foreground mt-2 mb-6 text-center font-semibold">Customer Reviews & Ratings</p>
                 <Card className="p-6 mb-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="text-center md:text-left">

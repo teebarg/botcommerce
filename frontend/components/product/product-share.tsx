@@ -38,7 +38,7 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
             <div className="absolute right-0 mt-2 w-48 bg-secondary rounded-lg shadow-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                 <div className="space-y-2">
                     <button
-                        className="flex items-center w-full px-4 py-2 text-muted-foreground hover:bg-default-50 rounded-lg transition-colors cursor-pointer"
+                        className="flex items-center w-full px-4 py-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
                         onClick={() => handleShare("facebook")}
                     >
                         <Facebook className="w-5 h-5 mr-3 text-blue-600" />
@@ -46,7 +46,7 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
                     </button>
 
                     <button
-                        className="flex items-center w-full px-4 py-2 text-muted-foreground hover:bg-default-50 rounded-lg transition-colors cursor-pointer"
+                        className="flex items-center w-full px-4 py-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
                         onClick={() => handleShare("twitter")}
                     >
                         <Twitter className="w-5 h-5 mr-3" />
@@ -54,7 +54,7 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
                     </button>
 
                     <button
-                        className="flex items-center w-full px-4 py-2 text-muted-foreground hover:bg-default-50 rounded-lg transition-colors cursor-pointer"
+                        className="flex items-center w-full px-4 py-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
                         onClick={() => handleShare("linkedin")}
                     >
                         <Linkedin className="w-5 h-5 mr-3 text-blue-300" />

@@ -139,10 +139,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-default-100 px-6 py-4">
+                        <div className="border-b border-border px-6 py-4">
                             <h2 className="text-lg font-medium">Order Items</h2>
                         </div>
-                        <div className="divide-y divide-default-100">
+                        <div className="divide-y divide-border">
                             {order.order_items.map((item: OrderItem, idx: number) => (
                                 <OrderItemCard key={idx} orderId={order.id} orderItem={item} />
                             ))}

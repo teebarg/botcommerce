@@ -87,7 +87,7 @@ const ProductOverview: React.FC<{
 
     return (
         <div className="bg-content1 z-50 overflow-y-auto duration-300 w-full rounded-[inherit]">
-            <div className="sticky top-safe z-20 bg-content1">
+            <div className="sticky top-safe z-20 bg-background">
                 <button
                     className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg"
                     onClick={onClose}
@@ -140,9 +140,9 @@ const ProductOverview: React.FC<{
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="flex items-center space-x-2">
-                            <span className="text-3xl font-bold text-default-900">{currency(selectedVariant?.price || priceInfo.minPrice)}</span>
+                            <span className="text-3xl font-bold">{currency(selectedVariant?.price || priceInfo.minPrice)}</span>
                             {selectedVariant?.old_price > selectedVariant?.price && (
-                                <span className="text-lg text-default-500 line-through">{currency(selectedVariant?.old_price)}</span>
+                                <span className="text-lg text-muted-foreground line-through">{currency(selectedVariant?.old_price)}</span>
                             )}
                         </div>
                         {selectedVariant?.old_price > selectedVariant?.price && (
@@ -153,23 +153,23 @@ const ProductOverview: React.FC<{
                     </div>
                     <div className="flex items-center gap-2">
                         <button
-                            className="p-3 bg-default-200 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
+                            className="p-3 bg-secondary rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 isLiked ? removeWishlist() : addWishlist();
                             }}
                         >
-                            <Heart className={`w-6 h-6 ${isLiked ? "text-red-500 fill-current" : "text-default-600"}`} />
+                            <Heart className={`w-6 h-6 ${isLiked ? "text-red-500 fill-current" : "text-muted-foreground"}`} />
                         </button>
                     </div>
                 </div>
 
                 <div>
-                    <p className="text-default-600 leading-relaxed">{product.description}</p>
+                    <p className="text-muted-foreground leading-relaxed">{product.description}</p>
                 </div>
 
                 <div className={cn("hidden", colors?.length > 0 && "block")}>
-                    <h3 className="font-semibold text-default-900 mb-3">Color: {selectedColor}</h3>
+                    <h3 className="font-semibold mb-3">Color: {selectedColor}</h3>
                     <div className="flex space-x-3">
                         {colors?.map((color: string, idx: number) => {
                             const available = isOptionAvailable("color", color!);
@@ -193,7 +193,7 @@ const ProductOverview: React.FC<{
                                 >
                                     {!available && (
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="w-6 h-0.5 bg-default-400 rotate-45" />
+                                            <div className="w-6 h-0.5 bg-border rotate-45" />
                                         </div>
                                     )}
                                 </button>
@@ -203,7 +203,7 @@ const ProductOverview: React.FC<{
                 </div>
 
                 <div className={cn("hidden", measurements?.length > 0 && "block")}>
-                    <h3 className="font-semibold text-default-900 mb-3">Measurement: {selectedMeasurement}</h3>
+                    <h3 className="font-semibold mb-3">Measurement: {selectedMeasurement}</h3>
                     <div className="flex gap-2">
                         {measurements?.map((measurement: number, idx: number) => {
                             const available = isOptionAvailable("measurement", measurement.toString());
@@ -213,10 +213,10 @@ const ProductOverview: React.FC<{
                                 <button
                                     key={idx}
                                     className={cn(
-                                        "px-4 py-2 rounded-lg border border-default-200 transition-all data-[state=checked]:ring-1 ring-offset-1",
+                                        "px-4 py-2 rounded-lg border border-border transition-all data-[state=checked]:ring-1 ring-offset-1",
                                         "data-[state=checked]:ring-blue-500 data-[state=checked]:text-blue-600 data-[state=checked]:bg-blue-50",
                                         {
-                                            "cursor-not-allowed opacity-60 bg-default-300": !available,
+                                            "cursor-not-allowed opacity-60 bg-secondary": !available,
                                         }
                                     )}
                                     data-state={isSelected ? "checked" : "unchecked"}
@@ -231,7 +231,7 @@ const ProductOverview: React.FC<{
                 </div>
 
                 <div className={cn("hidden", sizes?.length > 0 && "block")}>
-                    <h3 className="font-semibold text-default-900 mb-3">Size: {selectedSize}</h3>
+                    <h3 className="font-semibold mb-3">Size: {selectedSize}</h3>
                     <div className="flex gap-2">
                         {sizes?.map((size: string, idx: number) => {
                             const available = isOptionAvailable("size", size!);
@@ -241,10 +241,10 @@ const ProductOverview: React.FC<{
                                 <button
                                     key={idx}
                                     className={cn(
-                                        "px-4 py-2 rounded-lg border border-default-200 transition-all data-[state=checked]:ring-1 ring-offset-1",
+                                        "px-4 py-2 rounded-lg border border-border transition-all data-[state=checked]:ring-1 ring-offset-1",
                                         "data-[state=checked]:ring-blue-500 data-[state=checked]:text-blue-600 data-[state=checked]:bg-blue-50",
                                         {
-                                            "cursor-not-allowed opacity-60 bg-default-300": !available,
+                                            "cursor-not-allowed opacity-60 bg-secondary": !available,
                                         }
                                     )}
                                     data-state={isSelected ? "checked" : "unchecked"}
@@ -259,10 +259,10 @@ const ProductOverview: React.FC<{
                 </div>
 
                 <div>
-                    <h3 className="text-lg font-semibold text-default-900 mb-3">Quantity</h3>
+                    <h3 className="text-lg font-semibold mb-3">Quantity</h3>
                     <div className="flex items-center space-x-4">
                         <button
-                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={quantity <= 1}
                             onClick={() => setQuantity(quantity - 1)}
                         >
@@ -270,7 +270,7 @@ const ProductOverview: React.FC<{
                         </button>
                         <span className="text-xl font-medium w-8 text-center">{quantity}</span>
                         <button
-                            className="w-10 h-10 rounded-full border border-default-300 flex items-center justify-center hover:bg-default-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={quantity >= selectedVariant?.inventory}
                             onClick={() => setQuantity(quantity + 1)}
                         >
@@ -279,31 +279,31 @@ const ProductOverview: React.FC<{
                     </div>
                 </div>
             </div>
-            <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-default-200">
+            <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-border">
                 <div className="text-center">
                     <Truck className="w-6 h-6 text-green-500 mx-auto mb-1" />
-                    <p className="text-xs text-default-600">Fast Shipping</p>
+                    <p className="text-xs text-muted-foreground">Fast Shipping</p>
                 </div>
                 <div className="text-center">
                     <Shield className="w-6 h-6 text-blue-500 mx-auto mb-1" />
-                    <p className="text-xs text-default-600">Secure Payment</p>
+                    <p className="text-xs text-muted-foreground">Secure Payment</p>
                 </div>
                 <div className="text-center">
                     <RotateCcw className="w-6 h-6 text-purple-500 mx-auto mb-1" />
-                    <p className="text-xs text-default-600">Easy Returns</p>
+                    <p className="text-xs text- muted-foreground">Easy Returns</p>
                 </div>
             </div>
 
-            <div className="sticky bottom-0 bg-content1 border-t border-default-200 p-4">
+            <div className="sticky bottom-0 p-4 bg-background">
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-default-500">Total</p>
-                            <p className="text-2xl font-bold text-default-900">{currency(selectedVariant?.price * quantity || 0)}</p>
+                            <p className="text-sm text-muted-foreground">Total</p>
+                            <p className="text-2xl font-bold text-foreground">{currency(selectedVariant?.price * quantity || 0)}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-sm text-default-500">Quantity</p>
-                            <p className="text-lg font-semibold text-default-900">
+                            <p className="text-sm text-muted-foreground">Quantity</p>
+                            <p className="text-lg font-semibold text-foreground">
                                 {quantity} item{quantity > 1 ? "s" : ""}
                             </p>
                         </div>

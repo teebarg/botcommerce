@@ -70,24 +70,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
 
                     <div className="py-4 px-2 space-y-2">
-                        {/* <div className="hidden lg:flex items-center gap-2">
-                            <p
-                                className={cn(
-                                    "hidden text-default-500 font-medium",
-                                    product.variants?.length && product.variants?.[0].size && "inline-block"
-                                )}
-                            >
-                                UK: {product.variants?.[0].size}
-                            </p>
-                            <p
-                                className={cn(
-                                    "hidden text-default-500 font-medium",
-                                    product.variants?.length && product.variants?.[0].color && "inline-block"
-                                )}
-                            >
-                                Color: {product.variants?.[0].color}
-                            </p>
-                        </div> */}
                         <PriceLabel priceInfo={priceInfo} />
                         <ProductActions product={product} />
                     </div>

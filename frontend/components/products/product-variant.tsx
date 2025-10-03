@@ -36,20 +36,20 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
 
     return (
         <div>
-            <h4 className="text-lg font-medium text-default-800 mt-4">Product Variants</h4>
+            <h4 className="text-lg font-medium mt-4">Product Variants</h4>
             <div className="py-4 rounded-md">
                 <div className="space-y-2">
                     {variants?.map((variant: ProductVariant, idx: number) => (
                         <div key={idx} className="flex flex-col gap-2 rounded-md p-2 bg-content2">
-                            <p className="text-sm font-medium text-default-800">Sku: {variant.sku}</p>
-                            <p className="text-sm font-medium text-default-800">Price: {currency(variant.price)}</p>
-                            <p className={cn("text-sm font-medium text-default-800", variant.size ? "" : "hidden")}>Size: {variant.size}</p>
-                            <p className={cn("text-sm font-medium text-default-800", variant.color ? "" : "hidden")}>Color: {variant.color}</p>
-                            <p className={cn("text-sm font-medium text-default-800", variant.measurement ? "" : "hidden")}>
+                            <p className="text-sm font-medium">Sku: {variant.sku}</p>
+                            <p className="text-sm font-medium">Price: {currency(variant.price)}</p>
+                            <p className={cn("text-sm font-medium", variant.size ? "" : "hidden")}>Size: {variant.size}</p>
+                            <p className={cn("text-sm font-medium", variant.color ? "" : "hidden")}>Color: {variant.color}</p>
+                            <p className={cn("text-sm font-medium ", variant.measurement ? "" : "hidden")}>
                                 Measurement: {variant.measurement}
                             </p>
-                            <p className="text-sm font-medium text-default-800">Inventory: {variant.inventory}</p>
-                            <p className="text-sm font-medium text-default-800">
+                            <p className="text-sm font-medium">Inventory: {variant.inventory}</p>
+                            <p className="text-sm font-medium">
                                 <Badge variant={variant.status === "IN_STOCK" ? "emerald" : "destructive"}>{variant.status}</Badge>
                             </p>
                             <div className="flex gap-2 justify-end">
@@ -69,7 +69,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                     ))}
                     {variants.length === 0 && (
                         <div>
-                            <p className="px-3 py-2 whitespace-nowrap text-sm text-default-500 text-center">No variants found</p>
+                            <p className="px-3 py-2 whitespace-nowrap text-sm text-muted-foreground text-center">No variants found</p>
                         </div>
                     )}
                 </div>

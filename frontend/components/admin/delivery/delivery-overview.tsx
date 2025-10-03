@@ -48,7 +48,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     };
 
     return (
-        <div className="bg-card rounded-2xl shadow-lg border border-default-200 overflow-hidden">
+        <div className="bg-card rounded-2xl shadow-lg border border-border overflow-hidden">
             <div className="p-6">
                 <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4 flex-1">

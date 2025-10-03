@@ -93,7 +93,7 @@ const OverviewTemplate: React.FC = () => {
                     <span data-testid="welcome-message" data-value={session?.user?.first_name}>
                         Hello {session?.user?.first_name}
                     </span>
-                    <span className="text-sm text-default-900">
+                    <span className="text-sm text-foreground">
                         Signed in as:{" "}
                         <span className="font-semibold" data-testid="customer-email" data-value={session?.user?.email}>
                             {session?.user?.email}
@@ -103,7 +103,7 @@ const OverviewTemplate: React.FC = () => {
                 <div className="flex flex-col py-2 border-t border-gray-200 mt-2">
                     <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
                         <div className="grid grid-cols-2 gap-x-2 max-w-xl">
-                            <div className="flex flex-col bg-pink-100 dark:bg-pink-900 rounded-lg py-2 px-4 text-default-900 ">
+                            <div className="flex flex-col bg-pink-100 dark:bg-pink-900 rounded-lg py-2 px-4">
                                 <h3 className="font-semibold">Profile</h3>
                                 <div className="flex items-center gap-x-2">
                                     <span data-testid="customer-profile-completion" data-value={getProfileCompletion(session?.user!)}>
@@ -113,7 +113,7 @@ const OverviewTemplate: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col bg-yellow-100 dark:bg-yellow-900 rounded-lg py-2 px-4 text-default-900">
+                            <div className="flex flex-col bg-yellow-100 dark:bg-yellow-900 rounded-lg py-2 px-4">
                                 <h3 className="font-semibold">Addresses</h3>
                                 <div className="flex items-center gap-x-2">
                                     <span data-testid="addresses-count" data-value={session?.user?.addresses?.length || 0}>

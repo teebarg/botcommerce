@@ -104,7 +104,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                 <div className="flex-shrink-0 ml-4">
                     <Button aria-label="Remove activity" disabled={isPending} size="icon" variant="ghost" onClick={() => removeActivity(activity.id)}>
                         {isPending ? (
-                            <div className="animate-spin h-4 w-4 border-2 border-default-200 border-t-red-500 rounded-full" />
+                            <div className="animate-spin h-4 w-4 border-2 border-border border-t-red-500 rounded-full" />
                         ) : (
                             <Trash2 className="text-red-500" size={16} />
                         )}
@@ -117,7 +117,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
 
 const ActivityView: React.FC<Props> = ({ activities }) => {
     return (
-        <div className="bg-background rounded-lg shadow-sm border border-default-200">
+        <div className="bg-background rounded-lg shadow-sm border border-border">
             <div className="px-6 py-4">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                     <Clock className="text-muted-foreground" size={20} />
@@ -126,7 +126,7 @@ const ActivityView: React.FC<Props> = ({ activities }) => {
             </div>
             <Separator />
 
-            <div className="divide-y divide-default-200">
+            <div className="divide-y divide-border">
                 {!activities || activities.length === 0 ? (
                     <div className="px-6 py-12 text-center">
                         <Clock className="mx-auto h-12 w-12 text-muted-foreground" />

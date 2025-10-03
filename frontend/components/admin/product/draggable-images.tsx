@@ -187,8 +187,8 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                         onTouchMove={handleTouchMove}
                         onTouchStart={(e) => handleTouchStart(e, index)}
                     >
-                        <div className="flex items-center p-3 rounded-lg hover:bg-default-100">
-                            <div className="mr-4 text-muted-foreground font-semibold w-8 h-8 flex items-center justify-center bg-default-200 rounded-full">
+                        <div className="flex items-center p-3 rounded-lg">
+                            <div className="mr-4 text-muted-foreground font-semibold w-8 h-8 flex items-center justify-center bg-secondary rounded-full">
                                 {index + 1}
                             </div>
 

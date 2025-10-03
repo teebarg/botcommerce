@@ -154,14 +154,14 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     <ProductVariantSelection product={product} onVariantChange={setSelectedVariant} />
 
                     <div className="mt-4">
-                        <p className="line-clamp-3 text-base text-default-500">{product.description}</p>
+                        <p className="line-clamp-3 text-base text-muted-foreground">{product.description}</p>
                     </div>
                     {session?.user?.isAdmin && product?.variants?.length ? (
                         <div className="flex flex-col gap-2 mt-4">
                             {product.variants.map((v) => (
                                 <div key={v.id} className="flex lg:flex-row items-center justify-between text-sm gap-2 bg-content1 p-2">
                                     <div className="flex flex-col md:flex-row md:items-center gap-3">
-                                        <span className="text-default-700">SKU: {v.sku}</span>
+                                        <span>SKU: {v.sku}</span>
                                         <span>Inventory: {v.inventory}</span>
                                         <span className={v.inventory > 0 ? "text-emerald-600" : "text-red-600"}>
                                             {v.inventory > 0 ? "IN_STOCK" : "OUT_OF_STOCK"}
@@ -178,7 +178,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     ) : null}
                     <div className="mt-6 flex flex-col gap-1">
                         <LocalizedClientLink
-                            className="inline-flex items-center text-sm hover:opacity-80 transition-opacity my-2 text-default-500"
+                            className="inline-flex items-center text-sm hover:opacity-80 transition-opacity my-2 text-muted-foreground"
                             href={"/"}
                         >
                             See guide

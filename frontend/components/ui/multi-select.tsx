@@ -78,7 +78,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     ref={ref}
                     className={`flex min-h-10 w-full flex-wrap items-center gap-1 rounded-md border px-3 py-2 text-sm bg-background ${
                         disabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"
-                    } ${error ? "border-red-500" : "border-default-200"}`}
+                    } ${error ? "border-red-500" : "border-border"}`}
                     onClick={toggleDropdown}
                 >
                     {selectedItems.length > 0 ? (
@@ -100,7 +100,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                 {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
                 {isOpen && !disabled && (
-                    <div className="absolute z-40 mt-1 w-full rounded-md border min-h-40 max-h-60 overflow-auto border-default-200 bg-background py-1 shadow-lg">
+                    <div className="absolute z-40 mt-1 w-full rounded-md border min-h-40 max-h-60 overflow-auto border-border bg-background py-1 shadow-lg">
                         {options.length > 0 ? (
                             options.map((option) => {
                                 const isSelected = selectedItems.some((item) => item.value === option.value);
@@ -113,7 +113,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                                     >
                                         <div
                                             className={`mr-2 flex h-4 w-4 items-center justify-center rounded border ${
-                                                isSelected ? "border-blue-500 bg-blue-500" : "border-default-200"
+                                                isSelected ? "border-blue-500 bg-blue-500" : "border-border"
                                             }`}
                                         />
                                         {option.label}

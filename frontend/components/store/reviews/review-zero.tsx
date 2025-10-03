@@ -88,7 +88,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                             <ReviewForm productName={productName} product_id={product_id} onClose={state.close} />
                         </Overlay>
 
-                        <p className="text-xs text-default-500">Takes less than 2 minutes</p>
+                        <p className="text-xs text-muted-foreground">Takes less than 2 minutes</p>
                     </div>
                 ) : (
                     <div className="space-y-3">

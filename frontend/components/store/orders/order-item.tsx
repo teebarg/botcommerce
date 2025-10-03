@@ -10,7 +10,7 @@ const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
     return (
         <div className="flex gap-3 p-4">
             <div className="relative">
-                <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
+                <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
                     <img alt={item.name} className="object-cover object-center rounded-lg" src={item?.image || "/placeholder.jpg"} />
                 </div>
             </div>
@@ -27,7 +27,7 @@ const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
                         {item.variant.color && (
                             <Badge variant="gray">
                                 <div
-                                    className="w-2.5 h-2.5 rounded-full border border-default-300 mr-1"
+                                    className="w-2.5 h-2.5 rounded-full border border-border mr-1"
                                     style={{ backgroundColor: item.variant.color.toLowerCase() }}
                                 />
                                 {item.variant.color}

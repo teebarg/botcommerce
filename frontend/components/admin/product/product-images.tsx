@@ -60,7 +60,7 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
                     <p className="text-sm text-muted-foreground">(Max 5MB, JPG/PNG/GIF only)</p>
                     {uploadImages.isPending && (
                         <div className="mb-4">
-                            <div className="w-full bg-default-200 rounded-full h-2.5">
+                            <div className="w-full bg-border rounded-full h-2.5">
                                 <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />
                             </div>
                             <p className="text-sm text-blue-500 mt-1">Uploading...</p>

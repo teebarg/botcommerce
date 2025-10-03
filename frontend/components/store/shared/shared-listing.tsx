@@ -57,7 +57,7 @@ export const SocialShare = ({ title, view_count }: { title: string; view_count: 
                     {copied ? "Copied!" : "Copy Link"}
                 </button>
             </div>
-            <div className="mb-6 text-sm text-default-400">Curated list • {view_count} views</div>
+            <div className="mb-6 text-sm text-muted-foreground">Curated list • {view_count} views</div>
         </div>
     );
 };

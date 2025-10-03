@@ -108,9 +108,9 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
             <div className="relative mx-auto flex max-w-[1400px] flex-col pb-4 pt-2">
                 <header className="flex gap-6 sm:items-end justify-between">
                     <div>
-                        <p className={cn("font-medium uppercase text-default-500 font-outfit", !title && "hidden")}>{title}</p>
+                        <p className={cn("font-medium uppercase text-muted-foreground font-outfit", !title && "hidden")}>{title}</p>
                         <h2
-                            className={cn("text-xl font-medium tracking-tight text-default-900 md:text-2xl", !description && "hidden")}
+                            className={cn("text-xl font-medium tracking-tight md:text-2xl", !description && "hidden")}
                             id={headingId}
                         >
                             {description}

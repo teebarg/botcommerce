@@ -39,7 +39,7 @@ export function ProductQuery({ collections, selectedCollections }: ProductQueryP
                 <Search className="text-muted-foreground" size={18} />
             </div>
             <input
-                className="pl-10 pr-12 py-2 w-full border border-default-200 rounded-lg focus:outline-none"
+                className="pl-10 pr-12 py-2 w-full border border-border rounded-lg focus:outline-none"
                 placeholder="Search products..."
                 type="text"
                 value={searchQuery}

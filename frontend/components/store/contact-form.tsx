@@ -49,8 +49,8 @@ export default function ContactForm() {
     return (
         <div className="bg-secondary rounded-lg border border-divider md:p-8 p-4">
             <div className="mb-6">
-                <h3 className="text-xl font-semibold text-default-foreground mb-2">Send us a Message</h3>
-                <p className="text-default-600 text-sm">{`Fill out the form below and we'll get back to you within 24 hours.`}</p>
+                <h3 className="text-xl font-semibold mb-2">Send us a Message</h3>
+                <p className="text-muted-foreground text-sm">{`Fill out the form below and we'll get back to you within 24 hours.`}</p>
             </div>
             <Form {...form}>
                 <form className="mt-10 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -147,7 +147,7 @@ export default function ContactForm() {
                                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
-                                    <FormLabel className="text-sm text-default-500">I allow this website to store my submission.</FormLabel>
+                                    <FormLabel className="text-sm text-muted-foreground">I allow this website to store my submission.</FormLabel>
                                     <FormMessage />
                                 </div>
                             </FormItem>
@@ -164,7 +164,7 @@ export default function ContactForm() {
                         </Button>
                     </div>
 
-                    <p className="text-xs text-default-500 text-center">
+                    <p className="text-xs text-muted-foreground text-center">
                         By submitting this form, you agree to our privacy policy and terms of service.
                     </p>
                 </form>

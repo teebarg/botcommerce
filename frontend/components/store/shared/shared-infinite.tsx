@@ -112,7 +112,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
                             );
                         })}
                     </div>
-                    {query.isFetchingNextPage && <div className="col-span-full text-center py-4 text-default-500">Loading...</div>}
+                    {query.isFetchingNextPage && <div className="col-span-full text-center py-4 text-muted-foreground">Loading...</div>}
                 </div>
             </div>
         </main>

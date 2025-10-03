@@ -16,7 +16,7 @@ const OrderItems: React.FC<{ items: OrderItem[]; showDetails: boolean }> = ({ it
             </div>
 
             {expanded && (
-                <div className="divide-y divide-default-200">
+                <div className="divide-y divide-border">
                     {items.map((item: OrderItem, idx: number) => (
                         <OrderItemComponent key={idx} item={item} />
                     ))}

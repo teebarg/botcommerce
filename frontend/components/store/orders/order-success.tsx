@@ -28,9 +28,9 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
                         <Check className="w-12 h-12 text-emerald-700" />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-900 mb-2">Order Confirmed!</h2>
+                    <h2 className="text-2xl font-bold mb-2">Order Confirmed!</h2>
 
-                    <p className="text-default-600">{`Thank you for your purchase. We've sent a confirmation to ${order.email}.`}</p>
+                    <p className="text-muted-foreground">{`Thank you for your purchase. We've sent a confirmation to ${order.email}.`}</p>
                 </div>
             </FadeInComponent>
 

@@ -75,7 +75,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
 
     return (
         <div>
-            <p className="text-default-500 mt-8 font-semibold">Manage variant</p>
+            <p className="text-muted-foreground mt-8 font-semibold">Manage variant</p>
             <div className="bg-content2 p-4 rounded-lg">
                 <Form {...form}>
                     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>

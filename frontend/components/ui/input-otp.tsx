@@ -123,14 +123,14 @@ const InputOtp: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail }) =
                 <div className="flex flex-col gap-8 text-center px-9 py-8">
                     <div>
                         <div className="flex flex-col gap-1 items-stretch justify-start">
-                            <h1 className="font-bold text-lg text-default-900" data-localization-key="signUp.emailCode.title">
+                            <h1 className="font-bold text-lg" data-localization-key="signUp.emailCode.title">
                                 Verify your email
                             </h1>
-                            <p className="font-medium text-sm text-default-500" data-localization-key="signUp.emailCode.subtitle">
+                            <p className="font-medium text-sm text-muted-foreground" data-localization-key="signUp.emailCode.subtitle">
                                 Enter the verification code sent to your email
                             </p>
                             <div className="flex gap-2 items-center justify-center">
-                                <p className="font-medium text-sm text-default-500">{email}</p>
+                                <p className="font-medium text-sm text-muted-foreground">{email}</p>
                                 <button aria-label="Edit" onClick={onEditEmail}>
                                     <Pencil />
                                 </button>

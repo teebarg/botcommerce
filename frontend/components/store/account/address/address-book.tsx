@@ -35,7 +35,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
 
     return (
         <div
-            className={cn("border border-default-300 rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors", {
+            className={cn("border border-border rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors", {
                 "border-primary": isActive,
             })}
             data-testid="address-container"

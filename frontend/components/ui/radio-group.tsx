@@ -107,8 +107,8 @@ function RadioGroupWithLabel({
         <div className="space-y-3">
             {label && (
                 <div className="space-y-1">
-                    <h3 className="text-sm font-medium text-default-900">{label}</h3>
-                    {description && <p className="text-sm text-default-600">{description}</p>}
+                    <h3 className="text-sm font-medium">{label}</h3>
+                    {description && <p className="text-sm text-muted-foreground">{description}</p>}
                 </div>
             )}
             <RadioGroup className={className} variant={variant} {...props} />
